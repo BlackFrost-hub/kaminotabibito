@@ -8,7 +8,7 @@ const { registerDeathListener } = require("系统.00．核心系统.01．事件�
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 const { 直接复活玩家英雄 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.04．英雄复活系统") as {
-  直接复活玩家英雄: (this: void, dyingUnit: any) => boolean;
+  直接复活玩家英雄: (this: void, dyingUnit: any, 原地复活?: boolean) => boolean;
 };
 const { getServerTime } = require("系统.00．核心系统.05．中心计时器") as {
   getServerTime: (this: void) => number;
@@ -41,7 +41,7 @@ function 处理欧菲莉亚死亡被动(this: void, dyingUnit: any, _killingUnit
   const now = getServerTime();
   const cooldownUntil = 被动复活冷却到期表[handleId] ?? 0;
   if (now < cooldownUntil) return;
-  if (!直接复活玩家英雄(dyingUnit)) return;
+  if (!直接复活玩家英雄(dyingUnit, true)) return;
 
   设置欧菲莉亚被动复活生命(dyingUnit);
   被动复活冷却到期表[handleId] = now

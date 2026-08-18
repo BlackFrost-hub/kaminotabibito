@@ -8,7 +8,7 @@
  * - 玩家任意单位右键点选目标时，在目标单位 100 码内寻找佐佐木分身
  *   （存活、幻象 Buff、同类型、距本体 ≤1000 码），随机选取一个
  * - 本体与分身交换位置（本体 SetUnitX/Y，分身 SetUnitPosition），
- *   本体原地 holdposition，进入 3 秒瞬移冷却（A0GU 倒计时，见 00B）
+ *   本体原地 holdposition，进入 3 秒内部瞬移冷却（A0GW 上由 QWERD 系统显示，见 00B）
  * - 在原位置生成残影马甲（e07W，动作 9 @2.2 倍速、顶点色 alpha 225）向分身原位置冲刺：
  *   常速 40 码/20ms（2000 码/秒）；距离 ≥750 码进入快速模式 60 码/20ms（3000 码/秒）
  * - 冲刺路径 200 码内敌人受到 攻击力×1.5 换位冲刺伤害（每单位一次）
@@ -57,7 +57,7 @@ const { isUnitEnemy } = require("lib.扩展函数.自定义扩展函数.02．条
   isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
 };
 
-const D技能ID数值 = stringToFourCCSafe(佐佐木单位技能配置.D技能ID);
+const D技能ID数值 = stringToFourCCSafe(佐佐木单位技能配置.D被动技能ID);
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
@@ -138,7 +138,7 @@ function 执行佐佐木换位(this: void, 英雄: any, 分身单位: any): void
   播放佐佐木坐标音效(cfg.突进音效路径, 本体X, 本体Y, cfg.突进音效裁断);
   播放佐佐木坐标音效(cfg.换位音效路径, 本体X, 本体Y, cfg.换位音效裁断);
 
-  // 瞬移冷却（A0GU 倒计时 3 秒；创建分身时会提前刷新，见 00B）
+  // 内部瞬移冷却 3 秒；A0GW 上由 QWERD 系统显示，创建分身时会提前刷新
   启用瞬移冷却(英雄);
 
   // 交换位置：本体瞬移到分身处，分身送回原位；本体原地待命
@@ -247,22 +247,14 @@ function on佐佐木右键指令(this: void, 指令单位: any, orderId: number,
   if (!单位存活(英雄)) return;
   if (!瞬移是否就绪(英雄)) return;
 
-  // 点选目标 100 码内的可选分身（距本体 ≤1000 码），随机选取一个
+  // 只认右键点中的分身：目标单位本身是佐佐木有效分身（距本体 ≤1000 码）时直接换位。
+  // 不做范围搜索/随机选取——玩家点中的就是目标，且避免命中残留句柄传到地图中心。
   const cfg = 佐佐木单位技能配置.D;
   const 本体X = GetUnitX(英雄);
   const 本体Y = GetUnitY(英雄);
-  const candidates = getUnitsInRange(GetUnitX(目标单位), GetUnitY(目标单位), 100);
-  const 可选分身: any[] = [];
-  for (let i = 0; i < candidates.length; i++) {
-    const unit = candidates[i];
-    if (!是佐佐木分身(英雄, unit)) continue;
-    if (两点距离(本体X, 本体Y, GetUnitX(unit), GetUnitY(unit)) > cfg.瞬移最大距离) continue;
-    可选分身.push(unit);
+  if (是佐佐木分身(英雄, 目标单位) && 两点距离(本体X, 本体Y, GetUnitX(目标单位), GetUnitY(目标单位)) <= cfg.瞬移最大距离) {
+    执行佐佐木换位(英雄, 目标单位);
   }
-  if (可选分身.length === 0) return;
-
-  const 分身单位 = 可选分身[Math.floor(Math.random() * 可选分身.length)];
-  执行佐佐木换位(英雄, 分身单位);
 }
 
 registerTargetOrderListener(on佐佐木右键指令);

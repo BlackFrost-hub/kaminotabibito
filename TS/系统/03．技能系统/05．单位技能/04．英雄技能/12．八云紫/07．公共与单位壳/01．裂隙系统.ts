@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import { 八云紫单位技能配置 } from "../00．配置";
+import { 八云紫诊断日志, 八云紫诊断句柄 } from "../00B．诊断";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -12,8 +13,7 @@ const { addDelayedCallback, getGameTime } = require("系统.00．核心系统.05
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
-const { getUnitsInRange, getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
-  getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
+const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getEnemyUnitsInRange: (this: void, source: any, x: number, y: number, radius: number) => any[];
 };
 const { 是否精英单位 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断") as {
@@ -49,17 +49,44 @@ export interface 八云紫裂隙记录 {
   已结束: boolean;
 }
 
+export interface 八云紫D裂隙放置结果 {
+  可创建: boolean;
+  持续秒: number;
+  长期: boolean;
+  失败原因?: string;
+}
+
+export interface 八云紫裂隙指定寿命 {
+  持续秒: number;
+  长期: boolean;
+}
+
 export type 裂隙扩散发射器 = (this: void, hero: any, gap: 八云紫裂隙记录) => void;
 export type 裂隙创建监听器 = (this: void, hero: any, gap: 八云紫裂隙记录, skillId: number, skillInstanceId?: number) => void;
 
 const 裂隙记录表: Record<number, 八云紫裂隙记录 | undefined> = {};
 const 英雄长期裂隙数: Record<number, number | undefined> = {};
 const 间隙命中次数: Record<number, number | undefined> = {};
-let 裂隙扩散发射器: 裂隙扩散发射器 | undefined;
+let 已注册裂隙扩散发射器: 裂隙扩散发射器 | undefined;
 const 裂隙创建监听器列表: 裂隙创建监听器[] = [];
 
 function 句柄ID(this: void, handle: any): number {
   return handle == null || handle === 0 ? 0 : jass.GetHandleId(handle);
+}
+
+// 裂隙物编属于 Ancient，不能经过公共战斗单位筛选器。
+function 获取范围内原生单位(this: void, x: number, y: number, radius: number): any[] {
+  const group = jass.CreateGroup();
+  const result: any[] = [];
+  jass.GroupEnumUnitsInRange(group, x, y, radius, null);
+  let unit = jass.FirstOfGroup(group);
+  while (unit != null && unit !== 0) {
+    result.push(unit);
+    jass.GroupRemoveUnit(group, unit);
+    unit = jass.FirstOfGroup(group);
+  }
+  jass.DestroyGroup(group);
+  return result;
 }
 
 export function 八云紫单位存活(this: void, unit: any): boolean {
@@ -195,7 +222,7 @@ function 裂隙到期(this: void, variable?: any): void {
 }
 
 function 附近存在长期裂隙(this: void, x: number, y: number): boolean {
-  const units = getUnitsInRange(x, y, 配置.裂隙.附近检测范围);
+  const units = 获取范围内原生单位(x, y, 配置.裂隙.附近检测范围);
   for (let i = 0; i < units.length; i++) {
     const record = 裂隙记录表[句柄ID(units[i])];
     if (record != null && !record.已结束 && record.长期) return true;
@@ -217,6 +244,24 @@ function 选择裂隙持续时间(this: void, hero: any, x: number, y: number): 
   if (附近存在长期裂隙(x, y)) return { duration: 配置.裂隙.短期持续秒, long: false };
   if ((英雄长期裂隙数[heroId] ?? 0) >= 配置.裂隙.最多长期裂隙) return { duration: 配置.裂隙.短期持续秒, long: false };
   return { duration: 配置.裂隙.长期持续秒, long: true };
+}
+
+export function 检查八云紫D裂隙放置(this: void, hero: any, x: number, y: number): 八云紫D裂隙放置结果 {
+  if (!是八云紫(hero)) return { 可创建: false, 持续秒: 0, 长期: false, 失败原因: "施法者无效。" };
+  if (附近存在精英敌人(hero, x, y)) {
+    八云紫诊断日志("裂隙", "D放置判定为短期间隙", "英雄", 八云紫诊断句柄(hero), "X", x, "Y", y, "原因", "附近存在精英敌人");
+    return { 可创建: true, 持续秒: 配置.裂隙.短期持续秒, 长期: false };
+  }
+  if (附近存在长期裂隙(x, y)) {
+    八云紫诊断日志("裂隙", "D放置被拒绝", "英雄", 八云紫诊断句柄(hero), "X", x, "Y", y, "原因", "附近已有长期裂隙");
+    return { 可创建: false, 持续秒: 0, 长期: false, 失败原因: "附近已有长期『间隙』，无法再次放置。" };
+  }
+  const heroId = 句柄ID(hero);
+  if ((英雄长期裂隙数[heroId] ?? 0) >= 配置.裂隙.最多长期裂隙) {
+    八云紫诊断日志("裂隙", "D放置被拒绝", "英雄", heroId, "X", x, "Y", y, "原因", "长期裂隙达到上限", "当前数量", 英雄长期裂隙数[heroId] ?? 0);
+    return { 可创建: false, 持续秒: 0, 长期: false, 失败原因: "长期『间隙』数量已达到上限。" };
+  }
+  return { 可创建: true, 持续秒: 配置.裂隙.长期持续秒, 长期: true };
 }
 
 export function 计算裂隙可达终点(this: void, startX: number, startY: number, targetX: number, targetY: number): { x: number; y: number } {
@@ -249,11 +294,26 @@ export function 创建八云紫裂隙(
   y: number,
   skillId: number = 配置.技能.D.类型ID,
   skillInstanceId?: number,
+  指定寿命?: 八云紫裂隙指定寿命,
 ): 八云紫裂隙记录 | undefined {
   if (!是八云紫(hero)) return undefined;
-  const lifetime = 选择裂隙持续时间(hero, x, y);
+  let lifetime = 指定寿命 != null
+    ? { duration: 指定寿命.持续秒, long: 指定寿命.长期 }
+    : 选择裂隙持续时间(hero, x, y);
+  八云紫诊断日志("裂隙", "请求创建间隙", "英雄", 八云紫诊断句柄(hero), "技能ID", skillId, "请求X", x, "请求Y", y, "初选长期", lifetime.long, "初选持续秒", lifetime.duration, "指定寿命", 指定寿命 != null, "技能实例ID", skillInstanceId ?? 0);
+  if (skillId === 配置.技能.D.类型ID) {
+    const placement = 检查八云紫D裂隙放置(hero, x, y);
+    if (!placement.可创建) {
+      八云紫诊断日志("裂隙", "创建间隙终止", "技能ID", skillId, "原因", placement.失败原因 ?? "D放置判定失败");
+      return undefined;
+    }
+    lifetime = { duration: placement.持续秒, long: placement.长期 };
+  }
   const gap = 创建单位并登记排泄安全(jass.GetOwningPlayer(hero), 配置.单位.裂隙类型ID, x, y, 0);
-  if (gap == null || gap === 0) return undefined;
+  if (gap == null || gap === 0) {
+    八云紫诊断日志("裂隙", "CreateUnit失败", "单位类型ID", 配置.单位.裂隙类型ID, "X", x, "Y", y);
+    return undefined;
+  }
   const record: 八云紫裂隙记录 = {
     单位: gap,
     主人: hero,
@@ -269,6 +329,7 @@ export function 创建八云紫裂隙(
   }
   jass.SetUnitState(gap, UNIT_STATE_MAX_LIFE, lifetime.duration);
   jass.SetUnitState(gap, UNIT_STATE_LIFE, lifetime.duration);
+  八云紫诊断日志("裂隙", "间隙创建成功", "间隙", 八云紫诊断句柄(gap), "单位类型ID", jass.GetUnitTypeId(gap), "实际X", jass.GetUnitX(gap), "实际Y", jass.GetUnitY(gap), "长期", lifetime.long, "持续秒", lifetime.duration, "英雄长期数量", 英雄长期裂隙数[句柄ID(hero)] ?? 0, "监听器数", 裂隙创建监听器列表.length);
   addDelayedCallback(lifetime.duration * 1000, 裂隙到期, record);
   结算八云紫裂隙展开(hero, x, y, skillId, skillInstanceId);
   for (let i = 0; i < 裂隙创建监听器列表.length; i++) {
@@ -296,7 +357,7 @@ export function 获取八云紫裂隙记录(this: void, unit: any): 八云紫裂
 }
 
 export function 查找八云紫裂隙(this: void, x: number, y: number, radius: number, owner?: any): 八云紫裂隙记录 | undefined {
-  const units = getUnitsInRange(x, y, radius);
+  const units = 获取范围内原生单位(x, y, radius);
   for (let i = 0; i < units.length; i++) {
     const record = 获取八云紫裂隙记录(units[i]);
     if (record == null) continue;
@@ -307,7 +368,7 @@ export function 查找八云紫裂隙(this: void, x: number, y: number, radius: 
 
 export function 获取范围内八云紫裂隙(this: void, x: number, y: number, radius: number, owner?: any): 八云紫裂隙记录[] {
   const result: 八云紫裂隙记录[] = [];
-  const units = getUnitsInRange(x, y, radius);
+  const units = 获取范围内原生单位(x, y, radius);
   for (let i = 0; i < units.length; i++) {
     const record = 获取八云紫裂隙记录(units[i]);
     if (record == null) continue;
@@ -318,7 +379,7 @@ export function 获取范围内八云紫裂隙(this: void, x: number, y: number,
 }
 
 export function 注册八云紫裂隙扩散发射器(this: void, handler: 裂隙扩散发射器): void {
-  裂隙扩散发射器 = handler;
+  已注册裂隙扩散发射器 = handler;
 }
 
 export function 注册八云紫裂隙创建监听器(this: void, handler: 裂隙创建监听器): void {
@@ -330,7 +391,7 @@ export function 注册八云紫裂隙创建监听器(this: void, handler: 裂隙
 }
 
 export function 触发八云紫裂隙扩散(this: void, hero: any, centerGap: 八云紫裂隙记录): number {
-  if (裂隙扩散发射器 == null || centerGap.已结束) return 0;
+  if (已注册裂隙扩散发射器 == null || centerGap.已结束) return 0;
   const gaps = 获取范围内八云紫裂隙(
     jass.GetUnitX(centerGap.单位),
     jass.GetUnitY(centerGap.单位),
@@ -351,7 +412,7 @@ export function 触发八云紫裂隙扩散(this: void, hero: any, centerGap: �
     }
     jass.SetUnitState(gap.单位, UNIT_STATE_LIFE, life - cost);
     gap.扩散冷却到 = now + 配置.裂隙.扩散冷却秒 * 1000;
-    裂隙扩散发射器(hero, gap);
+    已注册裂隙扩散发射器(hero, gap);
     count += 1;
   }
   return count;

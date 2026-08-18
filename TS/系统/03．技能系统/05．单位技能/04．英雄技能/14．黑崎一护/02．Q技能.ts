@@ -2,8 +2,8 @@
 // 黑崎一护 Q：月牙天冲（A01G）。解放前后双形态弹道，使用后刷新瞬步D。
 // 源 JASS 真源：技能.j（A01G 段 646-692；弹道周期 Func009T 38-111；碰撞 Func017A 8-17）。
 // 单位壳 e00P/e012/e013 迁移为直接特效 + 路径上下文（计划第 5 节），伤害走统一封装。
-// 冲突口径：解放后“无视100%护甲”源挂 player 属性；伤害系统 getBoolAttr 本身支持“单位属性优先、玩家属性回退”，
-// 故按源口径直挂 player 属性（结算前开、结算后关）。
+// 冲突口径：解放后“无视100%护甲”源挂 player 属性；项目布尔属性安全读取无法区分“单位未设置”和 false，
+// 因此改挂施法者 unit 属性，只在同步伤害结算前开、结算后关。
 
 import { 黑崎一护技能配置 } from "./00．配置";
 import { 黑崎一护是否卍解, 记录月牙位置, 清除月牙位置 } from "./01．状态表";
@@ -12,6 +12,7 @@ import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．�
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const jglobals = require("jass.globals") as any;
 
 const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -26,8 +27,8 @@ const { 获取范围敌军 } = require("系统.03．技能系统.05．单位技�
 const { 技能_设置技能冷却时间 } = require("平台扩展API动作") as {
   技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
 };
-const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+const { PlaySoundAtPointBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundAtPointBJ: (this: void, soundHandle: any, volumePercent: number, x: number, y: number, z: number) => void;
 };
 const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
@@ -44,7 +45,6 @@ const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
-const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
@@ -125,8 +125,8 @@ function 结算Q月牙碰撞(this: void, ctx: Q弹道上下文): void {
 
   const 参数 = ctx.卍解 ? 配置.Q.解放后 : 配置.Q.未解放;
   const 伤害 = ctx.攻击力快照 * 参数.伤害攻击力倍率;
-  // 源：卍解分支结算前 player“无视护甲”置 true；伤害系统 getBoolAttr 单位无该属性时回退读玩家属性。
-  if (ctx.卍解) YDUserDataSetSafe("player", GetOwningPlayer(caster), "无视护甲", "boolean", true);
+  // UnitDamageTarget 与伤害主流程同步执行；临时挂到施法者单位，确保伤害系统本次结算能读到。
+  if (ctx.卍解) YDUserDataSetSafe("unit", caster, "无视护甲", "boolean", true);
   for (let i = 0; i < 敌军.length; i++) {
     const target = 敌军[i];
     if (target == null || target === 0) continue;
@@ -148,7 +148,7 @@ function 结算Q月牙碰撞(this: void, ctx: Q弹道上下文): void {
       技能实例ID: ctx.技能实例ID,
     });
   }
-  if (ctx.卍解) YDUserDataSetSafe("player", GetOwningPlayer(caster), "无视护甲", "boolean", false);
+  if (ctx.卍解) YDUserDataSetSafe("unit", caster, "无视护甲", "boolean", false);
 }
 
 function 推进Q月牙(this: void, variable: any): void {
@@ -204,7 +204,8 @@ function 释放Q月牙天冲(this: void, context: Q弹道上下文, caster: any,
   const 卍解 = 黑崎一护是否卍解(caster);
   const 参数 = 卍解 ? 配置.Q.解放后 : 配置.Q.未解放;
 
-  Sound3DII_CooPlayReuse(参数.音效.路径, sx, sy, 0, 参数.音效.裁断距离);
+  const 月牙音效 = 卍解 ? jglobals.gg_snd_YH_yueya : jglobals.gg_snd_yueyatianchongyinxiao;
+  PlaySoundAtPointBJ(月牙音效, 100, sx, sy, 0);
 
   context.施法者 = caster;
   context.X = sx;

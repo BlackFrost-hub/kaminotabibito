@@ -267,7 +267,7 @@ end
 function ____exports.GetLearnedSkillBJ()
     return jass.GetLearnedSkill()
 end
---- 统计单位组中的单位数量（1.27 没有 BlzGroupGetSize）
+--- 统计单位组中的单位数量（1.27 没有原生单位组计数接口）
 -- 对应BJ: CountUnitsInGroup
 function ____exports.CountUnitsInGroup(g)
     if g == nil or g == 0 then

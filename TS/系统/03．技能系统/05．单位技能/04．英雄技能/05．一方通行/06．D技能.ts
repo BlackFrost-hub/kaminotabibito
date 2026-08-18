@@ -49,8 +49,6 @@ const GetUnitFlyHeight = jass.GetUnitFlyHeight as (this: void, unit: any) => num
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
-const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
-const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
 const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, player: any) => boolean;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
@@ -62,8 +60,8 @@ interface 一方通行D上下文 {
   蓄力次数: number;
   目标X: number;
   目标Y: number;
-  蓄力特效: any;
   已结算: boolean;
+  蓄力持续特效: any;
 }
 
 const 上下文表: Record<number, 一方通行D上下文 | undefined> = {};
@@ -88,8 +86,8 @@ function 获取或创建D上下文(this: void, unit: any): 一方通行D上下�
     蓄力次数: 0,
     目标X: 0,
     目标Y: 0,
-    蓄力特效: null,
     已结算: false,
+    蓄力持续特效: null,
   };
   上下文表[id] = created;
   return created;
@@ -103,13 +101,9 @@ function D目标允许(this: void, caster: any, target: any): boolean {
 }
 
 function 清理D上下文(this: void, context: 一方通行D上下文): void {
-  if (context.蓄力特效 != null && context.蓄力特效 !== 0) {
-    销毁点特效(context.蓄力特效);
-    context.蓄力特效 = null;
-  }
-  if (单位存活(context.施法者)) {
-    SetUnitTimeScale(context.施法者, 1);
-    SetUnitAnimation(context.施法者, "stand");
+  if (context.蓄力持续特效 != null && context.蓄力持续特效 !== 0) {
+    销毁点特效(context.蓄力持续特效);
+    context.蓄力持续特效 = null;
   }
   const id = 取单位ID(context.施法者);
   if (id !== 0 && 上下文表[id] === context) delete 上下文表[id];
@@ -197,17 +191,15 @@ function 一方通行D结束(this: void, unit: any, _reason: string, chargeId: n
 function 一方通行D开始(this: void, unit: any, chargeId: number): void {
   const context = 获取D上下文(unit);
   if (context == null) return;
-  SetUnitAnimation(unit, D配置.施法动作名);
-  Sound3DII_UnitPlayReuse(D配置.施法音效路径, unit, D配置.施法音效裁断距离);
-  Sound3DII_UnitPlayReuse(D配置.环境音效路径, unit, D配置.环境音效裁断距离);
-  context.蓄力特效 = 创建点特效({
-    模型路径: D配置.蓄力特效模型,
+  context.蓄力持续特效 = 创建点特效({
+    模型路径: D配置.蓄力持续特效模型,
     X: GetUnitX(unit),
     Y: GetUnitY(unit),
     Z: GetUnitFlyHeight(unit) + D配置.特效Z偏移,
-    缩放: D配置.蓄力特效缩放,
-    持续秒: D配置.施法持续秒,
+    缩放: D配置.蓄力持续特效缩放,
   });
+  Sound3DII_UnitPlayReuse(D配置.施法音效路径, unit, D配置.施法音效裁断距离);
+  Sound3DII_UnitPlayReuse(D配置.环境音效路径, unit, D配置.环境音效裁断距离);
 }
 
 function 释放一方通行D(this: void, context: 一方通行D上下文, caster: any, skillInstanceId?: number): void {
@@ -219,10 +211,11 @@ function 释放一方通行D(this: void, context: 一方通行D上下文, caster
   context.已结算 = false;
   context.充能ID = 开始充能(caster, {
     持续时间: D配置.施法持续秒,
-    强制硬直: true,
+    强制硬直: false,
+    指令中断: true,
     显示进度条特效: true,
     开始回调: 一方通行D开始,
-    周期回调间隔: D配置.蓄力周期毫秒,
+    周期回调间隔: D配置.蓄力周期毫秒 / 1000,
     周期回调: (unit: any, chargeId: number) => 一方通行D蓄力Tick(unit, chargeId),
     结束回调: 一方通行D结束,
   });

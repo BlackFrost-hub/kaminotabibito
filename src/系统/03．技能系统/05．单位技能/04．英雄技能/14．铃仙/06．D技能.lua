@@ -7,6 +7,7 @@ local ____12_FF0E_94C3_4ED9 = require("系统.05．Buff系统.03．Buff表.02．
 local _____94C3_4ED9BuffID = ____12_FF0E_94C3_4ED9["铃仙BuffID"]
 local ____00A_FF0E_8868_73B0_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．铃仙.00A．表现工具")
 local _____64AD_653E_94C3_4ED9_5168_5C40_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放铃仙全局音效"]
+local _____64AD_653E_94C3_4ED9_5355_4F4D_7ED1_5B9A_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放铃仙单位绑定音效"]
 local ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406 = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．铃仙.00B．分身与状态管理")
 local _____662F_94C3_4ED9_672C_4F53 = ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406["是铃仙本体"]
 local _____662F_6709_6548_654C_5BF9_76EE_6807 = ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406["是有效敌对目标"]
@@ -53,7 +54,12 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local CreateUnit = jass.CreateUnit
 local RemoveUnit = jass.RemoveUnit
 local SetUnitPosition = jass.SetUnitPosition
+local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
+local DestroyEffect = jass.DestroyEffect
 local DisplayCineFilter = jass.DisplayCineFilter
+local ____require_result_8 = require("lib.扩展函数.BJ函数.05A．电影函数")
+local CinematicFilterGenericBJ = ____require_result_8.CinematicFilterGenericBJ
+local BLEND_MODE_BLEND = jass.BLEND_MODE_BLEND
 --- 结束 D：移除推进回调、清理所有剩余弹幕（英雄死亡 / 弹幕全消 / 5 波后清理）
 local function _____7ED3_675FD_5F39_5E55(ctx)
     if ctx["已结束"] then
@@ -84,6 +90,7 @@ local function _____53D1_5C04D_4E00_6CE2(ctx)
     local _____73A9_5BB6 = GetOwningPlayer(_____65BD_6CD5_8005)
     local _____4E2D_5FC3X = GetUnitX(_____65BD_6CD5_8005)
     local _____4E2D_5FC3Y = GetUnitY(_____65BD_6CD5_8005)
+    local _____521B_5EFA_6570 = 0
     do
         local N = 1
         while N <= cfg.D["每波弹幕数"] do
@@ -102,8 +109,9 @@ local function _____53D1_5C04D_4E00_6CE2(ctx)
                 if DzSetUnitModel ~= nil then
                     DzSetUnitModel(_____5F39_5E55, cfg.D["弹幕模型"])
                 end
-                local ____ctx__5F39_5E55_5217_8868_8 = ctx["弹幕列表"]
-                ____ctx__5F39_5E55_5217_8868_8[#____ctx__5F39_5E55_5217_8868_8 + 1] = _____5F39_5E55
+                local ____ctx__5F39_5E55_5217_8868_9 = ctx["弹幕列表"]
+                ____ctx__5F39_5E55_5217_8868_9[#____ctx__5F39_5E55_5217_8868_9 + 1] = _____5F39_5E55
+                _____521B_5EFA_6570 = _____521B_5EFA_6570 + 1
             end
             ::__continue10::
             N = N + 1
@@ -122,6 +130,9 @@ local function _____53D1_5C04D_4E0B_4E00_6CE2(ctx)
     end
     ctx["波次数"] = ctx["波次数"] + 1
     ctx["重复命中表"] = {}
+    DestroyEffect(AddSpecialEffectTarget("war3mapImported\\Whine.mdx", _____65BD_6CD5_8005, "overhead"))
+    DestroyEffect(AddSpecialEffectTarget("war3mapImported\\Shockwave_Darkness.mdx", _____65BD_6CD5_8005, "origin"))
+    _____64AD_653E_94C3_4ED9_5355_4F4D_7ED1_5B9A_97F3_6548(_____65BD_6CD5_8005, "gg_snd_tan2", 100)
     _____53D1_5C04D_4E00_6CE2(ctx)
     if ctx["波次数"] >= cfg.D["持续秒"] then
         addDelayedCallback(
@@ -248,7 +259,19 @@ local function ____on_94C3_4ED9D_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_8
     _____5168_56FE_82F1_96C4_514D_75AB_4F24_5BB3(cfg.D["免伤秒"])
     _____64AD_653E_94C3_4ED9_5168_5C40_97F3_6548("gg_snd_LX_D_24343")
     _____64AD_653E_94C3_4ED9_5168_5C40_97F3_6548("gg_snd_LX_D")
-    DisplayCineFilter(true)
+    CinematicFilterGenericBJ(
+        1.1,
+        BLEND_MODE_BLEND,
+        "222.blp",
+        100,
+        100,
+        100,
+        0,
+        0,
+        0,
+        0,
+        0
+    )
     addDelayedCallback(
         1100,
         function() return DisplayCineFilter(false) end

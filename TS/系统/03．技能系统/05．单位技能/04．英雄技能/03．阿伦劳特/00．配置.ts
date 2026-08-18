@@ -4,16 +4,23 @@ export const 阿伦劳特单位技能配置 = {
   英雄名: "阿伦劳特",
   光形态单位ID: "H00F",
   暗形态单位ID: "H00G",
-  主技能ID: "A0D6",
+  /** W 神圣护甲/裁决护盾（A0D6，物编 W 键） */
+  W技能ID: "A0D6",
+  /** E 光之裁决/裁决吸引（A0D4，物编 E 键） */
+  E技能ID: "A0D4",
   引爆技能ID: "A0D3",
   Q技能ID: "A0D7",
   R技能ID: "A0D5",
   R二段技能ID: "A0D2",
   D技能ID: "A0D8",
   天堂呼唤强化BuffID: "B018",
+  天堂呼唤强化技能ID: "S007",
   裁决审判强化BuffID: "B015",
+  裁决审判强化技能ID: "S005",
   裁决制裁BuffID: "B019",
+  裁决制裁技能ID: "S006",
   切换加攻BuffID: "B017",
+  切换加攻技能ID: "S008",
   裁决护盾标签: "阿伦劳特-裁决护盾",
   神圣护甲默认持续秒: 3,
   神圣护甲强化持续秒: 5,
@@ -43,10 +50,10 @@ export const 阿伦劳特单位技能配置 = {
     暗生命恢复增幅: 0.12,
     暗受到治疗加成: 0.12,
     /** 属性 key（玩家级 YDUserData） */
-    光治疗加成属性名: "技能治疗加成",
-    光魔法伤害加成属性名: "魔法伤害加成",
-    暗生命恢复增幅属性名: "生命恢复属性增幅",
-    暗受到治疗加成属性名: "受到的治疗加成",
+    光治疗加成属性名: "技能治疗率",
+    光魔法伤害加成属性名: "魔法伤害",
+    暗生命恢复增幅属性名: "生命恢复效率",
+    暗受到治疗加成属性名: "受到的治疗率",
     /** 形态切换特效 */
     光切暗特效A: "war3mapImported\\Metamorphosis.mdl",
     光切暗特效B: "war3mapImported\\BloodSlam.mdl",
@@ -56,16 +63,85 @@ export const 阿伦劳特单位技能配置 = {
     /** 形态图标（源 YDWESetUnitAbilityDataString 204） */
     图标: {
       暗Q: "ReplaceableTextures\\CommandButtons\\BTNALLT-Q2.blp",
-      暗E: "ReplaceableTextures\\CommandButtons\\BTNSoulGem.blp",
-      暗W: "ReplaceableTextures\\CommandButtons\\BTNALLT-E2.blp",
+      暗E: "ReplaceableTextures\\CommandButtons\\BTNALLT-E2.blp",
+      暗W: "ReplaceableTextures\\CommandButtons\\BTNSoulGem.blp",
       暗R: "ReplaceableTextures\\CommandButtons\\BTNALLT-R2.blp",
       暗D: "ReplaceableTextures\\CommandButtons\\BTNArthas.blp",
       光Q: "ReplaceableTextures\\CommandButtons\\BTNALLT-Q.blp",
-      光E: "ReplaceableTextures\\CommandButtons\\BTNALLT-W.blp",
-      光W: "ReplaceableTextures\\CommandButtons\\BTNALLT-E.blp",
+      光E: "ReplaceableTextures\\CommandButtons\\BTNALLT-E.blp",
+      光W: "ReplaceableTextures\\CommandButtons\\BTNALLT-W.blp",
       光R: "ReplaceableTextures\\CommandButtons\\BTNALLT-R.blp",
       光D: "ReplaceableTextures\\CommandButtons\\BTNHeroDeathKnight.blp",
     },
+  },
+
+  /** E 光之裁决/裁决吸引（源 主要技能.j A0D4 分支，物编 E 键） */
+  E: {
+    /** 光形态：冲锋每 tick 移动 60 码（0.05s 周期） */
+    冲锋每tick距离: 60,
+    冲锋周期秒: 0.05,
+    /** 光形态：主目标 300% 攻击力魔法伤害（非天堂审判） */
+    光主目标倍率: 3.0,
+    /** 光形态：300 范围溅射 150% 攻击力（非天堂审判） */
+    光溅射倍率: 1.5,
+    /** 光形态天堂审判（B018）：主目标必定暴击 200% 攻击力 */
+    光天堂审判主目标倍率: 2.0,
+    /** 光形态天堂审判：溅射 200% 攻击力 */
+    光天堂审判溅射倍率: 2.0,
+    /** 光形态天堂审判：溅射击退 */
+    光天堂审判溅射击退距离: 300,
+    光天堂审判溅射眩晕秒: 1,
+    /** 光形态：结算前动画延迟（非天堂审判 0.27s） */
+    光结算延迟秒: 0.27,
+    /** 光形态：到达目标攻击范围判定（×1 进入结算判定） */
+    光到达范围倍数: 1,
+    /** 光形态：移动距离阈值（距离/60 决定冲锋次数；距离<攻击范围直接结算） */
+    光冲锋次数上限: 20,
+    /** 残影 e060：0.35s 销毁，顶点色 100/100/100/80 */
+    残影持续秒: 0.35,
+    残影红: 100,
+    残影绿: 100,
+    残影蓝: 100,
+    残影透明: 80,
+    /** 暗形态：目标周围 450 收集范围 */
+    暗收集范围: 450,
+    /** 暗形态：吸引周期 0.04s，最多 75 tick（3s） */
+    暗周期秒: 0.04,
+    暗最大tick: 75,
+    /** 暗形态：敌人每 tick 靠近 12 码，友军 24 码 */
+    暗敌人靠近距离: 12,
+    暗友军靠近距离: 24,
+    /** 暗形态：每 tick 吸取 每秒生命恢复 × 0.04 */
+    暗吸取tick比例: 0.04,
+    /** 暗形态：敌人到达攻击范围后伤害 攻击力×150% + 当前生命×15% */
+    暗敌人伤害倍率: 1.5,
+    暗敌人当前生命比例: 0.15,
+    /** 暗形态：敌人减速 50% / 2s，友军加速 50% / 2s */
+    暗减速比例: 0.5,
+    暗减速持续秒: 2,
+    暗加速比例: 0.5,
+    暗加速持续秒: 2,
+    /** 光残影单位 e060（用 创建点特效+残影单位 替代，需项目支持；先保底用 e060 马甲） */
+    残影单位ID: "e060",
+    /** 光结算特效 Judgement_impact_chest.mdx 缩放 2.0，Z=目标飞行高度+50，2s（源 JASS 379-382） */
+    光结算特效: "war3mapImported\\Judgement_impact_chest.mdx",
+    光结算特效缩放: 2.0,
+    光结算特效Z偏移: 50,
+    光结算特效持续秒: 2,
+    /** 光结算雷击特效 ThunderClapCaster.mdl（目标位置，2s，源 JASS 307） */
+    光雷击特效: "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl",
+    光雷击特效持续秒: 2,
+    /** 光形态溅射命中特效 CritterBloodAlbatross.mdl 挂 chest（1s，源 JASS 251/256） */
+    光溅射命中特效: "Objects\\Spawnmodels\\Critters\\Albatross\\CritterBloodAlbatross.mdl",
+    光溅射命中特效持续秒: 1,
+    /** 暗形态汲取闪电：DRAB 连接 目标↔施法者，0.03s 销毁（源 JASS 130） */
+    暗汲取闪电代码: "DRAB",
+    暗汲取闪电持续秒: 0.03,
+    /** 暗形态敌人命中特效 UndeadDissipate.mdl，Z=目标飞行高度，1s（源 JASS 158-160） */
+    暗敌人命中特效: "Objects\\Spawnmodels\\Undead\\UndeadDissipate\\UndeadDissipate.mdl",
+    暗敌人命中特效持续秒: 1,
+    /** 暗吸取音效 */
+    暗吸取音效: "LifeDrain",
   },
 
   /** Q 神圣之光/裁决制裁（源 主要技能.j A0D7 分支） */
@@ -104,9 +180,6 @@ export const 阿伦劳特单位技能配置 = {
     /** 暗敌人命中特效 */
     暗敌人特效: "war3mapImported\\[AKE]war3AKE.com - 1668370942454584199408155.mdx",
     暗敌人特效持续秒: 1,
-    /** 暗友军加攻特效 FurorEffect.mdx */
-    暗友军加攻特效: "war3mapImported\\FurorEffect.mdx",
-    暗友军加攻特效持续秒: 0.3,
     /** 技能间隔 8.5 秒（物编） */
     技能间隔秒: 8.5,
   },
@@ -143,9 +216,10 @@ export const 阿伦劳特单位技能配置 = {
     光周期特效1缩放: 4,
     光周期特效2: "war3mapImported\\[ake]hunsebo.mdx",
     光周期特效持续秒: 3,
-    /** 光强化期间特效 Life Magic.mdl */
+    /** 光强化期间特效 Life Magic.mdl（源 JASS：每 0.4 秒循环播放一次，挂 chest） */
     光强化特效: "war3mapImported\\Life Magic.mdl",
-    光强化特效持续秒: 6,
+    光强化特效周期秒: 0.4,
+    光强化特效单次持续秒: 0.6,
     /** 暗汲取命中特效 CrimsonWake.mdl */
     暗汲取命中特效: "war3mapImported\\CrimsonWake.mdl",
     暗汲取命中特效持续秒: 2,
@@ -156,6 +230,9 @@ export const 阿伦劳特单位技能配置 = {
     暗汲取弹道最大tick: 60,
     暗汲取弹道Z偏移: 100,
     暗汲取弹道后方偏移: 75,
+    /** 暗汲取弹道三次贝塞尔弧线：控制点抬高，纯特效不参与碰撞 */
+    暗汲取弹道贝塞尔高度: 280,
+    暗汲取弹道贝塞尔侧偏: 140,
     /** 暗持续鲜血爆发特效 */
     暗持续特效: "war3mapImported\\[AKE]war3AKE.com - 0115207102182414463445274.mdx",
     暗持续特效持续秒: 1.5,

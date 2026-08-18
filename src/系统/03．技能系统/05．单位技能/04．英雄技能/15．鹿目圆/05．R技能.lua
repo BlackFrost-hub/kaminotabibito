@@ -54,6 +54,8 @@ local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
 local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_9["读取单位攻击力"]
 local _____4E24_70B9_89D2_5EA6 = ____require_result_9["两点角度"]
+local ____require_result_10 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetRandomDirectionDeg = ____require_result_10.GetRandomDirectionDeg
 GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -72,7 +74,6 @@ local SetUnitAnimation = jass.SetUnitAnimation
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local RemoveUnit = jass.RemoveUnit
 local GetRandomReal = jass.GetRandomReal
-local GetRandomDirectionDeg = jass.GetRandomDirectionDeg
 local SquareRoot = jass.SquareRoot
 local Cos = jass.Cos
 local Sin = jass.Sin
@@ -82,11 +83,11 @@ local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____jass_bj_DEGTORAD_10 = jass.bj_DEGTORAD
-if ____jass_bj_DEGTORAD_10 == nil then
-    ____jass_bj_DEGTORAD_10 = 0.017453292519943295
+local ____jass_bj_DEGTORAD_11 = jass.bj_DEGTORAD
+if ____jass_bj_DEGTORAD_11 == nil then
+    ____jass_bj_DEGTORAD_11 = 0.017453292519943295
 end
-local bj_DEGTORAD = ____jass_bj_DEGTORAD_10
+local bj_DEGTORAD = ____jass_bj_DEGTORAD_11
 GetUnitStateJapi = japi.GetUnitState
 _____914D_7F6E = _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E
 local function _____79FB_9664_5355_4F4D_58F3(unit)

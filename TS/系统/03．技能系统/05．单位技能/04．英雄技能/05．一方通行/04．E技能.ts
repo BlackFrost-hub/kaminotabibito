@@ -7,6 +7,9 @@ import {
   读取单位攻击力,
 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+};
 
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
@@ -57,9 +60,7 @@ const { 技能_设置技能冷却时间 } = require("平台扩展API动作") as 
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const jglobals = require("jass.globals") as any;
 
-const AttachSoundToUnit = jass.AttachSoundToUnit as (this: void, soundHandle: any, unit: any) => void;
 const CreateGroup = jass.CreateGroup as (this: void) => any;
 const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (this: void, player: any, x: number, y: number, duration: number, text: string) => void;
 const FirstOfGroup = jass.FirstOfGroup as (this: void, group: any) => any;
@@ -77,11 +78,9 @@ const GroupRemoveUnit = jass.GroupRemoveUnit as (this: void, group: any, unit: a
 const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, player: any) => boolean;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void, player: any, abilityId: number, available: boolean) => void;
-const SetSoundVolume = jass.SetSoundVolume as (this: void, soundHandle: any, volume: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, angle: number) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, unit: any, player: any, changeColor: boolean) => void;
 const SetUnitState = jass.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
-const StartSound = jass.StartSound as (this: void, soundHandle: any) => void;
 const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
 const UnitRemoveAbility = jass.UnitRemoveAbility as (this: void, unit: any, abilityId: number) => boolean;
 const EXSetUnitFacing = japi.EXSetUnitFacing as (this: void, unit: any, angle: number) => void;
@@ -172,11 +171,12 @@ function 读取当前魔法比例(this: void, unit: any): number {
 }
 
 function 播放矢量反射音效(this: void, unit: any): void {
-  const soundHandle = jglobals.gg_snd_AcceleratorW01;
-  if (soundHandle == null || soundHandle === 0 || unit == null || unit === 0) return;
-  AttachSoundToUnit(soundHandle, unit);
-  SetSoundVolume(soundHandle, 127);
-  StartSound(soundHandle);
+  if (unit == null || unit === 0) return;
+  Sound3DII_UnitPlayReuse(
+    一方通行单位技能配置.W.施法音效路径,
+    unit,
+    一方通行单位技能配置.W.施法音效裁断距离,
+  );
 }
 
 function 显示矢量反射强制关闭提示(this: void, unit: any): void {

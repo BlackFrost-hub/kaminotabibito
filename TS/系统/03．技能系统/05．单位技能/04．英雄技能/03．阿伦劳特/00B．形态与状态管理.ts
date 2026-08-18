@@ -5,7 +5,7 @@
  *
  * 职责：
  * - 光（H00F）/暗（H00G）形态判定
- * - 原生 Buff 挂载/移除（B015 裁决审判、B018 天堂呼唤、B019 裁决制裁、B017 切换加攻），
+ * - 原生 Buff 挂载/移除（由 S005/S007/S006/S008 产生 B015/B018/B019/B017），
  *   供 Q/E/R 以统一方式判定强化状态（E 文件直接读 B015/B018）
  * - 通用工具：目标过滤、角度/距离、单位存活
  */
@@ -13,6 +13,8 @@
 import { 阿伦劳特单位技能配置 } from "./00．配置";
 
 const jass = require("jass.common") as any;
+const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
+const 弧度转角度 = 57.29577951308232;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
@@ -27,6 +29,10 @@ const B015 = stringToFourCCSafe(阿伦劳特单位技能配置.裁决审判强�
 const B018 = stringToFourCCSafe(阿伦劳特单位技能配置.天堂呼唤强化BuffID);
 const B019 = stringToFourCCSafe(阿伦劳特单位技能配置.裁决制裁BuffID);
 const B017 = stringToFourCCSafe(阿伦劳特单位技能配置.切换加攻BuffID);
+const S005 = stringToFourCCSafe(阿伦劳特单位技能配置.裁决审判强化技能ID);
+const S007 = stringToFourCCSafe(阿伦劳特单位技能配置.天堂呼唤强化技能ID);
+const S006 = stringToFourCCSafe(阿伦劳特单位技能配置.裁决制裁技能ID);
+const S008 = stringToFourCCSafe(阿伦劳特单位技能配置.切换加攻技能ID);
 
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
@@ -56,7 +62,8 @@ export function 是暗形态(this: void, unit: any): boolean {
 /** 单位是否拥有指定原生 Buff（GetUnitAbilityLevel > 0） */
 export function 阿伦劳特拥有原生Buff(this: void, unit: any, buffId: number): boolean {
   if (unit == null || unit === 0 || buffId === 0) return false;
-  return GetUnitAbilityLevel(unit, buffId) > 0;
+  const abilityId = 取原生Buff技能ID(buffId);
+  return abilityId !== 0 && GetUnitAbilityLevel(unit, abilityId) > 0;
 }
 
 /** 判定：拥有裁决审判（B015） */
@@ -78,7 +85,10 @@ const 原生Buff定时表: Record<number, Record<number, 原生Buff记录 | unde
 /** 给单位添加原生 Buff，持续 duration 秒后自动移除；重复添加刷新时长 */
 export function 添加原生Buff持续(this: void, unit: any, buffId: number, duration: number): void {
   if (unit == null || unit === 0 || duration <= 0) return;
-  UnitAddAbility(unit, buffId);
+  const abilityId = 取原生Buff技能ID(buffId);
+  if (abilityId === 0) return;
+  UnitAddAbility(unit, abilityId);
+  if (GetUnitAbilityLevel(unit, abilityId) <= 0) return;
   const unitId = GetHandleId(unit);
   let unitMap = 原生Buff定时表[unitId];
   if (unitMap == null) {
@@ -88,7 +98,7 @@ export function 添加原生Buff持续(this: void, unit: any, buffId: number, du
   const old = unitMap[buffId];
   if (old != null && old.定时器ID !== 0) removeDelayedCallback(old.定时器ID);
   const timerId = addDelayedCallback(Math.round(duration * 1000), () => {
-    UnitRemoveAbility(unit, buffId);
+    UnitRemoveAbility(unit, abilityId);
     const map = 原生Buff定时表[unitId];
     if (map != null) map[buffId] = undefined;
   });
@@ -98,13 +108,23 @@ export function 添加原生Buff持续(this: void, unit: any, buffId: number, du
 /** 立即移除指定原生 Buff（含定时器清理） */
 export function 移除原生Buff(this: void, unit: any, buffId: number): void {
   if (unit == null || unit === 0) return;
-  UnitRemoveAbility(unit, buffId);
+  const abilityId = 取原生Buff技能ID(buffId);
+  if (abilityId === 0) return;
+  UnitRemoveAbility(unit, abilityId);
   const unitId = GetHandleId(unit);
   const map = 原生Buff定时表[unitId];
   if (map == null) return;
   const record = map[buffId];
   if (record != null && record.定时器ID !== 0) removeDelayedCallback(record.定时器ID);
   map[buffId] = undefined;
+}
+
+function 取原生Buff技能ID(this: void, buffId: number): number {
+  if (buffId === B015) return S005;
+  if (buffId === B018) return S007;
+  if (buffId === B019) return S006;
+  if (buffId === B017) return S008;
+  return 0;
 }
 
 /** 目标过滤：排除古树/机械/建筑 + 存活 */
@@ -119,7 +139,7 @@ export function 是有效目标(this: void, target: any): boolean {
 
 /** 两点角度（度） */
 export function 两点角度(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+  return Atan2(y2 - y1, x2 - x1) * 弧度转角度;
 }
 
 /** 两点距离 */

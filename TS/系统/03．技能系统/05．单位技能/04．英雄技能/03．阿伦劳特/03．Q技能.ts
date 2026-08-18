@@ -87,6 +87,9 @@ const GetUnitFlyHeight = jass.GetUnitFlyHeight as (this: void, unit: any) => num
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const SetUnitState = jass.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
+const R2I = jass.R2I as (this: void, value: number) => number;
+const Cos = jass.Cos as (this: void, radians: number) => number;
+const Sin = jass.Sin as (this: void, radians: number) => number;
 const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, player: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
@@ -94,7 +97,11 @@ const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const EXSetEffectXY = (japi as any).EXSetEffectXY as ((this: void, effect: any, x: number, y: number) => void) | undefined;
 
-const 角度转弧度 = Math.PI / 180;
+const 角度转弧度 = 0.0174532925199433;
+
+function 秒转毫秒(this: void, 秒: number): number {
+  return R2I(秒 * 1000 + 0.5);
+}
 
 // =============================================================================
 // 光形态：神圣之光（H00F）
@@ -216,30 +223,46 @@ function 开始暗抽取(this: void, 施法者: any, 目标单位: any, 目标X:
     剩余tick: cfg.暗抽取弹道最大tick,
     回调ID: 0,
   };
-  上下文.回调ID = addPeriodicCallback(20, () => {
-    const ctx = 上下文;
-    if (ctx.剩余tick <= 0 || ctx.施法者 == null || ctx.施法者 === 0) {
-      removePeriodicCallback(ctx.回调ID);
-      销毁点特效(ctx.弹道特效);
-      return;
-    }
-    ctx.剩余tick -= 1;
+  上下文.回调ID = addPeriodicCallback(20, 推进暗抽取弹道, 上下文);
+}
 
-    const 施法者X = GetUnitX(ctx.施法者);
-    const 施法者Y = GetUnitY(ctx.施法者);
-    // 到达施法者：销毁并结算恢复（源 IsUnitInRangeLoc 25 判定）
-    if (两点距离(ctx.当前X, ctx.当前Y, 施法者X, 施法者Y) <= 25) {
-      removePeriodicCallback(ctx.回调ID);
-      销毁点特效(ctx.弹道特效);
-      结算暗抽取恢复(ctx.施法者, ctx.抽取值HP, ctx.抽取值MP);
-      return;
-    }
+function 推进暗抽取弹道(this: void, variable?: any): void {
+  const ctx = variable as 暗抽取弹道上下文;
+  if (ctx == null || ctx.回调ID === 0) return;
+  const cfg = 阿伦劳特单位技能配置.Q;
+  if (ctx.剩余tick <= 0 || ctx.施法者 == null || ctx.施法者 === 0) {
+    removePeriodicCallback(ctx.回调ID);
+    销毁点特效(ctx.弹道特效);
+    return;
+  }
+  ctx.剩余tick -= 1;
 
-    const 角度 = 两点角度(ctx.当前X, ctx.当前Y, 施法者X, 施法者Y);
-    ctx.当前X += Math.cos(角度 * 角度转弧度) * cfg.暗抽取弹道每tick距离;
-    ctx.当前Y += Math.sin(角度 * 角度转弧度) * cfg.暗抽取弹道每tick距离;
-    if (EXSetEffectXY != null) EXSetEffectXY(ctx.弹道特效, ctx.当前X, ctx.当前Y);
-  });
+  const 施法者X = GetUnitX(ctx.施法者);
+  const 施法者Y = GetUnitY(ctx.施法者);
+  // 到达施法者：销毁并结算恢复（源 IsUnitInRangeLoc 25 判定）
+  if (两点距离(ctx.当前X, ctx.当前Y, 施法者X, 施法者Y) <= 25) {
+    removePeriodicCallback(ctx.回调ID);
+    销毁点特效(ctx.弹道特效);
+    结算暗抽取恢复(ctx.施法者, ctx.抽取值HP, ctx.抽取值MP);
+    return;
+  }
+
+  const 角度 = 两点角度(ctx.当前X, ctx.当前Y, 施法者X, 施法者Y);
+  ctx.当前X += Cos(角度 * 角度转弧度) * cfg.暗抽取弹道每tick距离;
+  ctx.当前Y += Sin(角度 * 角度转弧度) * cfg.暗抽取弹道每tick距离;
+  if (EXSetEffectXY != null) EXSetEffectXY(ctx.弹道特效, ctx.当前X, ctx.当前Y);
+}
+
+interface 暗友军加攻到期上下文 {
+  目标: any;
+  加攻值: number;
+}
+
+function 暗友军加攻到期(this: void, variable?: any): void {
+  const ctx = variable as 暗友军加攻到期上下文;
+  if (ctx == null || ctx.目标 == null || ctx.目标 === 0) return;
+  临时调整攻击(ctx.目标, -ctx.加攻值);
+  移除单位指定Buff(ctx.目标, 阿伦劳特BuffID.裁决制裁);
 }
 
 function 暗形态Q(this: void, 施法者: any, 目标单位: any, 目标X: number, 目标Y: number): void {
@@ -285,14 +308,9 @@ function 暗形态Q(this: void, 施法者: any, 目标单位: any, 目标X: numb
       if (加攻值 > 0) {
         临时调整攻击(目标, 加攻值);
         registerManualBuff(目标, 阿伦劳特BuffID.裁决制裁, cfg.暗友军加攻持续秒, 加攻值);
-        addDelayedCallback(Math.round(cfg.暗友军加攻持续秒 * 1000), () => {
-          if (目标 == null || 目标 === 0) return;
-          临时调整攻击(目标, -加攻值);
-          移除单位指定Buff(目标, 阿伦劳特BuffID.裁决制裁);
-        });
+        addDelayedCallback(秒转毫秒(cfg.暗友军加攻持续秒), 暗友军加攻到期, { 目标, 加攻值 });
       }
       添加原生Buff持续(目标, 裁决制裁BuffID, cfg.暗友军加攻持续秒);
-      createTimedUnitEffect(目标, "origin", cfg.暗友军加攻特效, cfg.暗友军加攻特效持续秒);
 
       // 主目标若为合法友军（非自己、非中立被动、存活）：抽取生命/魔法供自身恢复
       if (目标 === 目标单位 && 目标 !== 施法者 && GetOwningPlayer(目标) !== PLAYER_NEUTRAL_PASSIVE) {

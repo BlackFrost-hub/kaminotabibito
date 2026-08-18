@@ -73,7 +73,6 @@ const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, name: string) => void;
-const ResetUnitAnimation = jass.ResetUnitAnimation as (this: void, unit: any) => void;
 const SetUnitTurnSpeed = jass.SetUnitTurnSpeed as (this: void, unit: any, speed: number) => void;
 const SetUnitFlyHeight = jass.SetUnitFlyHeight as (this: void, unit: any, height: number, rate: number) => void;
 const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void, player: any, abilityId: number, available: boolean) => void;
@@ -174,7 +173,7 @@ function 恢复Q目标表现(this: void, variable?: any): void {
   if (ctx == null) return;
   const target = ctx.target;
   if (target == null || target === 0 || !单位存活(target)) return;
-  ResetUnitAnimation(target);
+  SetUnitAnimation(target, "stand");
   SetUnitTimeScale(target, 1.0);
 }
 

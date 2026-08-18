@@ -38,13 +38,14 @@ local _____6CE8_518C_666E_653B_653B_51FB_6548_679C_76D1_542C = ____require_resul
 local ____require_result_11 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_11.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_11["移除单位指定Buff"]
+local ____require_result_12 = require("系统.03．技能系统.01．技能冷却.03．QWERD冷却显示")
+local _____767B_8BB0_88AB_52A8_6280_80FD_51B7_5374 = ____require_result_12["登记被动技能冷却"]
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local _____4F50_4F50_6728_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_4E8C_6BB5_6280_80FDID = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["Q二段技能ID"])
 local ____W_4E8C_6BB5_6280_80FDID = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["W二段技能ID"])
-local ____D_6280_80FDID = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["D技能ID"])
 local ____D_88AB_52A8_6280_80FDID = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["D被动技能ID"])
 --- 幻象原生 Buff（分身判定标志）
 local _____5E7B_8C61BuffID = stringToFourCCSafe("BIil")
@@ -56,11 +57,7 @@ local SetUnitX = jass.SetUnitX
 local SetUnitY = jass.SetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
 local SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable
-local UnitAddAbility = jass.UnitAddAbility
-local UnitRemoveAbility = jass.UnitRemoveAbility
 local IsUnitIllusion = jass.IsUnitIllusion
-local ____require_result_12 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWESetUnitAbilityStateSafe = ____require_result_12.YDWESetUnitAbilityStateSafe
 do
     local playerId = 0
     while playerId <= 15 do
@@ -223,22 +220,20 @@ ____exports["瞬移是否就绪"] = function(_____82F1_96C4)
     local record = _____77AC_79FB_51B7_5374_8868[GetHandleId(_____82F1_96C4)]
     return record == nil or record["冷却中"] ~= true
 end
---- 禁用瞬移指示：移除 A0GU，恢复被动图标 A0GW，冷却结束
-local function _____7981_7528_77AC_79FB_6307_793A(_____82F1_96C4)
-    if not _____5355_4F4D_5B58_6D3B(_____82F1_96C4) then
+--- 结束内部瞬移冷却，并清除 D 被动图标上的模拟冷却显示。
+local function _____7ED3_675F_77AC_79FB_51B7_5374(_____82F1_96C4)
+    if _____82F1_96C4 == nil or _____82F1_96C4 == 0 then
         return
     end
-    local owner = GetOwningPlayer(_____82F1_96C4)
-    UnitRemoveAbility(_____82F1_96C4, ____D_6280_80FDID)
-    SetPlayerAbilityAvailable(owner, ____D_88AB_52A8_6280_80FDID, true)
     local id = GetHandleId(_____82F1_96C4)
     local record = _____77AC_79FB_51B7_5374_8868[id]
     if record ~= nil then
         record["冷却中"] = false
         record["计时器ID"] = 0
     end
+    _____767B_8BB0_88AB_52A8_6280_80FD_51B7_5374(_____82F1_96C4, ____D_88AB_52A8_6280_80FDID, 0)
 end
---- 启用瞬移指示：显示 A0GU 并挂 3 秒冷却（右键换位后调用）
+--- 启用 3 秒内部瞬移冷却，并在常驻 A0GW 被动图标上显示倒计时。
 ____exports["启用瞬移冷却"] = function(_____82F1_96C4)
     local id = GetHandleId(_____82F1_96C4)
     local record = _____77AC_79FB_51B7_5374_8868[id]
@@ -249,11 +244,8 @@ ____exports["启用瞬移冷却"] = function(_____82F1_96C4)
     if record["计时器ID"] ~= 0 then
         removeDelayedCallback(record["计时器ID"])
     end
-    local owner = GetOwningPlayer(_____82F1_96C4)
-    SetPlayerAbilityAvailable(owner, ____D_88AB_52A8_6280_80FDID, false)
-    UnitAddAbility(_____82F1_96C4, ____D_6280_80FDID)
-    YDWESetUnitAbilityStateSafe(_____82F1_96C4, ____D_6280_80FDID, 1, _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.D["瞬移冷却秒"])
     record["冷却中"] = true
+    _____767B_8BB0_88AB_52A8_6280_80FD_51B7_5374(_____82F1_96C4, ____D_88AB_52A8_6280_80FDID, _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.D["瞬移冷却秒"])
     record["计时器ID"] = addDelayedCallback(
         _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.D["瞬移冷却秒"] * 1000,
         function()
@@ -262,13 +254,13 @@ ____exports["启用瞬移冷却"] = function(_____82F1_96C4)
                 return
             end
             current["计时器ID"] = 0
-            _____7981_7528_77AC_79FB_6307_793A(current["英雄"])
+            _____7ED3_675F_77AC_79FB_51B7_5374(current["英雄"])
             _____77AC_79FB_51B7_5374_8868[id] = nil
         end
     )
 end
 --- 刷新瞬移就绪（Q/W 施法与创建分身时调用）：
--- 源 JASS：Q/W 释放时移除 A0GU 恢复 A0GW；创建分身会提前销毁 3 秒冷却计时器。
+-- 保留源 JASS 的立即刷新语义，但只清内部状态和 QWERD 模拟冷却。
 ____exports["刷新瞬移就绪"] = function(_____82F1_96C4)
     local id = GetHandleId(_____82F1_96C4)
     local record = _____77AC_79FB_51B7_5374_8868[id]
@@ -279,20 +271,18 @@ ____exports["刷新瞬移就绪"] = function(_____82F1_96C4)
     if record ~= nil then
         record["冷却中"] = false
     end
-    local owner = GetOwningPlayer(_____82F1_96C4)
-    UnitRemoveAbility(_____82F1_96C4, ____D_6280_80FDID)
-    SetPlayerAbilityAvailable(owner, ____D_88AB_52A8_6280_80FDID, true)
+    _____767B_8BB0_88AB_52A8_6280_80FD_51B7_5374(_____82F1_96C4, ____D_88AB_52A8_6280_80FDID, 0)
 end
 local _____5206_8EAB_5F85_843D_5730_8868 = {}
+--- 当前正在创建分身的佐佐木本体（SFB 幻象召唤事件的召唤单位是全局马甲，无法从召唤单位反推本体）
+local _____5F53_524D_521B_5EFA_5206_8EAB_7684_82F1_96C4 = nil
 local function _____5206_8EAB_5165_573A_5904_7406(_____5206_8EAB, _____8BB0_5F55)
     if type(japi.EXSetUnitCollisionType) == "function" then
         japi.EXSetUnitCollisionType(false, _____5206_8EAB, 1)
     end
     _____6DFB_52A0_5355_4F4D_6682_505C(_____5206_8EAB, _____5206_8EAB_5165_573A_6682_505C_6765_6E90)
-    if _____8BB0_5F55["行为"] ~= "原地" then
-        SetUnitX(_____5206_8EAB, _____8BB0_5F55["落点X"])
-        SetUnitY(_____5206_8EAB, _____8BB0_5F55["落点Y"])
-    end
+    SetUnitX(_____5206_8EAB, _____8BB0_5F55["落点X"])
+    SetUnitY(_____5206_8EAB, _____8BB0_5F55["落点Y"])
     _____64AD_653E_4F50_4F50_6728_914D_7F6E_52A8_4F5C(_____5206_8EAB, 9, 1.2)
     if _____8BB0_5F55["行为"] == "W落地" then
         local cfg = _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.W
@@ -329,16 +319,22 @@ local function ____on_4F50_4F50_6728_5206_8EAB_53EC_5524(_____88AB_53EC_5524_535
     if _____88AB_53EC_5524_5355_4F4D == nil or _____88AB_53EC_5524_5355_4F4D == 0 then
         return
     end
-    if not IsUnitIllusion(_____88AB_53EC_5524_5355_4F4D) then
+    local _____662F_5E7B_8C61 = IsUnitIllusion(_____88AB_53EC_5524_5355_4F4D)
+    local _____7C7B_578B_5339_914D = GetUnitTypeId(_____88AB_53EC_5524_5355_4F4D) == _____4F50_4F50_6728_5355_4F4D_7C7B_578BID
+    if not _____662F_5E7B_8C61 then
         return
     end
-    if GetUnitTypeId(_____88AB_53EC_5524_5355_4F4D) ~= _____4F50_4F50_6728_5355_4F4D_7C7B_578BID then
+    if not _____7C7B_578B_5339_914D then
         return
     end
-    if not ____exports["是佐佐木本体"](_____53EC_5524_5355_4F4D) then
+    local _____82F1_96C4 = _____5F53_524D_521B_5EFA_5206_8EAB_7684_82F1_96C4
+    if _____82F1_96C4 == nil or _____82F1_96C4 == 0 then
         return
     end
-    local id = GetHandleId(_____53EC_5524_5355_4F4D)
+    if not ____exports["是佐佐木本体"](_____82F1_96C4) then
+        return
+    end
+    local id = GetHandleId(_____82F1_96C4)
     local _____8BB0_5F55 = _____5206_8EAB_5F85_843D_5730_8868[id]
     if _____8BB0_5F55 == nil then
         return
@@ -361,6 +357,7 @@ ____exports["创建佐佐木分身"] = function(_____82F1_96C4, _____843D_70B9X,
         ["行为"] = _____884C_4E3A,
         ["技能ID"] = _____6280_80FDID
     }
+    _____5F53_524D_521B_5EFA_5206_8EAB_7684_82F1_96C4 = _____82F1_96C4
     local ok = SFB_setItemIllusion(
         _____82F1_96C4,
         _____82F1_96C4,
@@ -368,6 +365,7 @@ ____exports["创建佐佐木分身"] = function(_____82F1_96C4, _____843D_70B9X,
         cfg["分身输出倍率"],
         cfg["分身承伤倍率"]
     )
+    _____5F53_524D_521B_5EFA_5206_8EAB_7684_82F1_96C4 = nil
     if not ok then
         _____5206_8EAB_5F85_843D_5730_8868[id] = nil
         return false
@@ -451,7 +449,7 @@ local function ____on_4F50_4F50_6728_666E_653B_547D_4E2D(ctx)
         _____8EAB_540EY,
         _____6307_5411_89D2_5EA6,
         "身后",
-        ____D_6280_80FDID
+        ____D_88AB_52A8_6280_80FDID
     )
 end
 _____6CE8_518C_666E_653B_653B_51FB_6548_679C_76D1_542C({

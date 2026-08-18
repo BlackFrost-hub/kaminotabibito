@@ -54,14 +54,17 @@ export const 坂井悠二技能配置 = {
     },
 
     // 主动：直线黑暗冲击波
+    // 源结构（2026-08-17 修正）：外层 0.21s ×5 段，每段在施法者位置固定创建 e06T 马甲（特效不推进）；
+    // 每段内层 0.01s ×20 tick 从施法者位置沿施法方向推进伤害判定点 40码/tick，半径 175 枚举，段内去重。
     主动: {
       总伤害攻击力倍率: 3.00, // 300% 攻击力
-      段数: 5, // 源 JASS 分5段
-      单段伤害比例: 0.20, // 每段 20%，合计 100%
-      推进间隔秒: 0.21, // 源 JASS 0.21秒
-      推进距离: 40, // 每次 40 码
+      段数: 5, // 源 JASS 外层循环实数 >= 5.00 退出
+      单段伤害比例: 0.20, // 每次命中 20%，段间不去重（可重复命中），段内去重
+      段间隔秒: 0.21, // 源外层周期 0.21 秒
+      扫描间隔秒: 0.01, // 源内层周期 0.01 秒
+      扫描次数: 20, // 源内层循环实数2 >= 20.00 退出
+      每次扫描推进距离: 40, // 源 PolarProjectionBJ(saber点, 40×循环实数2, 角度)
       命中半径: 175, // 枚举半径
-      最大推进时间秒: 5.00, // 源 JASS 循环实数 >= 5.00 退出
       施法距离: 800,
       魔耗最大魔法比例: 0.05, // 5% 最大魔法值
       冷却秒: 8,
@@ -105,10 +108,9 @@ export const 坂井悠二技能配置 = {
       { 模型路径: "war3mapImported\\ShadowAssault.mdx", 持续秒: 1.0 },
     ],
 
-    // 音效
+    // 音效：源 PlaySoundOnUnitBJ(gg_snd_ReviveUndead, 目标)，照源用全局音效句柄
     音效: {
-      路径: "Sound\\ReviveUndead.wav", // 源 JASS gg_snd_ReviveUndead；路径待核对 soundlist 真源
-      裁断距离: 1250,
+      全局音效键: "gg_snd_ReviveUndead",
     },
 
     // e008 银之监牢马甲（迁移计划允许优化为 TS 控制 + 直接特效）
@@ -151,18 +153,15 @@ export const 坂井悠二技能配置 = {
         持续秒: 2.0,
       },
       音效: {
-        路径: "Sound\\SpellShieldImpact1.wav", // 源 JASS gg_snd_SpellShieldImpact1；待核对
-        裁断距离: 1250,
+        全局音效键: "gg_snd_SpellShieldImpact1", // 源 gg_snd_SpellShieldImpact1，照源用全局音效句柄
       },
     },
 
-    // 目标点分支（源 JASS 辅助马甲推进碰撞）
+    // 目标点分支（2026-08-17 修正：源用辅助马甲 0.01s×20 tick 每步 25 码探测地形，TS 改为提前计算路径后一次性瞬移；
+    // 撞墙停在地形前且不播放落点特效，无撞墙瞬移到落点并播放落点特效）
     目标点分支: {
-      辅助马甲单位ID: "e00D",
-      推进周期秒: 0.01,
-      推进步长: 25,
-      最大推进次数: 20,
-      撞墙回退距离: 75,
+      探测步长: 25, // 源每步 25 码
+      最大探测步数: 20, // 源最多 20 步（500 码）
       传送特效: {
         模型路径: "war3mapImported\\DGate.MDX",
         持续秒: 1.0,
@@ -185,10 +184,14 @@ export const 坂井悠二技能配置 = {
     持续秒: 7.0,
     刷新E技能冷却: true,
 
-    // 神门单位 e001（承载单位，迁移计划保留）
+    // 神门单位（承载单位，迁移计划保留）
+    // 2026-08-17 修正：源 JASS 'e001' 是旧 ID，当前物编不存在（大写 E001 是十六夜咲夜英雄）；
+    // 真身为 e06S（编辑器后缀“神门”，sichongjiejie_b.mdl，缩放 1.5，飞行 moveHeight=1300，HP10/回血-1 限时寿命，Aloc）
     神门单位: {
-      单位ID: "e001",
-      飞行高度增量: 0, // 源 JASS 施法者飞行高度 + 神门默认高度
+      单位ID: "e06S",
+      // 2026-08-17 二轮修正：源 = 施法者高度 + GetUnitDefaultFlyHeight(神门)，即 moveHeight 1300；
+      // 运行时创建的飞行单位 moveHeight 不自动生效，必须显式 SetUnitFlyHeight（此前高度偏低根源）
+      飞行高度增量: 1300,
     },
 
     // 周期伤害
@@ -202,23 +205,20 @@ export const 坂井悠二技能配置 = {
         { 模型路径: "war3mapImported\\ShadowSpine.mdx", 动画速度: 2.48, 持续秒: 0.35 },
       ],
       落点音效: {
-        路径: "Sound\\StormBoltLaunch.wav", // 源 JASS gg_snd_StormBoltLaunch；待核对
-        裁断距离: 1500,
+        全局音效键: "gg_snd_StormBoltLaunch", // 源 JASS PlaySoundOnUnitBJ(gg_snd_StormBoltLaunch)，war3map.j 已注册
       },
       伤害延迟结算秒: 0.35, // 源 JASS 0.35秒后结算
       伤害判定半径: 250,
     },
 
     // 二段：胧天震（英雄等级 ≥ 20 开放，按用户决策 A）
+    // 2026-08-17 用户纠正：二段是无目标技能（物编确认），伤害/特效中心 = 一段 R 的神门位置，
+    // 不是施法目标点；禁止改物编目标类型
     二段: {
       技能ID: R二段技能ID,
       技能类型ID: stringToFourCCSafe(R二段技能ID),
       解锁英雄等级: 20,
-      魔耗检查: {
-        最大魔法比例: 0.20, // 20% 最大魔法值
-        固定加值: 300,
-      },
-      失败提示: "魔法值不足",
+      // 魔法检测条件已按用户要求删除（魔耗由物编 A0EC Cost=300 引擎自动扣）
 
       // 周期伤害：源 JASS 0.50秒/次，单次 50% 攻击力；物编 Ubertip 100%/秒
       持续秒: 5.0,
@@ -247,8 +247,9 @@ export const 坂井悠二技能配置 = {
       },
 
       音效: {
-        路径: "Sound\\effect_sound12.wav", // 源 JASS gg_snd_effect_sound12；待核对
-        裁断距离: 2000,
+        // 每 tick 播放，走音效池严格 4 句柄轮转叠放（Sound3DII_Mp3Play，防泄漏）；
+        // 路径对应 war3map.j 注册的 gg_snd_effect_sound12
+        路径: "war3mapImported\\effect_sound12.mp3",
       },
     },
   },
@@ -273,9 +274,9 @@ export const 坂井悠二技能配置 = {
 
     // D 期间效果
     期间: {
-      暗属性伤害加成: 0.30,
+      暗属性伤害: 0.30,
       E技能冷却秒: 2.50, // D 期间 E 冷却固定为 2.5秒
-      移速最大化技能ID: "待查", // 源 JASS YDUserDataGet(string,"移速最大化","技能",abilcode)；待核对项目统一移速封装
+      移速最大化技能ID: "A01P", // 物编：移速最大化（522）
     },
 
     // 鼓舞（800范围友军，不含自己）
@@ -290,31 +291,37 @@ export const 坂井悠二技能配置 = {
     // D 结束后恢复 E 冷却为 8秒
     结束恢复E冷却秒: 8.0,
 
+    // 过去备份地图中的源 e06V dummy；origin 挂点姿态用于正确拼接蛇头与蛇身。
+    马甲载体模型路径: "Common\\Model\\Dummy\\SakaiYuujiD\\dummy.mdx",
+    马甲模型刷新等待秒: 0.05,
+
     // 第一层马甲（照抄坂井悠二原壳例外）
     马甲一: {
-      单位类型ID: "待查", // 源 JASS YDUserDataGet(unitcode,"马甲类型")
+      // 源马甲类型 e06V：专用源 dummy、基础缩放 1.00、X/Y 最大旋转角 0、origin 挂点。
+      单位类型ID: "e06V",
+      HP保障值: 99999,
       动画编号: 0,
       时间缩放: 20.0,
       缩放: 1.20,
       颜色: { 红: 100, 绿: 100, 蓝: 100, 透明度: 70 },
       飞行高度增量: 200,
-      特效: { 模型路径: "war3mapImported\\SakaiYuji_Snake_DAce(Head).mdl", 挂点: "origin" },
-      绑定技能1: "待查", // 源 JASS YDUserDataGet(abilcode,"技能")
-      绑定技能2: "待查", // 源 JASS YDUserDataGet(abilcode,"技能2")
+      特效: { 模型路径: "war3mapImported\\SakaiYuji_Snake_DAce(Head).mdx", 挂点: "origin" }, // 2026-08-17 修正：实际资源为 .mdx，原写 .mdl 导致蛇特效不显示
+      绑定技能1: "S00B", // 源全局“技能”真身（ability.ini 存在，光环类）；“技能2”在当前地图无注册，不接入
+      绑定技能2: "",
     },
 
     // 第二层马甲 ×5（照抄坂井悠二原壳例外）
     马甲二: {
       数量: 5,
-      单位类型ID: "待查",
+      单位类型ID: "e06V",
       动画编号: 0,
       时间缩放: 20.0,
       缩放: 4.0,
       颜色: { 红: 100, 绿: 100, 蓝: 100, 透明度: 70 },
       飞行高度增量: 300,
       特效: [
-        { 模型路径: "war3mapImported\\SakaiYuji_Snake_DAce.mdl", 挂点: "origin" },
-        { 模型路径: "war3mapImported\\Beam(GreenBlack).mdl", 挂点: "origin" },
+        { 模型路径: "war3mapImported\\SakaiYuji_Snake_DAce.mdx", 挂点: "origin" }, // 2026-08-17 修正：.mdl → .mdx
+        { 模型路径: "war3mapImported\\Beam(GreenBlack).mdx", 挂点: "origin" }, // 2026-08-17 修正：.mdl → .mdx
       ],
       // 各马甲初始参数（源 JASS ydul_i=1..5）
       初始: [

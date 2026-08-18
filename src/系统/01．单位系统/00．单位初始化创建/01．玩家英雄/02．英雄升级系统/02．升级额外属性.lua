@@ -6,9 +6,11 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具")
 local _____83B7_53D6_5355_4F4D_82F1_96C4Rawcode = ____require_result_0["获取单位英雄Rawcode"]
-local ____require_result_1 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.02．英雄升级系统.01．升级配置表")
-local _____901A_7528_5347_7EA7_989D_5916_5C5E_6027_914D_7F6E = ____require_result_1["通用升级额外属性配置"]
-local _____83B7_53D6_82F1_96C4_5347_7EA7_914D_7F6E = ____require_result_1["获取英雄升级配置"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
+local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_1["调整玩家属性"]
+local ____require_result_2 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.02．英雄升级系统.01．升级配置表")
+local _____901A_7528_5347_7EA7_989D_5916_5C5E_6027_914D_7F6E = ____require_result_2["通用升级额外属性配置"]
+local _____83B7_53D6_82F1_96C4_5347_7EA7_914D_7F6E = ____require_result_2["获取英雄升级配置"]
 local UNIT_STATE_ATTACK1_BASE = 18
 local UNIT_STATE_MANA_REGEN = 32
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
@@ -45,6 +47,9 @@ local function _____5E94_7528_5355_6761_989D_5916_5C5E_6027_89C4_5219(unit, leve
             jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE),
             rule.attackBonus
         )
+    end
+    if rule.skillDamageBonus ~= nil and rule.skillDamageBonus ~= 0 then
+        _____8C03_6574_73A9_5BB6_5C5E_6027(unit, "技能伤害", rule.skillDamageBonus)
     end
     if rule.manaRegenBonus ~= nil and rule.manaRegenBonus ~= 0 then
         _____589E_52A0_5355_4F4D_72B6_6001(

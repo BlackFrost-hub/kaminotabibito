@@ -4,7 +4,7 @@
 
 2026-08-15 扫描 `04．英雄技能` 目录后，确认以下目录只有迁移规划文档，没有英雄技能实现 `.ts`：
 
-`01．cloud`、`11．佐佐木小次郎`、`12．八云紫`、`13．坂井悠二`、`14．铃仙`、`14．黑崎一护`、`15．鹿目圆`、`16．塞拉斯`、`17．Saber`。
+`18．云端`、`11．佐佐木小次郎`、`12．八云紫`、`13．坂井悠二`、`14．铃仙`、`14．黑崎一护`、`15．鹿目圆`、`16．塞拉斯`、`17．Saber`。
 
 本次只制作计划中明确需要玩家看到的持续 Buff/状态图标，不新增英雄 TS 实现，不新增 TS Buff 表，不改变技能入口。
 
@@ -21,7 +21,7 @@
 
 | 英雄 | 目录 | 数量 | 图标文件 |
 | --- | --- | ---: | --- |
-| 云端 | `Cloud` | 8 | `cloud_blaze_burn`、`cloud_frost_slow`、`cloud_shadow_stun`、`cloud_light_dark_state`、`cloud_insight`、`cloud_breach`、`cloud_guard`、`cloud_agility` |
+| 云端 | `Yunduan` | 8 | `cloud_blaze_burn`、`cloud_frost_slow`、`cloud_shadow_stun`、`cloud_light_dark_state`、`cloud_insight`、`cloud_breach`、`cloud_guard`、`cloud_agility` |
 | 佐佐木小次郎 | `Sasaki` | 2 | `sasaki_heartless_sight`、`sasaki_tsubame_guard` |
 | 八云紫 | `YakumoYukari` | 1 | `yakumo_yukari_hidden_gap` |
 | 坂井悠二 | `SakaiYuuji` | 8 | `sakai_q_control`、`sakai_silver_prison`、`sakai_grammatica_guard`、`sakai_divine_gate`、`sakai_misty_shock`、`sakai_snake_descent`、`sakai_snake_aura`、`sakai_ally_command` |
@@ -30,8 +30,15 @@
 | 鹿目圆 | `KanameMadoka` | 7 | `madoka_causal_power`、`madoka_arrow_charge`、`madoka_rainbow_rain`、`madoka_goddess_power`、`madoka_ring_power_one`、`madoka_ring_power_two`、`madoka_circle_truth` |
 | 塞拉斯 | `Sylas` | 7 | `sylas_fire_attack`、`sylas_ice_attack`、`sylas_lightning_attack`、`sylas_burn`、`sylas_freeze`、`sylas_lightning_slow`、`sylas_grand_magic` |
 | Saber | `Saber` | 5 | `saber_mana_release`、`saber_avalon`、`saber_wind_control`、`saber_wind_slow`、`saber_impact_stun` |
+| 克劳德 | `Cloud` | 1 | `cloud_omnislash_immunity` |
+| 安斯艾尔 | `Ansel` | 2 | `ansel_holy_enchantment`、`ansel_peerless_warrior` |
+| 欧尔贝克 | `Olberic` | 4 | `olberic_accumulation`、`olberic_defense`、`olberic_cover`、`olberic_provoke` |
 
-总计：**55 张**。
+总计：**62 张**。
+
+克劳德图标为后续补充项：对应“超究武神霸斩伤害免疫”，已同时登记到英雄 Buff 表；这不表示 T 技能逻辑已经实现。
+
+安斯艾尔与欧尔贝克为后续补充项：安斯艾尔 Q“圣光附魔”、R“无双”和欧尔贝克 W/D 已接入 Buff 生命周期；安斯艾尔 R 的攻速/移速仍完全由原生技能提供，TS 只负责无双 Buff 显示与生命周期登记。
 
 ## 实现阶段接入规则
 

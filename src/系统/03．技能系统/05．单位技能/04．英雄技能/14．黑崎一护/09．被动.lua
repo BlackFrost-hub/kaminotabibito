@@ -18,15 +18,11 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
 local stringToFourCC = stringToFourCCSafe
-local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local _____914D_7F6E = _____9ED1_5D0E_4E00_62A4_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
 local ____Q_7C7B_578BID = stringToFourCC(_____914D_7F6E.Q["技能ID"])
-local function _____5904_7406_534D_89E3_666E_653B_7F29Q(unit, _damage, damageType, _fromDotTickBatch, source, isNormalAttack)
+local function _____5904_7406_534D_89E3_666E_653B_7F29Q(unit, _damage, _damageType, _fromDotTickBatch, source, isNormalAttack)
     if isNormalAttack ~= true then
-        return
-    end
-    if damageType ~= DAMAGE_TYPE_NORMAL then
         return
     end
     if source == nil or source == 0 then
@@ -43,7 +39,7 @@ local function _____5904_7406_534D_89E3_666E_653B_7F29Q(unit, _damage, damageTyp
         return
     end
     local _____5269_4F59 = _____8BFB_53D6_6280_80FD_5269_4F59_51B7_5374(source, ____Q_7C7B_578BID)
-    if _____5269_4F59 >= _____914D_7F6E["被动"]["Q冷却剩余阈值秒"] then
+    if _____5269_4F59 > _____914D_7F6E["被动"]["Q冷却剩余阈值秒"] then
         local _____65B0_51B7_5374 = _____5269_4F59 - _____914D_7F6E["被动"]["Q冷却缩减秒"]
         _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(source, ____Q_7C7B_578BID, _____65B0_51B7_5374 > 0 and _____65B0_51B7_5374 or 0, _____914D_7F6E.Q["物编冷却秒"])
     end

@@ -7,6 +7,7 @@ export type 升级额外属性配置 = {
   level: number;
   repeatEveryLevel?: boolean;
   attackBonus?: number;
+  skillDamageBonus?: number;
   manaRegenBonus?: number;
   maxLifeBonus?: number;
   maxManaBonus?: number;

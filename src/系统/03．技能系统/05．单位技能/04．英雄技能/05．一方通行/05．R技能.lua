@@ -30,14 +30,17 @@ local ____require_result_6 = require("系统.04．伤害系统.02．治疗系统
 local _____51CF_5C11_9B54_6CD5_503C = ____require_result_6["减少魔法值"]
 local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
-local ____require_result_8 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_8.Sound3DII_UnitPlayReuse
-local ____require_result_9 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_9.registerDeathListener
-local ____require_result_10 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local getObjectPropertyRealSafe = ____require_result_10.getObjectPropertyRealSafe
-local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_11.stringToFourCCSafe
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.进度条特效")
+local _____521B_5EFA_8FDB_5EA6_6761_7279_6548 = ____require_result_8["创建进度条特效"]
+local _____9500_6BC1_8FDB_5EA6_6761_7279_6548 = ____require_result_8["销毁进度条特效"]
+local ____require_result_9 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_9.Sound3DII_UnitPlayReuse
+local ____require_result_10 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_10.registerDeathListener
+local ____require_result_11 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local getObjectPropertyRealSafe = ____require_result_11.getObjectPropertyRealSafe
+local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_12.stringToFourCCSafe
 local cfg = _____4E00_65B9_901A_884C_5355_4F4D_6280_80FD_914D_7F6E
 local ____R_914D_7F6E = cfg.R
 local ____R_6280_80FDID = stringToFourCCSafe(cfg["R技能ID"])
@@ -73,13 +76,13 @@ local function _____53D6_5355_4F4DID(unit)
 end
 local function _____83B7_53D6R_4E0A_4E0B_6587(unit)
     local id = _____53D6_5355_4F4DID(unit)
-    local ____temp_12
+    local ____temp_13
     if id == 0 then
-        ____temp_12 = nil
+        ____temp_13 = nil
     else
-        ____temp_12 = _____4E0A_4E0B_6587_8868[id]
+        ____temp_13 = _____4E0A_4E0B_6587_8868[id]
     end
-    return ____temp_12
+    return ____temp_13
 end
 local function _____83B7_53D6_6216_521B_5EFAR_4E0A_4E0B_6587(unit)
     local id = _____53D6_5355_4F4DID(unit)
@@ -99,6 +102,7 @@ local function _____83B7_53D6_6216_521B_5EFAR_4E0A_4E0B_6587(unit)
         ["当前次数"] = 0,
         ["周期回调ID"] = 0,
         ["已启动"] = false,
+        ["施法进度条"] = nil,
         ["施法者暂停来源"] = "一方通行-R-施法者:" .. tostring(id),
         ["目标暂停来源"] = "一方通行-R-目标:" .. tostring(id)
     }
@@ -149,6 +153,10 @@ local function _____521B_5EFAR_95EA_7535(caster, target)
     end
 end
 local function _____6E05_7406R_4E0A_4E0B_6587(context, _____65BD_52A0_540E_7EED_865A_5F31)
+    if context["施法进度条"] ~= nil and context["施法进度条"] ~= 0 then
+        _____9500_6BC1_8FDB_5EA6_6761_7279_6548(context["施法进度条"])
+        context["施法进度条"] = nil
+    end
     if context["周期回调ID"] ~= 0 then
         removePeriodicCallback(context["周期回调ID"])
         context["周期回调ID"] = 0
@@ -252,6 +260,7 @@ local function _____91CA_653E_4E00_65B9_901A_884CR(context, caster, skillInstanc
     _____6DFB_52A0_5355_4F4D_6682_505C(caster, context["施法者暂停来源"])
     _____6DFB_52A0_5355_4F4D_6682_505C(target, context["目标暂停来源"])
     SetUnitAnimationByIndex(caster, 0)
+    context["施法进度条"] = _____521B_5EFA_8FDB_5EA6_6761_7279_6548(caster, {["动画序号"] = 0, ["动画速度"] = ____R_914D_7F6E["压制持续秒"] > 0 and 1 / ____R_914D_7F6E["压制持续秒"] or 1})
     Sound3DII_UnitPlayReuse(____R_914D_7F6E["施法音效路径"], caster, ____R_914D_7F6E["施法音效裁断距离"])
     context["周期回调ID"] = addPeriodicCallback(____R_914D_7F6E["伤害周期毫秒"], _____4E00_65B9_901A_884CR_5468_671FTick, context)
 end
@@ -272,15 +281,15 @@ local function _____4E00_65B9_901A_884CR_5355_4F4D_6B7B_4EA1(dyingUnit, _killing
 end
 local function _____4E00_65B9_901A_884CR_4F24_5BB3_4FEE_6B63(context)
     if context == nil or context.attacker == nil or context.attacker == 0 then
-        local ____opt_result_15
+        local ____opt_result_16
         if context ~= nil then
-            ____opt_result_15 = context.currentDamage
+            ____opt_result_16 = context.currentDamage
         end
-        local ____opt_result_15_16 = ____opt_result_15
-        if ____opt_result_15_16 == nil then
-            ____opt_result_15_16 = 0
+        local ____opt_result_16_17 = ____opt_result_16
+        if ____opt_result_16_17 == nil then
+            ____opt_result_16_17 = 0
         end
-        return ____opt_result_15_16
+        return ____opt_result_16_17
     end
     if getBuffRuntime(context.attacker, _____4E00_65B9_901A_884CBuffID["血液逆流虚弱"]) == nil then
         return context.currentDamage

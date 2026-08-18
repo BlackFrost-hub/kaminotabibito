@@ -1,4 +1,7 @@
 local ____lualib = require("lualib_bundle")
+local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
+local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
+local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local _____53CB_65B9_5171_540C_6D88_5931, jass, getGameTime, registerManualBuff, _____79FB_9664_5355_4F4D_6682_505C, ____E_6682_505C_6765_6E90
@@ -9,11 +12,19 @@ local _____516B_4E91_7D2B_5355_4F4D_5B58_6D3B = ____01_FF0E_88C2_9699_7CFB_7EDF[
 local _____662F_516B_4E91_7D2B = ____01_FF0E_88C2_9699_7CFB_7EDF["是八云紫"]
 local _____662F_516B_4E91_7D2B_5408_6CD5_654C_4EBA = ____01_FF0E_88C2_9699_7CFB_7EDF["是八云紫合法敌人"]
 local _____67E5_627E_516B_4E91_7D2B_88C2_9699 = ____01_FF0E_88C2_9699_7CFB_7EDF["查找八云紫裂隙"]
+local _____521B_5EFA_516B_4E91_7D2B_88C2_9699 = ____01_FF0E_88C2_9699_7CFB_7EDF["创建八云紫裂隙"]
 local _____521B_5EFA_516B_4E91_7D2B_70B9_7279_6548 = ____01_FF0E_88C2_9699_7CFB_7EDF["创建八云紫点特效"]
+local _____6CE8_518C_516B_4E91_7D2B_88C2_9699_521B_5EFA_76D1_542C_5668 = ____01_FF0E_88C2_9699_7CFB_7EDF["注册八云紫裂隙创建监听器"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____14_FF0E_516B_4E91_7D2B = require("系统.05．Buff系统.03．Buff表.02．英雄.14．八云紫")
 local _____516B_4E91_7D2BBuffID = ____14_FF0E_516B_4E91_7D2B["八云紫BuffID"]
+local ____00A_FF0E_8868_73B0_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00A．表现工具")
+local _____64AD_653E_516B_4E91_7D2B_5355_4F4D_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放八云紫单位音效"]
+local _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放八云紫随机单位音效"]
+local ____00B_FF0E_8BCA_65AD = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00B．诊断")
+local _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7 = ____00B_FF0E_8BCA_65AD["八云紫诊断日志"]
+local _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4 = ____00B_FF0E_8BCA_65AD["八云紫诊断句柄"]
 function _____53CB_65B9_5171_540C_6D88_5931(variable)
     local context = variable
     if context == nil or context["已结束"] or not _____516B_4E91_7D2B_5355_4F4D_5B58_6D3B(context["目标"]) then
@@ -87,6 +98,57 @@ local function _____53E5_67C4ID(unit)
         _____5355_4F4D_6709_6548_result_13 = 0
     end
     return _____5355_4F4D_6709_6548_result_13
+end
+local function _____521B_5EFAE_88C2_9699(hero, x, y, skillInstanceId)
+    do
+        local i = 0
+        while i < #_____914D_7F6E.D["展开音效键"] do
+            _____64AD_653E_516B_4E91_7D2B_5355_4F4D_97F3_6548(hero, _____914D_7F6E.D["展开音效键"][i + 1])
+            i = i + 1
+        end
+    end
+    local gap = _____521B_5EFA_516B_4E91_7D2B_88C2_9699(
+        hero,
+        x,
+        y,
+        _____914D_7F6E["技能"].E["类型ID"],
+        skillInstanceId,
+        {["持续秒"] = _____914D_7F6E["裂隙"]["短期持续秒"], ["长期"] = false}
+    )
+    local ____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7_20 = _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7
+    local ____array_19 = __TS__SparseArrayNew(
+        "E",
+        "E联动创建间隙",
+        "英雄",
+        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(hero),
+        "请求X",
+        x,
+        "请求Y",
+        y,
+        "间隙",
+        gap ~= nil and _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(gap["单位"]) or 0,
+        "实际X"
+    )
+    local ____temp_14
+    if gap ~= nil then
+        ____temp_14 = jass.GetUnitX(gap["单位"])
+    else
+        ____temp_14 = 0
+    end
+    __TS__SparseArrayPush(____array_19, ____temp_14, "实际Y")
+    local ____temp_15
+    if gap ~= nil then
+        ____temp_15 = jass.GetUnitY(gap["单位"])
+    else
+        ____temp_15 = 0
+    end
+    __TS__SparseArrayPush(____array_19, ____temp_15, "长期")
+    local ____temp_18 = gap and gap["长期"]
+    if ____temp_18 == nil then
+        ____temp_18 = false
+    end
+    __TS__SparseArrayPush(____array_19, ____temp_18)
+    ____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7_20(__TS__SparseArraySpread(____array_19))
 end
 local function _____9020_6210E_4F24_5BB3(context, target, damage, tag)
     if not _____662F_516B_4E91_7D2B_5408_6CD5_654C_4EBA(context["英雄"], target) or not (damage > 0) then
@@ -181,6 +243,8 @@ local function _____7ED3_7B97_654C_65B9_5206_652F(context)
     context["出现X"] = point.x
     context["出现Y"] = point.y
     jass.SetUnitPosition(context["英雄"], point.x, point.y)
+    _____64AD_653E_516B_4E91_7D2B_5355_4F4D_97F3_6548(context["英雄"], _____914D_7F6E.E["敌方出现语音键"])
+    _____521B_5EFAE_88C2_9699(context["英雄"], point.x, point.y, context["技能实例ID"])
     _____65BD_52A0_7729_6655(
         context["英雄"],
         target,
@@ -225,6 +289,28 @@ local function _____7ED3_675F_795E_9690(context, _____7ED3_7B97_4F24_5BB3)
     if context["已结束"] then
         return
     end
+    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
+        "E",
+        "开始结束神隐",
+        "英雄",
+        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(context["英雄"]),
+        "方式",
+        context["方式"],
+        "当前X",
+        jass.GetUnitX(context["英雄"]),
+        "当前Y",
+        jass.GetUnitY(context["英雄"]),
+        "记录出现X",
+        context["出现X"],
+        "记录出现Y",
+        context["出现Y"],
+        "目标",
+        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(context["目标"]),
+        "目标裂隙",
+        context["目标裂隙"] ~= nil and _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(context["目标裂隙"]["单位"]) or 0,
+        "结算伤害",
+        _____7ED3_7B97_4F24_5BB3
+    )
     context["已结束"] = true
     if context["周期ID"] ~= 0 then
         removePeriodicCallback(context["周期ID"])
@@ -254,13 +340,27 @@ local function _____7ED3_675F_795E_9690(context, _____7ED3_7B97_4F24_5BB3)
         jass.SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
         jass.SetUnitPosition(context["目标"], context["出现X"], context["出现Y"])
         _____79FB_9664_5355_4F4D_8D1F_9762Buff(context["目标"], false)
-    else
+    elseif context["方式"] ~= "自身" then
         jass.SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
     end
     _____6062_590D_516B_4E91_7D2B(context)
     if _____7ED3_7B97_4F24_5BB3 then
         _____7ED3_7B97_6700_7EC8_5C55_5F00(context)
     end
+    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
+        "E",
+        "神隐结束完成",
+        "英雄",
+        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(context["英雄"]),
+        "方式",
+        context["方式"],
+        "最终X",
+        jass.GetUnitX(context["英雄"]),
+        "最终Y",
+        jass.GetUnitY(context["英雄"]),
+        "友方已隐藏",
+        context["友方已隐藏"]
+    )
 end
 local function _____795E_9690_68C0_67E5(variable)
     local context = variable
@@ -282,8 +382,10 @@ local function _____53CB_65B9_795E_9690_5230_8FBE(variable)
     end
     context["出现X"] = jass.GetUnitX(context["目标"])
     context["出现Y"] = jass.GetUnitY(context["目标"])
+    _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(context["英雄"], _____914D_7F6E.E["友方出现语音键"])
     jass.SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
     _____521B_5EFA_516B_4E91_7D2B_70B9_7279_6548(_____914D_7F6E.E["出现特效"], context["出现X"], context["出现Y"], 1.5)
+    _____521B_5EFAE_88C2_9699(context["英雄"], context["出现X"], context["出现Y"], context["技能实例ID"])
     addDelayedCallback(_____914D_7F6E.E["友方消失延迟秒"] * 1000, _____53CB_65B9_5171_540C_6D88_5931, context)
 end
 local function _____8FDB_5165_795E_9690(context, _____51CF_5C11_51B7_5374_6BD4_4F8B)
@@ -293,6 +395,26 @@ local function _____8FDB_5165_795E_9690(context, _____51CF_5C11_51B7_5374_6BD4_4
         _____7ED3_675F_795E_9690(previous, false)
     end
     _____795E_9690_4E0A_4E0B_6587_8868[heroId] = context
+    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
+        "E",
+        "进入神隐状态",
+        "英雄",
+        heroId,
+        "方式",
+        context["方式"],
+        "目标",
+        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(context["目标"]),
+        "目标裂隙",
+        context["目标裂隙"] ~= nil and _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(context["目标裂隙"]["单位"]) or 0,
+        "出现X",
+        context["出现X"],
+        "出现Y",
+        context["出现Y"],
+        "持续秒",
+        _____914D_7F6E.E["最大间隙秒"],
+        "额外减冷却比例",
+        _____51CF_5C11_51B7_5374_6BD4_4F8B
+    )
     _____9690_85CF_516B_4E91_7D2B(context)
     jass.SetPlayerAbilityAvailable(
         jass.GetOwningPlayer(context["英雄"]),
@@ -329,6 +451,40 @@ local function _____91CA_653EE(_entry, hero, skillInstanceId)
     local cooldownReduction = 0
     local appearX = jass.GetUnitX(hero)
     local appearY = jass.GetUnitY(hero)
+    local ____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7_23 = _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7
+    local ____array_22 = __TS__SparseArrayNew(
+        "E",
+        "收到E施法",
+        "英雄",
+        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(hero),
+        "英雄X",
+        appearX,
+        "英雄Y",
+        appearY,
+        "目标",
+        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(target),
+        "目标类型ID"
+    )
+    local ____temp_21
+    if target ~= nil and target ~= 0 then
+        ____temp_21 = jass.GetUnitTypeId(target)
+    else
+        ____temp_21 = 0
+    end
+    __TS__SparseArrayPush(
+        ____array_22,
+        ____temp_21,
+        "目标X",
+        targetX,
+        "目标Y",
+        targetY,
+        "目标是自己",
+        target == hero,
+        "技能实例ID",
+        skillInstanceId or 0
+    )
+    ____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7_23(__TS__SparseArraySpread(____array_22))
+    _____521B_5EFAE_88C2_9699(hero, appearX, appearY, skillInstanceId)
     if target == hero then
         mode = "自身"
         cooldownReduction = _____914D_7F6E.E["自身额外减冷却比例"]
@@ -354,6 +510,18 @@ local function _____91CA_653EE(_entry, hero, skillInstanceId)
     else
         gap = _____67E5_627E_516B_4E91_7D2B_88C2_9699(targetX, targetY, _____914D_7F6E.E["裂隙搜索范围"], hero)
         if gap == nil then
+            _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
+                "E",
+                "地面E失败",
+                "原因",
+                "目标点附近没有已登记间隙",
+                "搜索范围",
+                _____914D_7F6E.E["裂隙搜索范围"],
+                "目标X",
+                targetX,
+                "目标Y",
+                targetY
+            )
             jass.DisplayTimedTextToPlayer(
                 jass.GetOwningPlayer(hero),
                 0,
@@ -369,6 +537,20 @@ local function _____91CA_653EE(_entry, hero, skillInstanceId)
         appearX = jass.GetUnitX(gap["单位"])
         appearY = jass.GetUnitY(gap["单位"])
     end
+    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
+        "E",
+        "E分支判定完成",
+        "方式",
+        mode,
+        "出现X",
+        appearX,
+        "出现Y",
+        appearY,
+        "目标裂隙",
+        gap ~= nil and _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(gap["单位"]) or 0,
+        "减冷却比例",
+        cooldownReduction
+    )
     _____8FDB_5165_795E_9690(
         {
             ["英雄"] = hero,
@@ -393,8 +575,35 @@ local function _____76D1_542C_4E3B_52A8_51FA_73B0(caster, spellAbilityId)
     end
     local context = _____795E_9690_4E0A_4E0B_6587_8868[_____53E5_67C4ID(caster)]
     if context ~= nil then
+        _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(caster, _____914D_7F6E.E["主动出现语音键"])
         _____7ED3_675F_795E_9690(context, true)
     end
+end
+local function _____76D1_542C_81EA_8EAB_795E_9690D_95F4_9699(hero, gap, skillId)
+    if skillId ~= _____914D_7F6E["技能"].D["类型ID"] then
+        return
+    end
+    local context = _____795E_9690_4E0A_4E0B_6587_8868[_____53E5_67C4ID(hero)]
+    if context == nil or context["已结束"] or context["方式"] ~= "自身" then
+        return
+    end
+    context["出现X"] = jass.GetUnitX(gap["单位"])
+    context["出现Y"] = jass.GetUnitY(gap["单位"])
+    jass.SetUnitPosition(hero, context["出现X"], context["出现Y"])
+    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
+        "E",
+        "自身神隐由D间隙出现",
+        "英雄",
+        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(hero),
+        "D间隙",
+        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(gap["单位"]),
+        "出现X",
+        context["出现X"],
+        "出现Y",
+        context["出现Y"]
+    )
+    _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(hero, _____914D_7F6E.E["主动出现语音键"])
+    _____7ED3_675F_795E_9690(context, true)
 end
 _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
     ["名称"] = "八云紫-八云紫的神隐（E）",
@@ -407,4 +616,5 @@ _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
     ["技能实例持续时间秒"] = 3
 })
 registerSpellEffectListener(_____76D1_542C_4E3B_52A8_51FA_73B0)
+_____6CE8_518C_516B_4E91_7D2B_88C2_9699_521B_5EFA_76D1_542C_5668(_____76D1_542C_81EA_8EAB_795E_9690D_95F4_9699)
 return ____exports

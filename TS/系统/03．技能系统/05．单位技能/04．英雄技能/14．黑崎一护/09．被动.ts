@@ -37,15 +37,12 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
 };
 const stringToFourCC = stringToFourCCSafe;
-const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
-
 const 配置 = 黑崎一护技能配置;
 const 英雄单位类型ID = 配置.单位类型ID;
 const Q类型ID = stringToFourCC(配置.Q.技能ID);
 
-function 处理卍解普攻缩Q(this: void, unit: any, _damage: number, damageType: number, _fromDotTickBatch?: boolean, source?: any, isNormalAttack?: boolean): void {
+function 处理卍解普攻缩Q(this: void, unit: any, _damage: number, _damageType: number, _fromDotTickBatch?: boolean, source?: any, isNormalAttack?: boolean): void {
   if (isNormalAttack !== true) return;
-  if (damageType !== DAMAGE_TYPE_NORMAL) return; // 源：仅物理普攻类型
   if (source == null || source === 0) return;
   if (GetUnitTypeId(source) !== 英雄单位类型ID) return;
   // 源：目标必须是施法者的敌人（非友方且非自己单位）
@@ -54,7 +51,7 @@ function 处理卍解普攻缩Q(this: void, unit: any, _damage: number, damageTy
   if (!黑崎一护是否卍解(source)) return;
 
   const 剩余 = 读取技能剩余冷却(source, Q类型ID);
-  if (剩余 >= 配置.被动.Q冷却剩余阈值秒) {
+  if (剩余 > 配置.被动.Q冷却剩余阈值秒) {
     const 新冷却 = 剩余 - 配置.被动.Q冷却缩减秒;
     技能_设置技能冷却时间(source, Q类型ID, 新冷却 > 0 ? 新冷却 : 0, 配置.Q.物编冷却秒);
   }

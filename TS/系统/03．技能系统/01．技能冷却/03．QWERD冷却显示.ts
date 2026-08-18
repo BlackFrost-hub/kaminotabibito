@@ -6,6 +6,9 @@ const japi = require("jass.japi") as any;
 const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
 };
+const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
+  registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
+};
 const selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照") as {
   初始化本地选中技能快照: (this: void) => void;
   获取本地选中技能快照: (this: void) => {
@@ -54,8 +57,65 @@ const TEXT_H = 0.020;
 let initialized = false;
 let 文本组缓存: 文本组表 | null = null;
 
+// ===========================================================================
+// 被动技能冷却登记（2026-08-17）：被动/内部标记类冷却（如云端无双剑法 8 秒触发冷却）
+// 引擎不感知，DzGetUnitAbilityCool 恒 0；外部调 登记被动技能冷却 传秒数，
+// 刷新时优先查本覆盖表（结束毫秒时间戳倒计），到期自动回落引擎冷却。
+// 键 = 单位句柄ID + "_" + 技能代码；显示槽位由本地快照按命令卡实际技能 ID 匹配，无需指定热键。
+// ===========================================================================
+interface 被动冷却记录 {
+  结束毫秒: number;
+  总毫秒: number;
+}
+const 被动冷却表: Record<string, 被动冷却记录 | undefined> = {};
+
 function isValidHandle(handle: any): boolean {
   return handle != null && handle !== 0;
+}
+
+function 当前毫秒(this: void): number {
+  return os.clock() * 1000;
+}
+
+function 被动冷却键(this: void, whichHero: any, abilityId: number): string {
+  return jass.GetHandleId(whichHero) + "_" + abilityId;
+}
+
+/**
+ * 登记被动/内部冷却到 QWERD 冷却显示（仅本地表现，外部传秒数）。
+ * @param whichHero 拥有该被动技能的单位
+ * @param abilityId 被动技能代码（命令卡上实际显示的 ID）
+ * @param cooldownSec 冷却秒数；<=0 清除登记
+ */
+export function 登记被动技能冷却(this: void, whichHero: any, abilityId: number, cooldownSec: number): void {
+  if (!isValidHandle(whichHero) || abilityId === 0) return;
+  const key = 被动冷却键(whichHero, abilityId);
+  if (cooldownSec <= 0) {
+    被动冷却表[key] = undefined;
+    return;
+  }
+  const totalMs = cooldownSec * 1000;
+  被动冷却表[key] = { 结束毫秒: 当前毫秒() + totalMs, 总毫秒: totalMs };
+}
+
+function 查询被动冷却(this: void, whichHero: any, abilityId: number): number {
+  const record = 被动冷却表[被动冷却键(whichHero, abilityId)];
+  if (record == null) return 0;
+  const remainingMs = record.结束毫秒 - 当前毫秒();
+  if (remainingMs <= 0) {
+    被动冷却表[被动冷却键(whichHero, abilityId)] = undefined;
+    return 0;
+  }
+  return remainingMs / 1000;
+}
+
+/** 单位死亡时清掉其名下全部被动冷却登记（防句柄复用后脏键命中）。 */
+function 被动冷却死亡清理(this: void, dyingUnit: any, _killingUnit: any): void {
+  if (!isValidHandle(dyingUnit)) return;
+  const prefix = jass.GetHandleId(dyingUnit) + "_";
+  for (const key in 被动冷却表) {
+    if (key.indexOf(prefix) === 0) 被动冷却表[key] = undefined;
+  }
 }
 
 function getLocalHero(this: void): any | null {
@@ -91,6 +151,9 @@ function fourCCText(this: void, abilityId: number): string {
 
 function getCooldown(this: void, whichHero: any, abilityId: number): number {
   if (!isValidHandle(whichHero) || abilityId === 0) return 0;
+  // 被动/内部冷却登记优先（引擎冷却对被动恒 0）
+  const 被动剩余 = 查询被动冷却(whichHero, abilityId);
+  if (被动剩余 > 0) return 被动剩余;
   return 技能_获取技能当前冷却时间(whichHero, abilityId) || 0;
 }
 
@@ -214,6 +277,7 @@ export function 初始化QWERD冷却显示(this: void): void {
   if (initialized) return;
   initialized = true;
   selectionSnapshotSystem.初始化本地选中技能快照();
+  registerDeathListener(被动冷却死亡清理 as unknown as (this: void, dyingUnit: any, killingUnit: any) => void);
   addPeriodicCallback(REFRESH_MS, onTick);
 }
 

@@ -6,11 +6,15 @@ import {
   是八云紫,
   是八云紫合法敌人,
   查找八云紫裂隙,
+  创建八云紫裂隙,
   创建八云紫点特效,
+  注册八云紫裂隙创建监听器,
   type 八云紫裂隙记录,
 } from "../07．公共与单位壳/01．裂隙系统";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 八云紫BuffID } from "../../../../../05．Buff系统/03．Buff表/02．英雄/14．八云紫";
+import { 播放八云紫单位音效, 播放八云紫随机单位音效 } from "../00A．表现工具";
+import { 八云紫诊断日志, 八云紫诊断句柄 } from "../00B．诊断";
 
 const jass = require("jass.common") as any;
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback, getGameTime } = require("系统.00．核心系统.05．中心计时器") as {
@@ -101,6 +105,15 @@ function 句柄ID(this: void, unit: any): number {
   return 单位有效(unit) ? jass.GetHandleId(unit) : 0;
 }
 
+function 创建E裂隙(this: void, hero: any, x: number, y: number, skillInstanceId?: number): void {
+  for (let i = 0; i < 配置.D.展开音效键.length; i++) 播放八云紫单位音效(hero, 配置.D.展开音效键[i]);
+  const gap = 创建八云紫裂隙(hero, x, y, 配置.技能.E.类型ID, skillInstanceId, {
+    持续秒: 配置.裂隙.短期持续秒,
+    长期: false,
+  });
+  八云紫诊断日志("E", "E联动创建间隙", "英雄", 八云紫诊断句柄(hero), "请求X", x, "请求Y", y, "间隙", gap != null ? 八云紫诊断句柄(gap.单位) : 0, "实际X", gap != null ? jass.GetUnitX(gap.单位) : 0, "实际Y", gap != null ? jass.GetUnitY(gap.单位) : 0, "长期", gap?.长期 ?? false);
+}
+
 function 造成E伤害(this: void, context: 神隐上下文, target: any, damage: number, tag: string): void {
   if (!是八云紫合法敌人(context.英雄, target) || !(damage > 0)) return;
   造成单体技能伤害({
@@ -177,6 +190,8 @@ function 结算敌方分支(this: void, context: 神隐上下文): void {
   context.出现X = point.x;
   context.出现Y = point.y;
   jass.SetUnitPosition(context.英雄, point.x, point.y);
+  播放八云紫单位音效(context.英雄, 配置.E.敌方出现语音键);
+  创建E裂隙(context.英雄, point.x, point.y, context.技能实例ID);
   施加眩晕(context.英雄, target, 配置.E.敌方眩晕秒, "八云紫-E-神隐突袭", "技能");
   创建点特效({
     模型路径: 配置.E.敌方结算特效,
@@ -211,6 +226,7 @@ function 结算最终展开(this: void, context: 神隐上下文): void {
 
 function 结束神隐(this: void, context: 神隐上下文, 结算伤害: boolean): void {
   if (context.已结束) return;
+  八云紫诊断日志("E", "开始结束神隐", "英雄", 八云紫诊断句柄(context.英雄), "方式", context.方式, "当前X", jass.GetUnitX(context.英雄), "当前Y", jass.GetUnitY(context.英雄), "记录出现X", context.出现X, "记录出现Y", context.出现Y, "目标", 八云紫诊断句柄(context.目标), "目标裂隙", context.目标裂隙 != null ? 八云紫诊断句柄(context.目标裂隙.单位) : 0, "结算伤害", 结算伤害);
   context.已结束 = true;
   if (context.周期ID !== 0) removePeriodicCallback(context.周期ID);
   const heroId = 句柄ID(context.英雄);
@@ -233,10 +249,11 @@ function 结束神隐(this: void, context: 神隐上下文, 结算伤害: boolea
     jass.SetUnitPosition(context.英雄, context.出现X, context.出现Y);
     jass.SetUnitPosition(context.目标, context.出现X, context.出现Y);
     移除单位负面Buff(context.目标, false);
-  } else jass.SetUnitPosition(context.英雄, context.出现X, context.出现Y);
+  } else if (context.方式 !== "自身") jass.SetUnitPosition(context.英雄, context.出现X, context.出现Y);
 
   恢复八云紫(context);
   if (结算伤害) 结算最终展开(context);
+  八云紫诊断日志("E", "神隐结束完成", "英雄", 八云紫诊断句柄(context.英雄), "方式", context.方式, "最终X", jass.GetUnitX(context.英雄), "最终Y", jass.GetUnitY(context.英雄), "友方已隐藏", context.友方已隐藏);
 }
 
 function 神隐检查(this: void, variable?: any): void {
@@ -254,8 +271,10 @@ function 友方神隐到达(this: void, variable?: any): void {
   if (context == null || context.已结束 || !八云紫单位存活(context.目标)) return;
   context.出现X = jass.GetUnitX(context.目标);
   context.出现Y = jass.GetUnitY(context.目标);
+  播放八云紫随机单位音效(context.英雄, 配置.E.友方出现语音键);
   jass.SetUnitPosition(context.英雄, context.出现X, context.出现Y);
   创建八云紫点特效(配置.E.出现特效, context.出现X, context.出现Y, 1.5);
+  创建E裂隙(context.英雄, context.出现X, context.出现Y, context.技能实例ID);
   addDelayedCallback(配置.E.友方消失延迟秒 * 1000, 友方共同消失, context);
 }
 
@@ -276,6 +295,8 @@ function 进入神隐(this: void, context: 神隐上下文, 减少冷却比例: 
   const previous = 神隐上下文表[heroId];
   if (previous != null && !previous.已结束) 结束神隐(previous, false);
   神隐上下文表[heroId] = context;
+
+  八云紫诊断日志("E", "进入神隐状态", "英雄", heroId, "方式", context.方式, "目标", 八云紫诊断句柄(context.目标), "目标裂隙", context.目标裂隙 != null ? 八云紫诊断句柄(context.目标裂隙.单位) : 0, "出现X", context.出现X, "出现Y", context.出现Y, "持续秒", 配置.E.最大间隙秒, "额外减冷却比例", 减少冷却比例);
 
   隐藏八云紫(context);
   jass.SetPlayerAbilityAvailable(jass.GetOwningPlayer(context.英雄), 配置.技能.E.类型ID, false);
@@ -308,6 +329,10 @@ function 释放E(this: void, _entry: { 英雄: any }, hero: any, skillInstanceId
   let appearX = jass.GetUnitX(hero);
   let appearY = jass.GetUnitY(hero);
 
+  八云紫诊断日志("E", "收到E施法", "英雄", 八云紫诊断句柄(hero), "英雄X", appearX, "英雄Y", appearY, "目标", 八云紫诊断句柄(target), "目标类型ID", target != null && target !== 0 ? jass.GetUnitTypeId(target) : 0, "目标X", targetX, "目标Y", targetY, "目标是自己", target === hero, "技能实例ID", skillInstanceId ?? 0);
+
+  创建E裂隙(hero, appearX, appearY, skillInstanceId);
+
   if (target === hero) {
     mode = "自身";
     cooldownReduction = 配置.E.自身额外减冷却比例;
@@ -323,6 +348,7 @@ function 释放E(this: void, _entry: { 英雄: any }, hero: any, skillInstanceId
   } else {
     gap = 查找八云紫裂隙(targetX, targetY, 配置.E.裂隙搜索范围, hero);
     if (gap == null) {
+      八云紫诊断日志("E", "地面E失败", "原因", "目标点附近没有已登记间隙", "搜索范围", 配置.E.裂隙搜索范围, "目标X", targetX, "目标Y", targetY);
       jass.DisplayTimedTextToPlayer(jass.GetOwningPlayer(hero), 0, 0, 3, "目标位置附近没有可用的『间隙』。 ");
       技能_设置技能冷却时间(hero, 配置.技能.E.类型ID, 5, 5);
       return;
@@ -332,6 +358,8 @@ function 释放E(this: void, _entry: { 英雄: any }, hero: any, skillInstanceId
     appearX = jass.GetUnitX(gap.单位);
     appearY = jass.GetUnitY(gap.单位);
   }
+
+  八云紫诊断日志("E", "E分支判定完成", "方式", mode, "出现X", appearX, "出现Y", appearY, "目标裂隙", gap != null ? 八云紫诊断句柄(gap.单位) : 0, "减冷却比例", cooldownReduction);
 
   进入神隐({
     英雄: hero,
@@ -352,7 +380,22 @@ function 释放E(this: void, _entry: { 英雄: any }, hero: any, skillInstanceId
 function 监听主动出现(this: void, caster: any, spellAbilityId: number): void {
   if (spellAbilityId !== 配置.技能.E出现.类型ID || !是八云紫(caster)) return;
   const context = 神隐上下文表[句柄ID(caster)];
-  if (context != null) 结束神隐(context, true);
+  if (context != null) {
+    播放八云紫随机单位音效(caster, 配置.E.主动出现语音键);
+    结束神隐(context, true);
+  }
+}
+
+function 监听自身神隐D间隙(this: void, hero: any, gap: 八云紫裂隙记录, skillId: number): void {
+  if (skillId !== 配置.技能.D.类型ID) return;
+  const context = 神隐上下文表[句柄ID(hero)];
+  if (context == null || context.已结束 || context.方式 !== "自身") return;
+  context.出现X = jass.GetUnitX(gap.单位);
+  context.出现Y = jass.GetUnitY(gap.单位);
+  jass.SetUnitPosition(hero, context.出现X, context.出现Y);
+  八云紫诊断日志("E", "自身神隐由D间隙出现", "英雄", 八云紫诊断句柄(hero), "D间隙", 八云紫诊断句柄(gap.单位), "出现X", context.出现X, "出现Y", context.出现Y);
+  播放八云紫随机单位音效(hero, 配置.E.主动出现语音键);
+  结束神隐(context, true);
 }
 
 注册单位技能壳监听({
@@ -366,5 +409,6 @@ function 监听主动出现(this: void, caster: any, spellAbilityId: number): vo
   技能实例持续时间秒: 3,
 });
 registerSpellEffectListener(监听主动出现);
+注册八云紫裂隙创建监听器(监听自身神隐D间隙);
 
 export {};

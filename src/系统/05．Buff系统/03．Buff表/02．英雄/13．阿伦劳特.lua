@@ -1,7 +1,7 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 --- 阿伦劳特 - 英雄 Buff 表
--- 图标目录：imports\BuffIcon\Hero\Alaurent\（尚未生成，路径按迁移计划 §7.3 规划）
+-- 图标目录：imports\BuffIcon\Hero\Alaurent\（已生成 9 张 64x64 BLP1 图标）
 ____exports["阿伦劳特BuffID"] = {
     ["光之圣剑形态"] = "ALT1",
     ["裁决圣剑形态"] = "ALT2",
@@ -142,7 +142,11 @@ ____exports["阿伦劳特Buff表"] = {
         buffID = ____exports["阿伦劳特BuffID"]["裁决制裁"],
         buffName = "裁决制裁",
         icon = "BuffIcon\\Hero\\Alaurent\\judgement_sanction.blp",
-        effect = "",
+        effect = "war3mapImported\\FurorEffect.mdx",
+        effectMode = "attach",
+        effectAttachPoint = "origin",
+        effectTick = 0.3,
+        effectTickDuration = 0.3,
         type = "Buff:magic:positive",
         interval = 0,
         maxStack = 1,

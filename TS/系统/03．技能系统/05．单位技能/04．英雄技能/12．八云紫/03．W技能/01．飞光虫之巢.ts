@@ -4,6 +4,7 @@ import { 八云紫单位技能配置 } from "../00．配置";
 import { 八云紫单位存活, 是八云紫, 是八云紫合法敌人, 创建八云紫临时裂隙, 创建八云紫点特效 } from "../07．公共与单位壳/01．裂隙系统";
 import { 发射八云紫弹幕 } from "../02．Q技能/01．波与粒的境界";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 播放八云紫随机单位音效 } from "../00A．表现工具";
 
 const jass = require("jass.common") as any;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -131,6 +132,7 @@ function 释放W(this: void, _entry: { 英雄: any }, hero: any, skillInstanceId
   };
 
   if (target != null && target !== 0 && 是八云紫合法敌人(hero, target)) {
+    播放八云紫随机单位音效(hero, 配置.W.指定目标语音键);
     for (let i = 0; i < 配置.W.裂隙数量; i++) {
       const angle = 45 + 90 * (i + 1);
       const radians = angle * Math.PI / 180;
@@ -138,10 +140,11 @@ function 释放W(this: void, _entry: { 英雄: any }, hero: any, skillInstanceId
         hero,
         targetX + Math.cos(radians) * 配置.W.指定目标裂隙半径,
         targetY + Math.sin(radians) * 配置.W.指定目标裂隙半径,
-        配置.W.裂隙持续秒,
+        配置.W.裂隙持续秒 + 配置.W.裂隙清理宽限秒,
       ));
     }
   } else {
+    播放八云紫随机单位音效(hero, 配置.W.无目标语音键);
     const heroX = jass.GetUnitX(hero);
     const heroY = jass.GetUnitY(hero);
     const angle = 两点角度(heroX, heroY, targetX, targetY);
@@ -156,7 +159,7 @@ function 释放W(this: void, _entry: { 英雄: any }, hero: any, skillInstanceId
         hero,
         firstX - Math.cos(sideRadians) * 配置.W.横向间距 * i,
         firstY - Math.sin(sideRadians) * 配置.W.横向间距 * i,
-        配置.W.裂隙持续秒,
+        配置.W.裂隙持续秒 + 配置.W.裂隙清理宽限秒,
       ));
     }
   }
@@ -165,7 +168,7 @@ function 释放W(this: void, _entry: { 英雄: any }, hero: any, skillInstanceId
     addDelayedCallback(wave * 配置.W.发射间隔秒 * 1000, 发射W一波, { 上下文: context, 波次: wave } as W发射参数);
   }
   if (target != null && target !== 0 && 是八云紫合法敌人(hero, target)) {
-    addDelayedCallback(配置.W.裂隙持续秒 * 1000, 结算W指定目标, context);
+    addDelayedCallback((配置.W.每裂隙弹幕数 + 1) * 配置.W.发射间隔秒 * 1000, 结算W指定目标, context);
   }
 }
 

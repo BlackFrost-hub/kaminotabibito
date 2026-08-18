@@ -93,7 +93,10 @@ function _____65BD_52A0_590D_6D3B_65E0_654C(hero)
     end
     _____5F00_59CB_65E0_654C_5E27(hero, _____590D_6D3B_65E0_654C_79D2)
 end
-function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_6B21_6570)
+function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_6B21_6570, _____539F_5730_590D_6D3B)
+    if _____539F_5730_590D_6D3B == nil then
+        _____539F_5730_590D_6D3B = false
+    end
     if not _____662F_5426_6709_6548(dyingUnit) then
         return false
     end
@@ -103,6 +106,8 @@ function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_
     if IsUnitType(dyingUnit, jass.UNIT_TYPE_DEAD) ~= true then
         return false
     end
+    local _____539F_5730X = _____539F_5730_590D_6D3B and GetUnitX(dyingUnit) or 0
+    local _____539F_5730Y = _____539F_5730_590D_6D3B and GetUnitY(dyingUnit) or 0
     _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6(_____53D6_82F1_96C4_680F_69FD_4F4D(dyingUnit))
     local _____6D88_8017_590D_6D3B_6B21_6570_8
     if _____6D88_8017_590D_6D3B_6B21_6570 then
@@ -123,46 +128,64 @@ function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_
             _____5269_4F59_6B21_6570 - 1
         )
     end
-    local boss = _____8BFB_53D6_5F53_524D_590D_6D3BBoss()
-    if _____662F_5426_6709_6548(boss) then
-        local pos = _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9(boss, dyingUnit)
-        if pos == nil then
-            return false
-        end
-        local loc = Location(
-            GetUnitX(boss),
-            GetUnitY(boss)
-        )
+    if _____539F_5730_590D_6D3B then
+        local loc = Location(_____539F_5730X, _____539F_5730Y)
         ReviveHeroLoc(dyingUnit, loc, true)
         RemoveLocation(loc)
-        SetUnitX(dyingUnit, pos.x)
-        SetUnitY(dyingUnit, pos.y)
+        SetUnitX(dyingUnit, _____539F_5730X)
+        SetUnitY(dyingUnit, _____539F_5730Y)
         _____65BD_52A0_590D_6D3B_65E0_654C(dyingUnit)
         addDelayedCallback(
             0,
             ____on_590D_6D3B_955C_5934_79FB_52A8,
             {
                 ["玩家"] = GetOwningPlayer(dyingUnit),
-                x = pos.x,
-                y = pos.y
+                x = _____539F_5730X,
+                y = _____539F_5730Y
             }
         )
     else
-        local _____590D_6D3B_70B9 = g.udg_FHD
-        if not _____662F_5426_6709_6548(_____590D_6D3B_70B9) then
-            return false
+        local boss = _____8BFB_53D6_5F53_524D_590D_6D3BBoss()
+        if _____662F_5426_6709_6548(boss) then
+            local pos = _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9(boss, dyingUnit)
+            if pos == nil then
+                return false
+            end
+            local loc = Location(
+                GetUnitX(boss),
+                GetUnitY(boss)
+            )
+            ReviveHeroLoc(dyingUnit, loc, true)
+            RemoveLocation(loc)
+            SetUnitX(dyingUnit, pos.x)
+            SetUnitY(dyingUnit, pos.y)
+            _____65BD_52A0_590D_6D3B_65E0_654C(dyingUnit)
+            addDelayedCallback(
+                0,
+                ____on_590D_6D3B_955C_5934_79FB_52A8,
+                {
+                    ["玩家"] = GetOwningPlayer(dyingUnit),
+                    x = pos.x,
+                    y = pos.y
+                }
+            )
+        else
+            local _____590D_6D3B_70B9 = g.udg_FHD
+            if not _____662F_5426_6709_6548(_____590D_6D3B_70B9) then
+                return false
+            end
+            ReviveHeroLoc(dyingUnit, _____590D_6D3B_70B9, true)
+            _____65BD_52A0_590D_6D3B_65E0_654C(dyingUnit)
+            addDelayedCallback(
+                0,
+                ____on_590D_6D3B_955C_5934_79FB_52A8,
+                {
+                    ["玩家"] = GetOwningPlayer(dyingUnit),
+                    x = GetUnitX(dyingUnit),
+                    y = GetUnitY(dyingUnit)
+                }
+            )
         end
-        ReviveHeroLoc(dyingUnit, _____590D_6D3B_70B9, true)
-        _____65BD_52A0_590D_6D3B_65E0_654C(dyingUnit)
-        addDelayedCallback(
-            0,
-            ____on_590D_6D3B_955C_5934_79FB_52A8,
-            {
-                ["玩家"] = GetOwningPlayer(dyingUnit),
-                x = GetUnitX(dyingUnit),
-                y = GetUnitY(dyingUnit)
-            }
-        )
     end
     return true
 end
@@ -514,9 +537,13 @@ local function ____on_82F1_96C4_6B7B_4EA1_5EF6_8FDF_590D_6D3B(variable)
     _____590D_6D3B_73A9_5BB6_82F1_96C4(variable, true)
 end
 --- 立即复活已注册的玩家英雄，不消耗关卡团队复活次数。
+-- 原地复活为 true 时，英雄会在死亡坐标复活，不读取 Boss 复活点或全局复活点。
 -- 调用方必须处于全局同步游戏逻辑，不能从 GetLocalPlayer 分支调用。
-____exports["直接复活玩家英雄"] = function(dyingUnit)
-    return _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, false)
+____exports["直接复活玩家英雄"] = function(dyingUnit, _____539F_5730_590D_6D3B)
+    if _____539F_5730_590D_6D3B == nil then
+        _____539F_5730_590D_6D3B = false
+    end
+    return _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, false, _____539F_5730_590D_6D3B)
 end
 local function _____82F1_96C4_6B7B_4EA1_5EF6_8FDF_590D_6D3B(dyingUnit, _____51FB_6740_8005)
     if not _____662F_73A9_5BB6_82F1_96C4(dyingUnit) then

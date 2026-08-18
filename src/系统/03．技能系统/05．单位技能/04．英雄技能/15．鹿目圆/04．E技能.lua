@@ -38,6 +38,8 @@ local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用�
 local createTimedEffect = ____require_result_8.createTimedEffect
 local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____4E24_70B9_89D2_5EA6 = ____require_result_9["两点角度"]
+local ____require_result_10 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetRandomDirectionDeg = ____require_result_10.GetRandomDirectionDeg
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -48,7 +50,6 @@ local GetSpellTargetY = jass.GetSpellTargetY
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetHeroLevel = jass.GetHeroLevel
 local GetRandomReal = jass.GetRandomReal
-local GetRandomDirectionDeg = jass.GetRandomDirectionDeg
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitAnimation = jass.SetUnitAnimation
 local SetUnitFlyHeight = jass.SetUnitFlyHeight
@@ -61,11 +62,11 @@ local IsUnitAlly = jass.IsUnitAlly
 local SquareRoot = jass.SquareRoot
 local Cos = jass.Cos
 local Sin = jass.Sin
-local ____jass_bj_DEGTORAD_10 = jass.bj_DEGTORAD
-if ____jass_bj_DEGTORAD_10 == nil then
-    ____jass_bj_DEGTORAD_10 = 0.017453292519943295
+local ____jass_bj_DEGTORAD_11 = jass.bj_DEGTORAD
+if ____jass_bj_DEGTORAD_11 == nil then
+    ____jass_bj_DEGTORAD_11 = 0.017453292519943295
 end
-local bj_DEGTORAD = ____jass_bj_DEGTORAD_10
+local bj_DEGTORAD = ____jass_bj_DEGTORAD_11
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
@@ -134,8 +135,8 @@ local function _____521B_5EFAE_96E8_58F3(context)
     end
     SetUnitFlyHeight(rain, _____914D_7F6E.E["雨单位高度"], 0)
     SetUnitScale(rain, _____914D_7F6E.E["雨单位缩放"], _____914D_7F6E.E["雨单位缩放"], _____914D_7F6E.E["雨单位缩放"])
-    local ____context__96E8_5355_4F4D_11 = context["雨单位"]
-    ____context__96E8_5355_4F4D_11[#____context__96E8_5355_4F4D_11 + 1] = rain
+    local ____context__96E8_5355_4F4D_12 = context["雨单位"]
+    ____context__96E8_5355_4F4D_12[#____context__96E8_5355_4F4D_12 + 1] = rain
 end
 local function _____63A8_8FDBE_96E8_58F3(context)
     local kept = {}

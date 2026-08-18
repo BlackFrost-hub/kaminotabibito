@@ -45,44 +45,40 @@ function _____6E05_7406_7B26_5361R(context)
     end
 end
 local jass = require("jass.common")
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_0.debugLogForce
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-removeDelayedCallback = ____require_result_1.removeDelayedCallback
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
-local removePeriodicCallback = ____require_result_1.removePeriodicCallback
-local ____require_result_2 = require("lib.扩展函数.封装函数.07．镜头函数.01．镜头震动")
-local CameraSetEQNoiseForPlayer = ____require_result_2.CameraSetEQNoiseForPlayer
-CameraClearNoiseForPlayer = ____require_result_2.CameraClearNoiseForPlayer
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
-local _____5F00_59CB_51B2_950B = ____require_result_3["开始冲锋"]
-local _____505C_6B62_4F4D_79FB = ____require_result_3["停止位移"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.03．线性升降系统")
-local _____5F00_59CB_7EBF_6027_5347_964D = ____require_result_4["开始线性升降"]
-local _____505C_6B62_5355_4F4D_7EBF_6027_5347_964D = ____require_result_4["停止单位线性升降"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
-local _____5F00_59CB_786C_76F4 = ____require_result_5["开始硬直"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
-local _____65BD_52A0_7729_6655 = ____require_result_6["施加眩晕"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+removeDelayedCallback = ____require_result_0.removeDelayedCallback
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local removePeriodicCallback = ____require_result_0.removePeriodicCallback
+local ____require_result_1 = require("lib.扩展函数.封装函数.07．镜头函数.01．镜头震动")
+local CameraSetEQNoiseForPlayer = ____require_result_1.CameraSetEQNoiseForPlayer
+CameraClearNoiseForPlayer = ____require_result_1.CameraClearNoiseForPlayer
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
+local _____5F00_59CB_51B2_950B = ____require_result_2["开始冲锋"]
+local _____505C_6B62_4F4D_79FB = ____require_result_2["停止位移"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.03．线性升降系统")
+local _____5F00_59CB_7EBF_6027_5347_964D = ____require_result_3["开始线性升降"]
+local _____505C_6B62_5355_4F4D_7EBF_6027_5347_964D = ____require_result_3["停止单位线性升降"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_4["开始硬直"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
+local _____65BD_52A0_7729_6655 = ____require_result_5["施加眩晕"]
+local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_6["造成单体技能伤害"]
 local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_7["造成单体技能伤害"]
-local ____require_result_8 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3 = ____require_result_8["造成批量AOE技能伤害"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_9["读取单位攻击力"]
-local _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D = ____require_result_9["读取单位最大生命"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_9["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_9["两点角度"]
-local ____require_result_10 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-local _____83B7_53D6_8303_56F4_654C_519B = ____require_result_10["获取范围敌军"]
-local ____require_result_11 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_11.registerDeathListener
-local ____require_result_12 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local SetUnitVertexColorBJ = ____require_result_12.SetUnitVertexColorBJ
+local _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3 = ____require_result_7["造成批量AOE技能伤害"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
+local _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D = ____require_result_8["读取单位最大生命"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_8["两点角度"]
+local ____require_result_9 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+local _____83B7_53D6_8303_56F4_654C_519B = ____require_result_9["获取范围敌军"]
+local ____require_result_10 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_10.registerDeathListener
+local ____require_result_11 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local SetUnitVertexColorBJ = ____require_result_11.SetUnitVertexColorBJ
 GetHandleId = jass.GetHandleId
-local GetUnitTypeId = jass.GetUnitTypeId
-local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetUnitX = jass.GetUnitX
@@ -111,21 +107,13 @@ local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local BJ_DEGTORAD = jass.bj_DEGTORAD or 0.017453292519943295
-local ____require_result_13 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_13.stringToFourCCSafe
+local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_12.stringToFourCCSafe
 local _____666E_901AR_6280_80FDID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["普通R技能ID"])
 local _____7B26_5361R_6280_80FDID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡R技能ID"])
 local _____5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local _____666E_901AR_4E0A_4E0B_6587_8868 = {}
 _____7B26_5361R_4E0A_4E0B_6587_8868 = {}
-local _____666E_901AR_8BCA_65AD_6A21_5757 = "藤原妹红普通R诊断"
-local _____7B26_5361R_8BCA_65AD_6A21_5757 = "藤原妹红符卡R诊断"
-local function _____8BFB_53D6_7B26_5361R_6280_80FD_7B49_7EA7(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetUnitAbilityLevel(unit, _____7B26_5361R_6280_80FDID)
-end
 local function _____83B7_53D6_666E_901AR_4E0A_4E0B_6587(unit)
     return unit
 end
@@ -303,32 +291,12 @@ local function _____666E_901AR_547D_4E2D_76EE_6807(_unit, target, displacementId
     end
     context["目标"] = target
     context["冲锋ID"] = displacementId
-    debugLogForce(
-        _____666E_901AR_8BCA_65AD_6A21_5757,
-        "普通R命中目标",
-        "施法者",
-        _____53D6_5355_4F4D_53E5_67C4ID(_unit),
-        "目标",
-        _____53D6_5355_4F4D_53E5_67C4ID(target),
-        "位移ID",
-        displacementId
-    )
 end
 local function _____666E_901AR_51B2_950B_7ED3_675F(unit, reason, _displacementId, _hitTarget)
     local context = _____666E_901AR_4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4ID(unit)]
     if context == nil or not context["活跃"] then
         return
     end
-    debugLogForce(
-        _____666E_901AR_8BCA_65AD_6A21_5757,
-        "普通R冲锋结束",
-        "施法者",
-        _____53D6_5355_4F4D_53E5_67C4ID(unit),
-        "原因",
-        reason,
-        "目标",
-        _____53D6_5355_4F4D_53E5_67C4ID(context["目标"])
-    )
     context["冲锋ID"] = 0
     if reason == "命中" and context["目标"] ~= nil then
         _____5F00_59CB_666E_901AR_643A_5E26(context)
@@ -339,30 +307,12 @@ end
 local function _____5F00_59CB_666E_901AR_51B2_950B(variable)
     local context = variable
     if context == nil or not context["活跃"] or not _____5355_4F4D_5B58_6D3B(context["施法者"]) then
-        debugLogForce(
-            _____666E_901AR_8BCA_65AD_6A21_5757,
-            "普通R冲锋阶段提前退出",
-            "上下文有效",
-            context ~= nil,
-            "上下文活跃",
-            (context and context["活跃"]) == true
-        )
         if context ~= nil then
             _____6E05_7406_666E_901AR(context)
         end
         return
     end
     local cfg = _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["普通R"]
-    debugLogForce(
-        _____666E_901AR_8BCA_65AD_6A21_5757,
-        "普通R进入冲锋阶段",
-        "施法者",
-        _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"]),
-        "目标X",
-        context["目标X"],
-        "目标Y",
-        context["目标Y"]
-    )
     context["冲锋ID"] = _____5F00_59CB_51B2_950B(context["施法者"], {
         ["目标X"] = context["目标X"],
         ["目标Y"] = context["目标Y"],
@@ -389,16 +339,6 @@ local function _____666E_901AR_81EA_635F_7ED3_7B97(variable)
     if context == nil or not context["活跃"] or context["目标"] == nil or not _____5355_4F4D_5B58_6D3B(context["目标"]) then
         return
     end
-    debugLogForce(
-        _____666E_901AR_8BCA_65AD_6A21_5757,
-        "普通R自损结算",
-        "施法者",
-        _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"]),
-        "目标",
-        _____53D6_5355_4F4D_53E5_67C4ID(context["目标"]),
-        "自损生命",
-        context["自损生命"]
-    )
     local caster = context["施法者"]
     local target = context["目标"]
     local life = GetUnitState(caster, UNIT_STATE_LIFE)
@@ -432,20 +372,7 @@ end
 local function _____91CA_653E_85E4_539F_59B9_7EA2_666E_901AR(_context, caster, skillInstanceId)
     local casterId = _____53D6_5355_4F4D_53E5_67C4ID(caster)
     local casterValid = _____5355_4F4D_5B58_6D3B(caster) and casterId ~= 0
-    debugLogForce(
-        _____666E_901AR_8BCA_65AD_6A21_5757,
-        "进入普通R入口",
-        "施法者",
-        casterId,
-        "单位类型",
-        casterValid and GetUnitTypeId(caster) or 0,
-        "普通R技能数字ID",
-        _____666E_901AR_6280_80FDID,
-        "施法者有效",
-        casterValid
-    )
     if not casterValid then
-        debugLogForce(_____666E_901AR_8BCA_65AD_6A21_5757, "普通R提前退出", "原因", "施法者无效")
         return
     end
     local unitId = casterId
@@ -456,20 +383,6 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_666E_901AR(_context, caster, s
     local cfg = _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["普通R"]
     local targetX = GetSpellTargetX()
     local targetY = GetSpellTargetY()
-    debugLogForce(
-        _____666E_901AR_8BCA_65AD_6A21_5757,
-        "普通R目标点",
-        "施法者",
-        unitId,
-        "目标X",
-        targetX,
-        "目标Y",
-        targetY,
-        "硬直秒",
-        cfg["硬直秒"],
-        "自损延迟秒",
-        cfg["自损延迟秒"]
-    )
     local context = {
         ["施法者"] = caster,
         ["目标X"] = targetX,
@@ -499,25 +412,17 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_666E_901AR(_context, caster, s
     _____64AD_653E_85E4_539F_59B9_7EA2_914D_7F6E_52A8_4F5C(caster, cfg["动作编号"], cfg["动作速度"])
     addDelayedCallback(cfg["硬直秒"] * 1000, _____5F00_59CB_666E_901AR_51B2_950B, context)
     addDelayedCallback(cfg["自损延迟秒"] * 1000, _____666E_901AR_81EA_635F_7ED3_7B97, context)
-    debugLogForce(
-        _____666E_901AR_8BCA_65AD_6A21_5757,
-        "普通R上下文已创建",
-        "施法者",
-        unitId,
-        "技能实例ID",
-        skillInstanceId
-    )
 end
 local function _____85E4_539F_59B9_7EA2_666E_901AR_5355_4F4D_6B7B_4EA1(dyingUnit, _killingUnit)
     for key in pairs(_____666E_901AR_4E0A_4E0B_6587_8868) do
         do
             local context = _____666E_901AR_4E0A_4E0B_6587_8868[__TS__Number(key)]
             if context == nil or context["施法者"] ~= dyingUnit and context["目标"] ~= dyingUnit then
-                goto __continue49
+                goto __continue47
             end
             _____6E05_7406_666E_901AR(context)
         end
-        ::__continue49::
+        ::__continue47::
     end
     local cardContext = _____7B26_5361R_4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4ID(dyingUnit)]
     if cardContext ~= nil and cardContext["施法者"] == dyingUnit then
@@ -644,37 +549,13 @@ local function _____7ED3_7B97_85E4_539F_59B9_7EA2_7B26_5361R(variable)
 end
 local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361R(_context, caster, skillInstanceId)
     local casterValid = _____5355_4F4D_5B58_6D3B(caster)
-    debugLogForce(
-        _____7B26_5361R_8BCA_65AD_6A21_5757,
-        "进入符卡R入口",
-        "施法者",
-        _____53D6_5355_4F4D_53E5_67C4ID(caster),
-        "单位类型",
-        casterValid and GetUnitTypeId(caster) or 0,
-        "符卡R技能等级",
-        _____8BFB_53D6_7B26_5361R_6280_80FD_7B49_7EA7(caster),
-        "施法者有效",
-        casterValid
-    )
     if not casterValid then
-        debugLogForce(_____7B26_5361R_8BCA_65AD_6A21_5757, "符卡R提前退出", "原因", "施法者无效")
         return
     end
     _____5173_95ED_85E4_539F_59B9_7EA2_7B26_5361_6A21_5F0F(caster, true)
     local target = GetSpellTargetUnit()
     local targetValid = _____5355_4F4D_5B58_6D3B(target)
-    debugLogForce(
-        _____7B26_5361R_8BCA_65AD_6A21_5757,
-        "符卡R目标检查",
-        "施法者",
-        _____53D6_5355_4F4D_53E5_67C4ID(caster),
-        "目标",
-        _____53D6_5355_4F4D_53E5_67C4ID(target),
-        "目标有效",
-        targetValid
-    )
     if not targetValid then
-        debugLogForce(_____7B26_5361R_8BCA_65AD_6A21_5757, "符卡R提前退出", "原因", "目标无效")
         return
     end
     local casterId = _____53D6_5355_4F4D_53E5_67C4ID(caster)
@@ -718,30 +599,8 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361R(_context, caster, s
     _____521B_5EFA_85E4_539F_59B9_7EA2_70B9_7279_6548(cfg["进度条特效"], casterX, casterY, direction)
     context["结算回调ID"] = addDelayedCallback(cfg["结算延迟秒"] * 1000, _____7ED3_7B97_85E4_539F_59B9_7EA2_7B26_5361R, context)
     context["收尾回调ID"] = addDelayedCallback(cfg["收尾延迟秒"] * 1000, _____7B26_5361R_6536_5C3E, context)
-    debugLogForce(
-        _____7B26_5361R_8BCA_65AD_6A21_5757,
-        "符卡R上下文已创建",
-        "施法者",
-        casterId,
-        "目标",
-        _____53D6_5355_4F4D_53E5_67C4ID(target),
-        "结算延迟秒",
-        cfg["结算延迟秒"],
-        "收尾延迟秒",
-        cfg["收尾延迟秒"]
-    )
 end
 local function _____6CE8_518C_85E4_539F_59B9_7EA2_7B26_5361R()
-    debugLogForce(
-        _____7B26_5361R_8BCA_65AD_6A21_5757,
-        "注册R监听",
-        "单位类型ID",
-        _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"],
-        "符卡R技能ID",
-        _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡R技能ID"],
-        "符卡R数字ID",
-        _____7B26_5361R_6280_80FDID
-    )
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "藤原妹红-符卡R",
         ["单位类型ID"] = _____5355_4F4D_7C7B_578BID,
@@ -768,6 +627,5 @@ ____exports["注册藤原妹红普通R"] = function()
     registerDeathListener(_____85E4_539F_59B9_7EA2_666E_901AR_5355_4F4D_6B7B_4EA1)
 end
 ____exports["注册藤原妹红普通R"]()
-debugLogForce(_____666E_901AR_8BCA_65AD_6A21_5757, "R模块已加载并完成监听注册")
 ____exports["藤原妹红普通R技能状态"] = {["已完成设计"] = true, ["已完成实现"] = true, ["伤害形态"] = "抓取后携带目标，1.35秒自损与强化单体伤害"}
 return ____exports

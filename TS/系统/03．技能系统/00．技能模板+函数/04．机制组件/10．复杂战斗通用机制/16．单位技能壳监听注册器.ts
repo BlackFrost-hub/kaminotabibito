@@ -48,12 +48,22 @@ function 转ID(this: void, id: string | number): number {
 function on单位技能壳监听施法(this: void, castingUnit: any, spellAbilityId: number): void {
   if (!单位有效(castingUnit)) return;
   const unitTypeId = GetUnitTypeId(castingUnit);
-  let matchedCount = 0;
+  if (unitTypeId === 转ID("H00F") || unitTypeId === 转ID("H00G")) {
+    debugLogForce(
+      "阿伦劳特技能壳诊断",
+      "收到施法",
+      "施法单位类型ID",
+      unitTypeId,
+      "技能ID",
+      spellAbilityId,
+      "监听总数",
+      监听列表.length,
+    );
+  }
   for (let i = 0; i < 监听列表.length; i++) {
     const 参数 = 监听列表[i];
     if (spellAbilityId !== 转ID(参数.技能ID)) continue;
     if (unitTypeId !== 转ID(参数.单位类型ID)) continue;
-    matchedCount += 1;
     const context = 参数.获取或创建上下文(castingUnit);
     if (context == null) continue;
     if (参数.可释放 != null && !参数.可释放(context, castingUnit)) continue;
@@ -69,18 +79,6 @@ function on单位技能壳监听施法(this: void, castingUnit: any, spellAbilit
     绑定单位当前独立技能伤害实例(castingUnit, 技能实例ID);
     参数.释放技能(context, castingUnit, 技能实例ID);
   }
-  if (unitTypeId === 转ID("H00R")) {
-    debugLogForce(
-      "藤原妹红技能壳诊断",
-      "壳层收到施法",
-      "技能ID",
-      spellAbilityId,
-      "匹配数",
-      matchedCount,
-      "监听总数",
-      监听列表.length,
-    );
-  }
 }
 
 function 确保单位技能壳总监听(this: void): void {
@@ -92,18 +90,6 @@ function 确保单位技能壳总监听(this: void): void {
 export function 注册单位技能壳监听<T>(this: void, 参数: 单位技能壳监听参数<T>): void {
   确保单位技能壳总监听();
   监听列表.push(参数 as 单位技能壳监听参数<any>);
-  if (转ID(参数.单位类型ID) === 转ID("H00R")) {
-    debugLogForce(
-      "藤原妹红技能壳诊断",
-      "注册监听",
-      "名称",
-      参数.名称,
-      "技能ID",
-      转ID(参数.技能ID),
-      "监听总数",
-      监听列表.length,
-    );
-  }
 }
 
 export {};

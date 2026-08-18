@@ -233,5 +233,4 @@ export function 注册沙漠食人魔咒(this: void): void {
     释放技能: on食人魔咒技能壳释放,
     技能实例持续时间秒: 10,
   });
-  debugLogForce('沙漠食人魔-食人魔咒', '技能监听注册完成', 'skillId=', 食人魔咒技能ID);
 }

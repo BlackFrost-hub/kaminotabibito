@@ -28,7 +28,7 @@ ____exports["塞拉斯技能配置"] = {
         ["施法距离"] = 800,
         ["冷却秒"] = 45,
         ["魔耗"] = "统一百分比魔耗系统处理（介绍 5%），技能文件不扣魔",
-        ["音效"] = {["路径"] = "Sound\\SLD_D.wav", ["裁断距离"] = 1250},
+        ["音效键"] = "gg_snd_SLD_D",
         ["错误提示"] = "目标不是当前 Boss 战单位",
         ["提示持续秒"] = 15
     },
@@ -64,8 +64,8 @@ ____exports["塞拉斯技能配置"] = {
             ["灼烧每次命中加层"] = 2,
             ["特效"] = {{["模型路径"] = "war3mapImported\\fire.mdl", ["缩放"] = 1.45, ["持续秒"] = 1.2}, {["模型路径"] = "war3mapImported\\FireImpact.mdl", ["缩放"] = 1.45, ["持续秒"] = 1.2}, {["模型路径"] = "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdl", ["缩放"] = 1, ["持续秒"] = 1.2}},
             ["灼烧特效"] = {["模型路径"] = "war3mapImported\\Fire2.mdl", ["挂点"] = "origin", ["持续秒"] = 2},
-            ["音效普通"] = {["路径"] = "Sound\\SLS_W.wav", ["裁断距离"] = 1250},
-            ["音效大魔法"] = {["路径"] = "Sound\\SLS_W2.wav", ["裁断距离"] = 1250}
+            ["音效普通键"] = "gg_snd_SLS_W",
+            ["音效大魔法键"] = "gg_snd_SLS_W2"
         },
         ["冰冻"] = {
             ["元素"] = "冰",
@@ -73,8 +73,8 @@ ____exports["塞拉斯技能配置"] = {
             ["每级成长"] = 0.1,
             ["冻结秒"] = 0.6,
             ["特效"] = {{["模型路径"] = "war3mapImported\\FrostNova.mdl", ["缩放"] = 0.66, ["持续秒"] = 1.2}, {["模型路径"] = "war3mapImported\\ICE.mdl", ["缩放"] = 4, ["持续秒"] = 1.2}},
-            ["音效普通"] = {["路径"] = "Sound\\SLS_E.wav", ["裁断距离"] = 1250},
-            ["音效大魔法"] = {["路径"] = "Sound\\SLS_E2.wav", ["裁断距离"] = 1250}
+            ["音效普通键"] = "gg_snd_SLS_E",
+            ["音效大魔法键"] = "gg_snd_SLS_E2"
         },
         ["雷击"] = {
             ["元素"] = "雷",
@@ -84,9 +84,9 @@ ____exports["塞拉斯技能配置"] = {
             ["减速比例"] = 0.99,
             ["目标特效"] = {["模型路径"] = "Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdl", ["缩放"] = 1.25, ["持续秒"] = 1},
             ["落点特效"] = {["模型路径"] = "war3mapImported\\OrbOfLightning.mdl", ["缩放"] = 7, ["持续秒"] = 1.2},
-            ["目标音效"] = {["路径"] = "Sound\\CorrosiveBreathMissileLaunch1.wav", ["裁断距离"] = 1250},
-            ["音效普通"] = {["路径"] = "Sound\\SLS_R.wav", ["裁断距离"] = 1250},
-            ["音效大魔法"] = {["路径"] = "Sound\\SLS_R2.wav", ["裁断距离"] = 1250}
+            ["目标音效键"] = "gg_snd_CorrosiveBreathMissileLaunch1",
+            ["音效普通键"] = "gg_snd_SLS_R",
+            ["音效大魔法键"] = "gg_snd_SLS_R2"
         }
     },
     W = {
@@ -97,7 +97,8 @@ ____exports["塞拉斯技能配置"] = {
         ["冷却基础秒"] = 20,
         ["冷却每级递减秒"] = 0.5,
         ["特效"] = {{["模型路径"] = "war3mapImported\\[AKE]war3AKE.com - 4824137662399555907875383.mdl", ["缩放"] = 2, ["持续秒"] = 1.2}, {["模型路径"] = "war3mapImported\\Teleport.mdl", ["缩放"] = 3, ["持续秒"] = 1.2}},
-        ["音效"] = {{["路径"] = "Sound\\SLS_ZW.wav", ["裁断距离"] = 1500}, {["路径"] = "Sound\\Tranquility01.wav", ["裁断距离"] = 1500}}
+        ["音效键"] = {"gg_snd_SLS_ZW", "gg_snd_Tranquility01"},
+        ["刷新冷却秒"] = 0.05
     },
     E = {
         ["快捷键序号"] = 3,

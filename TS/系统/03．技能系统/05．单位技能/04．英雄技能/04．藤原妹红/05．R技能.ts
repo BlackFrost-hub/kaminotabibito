@@ -15,9 +15,6 @@ import { 关闭藤原妹红符卡模式 } from "./04．E技能";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const jass = require("jass.common") as any;
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removeDelayedCallback: (this: void, id: number) => void;
@@ -65,8 +62,6 @@ const { SetUnitVertexColorBJ } = require("lib.扩展函数.BJ函数.02．单位�
 };
 
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
-const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
-const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, abilityId: number) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -138,16 +133,9 @@ const 符卡R技能ID = stringToFourCCSafe(藤原妹红单位技能配置.符卡
 const 单位类型ID = stringToFourCCSafe(藤原妹红单位技能配置.单位类型ID);
 const 普通R上下文表: Record<number, 藤原妹红普通R运行时上下文 | undefined> = {};
 const 符卡R上下文表: Record<number, 藤原妹红符卡R运行时上下文 | undefined> = {};
-const 普通R诊断模块 = "藤原妹红普通R诊断";
-const 符卡R诊断模块 = "藤原妹红符卡R诊断";
 
 function 取单位句柄ID(this: void, unit: any): number {
   return unit == null || unit === 0 ? 0 : (GetHandleId(unit) || 0);
-}
-
-function 读取符卡R技能等级(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetUnitAbilityLevel(unit, 符卡R技能ID);
 }
 
 function 获取普通R上下文(this: void, unit: any): any {
@@ -302,31 +290,11 @@ function 普通R命中目标(this: void, _unit: any, target: any, displacementId
   if (context == null || !context.活跃 || context.目标 != null) return;
   context.目标 = target;
   context.冲锋ID = displacementId;
-  debugLogForce(
-    普通R诊断模块,
-    "普通R命中目标",
-    "施法者",
-    取单位句柄ID(_unit),
-    "目标",
-    取单位句柄ID(target),
-    "位移ID",
-    displacementId,
-  );
 }
 
 function 普通R冲锋结束(this: void, unit: any, reason: string, _displacementId: number, _hitTarget?: any): void {
   const context = 普通R上下文表[取单位句柄ID(unit)];
   if (context == null || !context.活跃) return;
-  debugLogForce(
-    普通R诊断模块,
-    "普通R冲锋结束",
-    "施法者",
-    取单位句柄ID(unit),
-    "原因",
-    reason,
-    "目标",
-    取单位句柄ID(context.目标),
-  );
   context.冲锋ID = 0;
   if (reason === "命中" && context.目标 != null) {
     开始普通R携带(context);
@@ -338,21 +306,10 @@ function 普通R冲锋结束(this: void, unit: any, reason: string, _displacemen
 function 开始普通R冲锋(this: void, variable?: any): void {
   const context = variable as 藤原妹红普通R运行时上下文 | undefined;
   if (context == null || !context.活跃 || !单位存活(context.施法者)) {
-    debugLogForce(普通R诊断模块, "普通R冲锋阶段提前退出", "上下文有效", context != null, "上下文活跃", context?.活跃 === true);
     if (context != null) 清理普通R(context);
     return;
   }
   const cfg = 藤原妹红单位技能配置.普通R;
-  debugLogForce(
-    普通R诊断模块,
-    "普通R进入冲锋阶段",
-    "施法者",
-    取单位句柄ID(context.施法者),
-    "目标X",
-    context.目标X,
-    "目标Y",
-    context.目标Y,
-  );
   context.冲锋ID = 开始冲锋(context.施法者, {
     目标X: context.目标X,
     目标Y: context.目标Y,
@@ -376,16 +333,6 @@ function 开始普通R冲锋(this: void, variable?: any): void {
 function 普通R自损结算(this: void, variable?: any): void {
   const context = variable as 藤原妹红普通R运行时上下文 | undefined;
   if (context == null || !context.活跃 || context.目标 == null || !单位存活(context.目标)) return;
-  debugLogForce(
-    普通R诊断模块,
-    "普通R自损结算",
-    "施法者",
-    取单位句柄ID(context.施法者),
-    "目标",
-    取单位句柄ID(context.目标),
-    "自损生命",
-    context.自损生命,
-  );
   const caster = context.施法者;
   const target = context.目标;
   const life = GetUnitState(caster, UNIT_STATE_LIFE);
@@ -416,20 +363,7 @@ function 普通R自损结算(this: void, variable?: any): void {
 function 释放藤原妹红普通R(this: void, _context: any, caster: any, skillInstanceId?: number): void {
   const casterId = 取单位句柄ID(caster);
   const casterValid = 单位存活(caster) && casterId !== 0;
-  debugLogForce(
-    普通R诊断模块,
-    "进入普通R入口",
-    "施法者",
-    casterId,
-    "单位类型",
-    casterValid ? GetUnitTypeId(caster) : 0,
-    "普通R技能数字ID",
-    普通R技能ID,
-    "施法者有效",
-    casterValid,
-  );
   if (!casterValid) {
-    debugLogForce(普通R诊断模块, "普通R提前退出", "原因", "施法者无效");
     return;
   }
   const unitId = casterId;
@@ -438,20 +372,6 @@ function 释放藤原妹红普通R(this: void, _context: any, caster: any, skill
   const cfg = 藤原妹红单位技能配置.普通R;
   const targetX = GetSpellTargetX();
   const targetY = GetSpellTargetY();
-  debugLogForce(
-    普通R诊断模块,
-    "普通R目标点",
-    "施法者",
-    unitId,
-    "目标X",
-    targetX,
-    "目标Y",
-    targetY,
-    "硬直秒",
-    cfg.硬直秒,
-    "自损延迟秒",
-    cfg.自损延迟秒,
-  );
   const context: 藤原妹红普通R运行时上下文 = {
     施法者: caster,
     目标X: targetX,
@@ -476,7 +396,6 @@ function 释放藤原妹红普通R(this: void, _context: any, caster: any, skill
   播放藤原妹红配置动作(caster, cfg.动作编号, cfg.动作速度);
   addDelayedCallback(cfg.硬直秒 * 1000, 开始普通R冲锋, context);
   addDelayedCallback(cfg.自损延迟秒 * 1000, 普通R自损结算, context);
-  debugLogForce(普通R诊断模块, "普通R上下文已创建", "施法者", unitId, "技能实例ID", skillInstanceId);
 }
 
 function 藤原妹红普通R单位死亡(this: void, dyingUnit: any, _killingUnit: any): void {
@@ -618,37 +537,13 @@ function 结算藤原妹红符卡R(this: void, variable?: any): void {
 
 function 释放藤原妹红符卡R(this: void, _context: any, caster: any, skillInstanceId?: number): void {
   const casterValid = 单位存活(caster);
-  debugLogForce(
-    符卡R诊断模块,
-    "进入符卡R入口",
-    "施法者",
-    取单位句柄ID(caster),
-    "单位类型",
-    casterValid ? GetUnitTypeId(caster) : 0,
-    "符卡R技能等级",
-    读取符卡R技能等级(caster),
-    "施法者有效",
-    casterValid,
-  );
   if (!casterValid) {
-    debugLogForce(符卡R诊断模块, "符卡R提前退出", "原因", "施法者无效");
     return;
   }
   关闭藤原妹红符卡模式(caster, true);
   const target = GetSpellTargetUnit();
   const targetValid = 单位存活(target);
-  debugLogForce(
-    符卡R诊断模块,
-    "符卡R目标检查",
-    "施法者",
-    取单位句柄ID(caster),
-    "目标",
-    取单位句柄ID(target),
-    "目标有效",
-    targetValid,
-  );
   if (!targetValid) {
-    debugLogForce(符卡R诊断模块, "符卡R提前退出", "原因", "目标无效");
     return;
   }
   const casterId = 取单位句柄ID(caster);
@@ -686,31 +581,9 @@ function 释放藤原妹红符卡R(this: void, _context: any, caster: any, skill
   创建藤原妹红点特效(cfg.进度条特效, casterX, casterY, direction);
   context.结算回调ID = addDelayedCallback(cfg.结算延迟秒 * 1000, 结算藤原妹红符卡R, context);
   context.收尾回调ID = addDelayedCallback(cfg.收尾延迟秒 * 1000, 符卡R收尾, context);
-  debugLogForce(
-    符卡R诊断模块,
-    "符卡R上下文已创建",
-    "施法者",
-    casterId,
-    "目标",
-    取单位句柄ID(target),
-    "结算延迟秒",
-    cfg.结算延迟秒,
-    "收尾延迟秒",
-    cfg.收尾延迟秒,
-  );
 }
 
 function 注册藤原妹红符卡R(this: void): void {
-  debugLogForce(
-    符卡R诊断模块,
-    "注册R监听",
-    "单位类型ID",
-    藤原妹红单位技能配置.单位类型ID,
-    "符卡R技能ID",
-    藤原妹红单位技能配置.符卡R技能ID,
-    "符卡R数字ID",
-    符卡R技能ID,
-  );
   注册单位技能壳监听({
     名称: "藤原妹红-符卡R",
     单位类型ID,
@@ -740,8 +613,6 @@ export function 注册藤原妹红普通R(this: void): void {
 }
 
 注册藤原妹红普通R();
-
-debugLogForce(普通R诊断模块, "R模块已加载并完成监听注册");
 
 export const 藤原妹红普通R技能状态 = {
   已完成设计: true,

@@ -23,6 +23,7 @@ function _____53D6_5F53_524D_65BD_6CD5_6280_80FD_7C7B_578BID()
     return _____5F53_524D_65BD_6CD5_6280_80FD_7C7B_578BID_7F13_5B58
 end
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
 local _____65BD_52A0_7729_6655 = ____require_result_0["施加眩晕"]
 local _____65BD_52A0_51CF_901F = ____require_result_0["施加减速"]
@@ -40,15 +41,13 @@ local _____83B7_53D6_8303_56F4_654C_519B = ____require_result_5["获取范围敌
 local _____5728_5750_6807_64AD_653E_7279_6548 = ____require_result_5["在坐标播放特效"]
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createTimedUnitEffect = ____require_result_6.createTimedUnitEffect
-local ____require_result_7 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_7.Sound3DII_UnitPlayReuse
-local ____require_result_8 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_8.addPeriodicCallback
-local removePeriodicCallback = ____require_result_8.removePeriodicCallback
-local ____require_result_9 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_9.registerDeathListener
-local ____require_result_10 = require("平台扩展API动作")
-local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_10["技能_设置技能冷却时间"]
+local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_7.addPeriodicCallback
+local removePeriodicCallback = ____require_result_7.removePeriodicCallback
+local ____require_result_8 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_8.registerDeathListener
+local ____require_result_9 = require("平台扩展API动作")
+local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_9["技能_设置技能冷却时间"]
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
@@ -64,6 +63,15 @@ local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 local UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
+local function _____64AD_653E_5168_5C40_97F3_6548(unit, soundKey)
+    local soundHandle = jglobals[soundKey]
+    if unit == nil or unit == 0 or soundHandle == nil or soundHandle == 0 then
+        return
+    end
+    jass.AttachSoundToUnit(soundHandle, unit)
+    jass.SetSoundVolume(soundHandle, 127)
+    jass.StartSound(soundHandle)
+end
 local _____914D_7F6E = _____585E_62C9_65AF_6280_80FD_914D_7F6E
 local _____5143_7D20_914D_7F6E = _____914D_7F6E["元素魔法"]
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
@@ -85,14 +93,14 @@ local function _____8FC7_6EE4_5143_7D20_9B54_6CD5_6807_7684(_____654C_519B_5217_
             do
                 local u = _____654C_519B_5217_8868[i + 1]
                 if u == nil or u == 0 then
-                    goto __continue6
+                    goto __continue8
                 end
                 if IsUnitType(u, UNIT_TYPE_ANCIENT) or IsUnitType(u, UNIT_TYPE_MECHANICAL) or IsUnitType(u, UNIT_TYPE_STRUCTURE) then
-                    goto __continue6
+                    goto __continue8
                 end
                 result[#result + 1] = u
             end
-            ::__continue6::
+            ::__continue8::
             i = i + 1
         end
     end
@@ -267,7 +275,7 @@ local function _____64AD_653E_5143_7D20_843D_70B9_8868_73B0(caster, _____5143_7D
             end
         end
     elseif _____5143_7D20 == "雷" then
-        Sound3DII_UnitPlayReuse(_____5143_7D20_914D_7F6E["雷击"]["目标音效"]["路径"], caster, _____5143_7D20_914D_7F6E["雷击"]["目标音效"]["裁断距离"])
+        _____64AD_653E_5168_5C40_97F3_6548(caster, _____5143_7D20_914D_7F6E["雷击"]["目标音效键"])
         _____5728_5750_6807_64AD_653E_7279_6548(
             _____5143_7D20_914D_7F6E["雷击"]["落点特效"]["模型路径"],
             x,
@@ -299,19 +307,19 @@ local function _____63A8_8FDB_5143_7D20_9B54_6CD5tick(variable)
     end
     local _____654C_519B_5217_8868 = _____8FC7_6EE4_5143_7D20_9B54_6CD5_6807_7684(_____83B7_53D6_8303_56F4_654C_519B(caster, x, y, _____5143_7D20_914D_7F6E["范围"]))
     if context["伤害快照"] > 0 and #_____654C_519B_5217_8868 > 0 then
-        local ____temp_12
+        local ____temp_11
         if context["元素"] == "火" then
-            ____temp_12 = jass.DAMAGE_TYPE_FIRE
+            ____temp_11 = jass.DAMAGE_TYPE_FIRE
         else
-            local ____temp_11
+            local ____temp_10
             if context["元素"] == "冰" then
-                ____temp_11 = jass.DAMAGE_TYPE_COLD
+                ____temp_10 = jass.DAMAGE_TYPE_COLD
             else
-                ____temp_11 = jass.DAMAGE_TYPE_LIGHTNING
+                ____temp_10 = jass.DAMAGE_TYPE_LIGHTNING
             end
-            ____temp_12 = ____temp_11
+            ____temp_11 = ____temp_10
         end
-        local _____4F24_5BB3_7C7B_578B = ____temp_12
+        local _____4F24_5BB3_7C7B_578B = ____temp_11
         _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
             ["来源"] = caster,
             ["目标列表"] = _____654C_519B_5217_8868,
@@ -357,14 +365,11 @@ local function _____53D6_5143_7D20_4F24_5BB3_7C7B_578B_57FA_6570(_____5143_7D20)
 end
 local function _____64AD_653E_5143_7D20_65BD_6CD5_97F3_6548(caster, _____5143_7D20, _____662F_5927_9B54_6CD5)
     if _____5143_7D20 == "冰" then
-        local snd = _____662F_5927_9B54_6CD5 and _____5143_7D20_914D_7F6E["冰冻"]["音效大魔法"] or _____5143_7D20_914D_7F6E["冰冻"]["音效普通"]
-        Sound3DII_UnitPlayReuse(snd["路径"], caster, snd["裁断距离"])
+        _____64AD_653E_5168_5C40_97F3_6548(caster, _____662F_5927_9B54_6CD5 and _____5143_7D20_914D_7F6E["冰冻"]["音效大魔法键"] or _____5143_7D20_914D_7F6E["冰冻"]["音效普通键"])
     elseif _____5143_7D20 == "雷" then
-        local snd = _____662F_5927_9B54_6CD5 and _____5143_7D20_914D_7F6E["雷击"]["音效大魔法"] or _____5143_7D20_914D_7F6E["雷击"]["音效普通"]
-        Sound3DII_UnitPlayReuse(snd["路径"], caster, snd["裁断距离"])
+        _____64AD_653E_5168_5C40_97F3_6548(caster, _____662F_5927_9B54_6CD5 and _____5143_7D20_914D_7F6E["雷击"]["音效大魔法键"] or _____5143_7D20_914D_7F6E["雷击"]["音效普通键"])
     else
-        local snd = _____662F_5927_9B54_6CD5 and _____5143_7D20_914D_7F6E["火焰"]["音效大魔法"] or _____5143_7D20_914D_7F6E["火焰"]["音效普通"]
-        Sound3DII_UnitPlayReuse(snd["路径"], caster, snd["裁断距离"])
+        _____64AD_653E_5168_5C40_97F3_6548(caster, _____662F_5927_9B54_6CD5 and _____5143_7D20_914D_7F6E["火焰"]["音效大魔法键"] or _____5143_7D20_914D_7F6E["火焰"]["音效普通键"])
     end
 end
 local function _____83B7_53D6_6216_521B_5EFA_5143_7D20_4E0A_4E0B_6587(unit)
@@ -464,9 +469,8 @@ local function _____91CA_653EW_5927_9B54_6CD5_5316(_context, caster)
     end
     do
         local i = 0
-        while i < #_____914D_7F6E.W["音效"] do
-            local snd = _____914D_7F6E.W["音效"][i + 1]
-            Sound3DII_UnitPlayReuse(snd["路径"], caster, snd["裁断距离"])
+        while i < #_____914D_7F6E.W["音效键"] do
+            _____64AD_653E_5168_5C40_97F3_6548(caster, _____914D_7F6E.W["音效键"][i + 1])
             i = i + 1
         end
     end
@@ -495,6 +499,10 @@ local function _____91CA_653EW_5927_9B54_6CD5_5316(_context, caster)
         1,
         {stack = 1}
     )
+    _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(caster, ____Q_5165_53E3_7C7B_578BID, _____914D_7F6E.W["刷新冷却秒"], _____914D_7F6E.W["刷新冷却秒"])
+    _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(caster, _____5143_7D20_914D_7F6E["火焰技能类型ID"], _____914D_7F6E.W["刷新冷却秒"], _____914D_7F6E.W["刷新冷却秒"])
+    _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(caster, _____5143_7D20_914D_7F6E["冰冻技能类型ID"], _____914D_7F6E.W["刷新冷却秒"], _____914D_7F6E.W["刷新冷却秒"])
+    _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(caster, _____5143_7D20_914D_7F6E["雷击技能类型ID"], _____914D_7F6E.W["刷新冷却秒"], _____914D_7F6E.W["刷新冷却秒"])
     local ____W_7B49_7EA7 = GetUnitAbilityLevel(caster, _____914D_7F6E.W["技能类型ID"])
     local ____W_51B7_5374 = _____914D_7F6E.W["冷却基础秒"] - _____914D_7F6E.W["冷却每级递减秒"] * ____W_7B49_7EA7
     _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(caster, _____914D_7F6E.W["技能类型ID"], ____W_51B7_5374, ____W_51B7_5374)
@@ -514,7 +522,7 @@ local function _____5143_7D20_9B54_6CD5_5355_4F4D_6B7B_4EA1(dyingUnit, _killingU
         do
             local record = _____707C_70E7_5468_671F_8868[__TS__Number(key)]
             if record == nil then
-                goto __continue77
+                goto __continue79
             end
             if record.target == dyingUnit or record.caster == dyingUnit then
                 removePeriodicCallback(record["回调ID"])
@@ -524,7 +532,7 @@ local function _____5143_7D20_9B54_6CD5_5355_4F4D_6B7B_4EA1(dyingUnit, _killingU
                 )
             end
         end
-        ::__continue77::
+        ::__continue79::
     end
 end
 ____exports["注册塞拉斯元素魔法"] = function()

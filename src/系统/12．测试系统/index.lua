@@ -40,6 +40,8 @@ local ENABLE_PLAYER_HERO_REGISTRATION_TEST = true
 local ENABLE_TEST_PLAYER_WHITELIST_UNLOCK = true
 local ENABLE_HERO_LEVEL_LOOP_TEST = true
 local ENABLE_ITEM_SCORE_TEST = true
+local ENABLE_HERO_COOLDOWN_RESET_TEST = true
+local ENABLE_SAKAI_D_SNAKE_EFFECT_TEST = true
 local function loadTests(self)
     if ENABLE_MAIN_PROGRESS_TEST then
         require("系统.12．测试系统.20．主线进度测试")
@@ -161,6 +163,12 @@ local function loadTests(self)
     end
     if ENABLE_ITEM_SCORE_TEST then
         require("系统.12．测试系统.19．物品评分测试")
+    end
+    if ENABLE_HERO_COOLDOWN_RESET_TEST then
+        require("系统.12．测试系统.28．重置玩家英雄技能冷却测试")
+    end
+    if ENABLE_SAKAI_D_SNAKE_EFFECT_TEST then
+        require("系统.12．测试系统.29．坂井悠二D蛇特效测试")
     end
 end
 loadTests(nil)

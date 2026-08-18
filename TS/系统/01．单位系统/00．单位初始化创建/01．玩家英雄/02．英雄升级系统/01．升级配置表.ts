@@ -57,6 +57,14 @@ export const 英雄升级配置列表: readonly 英雄升级配置[] = [
     heroId: "H00I",
     heroName: "LV6",
     properName: "矢量操作",
+    extraAttrs: [
+      {
+        level: 1,
+        repeatEveryLevel: true,
+        skillDamageBonus: 0.01,
+        note: "一方通行每次英雄升级额外提高1%技能伤害。",
+      },
+    ],
     awakeningSkills: [
       { level: 2, abilityId: "A0DU" },
       { level: 5, abilityId: "A0DV" },

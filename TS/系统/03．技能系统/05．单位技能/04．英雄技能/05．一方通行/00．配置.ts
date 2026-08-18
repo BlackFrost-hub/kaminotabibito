@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import { 通用二段技能壳ID } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/25．限时二段技能壳";
+
 export const 一方通行单位技能配置 = {
   英雄名: "一方通行",
   单位类型ID: "H00I",
@@ -7,7 +9,7 @@ export const 一方通行单位技能配置 = {
   Q关闭技能ID: "A0DT",
   Q状态技能ID: "A0DZ",
   W技能ID: "A0DU",
-  W二段技能ID: "A0DY",
+  W二段技能ID: 通用二段技能壳ID.W,
   R技能ID: "A0DX",
   D技能ID: "A0DR",
   Q: {
@@ -20,7 +22,7 @@ export const 一方通行单位技能配置 = {
     额外移动速度: 500,
     移动周期毫秒: 50,
     到达距离: 100,
-    尾迹持续秒: 1,
+    尾迹持续秒: 0.4,
     浮空尾迹模型: "Objects\\Spawnmodels\\Naga\\NagaDeath\\NagaDeath.mdl",
     地面尾迹模型: "war3mapImported\\slidingdustwithrocks.mdx",
   },
@@ -39,7 +41,8 @@ export const 一方通行单位技能配置 = {
     地面单击范围: 400,
     地面单击伤害攻击力倍率: 3,
     地面击飞持续秒: 0.60,
-    二段窗口秒: 0.50,
+    地面击飞高度: 375,
+    二段窗口秒: 0.25,
     二段周期毫秒: 20,
     二段追加魔耗比例: 0.15,
     二段距离: 800,
@@ -80,15 +83,14 @@ export const 一方通行单位技能配置 = {
     结算周期毫秒: 200,
     结算次数: 10,
     伤害范围: 750,
-    蓄力特效模型: "war3mapImported\\tx7.mdx",
+    蓄力持续特效模型: "war3mapImported\\tx7.mdx",
     蓄力脉冲特效模型: "war3mapImported\\a.mdx",
     爆炸特效模型: "war3mapImported\\!superbigexplosion1!.mdx",
-    蓄力特效缩放: 1.5,
+    蓄力持续特效缩放: 1.5,
     蓄力脉冲特效缩放: 2,
     爆炸特效缩放: 2,
     特效Z偏移: 200,
     特效持续秒: 1,
-    施法动作名: "stand,channel",
     施法音效路径: "HeroVoice\\Accelerator\\AcceleratorD.mp3",
     施法音效裁断距离: 1250,
     环境音效路径: "Sound\\Ambient\\DoodadEffects\\ShimmeringPortalBirth.wav",

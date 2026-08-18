@@ -81,9 +81,9 @@ local function _____83B7_53D6_6216_521B_5EFAQ_4E0A_4E0B_6587(unit)
         ["施法者"] = unit,
         ["已启动"] = false,
         ["周期回调ID"] = 0,
-        ["当前推进秒"] = 0,
-        ["当前X"] = 0,
-        ["当前Y"] = 0,
+        ["已完成段数"] = 0,
+        ["起点X"] = 0,
+        ["起点Y"] = 0,
         ["方向角度"] = 0,
         ["伤害攻击力快照"] = 0
     }
@@ -138,56 +138,114 @@ local function ____Q_547D_4E2D_5B9A_8EAB_5904_7406(target, ______7D22_5F15, ____
         "技能"
     )
 end
-local function _____63A8_8FDBQ_4F24_5BB3(context)
+local function ____Q_6BB5_5185_626B_63CF(variable)
+    local scan = variable
+    if scan == nil then
+        return
+    end
+    local caster = scan["施法者"]
+    if scan["扫描次数"] >= _____914D_7F6E["主动"]["扫描次数"] then
+        removePeriodicCallback(scan["回调ID"])
+        scan["回调ID"] = 0
+        scan["已命中句柄表"] = {}
+        return
+    end
+    scan["扫描次数"] = scan["扫描次数"] + 1
+    if caster == nil or caster == 0 or not _____5355_4F4D_5B58_6D3B(caster) then
+        removePeriodicCallback(scan["回调ID"])
+        scan["回调ID"] = 0
+        scan["已命中句柄表"] = {}
+        return
+    end
+    local _____5F27_5EA6 = scan["方向角度"] * (3.14159265358979 / 180)
+    local _____8DDD_79BB = _____914D_7F6E["主动"]["每次扫描推进距离"] * scan["扫描次数"]
+    local _____5224_5B9AX = scan["起点X"] + _____8DDD_79BB * math.cos(_____5F27_5EA6)
+    local _____5224_5B9AY = scan["起点Y"] + _____8DDD_79BB * math.sin(_____5F27_5EA6)
+    local _____5355_6B21_4F24_5BB3 = scan["伤害攻击力快照"] * _____914D_7F6E["主动"]["总伤害攻击力倍率"] * _____914D_7F6E["主动"]["单段伤害比例"]
+    if _____5355_6B21_4F24_5BB3 <= 0 then
+        return
+    end
+    local _____654C_519B_5217_8868 = _____8FC7_6EE4Q_547D_4E2D_6807_7684(_____83B7_53D6_8303_56F4_654C_519B(caster, _____5224_5B9AX, _____5224_5B9AY, _____914D_7F6E["主动"]["命中半径"]))
+    local _____672C_6B21_76EE_6807 = {}
+    do
+        local i = 0
+        while i < #_____654C_519B_5217_8868 do
+            do
+                local u = _____654C_519B_5217_8868[i + 1]
+                if u == nil or u == 0 then
+                    goto __continue26
+                end
+                local hid = GetHandleId(u) or 0
+                if hid ~= 0 and scan["已命中句柄表"][hid] == true then
+                    goto __continue26
+                end
+                if hid ~= 0 then
+                    scan["已命中句柄表"][hid] = true
+                end
+                _____672C_6B21_76EE_6807[#_____672C_6B21_76EE_6807 + 1] = u
+            end
+            ::__continue26::
+            i = i + 1
+        end
+    end
+    if #_____672C_6B21_76EE_6807 == 0 then
+        return
+    end
+    _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
+        ["来源"] = caster,
+        ["目标列表"] = _____672C_6B21_76EE_6807,
+        ["伤害"] = _____5355_6B21_4F24_5BB3,
+        ["伤害类型"] = jass.DAMAGE_TYPE_MAGIC,
+        attackType = jass.ATTACK_TYPE_NORMAL,
+        weaponType = jass.WEAPON_TYPE_WHOKNOWS,
+        ["来源类型"] = "单位技能",
+        ["标签"] = "坂井悠二-Q-吸血鬼-分段",
+        ["技能ID"] = stringToFourCC(____Q_6280_80FDID_5B57_7B26_4E32),
+        ["技能实例ID"] = scan["技能实例ID"],
+        ["变量"] = caster,
+        ["每目标结算后处理器"] = ____Q_547D_4E2D_5B9A_8EAB_5904_7406
+    })
+end
+local function _____63A8_8FDBQ_6BB5(variable)
+    local context = variable
+    if context == nil then
+        return
+    end
     local caster = context["施法者"]
     if caster == nil or caster == 0 or not _____5355_4F4D_5B58_6D3B(caster) then
         _____6E05_7406Q_4E0A_4E0B_6587(context)
         return
     end
-    local intervalMs = _____914D_7F6E["主动"]["推进间隔秒"] * 1000
-    local _____63A8_8FDB_6B65_957F = _____914D_7F6E["主动"]["推进距离"]
-    local _____63A8_8FDB_89D2_5EA6 = context["方向角度"]
-    local _____5F27_5EA6 = _____63A8_8FDB_89D2_5EA6 * (3.14159265358979 / 180)
-    local _____65B0X = context["当前X"] + _____63A8_8FDB_6B65_957F * math.cos(_____5F27_5EA6)
-    local _____65B0Y = context["当前Y"] + _____63A8_8FDB_6B65_957F * math.sin(_____5F27_5EA6)
-    context["当前X"] = _____65B0X
-    context["当前Y"] = _____65B0Y
-    context["当前推进秒"] = context["当前推进秒"] + _____914D_7F6E["主动"]["推进间隔秒"]
+    if context["已完成段数"] >= _____914D_7F6E["主动"]["段数"] then
+        _____6E05_7406Q_4E0A_4E0B_6587(context)
+        return
+    end
+    context["已完成段数"] = context["已完成段数"] + 1
     local _____58F3_56DBCC = stringToFourCC(_____914D_7F6E["主动"]["壳"]["单位ID"])
     local _____58F3_5355_4F4D = CreateUnit(
         GetOwningPlayer(caster),
         _____58F3_56DBCC,
-        _____65B0X,
-        _____65B0Y,
-        _____63A8_8FDB_89D2_5EA6 + _____914D_7F6E["主动"]["壳"]["朝向偏移角度"]
+        context["起点X"],
+        context["起点Y"],
+        context["方向角度"] + _____914D_7F6E["主动"]["壳"]["朝向偏移角度"]
     )
     if _____58F3_5355_4F4D ~= nil and _____58F3_5355_4F4D ~= 0 then
         SetUnitFlyHeight(_____58F3_5355_4F4D, _____914D_7F6E["主动"]["壳"]["飞行高度增量"], 0)
-        SetUnitFacing(_____58F3_5355_4F4D, _____63A8_8FDB_89D2_5EA6 + _____914D_7F6E["主动"]["壳"]["朝向偏移角度"])
         SetUnitScale(_____58F3_5355_4F4D, _____914D_7F6E["主动"]["壳"]["缩放"], _____914D_7F6E["主动"]["壳"]["缩放"], _____914D_7F6E["主动"]["壳"]["缩放"])
         AddSpecialEffectTarget(_____914D_7F6E["主动"]["壳"]["模型路径"], _____58F3_5355_4F4D, "origin")
     end
-    local _____5355_6B21_4F24_5BB3 = context["伤害攻击力快照"] * _____914D_7F6E["主动"]["总伤害攻击力倍率"] * _____914D_7F6E["主动"]["单段伤害比例"]
-    if _____5355_6B21_4F24_5BB3 > 0 then
-        local _____654C_519B_5217_8868 = _____8FC7_6EE4Q_547D_4E2D_6807_7684(_____83B7_53D6_8303_56F4_654C_519B(caster, _____65B0X, _____65B0Y, _____914D_7F6E["主动"]["命中半径"]))
-        _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
-            ["来源"] = caster,
-            ["目标列表"] = _____654C_519B_5217_8868,
-            ["伤害"] = _____5355_6B21_4F24_5BB3,
-            ["伤害类型"] = jass.DAMAGE_TYPE_MAGIC,
-            attackType = jass.ATTACK_TYPE_NORMAL,
-            weaponType = jass.WEAPON_TYPE_WHOKNOWS,
-            ["来源类型"] = "单位技能",
-            ["标签"] = "坂井悠二-Q-吸血鬼-分段",
-            ["技能ID"] = stringToFourCC(____Q_6280_80FDID_5B57_7B26_4E32),
-            ["技能实例ID"] = context["技能实例ID"],
-            ["变量"] = caster,
-            ["每目标结算后处理器"] = ____Q_547D_4E2D_5B9A_8EAB_5904_7406
-        })
-    end
-    if context["当前推进秒"] >= _____914D_7F6E["主动"]["最大推进时间秒"] then
-        _____6E05_7406Q_4E0A_4E0B_6587(context)
-    end
+    local scan = {
+        ["施法者"] = caster,
+        ["技能实例ID"] = context["技能实例ID"],
+        ["起点X"] = context["起点X"],
+        ["起点Y"] = context["起点Y"],
+        ["方向角度"] = context["方向角度"],
+        ["伤害攻击力快照"] = context["伤害攻击力快照"],
+        ["扫描次数"] = 0,
+        ["回调ID"] = 0,
+        ["已命中句柄表"] = {}
+    }
+    scan["回调ID"] = addPeriodicCallback(_____914D_7F6E["主动"]["扫描间隔秒"] * 1000, ____Q_6BB5_5185_626B_63CF, scan)
 end
 local function _____91CA_653EQ_6280_80FD(context, caster, _____6280_80FD_5B9E_4F8BID)
     if context["已启动"] then
@@ -196,16 +254,15 @@ local function _____91CA_653EQ_6280_80FD(context, caster, _____6280_80FD_5B9E_4F
     context["已启动"] = true
     context["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
     context["伤害攻击力快照"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster)
-    context["当前X"] = GetUnitX(caster)
-    context["当前Y"] = GetUnitY(caster)
-    context["方向角度"] = GetUnitFacing(caster)
-    context["当前推进秒"] = 0
+    context["起点X"] = GetUnitX(caster)
+    context["起点Y"] = GetUnitY(caster)
+    context["已完成段数"] = 0
     local _____76EE_6807X = GetSpellTargetX()
     local _____76EE_6807Y = GetSpellTargetY()
-    local _____671D_5411_76EE_6807 = _____4E24_70B9_89D2_5EA6(context["当前X"], context["当前Y"], _____76EE_6807X, _____76EE_6807Y)
+    local _____671D_5411_76EE_6807 = _____4E24_70B9_89D2_5EA6(context["起点X"], context["起点Y"], _____76EE_6807X, _____76EE_6807Y)
     context["方向角度"] = _____671D_5411_76EE_6807
     SetUnitFacing(caster, _____671D_5411_76EE_6807)
-    context["周期回调ID"] = addPeriodicCallback(_____914D_7F6E["主动"]["推进间隔秒"] * 1000, _____63A8_8FDBQ_4F24_5BB3, context)
+    context["周期回调ID"] = addPeriodicCallback(_____914D_7F6E["主动"]["段间隔秒"] * 1000, _____63A8_8FDBQ_6BB5, context)
 end
 local function ____Q_53EF_91CA_653E(context)
     return not context["已启动"] and context["周期回调ID"] == 0
@@ -226,7 +283,7 @@ ____exports["注册坂井悠二Q"] = function()
         ["释放技能"] = _____91CA_653EQ_6280_80FD,
         ["创建独立技能实例"] = true,
         ["独立技能来源类型"] = "单位技能",
-        ["技能实例持续时间秒"] = _____914D_7F6E["主动"]["最大推进时间秒"] + 1
+        ["技能实例持续时间秒"] = _____914D_7F6E["主动"]["段间隔秒"] * _____914D_7F6E["主动"]["段数"] + _____914D_7F6E["主动"]["扫描间隔秒"] * _____914D_7F6E["主动"]["扫描次数"] + 1
     })
     if not _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C then
         _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = true
@@ -237,8 +294,8 @@ ____exports["注册坂井悠二Q"]()
 ____exports["坂井悠二Q技能状态"] = {
     ["已完成设计"] = true,
     ["已完成实现"] = true,
-    ["伤害形态"] = "AOE 分段直线推进伤害",
-    ["伤害"] = "300% 攻击力，分 5 段 × 20%，每 0.21 秒推进 40 码，半径 175",
+    ["伤害形态"] = "固定马甲 + 直线扫描伤害（特效不推进，伤害判定点推进）",
+    ["伤害"] = "300% 攻击力，外层 0.21s×5 段每次命中 20%，段内 0.01s×20 tick 扫描 40码/tick，半径 175，段内去重",
     ["命中控制"] = "几乎无法移动 1 秒（眩晕）"
 }
 return ____exports

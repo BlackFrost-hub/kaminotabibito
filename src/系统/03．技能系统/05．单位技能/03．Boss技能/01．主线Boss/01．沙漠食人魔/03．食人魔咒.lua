@@ -378,6 +378,5 @@ ____exports["注册沙漠食人魔咒"] = function()
         ["释放技能"] = ____on_98DF_4EBA_9B54_5492_6280_80FD_58F3_91CA_653E,
         ["技能实例持续时间秒"] = 10
     })
-    debugLogForce("沙漠食人魔-食人魔咒", "技能监听注册完成", "skillId=", _____98DF_4EBA_9B54_5492_6280_80FDID)
 end
 return ____exports

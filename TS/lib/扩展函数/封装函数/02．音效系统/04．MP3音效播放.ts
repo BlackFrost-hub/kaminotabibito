@@ -12,7 +12,7 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
 };
 
 import { SoundModel } from "./01．声音模型";
-import { createSoundInternal, getSoundInternal, getDefaultSoundModel, KEY_COUNT, KEY_ENABLED_SLOT_BASE, POOL_MAX, hash } from "./02．音效池";
+import { createSoundInternal, getSoundInternal, getDefaultSoundModel, KEY_COUNT, KEY_INDEX, KEY_ENABLED_SLOT_BASE, POOL_MAX, hash } from "./02．音效池";
 
 const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
@@ -74,9 +74,10 @@ function scheduleDestroySoundIfNeeded(sound: any): void {
 /**
  * 播放MP3音效（可指定玩家）
  *
- * 注意：此入口每次调用都会 CreateSound，并在播放后 KillSoundWhenDone。
- * 高频/同路径重复音效请优先使用 Sound3DII_Mp3PlayReuse，避免大量短时间创建音效句柄。
- * 只有确实需要多实例叠放、不能被 StopSound 打断上一声时，再使用本函数。
+ * 多实例叠放入口：严格使用音效池最多 4 个句柄轮转（同路径同时刻最多 4 声叠放）。
+ * 句柄只在首次占槽时 CreateSound，之后一律复用，绝不每次播放新建句柄（防泄漏）；
+ * 4 槽全占满时轮转复用最早的槽（Stop 后重播），不会创建第 5 个。
+ * 不需要叠放的高频同路径音效请用 Sound3DII_Mp3PlayReuse（单句柄）。
  *
  * @param path 音效路径
  * @param player 指定玩家（为null时所有玩家都能听到）
@@ -87,88 +88,40 @@ export function Sound3DII_Mp3Play(
   player: any = null,
   model: SoundModel = getDefaultSoundModel()
 ): any {
-  // 非复用入口：每次新建 sound，并 KillSoundWhenDone。高频同路径音效请用 Sound3DII_Mp3PlayReuse。
-  {
-    const Leak = require("lib.扩展函数.封装函数.05．泄露审计.index") as { LeakWatcher?: any };
-    const LW = Leak && Leak.LeakWatcher ? Leak.LeakWatcher : undefined;
-    let trackedByLeak = false;
-    let s: any = null;
-    if (LW && typeof LW.createSound === "function") {
-      s = LW.createSound(
-        "sound_mp3",
-        path,
-        false,
-        false,
-        false,
-        model.fadeInRate,
-        model.fadeOutRate,
-        model.soundType
-      );
-      if (s) trackedByLeak = true;
-    } else {
-      s = (jass as any).CreateSound(
-        path,
-        false,
-        false,
-        false,
-        model.fadeInRate,
-        model.fadeOutRate,
-        model.soundType
-      );
-    }
-    if (s) {
-      (jass as any).SetSoundChannel(s, model.channel);
-      (jass as any).SetSoundVolume(s, model.volume);
-      (jass as any).SetSoundPitch(s, model.pitch);
-
-      const shouldPlay =
-        !player ||
-        (jass as any).GetLocalPlayer() === player;
-      if (shouldPlay) (jass as any).StartSound(s);
-
-      if (LW && typeof LW.killSoundWhenDone === "function") {
-        LW.killSoundWhenDone(s);
-      } else {
-        (jass as any).KillSoundWhenDone(s);
-        if (trackedByLeak && LW && typeof LW.releaseSound === "function") {
-          LW.releaseSound(s);
-        }
-      }
-
-      (lastPlayedSound as any) = s;
-      debugLog("Sound3DII", "new sound, localPlay=", shouldPlay);
-      return s;
-    }
-  }
-
+  // 严格 4 槽池：slot = 轮转下标 % POOL_MAX；槽未建则 CreateSound（每路径每槽终生一次），已建则复用
   const pathHash = (jass as any).StringHash(path);
   let count = (jass as any).LoadInteger(hash, pathHash, KEY_COUNT) || 0;
   if (count > POOL_MAX) count = POOL_MAX;
+  let index = (jass as any).LoadInteger(hash, pathHash, KEY_INDEX) || 0;
+  const slot = index % POOL_MAX;
 
-  let availableIndex = -1;
-  for (let i = 0; i < count; i++) {
-    if ((jass as any).LoadBoolean(hash, pathHash, i + KEY_ENABLED_SLOT_BASE)) {
-      availableIndex = i;
-      break;
+  let sound: any = null;
+  if (slot >= count) {
+    // 首次占槽：新建并登记（每路径最多 4 次）
+    sound = createSoundInternal(path, 4000, slot, 0, 0, 0, false, model);
+    if (sound) {
+      (jass as any).SaveInteger(hash, pathHash, KEY_COUNT, count + 1);
+      (jass as any).SaveInteger(hash, pathHash, KEY_INDEX, index + 1);
     }
-  }
-
-  let sound: any;
-  if (availableIndex === -1) {
-    if (count >= POOL_MAX) return null;
-    sound = createSoundInternal(path, 4000, count, 0, 0, 0, false, model);
-    if (sound) (jass as any).SaveInteger(hash, pathHash, KEY_COUNT, count + 1);
   } else {
-    sound = getSoundInternal(path, 4000, availableIndex, 0, 0, 0, model);
+    // 复用已有句柄（含 4 槽全占满时的轮转，绝不新建第 5 个）
+    sound = getSoundInternal(path, 4000, slot, 0, 0, 0, model);
+    if (sound) {
+      (jass as any).SaveInteger(hash, pathHash, KEY_INDEX, index + 1);
+      (jass as any).StopSound(sound, false, false); // 打断该槽上一声再重播
+    }
   }
 
   if (sound) {
-    if (player) {
-      if ((jass as any).GetLocalPlayer() === player) (jass as any).StartSound(sound);
-    } else {
-      (jass as any).StartSound(sound);
-    }
+    (jass as any).SetSoundChannel(sound, model.channel);
+    (jass as any).SetSoundVolume(sound, model.volume);
+    (jass as any).SetSoundPitch(sound, model.pitch);
+    const shouldPlay =
+      !player ||
+      (jass as any).GetLocalPlayer() === player;
+    if (shouldPlay) (jass as any).StartSound(sound);
     (lastPlayedSound as any) = sound;
+    debugLog("Sound3DII", "pool slot=", slot, "count=", count, "localPlay=", shouldPlay);
   }
 
   return sound;

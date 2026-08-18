@@ -58,6 +58,7 @@ interface D记录 {
 const D技能ID = stringToFourCCSafe(提米诺斯单位技能配置.D技能ID);
 const 提米诺斯单位ID = stringToFourCCSafe(提米诺斯单位技能配置.单位类型ID);
 const EXSetUnitMoveType = japi.EXSetUnitMoveType as (this: void, unit: any, moveType: number) => void;
+const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
 const 提米诺斯D技能实例表: Record<number, true> = {};
 
 function on提米诺斯D最终伤害(this: void, _target: any, attacker: any, applied: number, snapshot: any): void {
@@ -119,7 +120,7 @@ function on提米诺斯D(this: void, caster: any, abilityId: number): void {
   };
   开始硬直(caster, cfg.硬直秒);
   EXSetUnitMoveType(caster, 0x04);
-  jass.ResetUnitAnimation(caster);
+  SetUnitAnimation(caster, "stand");
   jass.SetUnitTimeScale(caster, cfg.动作速度);
   执行战斗自身传送到坐标(caster, 极坐标X(jass.GetUnitX(target), targetFacing, cfg.目标偏移距离), 极坐标Y(jass.GetUnitY(target), targetFacing, cfg.目标偏移距离));
   播放提米诺斯单位音效(caster, cfg.全局音效键);

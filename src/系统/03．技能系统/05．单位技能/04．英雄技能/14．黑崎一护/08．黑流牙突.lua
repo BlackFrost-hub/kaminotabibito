@@ -1,32 +1,12 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____6309_73A9_5BB6_67E5_627E_9ED1_5D0E_4E00_62A4, jass, GetUnitTypeId, IsUnitAliveBJ, _____82F1_96C4_5355_4F4D_7C7B_578BID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．黑崎一护.00．配置")
 local _____9ED1_5D0E_4E00_62A4_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["黑崎一护技能配置"]
 local ____01_FF0E_72B6_6001_8868 = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．黑崎一护.01．状态表")
 local _____83B7_53D6_9ED1_5D0E_4E00_62A4_72B6_6001 = ____01_FF0E_72B6_6001_8868["获取黑崎一护状态"]
 local _____9ED1_5D0E_4E00_62A4_662F_5426_534D_89E3 = ____01_FF0E_72B6_6001_8868["黑崎一护是否卍解"]
 local _____89E3_9664_9ED1_5D0E_4E00_62A4A_952E_6B66_88C5 = ____01_FF0E_72B6_6001_8868["解除黑崎一护A键武装"]
-function _____6309_73A9_5BB6_67E5_627E_9ED1_5D0E_4E00_62A4(playerId)
-    local g = jass.CreateGroup()
-    jass.GroupEnumUnitsOfPlayer(
-        g,
-        jass.Player(playerId)
-    )
-    local found = nil
-    local u = jass.FirstOfGroup(g)
-    while u ~= nil and u ~= 0 do
-        jass.GroupRemoveUnit(g, u)
-        if GetUnitTypeId(u) == _____82F1_96C4_5355_4F4D_7C7B_578BID and IsUnitAliveBJ(u) then
-            found = u
-            break
-        end
-        u = jass.FirstOfGroup(g)
-    end
-    jass.DestroyGroup(g)
-    return found
-end
-jass = require("jass.common")
+local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
@@ -43,27 +23,22 @@ local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单�
 local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
 local _____9500_6BC1_70B9_7279_6548 = ____require_result_5["销毁点特效"]
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_6.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_6.YDUserDataSetSafe
-local YDUserDataClearSafe = ____require_result_6.YDUserDataClearSafe
-local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_7.registerDeathListener
+local ____require_result_6 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_6.registerDeathListener
+local ____require_result_7 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_7.IsUnitAliveBJ
+local SelectUnitForPlayerSingle = ____require_result_7.SelectUnitForPlayerSingle
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
-GetUnitTypeId = jass.GetUnitTypeId
+local GetUnitTypeId = jass.GetUnitTypeId
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
 local GetHeroLevel = jass.GetHeroLevel
 local IsUnitEnemy = jass.IsUnitEnemy
-IsUnitAliveBJ = jass.IsUnitAliveBJ
 local ShowUnit = jass.ShowUnit
-local SelectUnitForPlayerSingle = jass.SelectUnitForPlayerSingle
-local SetUnitX = jass.SetUnitX
-local SetUnitY = jass.SetUnitY
+local SetUnitPosition = jass.SetUnitPosition
 local SetUnitFacing = jass.SetUnitFacing
-local IsTerrainPathable = jass.IsTerrainPathable
 local Atan2 = jass.Atan2
 local Cos = jass.Cos
 local Sin = jass.Sin
@@ -71,21 +46,21 @@ local SquareRoot = jass.SquareRoot
 local OrderId = jass.OrderId
 local bj_RADTODEG = jass.bj_RADTODEG
 local bj_DEGTORAD = jass.bj_DEGTORAD
-local PATHING_TYPE_WALKABILITY = jass.PATHING_TYPE_WALKABILITY
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local DzSetEffectPos = japi.DzSetEffectPos
 local _____914D_7F6E = _____9ED1_5D0E_4E00_62A4_6280_80FD_914D_7F6E
-_____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
 local _____653B_51FB_6307_4EE4ID = OrderId("attack")
 local _____5DF2_6CE8_518CA_952E_7684_73A9_5BB6 = {}
+local _____73A9_5BB6_9ED1_5D0E_4E00_62A4_8868 = {}
 local function ____A_952E_56DE_8C03(event)
     if event == nil or event.player == nil or event.player == 0 then
         return
     end
     local playerId = GetPlayerId(event.player)
-    local hero = _____6309_73A9_5BB6_67E5_627E_9ED1_5D0E_4E00_62A4(playerId)
+    local hero = _____73A9_5BB6_9ED1_5D0E_4E00_62A4_8868[playerId]
     if hero == nil or hero == 0 then
         return
     end
@@ -103,6 +78,7 @@ ____exports["注册玩家黑流牙突A键"] = function(caster)
         return
     end
     local playerId = GetPlayerId(GetOwningPlayer(caster))
+    _____73A9_5BB6_9ED1_5D0E_4E00_62A4_8868[playerId] = caster
     if _____5DF2_6CE8_518CA_952E_7684_73A9_5BB6[playerId] == true then
         return
     end
@@ -110,6 +86,7 @@ ____exports["注册玩家黑流牙突A键"] = function(caster)
     _____6CE8_518CA_952E_76D1_542C(playerId, ____A_952E_56DE_8C03)
 end
 local _____7A81_8FDB_4E0A_4E0B_6587_8868 = {}
+local _____76EE_6807_72EC_7ACB_51B7_5374_8868 = {}
 local function _____6062_590D_65BD_6CD5_8005(ctx)
     local caster = ctx["施法者"]
     if caster ~= nil and caster ~= 0 then
@@ -127,11 +104,11 @@ local function _____6062_590D_65BD_6CD5_8005(ctx)
     ctx["回调ID"] = 0
 end
 local function _____6E05_9664_9ED1_6D41_7259_7A81_6807_8BB0(variable)
-    local target = variable
-    if target == nil or target == 0 then
+    local cooldown = variable
+    if cooldown == nil or cooldown["目标ID"] == nil then
         return
     end
-    YDUserDataClearSafe("unit", target, "黑流牙突", "boolean")
+    _____76EE_6807_72EC_7ACB_51B7_5374_8868[cooldown["目标ID"]] = false
 end
 local function _____7ED3_7B97_9ED1_6D41_7259_7A81_547D_4E2D(ctx)
     local caster = ctx["施法者"]
@@ -154,22 +131,19 @@ local function _____7ED3_7B97_9ED1_6D41_7259_7A81_547D_4E2D(ctx)
         ["伤害"] = _____4F24_5BB3,
         ["伤害类型"] = DAMAGE_TYPE_ENHANCED,
         attack = true,
+        ranged = false,
         attackType = ATTACK_TYPE_NORMAL,
         weaponType = WEAPON_TYPE_WHOKNOWS,
         ["来源类型"] = "单位技能",
         ["标签"] = "黑崎一护-黑流牙突"
     })
-    YDUserDataSetSafe(
-        "unit",
-        target,
-        "黑流牙突",
-        "boolean",
-        true
-    )
+    local _____76EE_6807ID = GetHandleId(target)
+    _____76EE_6807_72EC_7ACB_51B7_5374_8868[_____76EE_6807ID] = true
+    local _____51B7_5374_4E0A_4E0B_6587 = {["目标"] = target, ["目标ID"] = _____76EE_6807ID}
     addDelayedCallback(
         math.floor(_____914D_7F6E["黑流牙突"]["标记持续秒"] * 1000 + 0.5),
         _____6E05_9664_9ED1_6D41_7259_7A81_6807_8BB0,
-        target
+        _____51B7_5374_4E0A_4E0B_6587
     )
     _____6062_590D_65BD_6CD5_8005(ctx)
 end
@@ -180,11 +154,19 @@ local function _____63A8_8FDB_9ED1_6D41_7259_7A81(variable)
     end
     local caster = ctx["施法者"]
     local target = ctx["目标"]
-    ctx["Tick数"] = ctx["Tick数"] + 1
-    if caster == nil or caster == 0 or not IsUnitAliveBJ(caster) or target == nil or target == 0 or not IsUnitAliveBJ(target) or ctx["Tick数"] >= _____914D_7F6E["黑流牙突"]["最大推进次数"] then
+    if caster == nil or caster == 0 or not IsUnitAliveBJ(caster) then
         _____6062_590D_65BD_6CD5_8005(ctx)
         return
     end
+    if target == nil or target == 0 or not IsUnitAliveBJ(target) then
+        _____6062_590D_65BD_6CD5_8005(ctx)
+        return
+    end
+    if ctx["Tick数"] >= _____914D_7F6E["黑流牙突"]["最大推进次数"] then
+        _____6062_590D_65BD_6CD5_8005(ctx)
+        return
+    end
+    ctx["Tick数"] = ctx["Tick数"] + 1
     local cx = GetUnitX(caster)
     local cy = GetUnitY(caster)
     local tx = GetUnitX(target)
@@ -193,12 +175,7 @@ local function _____63A8_8FDB_9ED1_6D41_7259_7A81(variable)
     local rad = _____89D2_5EA6 * bj_DEGTORAD
     local nx = cx + Cos(rad) * _____914D_7F6E["黑流牙突"]["每Tick距离"]
     local ny = cy + Sin(rad) * _____914D_7F6E["黑流牙突"]["每Tick距离"]
-    if IsTerrainPathable(nx, ny, PATHING_TYPE_WALKABILITY) then
-        _____6062_590D_65BD_6CD5_8005(ctx)
-        return
-    end
-    SetUnitX(caster, nx)
-    SetUnitY(caster, ny)
+    SetUnitPosition(caster, nx, ny)
     SetUnitFacing(caster, _____89D2_5EA6)
     if ctx["特效"] ~= nil and ctx["特效"] ~= 0 then
         DzSetEffectPos(ctx["特效"], nx, ny, _____914D_7F6E["黑流牙突"]["特效高度"])
@@ -233,7 +210,7 @@ local function _____53D1_8D77_9ED1_6D41_7259_7A81(caster, target)
         Z = _____914D_7F6E["黑流牙突"]["特效高度"],
         ["面向角度"] = _____89D2_5EA6,
         ["缩放"] = _____914D_7F6E["黑流牙突"]["特效缩放"],
-        ["持续秒"] = 2.5
+        ["持续秒"] = 2
     })
     local ctx = {
         ["施法者"] = caster,
@@ -278,7 +255,9 @@ local function _____76EE_6807_6307_4EE4_56DE_8C03(unit, orderId, targetUnit, _ta
     ) then
         return
     end
-    if YDUserDataGetSafe("unit", targetUnit, "黑流牙突", "boolean") == true then
+    local _____76EE_6807ID = GetHandleId(targetUnit)
+    local _____76EE_6807_51B7_5374_4E2D = _____76EE_6807_72EC_7ACB_51B7_5374_8868[_____76EE_6807ID] == true
+    if _____76EE_6807_51B7_5374_4E2D then
         return
     end
     local dx = GetUnitX(targetUnit) - GetUnitX(unit)
@@ -303,15 +282,7 @@ local function _____9ED1_6D41_7259_7A81_6B7B_4EA1_6E05_7406(dyingUnit, _killingU
     end
     local ctx = _____7A81_8FDB_4E0A_4E0B_6587_8868[GetHandleId(dyingUnit)]
     if ctx ~= nil and ctx["进行中"] == true then
-        if ctx["回调ID"] ~= 0 then
-            removePeriodicCallback(ctx["回调ID"])
-        end
-        ctx["回调ID"] = 0
-        if ctx["特效"] ~= nil and ctx["特效"] ~= 0 then
-            _____9500_6BC1_70B9_7279_6548(ctx["特效"])
-        end
-        ctx["特效"] = nil
-        ctx["进行中"] = false
+        _____6062_590D_65BD_6CD5_8005(ctx)
     end
 end
 ____exports["注册黑流牙突"] = function()

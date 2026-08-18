@@ -26,8 +26,9 @@ const { 施加减速 } = require("系统.03．技能系统.00．技能模板+函
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
-const { GS_Suspend, 单位是否存在其他暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
-  GS_Suspend: (this: void, u: any, time: number) => void;
+const { 设置单位暂停时间, 移除单位暂停, 单位是否存在其他暂停占用 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  设置单位暂停时间: (this: void, u: any, source: string, time: number) => boolean;
+  移除单位暂停: (this: void, u: any, source: string) => boolean;
   单位是否存在其他暂停占用: (this: void, u: any, 自身来源: string) => boolean;
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
@@ -44,6 +45,10 @@ const { KEY, KEY_STATE } = require("lib.扩展函数.封装函数.04．硬件输
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
 };
+// IsUnitAliveBJ 是 Blizzard.j 函数，从 BJ 函数库取（jass.common 取到的是 nil）
+const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
+  IsUnitAliveBJ: (this: void, unit: any) => boolean;
+};
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
@@ -53,7 +58,6 @@ const GetPlayerId = jass.GetPlayerId as (this: void, p: any) => number;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
-const IsUnitAliveBJ = jass.IsUnitAliveBJ as (this: void, unit: any) => boolean;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -124,6 +128,7 @@ function 结束T(this: void, ctx: T上下文): void {
   ctx.已启动 = false;
   const caster = ctx.施法者;
   if (caster != null && caster !== 0) {
+    移除单位暂停(caster, 配置.暂停来源.T施法硬直);
     SetUnitTimeScale(caster, 1);
     if (ctx.减伤已加) 调整玩家受伤减少(caster, -配置.T.受伤减少比例);
     ctx.减伤已加 = false;
@@ -140,13 +145,8 @@ function 推进T周期(this: void, variable: any): void {
     return;
   }
 
-  ctx.Tick数 += 1;
-  if (ctx.Tick数 >= 配置.T.周期.次数) {
-    结束T(ctx);
-    return;
-  }
-
   刷新T区域减速(ctx);
+  ctx.Tick数 += 1;
 
   // 敌人打断判定：被其他系统控制（暂停占用）时打断；卍解且血量高于阈值免打断
   if (单位是否存在其他暂停占用(caster, 配置.暂停来源.T施法硬直)) {
@@ -156,6 +156,8 @@ function 推进T周期(this: void, variable: any): void {
       ctx.Tick数 = 配置.T.周期.次数; // 下一 tick 立即收尾（源：循环实数置满）
     }
   }
+
+  if (ctx.Tick数 >= 配置.T.周期.次数) 结束T(ctx);
 }
 
 function T进入主阶段(this: void, variable: any): void {
@@ -202,7 +204,7 @@ function 释放地蹦裂击(this: void, context: T上下文, caster: any, 技能
   context.技能实例ID = 技能实例ID;
   当前进行中的T = context;
 
-  GS_Suspend(caster, 配置.T.硬直持续秒); // 源：GS_Suspend 3.5 秒硬直
+  设置单位暂停时间(caster, 配置.暂停来源.T施法硬直, 配置.T.硬直持续秒);
 
   const x = GetUnitX(caster);
   const y = GetUnitY(caster);

@@ -43,6 +43,10 @@ const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用
 const { 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
 };
+// GetRandomDirectionDeg 是 Blizzard.j 函数，从 BJ 函数库取（jass.common 取到的是 nil）
+const { GetRandomDirectionDeg } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetRandomDirectionDeg: (this: void) => number;
+};
 
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
@@ -54,7 +58,6 @@ const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetHeroLevel = jass.GetHeroLevel as (this: void, unit: any) => number;
 const GetRandomReal = jass.GetRandomReal as (this: void, min: number, max: number) => number;
-const GetRandomDirectionDeg = jass.GetRandomDirectionDeg as (this: void) => number;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
 const SetUnitFlyHeight = jass.SetUnitFlyHeight as (this: void, unit: any, height: number, rate: number) => void;

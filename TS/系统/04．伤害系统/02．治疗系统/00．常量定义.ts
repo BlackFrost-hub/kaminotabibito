@@ -85,6 +85,9 @@ export const MANA_TEXT_COLOR = {
 /** 治疗率属性名（治疗别人时生效，如0.2=+20%） */
 export const ATTR_HEAL_RATE = "治疗率";
 
+/** 玩家技能治疗率属性名（装备、英雄成长等全局来源，如0.2=+20%） */
+export const ATTR_SKILL_HEAL_RATE = "技能治疗率";
+
 /** 受到治疗率属性名（被治疗时生效，如0.1=+10%） */
 export const ATTR_RECEIVED_HEAL_RATE = "受到的治疗率";
 

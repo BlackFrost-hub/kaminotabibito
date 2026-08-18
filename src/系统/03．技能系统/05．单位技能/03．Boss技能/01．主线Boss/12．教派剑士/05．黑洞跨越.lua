@@ -650,6 +650,5 @@ ____exports["注册教派剑士黑洞跨越"] = function()
     _____9ED1_6D1E_8DE8_8D8A_5DF2_6CE8_518C = true
     registerSpellEffectListener(____on_6559_6D3E_5251_58EB_9ED1_6D1E_8DE8_8D8A_751F_6548)
     registerDamageModifier(_____9ED1_6D1E_514B_5236_5C5E_6027_627F_4F24_4FEE_6B63, 8)
-    debugLogForce("教派剑士-黑洞跨越", "技能壳与黑洞克制承伤监听注册完成", "skillId=", _____9ED1_6D1E_8DE8_8D8A_6280_80FDID)
 end
 return ____exports

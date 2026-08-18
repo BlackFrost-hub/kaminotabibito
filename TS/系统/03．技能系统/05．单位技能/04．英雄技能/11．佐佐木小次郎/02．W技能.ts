@@ -52,6 +52,7 @@ const W二段技能ID数值 = stringToFourCCSafe(佐佐木单位技能配置.W�
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void, player: any, abilityId: number, available: boolean) => void;
@@ -75,9 +76,23 @@ function 切换W技能(this: void, 英雄: any, 施放技能ID: number): void {
   }
 }
 
+/**
+ * W 施放防抖：SPELL_EFFECT 阶段立即 SetPlayerAbilityAvailable 切换本体/二段，
+ * 切换瞬间玩家按下的 W 命令会被新技能重复响应，导致一次按键触发两个 W。
+ * 用施法硬直（0.5s）作防抖窗口，期间重复触发忽略；真实二段连招在硬直后触发不受影响。
+ */
+const W施放防抖表: Record<number, boolean | undefined> = {};
+
 function on佐佐木W生效(this: void, 施法单位: any, 技能ID数值: number): void {
   if (!是佐佐木本体(施法单位)) return;
   if (技能ID数值 !== W本体技能ID && 技能ID数值 !== W二段技能ID数值) return;
+
+  const 防抖id = GetHandleId(施法单位);
+  if (W施放防抖表[防抖id] === true) return;
+  W施放防抖表[防抖id] = true;
+  addDelayedCallback(佐佐木单位技能配置.W.施法硬直秒 * 1000, () => {
+    W施放防抖表[防抖id] = false;
+  });
 
   const cfg = 佐佐木单位技能配置.W;
   const 原点X = GetUnitX(施法单位);

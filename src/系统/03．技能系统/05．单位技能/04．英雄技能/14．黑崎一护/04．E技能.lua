@@ -28,12 +28,15 @@ local _____65BD_52A0_51CF_901F = ____require_result_3["施加减速"]
 local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_4.registerManualBuff
 local ____require_result_5 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_CooPlayReuse = ____require_result_5.Sound3DII_CooPlayReuse
+local Sound3DII_CooPlayPool4MultiInstanceRare = ____require_result_5.Sound3DII_CooPlayPool4MultiInstanceRare
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
 local _____9500_6BC1_70B9_7279_6548 = ____require_result_6["销毁点特效"]
 local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_7.registerDeathListener
+local ____require_result_8 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_8.IsUnitAliveBJ
+local SelectUnitForPlayerSingle = ____require_result_8.SelectUnitForPlayerSingle
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
@@ -44,15 +47,14 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local CreateUnit = jass.CreateUnit
 local UnitApplyTimedLife = jass.UnitApplyTimedLife
 local ShowUnit = jass.ShowUnit
-local SelectUnitForPlayerSingle = jass.SelectUnitForPlayerSingle
-local SetUnitAnimation = jass.SetUnitAnimation
-local IsUnitAliveBJ = jass.IsUnitAliveBJ
 local SquareRoot = jass.SquareRoot
 local Cos = jass.Cos
 local Sin = jass.Sin
 local Atan2 = jass.Atan2
 local R2S = jass.R2S
 local SetUnitState = jass.SetUnitState
+local DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha
+local DzSetEffectAnimation = japi.DzSetEffectAnimation
 local bj_RADTODEG = jass.bj_RADTODEG
 local bj_DEGTORAD = jass.bj_DEGTORAD
 local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
@@ -62,8 +64,8 @@ local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_8.stringToFourCCSafe
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
 local stringToFourCC = stringToFourCCSafe
 local _____914D_7F6E = _____9ED1_5D0E_4E00_62A4_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
@@ -114,7 +116,9 @@ local function _____6E05_7406E_5E7B_5F71(ctx)
         while i < #ctx["幻影列表"] do
             local phantom = ctx["幻影列表"][i + 1]
             if phantom["特效"] ~= nil and phantom["特效"] ~= 0 then
+                DzSetEffectVertexAlpha(phantom["特效"], 0)
                 _____9500_6BC1_70B9_7279_6548(phantom["特效"])
+                phantom["特效"] = nil
             end
             i = i + 1
         end
@@ -178,7 +182,7 @@ local function _____7ED3_675FE_666E_901A_5206_652F(ctx, _____662F_5426_7ED3_7B97
                 end
             end
         end
-        Sound3DII_CooPlayReuse(
+        Sound3DII_CooPlayPool4MultiInstanceRare(
             _____914D_7F6E.E["普通"]["结束"]["音效"]["路径"],
             x,
             y,
@@ -198,11 +202,11 @@ local function _____63A8_8FDBE_666E_901A_65A9_51FB(variable)
         _____7ED3_675FE_666E_901A_5206_652F(ctx, false)
         return
     end
-    ctx["普通Tick数"] = ctx["普通Tick数"] + 1
     if ctx["普通Tick数"] >= _____914D_7F6E.E["普通"]["斩击次数"] then
         _____7ED3_675FE_666E_901A_5206_652F(ctx, true)
         return
     end
+    ctx["普通Tick数"] = ctx["普通Tick数"] + 1
     local x = GetUnitX(caster)
     local y = GetUnitY(caster)
     _____521B_5EFA_70B9_7279_6548({
@@ -214,7 +218,7 @@ local function _____63A8_8FDBE_666E_901A_65A9_51FB(variable)
         ["缩放"] = _____914D_7F6E.E["普通"]["斩击特效"]["缩放"],
         ["持续秒"] = _____914D_7F6E.E["普通"]["斩击特效"]["持续秒"]
     })
-    Sound3DII_CooPlayReuse(
+    Sound3DII_CooPlayPool4MultiInstanceRare(
         _____914D_7F6E.E["普通"]["斩击音效"]["路径"],
         x,
         y,
@@ -286,7 +290,6 @@ local function _____7ED3_7B97E_5E7B_5F71_547D_4E2D(ctx, phantom)
         ["技能ID"] = ____E_7C7B_578BID,
         ["技能实例ID"] = ctx["技能实例ID"]
     })
-    SetUnitAnimation(target, "Death")
     local tx = GetUnitX(target)
     local ty = GetUnitY(target)
     local _____547D_4E2D_7279_6548 = _____9ED1_5D0E_4E00_62A4_662F_5426_534D_89E3(caster) and _____914D_7F6E.E["连携"]["命中特效解放后"] or _____914D_7F6E.E["连携"]["命中特效解放前"]
@@ -308,7 +311,7 @@ local function _____7ED3_7B97E_5E7B_5F71_547D_4E2D(ctx, phantom)
         ["缩放"] = _____914D_7F6E.E["普通"]["斩击特效"]["缩放"],
         ["持续秒"] = _____914D_7F6E.E["普通"]["斩击特效"]["持续秒"]
     })
-    Sound3DII_CooPlayReuse(
+    Sound3DII_CooPlayPool4MultiInstanceRare(
         _____914D_7F6E.E["普通"]["斩击音效"]["路径"],
         tx,
         ty,
@@ -316,7 +319,7 @@ local function _____7ED3_7B97E_5E7B_5F71_547D_4E2D(ctx, phantom)
         _____914D_7F6E.E["普通"]["斩击音效"]["裁断距离"]
     )
     local _____5207_8089_97F3 = GetRandomInt(1, 3)
-    Sound3DII_CooPlayReuse(
+    Sound3DII_CooPlayPool4MultiInstanceRare(
         ("Sound\\Units\\Combat\\MetalHeavySliceFlesh" .. R2S(_____5207_8089_97F3)) .. ".wav",
         tx,
         ty,
@@ -365,11 +368,11 @@ local function _____63A8_8FDBE_5E7B_5F71_51B2_950B(variable)
         _____7ED3_675FE_8FDE_643A_5206_652F(ctx)
         return
     end
-    ctx["冲锋Tick数"] = ctx["冲锋Tick数"] + 1
     if ctx["冲锋Tick数"] >= _____914D_7F6E.E["连携"]["最大推进次数"] then
         _____7ED3_675FE_8FDE_643A_5206_652F(ctx)
         return
     end
+    ctx["冲锋Tick数"] = ctx["冲锋Tick数"] + 1
     local target = ctx["目标"]
     local _____76EE_6807_5B58_6D3B = target ~= nil and target ~= 0 and IsUnitAliveBJ(target)
     local tx = _____76EE_6807_5B58_6D3B and GetUnitX(target) or 0
@@ -404,6 +407,9 @@ local function ____E_8FDE_643A_8D77_624B_51B2_950B(variable)
         local i = 0
         while i < #ctx["幻影列表"] do
             local phantom = ctx["幻影列表"][i + 1]
+            if phantom["特效"] ~= nil and phantom["特效"] ~= 0 then
+                DzSetEffectAnimation(phantom["特效"], _____914D_7F6E.E["连携"]["幻影施法动画索引"], 0)
+            end
             _____521B_5EFA_70B9_7279_6548({
                 ["模型路径"] = _____914D_7F6E.E["连携"]["起手特效"]["模型"],
                 X = phantom.X,
@@ -423,17 +429,45 @@ local function ____E_8FDE_643A_8D77_624B_51B2_950B(variable)
         ctx
     )
 end
+local function _____9009_53D6E_8FDE_643A_76EE_6807(caster, x, y)
+    local _____654C_519B = _____83B7_53D6_8303_56F4_654C_519B(caster, x, y, _____914D_7F6E.E["连携"]["目标选取半径"])
+    local target = nil
+    local _____6700_8FD1_8DDD_79BB = -1
+    if _____654C_519B ~= nil then
+        do
+            local i = 0
+            while i < #_____654C_519B do
+                do
+                    local u = _____654C_519B[i + 1]
+                    if u == nil or u == 0 then
+                        goto __continue51
+                    end
+                    local dx = GetUnitX(u) - x
+                    local dy = GetUnitY(u) - y
+                    local dist = dx * dx + dy * dy
+                    if _____6700_8FD1_8DDD_79BB < 0 or dist < _____6700_8FD1_8DDD_79BB then
+                        _____6700_8FD1_8DDD_79BB = dist
+                        target = u
+                    end
+                end
+                ::__continue51::
+                i = i + 1
+            end
+        end
+    end
+    return target
+end
 local function _____91CA_653E_77AC_6B65_65A9(context, caster, _____6280_80FD_5B9E_4F8BID)
     local x = GetUnitX(caster)
     local y = GetUnitY(caster)
-    Sound3DII_CooPlayReuse(
+    Sound3DII_CooPlayPool4MultiInstanceRare(
         _____914D_7F6E.E["音效"]["路径"],
         x,
         y,
         0,
         _____914D_7F6E.E["音效"]["裁断距离"]
     )
-    Sound3DII_CooPlayReuse(
+    Sound3DII_CooPlayPool4MultiInstanceRare(
         _____914D_7F6E.E["金属音效"]["路径"],
         x,
         y,
@@ -448,6 +482,11 @@ local function _____91CA_653E_77AC_6B65_65A9(context, caster, _____6280_80FD_5B9
     context["冲锋Tick数"] = 0
     context["幻影列表"] = {}
     context["目标"] = nil
+    local _____8FDE_643A_76EE_6807 = nil
+    if _____662F_5426_77AC_6B65_8FDE_643A_4E2D(caster) then
+        _____5173_95ED_77AC_6B65_8FDE_643A(caster)
+        _____8FDE_643A_76EE_6807 = _____9009_53D6E_8FDE_643A_76EE_6807(caster, x, y)
+    end
     ShowUnit(caster, false)
     context["视野马甲"] = CreateUnit(
         GetOwningPlayer(caster),
@@ -457,38 +496,8 @@ local function _____91CA_653E_77AC_6B65_65A9(context, caster, _____6280_80FD_5B9
         0
     )
     UnitApplyTimedLife(context["视野马甲"], _____5B9A_65F6_751F_547DBuffID, 2.5)
-    if _____662F_5426_77AC_6B65_8FDE_643A_4E2D(caster) then
-        _____5173_95ED_77AC_6B65_8FDE_643A(caster)
-        local _____654C_519B = _____83B7_53D6_8303_56F4_654C_519B(caster, x, y, _____914D_7F6E.E["连携"]["目标选取半径"])
-        local target = nil
-        local _____6700_8FD1_8DDD_79BB = -1
-        if _____654C_519B ~= nil then
-            do
-                local i = 0
-                while i < #_____654C_519B do
-                    do
-                        local u = _____654C_519B[i + 1]
-                        if u == nil or u == 0 then
-                            goto __continue51
-                        end
-                        local dx = GetUnitX(u) - x
-                        local dy = GetUnitY(u) - y
-                        local dist = dx * dx + dy * dy
-                        if _____6700_8FD1_8DDD_79BB < 0 or dist < _____6700_8FD1_8DDD_79BB then
-                            _____6700_8FD1_8DDD_79BB = dist
-                            target = u
-                        end
-                    end
-                    ::__continue51::
-                    i = i + 1
-                end
-            end
-        end
-        if target == nil then
-            context["已启动"] = false
-            _____6062_590DE_65BD_6CD5_8005_663E_793A(context)
-            return
-        end
+    if _____8FDE_643A_76EE_6807 ~= nil and _____8FDE_643A_76EE_6807 ~= 0 then
+        local target = _____8FDE_643A_76EE_6807
         context["目标"] = target
         _____65BD_52A0_7729_6655(
             caster,
@@ -515,11 +524,10 @@ local function _____91CA_653E_77AC_6B65_65A9(context, caster, _____6280_80FD_5B9
                     Z = _____914D_7F6E.E["连携"]["幻影高度"],
                     ["面向角度"] = faceDeg,
                     ["缩放"] = _____914D_7F6E.E["连携"]["幻影缩放"],
-                    ["透明度"] = _____914D_7F6E.E["连携"]["幻影透明度"],
-                    ["持续秒"] = 1.5
+                    ["透明度"] = _____914D_7F6E.E["连携"]["幻影透明度"]
                 })
-                local ____context__5E7B_5F71_5217_8868_9 = context["幻影列表"]
-                ____context__5E7B_5F71_5217_8868_9[#____context__5E7B_5F71_5217_8868_9 + 1] = {
+                local ____context__5E7B_5F71_5217_8868_10 = context["幻影列表"]
+                ____context__5E7B_5F71_5217_8868_10[#____context__5E7B_5F71_5217_8868_10 + 1] = {
                     X = px,
                     Y = py,
                     ["面向角度"] = faceDeg,

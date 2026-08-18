@@ -1,6 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
+local _____5207_6362_52A0_653BBuffID
 local ____13_FF0E_963F_4F26_52B3_7279 = require("系统.05．Buff系统.03．Buff表.02．英雄.13．阿伦劳特")
 local _____963F_4F26_52B3_7279BuffID = ____13_FF0E_963F_4F26_52B3_7279["阿伦劳特BuffID"]
 local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
@@ -35,23 +36,48 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJass = jass.GetUnitState
 local GetUnitStateJapi = japi.GetUnitState
-local SetUnitStateJapi = japi.SetUnitState
-local GetHeroStr = jass.GetHeroStr
 local DzSetUnitID = japi.DzSetUnitID
+local DzSetUnitAbilityArt = japi.DzSetUnitAbilityArt
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_ATTACK = jass.ConvertUnitState(21)
+local R2I = jass.R2I
+local function _____53D6_56DB_820D_4E94_5165_6574_6570(value)
+    return R2I(value + 0.5)
+end
+local function _____53D6_975E_8D1F_6570(value)
+    return value > 0 and value or 0
+end
+--- 项目约定：当前生命用 JASS，最大生命用 JAPI 读取。
+local function _____8BFB_53D6_5F53_524D_751F_547D(unit)
+    return GetUnitStateJass(unit, UNIT_STATE_LIFE)
+end
+local function _____8BFB_53D6_6700_5927_751F_547D(unit)
+    return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
+end
+local function _____5207_6362_52A0_653B_5230_671F(variable)
+    local ctx = variable
+    if ctx == nil or ctx["单位"] == nil or ctx["单位"] == 0 or not (ctx["加攻量"] > 0) then
+        return
+    end
+    _____4E34_65F6_8C03_6574_653B_51FB(ctx["单位"], -ctx["加攻量"])
+    _____79FB_9664_539F_751FBuff(ctx["单位"], _____5207_6362_52A0_653BBuffID)
+end
 local _____5149_5F62_6001_5355_4F4DID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["光形态单位ID"])
 local _____6697_5F62_6001_5355_4F4DID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["暗形态单位ID"])
+local ____Q_6280_80FDID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["Q技能ID"])
+local ____W_6280_80FDID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["W技能ID"])
+local ____E_6280_80FDID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["E技能ID"])
+local ____R_6280_80FDID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["R技能ID"])
 local ____D_6280_80FDID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["D技能ID"])
-local _____5207_6362_52A0_653BBuffID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["切换加攻BuffID"])
---- 切换后重设最大生命 = 30 + 力量 × 1.35（源 切换.j）
-local function _____91CD_8BBE_5F62_6001_6700_5927_751F_547D(unit)
-    SetUnitStateJapi(
-        unit,
-        UNIT_STATE_MAX_LIFE,
-        30 + GetHeroStr(unit, false) * 1.35
-    )
+_____5207_6362_52A0_653BBuffID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["切换加攻BuffID"])
+--- 更新 Q/W/E/R/D 五个技能图标（源 切换.j：YDWESetUnitAbilityDataString 204；项目用 japi.DzSetUnitAbilityArt）
+local function _____66F4_65B0_5F62_6001_56FE_6807(unit, _____56FE_6807_96C6)
+    DzSetUnitAbilityArt(unit, ____Q_6280_80FDID, _____56FE_6807_96C6.Q)
+    DzSetUnitAbilityArt(unit, ____W_6280_80FDID, _____56FE_6807_96C6.W)
+    DzSetUnitAbilityArt(unit, ____E_6280_80FDID, _____56FE_6807_96C6.E)
+    DzSetUnitAbilityArt(unit, ____R_6280_80FDID, _____56FE_6807_96C6.R)
+    DzSetUnitAbilityArt(unit, ____D_6280_80FDID, _____56FE_6807_96C6.D)
 end
 --- 光 H00F → 暗 H00G
 local function _____5149_5F62_6001_5207_6362_4E3A_6697(unit)
@@ -59,7 +85,13 @@ local function _____5149_5F62_6001_5207_6362_4E3A_6697(unit)
     DzSetUnitID(unit, _____6697_5F62_6001_5355_4F4DID)
     registerManualBuff(unit, _____963F_4F26_52B3_7279BuffID["裁决圣剑形态"], 999, 0)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(unit, _____963F_4F26_52B3_7279BuffID["光之圣剑形态"])
-    _____91CD_8BBE_5F62_6001_6700_5927_751F_547D(unit)
+    _____66F4_65B0_5F62_6001_56FE_6807(unit, {
+        Q = ____D_914D_7F6E["图标"]["暗Q"],
+        W = ____D_914D_7F6E["图标"]["暗W"],
+        E = ____D_914D_7F6E["图标"]["暗E"],
+        R = ____D_914D_7F6E["图标"]["暗R"],
+        D = ____D_914D_7F6E["图标"]["暗D"]
+    })
     createTimedUnitEffect(unit, "origin", ____D_914D_7F6E["光切暗特效A"], ____D_914D_7F6E["切换特效持续秒"])
     createTimedUnitEffect(unit, "origin", ____D_914D_7F6E["光切暗特效B"], ____D_914D_7F6E["切换特效持续秒"])
     _____8C03_6574_73A9_5BB6_5C5E_6027(
@@ -74,10 +106,7 @@ local function _____5149_5F62_6001_5207_6362_4E3A_6697(unit)
     )
     _____8C03_6574_73A9_5BB6_5C5E_6027(unit, ____D_914D_7F6E["暗生命恢复增幅属性名"], ____D_914D_7F6E["暗生命恢复增幅"])
     _____8C03_6574_73A9_5BB6_5C5E_6027(unit, ____D_914D_7F6E["暗受到治疗加成属性名"], ____D_914D_7F6E["暗受到治疗加成"])
-    local _____5DF2_635F_5931_751F_547D = math.max(
-        0,
-        GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) - GetUnitStateJass(unit, UNIT_STATE_LIFE)
-    )
+    local _____5DF2_635F_5931_751F_547D = _____53D6_975E_8D1F_6570(_____8BFB_53D6_6700_5927_751F_547D(unit) - _____8BFB_53D6_5F53_524D_751F_547D(unit))
     doHeal({
         HealSource = unit,
         HealTarget = unit,
@@ -92,11 +121,9 @@ local function _____5149_5F62_6001_5207_6362_4E3A_6697(unit)
         _____6DFB_52A0_539F_751FBuff_6301_7EED(unit, _____5207_6362_52A0_653BBuffID, ____D_914D_7F6E["切换加攻持续秒"])
         registerManualBuff(unit, _____963F_4F26_52B3_7279BuffID["切换加攻"], 2, 0)
         addDelayedCallback(
-            math.floor(____D_914D_7F6E["切换加攻持续秒"] * 1000 + 0.5),
-            function()
-                _____4E34_65F6_8C03_6574_653B_51FB(unit, -_____52A0_653B_91CF)
-                _____79FB_9664_539F_751FBuff(unit, _____5207_6362_52A0_653BBuffID)
-            end
+            _____53D6_56DB_820D_4E94_5165_6574_6570(____D_914D_7F6E["切换加攻持续秒"] * 1000),
+            _____5207_6362_52A0_653B_5230_671F,
+            {["单位"] = unit, ["加攻量"] = _____52A0_653B_91CF}
         )
     end
 end
@@ -107,7 +134,13 @@ local function _____6697_5F62_6001_5207_6362_4E3A_5149(unit)
     registerManualBuff(unit, _____963F_4F26_52B3_7279BuffID["光之圣剑形态"], 999, 0)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(unit, _____963F_4F26_52B3_7279BuffID["裁决圣剑形态"])
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(unit, _____963F_4F26_52B3_7279BuffID["切换加攻"])
-    _____91CD_8BBE_5F62_6001_6700_5927_751F_547D(unit)
+    _____66F4_65B0_5F62_6001_56FE_6807(unit, {
+        Q = ____D_914D_7F6E["图标"]["光Q"],
+        W = ____D_914D_7F6E["图标"]["光W"],
+        E = ____D_914D_7F6E["图标"]["光E"],
+        R = ____D_914D_7F6E["图标"]["光R"],
+        D = ____D_914D_7F6E["图标"]["光D"]
+    })
     createTimedUnitEffect(unit, "origin", ____D_914D_7F6E["暗切光特效A"], ____D_914D_7F6E["切换特效持续秒"])
     createTimedUnitEffect(unit, "origin", ____D_914D_7F6E["暗切光特效B"], ____D_914D_7F6E["切换特效持续秒"])
     _____8C03_6574_73A9_5BB6_5C5E_6027(unit, ____D_914D_7F6E["光治疗加成属性名"], ____D_914D_7F6E["光治疗加成"])

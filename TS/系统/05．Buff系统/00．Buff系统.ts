@@ -18,7 +18,15 @@ const leakCore = require("lib.扩展函数.封装函数.05．泄露审计.index"
 const LeakWatcher = leakCore.LeakWatcher ?? leakCore;
 const UnitRemoveAbility = jass["UnitRemoveAbility"] as (whichUnit: any, abilityId: number) => boolean;
 const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
-  buffs: Record<string, { effect: string; effectMode?: "attach" | "point"; effectAttachPoint?: string; effectScale?: number; effectHeight?: number }>;
+  buffs: Record<string, {
+    effect: string;
+    effectMode?: "attach" | "follow" | "point";
+    effectAttachPoint?: string;
+    effectScale?: number;
+    effectHeight?: number;
+    effectTick?: number;
+    effectTickDuration?: number;
+  }>;
 };
 const negativeEffectImmunity = require("系统.05．Buff系统.06．负面效果免疫状态") as {
   单位是否免疫负面效果BuffID: (this: void, unit: any, buffID: string) => boolean;
@@ -32,8 +40,12 @@ const buffEffectTools = require("lib.扩展函数.封装函数.01．通用工具
   创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number) => any;
   销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
   销毁Dz绑定特效句柄: (this: void, effect: any) => void;
+  创建点特效: (this: void, 参数: any) => any;
+  设置特效缩放: (this: void, effect: any, scale: number) => void;
 };
 const AddSpecialEffect = jass["AddSpecialEffect"] as (modelName: string, x: number, y: number) => any;
+const AddSpecialEffectTarget = jass["AddSpecialEffectTarget"] as (modelName: string, targetWidget: any, attachPointName: string) => any;
+const DestroyEffect = jass["DestroyEffect"] as (whichEffect: any) => void;
 const GetUnitX = jass["GetUnitX"] as (whichUnit: any) => number;
 const GetUnitY = jass["GetUnitY"] as (whichUnit: any) => number;
 const R2I = jass["R2I"] as (r: number) => number;
@@ -98,6 +110,13 @@ export interface BuffRuntime {
   visualEffectKey?: string;
   /** Buff 表现采用附着还是单位坐标跟随。 */
   visualEffectMode?: "bind" | "follow";
+  /** 周期特效累计时间。 */
+  visualEffectTickElapsed?: number;
+  /** 固定地点模式记录的首次施加坐标。 */
+  visualEffectPointX?: number;
+  visualEffectPointY?: number;
+  /** 周期特效句柄及其剩余寿命，由 Buff 池统一清理。 */
+  visualTickEffects?: { effect: any; remaining: number }[];
   /** Buff 池到期时一并移除的原生魔法效果 rawId，用于清理单位状态栏图标/效果。 */
   nativeBuffAbilityIds?: number[];
   /** Buff 被移除或到期时触发的纯 TS 清理回调。 */
@@ -271,7 +290,7 @@ export function syncDotBuff(
     maybeStopSyncTimer();
     return;
   }
-  const targetUnit = typeof target !== "number" ? target : unitRefByHid[hid];
+  const targetUnit = unitRefByHid[hid] ?? target;
   if (targetUnit != null && 单位是否免疫负面效果BuffID(targetUnit, buffID)) return;
   const row: BuffRuntime = {
     buffID,
@@ -286,7 +305,7 @@ export function syncDotBuff(
     _dotParsedDuration: state._dotParsedDuration,
   };
   setBuffToFlat(hid, buffID, row);
-  if (typeof target !== "number") unitRefByHid[hid] = target;
+  unitRefByHid[hid] = target;
   ensureSyncTimer();
 }
 
@@ -313,25 +332,131 @@ function playManualBuffEffect(target: any, buffID: string, row: BuffRuntime, dur
   const modelPath = row.effectModelOverride && row.effectModelOverride !== "" ? row.effectModelOverride : (meta?.effect ?? "");
   if (modelPath === "") return;
 
+  const effectMode = getManualBuffEffectMode(meta);
+  if (effectMode === "point") {
+    row.visualEffectPointX = GetUnitX(target);
+    row.visualEffectPointY = GetUnitY(target);
+  }
+  if (getManualBuffEffectTick(meta) > 0) {
+    row.visualEffectTickElapsed = 0;
+    row.visualTickEffects = [];
+    return;
+  }
+
   let effect: any = null;
-  if (meta?.effectMode === "point") {
+  if (effectMode === "point") {
     effect = AddSpecialEffect(modelPath, GetUnitX(target), GetUnitY(target));
     if (effect != null && effect !== 0) {
       YDWETimerDestroyEffectSafe(durationSec, effect);
     }
-  } else {
+  } else if (effectMode === "follow") {
     const effectKey = "manual-buff:" + buffID;
-    if (meta?.effectHeight != null) {
-      effect = buffEffectTools.创建单位坐标跟随特效(target, modelPath, effectKey, meta?.effectScale ?? 1, meta.effectHeight);
-      row.visualEffectMode = "follow";
-    } else {
-      effect = buffEffectTools.创建Dz绑定单位特效(target, meta?.effectAttachPoint ?? "overhead", modelPath, effectKey, meta?.effectScale ?? 1);
-      row.visualEffectMode = "bind";
-    }
+    effect = buffEffectTools.创建单位坐标跟随特效(target, modelPath, effectKey, meta?.effectScale ?? 1, meta?.effectHeight ?? 50);
+    row.visualEffectMode = "follow";
     if (effect != null && effect !== 0) {
       row.visualEffect = effect;
       row.visualEffectKey = effectKey;
     }
+  } else {
+    const effectKey = "manual-buff:" + buffID;
+    effect = buffEffectTools.创建Dz绑定单位特效(target, meta?.effectAttachPoint ?? "overhead", modelPath, effectKey, meta?.effectScale ?? 1);
+    row.visualEffectMode = "bind";
+    if (effect != null && effect !== 0) {
+      row.visualEffect = effect;
+      row.visualEffectKey = effectKey;
+    }
+  }
+}
+
+function getManualBuffEffectMode(meta: {
+  effectMode?: "attach" | "follow" | "point";
+  effectHeight?: number;
+} | undefined): "attach" | "follow" | "point" {
+  if (meta?.effectMode === "point") return "point";
+  if (meta?.effectMode === "follow" || meta?.effectHeight != null) return "follow";
+  return "attach";
+}
+
+function getManualBuffEffectTick(meta: { effectTick?: number } | undefined): number {
+  if (meta?.effectTick == null || !isFinite(meta.effectTick) || meta.effectTick <= 0) return 0;
+  return meta.effectTick;
+}
+
+function getManualBuffEffectTickDuration(meta: { effectTick?: number; effectTickDuration?: number } | undefined): number {
+  if (meta?.effectTickDuration != null && isFinite(meta.effectTickDuration) && meta.effectTickDuration > 0) {
+    return meta.effectTickDuration;
+  }
+  return getManualBuffEffectTick(meta);
+}
+
+function ageManualBuffTickEffects(row: BuffRuntime): void {
+  const effects = row.visualTickEffects;
+  if (effects == null || effects.length === 0) return;
+  const activeEffects: { effect: any; remaining: number }[] = [];
+  for (let i = 0; i < effects.length; i++) {
+    const record = effects[i];
+    record.remaining = record.remaining - BUFF_POOL_TICK;
+    if (record.remaining <= 0) {
+      DestroyEffect(record.effect);
+    } else {
+      activeEffects.push(record);
+    }
+  }
+  row.visualTickEffects = activeEffects;
+}
+
+function destroyManualBuffTickEffects(row: BuffRuntime): void {
+  const effects = row.visualTickEffects;
+  if (effects == null) return;
+  for (let i = 0; i < effects.length; i++) {
+    DestroyEffect(effects[i].effect);
+  }
+  row.visualTickEffects = undefined;
+}
+
+function playManualBuffTickEffect(target: any, buffID: string, row: BuffRuntime): void {
+  if (target == null || target === 0 || getBuffFromFlat(toHid(target), buffID) !== row) return;
+  const meta = buffTableMod.buffs[buffID];
+  const modelPath = row.effectModelOverride && row.effectModelOverride !== "" ? row.effectModelOverride : (meta?.effect ?? "");
+  const effectTick = getManualBuffEffectTick(meta);
+  const effectDuration = getManualBuffEffectTickDuration(meta);
+  if (modelPath === "" || effectTick <= 0 || effectDuration <= 0) return;
+
+  const effectMode = getManualBuffEffectMode(meta);
+  let effect: any = null;
+  if (effectMode === "attach") {
+    effect = AddSpecialEffectTarget(modelPath, target, meta?.effectAttachPoint ?? "overhead");
+    if (effect != null && effect !== 0 && meta?.effectScale != null) {
+      buffEffectTools.设置特效缩放(effect, meta.effectScale);
+    }
+  } else {
+    const x = effectMode === "point" ? row.visualEffectPointX : GetUnitX(target);
+    const y = effectMode === "point" ? row.visualEffectPointY : GetUnitY(target);
+    if (x == null || y == null) return;
+    effect = buffEffectTools.创建点特效({
+      模型路径: modelPath,
+      X: x,
+      Y: y,
+      Z: effectMode === "follow" ? (meta?.effectHeight ?? 0) : 0,
+      持续秒: -1,
+      缩放: meta?.effectScale ?? 1,
+    });
+  }
+  if (effect == null || effect === 0) return;
+  if (row.visualTickEffects == null) row.visualTickEffects = [];
+  row.visualTickEffects.push({ effect, remaining: effectDuration });
+}
+
+function tickManualBuffEffect(hid: number, buffID: string, row: BuffRuntime, unitRef: any): void {
+  ageManualBuffTickEffects(row);
+  const meta = buffTableMod.buffs[buffID];
+  const effectTick = getManualBuffEffectTick(meta);
+  if (effectTick <= 0 || unitRef == null || unitRef === 0) return;
+  row.visualEffectTickElapsed = (row.visualEffectTickElapsed ?? 0) + BUFF_POOL_TICK;
+  while (row.visualEffectTickElapsed >= effectTick) {
+    row.visualEffectTickElapsed = row.visualEffectTickElapsed - effectTick;
+    if (getBuffFromFlat(hid, buffID) !== row) return;
+    playManualBuffTickEffect(unitRef, buffID, row);
   }
 }
 
@@ -345,11 +470,11 @@ export function registerManualBuff(
   if (target == null || target === 0 || !buffID || durationSec <= 0) return;
   const hid = toHid(target);
   if (hid === 0) return;
-  const targetUnit = typeof target !== "number" ? target : unitRefByHid[hid];
+  const targetUnit = unitRefByHid[hid] ?? target;
   if (targetUnit != null && 单位是否免疫负面效果BuffID(targetUnit, buffID)) return;
   const oldRow = getBuffFromFlat(hid, buffID);
   if (oldRow != null) {
-    removeBuffRuntimeByKey(hid, buffID, oldRow, typeof target !== "number" ? target : unitRefByHid[hid]);
+    removeBuffRuntimeByKey(hid, buffID, oldRow, targetUnit);
   }
   const row: BuffRuntime = {
     buffID,
@@ -376,8 +501,8 @@ export function registerManualBuff(
     if (extras.tickWhilePaused === true) row.tickWhilePaused = true;
   }
   setBuffToFlat(hid, buffID, row);
-  if (typeof target !== "number") unitRefByHid[hid] = target;
-  playManualBuffEffect(target, buffID, row, durationSec);
+  unitRefByHid[hid] = target;
+  playManualBuffEffect(targetUnit, buffID, row, durationSec);
   ensureSyncTimer();
 }
 
@@ -482,6 +607,8 @@ function processBuffsForUnit(hid: number, buffs: { buffID: string; row: BuffRunt
     row.remaining = row.remaining - BUFF_POOL_TICK;
     if (row.remaining <= 0) {
       expired.push({ buffID, row });
+    } else {
+      tickManualBuffEffect(hid, buffID, row, unitRef);
     }
   }
   // 删除过期的 buff
@@ -511,12 +638,14 @@ function cleanupBuffOnRemove(unitRef: any, hid: number, buffID: string, row: Buf
 }
 
 function cleanupBuffVisualEffect(unitRef: any, row: BuffRuntime): void {
-  if (row.visualEffect == null || row.visualEffect === 0) return;
-  if (unitRef != null && unitRef !== 0 && row.visualEffectKey != null && row.visualEffectKey !== "") {
-    if (row.visualEffectMode === "follow") buffEffectTools.销毁单位坐标跟随特效(unitRef, row.visualEffectKey);
-    else buffEffectTools.销毁Dz绑定单位特效(unitRef, row.visualEffectKey);
-  } else {
-    buffEffectTools.销毁Dz绑定特效句柄(row.visualEffect);
+  destroyManualBuffTickEffects(row);
+  if (row.visualEffect != null && row.visualEffect !== 0) {
+    if (unitRef != null && unitRef !== 0 && row.visualEffectKey != null && row.visualEffectKey !== "") {
+      if (row.visualEffectMode === "follow") buffEffectTools.销毁单位坐标跟随特效(unitRef, row.visualEffectKey);
+      else buffEffectTools.销毁Dz绑定单位特效(unitRef, row.visualEffectKey);
+    } else {
+      buffEffectTools.销毁Dz绑定特效句柄(row.visualEffect);
+    }
   }
   row.visualEffect = null;
   row.visualEffectKey = undefined;
@@ -537,7 +666,7 @@ export function 移除单位指定Buff(unit: any, buffID: string): boolean {
   if (hid === 0 || buffID === "") return false;
   const row = getBuffFromFlat(hid, buffID);
   if (row == null) return false;
-  const unitRef = typeof unit !== "number" ? unit : unitRefByHid[hid];
+  const unitRef = unitRefByHid[hid] ?? unit;
   removeBuffRuntimeByKey(hid, buffID, row, unitRef);
   if (!hasAnyBuffOnHid(hid)) delete unitRefByHid[hid];
   maybeStopSyncTimer();

@@ -34,9 +34,6 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
 const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
   registerDamageCallback: (this: void, cb: (this: void, unit: any, damage: number, damageType: number, fromDotTickBatch?: boolean, source?: any, isNormalAttack?: boolean) => void, intervalSeconds?: number) => void;
 };
-const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境") as {
-  施加眩晕: (this: void, source: any, target: any, duration: number, name?: string, type?: "装备" | "技能") => void;
-};
 const { SFB_施加通用Buff } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
   SFB_施加通用Buff: (this: void, 来源单位: any, 目标单位: any, Buff类型: number, 持续时间: number) => void;
 };
@@ -50,6 +47,10 @@ const { 读取单位攻击力, 单位存活 } = require("系统.03．技能系�
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, target: any, buffID: string) => void;
+};
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, u: any, 来源: string) => boolean;
+  移除单位暂停: (this: void, u: any, 来源: string) => boolean;
 };
 
 const R技能ID数值 = stringToFourCCSafe(佐佐木单位技能配置.R技能ID);
@@ -95,7 +96,7 @@ function 发射燕返刀光(this: void, 英雄: any, 起点X: number, 起点Y: n
   // 音效：前两击 DK6，最后一击 DK52（源在英雄位置播放）
   播放佐佐木坐标音效(击.音效路径, GetUnitX(英雄), GetUnitY(英雄), cfg.三击音效裁断);
 
-  创建原生弹幕({
+  const 弹幕参数 = {
     所有者: 英雄,
     X: 起点X,
     Y: 起点Y,
@@ -116,13 +117,21 @@ function 发射燕返刀光(this: void, 英雄: any, 起点X: number, 起点Y: n
     标签: "佐佐木小次郎-燕返",
     伤害形态: "单体",
     参与技能伤害加成: true,
+    // 源 e07V「蓝色刀光（冰）」主模型 + e07U「剑气」伴随（最后一击缩放 2.5）
     模型: cfg.刀光特效模型,
-    缩放: 击.缩放,
+    缩放: 1.5, // 源 e07V modelScale 1.5
+    // 注：不设飞行高度——eaaa 马甲物编移动类型不支持飞行高度（见菲尼克斯尔复盘），设了会被拖回地面
+    附加特效1: {
+      模型: cfg.剑气伴随模型,
+      缩放: 击.缩放, // 源 e07U：基础 1.5 / 最后一击 SetUnitScale 2.5
+      跟随主弹幕参数: true,
+    },
     // 命中硬直（源控制效果 0.65 / 0.65 / 1.00）
     on命中: (目标单位: any) => {
       SFB_施加通用Buff(英雄, 目标单位, 21, 击.硬直秒);
     },
-  });
+  } as const;
+  创建原生弹幕(弹幕参数);
 }
 
 /** 触发燕返：无敌 + 0.55 倍速 + 三连刀光（源 Trig_zzm_QFunc003Func002Func005T） */
@@ -130,22 +139,25 @@ function 触发燕返(this: void, 英雄: any): void {
   const cfg = 佐佐木单位技能配置.R;
 
   SetUnitInvulnerable(英雄, true);
-  SetUnitTimeScale(英雄, 0.55);
-  施加眩晕(英雄, 英雄, cfg.三击间隔秒 * 4, "佐佐木燕返", "技能");
+  // 源 JASS 依靠永久硬直保持动作 6；项目暂停下需在反击成功时显式重播，否则会回到 stand。
+  播放佐佐木配置动作(英雄, cfg.反击动作索引, cfg.反击动作速度);
+  // 源 JASS：燕返期间不重复眩晕，沿用入口「添加单位暂停」（结算时仍处于硬直中），结束清理时统一「移除单位暂停」
   播放佐佐木全局音效(cfg.燕返触发音效键);
 
-  // 刀光起点：本体位置 + 25 码（面朝+90°）再 +50 码（面朝方向）
+  // 刀光起点：本体位置 + 25 码（面朝+90°方向）再 +50 码（面朝方向）
+  // 源 JASS: PolarProjectionBJ(saber位置, 25.00, 角度+90) → 结果再 PolarProjectionBJ(50, 角度+0)
   const 角度 = GetUnitFacing(英雄);
-  const 弧度 = 角度 * Math.PI / 180;
-  const 垂直弧度 = (角度 + 90) * Math.PI / 180;
-  const 起点X = GetUnitX(英雄) + Math.cos(垂直弧度) * 25 + Math.cos(弧度) * 50;
-  const 起点Y = GetUnitY(英雄) + Math.sin(垂直弧度) * 25 + Math.sin(弧度) * 50;
+  const 弧度_角度 = 角度 * Math.PI / 180;
+  const 弧度_角度加90 = (角度 + 90) * Math.PI / 180;
+  const 起点X = GetUnitX(英雄) + Math.cos(弧度_角度加90) * 25 + Math.cos(弧度_角度) * 50;
+  const 起点Y = GetUnitY(英雄) + Math.sin(弧度_角度加90) * 25 + Math.sin(弧度_角度) * 50;
 
   for (let 击序 = 0; 击序 < cfg.三击.length; 击序++) {
-    addDelayedCallback(Math.round((击序 + 1) * cfg.三击间隔秒 * 1000), () => {
+    // 通过 variable 参数按迭代捕获击序，避免 Lua 闭包捕获共享循环变量导致越界
+    addDelayedCallback(Math.round((击序 + 1) * cfg.三击间隔秒 * 1000), (当前击序: any) => {
       if (!单位存活(英雄)) return;
-      发射燕返刀光(英雄, 起点X, 起点Y, 角度, 击序);
-    });
+      发射燕返刀光(英雄, 起点X, 起点Y, 角度, 当前击序 as number);
+    }, 击序);
   }
 
   // 三击结束后恢复（源 0.40×4 时长后清理，即最后一击后再过一个间隔）
@@ -154,6 +166,7 @@ function 触发燕返(this: void, 英雄: any): void {
     SetUnitInvulnerable(英雄, false);
     SetUnitTimeScale(英雄, 1.0);
     SetUnitAnimation(英雄, "stand");
+    移除单位暂停(英雄, "佐佐木R燕返防御"); // 源 JASS: YDWEUnitRemoveStun 解除防御姿态硬直
   });
 }
 
@@ -168,10 +181,12 @@ function on佐佐木R生效(this: void, 施法单位: any, 技能ID数值: numbe
   const cfg = 佐佐木单位技能配置.R;
   const id = GetHandleId(施法单位);
 
-  // 防御姿态：ZZMR1 + 动作 6 + 自身硬直，开启 0.68 秒受击窗口
+  // 防御姿态：ZZMR1 + 动作 6 + 自身暂停（硬直），开启 0.68 秒受击窗口
+  // 源 JASS: YDWEUnitAddStun 永久硬直 → TS 走项目暂停系统（添加单位暂停），
+  // 0.70s 未触发或燕返结束后用「移除单位暂停」统一解除（对应 YDWEUnitRemoveStun）
   播放佐佐木全局音效(cfg.防御姿态音效键);
-  播放佐佐木配置动作(施法单位, 6, 0);
-  施加眩晕(施法单位, 施法单位, 0.7, "佐佐木燕返防御", "技能");
+  播放佐佐木配置动作(施法单位, cfg.防御动作索引, 0);
+  添加单位暂停(施法单位, "佐佐木R燕返防御");
   R防御窗口表[id] = true;
   R反击标记表[id] = false;
   registerManualBuff(施法单位, 佐佐木小次郎BuffID.燕返守卫, cfg.防御窗口秒, 0);
@@ -188,8 +203,10 @@ function on佐佐木R生效(this: void, 施法单位: any, 技能ID数值: numbe
       R反击标记表[id] = false;
       触发燕返(施法单位);
     } else {
+      // 源 JASS 未触发分支：重置动作 + 时间缩放 + YDWEUnitRemoveStun（→ 移除单位暂停）解除硬直
       SetUnitTimeScale(施法单位, 1.0);
       SetUnitAnimation(施法单位, "stand");
+      移除单位暂停(施法单位, "佐佐木R燕返防御");
     }
   });
 }

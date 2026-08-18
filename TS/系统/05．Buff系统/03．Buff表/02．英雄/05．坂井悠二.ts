@@ -119,7 +119,7 @@ export const 坂井悠二Buff表: Record<string, BuffData> = {
     dispelLevel: 3,
     priority: 80,
     canPurge: false,
-    data属性名: "暗属性伤害加成",
+    data属性名: "暗属性伤害",
     tooltip: "祭礼之蛇附身：暗属性伤害+30%，持续10秒。",
   },
   [坂井悠二BuffID.D期间状态]: {

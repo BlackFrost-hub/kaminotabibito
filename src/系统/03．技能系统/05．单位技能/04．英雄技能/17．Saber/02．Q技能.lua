@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8BA1_7B97_4E24_70B9_89D2_5EA6, _____5728_524D_65B9_534A_5706, _____8FC7_6EE4Q_5288_780D_76EE_6807, _____8BA1_7B97_5200_5149_70B9, _____64AD_653E_5200_5149, _____6062_590DQ_76EE_6807_8868_73B0, _____5E94_7528Q_76EE_6807_547D_4E2D_8868_73B0, _____7ED3_7B97Q_524D_65B9_5288_780D, ____Q_521D_6BB5_7A97_53E3_590D_4F4D, _____6CBF_9762_5411_77AC_6B65, ____Q2_8FC7_6E21, ____Q2_7B2C_4E8C_6BB5_5288_780D, ____Q_8FDE_51FB2_7A97_53E3_590D_4F4D, _____63A8_8FDBQ3_4E0B_964D, ____Q3_8FC7_6E21, ____Q3_7B2C_4E8C_6BB5_5288_780D, ____Q3_590D_4F4D, jass, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____5F00_59CB_51FB_9000, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____83B7_53D6_8303_56F4_654C_519B, _____65BD_52A0_7729_6655, registerManualBuff, _____79FB_9664_5355_4F4D_6682_505C, _____521B_5EFA_70B9_7279_6548, createTimedUnitEffect, GetUnitX, GetUnitY, GetUnitFacing, GetUnitFlyHeight, GetOwningPlayer, SetUnitTimeScale, SetUnitAnimationByIndex, SetUnitAnimation, ResetUnitAnimation, SetUnitTurnSpeed, SetUnitFlyHeight, SetPlayerAbilityAvailable, UnitAddAbility, UnitRemoveAbility, IsUnitType, IsUnitVisible, Atan2, Cos, Sin, bj_RADTODEG, bj_DEGTORAD, UNIT_TYPE_ANCIENT, UNIT_TYPE_MECHANICAL, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_METAL_HEAVY_BASH, EXSetUnitMoveType, _____914D_7F6E, ____Q_521D_6BB5ID, ____Q_8FDE_51FB2ID, ____Q_8FDE_51FB3ID
+local _____8BA1_7B97_4E24_70B9_89D2_5EA6, _____5728_524D_65B9_534A_5706, _____8FC7_6EE4Q_5288_780D_76EE_6807, _____8BA1_7B97_5200_5149_70B9, _____64AD_653E_5200_5149, _____6062_590DQ_76EE_6807_8868_73B0, _____5E94_7528Q_76EE_6807_547D_4E2D_8868_73B0, _____7ED3_7B97Q_524D_65B9_5288_780D, ____Q_521D_6BB5_7A97_53E3_590D_4F4D, _____6CBF_9762_5411_77AC_6B65, ____Q2_8FC7_6E21, ____Q2_7B2C_4E8C_6BB5_5288_780D, ____Q_8FDE_51FB2_7A97_53E3_590D_4F4D, _____63A8_8FDBQ3_4E0B_964D, ____Q3_8FC7_6E21, ____Q3_7B2C_4E8C_6BB5_5288_780D, ____Q3_590D_4F4D, jass, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____5F00_59CB_51FB_9000, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____83B7_53D6_8303_56F4_654C_519B, _____65BD_52A0_7729_6655, registerManualBuff, _____79FB_9664_5355_4F4D_6682_505C, _____521B_5EFA_70B9_7279_6548, createTimedUnitEffect, GetUnitX, GetUnitY, GetUnitFacing, GetUnitFlyHeight, GetOwningPlayer, SetUnitTimeScale, SetUnitAnimationByIndex, SetUnitAnimation, SetUnitTurnSpeed, SetUnitFlyHeight, SetPlayerAbilityAvailable, UnitAddAbility, UnitRemoveAbility, IsUnitType, IsUnitVisible, Atan2, Cos, Sin, bj_RADTODEG, bj_DEGTORAD, UNIT_TYPE_ANCIENT, UNIT_TYPE_MECHANICAL, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_METAL_HEAVY_BASH, EXSetUnitMoveType, _____914D_7F6E, ____Q_521D_6BB5ID, ____Q_8FDE_51FB2ID, ____Q_8FDE_51FB3ID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.17．Saber.00．配置")
 local ____Saber_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["Saber技能配置"]
 local ____08_FF0ESaber = require("系统.05．Buff系统.03．Buff表.02．英雄.08．Saber")
@@ -98,7 +98,7 @@ function _____6062_590DQ_76EE_6807_8868_73B0(variable)
     if target == nil or target == 0 or not _____5355_4F4D_5B58_6D3B(target) then
         return
     end
-    ResetUnitAnimation(target)
+    SetUnitAnimation(target, "stand")
     SetUnitTimeScale(target, 1)
 end
 function _____5E94_7528Q_76EE_6807_547D_4E2D_8868_73B0(caster, target, _____89D2_5EA6, _____51FB_9000_914D_7F6E)
@@ -454,7 +454,6 @@ local GetHandleId = jass.GetHandleId
 SetUnitTimeScale = jass.SetUnitTimeScale
 SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 SetUnitAnimation = jass.SetUnitAnimation
-ResetUnitAnimation = jass.ResetUnitAnimation
 SetUnitTurnSpeed = jass.SetUnitTurnSpeed
 SetUnitFlyHeight = jass.SetUnitFlyHeight
 SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable

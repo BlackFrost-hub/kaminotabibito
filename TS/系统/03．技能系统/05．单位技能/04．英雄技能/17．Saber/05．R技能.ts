@@ -38,6 +38,10 @@ const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
+// GetRandomDirectionDeg 是 Blizzard.j 函数，从 BJ 函数库取（jass.common 取到的是 nil）
+const { GetRandomDirectionDeg } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetRandomDirectionDeg: (this: void) => number;
+};
 
 const japi = require("jass.japi") as any;
 
@@ -51,7 +55,6 @@ const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
 const GetRandomReal = jass.GetRandomReal as (this: void, low: number, high: number) => number;
-const GetRandomDirectionDeg = jass.GetRandomDirectionDeg as (this: void) => number;
 const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const Sin = jass.Sin as (this: void, radians: number) => number;

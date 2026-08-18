@@ -13,6 +13,7 @@
 
 import { 欧尔贝克单位技能配置 } from "./00．配置";
 import { 播放欧尔贝克单位音效, 播放欧尔贝克配置动作 } from "./00A．表现工具";
+import { 欧尔贝克BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/17．欧尔贝克";
 
 const jass = require("jass.common") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -63,6 +64,9 @@ const { isUnitEnemy } = require("lib.扩展函数.自定义扩展函数.02．条
 const { 单位拥有原生Buff, 单位是指定类型 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   单位拥有原生Buff: (this: void, unit: any, buffId: number) => boolean;
   单位是指定类型: (this: void, unit: any, typeId: number) => boolean;
+};
+const { 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
+  移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
 };
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -251,6 +255,7 @@ function on欧尔贝克Q(this: void, caster: any, abilityId: number): void {
   const 十字斩 = 单位拥有原生Buff(caster, 积攒Buff类型ID);
   if (十字斩) {
     UnitRemoveAbility(caster, 积攒Buff类型ID);
+    移除单位指定Buff(caster, 欧尔贝克BuffID.积攒);
     播放欧尔贝克单位音效(caster, cfg.十字全局音效键);
   } else {
     播放欧尔贝克单位音效(caster, cfg.全局音效键);

@@ -33,6 +33,15 @@ const { 减少魔法值 } = require("系统.04．伤害系统.02．治疗系统.
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
 };
+const { 创建进度条特效, 销毁进度条特效 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.进度条特效") as {
+  创建进度条特效: (this: void, unit: any, options?: {
+    高度偏移?: number;
+    缩放?: number;
+    动画序号?: number;
+    动画速度?: number;
+  }) => any;
+  销毁进度条特效: (this: void, effect: any) => void;
+};
 const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
@@ -86,6 +95,7 @@ interface 一方通行R上下文 {
   当前次数: number;
   周期回调ID: number;
   已启动: boolean;
+  施法进度条: any;
   施法者暂停来源: string;
   目标暂停来源: string;
 }
@@ -115,6 +125,7 @@ function 获取或创建R上下文(this: void, unit: any): 一方通行R上下�
     当前次数: 0,
     周期回调ID: 0,
     已启动: false,
+    施法进度条: null,
     施法者暂停来源: `一方通行-R-施法者:${id}`,
     目标暂停来源: `一方通行-R-目标:${id}`,
   };
@@ -156,6 +167,10 @@ function 创建R闪电(this: void, caster: any, target: any): void {
 }
 
 function 清理R上下文(this: void, context: 一方通行R上下文, 施加后续虚弱: boolean): void {
+  if (context.施法进度条 != null && context.施法进度条 !== 0) {
+    销毁进度条特效(context.施法进度条);
+    context.施法进度条 = null;
+  }
   if (context.周期回调ID !== 0) {
     removePeriodicCallback(context.周期回调ID);
     context.周期回调ID = 0;
@@ -244,6 +259,10 @@ function 释放一方通行R(this: void, context: 一方通行R上下文, caster
   添加单位暂停(caster, context.施法者暂停来源);
   添加单位暂停(target, context.目标暂停来源);
   SetUnitAnimationByIndex(caster, 0);
+  context.施法进度条 = 创建进度条特效(caster, {
+    动画序号: 0,
+    动画速度: R配置.压制持续秒 > 0 ? 1 / R配置.压制持续秒 : 1,
+  });
   Sound3DII_UnitPlayReuse(R配置.施法音效路径, caster, R配置.施法音效裁断距离);
   context.周期回调ID = addPeriodicCallback(R配置.伤害周期毫秒, 一方通行R周期Tick, context);
 }

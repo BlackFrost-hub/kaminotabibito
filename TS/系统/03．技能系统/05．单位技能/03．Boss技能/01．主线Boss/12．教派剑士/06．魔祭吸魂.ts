@@ -250,5 +250,4 @@ export function 注册教派剑士魔祭吸魂(this: void): void {
   registerSpellEffectListener(on教派剑士魔祭吸魂生效);
   registerAppliedFinalDamageListener(on魔祭吸魂最终伤害);
   registerDamageModifier(魔祭吸魂增伤修正, 教派剑士技能配置.魔祭吸魂.伤害提高修正优先级);
-  debugLogForce('教派剑士-魔祭吸魂', '技能壳、增伤与最终伤害监听注册完成', 'skillId=', 魔祭吸魂技能ID);
 }

@@ -54,7 +54,7 @@ export const 黑崎一护技能配置 = {
     碰撞半径: 200, // 源：马甲点 200 范围内判碰撞，每目标仅命中一次
     未解放: {
       伤害攻击力倍率: 2.5, // 介绍 250%
-      音效: { 路径: "Sound\\war3mapImported\\yueyatianchongyinxiao.mp3", 裁断距离: 2000 },
+      音效: { 路径: "war3mapImported\\yueyatianchongyinxiao.mp3", 裁断距离: 2000 },
       弹道模型: "Abilities\\Weapons\\WingedSerpentMissile\\WingedSerpentMissile.mdl", // 马甲 e012
       弹道缩放: 5,
       弹道高度: 220,
@@ -68,7 +68,7 @@ export const 黑崎一护技能配置 = {
     },
     解放后: {
       伤害攻击力倍率: 3.5, // 介绍 350%
-      音效: { 路径: "Sound\\war3mapImported\\YH-yueya.mp3", 裁断距离: 2000 },
+      音效: { 路径: "war3mapImported\\YH-yueya.mp3", 裁断距离: 2000 },
       弹道模型: "war3mapImported\\!blackgetsuga!.mdl", // 马甲 e00P
       弹道缩放: 2,
       弹道高度: 240,
@@ -114,7 +114,7 @@ export const 黑崎一护技能配置 = {
     技能ID: E技能ID,
     技能类型ID: stringToFourCCSafe(E技能ID),
     物编冷却秒: 13,
-    音效: { 路径: "Sound\\HeroVoice\\ichigo\\yh-w.mp3", 裁断距离: 1500 },
+    音效: { 路径: "HeroVoice\\ichigo\\yh-w.mp3", 裁断距离: 1500 },
     金属音效: { 路径: "Sound\\Units\\Combat\\MetalMediumSliceWood1.wav", 裁断距离: 1500 },
     普通: {
       斩击间隔秒: 0.15,
@@ -124,14 +124,14 @@ export const 黑崎一护技能配置 = {
       减速比例: 0.2, // 源 SFB_setSlow(unit, 0, 0.20, 0.40)
       减速持续秒: 0.4,
       斩击特效: { 模型: "Common\\Effect\\Form\\Line\\coarse slash blue.mdx", 缩放: 1.75, 持续秒: 1 },
-      斩击音效: { 路径: "Sound\\YX\\DJYX01.wav", 裁断距离: 1500 },
+      斩击音效: { 路径: "YX\\DJYX01.wav", 裁断距离: 1500 },
       结束: {
         伤害攻击力倍率: 1.2, // 合计 10×0.1 + 1.2 = 220%（介绍口径）
         眩晕秒: 1.5, // 介绍：结束后造成1.5秒眩晕
         特效模型: "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl",
         特效缩放: 2,
         特效持续秒: 1,
-        音效: { 路径: "Sound\\war3mapImported\\shenlei01.mp3", 裁断距离: 2000 },
+        音效: { 路径: "war3mapImported\\shenlei01.mp3", 裁断距离: 2000 },
       },
     },
     连携: {
@@ -142,6 +142,7 @@ export const 黑崎一护技能配置 = {
       幻影缩放: 1.3,
       幻影高度: 135,
       幻影透明度: 125,
+      幻影施法动画索引: 4, // Ichigo.mdx：Spell（8333-9333）
       起手眩晕秒: 2, // 源：起手 眩晕2秒 技能（辅助马甲 thunderbolt）
       冲锋延迟秒: 0.2, // 源 +0.20s 幻影播放 Spell 后启动
       推进间隔秒: 0.03,
@@ -165,10 +166,10 @@ export const 黑崎一护技能配置 = {
     技能ID: D技能ID,
     技能类型ID: stringToFourCCSafe(D技能ID),
     物编冷却秒: 5,
-    音效: { 路径: "Sound\\YX\\DJ10.mp3", 裁断距离: 2000 },
+    音效: { 路径: "YX\\DJ10.mp3", 裁断距离: 2000 },
     基础距离: 450,
     每千魔法加成距离: 50, // 450 + (最大魔法/1000) × 50
-    冲锋持续时间秒: 0.15, // 源 RushSlide(0.05,0.01) 近似滑移，取 0.15 保证地形检查生效
+    冲锋持续时间秒: 0.05, // 源 RushSlide：0.05 秒完成，0.01 秒推进周期
     连携窗口秒: 2, // 源：瞬步后 2 秒内 瞬步连携开关为真
     // 5% 最大魔法消耗由统一魔耗系统按物编百分比字段处理，技能文件不重复扣除（计划第 4 节）。
   },
@@ -202,9 +203,9 @@ export const 黑崎一护技能配置 = {
     物编冷却秒: 65,
     持续秒: 30,
     移速: 666, // 介绍：移动速度提高到666（源 DYCultrams 666 → TS 移速突破系统）
-    起手音效: { 路径: "Sound\\war3mapImported\\0000YHR1.mp3", 裁断距离: 2500 },
+    起手音效: { 路径: "war3mapImported\\0000YHR1.mp3", 裁断距离: 2500 },
     卍解延迟秒: 0.98, // 源 +0.98s 进入卍解
-    卍解音效: { 路径: "Sound\\war3mapImported\\0000YHR2.mp3", 裁断距离: 2500 },
+    卍解音效: { 路径: "war3mapImported\\0000YHR2.mp3", 裁断距离: 2500 },
     卍解特效: { 模型: "war3mapImported\\chaosexplosion.mdl", 缩放: 1.1, 持续秒: 2, 高度: 40 },
     // 源倒计时文字（TextTag）为本地表现，TS 不迁移（差异审计见计划）。
     // 源“卍解特效”马甲单位类型无法反查，仅保留 chaosexplosion 表现（差异审计见计划）。
@@ -214,7 +215,7 @@ export const 黑崎一护技能配置 = {
   黑流牙突: {
     最小距离码: 500,
     最大距离码: 1200,
-    标记持续秒: 5, // 每目标独立 5 秒触发时间（YDUserData unit 表“黑流牙突”）
+    标记持续秒: 5, // 每目标句柄独立 5 秒触发时间
     出生偏移码: 75, // 施法者后方 75 码（源角度读取顺序缺陷按“反向75码”口径修正，见计划）
     特效模型: "Abilities\\Spells\\Other\\BlackArrow\\BlackArrowMissile.mdl", // 壳参数：缩放3.0/高度135
     特效缩放: 3,
@@ -232,7 +233,7 @@ export const 黑崎一护技能配置 = {
   // ===== 被动：卍解普攻缩减月牙天冲冷却 =====
   被动: {
     Q冷却缩减秒: 0.55, // 介绍：每次普攻减少0.55秒冷却时间
-    Q冷却剩余阈值秒: 0.55, // 源：剩余 > 0.50 才缩减（TS 按缩减量对齐为 >= 0.55）
+    Q冷却剩余阈值秒: 0.5, // 源：剩余 > 0.50 才缩减
   },
 
   暂停来源: {

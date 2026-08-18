@@ -440,6 +440,5 @@ ____exports["注册教派剑士深渊旋风"] = function()
     _____6DF1_6E0A_65CB_98CE_5DF2_6CE8_518C = true
     registerSpellEffectListener(____on_6559_6D3E_5251_58EB_6DF1_6E0A_65CB_98CE_751F_6548)
     registerDamageModifier(_____6559_6D3E_5251_58EB_65CB_98CE_9B54_6CD5_514D_75AB_4FEE_6B63, _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E["深渊旋风"]["魔法免疫修正优先级"])
-    debugLogForce("教派剑士-深渊旋风", "技能壳与魔法免疫监听注册完成", "skillId=", _____6DF1_6E0A_65CB_98CE_6280_80FDID)
 end
 return ____exports

@@ -409,5 +409,4 @@ export function 注册教派剑士黑洞跨越(this: void): void {
   黑洞跨越已注册 = true;
   registerSpellEffectListener(on教派剑士黑洞跨越生效);
   registerDamageModifier(黑洞克制属性承伤修正, 8);
-  debugLogForce('教派剑士-黑洞跨越', '技能壳与黑洞克制承伤监听注册完成', 'skillId=', 黑洞跨越技能ID);
 }

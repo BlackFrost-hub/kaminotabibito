@@ -281,5 +281,4 @@ export function 注册教派剑士深渊旋风(this: void): void {
   深渊旋风已注册 = true;
   registerSpellEffectListener(on教派剑士深渊旋风生效);
   registerDamageModifier(教派剑士旋风魔法免疫修正, 教派剑士技能配置.深渊旋风.魔法免疫修正优先级);
-  debugLogForce('教派剑士-深渊旋风', '技能壳与魔法免疫监听注册完成', 'skillId=', 深渊旋风技能ID);
 }

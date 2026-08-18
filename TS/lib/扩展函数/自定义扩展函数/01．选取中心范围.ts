@@ -5,6 +5,13 @@
  */
 
 const jass = require("jass.common") as any;
+const GetUnitX = jass["GetUnitX"] as (this: void, unit: any) => number;
+const GetUnitY = jass["GetUnitY"] as (this: void, unit: any) => number;
+const CreateGroup = jass["CreateGroup"] as (this: void) => any;
+const GroupEnumUnitsInRange = jass["GroupEnumUnitsInRange"] as (this: void, group: any, x: number, y: number, radius: number, filter: any) => void;
+const FirstOfGroup = jass["FirstOfGroup"] as (this: void, group: any) => any;
+const GroupRemoveUnit = jass["GroupRemoveUnit"] as (this: void, group: any, unit: any) => void;
+const DestroyGroup = jass["DestroyGroup"] as (this: void, group: any) => void;
 const { isValidUnit, isUnitEnemy } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
     isValidUnit: (this: void, unit: any) => boolean;
     isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
@@ -20,8 +27,8 @@ const { isValidUnit, isUnitEnemy } = require("lib.扩展函数.自定义扩展�
 export function getUnitsInRangeOfUnit(this: void, centerUnit: any, radius: number): any[] {
     if (!centerUnit) return [];
 
-    const x = jass.GetUnitX(centerUnit);
-    const y = jass.GetUnitY(centerUnit);
+    const x = GetUnitX(centerUnit);
+    const y = GetUnitY(centerUnit);
 
     return getUnitsInRange(x, y, radius);
 }
@@ -35,11 +42,11 @@ export function getUnitsInRangeOfUnit(this: void, centerUnit: any, radius: numbe
  * @returns 符合条件的单位数组
  */
 export function getUnitsInRange(this: void, x: number, y: number, radius: number): any[] {
-    const group = jass.CreateGroup();
-    jass.GroupEnumUnitsInRange(group, x, y, radius, null);
+    const group = CreateGroup();
+    GroupEnumUnitsInRange(group, x, y, radius, null);
 
     const units: any[] = [];
-    let unit = jass.FirstOfGroup(group);
+    let unit = FirstOfGroup(group);
 
     while (true) {
         if (unit == null || unit === 0) {
@@ -48,11 +55,11 @@ export function getUnitsInRange(this: void, x: number, y: number, radius: number
         if (isValidUnit(unit)) {
             units.push(unit);
         }
-        jass.GroupRemoveUnit(group, unit);
-        unit = jass.FirstOfGroup(group);
+        GroupRemoveUnit(group, unit);
+        unit = FirstOfGroup(group);
     }
 
-    jass.DestroyGroup(group);
+    DestroyGroup(group);
     return units;
 }
 
@@ -65,8 +72,8 @@ export function getUnitsInRange(this: void, x: number, y: number, radius: number
 export function getEnemyUnitsInRangeOfUnit(this: void, centerUnit: any, radius: number): any[] {
     if (!centerUnit) return [];
 
-    const x = jass.GetUnitX(centerUnit);
-    const y = jass.GetUnitY(centerUnit);
+    const x = GetUnitX(centerUnit);
+    const y = GetUnitY(centerUnit);
 
     return getEnemyUnitsInRange(centerUnit, x, y, radius);
 }
@@ -80,11 +87,11 @@ export function getEnemyUnitsInRangeOfUnit(this: void, centerUnit: any, radius: 
  * @returns 符合条件的敌对单位数组
  */
 export function getEnemyUnitsInRange(this: void, centerUnit: any, x: number, y: number, radius: number): any[] {
-    const group = jass.CreateGroup();
-    jass.GroupEnumUnitsInRange(group, x, y, radius, null);
+    const group = CreateGroup();
+    GroupEnumUnitsInRange(group, x, y, radius, null);
 
     const units: any[] = [];
-    let unit = jass.FirstOfGroup(group);
+    let unit = FirstOfGroup(group);
 
     while (true) {
         if (unit == null || unit === 0) {
@@ -93,11 +100,11 @@ export function getEnemyUnitsInRange(this: void, centerUnit: any, x: number, y: 
         if (isUnitEnemy(unit, centerUnit)) {
             units.push(unit);
         }
-        jass.GroupRemoveUnit(group, unit);
-        unit = jass.FirstOfGroup(group);
+        GroupRemoveUnit(group, unit);
+        unit = FirstOfGroup(group);
     }
 
-    jass.DestroyGroup(group);
+    DestroyGroup(group);
 
     return units;
 }

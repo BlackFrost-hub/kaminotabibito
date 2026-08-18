@@ -30,6 +30,7 @@ import {
   HEAL_TEXT_COLOR,
   MANA_TEXT_COLOR,
   ATTR_HEAL_RATE,
+  ATTR_SKILL_HEAL_RATE,
   ATTR_RECEIVED_HEAL_RATE,
 } from "./00．常量定义";
 
@@ -162,9 +163,11 @@ export function getHealRate(unit: any): number {
   const unitValue = YDUserDataGet("unit", unit, ATTR_HEAL_RATE, "real");
   const player = GetOwningPlayer(unit);
   const playerValue = player != null ? YDUserDataGet("player", player, ATTR_HEAL_RATE, "real") : 0;
+  const playerSkillValue = player != null ? YDUserDataGet("player", player, ATTR_SKILL_HEAL_RATE, "real") : 0;
   const unitRate = typeof unitValue === "number" ? unitValue : 0;
   const playerRate = typeof playerValue === "number" ? playerValue : 0;
-  return unitRate + playerRate;
+  const playerSkillRate = typeof playerSkillValue === "number" ? playerSkillValue : 0;
+  return unitRate + playerRate + playerSkillRate;
 }
 
 /** 设置单位受到治疗率（被治疗时生效） */

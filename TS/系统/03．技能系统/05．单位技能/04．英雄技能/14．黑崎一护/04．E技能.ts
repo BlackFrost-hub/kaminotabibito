@@ -31,8 +31,8 @@ const { 施加眩晕, 施加减速 } = require("系统.03．技能系统.00．�
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
-const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+const { Sound3DII_CooPlayPool4MultiInstanceRare } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_CooPlayPool4MultiInstanceRare: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
@@ -40,6 +40,11 @@ const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函
 };
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
+};
+// Blizzard.j 函数不能从 jass.common 取，统一从项目 BJ 函数库导入。
+const { IsUnitAliveBJ, SelectUnitForPlayerSingle } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
+  IsUnitAliveBJ: (this: void, unit: any) => boolean;
+  SelectUnitForPlayerSingle: (this: void, unit: any, player: any) => void;
 };
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -52,15 +57,14 @@ const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const CreateUnit = jass.CreateUnit as (this: void, p: any, typeId: number, x: number, y: number, facing: number) => any;
 const UnitApplyTimedLife = jass.UnitApplyTimedLife as (this: void, unit: any, buffId: number, duration: number) => void;
 const ShowUnit = jass.ShowUnit as (this: void, unit: any, show: boolean) => void;
-const SelectUnitForPlayerSingle = jass.SelectUnitForPlayerSingle as (this: void, unit: any, p: any) => void;
-const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, name: string) => void;
-const IsUnitAliveBJ = jass.IsUnitAliveBJ as (this: void, unit: any) => boolean;
 const SquareRoot = jass.SquareRoot as (this: void, x: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const Sin = jass.Sin as (this: void, radians: number) => number;
 const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
 const R2S = jass.R2S as (this: void, value: number) => string;
 const SetUnitState = jass.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
+const DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha as (this: void, effect: any, alpha: number) => void;
+const DzSetEffectAnimation = japi.DzSetEffectAnimation as (this: void, effect: any, animationIndex: number, flag: number) => void;
 const bj_RADTODEG = jass.bj_RADTODEG as number;
 const bj_DEGTORAD = jass.bj_DEGTORAD as number;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
@@ -151,7 +155,12 @@ function 恢复E施法者显示(this: void, ctx: E上下文): void {
 function 清理E幻影(this: void, ctx: E上下文): void {
   for (let i = 0; i < ctx.幻影列表.length; i++) {
     const phantom = ctx.幻影列表[i];
-    if (phantom.特效 != null && phantom.特效 !== 0) 销毁点特效(phantom.特效);
+    if (phantom.特效 != null && phantom.特效 !== 0) {
+      // 直接销毁 Ichigo.mdl 会播放模型 Death 序列；先隐藏再销毁，表现与源马甲瞬间清除一致。
+      DzSetEffectVertexAlpha(phantom.特效, 0);
+      销毁点特效(phantom.特效);
+      phantom.特效 = null;
+    }
   }
   ctx.幻影列表 = [];
 }
@@ -196,7 +205,7 @@ function 结束E普通分支(this: void, ctx: E上下文, 是否结算终结: bo
         registerManualBuff(target, 黑崎一护BuffID.瞬步斩眩晕, 配置.E.普通.结束.眩晕秒, 0);
       }
     }
-    Sound3DII_CooPlayReuse(配置.E.普通.结束.音效.路径, x, y, 0, 配置.E.普通.结束.音效.裁断距离);
+    Sound3DII_CooPlayPool4MultiInstanceRare(配置.E.普通.结束.音效.路径, x, y, 0, 配置.E.普通.结束.音效.裁断距离);
   }
   恢复E施法者显示(ctx);
 }
@@ -210,11 +219,11 @@ function 推进E普通斩击(this: void, variable: any): void {
     return;
   }
 
-  ctx.普通Tick数 += 1;
   if (ctx.普通Tick数 >= 配置.E.普通.斩击次数) {
     结束E普通分支(ctx, true);
     return;
   }
+  ctx.普通Tick数 += 1;
 
   const x = GetUnitX(caster);
   const y = GetUnitY(caster);
@@ -227,7 +236,7 @@ function 推进E普通斩击(this: void, variable: any): void {
     缩放: 配置.E.普通.斩击特效.缩放,
     持续秒: 配置.E.普通.斩击特效.持续秒,
   });
-  Sound3DII_CooPlayReuse(配置.E.普通.斩击音效.路径, x, y, 0, 配置.E.普通.斩击音效.裁断距离);
+  Sound3DII_CooPlayPool4MultiInstanceRare(配置.E.普通.斩击音效.路径, x, y, 0, 配置.E.普通.斩击音效.裁断距离);
 
   const 敌军 = 获取范围敌军(caster, x, y, 配置.E.普通.斩击半径);
   if (敌军 == null || 敌军.length === 0) return;
@@ -283,7 +292,6 @@ function 结算E幻影命中(this: void, ctx: E上下文, phantom: E幻影): voi
     技能实例ID: ctx.技能实例ID,
   });
 
-  SetUnitAnimation(target, "Death"); // 源：目标播放 Death 姿势
   const tx = GetUnitX(target);
   const ty = GetUnitY(target);
   const 命中特效 = 黑崎一护是否卍解(caster) ? 配置.E.连携.命中特效解放后 : 配置.E.连携.命中特效解放前;
@@ -297,9 +305,9 @@ function 结算E幻影命中(this: void, ctx: E上下文, phantom: E幻影): voi
     缩放: 配置.E.普通.斩击特效.缩放,
     持续秒: 配置.E.普通.斩击特效.持续秒,
   });
-  Sound3DII_CooPlayReuse(配置.E.普通.斩击音效.路径, tx, ty, 0, 配置.E.普通.斩击音效.裁断距离);
+  Sound3DII_CooPlayPool4MultiInstanceRare(配置.E.普通.斩击音效.路径, tx, ty, 0, 配置.E.普通.斩击音效.裁断距离);
   const 切肉音 = GetRandomInt(1, 3);
-  Sound3DII_CooPlayReuse("Sound\\Units\\Combat\\MetalHeavySliceFlesh" + R2S(切肉音) + ".wav", tx, ty, 0, 1500);
+  Sound3DII_CooPlayPool4MultiInstanceRare("Sound\\Units\\Combat\\MetalHeavySliceFlesh" + R2S(切肉音) + ".wav", tx, ty, 0, 1500);
 }
 
 function SetUnitManaDirect(this: void, unit: any, value: number): void {
@@ -335,11 +343,11 @@ function 推进E幻影冲锋(this: void, variable: any): void {
     return;
   }
 
-  ctx.冲锋Tick数 += 1;
   if (ctx.冲锋Tick数 >= 配置.E.连携.最大推进次数) {
     结束E连携分支(ctx);
     return;
   }
+  ctx.冲锋Tick数 += 1;
 
   const target = ctx.目标;
   const 目标存活 = target != null && target !== 0 && IsUnitAliveBJ(target);
@@ -370,6 +378,9 @@ function E连携起手冲锋(this: void, variable: any): void {
   // 源：+0.2s 幻影播放 Spell 并落下 AIviTarget，随后启动 0.03s 冲锋周期
   for (let i = 0; i < ctx.幻影列表.length; i++) {
     const phantom = ctx.幻影列表[i];
+    if (phantom.特效 != null && phantom.特效 !== 0) {
+      DzSetEffectAnimation(phantom.特效, 配置.E.连携.幻影施法动画索引, 0);
+    }
     创建点特效({ 模型路径: 配置.E.连携.起手特效.模型, X: phantom.X, Y: phantom.Y, Z: 0, 面向角度: 270, 缩放: 配置.E.连携.起手特效.缩放, 持续秒: 配置.E.连携.起手特效.持续秒 });
   }
   ctx.冲锋Tick数 = 0;
@@ -384,11 +395,31 @@ function E连携起手冲锋(this: void, variable: any): void {
 // 释放入口
 // ---------------------------------------------------------------------------
 
+function 选取E连携目标(this: void, caster: any, x: number, y: number): any {
+  const 敌军 = 获取范围敌军(caster, x, y, 配置.E.连携.目标选取半径);
+  let target: any = null;
+  let 最近距离 = -1;
+  if (敌军 != null) {
+    for (let i = 0; i < 敌军.length; i++) {
+      const u = 敌军[i];
+      if (u == null || u === 0) continue;
+      const dx = GetUnitX(u) - x;
+      const dy = GetUnitY(u) - y;
+      const dist = dx * dx + dy * dy;
+      if (最近距离 < 0 || dist < 最近距离) {
+        最近距离 = dist;
+        target = u;
+      }
+    }
+  }
+  return target;
+}
+
 function 释放瞬步斩(this: void, context: E上下文, caster: any, 技能实例ID?: number): void {
   const x = GetUnitX(caster);
   const y = GetUnitY(caster);
-  Sound3DII_CooPlayReuse(配置.E.音效.路径, x, y, 0, 配置.E.音效.裁断距离);
-  Sound3DII_CooPlayReuse(配置.E.金属音效.路径, x, y, 0, 配置.E.金属音效.裁断距离);
+  Sound3DII_CooPlayPool4MultiInstanceRare(配置.E.音效.路径, x, y, 0, 配置.E.音效.裁断距离);
+  Sound3DII_CooPlayPool4MultiInstanceRare(配置.E.金属音效.路径, x, y, 0, 配置.E.金属音效.裁断距离);
 
   context.施法者 = caster;
   context.已启动 = true;
@@ -399,37 +430,20 @@ function 释放瞬步斩(this: void, context: E上下文, caster: any, 技能实
   context.幻影列表 = [];
   context.目标 = null;
 
+  // D 连携只在范围内存在合法目标时成立；否则消耗本次连携窗口并完整回退普通 E。
+  let 连携目标: any = null;
+  if (是否瞬步连携中(caster)) {
+    关闭瞬步连携(caster);
+    连携目标 = 选取E连携目标(caster, x, y);
+  }
+
   // 源：隐藏本体，创建视野马甲保持视野
   ShowUnit(caster, false);
   context.视野马甲 = CreateUnit(GetOwningPlayer(caster), 视野马甲类型ID, x, y, 0);
   UnitApplyTimedLife(context.视野马甲, 定时生命BuffID, 2.5);
 
-  if (是否瞬步连携中(caster)) {
-    关闭瞬步连携(caster); // 源：连携分支立即消耗开关
-
-    // 目标选取：介绍口径 200 码内最近敌人
-    const 敌军 = 获取范围敌军(caster, x, y, 配置.E.连携.目标选取半径);
-    let target: any = null;
-    let 最近距离 = -1;
-    if (敌军 != null) {
-      for (let i = 0; i < 敌军.length; i++) {
-        const u = 敌军[i];
-        if (u == null || u === 0) continue;
-        const dx = GetUnitX(u) - x;
-        const dy = GetUnitY(u) - y;
-        const dist = dx * dx + dy * dy;
-        if (最近距离 < 0 || dist < 最近距离) {
-          最近距离 = dist;
-          target = u;
-        }
-      }
-    }
-    if (target == null) {
-      // 无目标时直接收尾（源未处理该分支，按安全口径补全）
-      context.已启动 = false;
-      恢复E施法者显示(context);
-      return;
-    }
+  if (连携目标 != null && 连携目标 !== 0) {
+    const target = 连携目标;
     context.目标 = target;
 
     // 源：起手即对目标施加 2 秒眩晕
@@ -453,7 +467,6 @@ function 释放瞬步斩(this: void, context: E上下文, caster: any, 技能实
         面向角度: faceDeg,
         缩放: 配置.E.连携.幻影缩放,
         透明度: 配置.E.连携.幻影透明度,
-        持续秒: 1.5,
       });
       context.幻影列表.push({ X: px, Y: py, 面向角度: faceDeg, 特效: effect, 已命中: false });
     }

@@ -18,11 +18,12 @@
 
 import { 铃仙单位技能配置 } from "./00．配置";
 import { 铃仙BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/12．铃仙";
-import { 播放铃仙全局音效 } from "./00A．表现工具";
+import { 播放铃仙全局音效, 播放铃仙单位绑定音效 } from "./00A．表现工具";
 import { 是铃仙本体, 是有效敌对目标, 全图英雄免疫伤害 } from "./00B．分身与状态管理";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
@@ -90,7 +91,13 @@ const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const CreateUnit = jass.CreateUnit as (this: void, player: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, unit: any, x: number, y: number) => void;
+const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (this: void, model: string, target: any, attachPoint: string) => any;
+const DestroyEffect = jass.DestroyEffect as (this: void, effect: any) => void;
 const DisplayCineFilter = jass.DisplayCineFilter as (this: void, show: boolean) => void;
+const { CinematicFilterGenericBJ } = require("lib.扩展函数.BJ函数.05A．电影函数") as {
+  CinematicFilterGenericBJ: (this: void, duration: number, bmode: any, tex: string, red0: number, green0: number, blue0: number, trans0: number, red1: number, green1: number, blue1: number, trans1: number) => void;
+};
+const BLEND_MODE_BLEND = jass.BLEND_MODE_BLEND as number;
 
 //=============================================================================
 // 一、D 弹幕上下文（每次施法独立）
@@ -133,12 +140,14 @@ function 发射D一波(this: void, ctx: D弹幕上下文): void {
   const 玩家 = GetOwningPlayer(施法者);
   const 中心X = GetUnitX(施法者);
   const 中心Y = GetUnitY(施法者);
+  let 创建数 = 0;
   for (let N = 1; N <= cfg.D.每波弹幕数; N++) {
     const 角度 = N * cfg.D.弹幕角度间隔;
     const 弹幕 = CreateUnit(玩家, 弹幕马甲ID, 中心X, 中心Y, 角度);
     if (弹幕 == null || 弹幕 === 0) continue;
     if (DzSetUnitModel != null) DzSetUnitModel(弹幕, cfg.D.弹幕模型);
     ctx.弹幕列表.push(弹幕);
+    创建数 += 1;
   }
 }
 
@@ -152,6 +161,12 @@ function 发射D下一波(this: void, ctx: D弹幕上下文): void {
   }
   ctx.波次数 += 1;
   ctx.重复命中表 = {}; // 每波重置去重
+
+  // 每 tick 头顶 Whine 特效 + 震波特效 + 音效（源 JASS ResenFunc006Func016T）
+  DestroyEffect(AddSpecialEffectTarget("war3mapImported\\Whine.mdx", 施法者, "overhead"));
+  DestroyEffect(AddSpecialEffectTarget("war3mapImported\\Shockwave_Darkness.mdx", 施法者, "origin"));
+  播放铃仙单位绑定音效(施法者, "gg_snd_tan2", 100);
+
   发射D一波(ctx);
   if (ctx.波次数 >= cfg.D.持续秒) {
     // 5 波射完，延迟 1 秒清理
@@ -259,8 +274,8 @@ function on铃仙D生效(this: void, 施法单位: any, 技能ID数值: number):
   播放铃仙全局音效("gg_snd_LX_D_24343");
   播放铃仙全局音效("gg_snd_LX_D");
 
-  // 屏幕滤镜约 1.1 秒（源 CinematicFilterGenericBJ 简化）
-  DisplayCineFilter(true);
+  // 屏幕滤镜（源 JASS CinematicFilterGenericBJ）
+  CinematicFilterGenericBJ(1.10, BLEND_MODE_BLEND, "222.blp", 100, 100, 100.00, 0.00, 0, 0, 0, 0);
   addDelayedCallback(1100, () => DisplayCineFilter(false));
 
   // D 波次状态：持续弹幕期间显示状态图标

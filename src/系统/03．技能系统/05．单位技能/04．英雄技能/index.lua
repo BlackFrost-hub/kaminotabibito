@@ -9,7 +9,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.01．cloud.index")
+    local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.01．克劳德.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -97,6 +97,14 @@ do
     end
 end
 do
+    local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
     local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.13．坂井悠二.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
@@ -138,6 +146,22 @@ do
 end
 do
     local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.17．Saber.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.18．云端.index")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.index")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

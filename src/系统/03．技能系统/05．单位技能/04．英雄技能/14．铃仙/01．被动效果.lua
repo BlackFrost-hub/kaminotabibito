@@ -22,6 +22,7 @@ local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 local UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
+local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local _____88AB_52A8_914D_7F6E = _____94C3_4ED9_5355_4F4D_6280_80FD_914D_7F6E["被动"]
 local _____88AB_52A8_6280_80FDID = stringToFourCCSafe(_____94C3_4ED9_5355_4F4D_6280_80FD_914D_7F6E["被动技能ID"])
@@ -101,7 +102,7 @@ local function _____94C3_4ED9_88AB_52A8_4F24_5BB3_4FEE_6B63(context)
         return damage
     end
     if isIllusion then
-        return damage * _____88AB_52A8_914D_7F6E["分身普攻伤害比例"]
+        return damage
     end
     return damage * _____88AB_52A8_914D_7F6E["普攻伤害比例"]
 end

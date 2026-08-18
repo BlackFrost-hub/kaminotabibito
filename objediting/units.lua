@@ -170,6 +170,35 @@ summonShell:setPriority(0)
 summonShell:setFormationRank(0)
 summonShell:setCanFlee(false)
 
+-- 坂井悠二 D「祭礼之蛇」专用特效承载马甲。
+-- 源 JASS 的 SetUnitScale(1.20/4.00) 依赖单位物编基础缩放 1.00，不能复用基础缩放 2.50 的 eaaa。
+local e06V = UnitDefinition:new('e06V', 'ewsp')
+applyCommonDummyUnit(e06V, {
+  name = '[英雄技能]坂井悠二D祭礼之蛇马甲',
+  modelFile = 'Common\\Model\\Dummy\\SakaiYuujiD\\dummy.mdx',
+  scale = 1.00,
+  movementType = MovementType.Fly,
+  minHeight = 0.0,
+  height = 50.0,
+  speedBase = 522,
+  turnRate = 3.0,
+  classification = 'ancient',
+  hp = 99999,
+  hpRegen = 0.0,
+  hideMinimap = true,
+  sightDay = 0,
+  sightNight = 0,
+  selectionScale = 0.0,
+})
+e06V:setModelFileExtraVersions('0')
+-- 源物编 X/Y 轴最大旋转角度均为 0；禁止坡面俯仰/侧倾传给 origin 挂载的蛇头与蛇身。
+e06V:setMaximumPitchAngledegrees(0.0)
+e06V:setMaximumRollAngledegrees(0.0)
+applyNoCostNoBounty(e06V)
+e06V:setSelectionCircleHeight(0.0)
+e06V:setSelectionCircleOnWater(false)
+e06V:setDeathTimeseconds(0.1)
+
 -- TS 原生弹幕默认马甲单位
 -- 分类约定：
 -- ancient = 蝗虫单位，mechanical + ward = 弹幕/技能弹道。
@@ -177,7 +206,8 @@ summonShell:setCanFlee(false)
 local eaaa = UnitDefinition:new('eaaa', 'ewsp')
 applyCommonDummyUnit(eaaa, {
   name = '[系统]TS原生弹幕马甲',
-  modelFile = '.mdl',
+  -- 通用辅助马甲模型：根目录 dummy.mdx 文件头有效且带 origin 挂点。
+  modelFile = 'dummy.mdx',
   scale = 2.50,
   icon = 'ReplaceableTextures\\CommandButtons\\BTNHumArtilleryUpOne.blp',
   special = 'Units\\NightElf\\Wisp\\WispExplode.mdl',

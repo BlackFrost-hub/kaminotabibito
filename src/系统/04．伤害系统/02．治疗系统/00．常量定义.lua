@@ -35,6 +35,8 @@ ____exports.HEAL_TEXT_COLOR = {red = 80, green = 255, blue = 80}
 ____exports.MANA_TEXT_COLOR = {red = 53, green = 80, blue = 92}
 --- 治疗率属性名（治疗别人时生效，如0.2=+20%）
 ____exports.ATTR_HEAL_RATE = "治疗率"
+--- 玩家技能治疗率属性名（装备、英雄成长等全局来源，如0.2=+20%）
+____exports.ATTR_SKILL_HEAL_RATE = "技能治疗率"
 --- 受到治疗率属性名（被治疗时生效，如0.1=+10%）
 ____exports.ATTR_RECEIVED_HEAL_RATE = "受到的治疗率"
 return ____exports

@@ -62,6 +62,50 @@ export function GetRandomDirectionDeg(): number {
     return jass.GetRandomReal(0, 360);
 }
 
+/**
+ * Blizzard.j 摄像机 BJ 封装（观察者不控制镜头）。
+ * 属于 Blizzard.j 函数，禁止从 jass.common 取（运行时为 nil）。
+ */
+export function SetCameraTargetControllerNoZForPlayer(
+    whichPlayer: any,
+    whichUnit: any,
+    xoffset: number,
+    yoffset: number,
+    inheritOrientation: boolean
+): void {
+    if (!jass.IsPlayerObserver(whichPlayer)) {
+        jass.SetCameraTargetController(whichUnit, xoffset, yoffset, inheritOrientation);
+    }
+}
+
+/**
+ * Blizzard.j 镜头字段 BJ 封装（指定玩家的镜头字段，内部带 LocalPlayer 校验）。
+ * jass.common 不暴露 SetCameraFieldForPlayer，必须走 BJ 封装。
+ */
+export function SetCameraFieldForPlayer(
+    whichPlayer: any,
+    whichField: any,
+    value: number,
+    duration: number
+): void {
+    if (jass.GetLocalPlayer() === whichPlayer) {
+        jass.SetCameraField(whichField, value, duration);
+    }
+}
+
+/**
+ * Blizzard.j 恢复游戏镜头 BJ 封装（指定玩家，内部带 LocalPlayer 校验）。
+ * jass.common 不暴露 ResetToGameCameraForPlayer，必须走 BJ 封装。
+ */
+export function ResetToGameCameraForPlayer(
+    whichPlayer: any,
+    duration: number
+): void {
+    if (jass.GetLocalPlayer() === whichPlayer) {
+        jass.ResetToGameCamera(duration);
+    }
+}
+
 export function GetSpellAbilityId(): number {
     return jass.GetSpellAbilityId();
 }

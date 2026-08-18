@@ -64,9 +64,9 @@ interface Q上下文 {
   技能实例ID?: number;
   已启动: boolean;
   周期回调ID: number;
-  当前推进秒: number;
-  当前X: number;
-  当前Y: number;
+  已完成段数: number;
+  起点X: number;
+  起点Y: number;
   方向角度: number;
   伤害攻击力快照: number;
 }
@@ -94,9 +94,9 @@ function 获取或创建Q上下文(this: void, unit: any): Q上下文 | undefine
     施法者: unit,
     已启动: false,
     周期回调ID: 0,
-    当前推进秒: 0,
-    当前X: 0,
-    当前Y: 0,
+    已完成段数: 0,
+    起点X: 0,
+    起点Y: 0,
     方向角度: 0,
     伤害攻击力快照: 0,
   };
@@ -129,61 +129,121 @@ function Q命中定身处理(this: void, target: any, _索引: number, _成功: 
   if (target == null || target === 0) return;
   const caster = 变量 as any;
   if (caster == null || caster === 0) return;
-  // 命中定身：1秒几乎无法移动
+  // 命中定身：1秒几乎无法移动（源：SetUnitMoveSpeed 0 + 1秒后恢复默认移速）
   施加眩晕(caster, target, 配置.主动.命中控制.控制秒, 坂井悠二BuffID.Q命中定身, "技能");
 }
 
-function 推进Q伤害(this: void, context: Q上下文): void {
+interface Q扫描上下文 {
+  施法者: any;
+  技能实例ID?: number;
+  起点X: number;
+  起点Y: number;
+  方向角度: number;
+  伤害攻击力快照: number;
+  扫描次数: number;
+  回调ID: number;
+  已命中句柄表: Record<number, boolean>; // 段内去重（源 重复单位组）
+}
+
+// 内层扫描周期：从施法者位置沿施法方向推进伤害判定点 40码/tick，半径 175 枚举，段内去重
+function Q段内扫描(this: void, variable?: any): void {
+  const scan = variable as Q扫描上下文;
+  if (scan == null) return;
+  const caster = scan.施法者;
+
+  if (scan.扫描次数 >= 配置.主动.扫描次数) {
+    // 源：内层周期结束销毁重复单位组；TS 移除周期回调，记录表随上下文释放
+    removePeriodicCallback(scan.回调ID);
+    scan.回调ID = 0;
+    scan.已命中句柄表 = {};
+    return;
+  }
+  scan.扫描次数 = scan.扫描次数 + 1;
+
+  if (caster == null || caster === 0 || !单位存活(caster)) {
+    removePeriodicCallback(scan.回调ID);
+    scan.回调ID = 0;
+    scan.已命中句柄表 = {};
+    return;
+  }
+
+  // 源：特效点 = PolarProjectionBJ(saber点, 40×循环实数2, 角度)
+  const 弧度 = scan.方向角度 * (3.14159265358979 / 180);
+  const 距离 = 配置.主动.每次扫描推进距离 * scan.扫描次数;
+  const 判定X = scan.起点X + 距离 * Math.cos(弧度);
+  const 判定Y = scan.起点Y + 距离 * Math.sin(弧度);
+
+  // AOE 伤害：当前半径内未命中过的敌人，单次伤害为总伤害的 20%
+  const 单次伤害 = scan.伤害攻击力快照 * 配置.主动.总伤害攻击力倍率 * 配置.主动.单段伤害比例;
+  if (单次伤害 <= 0) return;
+
+  const 敌军列表 = 过滤Q命中标的(获取范围敌军(caster, 判定X, 判定Y, 配置.主动.命中半径));
+  const 本次目标: any[] = [];
+  for (let i = 0; i < 敌军列表.length; i++) {
+    const u = 敌军列表[i];
+    if (u == null || u === 0) continue;
+    const hid = GetHandleId(u) || 0;
+    if (hid !== 0 && scan.已命中句柄表[hid] === true) continue;
+    if (hid !== 0) scan.已命中句柄表[hid] = true;
+    本次目标.push(u);
+  }
+  if (本次目标.length === 0) return;
+
+  造成批量AOE技能伤害({
+    来源: caster,
+    目标列表: 本次目标,
+    伤害: 单次伤害,
+    伤害类型: jass.DAMAGE_TYPE_MAGIC,
+    attackType: jass.ATTACK_TYPE_NORMAL,
+    weaponType: jass.WEAPON_TYPE_WHOKNOWS,
+    来源类型: "单位技能",
+    标签: "坂井悠二-Q-吸血鬼-分段",
+    技能ID: stringToFourCC(Q技能ID字符串),
+    技能实例ID: scan.技能实例ID,
+    变量: caster,
+    每目标结算后处理器: Q命中定身处理,
+  });
+}
+
+// 外层段周期：每段在施法者位置固定创建 e06T 马甲（特效不推进），并启动段内扫描
+function 推进Q段(this: void, variable?: any): void {
+  const context = variable as Q上下文;
+  if (context == null) return;
   const caster = context.施法者;
   if (caster == null || caster === 0 || !单位存活(caster)) {
     清理Q上下文(context);
     return;
   }
 
-  const intervalMs = 配置.主动.推进间隔秒 * 1000;
-  const 推进步长 = 配置.主动.推进距离;
-  const 推进角度 = context.方向角度;
-  const 弧度 = 推进角度 * (3.14159265358979 / 180);
-  const 新X = context.当前X + 推进步长 * Math.cos(弧度);
-  const 新Y = context.当前Y + 推进步长 * Math.sin(弧度);
-  context.当前X = 新X;
-  context.当前Y = 新Y;
-  context.当前推进秒 = context.当前推进秒 + 配置.主动.推进间隔秒;
+  if (context.已完成段数 >= 配置.主动.段数) {
+    清理Q上下文(context);
+    return;
+  }
+  context.已完成段数 = context.已完成段数 + 1;
 
-  // 创建吸血鬼壳 e06T（坂井悠二原壳例外：保留马甲）
+  // 源：CreateUnitAtLoc(e06T, saber点, 角度+90) —— 马甲始终创建在施法者位置（saber点不移动）
   const 壳四CC = stringToFourCC(配置.主动.壳.单位ID);
-  const 壳单位 = CreateUnit(GetOwningPlayer(caster), 壳四CC, 新X, 新Y, 推进角度 + 配置.主动.壳.朝向偏移角度);
+  const 壳单位 = CreateUnit(GetOwningPlayer(caster), 壳四CC, context.起点X, context.起点Y, context.方向角度 + 配置.主动.壳.朝向偏移角度);
   if (壳单位 != null && 壳单位 !== 0) {
     SetUnitFlyHeight(壳单位, 配置.主动.壳.飞行高度增量, 0);
-    SetUnitFacing(壳单位, 推进角度 + 配置.主动.壳.朝向偏移角度);
     SetUnitScale(壳单位, 配置.主动.壳.缩放, 配置.主动.壳.缩放, 配置.主动.壳.缩放);
     // 马甲为限时生命单位（由 e06T 自带），特效随马甲销毁自动释放
     AddSpecialEffectTarget(配置.主动.壳.模型路径, 壳单位, "origin");
   }
 
-  // AOE 伤害：当前半径内全部敌人，单次伤害为总伤害的 20%
-  const 单次伤害 = context.伤害攻击力快照 * 配置.主动.总伤害攻击力倍率 * 配置.主动.单段伤害比例;
-  if (单次伤害 > 0) {
-    const 敌军列表 = 过滤Q命中标的(获取范围敌军(caster, 新X, 新Y, 配置.主动.命中半径));
-    造成批量AOE技能伤害({
-      来源: caster,
-      目标列表: 敌军列表,
-      伤害: 单次伤害,
-      伤害类型: jass.DAMAGE_TYPE_MAGIC,
-      attackType: jass.ATTACK_TYPE_NORMAL,
-      weaponType: jass.WEAPON_TYPE_WHOKNOWS,
-      来源类型: "单位技能",
-      标签: "坂井悠二-Q-吸血鬼-分段",
-      技能ID: stringToFourCC(Q技能ID字符串),
-      技能实例ID: context.技能实例ID,
-      变量: caster,
-      每目标结算后处理器: Q命中定身处理,
-    });
-  }
-
-  if (context.当前推进秒 >= 配置.主动.最大推进时间秒) {
-    清理Q上下文(context);
-  }
+  // 段内扫描：0.01s ×20 tick 推进伤害判定点（variable 持有本段去重表，到期/死亡自移除）
+  const scan: Q扫描上下文 = {
+    施法者: caster,
+    技能实例ID: context.技能实例ID,
+    起点X: context.起点X,
+    起点Y: context.起点Y,
+    方向角度: context.方向角度,
+    伤害攻击力快照: context.伤害攻击力快照,
+    扫描次数: 0,
+    回调ID: 0,
+    已命中句柄表: {},
+  };
+  scan.回调ID = addPeriodicCallback(配置.主动.扫描间隔秒 * 1000, Q段内扫描 as unknown as (this: void, v?: any) => void, scan);
 }
 
 function 释放Q技能(this: void, context: Q上下文, caster: any, 技能实例ID?: number): void {
@@ -191,20 +251,19 @@ function 释放Q技能(this: void, context: Q上下文, caster: any, 技能实�
   context.已启动 = true;
   context.技能实例ID = 技能实例ID;
   context.伤害攻击力快照 = 读取单位攻击力(caster);
-  context.当前X = GetUnitX(caster);
-  context.当前Y = GetUnitY(caster);
-  context.方向角度 = GetUnitFacing(caster);
-  context.当前推进秒 = 0;
+  context.起点X = GetUnitX(caster);
+  context.起点Y = GetUnitY(caster);
+  context.已完成段数 = 0;
 
   const 目标X = GetSpellTargetX();
   const 目标Y = GetSpellTargetY();
-  const 朝向目标 = 两点角度(context.当前X, context.当前Y, 目标X, 目标Y);
+  const 朝向目标 = 两点角度(context.起点X, context.起点Y, 目标X, 目标Y);
   context.方向角度 = 朝向目标;
   SetUnitFacing(caster, 朝向目标);
 
   context.周期回调ID = addPeriodicCallback(
-    配置.主动.推进间隔秒 * 1000,
-    推进Q伤害 as unknown as (this: void, variable?: any) => void,
+    配置.主动.段间隔秒 * 1000,
+    推进Q段 as unknown as (this: void, variable?: any) => void,
     context,
   );
 }
@@ -228,7 +287,7 @@ export function 注册坂井悠二Q(this: void): void {
     释放技能: 释放Q技能,
     创建独立技能实例: true,
     独立技能来源类型: "单位技能",
-    技能实例持续时间秒: 配置.主动.最大推进时间秒 + 1,
+    技能实例持续时间秒: 配置.主动.段间隔秒 * 配置.主动.段数 + 配置.主动.扫描间隔秒 * 配置.主动.扫描次数 + 1,
   });
   if (!死亡监听已注册) {
     死亡监听已注册 = true;
@@ -241,7 +300,7 @@ export function 注册坂井悠二Q(this: void): void {
 export const 坂井悠二Q技能状态 = {
   已完成设计: true,
   已完成实现: true,
-  伤害形态: "AOE 分段直线推进伤害",
-  伤害: "300% 攻击力，分 5 段 × 20%，每 0.21 秒推进 40 码，半径 175",
+  伤害形态: "固定马甲 + 直线扫描伤害（特效不推进，伤害判定点推进）",
+  伤害: "300% 攻击力，外层 0.21s×5 段每次命中 20%，段内 0.01s×20 tick 扫描 40码/tick，半径 175，段内去重",
   命中控制: "几乎无法移动 1 秒（眩晕）",
 } as const;

@@ -8,3 +8,4 @@ export * from "./01．TS原生弹幕/index";
 export * from "./02．弹道跳链/index";
 export * from "./03．回旋回收/index";
 export * from "./04．组合示例/index";
+export * from "./05．单位与特效环绕/index";

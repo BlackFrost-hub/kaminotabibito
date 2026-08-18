@@ -12,32 +12,37 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 local _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位最大生命"]
 local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local ____23_FF0E_77AC_79FB_8DEF_5F84_9884_8BA1_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.23．瞬移路径预计算")
+local _____8BA1_7B97_77AC_79FB_8DEF_5F84 = ____23_FF0E_77AC_79FB_8DEF_5F84_9884_8BA1_7B97["计算瞬移路径"]
 function GetUnitTypeIdLocal(unit)
     return jass.GetUnitTypeId(unit)
 end
 jass = require("jass.common")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
 local _____65BD_52A0_7729_6655 = ____require_result_0["施加眩晕"]
 local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_1.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
 local getBuffRuntime = ____require_result_1.getBuffRuntime
-local ____require_result_2 = require("系统.04．伤害系统.01．伤害事件")
-local registerDamageCallback = ____require_result_2.registerDamageCallback
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
+local ____require_result_2 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWESetUnitAbilityStateSafe = ____require_result_2.YDWESetUnitAbilityStateSafe
+local ____require_result_3 = require("系统.04．伤害系统.01．伤害事件")
+local registerDamageCallback = ____require_result_3.registerDamageCallback
 local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedEffect = ____require_result_4.createTimedEffect
-local createTimedUnitEffect = ____require_result_4.createTimedUnitEffect
-local ____require_result_5 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_5.Sound3DII_UnitPlayReuse
-local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_6.addDelayedCallback
-local removeDelayedCallback = ____require_result_6.removeDelayedCallback
-local addPeriodicCallback = ____require_result_6.addPeriodicCallback
-local removePeriodicCallback = ____require_result_6.removePeriodicCallback
-local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_7.registerDeathListener
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedEffect = ____require_result_5.createTimedEffect
+local createTimedUnitEffect = ____require_result_5.createTimedUnitEffect
+local ____require_result_6 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundOnUnitBJ = ____require_result_6.PlaySoundOnUnitBJ
+local ____require_result_7 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_7.addDelayedCallback
+local removeDelayedCallback = ____require_result_7.removeDelayedCallback
+local addPeriodicCallback = ____require_result_7.addPeriodicCallback
+local removePeriodicCallback = ____require_result_7.removePeriodicCallback
+local ____require_result_8 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_8.registerDeathListener
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
@@ -52,14 +57,16 @@ local SetUnitFacing = jass.SetUnitFacing
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
 local CreateUnit = jass.CreateUnit
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_8.stringToFourCCSafe
+local SetUnitPosition = jass.SetUnitPosition
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
 local stringToFourCC = stringToFourCCSafe
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local IsUnitEnemy = jass.IsUnitEnemy
 local _____914D_7F6E = _____5742_4E95_60A0_4E8C_6280_80FD_914D_7F6E.E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____5742_4E95_60A0_4E8C_6280_80FD_914D_7F6E["单位类型ID"]
 local ____E_6280_80FDID_5B57_7B26_4E32 = _____914D_7F6E["技能ID"]
+local ____E_6280_80FD_7C7B_578BID = _____914D_7F6E["技能类型ID"]
 local ____E_62B5_6321BuffID = _____5742_4E95_60A0_4E8CBuffID["E抵挡"]
 local _____4E0A_4E0B_6587_8868 = {}
 local _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
@@ -90,12 +97,9 @@ local function _____83B7_53D6_6216_521B_5EFAE_4E0A_4E0B_6587(unit)
         ["施法者"] = unit,
         ["已启动"] = false,
         ["延迟回调ID"] = 0,
-        ["推进周期回调ID"] = 0,
-        ["推进次数"] = 0,
-        ["推进方向"] = 0,
-        ["推进目标X"] = 0,
-        ["推进目标Y"] = 0,
-        ["推进辅助马甲"] = nil
+        ["锁存目标单位"] = nil,
+        ["锁存目标X"] = 0,
+        ["锁存目标Y"] = 0
     }
     _____4E0A_4E0B_6587_8868[id] = created
     return created
@@ -105,19 +109,14 @@ local function _____6E05_7406E_4E0A_4E0B_6587(context)
         removeDelayedCallback(context["延迟回调ID"])
         context["延迟回调ID"] = 0
     end
-    if context["推进周期回调ID"] ~= 0 then
-        removePeriodicCallback(context["推进周期回调ID"])
-        context["推进周期回调ID"] = 0
-    end
     context["已启动"] = false
     local id = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
     if id ~= 0 and _____4E0A_4E0B_6587_8868[id] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, id)
     end
 end
-local function _____6267_884CE_654C_4EBA_5206_652F(context)
+local function _____6267_884CE_654C_4EBA_5206_652F(context, target)
     local caster = context["施法者"]
-    local target = context["推进辅助马甲"]
     if caster == nil or caster == 0 or not _____5355_4F4D_5B58_6D3B(caster) then
         return
     end
@@ -158,26 +157,28 @@ local function _____6267_884CE_81EA_65BD_6CD5_5206_652F(context)
         {["来源"] = caster, ["来源类型"] = "技能", ["标签"] = "坂井悠二-E-语法抵挡"}
     )
 end
-local function _____63A8_8FDBE_76EE_6807_70B9(context)
-    local ctx = context
-    if ctx == nil then
-        return
-    end
-    local caster = ctx["施法者"]
+local function _____6267_884CE_76EE_6807_70B9_5206_652F(context)
+    local caster = context["施法者"]
     if caster == nil or caster == 0 or not _____5355_4F4D_5B58_6D3B(caster) then
-        _____6E05_7406E_4E0A_4E0B_6587(ctx)
         return
     end
-    local _____6B65_957F = _____914D_7F6E["目标点分支"]["推进步长"]
-    local _____5F27_5EA6 = ctx["推进方向"] * (3.14159265358979 / 180)
-    local _____65B0X = GetUnitX(caster) + _____6B65_957F * math.cos(_____5F27_5EA6)
-    local _____65B0Y = GetUnitY(caster) + _____6B65_957F * math.sin(_____5F27_5EA6)
-    SetUnitX(caster, _____65B0X)
-    SetUnitY(caster, _____65B0Y)
-    ctx["推进次数"] = ctx["推进次数"] + 1
-    if ctx["推进次数"] >= _____914D_7F6E["目标点分支"]["最大推进次数"] then
+    local _____76EE_6807X = context["锁存目标X"]
+    local _____76EE_6807Y = context["锁存目标Y"]
+    local _____8D77_59CBX = GetUnitX(caster)
+    local _____8D77_59CBY = GetUnitY(caster)
+    local _____65B9_5411 = _____4E24_70B9_89D2_5EA6(_____8D77_59CBX, _____8D77_59CBY, _____76EE_6807X, _____76EE_6807Y)
+    createTimedUnitEffect(caster, "origin", _____914D_7F6E["目标点分支"]["传送特效"]["模型路径"], _____914D_7F6E["目标点分支"]["传送特效"]["持续秒"])
+    local _____8DEF_5F84 = _____8BA1_7B97_77AC_79FB_8DEF_5F84(
+        _____8D77_59CBX,
+        _____8D77_59CBY,
+        _____65B9_5411,
+        _____914D_7F6E["目标点分支"]["探测步长"],
+        _____914D_7F6E["目标点分支"]["最大探测步数"]
+    )
+    SetUnitPosition(caster, _____8DEF_5F84.X, _____8DEF_5F84.Y)
+    SetUnitFacing(caster, _____65B9_5411)
+    if not _____8DEF_5F84["撞墙"] then
         createTimedUnitEffect(caster, "origin", _____914D_7F6E["目标点分支"]["传送特效"]["模型路径"], _____914D_7F6E["目标点分支"]["传送特效"]["持续秒"])
-        _____6E05_7406E_4E0A_4E0B_6587(ctx)
     end
 end
 local function _____5EF6_8FDF_542F_52A8E(context)
@@ -191,10 +192,9 @@ local function _____5EF6_8FDF_542F_52A8E(context)
         _____6E05_7406E_4E0A_4E0B_6587(ctx)
         return
     end
-    local _____76EE_6807_5355_4F4D = GetSpellTargetUnit()
+    local _____76EE_6807_5355_4F4D = ctx["锁存目标单位"]
     if _____76EE_6807_5355_4F4D ~= nil and _____76EE_6807_5355_4F4D ~= 0 and _____76EE_6807_5355_4F4D ~= caster and _____5355_4F4D_5B58_6D3B(_____76EE_6807_5355_4F4D) then
-        ctx["推进辅助马甲"] = _____76EE_6807_5355_4F4D
-        _____6267_884CE_654C_4EBA_5206_652F(ctx)
+        _____6267_884CE_654C_4EBA_5206_652F(ctx, _____76EE_6807_5355_4F4D)
         _____6E05_7406E_4E0A_4E0B_6587(ctx)
         return
     end
@@ -203,17 +203,8 @@ local function _____5EF6_8FDF_542F_52A8E(context)
         _____6E05_7406E_4E0A_4E0B_6587(ctx)
         return
     end
-    local _____76EE_6807X = GetSpellTargetX()
-    local _____76EE_6807Y = GetSpellTargetY()
-    local _____8D77_59CBX = GetUnitX(caster)
-    local _____8D77_59CBY = GetUnitY(caster)
-    local _____65B9_5411 = _____4E24_70B9_89D2_5EA6(_____8D77_59CBX, _____8D77_59CBY, _____76EE_6807X, _____76EE_6807Y)
-    ctx["推进方向"] = _____65B9_5411
-    ctx["推进目标X"] = _____76EE_6807X
-    ctx["推进目标Y"] = _____76EE_6807Y
-    ctx["推进次数"] = 0
-    createTimedUnitEffect(caster, "origin", _____914D_7F6E["目标点分支"]["传送特效"]["模型路径"], _____914D_7F6E["目标点分支"]["传送特效"]["持续秒"])
-    ctx["推进周期回调ID"] = addPeriodicCallback(_____914D_7F6E["目标点分支"]["推进周期秒"] * 1000, _____63A8_8FDBE_76EE_6807_70B9, ctx)
+    _____6267_884CE_76EE_6807_70B9_5206_652F(ctx)
+    _____6E05_7406E_4E0A_4E0B_6587(ctx)
 end
 local function _____91CA_653EE_6280_80FD(context, caster, _____6280_80FD_5B9E_4F8BID)
     if context["已启动"] then
@@ -221,6 +212,12 @@ local function _____91CA_653EE_6280_80FD(context, caster, _____6280_80FD_5B9E_4F
     end
     context["已启动"] = true
     context["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
+    context["锁存目标单位"] = GetSpellTargetUnit()
+    context["锁存目标X"] = GetSpellTargetX()
+    context["锁存目标Y"] = GetSpellTargetY()
+    if getBuffRuntime(caster, _____5742_4E95_60A0_4E8CBuffID["D期间状态"]) ~= nil then
+        YDWESetUnitAbilityStateSafe(caster, ____E_6280_80FD_7C7B_578BID, 1, _____5742_4E95_60A0_4E8C_6280_80FD_914D_7F6E.D["期间"]["E技能冷却秒"])
+    end
     context["延迟回调ID"] = addDelayedCallback(_____914D_7F6E["启动延迟秒"] * 1000, _____5EF6_8FDF_542F_52A8E, context)
 end
 local function ____E_53EF_91CA_653E(context)
@@ -245,7 +242,10 @@ local function _____5904_7406E_62B5_6321_53D7_5230_4F24_5BB3(target, damage, _da
     local _____9608_503C = _____6700_5927_751F_547D * _____914D_7F6E["自施法分支"]["单次伤害阈值最大生命比例"]
     if damage >= _____9608_503C or damage >= _____5F53_524D_751F_547D then
         createTimedUnitEffect(target, "origin", _____914D_7F6E["自施法分支"]["破除特效"]["模型路径"], _____914D_7F6E["自施法分支"]["破除特效"]["持续秒"])
-        Sound3DII_UnitPlayReuse(_____914D_7F6E["自施法分支"]["音效"]["路径"], target, _____914D_7F6E["自施法分支"]["音效"]["裁断距离"])
+        local ____e_97F3_6548_53E5_67C4 = jglobals[_____914D_7F6E["自施法分支"]["音效"]["全局音效键"]]
+        if ____e_97F3_6548_53E5_67C4 ~= nil then
+            PlaySoundOnUnitBJ(____e_97F3_6548_53E5_67C4, 100, target)
+        end
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(target, ____E_62B5_6321BuffID)
     end
 end
@@ -284,5 +284,5 @@ ____exports["注册坂井悠二E"] = function()
     end
 end
 ____exports["注册坂井悠二E"]()
-____exports["坂井悠二E技能状态"] = {["已完成设计"] = true, ["已完成实现"] = true, ["伤害形态"] = "无直接伤害（控制/位移/抵挡）", ["分支"] = "敌方目标瞬移+0.5秒眩晕 / 自施法抵挡1.5秒+75%减伤 / 目标点推进"}
+____exports["坂井悠二E技能状态"] = {["已完成设计"] = true, ["已完成实现"] = true, ["伤害形态"] = "无直接伤害（控制/位移/抵挡）", ["分支"] = "敌方目标瞬移+0.5秒眩晕 / 自施法抵挡1.5秒+75%减伤 / 目标点预计算路径一次性瞬移（撞墙停在地形前）"}
 return ____exports

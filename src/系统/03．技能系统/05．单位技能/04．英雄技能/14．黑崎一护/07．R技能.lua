@@ -15,6 +15,7 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____08_FF0E_9ED1_6D41_7259_7A81 = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．黑崎一护.08．黑流牙突")
 local _____6CE8_518C_73A9_5BB6_9ED1_6D41_7259_7A81A_952E = ____08_FF0E_9ED1_6D41_7259_7A81["注册玩家黑流牙突A键"]
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
@@ -24,20 +25,21 @@ local SOS_SetUnitSpeed = ____require_result_1.SOS_SetUnitSpeed
 local SOS_UnSetUnitSpeed = ____require_result_1.SOS_UnSetUnitSpeed
 local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_2.registerManualBuff
-local ____require_result_3 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_CooPlayReuse = ____require_result_3.Sound3DII_CooPlayReuse
+local ____require_result_3 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundAtPointBJ = ____require_result_3.PlaySoundAtPointBJ
 local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
 local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_5.registerDeathListener
+local ____require_result_6 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_6.IsUnitAliveBJ
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
-local IsUnitAliveBJ = jass.IsUnitAliveBJ
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_6.stringToFourCCSafe
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
 local stringToFourCC = stringToFourCCSafe
 local _____914D_7F6E = _____9ED1_5D0E_4E00_62A4_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
@@ -113,12 +115,12 @@ local function _____542F_52A8_534D_89E3(variable)
         ["缩放"] = _____914D_7F6E.R["卍解特效"]["缩放"],
         ["持续秒"] = _____914D_7F6E.R["卍解特效"]["持续秒"]
     })
-    Sound3DII_CooPlayReuse(
-        _____914D_7F6E.R["卍解音效"]["路径"],
+    PlaySoundAtPointBJ(
+        jglobals.gg_snd_0000YHR2,
+        100,
         x,
         y,
-        0,
-        _____914D_7F6E.R["卍解音效"]["裁断距离"]
+        0
     )
     registerManualBuff(caster, _____9ED1_5D0E_4E00_62A4BuffID["卍解"], _____914D_7F6E.R["持续秒"], 0)
     _____6CE8_518C_73A9_5BB6_9ED1_6D41_7259_7A81A_952E(caster)
@@ -127,8 +129,8 @@ local function _____542F_52A8_534D_89E3(variable)
     ctx["倒计时回调ID"] = addPeriodicCallback(100, _____63A8_8FDB_534D_89E3_5012_8BA1_65F6, ctx)
 end
 local function _____91CA_653E_89E3_653E(context, caster, ______6280_80FD_5B9E_4F8BID)
-    local ____opt_7 = _____83B7_53D6_9ED1_5D0E_4E00_62A4_72B6_6001(caster)
-    if (____opt_7 and ____opt_7["卍解"]) == true then
+    local ____opt_8 = _____83B7_53D6_9ED1_5D0E_4E00_62A4_72B6_6001(caster)
+    if (____opt_8 and ____opt_8["卍解"]) == true then
         ____exports["结束卍解"](caster)
     end
     context["施法者"] = caster
@@ -136,12 +138,12 @@ local function _____91CA_653E_89E3_653E(context, caster, ______6280_80FD_5B9E_4F
     context["Tick数"] = 0
     local x = GetUnitX(caster)
     local y = GetUnitY(caster)
-    Sound3DII_CooPlayReuse(
-        _____914D_7F6E.R["起手音效"]["路径"],
+    PlaySoundAtPointBJ(
+        jglobals.gg_snd_0000YHR1,
+        100,
         x,
         y,
-        0,
-        _____914D_7F6E.R["起手音效"]["裁断距离"]
+        0
     )
     SOS_SetUnitSpeed(caster, _____914D_7F6E.R["移速"])
     _____83B7_53D6_6216_521B_5EFA_9ED1_5D0E_4E00_62A4_72B6_6001(caster)["移速已突破"] = true

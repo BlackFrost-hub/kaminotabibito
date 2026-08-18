@@ -28,6 +28,7 @@ local ____W_672C_4F53_6280_80FDID = stringToFourCCSafe(_____4F50_4F50_6728_5355_
 local ____W_4E8C_6BB5_6280_80FDID_6570_503C = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["W二段技能ID"])
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetHandleId = jass.GetHandleId
 local GetUnitFacing = jass.GetUnitFacing
 local GetOwningPlayer = jass.GetOwningPlayer
 local SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable
@@ -50,6 +51,10 @@ local function _____5207_6362W_6280_80FD(_____82F1_96C4, _____65BD_653E_6280_80F
         SetPlayerAbilityAvailable(owner, ____W_672C_4F53_6280_80FDID, true)
     end
 end
+--- W 施放防抖：SPELL_EFFECT 阶段立即 SetPlayerAbilityAvailable 切换本体/二段，
+-- 切换瞬间玩家按下的 W 命令会被新技能重复响应，导致一次按键触发两个 W。
+-- 用施法硬直（0.5s）作防抖窗口，期间重复触发忽略；真实二段连招在硬直后触发不受影响。
+local ____W_65BD_653E_9632_6296_8868 = {}
 local function ____on_4F50_4F50_6728W_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_80FDID_6570_503C)
     if not _____662F_4F50_4F50_6728_672C_4F53(_____65BD_6CD5_5355_4F4D) then
         return
@@ -57,6 +62,17 @@ local function ____on_4F50_4F50_6728W_751F_6548(_____65BD_6CD5_5355_4F4D, _____6
     if _____6280_80FDID_6570_503C ~= ____W_672C_4F53_6280_80FDID and _____6280_80FDID_6570_503C ~= ____W_4E8C_6BB5_6280_80FDID_6570_503C then
         return
     end
+    local _____9632_6296id = GetHandleId(_____65BD_6CD5_5355_4F4D)
+    if ____W_65BD_653E_9632_6296_8868[_____9632_6296id] == true then
+        return
+    end
+    ____W_65BD_653E_9632_6296_8868[_____9632_6296id] = true
+    addDelayedCallback(
+        _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.W["施法硬直秒"] * 1000,
+        function()
+            ____W_65BD_653E_9632_6296_8868[_____9632_6296id] = false
+        end
+    )
     local cfg = _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.W
     local _____539F_70B9X = GetUnitX(_____65BD_6CD5_5355_4F4D)
     local _____539F_70B9Y = GetUnitY(_____65BD_6CD5_5355_4F4D)

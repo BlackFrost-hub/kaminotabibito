@@ -5,7 +5,7 @@ local _____94C3_4ED9_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["铃�
 local ____12_FF0E_94C3_4ED9 = require("系统.05．Buff系统.03．Buff表.02．英雄.12．铃仙")
 local _____94C3_4ED9BuffID = ____12_FF0E_94C3_4ED9["铃仙BuffID"]
 local ____00A_FF0E_8868_73B0_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．铃仙.00A．表现工具")
-local _____64AD_653E_94C3_4ED9_5168_5C40_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放铃仙全局音效"]
+local _____64AD_653E_94C3_4ED9_5355_4F4D_7ED1_5B9A_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放铃仙单位绑定音效"]
 local ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406 = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．铃仙.00B．分身与状态管理")
 local _____662F_94C3_4ED9_672C_4F53 = ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406["是铃仙本体"]
 local _____662F_94C3_4ED9_5206_8EAB = ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406["是铃仙分身"]
@@ -61,6 +61,15 @@ local DestroyEffect = jass.DestroyEffect
 local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local _____94C3_4ED9W_4F1A_8BDD_8868 = {}
+--- 当前正在创建分身的铃仙（SFB 马甲回调中无法从召唤单位获取本体，用此变量桥接）
+local _____5F53_524DW_94C3_4ED9 = nil
+--- 获取当前正在创建分身的铃仙句柄（供召唤回调使用，对应 JASS 触发器存储的铃仙引用）
+local function _____83B7_53D6_94C3_4ED9_53E5_67C4(_____88AB_53EC_5524_5355_4F4D)
+    if _____5F53_524DW_94C3_4ED9 ~= nil and _____5F53_524DW_94C3_4ED9 ~= 0 then
+        return GetHandleId(_____5F53_524DW_94C3_4ED9)
+    end
+    return nil
+end
 local function _____5355_4F4D_5B58_6D3B(unit)
     return unit ~= nil and unit ~= 0 and not IsUnitType(unit, UNIT_TYPE_DEAD)
 end
@@ -84,10 +93,10 @@ local function _____67E5_627E_5355_4F4D_6240_5C5E_4F1A_8BDD(_____5355_4F4D)
         do
             local _____4F1A_8BDD = _____94C3_4ED9W_4F1A_8BDD_8868[key]
             if _____4F1A_8BDD == nil or _____4F1A_8BDD["是否出现"] then
-                goto __continue7
+                goto __continue9
             end
             if not _____5355_4F4D_5B58_6D3B(_____4F1A_8BDD["英雄"]) then
-                goto __continue7
+                goto __continue9
             end
             local _____5206_8EAB_7EC4 = _____83B7_53D6_94C3_4ED9_5206_8EAB_7EC4(_____4F1A_8BDD["英雄"])
             do
@@ -100,7 +109,7 @@ local function _____67E5_627E_5355_4F4D_6240_5C5E_4F1A_8BDD(_____5355_4F4D)
                 end
             end
         end
-        ::__continue7::
+        ::__continue9::
     end
     return nil
 end
@@ -192,18 +201,19 @@ local function ____on_94C3_4ED9_5206_8EAB_53EC_5524(_____88AB_53EC_5524_5355_4F4
     if not _____662F_94C3_4ED9_5206_8EAB(_____88AB_53EC_5524_5355_4F4D) then
         return
     end
-    if not _____662F_94C3_4ED9_672C_4F53(_____53EC_5524_5355_4F4D) then
+    local _____94C3_4ED9_53E5_67C4 = _____83B7_53D6_94C3_4ED9_53E5_67C4(_____88AB_53EC_5524_5355_4F4D)
+    if _____94C3_4ED9_53E5_67C4 == nil then
         return
     end
-    local _____4F1A_8BDD = _____94C3_4ED9W_4F1A_8BDD_8868[GetHandleId(_____53EC_5524_5355_4F4D)]
+    local _____4F1A_8BDD = _____94C3_4ED9W_4F1A_8BDD_8868[_____94C3_4ED9_53E5_67C4]
     if _____4F1A_8BDD == nil or _____4F1A_8BDD["是否出现"] then
         return
     end
     local cfg = _____94C3_4ED9_5355_4F4D_6280_80FD_914D_7F6E.W
-    _____52A0_5165_94C3_4ED9_5206_8EAB(_____53EC_5524_5355_4F4D, _____88AB_53EC_5524_5355_4F4D)
+    _____52A0_5165_94C3_4ED9_5206_8EAB(_____4F1A_8BDD["英雄"], _____88AB_53EC_5524_5355_4F4D)
     _____4F1A_8BDD["角度"] = _____4F1A_8BDD["角度"] + 90
     if _____4F1A_8BDD["角度"] >= 450 then
-        ShowUnit(_____53EC_5524_5355_4F4D, false)
+        ShowUnit(_____4F1A_8BDD["英雄"], false)
         SetUnitX(_____88AB_53EC_5524_5355_4F4D, _____4F1A_8BDD["原X"])
         SetUnitY(_____88AB_53EC_5524_5355_4F4D, _____4F1A_8BDD["原Y"])
         SetUnitFacing(_____88AB_53EC_5524_5355_4F4D, _____4F1A_8BDD["原朝向"])
@@ -233,7 +243,8 @@ local function ____on_5206_8EAB_6B7B_4EA1(_____6B7B_4EA1_5355_4F4D)
         return
     end
     _____79FB_9664_94C3_4ED9_5206_8EAB(_____4F1A_8BDD["英雄"], _____6B7B_4EA1_5355_4F4D)
-    if _____94C3_4ED9_5206_8EAB_6570_91CF(_____4F1A_8BDD["英雄"]) <= 0 then
+    local _____5269_4F59 = _____94C3_4ED9_5206_8EAB_6570_91CF(_____4F1A_8BDD["英雄"])
+    if _____5269_4F59 <= 0 then
         _____94C3_4ED9_539F_5730_51FA_73B0(_____4F1A_8BDD)
     end
 end
@@ -276,7 +287,7 @@ local function ____on_94C3_4ED9W_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_8
     local _____539FX = GetUnitX(_____82F1_96C4)
     local _____539FY = GetUnitY(_____82F1_96C4)
     local _____539F_671D_5411 = GetUnitFacing(_____82F1_96C4)
-    _____64AD_653E_94C3_4ED9_5168_5C40_97F3_6548("gg_snd_LX_W2")
+    _____64AD_653E_94C3_4ED9_5355_4F4D_7ED1_5B9A_97F3_6548(_____82F1_96C4, "gg_snd_LX_W2", 100)
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = cfg["施法特效模型"],
         X = _____539FX,
@@ -292,11 +303,11 @@ local function ____on_94C3_4ED9W_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_8
             do
                 local _____654C_65B9 = _____5468_56F4_5355_4F4D[i + 1]
                 if not _____662F_6709_6548_654C_5BF9_76EE_6807(_____82F1_96C4, _____654C_65B9) then
-                    goto __continue55
+                    goto __continue57
                 end
                 registerManualBuff(_____654C_65B9, _____94C3_4ED9BuffID["W对视"], 1, 0)
             end
-            ::__continue55::
+            ::__continue57::
             i = i + 1
         end
     end
@@ -311,6 +322,8 @@ local function ____on_94C3_4ED9W_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_8
         ["超时计时器ID"] = 0
     }
     _____94C3_4ED9W_4F1A_8BDD_8868[id] = _____4F1A_8BDD
+    _____5F53_524DW_94C3_4ED9 = _____82F1_96C4
+    local _____521B_5EFA_6210_529F_6570 = 0
     do
         local i = 0
         while i < 5 do
@@ -324,9 +337,11 @@ local function ____on_94C3_4ED9W_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_8
             if not ok then
                 break
             end
+            _____521B_5EFA_6210_529F_6570 = _____521B_5EFA_6210_529F_6570 + 1
             i = i + 1
         end
     end
+    _____5F53_524DW_94C3_4ED9 = nil
     _____4F1A_8BDD["超时计时器ID"] = addDelayedCallback(
         cfg["超时恢复秒"] * 1000,
         function()

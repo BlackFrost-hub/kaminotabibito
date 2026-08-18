@@ -255,7 +255,7 @@ export function GetLearnedSkillBJ(): number {
 }
 
 /**
- * 统计单位组中的单位数量（1.27 没有 BlzGroupGetSize）
+ * 统计单位组中的单位数量（1.27 没有原生单位组计数接口）
  * 对应BJ: CountUnitsInGroup
  */
 export function CountUnitsInGroup(g: any): number {

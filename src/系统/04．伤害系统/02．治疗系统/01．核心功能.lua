@@ -14,6 +14,7 @@ local DEFAULT_MANA_HEAL_EFFECT_PATH = ____00_FF0E_5E38_91CF_5B9A_4E49.DEFAULT_MA
 local HEAL_TEXT_COLOR = ____00_FF0E_5E38_91CF_5B9A_4E49.HEAL_TEXT_COLOR
 local MANA_TEXT_COLOR = ____00_FF0E_5E38_91CF_5B9A_4E49.MANA_TEXT_COLOR
 local ATTR_HEAL_RATE = ____00_FF0E_5E38_91CF_5B9A_4E49.ATTR_HEAL_RATE
+local ATTR_SKILL_HEAL_RATE = ____00_FF0E_5E38_91CF_5B9A_4E49.ATTR_SKILL_HEAL_RATE
 local ATTR_RECEIVED_HEAL_RATE = ____00_FF0E_5E38_91CF_5B9A_4E49.ATTR_RECEIVED_HEAL_RATE
 function _____5904_7406_5F85_9500_6BC1_6CBB_7597_7279_6548()
     local _____5F53_524D_65F6_95F4 = getServerTime()
@@ -106,9 +107,23 @@ function ____exports.getHealRate(unit)
         ____temp_4 = 0
     end
     local playerValue = ____temp_4
+    local ____temp_5
+    if player ~= nil then
+        ____temp_5 = YDUserDataGet(
+            nil,
+            "player",
+            player,
+            ATTR_SKILL_HEAL_RATE,
+            "real"
+        )
+    else
+        ____temp_5 = 0
+    end
+    local playerSkillValue = ____temp_5
     local unitRate = type(unitValue) == "number" and unitValue or 0
     local playerRate = type(playerValue) == "number" and playerValue or 0
-    return unitRate + playerRate
+    local playerSkillRate = type(playerSkillValue) == "number" and playerSkillValue or 0
+    return unitRate + playerRate + playerSkillRate
 end
 --- 获取单位受到治疗率
 function ____exports.getReceivedHealRate(unit)
@@ -123,9 +138,9 @@ function ____exports.getReceivedHealRate(unit)
         "real"
     )
     local player = GetOwningPlayer(unit)
-    local ____temp_5
+    local ____temp_6
     if player ~= nil then
-        ____temp_5 = YDUserDataGet(
+        ____temp_6 = YDUserDataGet(
             nil,
             "player",
             player,
@@ -133,9 +148,9 @@ function ____exports.getReceivedHealRate(unit)
             "real"
         )
     else
-        ____temp_5 = 0
+        ____temp_6 = 0
     end
-    local playerValue = ____temp_5
+    local playerValue = ____temp_6
     local unitRate = type(unitValue) == "number" and unitValue or 0
     local playerRate = type(playerValue) == "number" and playerValue or 0
     return unitRate + playerRate
@@ -270,36 +285,36 @@ function ____exports.doHeal(params)
         end
         return 0
     end
-    local ____params_ManaEffect_6 = params.ManaEffect
-    if ____params_ManaEffect_6 == nil then
-        ____params_ManaEffect_6 = (params.HealManaAmount or 0) > 0
+    local ____params_ManaEffect_7 = params.ManaEffect
+    if ____params_ManaEffect_7 == nil then
+        ____params_ManaEffect_7 = (params.HealManaAmount or 0) > 0
     end
-    local manaEffectEnabled = ____params_ManaEffect_6
-    local ____params_7 = params
-    local HealSource = ____params_7.HealSource
-    local HealTarget = ____params_7.HealTarget
-    local HealAmount = ____params_7.HealAmount
-    local HealManaAmount = ____params_7.HealManaAmount
+    local manaEffectEnabled = ____params_ManaEffect_7
+    local ____params_8 = params
+    local HealSource = ____params_8.HealSource
+    local HealTarget = ____params_8.HealTarget
+    local HealAmount = ____params_8.HealAmount
+    local HealManaAmount = ____params_8.HealManaAmount
     if HealManaAmount == nil then
         HealManaAmount = 0
     end
-    local ItemHeal = ____params_7.ItemHeal
-    local HealEffect = ____params_7.HealEffect
-    local HealEffectPath = ____params_7.HealEffectPath
-    local UseDefaultHealEffect = ____params_7.UseDefaultHealEffect
+    local ItemHeal = ____params_8.ItemHeal
+    local HealEffect = ____params_8.HealEffect
+    local HealEffectPath = ____params_8.HealEffectPath
+    local UseDefaultHealEffect = ____params_8.UseDefaultHealEffect
     if UseDefaultHealEffect == nil then
         UseDefaultHealEffect = false
     end
-    local HealShowText = ____params_7.HealShowText
+    local HealShowText = ____params_8.HealShowText
     if HealShowText == nil then
         HealShowText = true
     end
-    local ManaEffectPath = ____params_7.ManaEffectPath
-    local UseDefaultManaEffect = ____params_7.UseDefaultManaEffect
+    local ManaEffectPath = ____params_8.ManaEffectPath
+    local UseDefaultManaEffect = ____params_8.UseDefaultManaEffect
     if UseDefaultManaEffect == nil then
         UseDefaultManaEffect = false
     end
-    local ManaShowText = ____params_7.ManaShowText
+    local ManaShowText = ____params_8.ManaShowText
     if ManaShowText == nil then
         ManaShowText = true
     end
@@ -355,8 +370,8 @@ function ____exports.doHeal(params)
         end
     end
     if HealManaAmount > 0 then
-        local ____require_result_8 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
-        local _____9B54_6CD5_589E_51CF = ____require_result_8["魔法增减"]
+        local ____require_result_9 = require("系统.04．伤害系统.02．治疗系统.06．魔法恢复")
+        local _____9B54_6CD5_589E_51CF = ____require_result_9["魔法增减"]
         _____9B54_6CD5_589E_51CF(HealTarget, HealManaAmount, ManaShowText, manaEffectEnabled or UseDefaultManaEffect)
     end
     return actualHeal

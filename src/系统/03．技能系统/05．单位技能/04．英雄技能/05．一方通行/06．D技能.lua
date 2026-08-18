@@ -44,8 +44,6 @@ local GetUnitFlyHeight = jass.GetUnitFlyHeight
 local GetUnitState = jass.GetUnitState
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
-local SetUnitAnimation = jass.SetUnitAnimation
-local SetUnitTimeScale = jass.SetUnitTimeScale
 local IsUnitEnemy = jass.IsUnitEnemy
 local IsUnitType = jass.IsUnitType
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -78,8 +76,8 @@ local function _____83B7_53D6_6216_521B_5EFAD_4E0A_4E0B_6587(unit)
         ["蓄力次数"] = 0,
         ["目标X"] = 0,
         ["目标Y"] = 0,
-        ["蓄力特效"] = nil,
-        ["已结算"] = false
+        ["已结算"] = false,
+        ["蓄力持续特效"] = nil
     }
     _____4E0A_4E0B_6587_8868[id] = created
     return created
@@ -91,13 +89,9 @@ local function ____D_76EE_6807_5141_8BB8(caster, target)
     ) and not IsUnitType(target, UNIT_TYPE_ANCIENT) and not IsUnitType(target, UNIT_TYPE_MECHANICAL)
 end
 local function _____6E05_7406D_4E0A_4E0B_6587(context)
-    if context["蓄力特效"] ~= nil and context["蓄力特效"] ~= 0 then
-        _____9500_6BC1_70B9_7279_6548(context["蓄力特效"])
-        context["蓄力特效"] = nil
-    end
-    if _____5355_4F4D_5B58_6D3B(context["施法者"]) then
-        SetUnitTimeScale(context["施法者"], 1)
-        SetUnitAnimation(context["施法者"], "stand")
+    if context["蓄力持续特效"] ~= nil and context["蓄力持续特效"] ~= 0 then
+        _____9500_6BC1_70B9_7279_6548(context["蓄力持续特效"])
+        context["蓄力持续特效"] = nil
     end
     local id = _____53D6_5355_4F4DID(context["施法者"])
     if id ~= 0 and _____4E0A_4E0B_6587_8868[id] == context then
@@ -198,17 +192,15 @@ local function _____4E00_65B9_901A_884CD_5F00_59CB(unit, chargeId)
     if context == nil then
         return
     end
-    SetUnitAnimation(unit, ____D_914D_7F6E["施法动作名"])
-    Sound3DII_UnitPlayReuse(____D_914D_7F6E["施法音效路径"], unit, ____D_914D_7F6E["施法音效裁断距离"])
-    Sound3DII_UnitPlayReuse(____D_914D_7F6E["环境音效路径"], unit, ____D_914D_7F6E["环境音效裁断距离"])
-    context["蓄力特效"] = _____521B_5EFA_70B9_7279_6548({
-        ["模型路径"] = ____D_914D_7F6E["蓄力特效模型"],
+    context["蓄力持续特效"] = _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = ____D_914D_7F6E["蓄力持续特效模型"],
         X = GetUnitX(unit),
         Y = GetUnitY(unit),
         Z = GetUnitFlyHeight(unit) + ____D_914D_7F6E["特效Z偏移"],
-        ["缩放"] = ____D_914D_7F6E["蓄力特效缩放"],
-        ["持续秒"] = ____D_914D_7F6E["施法持续秒"]
+        ["缩放"] = ____D_914D_7F6E["蓄力持续特效缩放"]
     })
+    Sound3DII_UnitPlayReuse(____D_914D_7F6E["施法音效路径"], unit, ____D_914D_7F6E["施法音效裁断距离"])
+    Sound3DII_UnitPlayReuse(____D_914D_7F6E["环境音效路径"], unit, ____D_914D_7F6E["环境音效裁断距离"])
 end
 local function _____91CA_653E_4E00_65B9_901A_884CD(context, caster, skillInstanceId)
     if context["充能ID"] ~= 0 then
@@ -223,10 +215,11 @@ local function _____91CA_653E_4E00_65B9_901A_884CD(context, caster, skillInstanc
         caster,
         {
             ["持续时间"] = ____D_914D_7F6E["施法持续秒"],
-            ["强制硬直"] = true,
+            ["强制硬直"] = false,
+            ["指令中断"] = true,
             ["显示进度条特效"] = true,
             ["开始回调"] = _____4E00_65B9_901A_884CD_5F00_59CB,
-            ["周期回调间隔"] = ____D_914D_7F6E["蓄力周期毫秒"],
+            ["周期回调间隔"] = ____D_914D_7F6E["蓄力周期毫秒"] / 1000,
             ["周期回调"] = function(unit, chargeId) return _____4E00_65B9_901A_884CD_84C4_529BTick(unit, chargeId) end,
             ["结束回调"] = _____4E00_65B9_901A_884CD_7ED3_675F
         }

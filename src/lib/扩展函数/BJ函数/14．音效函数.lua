@@ -302,4 +302,11 @@ function ____exports.PlaySoundOnUnitBJ(soundHandle, volumePercent, whichUnit)
     SetSoundVolume(soundHandle, volumePercent)
     ____exports.PlaySoundBJ(soundHandle)
 end
+--- Blizzard.j 坐标音效 BJ 封装。
+-- 属于 Blizzard.j 函数，禁止从 jass.common 取（运行时为 nil）。
+function ____exports.PlaySoundAtPointBJ(soundHandle, volumePercent, x, y, z)
+    jass.SetSoundPosition(soundHandle, x, y, z)
+    SetSoundVolume(soundHandle, volumePercent)
+    ____exports.PlaySoundBJ(soundHandle)
+end
 return ____exports

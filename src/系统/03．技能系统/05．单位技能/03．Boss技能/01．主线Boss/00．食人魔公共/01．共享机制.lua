@@ -472,11 +472,9 @@ ____exports["施放食人魔雷霆震怒"] = function(boss, _____914D_7F6E)
 end
 ____exports["注册食人魔共享机制"] = function()
     if _____98DF_4EBA_9B54_5171_4EAB_673A_5236_5DF2_6CE8_518C then
-        debugLogForce("食人魔-共享机制", "重复注册请求已忽略")
         return
     end
     _____98DF_4EBA_9B54_5171_4EAB_673A_5236_5DF2_6CE8_518C = true
     registerDeathListener(____on_98DF_4EBA_9B54_51FB_6740)
-    debugLogForce("食人魔-共享机制", "共享机制注册完成：击杀啃食与雷霆震怒")
 end
 return ____exports

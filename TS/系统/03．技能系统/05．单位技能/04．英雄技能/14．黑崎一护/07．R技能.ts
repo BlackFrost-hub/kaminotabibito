@@ -11,6 +11,7 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 import { 注册玩家黑流牙突A键 } from "./08．黑流牙突";
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -24,8 +25,8 @@ const { SOS_SetUnitSpeed, SOS_UnSetUnitSpeed } = require("lib.扩展函数.Star�
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
-const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+const { PlaySoundAtPointBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundAtPointBJ: (this: void, soundHandle: any, volumePercent: number, x: number, y: number, z: number) => void;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
@@ -33,13 +34,16 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
+// IsUnitAliveBJ 是 Blizzard.j 函数，从 BJ 函数库取（jass.common 取到的是 nil）
+const { IsUnitAliveBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
+  IsUnitAliveBJ: (this: void, unit: any) => boolean;
+};
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetPlayerId = jass.GetPlayerId as (this: void, p: any) => number;
-const IsUnitAliveBJ = jass.IsUnitAliveBJ as (this: void, unit: any) => boolean;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
 };
@@ -125,10 +129,10 @@ function 启动卍解(this: void, variable: any): void {
     缩放: 配置.R.卍解特效.缩放,
     持续秒: 配置.R.卍解特效.持续秒,
   });
-  Sound3DII_CooPlayReuse(配置.R.卍解音效.路径, x, y, 0, 配置.R.卍解音效.裁断距离);
+  PlaySoundAtPointBJ(jglobals.gg_snd_0000YHR2, 100, x, y, 0);
   registerManualBuff(caster, 黑崎一护BuffID.卍解, 配置.R.持续秒, 0);
   注册玩家黑流牙突A键(caster); // 首次注册后重复调用被忽略，不叠加监听（计划第 3 节）
-  武装黑崎一护A键(caster); // 卍解期间 A 键可发起黑流牙突
+  武装黑崎一护A键(caster);
 
   ctx.Tick数 = 0;
   ctx.倒计时回调ID = addPeriodicCallback(100, 推进卍解倒计时 as unknown as (this: void, variable?: any) => void, ctx);
@@ -144,7 +148,7 @@ function 释放解放(this: void, context: R上下文, caster: any, _技能实�
 
   const x = GetUnitX(caster);
   const y = GetUnitY(caster);
-  Sound3DII_CooPlayReuse(配置.R.起手音效.路径, x, y, 0, 配置.R.起手音效.裁断距离);
+  PlaySoundAtPointBJ(jglobals.gg_snd_0000YHR1, 100, x, y, 0);
   SOS_SetUnitSpeed(caster, 配置.R.移速);
   获取或创建黑崎一护状态(caster).移速已突破 = true;
 

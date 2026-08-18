@@ -23,6 +23,7 @@ export * from "./18．单位动画守护";
 export * from "./20．位移技能限制";
 export * from "./21．组合技能伤害";
 export * from "./22．Boss技能伤害执行器";
+export * from "./23．瞬移路径预计算";
 export {
   stringToFourCC as BossStringToFourCC,
   取单位ID as Boss取单位ID,

@@ -226,6 +226,5 @@ ____exports["注册教派剑士黑魔法侵蚀"] = function()
     _____9ED1_9B54_6CD5_4FB5_8680_5DF2_6CE8_518C = true
     registerAppliedFinalDamageListener(____on_6559_6D3E_5251_58EB_666E_901A_653B_51FB_6700_7EC8_4F24_5BB3)
     registerDamageModifier(_____6559_6D3E_5251_58EB_9ED1_9B54_6CD5_66B4_51FB_4FEE_6B63, _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E["黑魔法侵蚀"]["黑魔法暴击修正器优先级"])
-    debugLogForce("教派剑士-黑魔法侵蚀", "普通攻击附加暗伤与优先级99黑魔法暴击监听注册完成", "unitTypeId=", _____6559_6D3E_5251_58EB_5355_4F4D_7C7B_578BID)
 end
 return ____exports

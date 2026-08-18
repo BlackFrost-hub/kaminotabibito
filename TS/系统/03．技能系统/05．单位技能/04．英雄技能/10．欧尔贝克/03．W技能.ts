@@ -14,6 +14,7 @@
 import { 欧尔贝克单位技能配置 } from "./00．配置";
 import { 播放欧尔贝克单位音效 } from "./00A．表现工具";
 import { 获取欧尔贝克积攒计数, 设置欧尔贝克积攒计数 } from "./00B．积攒状态";
+import { 欧尔贝克BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/17．欧尔贝克";
 
 const jass = require("jass.common") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -51,6 +52,10 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
     持续秒?: number;
   }) => any;
 };
+const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+  移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
+};
 
 const W技能ID = stringToFourCCSafe(欧尔贝克单位技能配置.W技能ID);
 const 欧尔贝克单位类型ID = stringToFourCCSafe(欧尔贝克单位技能配置.单位类型ID);
@@ -82,6 +87,7 @@ function 结束积攒(this: void, id: number, record: 积攒状态记录): void 
   调整玩家属性(record.单位, "暴击率", -record.暴击加成);
   // 积攒计数清零，结束本次积攒
   设置欧尔贝克积攒计数(record.单位, 0);
+  移除单位指定Buff(record.单位, 欧尔贝克BuffID.积攒);
   delete 积攒状态缓存[id];
 }
 
@@ -115,6 +121,10 @@ function on欧尔贝克W(this: void, caster: any, abilityId: number): void {
     暴击加成,
   };
   积攒状态缓存[id] = record;
+  registerManualBuff(caster, 欧尔贝克BuffID.积攒, cfg.持续秒, 0, {
+    sourceUnit: caster,
+    sourceName: "积攒",
+  });
 
   // 周期：播放特效并检查结束条件（与源 JASS 一致）
   record.周期回调ID = addPeriodicCallback(cfg.周期秒 * 1000, () => {

@@ -8,16 +8,16 @@
  * 逻辑：
  * 1. 铃仙本体远程普攻只造成 70% 伤害
  * 2. 铃仙本体和分身的普通攻击额外造成 攻击力×0.25 的魔法伤害
- * 3. 分身的普通攻击伤害只有本体的 16%（即普攻伤害修正为 0.16）
- * 4. 分身的额外魔法伤害只有 攻击力×0.04
- * 5. 额外魔法伤害不触发攻击效果（attack=false）
- * 6. 排除古树/机械/建筑目标
+ * 3. 分身的额外魔法伤害只有本体的16%（即 攻击力×0.04）
+ * 4. 额外魔法伤害不触发攻击效果（attack=false）
+ * 5. 排除古树/机械/建筑目标
  */
 
 import { 铃仙单位技能配置 } from "./00．配置";
 import { 是铃仙本体, 是铃仙分身 } from "./00B．分身与状态管理";
 
 const jass = require("jass.common") as any;
+
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
@@ -41,6 +41,7 @@ const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
 const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
 const UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE as any;
 
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 
 const 被动配置 = 铃仙单位技能配置.被动;
@@ -85,8 +86,8 @@ function 铃仙被动伤害修正(this: void, context: any): number {
   if (是无效目标(target)) return damage;
 
   if (isIllusion) {
-    // 分身普攻伤害修正为 16%
-    return damage * 被动配置.分身普攻伤害比例;
+    // 分身普攻不由被动修正，自然输出由 SFB 幻象技能字段 108 控制（15%）
+    return damage;
   }
 
   // 本体普攻伤害修正为 70%

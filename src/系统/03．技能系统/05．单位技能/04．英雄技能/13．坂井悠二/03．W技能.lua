@@ -12,6 +12,7 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
 local _____65BD_52A0_7729_6655 = ____require_result_0["施加眩晕"]
 local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -21,8 +22,8 @@ local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
 local _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_2["创建单位坐标跟随特效"]
 local _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_2["销毁单位坐标跟随特效"]
 local _____8BBE_7F6E_7279_6548_989C_8272 = ____require_result_2["设置特效颜色"]
-local ____require_result_3 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_3.Sound3DII_UnitPlayReuse
+local ____require_result_3 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundOnUnitBJ = ____require_result_3.PlaySoundOnUnitBJ
 local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_4.addDelayedCallback
 local removeDelayedCallback = ____require_result_4.removeDelayedCallback
@@ -158,7 +159,10 @@ local function _____91CA_653EW_6280_80FD(context, caster, _____6280_80FD_5B9E_4F
             ["技能实例ID"] = context["技能实例ID"]
         })
     end
-    Sound3DII_UnitPlayReuse(_____914D_7F6E["音效"]["路径"], target, _____914D_7F6E["音效"]["裁断距离"])
+    local ____w_97F3_6548_53E5_67C4 = jglobals[_____914D_7F6E["音效"]["全局音效键"]]
+    if ____w_97F3_6548_53E5_67C4 ~= nil then
+        PlaySoundOnUnitBJ(____w_97F3_6548_53E5_67C4, 100, target)
+    end
     if _____914D_7F6E["壳优化为控制特效"]["启用"] then
         local _____7F29_653E_500D_7387 = _____914D_7F6E["壳优化为控制特效"]["缩放倍率"]
         local _____5F53_524D_7F29_653E = GetUnitModelScale(target)

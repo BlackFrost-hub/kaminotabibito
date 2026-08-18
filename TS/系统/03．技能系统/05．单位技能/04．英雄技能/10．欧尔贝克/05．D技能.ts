@@ -9,11 +9,13 @@
  * - 友军：『掩护』标记目标 2 秒，期间目标受到单次伤害超过其最大生命 10% 时，
  *   取消该伤害，欧尔贝克瞬间移动到目标与伤害来源之间（目标身后 125 码），
  *   并获得 0.5 秒免伤；
- * - 敌军：『挑衅』每 0.3 秒命令目标攻击自己（共 5 次），并在自身位置播放挑衅特效。
+ * - 敌军：『挑衅』底层嘲讽目标 1 秒（C020），并给目标加「相当于造成 30% 最大生命伤害」的仇恨，
+ *   在自身位置播放挑衅特效。
  */
 
 import { 欧尔贝克单位技能配置 } from "./00．配置";
 import { 播放欧尔贝克单位音效, 播放欧尔贝克配置动作 } from "./00A．表现工具";
+import { 欧尔贝克BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/17．欧尔贝克";
 
 const jass = require("jass.common") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -22,11 +24,9 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellEffectListener: (this: void, callback: (this: void, unit: any, abilityId: number) => void) => void;
 };
-const { addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   removeDelayedCallback: (this: void, id: number) => void;
-  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
-  removePeriodicCallback: (this: void, id: number) => void;
 };
 const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
@@ -34,8 +34,11 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
 const { 调整单位属性 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令") as {
   调整单位属性: (this: void, 单位: any, 属性名: string, 增量: number) => void;
 };
-const { 命令攻击来源 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令") as {
-  命令攻击来源: (this: void, 目标: any, 来源: any) => void;
+const { 增加生命比例仇恨 } = require("系统.01．单位系统.06．仇恨系统.06．对外接口") as {
+  增加生命比例仇恨: (this: void, 敌人: any, 仇恨目标: any, 相当于最大生命比例: number) => void;
+};
+const { 施加嘲讽 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.index") as {
+  施加嘲讽: (this: void, 来源单位: any, 目标单位: any, 参数: { 持续时间: number; 反伤倍率?: number }) => number;
 };
 const { 单位存活, 两点角度, 读取单位最大生命 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   单位存活: (this: void, unit: any) => boolean;
@@ -62,6 +65,10 @@ const { 单位是指定类型 } = require("系统.03．技能系统.05．单位�
 };
 const { YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+};
+const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+  移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
 };
 
 const D技能ID = stringToFourCCSafe(欧尔贝克单位技能配置.D技能ID);
@@ -104,6 +111,7 @@ function 结束防御(this: void, id: number, record: 防御记录): void {
     UnitRemoveAbility(record.单位, 防御技能类型ID);
   }
   调整单位属性(record.单位, "伤害减少%", -cfg.防御减免);
+  移除单位指定Buff(record.单位, 欧尔贝克BuffID.防御);
   delete 防御记录缓存[id];
 }
 
@@ -115,12 +123,14 @@ function 施加防御(this: void, caster: any): void {
     // 重复施法：仅刷新持续时间，避免属性叠加
     removeDelayedCallback(old.到期回调ID);
     old.到期回调ID = addDelayedCallback(cfg.防御持续秒 * 1000, () => 结束防御(id, old));
+    registerManualBuff(caster, 欧尔贝克BuffID.防御, cfg.防御持续秒, cfg.防御减免, { sourceUnit: caster });
     return;
   }
   UnitAddAbility(caster, 防御技能类型ID);
   调整单位属性(caster, "伤害减少%", cfg.防御减免);
   const record: 防御记录 = { 单位: caster, 到期回调ID: 0 };
   防御记录缓存[id] = record;
+  registerManualBuff(caster, 欧尔贝克BuffID.防御, cfg.防御持续秒, cfg.防御减免, { sourceUnit: caster });
   record.到期回调ID = addDelayedCallback(cfg.防御持续秒 * 1000, () => 结束防御(id, record));
 }
 
@@ -131,6 +141,7 @@ function 施加防御(this: void, caster: any): void {
 function 结束掩护(this: void, id: number, record: 掩护记录): void {
   if (掩护记录缓存[id] !== record) return;
   if (record.到期回调ID !== 0) removeDelayedCallback(record.到期回调ID);
+  移除单位指定Buff(record.目标, 欧尔贝克BuffID.掩护);
   delete 掩护记录缓存[id];
 }
 
@@ -143,10 +154,12 @@ function 施加掩护(this: void, caster: any, target: any): void {
     removeDelayedCallback(old.到期回调ID);
     old.施法者 = caster;
     old.到期回调ID = addDelayedCallback(cfg.掩护持续秒 * 1000, () => 结束掩护(id, old));
+    registerManualBuff(target, 欧尔贝克BuffID.掩护, cfg.掩护持续秒, 0, { sourceUnit: caster });
     return;
   }
   const record: 掩护记录 = { 目标: target, 施法者: caster, 到期回调ID: 0 };
   掩护记录缓存[id] = record;
+  registerManualBuff(target, 欧尔贝克BuffID.掩护, cfg.掩护持续秒, 0, { sourceUnit: caster });
   record.到期回调ID = addDelayedCallback(cfg.掩护持续秒 * 1000, () => 结束掩护(id, record));
 }
 
@@ -198,21 +211,17 @@ function 处理掩护伤害(this: void, context: any): number {
 
 function 施加挑衅(this: void, caster: any, target: any): void {
   const cfg = 欧尔贝克单位技能配置.D;
-  let 周期 = 0;
-  const 回调ID = addPeriodicCallback(cfg.挑衅周期秒 * 1000, () => {
-    if (周期 >= cfg.挑衅周期数 || !单位存活(caster) || !单位存活(target)) {
-      removePeriodicCallback(回调ID);
-      return;
-    }
-    周期 += 1;
-    命令攻击来源(target, caster);
-    创建点特效({
-      模型路径: cfg.挑衅特效模型,
-      X: GetUnitX(caster),
-      Y: GetUnitY(caster),
-      Z: 0,
-      持续秒: cfg.挑衅特效持续秒,
-    });
+  // 底层嘲讽 Buff 系统：嘲讽 1 秒（C020，强制攻击来源并屏蔽其他指令）
+  施加嘲讽(caster, target, { 持续时间: cfg.挑衅持续秒 });
+  // 仇恨系统：施法时给目标加「相当于造成 30% 最大生命伤害」的仇恨（0.3×1000=300 点）
+  增加生命比例仇恨(target, caster, cfg.挑衅仇恨生命比例);
+  // 自身位置播放挑衅特效
+  创建点特效({
+    模型路径: cfg.挑衅特效模型,
+    X: GetUnitX(caster),
+    Y: GetUnitY(caster),
+    Z: 0,
+    持续秒: cfg.挑衅特效持续秒,
   });
 }
 

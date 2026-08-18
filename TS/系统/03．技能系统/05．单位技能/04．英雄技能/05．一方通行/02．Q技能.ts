@@ -57,7 +57,7 @@ const SetUnitX = jass.SetUnitX as (this: void, unit: any, x: number) => void;
 const SetUnitY = jass.SetUnitY as (this: void, unit: any, y: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, angle: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
-const ResetUnitAnimation = jass.ResetUnitAnimation as (this: void, unit: any) => void;
+const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
 const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
 const UnitRemoveAbility = jass.UnitRemoveAbility as (this: void, unit: any, abilityId: number) => boolean;
 const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void, player: any, abilityId: number, available: boolean) => void;
@@ -91,21 +91,28 @@ function 获取Q运行时(this: void, unit: any): Q运行时 | undefined {
   return Q运行时表[取单位ID(unit)];
 }
 
-function 停止矢量移动(this: void, unit: any): void {
+function 停止Q当前移动(this: void, unit: any): void {
   const id = 取单位ID(unit);
   const runtime = Q运行时表[id];
-  if (runtime == null || !runtime.active) return;
-  runtime.active = false;
+  if (runtime == null) return;
   if (runtime.tickId !== 0) {
     removePeriodicCallback(runtime.tickId);
     runtime.tickId = 0;
   }
+  SetUnitAnimation(unit, "stand");
+  EXSetUnitMoveType(unit, 0x02);
+}
+
+function 停止矢量移动(this: void, unit: any): void {
+  const id = 取单位ID(unit);
+  const runtime = Q运行时表[id];
+  if (runtime == null || !runtime.active) return;
+  停止Q当前移动(unit);
+  runtime.active = false;
   移除单位指定Buff(unit, 一方通行BuffID.矢量移动);
   UnitRemoveAbility(unit, Q关闭技能ID);
   UnitRemoveAbility(unit, Q状态技能ID);
   SetPlayerAbilityAvailable(GetOwningPlayer(unit), Q技能ID, true);
-  ResetUnitAnimation(unit);
-  EXSetUnitMoveType(unit, 0x02);
   delete Q运行时表[id];
 }
 
@@ -130,7 +137,7 @@ function 矢量移动Tick(this: void, variable?: any): void {
   const dy = runtime.targetY - currentY;
   const distance = Math.sqrt(dx * dx + dy * dy);
   if (distance <= 配置.到达距离) {
-    停止矢量移动(caster);
+    停止Q当前移动(caster);
     return;
   }
 
@@ -159,7 +166,7 @@ function 矢量移动Tick(this: void, variable?: any): void {
   });
 
   if (next.实际步数 <= 0) {
-    停止矢量移动(caster);
+    停止Q当前移动(caster);
     return;
   }
   SetUnitX(caster, next.最终X);

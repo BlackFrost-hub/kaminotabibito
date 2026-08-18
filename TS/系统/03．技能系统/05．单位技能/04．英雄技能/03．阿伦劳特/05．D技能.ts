@@ -7,12 +7,12 @@
  * 监听 A0D8 技能施放触发（技能冷却由物编控制，不受冷却缩减）。
  *
  * 光 → 暗：
- * - DzSetUnitID 切换为 H00G，重设最大生命 = 30 + 力量 × 1.35
+ * - DzSetUnitID 切换为 H00G，保留原最大生命
  * - 移除光形态属性（治疗加成、魔法伤害加成），增加暗形态属性（生命恢复增幅、受到治疗）
  * - 恢复已损失生命 15%，临时 +10% 攻击 2 秒（B017，到期回滚）
  *
  * 暗 → 光：
- * - DzSetUnitID 切换为 H00F，重设最大生命
+ * - DzSetUnitID 切换为 H00F，保留原最大生命
  * - 反向恢复属性、驱散负面 Buff、0.5 秒免伤
  */
 
@@ -46,7 +46,7 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
   stringToFourCCSafe: (this: void, value: string) => number;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const { 调整玩家属性, 临时调整攻击 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令") as {
   调整玩家属性: (this: void, 单位: any, 属性名: string, 增量: number) => void;
@@ -70,21 +70,58 @@ const japi = require("jass.japi") as any;
 
 const GetUnitStateJass = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
-const SetUnitStateJapi = japi.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
-const GetHeroStr = jass.GetHeroStr as (this: void, hero: any, includeBonuses: boolean) => number;
 const DzSetUnitID = japi.DzSetUnitID as (this: void, unit: any, unitTypeId: number) => void;
+const DzSetUnitAbilityArt = japi.DzSetUnitAbilityArt as (this: void, unit: any, abilityId: number, art: string) => boolean;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_STATE_ATTACK = jass.ConvertUnitState(0x15) as any;
+const R2I = jass.R2I as (this: void, value: number) => number;
+
+function 取四舍五入整数(this: void, value: number): number {
+  return R2I(value + 0.5);
+}
+
+function 取非负数(this: void, value: number): number {
+  return value > 0 ? value : 0;
+}
+
+/** 项目约定：当前生命用 JASS，最大生命用 JAPI 读取。 */
+function 读取当前生命(this: void, unit: any): number {
+  return GetUnitStateJass(unit, UNIT_STATE_LIFE);
+}
+
+function 读取最大生命(this: void, unit: any): number {
+  return GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE);
+}
+
+interface 切换加攻到期上下文 {
+  单位: any;
+  加攻量: number;
+}
+
+function 切换加攻到期(this: void, variable?: any): void {
+  const ctx = variable as 切换加攻到期上下文;
+  if (ctx == null || ctx.单位 == null || ctx.单位 === 0 || !(ctx.加攻量 > 0)) return;
+  临时调整攻击(ctx.单位, -ctx.加攻量);
+  移除原生Buff(ctx.单位, 切换加攻BuffID);
+}
 
 const 光形态单位ID = stringToFourCCSafe(阿伦劳特单位技能配置.光形态单位ID);
 const 暗形态单位ID = stringToFourCCSafe(阿伦劳特单位技能配置.暗形态单位ID);
+const Q技能ID = stringToFourCCSafe(阿伦劳特单位技能配置.Q技能ID);
+const W技能ID = stringToFourCCSafe(阿伦劳特单位技能配置.W技能ID);
+const E技能ID = stringToFourCCSafe(阿伦劳特单位技能配置.E技能ID); // A0D4 光之裁决/裁决吸引
+const R技能ID = stringToFourCCSafe(阿伦劳特单位技能配置.R技能ID);
 const D技能ID = stringToFourCCSafe(阿伦劳特单位技能配置.D技能ID);
 const 切换加攻BuffID = stringToFourCCSafe(阿伦劳特单位技能配置.切换加攻BuffID);
 
-/** 切换后重设最大生命 = 30 + 力量 × 1.35（源 切换.j） */
-function 重设形态最大生命(this: void, unit: any): void {
-  SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, 30 + GetHeroStr(unit, false) * 1.35);
+/** 更新 Q/W/E/R/D 五个技能图标（源 切换.j：YDWESetUnitAbilityDataString 204；项目用 japi.DzSetUnitAbilityArt） */
+function 更新形态图标(this: void, unit: any, 图标集: { Q: string; W: string; E: string; R: string; D: string }): void {
+  DzSetUnitAbilityArt(unit, Q技能ID, 图标集.Q);
+  DzSetUnitAbilityArt(unit, W技能ID, 图标集.W);
+  DzSetUnitAbilityArt(unit, E技能ID, 图标集.E);
+  DzSetUnitAbilityArt(unit, R技能ID, 图标集.R);
+  DzSetUnitAbilityArt(unit, D技能ID, 图标集.D);
 }
 
 /** 光 H00F → 暗 H00G */
@@ -97,11 +134,16 @@ function 光形态切换为暗(this: void, unit: any): void {
   registerManualBuff(unit, 阿伦劳特BuffID.裁决圣剑形态, 999, 0);
   移除单位指定Buff(unit, 阿伦劳特BuffID.光之圣剑形态);
 
-  // 2. 重设最大生命
-  重设形态最大生命(unit);
+  // 2. 形态切换只治疗已损失生命，不修改最大生命
 
-  // 3. 技能图标更新：源 JASS 用 YDWESetUnitAbilityDataString(204) 更新 Q/W/E/R/D 图标；
-  //    图标属本地表现（仅本机可见），项目不在同步路径处理，故跳过。
+  // 3. 更新技能图标为暗形态（源 切换.j：YDWESetUnitAbilityDataString 204 → 项目 japi.DzSetUnitAbilityArt）
+  更新形态图标(unit, {
+    Q: D配置.图标.暗Q,
+    W: D配置.图标.暗W,
+    E: D配置.图标.暗E,
+    R: D配置.图标.暗R,
+    D: D配置.图标.暗D,
+  });
 
   // 4. 播放切换特效（挂 origin，2 秒后自动销毁）
   createTimedUnitEffect(unit, "origin", D配置.光切暗特效A, D配置.切换特效持续秒);
@@ -114,7 +156,7 @@ function 光形态切换为暗(this: void, unit: any): void {
   调整玩家属性(unit, D配置.暗受到治疗加成属性名, D配置.暗受到治疗加成);
 
   // 6. 恢复已损失生命的 15%
-  const 已损失生命 = Math.max(0, GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) - GetUnitStateJass(unit, UNIT_STATE_LIFE));
+  const 已损失生命 = 取非负数(读取最大生命(unit) - 读取当前生命(unit));
   doHeal({
     HealSource: unit,
     HealTarget: unit,
@@ -130,9 +172,9 @@ function 光形态切换为暗(this: void, unit: any): void {
     临时调整攻击(unit, 加攻量);
     添加原生Buff持续(unit, 切换加攻BuffID, D配置.切换加攻持续秒);
     registerManualBuff(unit, 阿伦劳特BuffID.切换加攻, 2, 0);
-    addDelayedCallback(Math.round(D配置.切换加攻持续秒 * 1000), () => {
-      临时调整攻击(unit, -加攻量);
-      移除原生Buff(unit, 切换加攻BuffID);
+    addDelayedCallback(取四舍五入整数(D配置.切换加攻持续秒 * 1000), 切换加攻到期, {
+      单位: unit,
+      加攻量,
     });
   }
 }
@@ -148,10 +190,16 @@ function 暗形态切换为光(this: void, unit: any): void {
   移除单位指定Buff(unit, 阿伦劳特BuffID.裁决圣剑形态);
   移除单位指定Buff(unit, 阿伦劳特BuffID.切换加攻);
 
-  // 2. 重设最大生命
-  重设形态最大生命(unit);
+  // 2. 形态切换不修改最大生命
 
-  // 3. 技能图标更新：本地表现，跳过（同光切暗）。
+  // 3. 更新技能图标为光形态（源 切换.j：YDWESetUnitAbilityDataString 204 → 项目 japi.DzSetUnitAbilityArt）
+  更新形态图标(unit, {
+    Q: D配置.图标.光Q,
+    W: D配置.图标.光W,
+    E: D配置.图标.光E,
+    R: D配置.图标.光R,
+    D: D配置.图标.光D,
+  });
 
   // 4. 播放切换特效（挂 origin，2 秒后自动销毁）
   createTimedUnitEffect(unit, "origin", D配置.暗切光特效A, D配置.切换特效持续秒);

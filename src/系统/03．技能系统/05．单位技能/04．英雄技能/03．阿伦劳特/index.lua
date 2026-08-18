@@ -25,7 +25,7 @@ do
     end
 end
 do
-    local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.03．阿伦劳特.02．神圣护甲与裁决护盾")
+    local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.03．阿伦劳特.02．W技能")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue
@@ -50,6 +50,14 @@ do
 end
 do
     local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.03．阿伦劳特.05．D技能")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.03．技能系统.05．单位技能.04．英雄技能.03．阿伦劳特.06．E技能")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

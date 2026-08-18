@@ -6,6 +6,8 @@ local _____6B27_5C14_8D1D_514B_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_
 local ____00A_FF0E_8868_73B0_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.10．欧尔贝克.00A．表现工具")
 local _____64AD_653E_6B27_5C14_8D1D_514B_5355_4F4D_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放欧尔贝克单位音效"]
 local _____64AD_653E_6B27_5C14_8D1D_514B_914D_7F6E_52A8_4F5C = ____00A_FF0E_8868_73B0_5DE5_5177["播放欧尔贝克配置动作"]
+local ____17_FF0E_6B27_5C14_8D1D_514B = require("系统.05．Buff系统.03．Buff表.02．英雄.17．欧尔贝克")
+local _____6B27_5C14_8D1D_514BBuffID = ____17_FF0E_6B27_5C14_8D1D_514B["欧尔贝克BuffID"]
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
@@ -35,6 +37,8 @@ local isUnitEnemy = ____require_result_10.isUnitEnemy
 local ____require_result_11 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____5355_4F4D_62E5_6709_539F_751FBuff = ____require_result_11["单位拥有原生Buff"]
 local _____5355_4F4D_662F_6307_5B9A_7C7B_578B = ____require_result_11["单位是指定类型"]
+local ____require_result_12 = require("系统.05．Buff系统.00．Buff系统")
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_12["移除单位指定Buff"]
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -254,6 +258,7 @@ local function ____on_6B27_5C14_8D1D_514BQ(caster, abilityId)
     local _____5341_5B57_65A9 = _____5355_4F4D_62E5_6709_539F_751FBuff(caster, _____79EF_6512Buff_7C7B_578BID)
     if _____5341_5B57_65A9 then
         UnitRemoveAbility(caster, _____79EF_6512Buff_7C7B_578BID)
+        _____79FB_9664_5355_4F4D_6307_5B9ABuff(caster, _____6B27_5C14_8D1D_514BBuffID["积攒"])
         _____64AD_653E_6B27_5C14_8D1D_514B_5355_4F4D_97F3_6548(caster, cfg["十字全局音效键"])
     else
         _____64AD_653E_6B27_5C14_8D1D_514B_5355_4F4D_97F3_6548(caster, cfg["全局音效键"])

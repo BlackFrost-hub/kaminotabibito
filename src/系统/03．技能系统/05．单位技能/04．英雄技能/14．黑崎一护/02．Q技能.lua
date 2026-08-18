@@ -12,6 +12,7 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local removePeriodicCallback = ____require_result_0.removePeriodicCallback
@@ -21,8 +22,8 @@ local ____require_result_2 = require("系统.03．技能系统.05．单位技能
 local _____83B7_53D6_8303_56F4_654C_519B = ____require_result_2["获取范围敌军"]
 local ____require_result_3 = require("平台扩展API动作")
 local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_3["技能_设置技能冷却时间"]
-local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_CooPlayReuse = ____require_result_4.Sound3DII_CooPlayReuse
+local ____require_result_4 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundAtPointBJ = ____require_result_4.PlaySoundAtPointBJ
 local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
 local _____9500_6BC1_70B9_7279_6548 = ____require_result_5["销毁点特效"]
@@ -34,7 +35,6 @@ local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetOwningPlayer = jass.GetOwningPlayer
 local GetHandleId = jass.GetHandleId
 local Atan2 = jass.Atan2
 local Cos = jass.Cos
@@ -102,8 +102,8 @@ local function _____7ED3_7B97Q_6708_7259_78B0_649E(ctx)
     local _____4F24_5BB3 = ctx["攻击力快照"] * _____53C2_6570["伤害攻击力倍率"]
     if ctx["卍解"] then
         YDUserDataSetSafe(
-            "player",
-            GetOwningPlayer(caster),
+            "unit",
+            caster,
             "无视护甲",
             "boolean",
             true
@@ -143,8 +143,8 @@ local function _____7ED3_7B97Q_6708_7259_78B0_649E(ctx)
     end
     if ctx["卍解"] then
         YDUserDataSetSafe(
-            "player",
-            GetOwningPlayer(caster),
+            "unit",
+            caster,
             "无视护甲",
             "boolean",
             false
@@ -202,12 +202,19 @@ local function _____91CA_653EQ_6708_7259_5929_51B2(context, caster, _____6280_80
     local _____89D2_5EA6 = _____8BA1_7B97_4E24_70B9_89D2_5EA6(sx, sy, tx, ty)
     local _____534D_89E3 = _____9ED1_5D0E_4E00_62A4_662F_5426_534D_89E3(caster)
     local _____53C2_6570 = _____534D_89E3 and _____914D_7F6E.Q["解放后"] or _____914D_7F6E.Q["未解放"]
-    Sound3DII_CooPlayReuse(
-        _____53C2_6570["音效"]["路径"],
+    local _____534D_89E3_8
+    if _____534D_89E3 then
+        _____534D_89E3_8 = jglobals.gg_snd_YH_yueya
+    else
+        _____534D_89E3_8 = jglobals.gg_snd_yueyatianchongyinxiao
+    end
+    local _____6708_7259_97F3_6548 = _____534D_89E3_8
+    PlaySoundAtPointBJ(
+        _____6708_7259_97F3_6548,
+        100,
         sx,
         sy,
-        0,
-        _____53C2_6570["音效"]["裁断距离"]
+        0
     )
     context["施法者"] = caster
     context.X = sx

@@ -39,6 +39,7 @@ local stringToFourCCSafe = ____require_result_10.stringToFourCCSafe
 local ____D_6280_80FDID = stringToFourCCSafe(_____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E["D技能ID"])
 local _____63D0_7C73_8BFA_65AF_5355_4F4DID = stringToFourCCSafe(_____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local EXSetUnitMoveType = japi.EXSetUnitMoveType
+local SetUnitAnimation = jass.SetUnitAnimation
 local _____63D0_7C73_8BFA_65AFD_6280_80FD_5B9E_4F8B_8868 = {}
 local function ____on_63D0_7C73_8BFA_65AFD_6700_7EC8_4F24_5BB3(_target, attacker, applied, snapshot)
     local ____opt_result_13
@@ -149,7 +150,7 @@ local function ____on_63D0_7C73_8BFA_65AFD(caster, abilityId)
     }
     _____5F00_59CB_786C_76F4(caster, cfg["硬直秒"])
     EXSetUnitMoveType(caster, 4)
-    jass.ResetUnitAnimation(caster)
+    SetUnitAnimation(caster, "stand")
     jass.SetUnitTimeScale(caster, cfg["动作速度"])
     _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(
         caster,

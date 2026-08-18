@@ -83,15 +83,17 @@ local function _____91CA_653E_77AC_6B65(context, caster, ______6280_80FD_5B9E_4F
         local ty = GetSpellTargetY()
         local dx = tx - x
         local dy = ty - y
-        local _____70B9_8DDD = SquareRoot(dx * dx + dy * dy)
-        local _____5B9E_9645_8DDD_79BB = _____70B9_8DDD < _____77AC_6B65_8DDD_79BB and _____70B9_8DDD or _____77AC_6B65_8DDD_79BB
         local _____89D2_5EA6 = Atan2(dy, dx) * bj_RADTODEG
-        _____76EE_6807X = x + MathCos(_____89D2_5EA6) * _____5B9E_9645_8DDD_79BB
-        _____76EE_6807Y = y + MathSin(_____89D2_5EA6) * _____5B9E_9645_8DDD_79BB
+        _____76EE_6807X = x + MathCos(_____89D2_5EA6) * _____77AC_6B65_8DDD_79BB
+        _____76EE_6807Y = y + MathSin(_____89D2_5EA6) * _____77AC_6B65_8DDD_79BB
     end
+    local _____4F4D_79FBX = _____76EE_6807X - x
+    local _____4F4D_79FBY = _____76EE_6807Y - y
+    local _____5B9E_9645_4F4D_79FB_8DDD_79BB = SquareRoot(_____4F4D_79FBX * _____4F4D_79FBX + _____4F4D_79FBY * _____4F4D_79FBY)
     _____5F00_59CB_51B2_950B(caster, {
         ["目标X"] = _____76EE_6807X,
         ["目标Y"] = _____76EE_6807Y,
+        ["距离"] = _____5B9E_9645_4F4D_79FB_8DDD_79BB,
         ["持续时间"] = _____914D_7F6E.D["冲锋持续时间秒"],
         ["检查地形"] = true,
         ["禁用碰撞"] = true

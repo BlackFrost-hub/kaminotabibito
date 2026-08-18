@@ -11,6 +11,7 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, params: any) => boolean;
@@ -27,8 +28,8 @@ const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
 };
-const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+const { PlaySoundAtPointBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundAtPointBJ: (this: void, soundHandle: any, volumePercent: number, x: number, y: number, z: number) => void;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
@@ -91,7 +92,7 @@ function 释放灵压爆发(this: void, _context: W上下文, caster: any, 技�
   if (连携) {
     创建点特效({ 模型路径: 配置.W.连携.附加特效.模型, X: x, Y: y, Z: 0, 缩放: 配置.W.连携.附加特效.缩放, 持续秒: 配置.W.连携.附加特效.持续秒 });
   }
-  Sound3DII_CooPlayReuse(配置.W.音效.路径, x, y, 0, 配置.W.音效.裁断距离);
+  PlaySoundAtPointBJ(jglobals.gg_snd_ThunderClapCaster, 100, x, y, 0);
 
   const 伤害 = 读取单位攻击力(caster) * 配置.W.伤害攻击力倍率;
   for (let i = 0; i < 敌军.length; i++) {

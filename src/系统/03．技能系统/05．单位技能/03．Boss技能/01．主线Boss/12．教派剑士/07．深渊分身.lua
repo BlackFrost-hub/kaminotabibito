@@ -439,6 +439,5 @@ ____exports["注册教派剑士深渊分身"] = function()
     _____6DF1_6E0A_5206_8EAB_5DF2_6CE8_518C = true
     registerSpellEffectListener(____on_6559_6D3E_5251_58EB_6DF1_6E0A_5206_8EAB_751F_6548)
     registerDamageModifier(_____6DF1_6E0A_5206_8EAB_4F24_5BB3_4FEE_6B63, _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E["深渊分身"]["分身伤害修正优先级"])
-    debugLogForce("教派剑士-深渊分身", "技能壳与分身伤害修正监听注册完成", "skillId=", _____6DF1_6E0A_5206_8EAB_6280_80FDID)
 end
 return ____exports

@@ -1,7 +1,9 @@
 /** @noSelfInFile */
 
 import { 八云紫单位技能配置 } from "../00．配置";
-import { 是八云紫, 计算裂隙可达终点, 创建八云紫裂隙 } from "../07．公共与单位壳/01．裂隙系统";
+import { 是八云紫, 计算裂隙可达终点, 创建八云紫裂隙, 检查八云紫D裂隙放置 } from "../07．公共与单位壳/01．裂隙系统";
+import { 播放八云紫单位音效 } from "../00A．表现工具";
+import { 八云紫诊断日志, 八云紫诊断句柄 } from "../00B．诊断";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const jass = require("jass.common") as any;
@@ -39,16 +41,25 @@ function 释放D(this: void, _context: { 英雄: any }, hero: any, skillInstance
   const startX = jass.GetUnitX(hero);
   const startY = jass.GetUnitY(hero);
   const end = 计算裂隙可达终点(startX, startY, jass.GetSpellTargetX(), jass.GetSpellTargetY());
+  const placement = 检查八云紫D裂隙放置(hero, end.x, end.y);
+  八云紫诊断日志("D", "收到D施法", "英雄", 八云紫诊断句柄(hero), "英雄X", startX, "英雄Y", startY, "目标X", jass.GetSpellTargetX(), "目标Y", jass.GetSpellTargetY(), "可达X", end.x, "可达Y", end.y, "允许创建", placement.可创建, "长期", placement.长期, "持续秒", placement.持续秒, "失败原因", placement.失败原因 ?? "无", "技能实例ID", skillInstanceId ?? 0);
+  if (!placement.可创建) {
+    jass.DisplayTimedTextToPlayer(jass.GetOwningPlayer(hero), 0, 0, 3, placement.失败原因 ?? "无法在此处放置『间隙』。 ");
+    技能_设置技能冷却时间(hero, 配置.技能.D.类型ID, 0, 5.5);
+    return;
+  }
+  for (let i = 0; i < 配置.D.展开音效键.length; i++) 播放八云紫单位音效(hero, 配置.D.展开音效键[i]);
   添加单位暂停(hero, D暂停来源);
-  jass.SetUnitAnimation(hero, "attack,2");
-  创建八云紫裂隙(hero, end.x, end.y, 配置.技能.D.类型ID, skillInstanceId);
-  addDelayedCallback(1200, 解除D硬直, hero);
+  jass.SetUnitAnimation(hero, 配置.D.施法动作);
+  const gap = 创建八云紫裂隙(hero, end.x, end.y, 配置.技能.D.类型ID, skillInstanceId);
+  八云紫诊断日志("D", "D创建间隙结果", "间隙", gap != null ? 八云紫诊断句柄(gap.单位) : 0, "实际X", gap != null ? jass.GetUnitX(gap.单位) : 0, "实际Y", gap != null ? jass.GetUnitY(gap.单位) : 0, "长期", gap?.长期 ?? false);
+  addDelayedCallback(配置.D.硬直秒 * 1000, 解除D硬直, hero);
 }
 
 function 监听D刷新(this: void, caster: any, spellAbilityId: number): void {
   if (!是八云紫(caster) || spellAbilityId === 配置.技能.D.类型ID) return;
   const maxCooldown = 技能_获取技能最大冷却时间(caster, spellAbilityId) || 0;
-  if (maxCooldown < 5.95) return;
+  if (maxCooldown <= 6) return;
   技能_设置技能冷却时间(caster, 配置.技能.D.类型ID, 0, 5.5);
 }
 

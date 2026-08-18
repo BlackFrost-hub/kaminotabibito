@@ -16,6 +16,7 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 
 const { 施加眩晕, 施加减速 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境") as {
   施加眩晕: (this: void, source: any, target: any, duration: number, name?: string, type?: "装备" | "技能") => void;
@@ -40,9 +41,6 @@ const { 获取范围敌军, 在坐标播放特效 } = require("系统.03．技�
 };
 const { createTimedUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, durationSec: number) => any;
-};
-const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
 const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -70,6 +68,15 @@ const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
 const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
 const UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE as any;
+
+// 音效按逆回十六夜模式：地图 war3map.j 已注册 gg_snd_* 句柄，直接取句柄挂单位播放（源 PlaySoundOnUnitBJ 等效）
+function 播放全局音效(this: void, unit: any, soundKey: string): void {
+  const soundHandle = jglobals[soundKey];
+  if (unit == null || unit === 0 || soundHandle == null || soundHandle === 0) return;
+  jass.AttachSoundToUnit(soundHandle, unit);
+  jass.SetSoundVolume(soundHandle, 127);
+  jass.StartSound(soundHandle);
+}
 
 const 配置 = 塞拉斯技能配置;
 const 元素配置 = 配置.元素魔法;
@@ -218,7 +225,7 @@ function 播放元素落点表现(this: void, caster: any, 元素: 塞拉斯元�
       在坐标播放特效(fx.模型路径, x, y, 0, fx.缩放, fx.持续秒);
     }
   } else if (元素 === "雷") {
-    Sound3DII_UnitPlayReuse(元素配置.雷击.目标音效.路径, caster, 元素配置.雷击.目标音效.裁断距离);
+    播放全局音效(caster, 元素配置.雷击.目标音效键);
     在坐标播放特效(元素配置.雷击.落点特效.模型路径, x, y, 0, 元素配置.雷击.落点特效.缩放, 元素配置.雷击.落点特效.持续秒);
   }
 }
@@ -293,14 +300,11 @@ function 取元素伤害类型基数(this: void, 元素: 塞拉斯元素): { 基
 
 function 播放元素施法音效(this: void, caster: any, 元素: 塞拉斯元素, 是大魔法: boolean): void {
   if (元素 === "冰") {
-    const snd = 是大魔法 ? 元素配置.冰冻.音效大魔法 : 元素配置.冰冻.音效普通;
-    Sound3DII_UnitPlayReuse(snd.路径, caster, snd.裁断距离);
+    播放全局音效(caster, 是大魔法 ? 元素配置.冰冻.音效大魔法键 : 元素配置.冰冻.音效普通键);
   } else if (元素 === "雷") {
-    const snd = 是大魔法 ? 元素配置.雷击.音效大魔法 : 元素配置.雷击.音效普通;
-    Sound3DII_UnitPlayReuse(snd.路径, caster, snd.裁断距离);
+    播放全局音效(caster, 是大魔法 ? 元素配置.雷击.音效大魔法键 : 元素配置.雷击.音效普通键);
   } else {
-    const snd = 是大魔法 ? 元素配置.火焰.音效大魔法 : 元素配置.火焰.音效普通;
-    Sound3DII_UnitPlayReuse(snd.路径, caster, snd.裁断距离);
+    播放全局音效(caster, 是大魔法 ? 元素配置.火焰.音效大魔法键 : 元素配置.火焰.音效普通键);
   }
 }
 
@@ -416,9 +420,8 @@ function 释放W大魔法化(this: void, _context: W上下文, caster: any): voi
   if (state == null) return;
   if (state.大魔法化) return; // 重复施法不叠加，旧状态由消费逻辑管理
 
-  for (let i = 0; i < 配置.W.音效.length; i++) {
-    const snd = 配置.W.音效[i];
-    Sound3DII_UnitPlayReuse(snd.路径, caster, snd.裁断距离);
+  for (let i = 0; i < 配置.W.音效键.length; i++) {
+    播放全局音效(caster, 配置.W.音效键[i]);
   }
   const x = GetUnitX(caster);
   const y = GetUnitY(caster);
@@ -427,9 +430,16 @@ function 释放W大魔法化(this: void, _context: W上下文, caster: any): voi
     在坐标播放特效(fx.模型路径, x, y, 0, fx.缩放, fx.持续秒);
   }
 
-  // 同步置大魔法化状态；审计：源 JASS 直接改真实冷却为 0.05，TS 禁止，只记状态
+  // 同步置大魔法化状态
   state.大魔法化 = true;
   registerManualBuff(caster, 塞拉斯BuffID.大魔法化, 60, 1, { stack: 1 });
+
+  // 源 JASS：W 施放时将 A0JT/A0JR/A0JQ/A0JS 剩余冷却置 0.05（介绍：刷新魔法知识 Q 冷却）。
+  // 同步冷却刷新属真实游戏数据，同步执行。
+  技能_设置技能冷却时间(caster, Q入口类型ID, 配置.W.刷新冷却秒, 配置.W.刷新冷却秒);
+  技能_设置技能冷却时间(caster, 元素配置.火焰技能类型ID, 配置.W.刷新冷却秒, 配置.W.刷新冷却秒);
+  技能_设置技能冷却时间(caster, 元素配置.冰冻技能类型ID, 配置.W.刷新冷却秒, 配置.W.刷新冷却秒);
+  技能_设置技能冷却时间(caster, 元素配置.雷击技能类型ID, 配置.W.刷新冷却秒, 配置.W.刷新冷却秒);
 
   // W 冷却按等级：20 - 0.5 × 技能等级（技能自身定义，同步设置）
   const W等级 = GetUnitAbilityLevel(caster, 配置.W.技能类型ID);

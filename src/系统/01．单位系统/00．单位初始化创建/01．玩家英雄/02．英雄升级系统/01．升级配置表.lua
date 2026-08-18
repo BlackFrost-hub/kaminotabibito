@@ -17,7 +17,13 @@ ____exports["英雄升级配置列表"] = {
         {level = 15, abilityId = "A0ED"},
         {level = 30, abilityId = "A0EB"}
     }},
-    {heroId = "H00I", heroName = "LV6", properName = "矢量操作", awakeningSkills = {{level = 2, abilityId = "A0DU"}, {level = 5, abilityId = "A0DV"}, {level = 10, abilityId = "A0DW"}, {level = 15, abilityId = "A0DX"}}},
+    {
+        heroId = "H00I",
+        heroName = "LV6",
+        properName = "矢量操作",
+        extraAttrs = {{level = 1, repeatEveryLevel = true, skillDamageBonus = 0.01, note = "一方通行每次英雄升级额外提高1%技能伤害。"}},
+        awakeningSkills = {{level = 2, abilityId = "A0DU"}, {level = 5, abilityId = "A0DV"}, {level = 10, abilityId = "A0DW"}, {level = 15, abilityId = "A0DX"}}
+    },
     {heroId = "H00S", heroName = "无名武士", properName = "无名的武士", awakeningSkills = {{level = 2, abilityId = "A0GS"}, {level = 5, abilityId = "A0GQ"}, {level = 10, abilityId = "A0GV"}, {level = 15, abilityId = "A0GP"}}},
     {heroId = "E001", heroName = "女仆", properName = "完美潇洒的女仆", awakeningSkills = {{level = 2, abilityId = "A00Q"}, {level = 5, abilityId = "A00U"}, {level = 10, abilityId = "A00Z"}, {level = 15, abilityId = "A00Y"}}},
     {heroId = "H00P", heroName = "永远17岁的少女", properName = "妖怪の贤者", awakeningSkills = {{level = 2, abilityId = "A0FV"}, {level = 5, abilityId = "A0FU"}, {level = 10, abilityId = "A0FW"}, {level = 15, abilityId = "A0FT"}}},

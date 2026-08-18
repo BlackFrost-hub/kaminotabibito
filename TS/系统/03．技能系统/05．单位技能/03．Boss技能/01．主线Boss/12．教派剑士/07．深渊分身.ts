@@ -290,5 +290,4 @@ export function 注册教派剑士深渊分身(this: void): void {
   深渊分身已注册 = true;
   registerSpellEffectListener(on教派剑士深渊分身生效);
   registerDamageModifier(深渊分身伤害修正, 教派剑士技能配置.深渊分身.分身伤害修正优先级);
-  debugLogForce('教派剑士-深渊分身', '技能壳与分身伤害修正监听注册完成', 'skillId=', 深渊分身技能ID);
 }

@@ -48,6 +48,10 @@ const { 读取单位攻击力, 两点角度 } = require("系统.03．技能系�
   读取单位攻击力: (this: void, unit: any) => number;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
 };
+// GetRandomDirectionDeg 是 Blizzard.j 函数，从 BJ 函数库取（jass.common 取到的是 nil）
+const { GetRandomDirectionDeg } = require("lib.扩展函数.BJ函数.07．杂项") as {
+  GetRandomDirectionDeg: (this: void) => number;
+};
 
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -67,7 +71,6 @@ const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animat
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
 const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 const GetRandomReal = jass.GetRandomReal as (this: void, min: number, max: number) => number;
-const GetRandomDirectionDeg = jass.GetRandomDirectionDeg as (this: void) => number;
 const SquareRoot = jass.SquareRoot as (this: void, value: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const Sin = jass.Sin as (this: void, radians: number) => number;

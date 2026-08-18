@@ -46,7 +46,7 @@ local SetUnitX = jass.SetUnitX
 local SetUnitY = jass.SetUnitY
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
-local ResetUnitAnimation = jass.ResetUnitAnimation
+local SetUnitAnimation = jass.SetUnitAnimation
 local UnitAddAbility = jass.UnitAddAbility
 local UnitRemoveAbility = jass.UnitRemoveAbility
 local SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable
@@ -66,17 +66,27 @@ end
 local function _____83B7_53D6Q_8FD0_884C_65F6(unit)
     return ____Q_8FD0_884C_65F6_8868[_____53D6_5355_4F4DID(unit)]
 end
+local function _____505C_6B62Q_5F53_524D_79FB_52A8(unit)
+    local id = _____53D6_5355_4F4DID(unit)
+    local runtime = ____Q_8FD0_884C_65F6_8868[id]
+    if runtime == nil then
+        return
+    end
+    if runtime.tickId ~= 0 then
+        removePeriodicCallback(runtime.tickId)
+        runtime.tickId = 0
+    end
+    SetUnitAnimation(unit, "stand")
+    EXSetUnitMoveType(unit, 2)
+end
 local function _____505C_6B62_77E2_91CF_79FB_52A8(unit)
     local id = _____53D6_5355_4F4DID(unit)
     local runtime = ____Q_8FD0_884C_65F6_8868[id]
     if runtime == nil or not runtime.active then
         return
     end
+    _____505C_6B62Q_5F53_524D_79FB_52A8(unit)
     runtime.active = false
-    if runtime.tickId ~= 0 then
-        removePeriodicCallback(runtime.tickId)
-        runtime.tickId = 0
-    end
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(unit, _____4E00_65B9_901A_884CBuffID["矢量移动"])
     UnitRemoveAbility(unit, ____Q_5173_95ED_6280_80FDID)
     UnitRemoveAbility(unit, ____Q_72B6_6001_6280_80FDID)
@@ -85,8 +95,6 @@ local function _____505C_6B62_77E2_91CF_79FB_52A8(unit)
         ____Q_6280_80FDID,
         true
     )
-    ResetUnitAnimation(unit)
-    EXSetUnitMoveType(unit, 2)
     __TS__Delete(____Q_8FD0_884C_65F6_8868, id)
 end
 local function _____77E2_91CF_79FB_52A8Tick(variable)
@@ -110,7 +118,7 @@ local function _____77E2_91CF_79FB_52A8Tick(variable)
     local dy = runtime.targetY - currentY
     local distance = math.sqrt(dx * dx + dy * dy)
     if distance <= _____914D_7F6E["到达距离"] then
-        _____505C_6B62_77E2_91CF_79FB_52A8(caster)
+        _____505C_6B62Q_5F53_524D_79FB_52A8(caster)
         return
     end
     local angle = math.atan(dy, dx) * 180 / math.pi
@@ -134,7 +142,7 @@ local function _____77E2_91CF_79FB_52A8Tick(variable)
         ["持续秒"] = _____914D_7F6E["尾迹持续秒"]
     })
     if next["实际步数"] <= 0 then
-        _____505C_6B62_77E2_91CF_79FB_52A8(caster)
+        _____505C_6B62Q_5F53_524D_79FB_52A8(caster)
         return
     end
     SetUnitX(caster, next["最终X"])

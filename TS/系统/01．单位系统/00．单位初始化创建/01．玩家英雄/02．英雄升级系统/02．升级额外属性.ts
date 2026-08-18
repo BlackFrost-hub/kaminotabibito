@@ -5,6 +5,9 @@ const japi = require("jass.japi") as any;
 const { 获取单位英雄Rawcode } = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具") as {
   获取单位英雄Rawcode: (this: void, unit: any) => string;
 };
+const { 调整玩家属性 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令") as {
+  调整玩家属性: (this: void, unit: any, attrName: string, delta: number) => void;
+};
 
 const { 通用升级额外属性配置, 获取英雄升级配置 } = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.02．英雄升级系统.01．升级配置表") as {
   通用升级额外属性配置: readonly import("./00．类型定义").升级额外属性配置[];
@@ -39,6 +42,9 @@ function 应用单条额外属性规则(this: void, unit: any, level: number, ru
 
   if (rule.attackBonus != null && rule.attackBonus !== 0) {
     增加单位状态(unit, jass.ConvertUnitState(UNIT_STATE_ATTACK1_BASE), rule.attackBonus);
+  }
+  if (rule.skillDamageBonus != null && rule.skillDamageBonus !== 0) {
+    调整玩家属性(unit, "技能伤害", rule.skillDamageBonus);
   }
   if (rule.manaRegenBonus != null && rule.manaRegenBonus !== 0) {
     增加单位状态(unit, jass.ConvertUnitState(UNIT_STATE_MANA_REGEN), rule.manaRegenBonus);

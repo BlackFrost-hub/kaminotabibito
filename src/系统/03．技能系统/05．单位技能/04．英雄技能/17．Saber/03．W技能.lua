@@ -66,7 +66,6 @@ local SetUnitY = jass.SetUnitY
 local SetUnitTimeScale = jass.SetUnitTimeScale
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitAnimation = jass.SetUnitAnimation
-local ResetUnitAnimation = jass.ResetUnitAnimation
 local SetUnitPathing = jass.SetUnitPathing
 local IsTerrainPathable = jass.IsTerrainPathable
 local IsUnitInRange = jass.IsUnitInRange
@@ -575,7 +574,7 @@ local function ____W_76EE_6807_786C_76F4_8868_73B0_6062_590D(variable)
     if target == nil or target == 0 or not _____5355_4F4D_5B58_6D3B(target) then
         return
     end
-    ResetUnitAnimation(target)
+    SetUnitAnimation(target, "stand")
     SetUnitTimeScale(target, 1)
 end
 local function _____63A8_8FDBW_654C_4EBA_8FFD_51FB(variable)

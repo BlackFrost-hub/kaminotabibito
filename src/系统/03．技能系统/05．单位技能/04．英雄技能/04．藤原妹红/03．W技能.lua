@@ -115,11 +115,8 @@ local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_9["造�
 local ____require_result_10 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_10.registerDeathListener
 local jass = require("jass.common")
-local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_11.debugLogForce
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
-local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
@@ -141,9 +138,9 @@ WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
-local ____require_result_12 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____4E24_70B9_89D2_5EA6 = ____require_result_12["两点角度"]
-local _____8DDD_79BBXY = ____require_result_12["距离XY"]
+local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____4E24_70B9_89D2_5EA6 = ____require_result_11["两点角度"]
+local _____8DDD_79BBXY = ____require_result_11["距离XY"]
 local _____85E4_539F_59B9_7EA2_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local _____4E3B_6280_80FDID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["主技能ID"])
 _____5F15_7206_6280_80FDID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["引爆技能ID"])
@@ -152,18 +149,11 @@ local _____85E4_539F_59B9_7EA2W_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
 local _____7B26_5361W_6280_80FDID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡W技能ID"])
 local _____85E4_539F_59B9_7EA2_7B26_5361W_4E0A_4E0B_6587_8868 = {}
 local _____85E4_539F_59B9_7EA2_7B26_5361W_4F4D_79FB_8868 = {}
-local _____7B26_5361W_8BCA_65AD_6A21_5757 = "藤原妹红符卡W诊断"
 local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
     if unit == nil or unit == 0 then
         return 0
     end
     return GetHandleId(unit) or 0
-end
-local function _____8BFB_53D6_7B26_5361W_6280_80FD_7B49_7EA7(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetUnitAbilityLevel(unit, _____7B26_5361W_6280_80FDID)
 end
 ____exports["获取或创建藤原妹红W上下文"] = function(unit)
     local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
@@ -187,13 +177,13 @@ ____exports["获取或创建藤原妹红W上下文"] = function(unit)
 end
 local function _____83B7_53D6_85E4_539F_59B9_7EA2W_4E0A_4E0B_6587(unit)
     local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    local ____temp_13
+    local ____temp_12
     if unitId == 0 then
-        ____temp_13 = nil
+        ____temp_12 = nil
     else
-        ____temp_13 = _____85E4_539F_59B9_7EA2W_4E0A_4E0B_6587_8868[unitId]
+        ____temp_12 = _____85E4_539F_59B9_7EA2W_4E0A_4E0B_6587_8868[unitId]
     end
-    return ____temp_13
+    return ____temp_12
 end
 local function _____6E05_7406_85E4_539F_59B9_7EA2W_72B6_6001(unit, shieldId)
     local context = _____83B7_53D6_85E4_539F_59B9_7EA2W_4E0A_4E0B_6587(unit)
@@ -378,29 +368,13 @@ local function _____85E4_539F_59B9_7EA2_7B26_5361W_63A8_8FDBTick(variable)
         local targetY = GetUnitY(context["目标"])
         local effectX = targetX + Cos(context["方向角"] * BJ_DEGTORAD) * cfg["击退距离"]
         local effectY = targetY + Sin(context["方向角"] * BJ_DEGTORAD) * cfg["击退距离"]
-        local successCount = 0
         do
             local i = 0
             while i < #cfg["命中特效"] do
-                local effect = _____521B_5EFA_85E4_539F_59B9_7EA2_70B9_7279_6548(cfg["命中特效"][i + 1], effectX, effectY, context["方向角"])
-                if effect ~= nil and effect ~= 0 then
-                    successCount = successCount + 1
-                end
+                _____521B_5EFA_85E4_539F_59B9_7EA2_70B9_7279_6548(cfg["命中特效"][i + 1], effectX, effectY, context["方向角"])
                 i = i + 1
             end
         end
-        debugLogForce(
-            _____7B26_5361W_8BCA_65AD_6A21_5757,
-            "推进命中特效",
-            "请求数",
-            #cfg["命中特效"],
-            "成功数",
-            successCount,
-            "X",
-            effectX,
-            "Y",
-            effectY
-        )
     end
     if context["推进总计时秒"] < cfg["击退持续秒"] then
         return
@@ -422,12 +396,12 @@ local function _____85E4_539F_59B9_7EA2_7B26_5361W_76EE_6807_4F4D_79FB_7ED3_675F
         while i < #context["位移ID列表"] do
             do
                 if context["位移ID列表"][i + 1] ~= displacementId then
-                    goto __continue62
+                    goto __continue59
                 end
                 __TS__ArraySplice(context["位移ID列表"], i, 1)
                 break
             end
-            ::__continue62::
+            ::__continue59::
             i = i + 1
         end
     end
@@ -482,14 +456,6 @@ local function _____7ED3_7B97_85E4_539F_59B9_7EA2_7B26_5361W(context)
     local cfg = _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡W"]
     local caster = context["施法者"]
     local target = context["目标"]
-    debugLogForce(
-        _____7B26_5361W_8BCA_65AD_6A21_5757,
-        "进入符卡W结算",
-        "施法者",
-        _____53D6_5355_4F4D_53E5_67C4ID(caster),
-        "目标",
-        _____53D6_5355_4F4D_53E5_67C4ID(target)
-    )
     local targetX = GetUnitX(target)
     local targetY = GetUnitY(target)
     local nearTargetX = targetX - Cos(context["方向角"] * BJ_DEGTORAD) * cfg["贴近目标距离"]
@@ -503,14 +469,6 @@ local function _____7ED3_7B97_85E4_539F_59B9_7EA2_7B26_5361W(context)
         targetY
     )
     if casterTargetDistance >= 250 then
-        debugLogForce(
-            _____7B26_5361W_8BCA_65AD_6A21_5757,
-            "符卡W结算提前退出",
-            "原因",
-            "移动后仍与目标距离过远",
-            "距离",
-            casterTargetDistance
-        )
         _____6E05_7406_85E4_539F_59B9_7EA2_7B26_5361W(context)
         return
     end
@@ -522,16 +480,14 @@ local function _____7ED3_7B97_85E4_539F_59B9_7EA2_7B26_5361W(context)
         GetUnitY(caster),
         cfg["搜索范围"]
     )
-    local hitCount = 0
     do
         local i = 0
         while i < #targets do
             do
                 local hitTarget = targets[i + 1]
                 if not _____7B26_5361W_76EE_6807_5141_8BB8_547D_4E2D(caster, hitTarget) then
-                    goto __continue75
+                    goto __continue72
                 end
-                hitCount = hitCount + 1
                 _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
                     ["来源"] = caster,
                     ["目标"] = hitTarget,
@@ -564,47 +520,22 @@ local function _____7ED3_7B97_85E4_539F_59B9_7EA2_7B26_5361W(context)
                 })
                 if displacementId > 0 then
                     context["剩余位移数"] = context["剩余位移数"] + 1
-                    local ____context__4F4D_79FBID_5217_8868_14 = context["位移ID列表"]
-                    ____context__4F4D_79FBID_5217_8868_14[#____context__4F4D_79FBID_5217_8868_14 + 1] = displacementId
+                    local ____context__4F4D_79FBID_5217_8868_13 = context["位移ID列表"]
+                    ____context__4F4D_79FBID_5217_8868_13[#____context__4F4D_79FBID_5217_8868_13 + 1] = displacementId
                     _____85E4_539F_59B9_7EA2_7B26_5361W_4F4D_79FB_8868[displacementId] = context
                 end
             end
-            ::__continue75::
+            ::__continue72::
             i = i + 1
         end
     end
-    debugLogForce(
-        _____7B26_5361W_8BCA_65AD_6A21_5757,
-        "符卡W命中目标统计",
-        "枚举数",
-        #targets,
-        "合法命中数",
-        hitCount
-    )
     context["推进回调ID"] = addPeriodicCallback(cfg["推进表现间隔毫秒"], _____85E4_539F_59B9_7EA2_7B26_5361W_63A8_8FDBTick, context)
 end
 local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361W(_context, caster, skillInstanceId)
     local target = GetSpellTargetUnit()
     local casterValid = _____5355_4F4D_6709_6548(caster)
     local targetValid = _____5355_4F4D_6709_6548(target)
-    debugLogForce(
-        _____7B26_5361W_8BCA_65AD_6A21_5757,
-        "进入符卡W入口",
-        "施法者",
-        _____53D6_5355_4F4D_53E5_67C4ID(caster),
-        "单位类型",
-        casterValid and GetUnitTypeId(caster) or 0,
-        "符卡W技能等级",
-        _____8BFB_53D6_7B26_5361W_6280_80FD_7B49_7EA7(caster),
-        "目标",
-        _____53D6_5355_4F4D_53E5_67C4ID(target),
-        "施法者有效",
-        casterValid,
-        "目标有效",
-        targetValid
-    )
     if not casterValid or not targetValid then
-        debugLogForce(_____7B26_5361W_8BCA_65AD_6A21_5757, "符卡W提前退出", "原因", not casterValid and "施法者无效" or "目标无效")
         return
     end
     local casterId = _____53D6_5355_4F4D_53E5_67C4ID(caster)
@@ -615,17 +546,7 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361W(_context, caster, s
     _____5173_95ED_85E4_539F_59B9_7EA2_7B26_5361_6A21_5F0F(caster, true)
     local cfg = _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡W"]
     _____64AD_653E_85E4_539F_59B9_7EA2_5355_4F4D_97F3_6548(caster, cfg["全局音效键"])
-    local targetWarningEffect = _____521B_5EFA_85E4_539F_59B9_7EA2_5355_4F4D_7279_6548(target, {["模型路径"] = cfg["目标预警特效"], ["持续秒"] = cfg["命中延迟秒"]}, "origin")
-    debugLogForce(
-        _____7B26_5361W_8BCA_65AD_6A21_5757,
-        "目标预警特效创建",
-        "目标",
-        _____53D6_5355_4F4D_53E5_67C4ID(target),
-        "路径",
-        cfg["目标预警特效"],
-        "成功",
-        targetWarningEffect ~= nil and targetWarningEffect ~= 0
-    )
+    _____521B_5EFA_85E4_539F_59B9_7EA2_5355_4F4D_7279_6548(target, {["模型路径"] = cfg["目标预警特效"], ["持续秒"] = cfg["命中延迟秒"]}, "origin")
     local _____65B9_5411_89D2 = _____4E24_70B9_89D2_5EA6(
         GetUnitX(caster),
         GetUnitY(caster),
@@ -637,16 +558,6 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361W(_context, caster, s
     _____5F00_59CB_786C_76F4(caster, cfg["硬直秒"])
     _____64AD_653E_85E4_539F_59B9_7EA2_914D_7F6E_52A8_4F5C(caster, cfg["动作编号"], cfg["动作速度"])
     local progressEffect = _____521B_5EFA_8FDB_5EA6_6761_7279_6548(caster, {["高度偏移"] = cfg["进度条高度偏移"], ["动画速度"] = cfg["进度条动画速度"]})
-    debugLogForce(
-        _____7B26_5361W_8BCA_65AD_6A21_5757,
-        "施法进度条创建",
-        "施法者",
-        casterId,
-        "成功",
-        progressEffect ~= nil and progressEffect ~= 0,
-        "命中延迟秒",
-        cfg["命中延迟秒"]
-    )
     local context = {
         ["施法者"] = caster,
         ["目标"] = target,
@@ -663,18 +574,6 @@ local function _____91CA_653E_85E4_539F_59B9_7EA2_7B26_5361W(_context, caster, s
     }
     _____85E4_539F_59B9_7EA2_7B26_5361W_4E0A_4E0B_6587_8868[casterId] = context
     addDelayedCallback(cfg["命中延迟秒"] * 1000, _____7ED3_7B97_85E4_539F_59B9_7EA2_7B26_5361W, context)
-    debugLogForce(
-        _____7B26_5361W_8BCA_65AD_6A21_5757,
-        "符卡W上下文已创建",
-        "施法者",
-        casterId,
-        "目标",
-        _____53D6_5355_4F4D_53E5_67C4ID(target),
-        "命中延迟秒",
-        cfg["命中延迟秒"],
-        "伤害",
-        context["伤害"]
-    )
 end
 local function _____5F15_7206_85E4_539F_59B9_7EA2W_62A4_76FE(context, caster)
     if not _____5355_4F4D_6709_6548(caster) then
@@ -703,10 +602,10 @@ local function _____85E4_539F_59B9_7EA2W_5355_4F4D_6B7B_4EA1(dyingUnit, _killing
         do
             local context = _____85E4_539F_59B9_7EA2W_4E0A_4E0B_6587_8868[__TS__Number(key)]
             if context == nil then
-                goto __continue89
+                goto __continue86
             end
             if context["施法者"] ~= dyingUnit and context["护盾目标"] ~= dyingUnit then
-                goto __continue89
+                goto __continue86
             end
             local caster = context["施法者"]
             _____6E05_7406_85E4_539F_59B9_7EA2W_72B6_6001(caster, context["护盾ID"])
@@ -715,20 +614,10 @@ local function _____85E4_539F_59B9_7EA2W_5355_4F4D_6B7B_4EA1(dyingUnit, _killing
                 __TS__Number(key)
             )
         end
-        ::__continue89::
+        ::__continue86::
     end
 end
 ____exports["注册藤原妹红W技能"] = function()
-    debugLogForce(
-        _____7B26_5361W_8BCA_65AD_6A21_5757,
-        "注册W监听",
-        "单位类型ID",
-        _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"],
-        "符卡W技能ID",
-        _____85E4_539F_59B9_7EA2_5355_4F4D_6280_80FD_914D_7F6E["符卡W技能ID"],
-        "符卡W数字ID",
-        _____7B26_5361W_6280_80FDID
-    )
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "藤原妹红-火焰护盾",
         ["单位类型ID"] = _____85E4_539F_59B9_7EA2_5355_4F4D_7C7B_578BID,

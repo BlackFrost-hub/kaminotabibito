@@ -459,6 +459,5 @@ ____exports["注册教派剑士魔祭吸魂"] = function()
     registerSpellEffectListener(____on_6559_6D3E_5251_58EB_9B54_796D_5438_9B42_751F_6548)
     registerAppliedFinalDamageListener(____on_9B54_796D_5438_9B42_6700_7EC8_4F24_5BB3)
     registerDamageModifier(_____9B54_796D_5438_9B42_589E_4F24_4FEE_6B63, _____6559_6D3E_5251_58EB_6280_80FD_914D_7F6E["魔祭吸魂"]["伤害提高修正优先级"])
-    debugLogForce("教派剑士-魔祭吸魂", "技能壳、增伤与最终伤害监听注册完成", "skillId=", _____9B54_796D_5438_9B42_6280_80FDID)
 end
 return ____exports

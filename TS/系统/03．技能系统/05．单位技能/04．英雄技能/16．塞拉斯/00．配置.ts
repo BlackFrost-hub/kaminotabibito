@@ -41,10 +41,7 @@ export const 塞拉斯技能配置 = {
     施法距离: 800,
     冷却秒: 45, // 物编 Cool=45
     魔耗: "统一百分比魔耗系统处理（介绍 5%），技能文件不扣魔",
-    音效: {
-      路径: "Sound\\SLD_D.wav", // gg_snd_SLD_D，路径待核对 soundlist 真源
-      裁断距离: 1250,
-    },
+    音效键: "gg_snd_SLD_D", // 地图 war3map.j 已注册（HeroVoice\SLS\SLD-D.mp3），按逆回十六夜模式取句柄播放
     错误提示: "目标不是当前 Boss 战单位",
     提示持续秒: 15,
   },
@@ -88,8 +85,8 @@ export const 塞拉斯技能配置 = {
         { 模型路径: "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdl", 缩放: 1.0, 持续秒: 1.2 },
       ],
       灼烧特效: { 模型路径: "war3mapImported\\Fire2.mdl", 挂点: "origin", 持续秒: 2.0 },
-      音效普通: { 路径: "Sound\\SLS_W.wav", 裁断距离: 1250 }, // gg_snd_SLS_W，路径待核对
-      音效大魔法: { 路径: "Sound\\SLS_W2.wav", 裁断距离: 1250 }, // gg_snd_SLS_W2，路径待核对
+      音效普通键: "gg_snd_SLS_W", // 地图已注册（HeroVoice\SLS\SLS-W.mp3）
+      音效大魔法键: "gg_snd_SLS_W2", // 地图已注册（HeroVoice\SLS\SLS-W2.mp3）
     },
 
     冰冻: {
@@ -103,8 +100,8 @@ export const 塞拉斯技能配置 = {
         { 模型路径: "war3mapImported\\FrostNova.mdl", 缩放: 0.66, 持续秒: 1.2 },
         { 模型路径: "war3mapImported\\ICE.mdl", 缩放: 4.0, 持续秒: 1.2 },
       ],
-      音效普通: { 路径: "Sound\\SLS_E.wav", 裁断距离: 1250 }, // gg_snd_SLS_E，路径待核对
-      音效大魔法: { 路径: "Sound\\SLS_E2.wav", 裁断距离: 1250 }, // gg_snd_SLS_E2，路径待核对
+      音效普通键: "gg_snd_SLS_E", // 地图已注册（HeroVoice\SLS\SLS-E.mp3）
+      音效大魔法键: "gg_snd_SLS_E2", // 地图已注册（HeroVoice\SLS\SLS-E2.mp3）
     },
 
     雷击: {
@@ -115,9 +112,9 @@ export const 塞拉斯技能配置 = {
       减速比例: 0.99, // 源 JASS 99% 减速
       目标特效: { 模型路径: "Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdl", 缩放: 1.25, 持续秒: 1.0 },
       落点特效: { 模型路径: "war3mapImported\\OrbOfLightning.mdl", 缩放: 7.0, 持续秒: 1.2 },
-      目标音效: { 路径: "Sound\\CorrosiveBreathMissileLaunch1.wav", 裁断距离: 1250 }, // gg_snd_CorrosiveBreathMissileLaunch1，路径待核对
-      音效普通: { 路径: "Sound\\SLS_R.wav", 裁断距离: 1250 }, // gg_snd_SLS_R，路径待核对
-      音效大魔法: { 路径: "Sound\\SLS_R2.wav", 裁断距离: 1250 }, // gg_snd_SLS_R2，路径待核对
+      目标音效键: "gg_snd_CorrosiveBreathMissileLaunch1", // 地图已注册（原生音）
+      音效普通键: "gg_snd_SLS_R", // 地图已注册（HeroVoice\SLS\SLS-R.mp3）
+      音效大魔法键: "gg_snd_SLS_R2", // 地图已注册（HeroVoice\SLS\SLS-R2.mp3）
     },
   },
 
@@ -132,12 +129,10 @@ export const 塞拉斯技能配置 = {
       { 模型路径: "war3mapImported\\[AKE]war3AKE.com - 4824137662399555907875383.mdl", 缩放: 2.0, 持续秒: 1.2 },
       { 模型路径: "war3mapImported\\Teleport.mdl", 缩放: 3.0, 持续秒: 1.2 },
     ],
-    音效: [
-      { 路径: "Sound\\SLS_ZW.wav", 裁断距离: 1500 }, // gg_snd_SLS_ZW，路径待核对
-      { 路径: "Sound\\Tranquility01.wav", 裁断距离: 1500 }, // gg_snd_Tranquility01，路径待核对
-    ],
-    // 审计：源 JASS 将 A0JT/A0JQ/A0JR/A0JS 真实冷却改为 0.05，TS 禁止改真实冷却实例，
-    // 改为同步置「大魔法化=true」，由元素魔法结算时消费。
+    音效键: ["gg_snd_SLS_ZW", "gg_snd_Tranquility01"], // 地图已注册（HeroVoice\SLS\SLS-ZW.mp3 + 原生 Tranquility）
+    刷新冷却秒: 0.05,
+    // 源 JASS：W 施放时 YDWESetUnitAbilityState 将 A0JT/A0JQ/A0JR/A0JS 剩余冷却置 0.05（介绍：刷新魔法知识 Q 冷却）；
+    // 同步冷却刷新属真实游戏数据，TS 用 技能_设置技能冷却时间 同步实现，并置「大魔法化=true」。
   },
 
   E: {

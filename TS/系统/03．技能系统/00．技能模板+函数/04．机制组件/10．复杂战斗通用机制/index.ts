@@ -20,3 +20,4 @@ export * from "./21．不同技能序列状态";
 export * from "./22．限次周期执行器";
 export * from "./23．Boss施法时间线";
 export * from "./24．非死亡Boss收束时间线";
+export * from "./25．限时二段技能壳";

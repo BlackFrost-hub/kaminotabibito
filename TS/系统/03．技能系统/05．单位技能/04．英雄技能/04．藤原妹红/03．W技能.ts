@@ -62,13 +62,9 @@ const { registerDeathListener } = require("系统.00．核心系统.01．事件�
 };
 
 const jass = require("jass.common") as any;
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
-const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, abilityId: number) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
@@ -128,16 +124,10 @@ interface 藤原妹红符卡W运行时上下文 {
 const 符卡W技能ID = stringToFourCCSafe(藤原妹红单位技能配置.符卡W技能ID);
 const 藤原妹红符卡W上下文表: Record<number, 藤原妹红符卡W运行时上下文 | undefined> = {};
 const 藤原妹红符卡W位移表: Record<number, 藤原妹红符卡W运行时上下文 | undefined> = {};
-const 符卡W诊断模块 = "藤原妹红符卡W诊断";
 
 function 取单位句柄ID(this: void, unit: any): number {
   if (unit == null || unit === 0) return 0;
   return GetHandleId(unit) || 0;
-}
-
-function 读取符卡W技能等级(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetUnitAbilityLevel(unit, 符卡W技能ID);
 }
 
 export function 获取或创建藤原妹红W上下文(this: void, unit: any): 藤原妹红W运行时上下文 | undefined {
@@ -373,23 +363,9 @@ function 藤原妹红符卡W推进Tick(this: void, variable?: any): void {
     const targetY = GetUnitY(context.目标);
     const effectX = targetX + Cos(context.方向角 * BJ_DEGTORAD) * cfg.击退距离;
     const effectY = targetY + Sin(context.方向角 * BJ_DEGTORAD) * cfg.击退距离;
-    let successCount = 0;
     for (let i = 0; i < cfg.命中特效.length; i++) {
-      const effect = 创建藤原妹红点特效(cfg.命中特效[i], effectX, effectY, context.方向角);
-      if (effect != null && effect !== 0) successCount += 1;
+      创建藤原妹红点特效(cfg.命中特效[i], effectX, effectY, context.方向角);
     }
-    debugLogForce(
-      符卡W诊断模块,
-      "推进命中特效",
-      "请求数",
-      cfg.命中特效.length,
-      "成功数",
-      successCount,
-      "X",
-      effectX,
-      "Y",
-      effectY,
-    );
   }
   if (context.推进总计时秒 < cfg.击退持续秒) return;
   removePeriodicCallback(context.推进回调ID);
@@ -446,14 +422,6 @@ function 结算藤原妹红符卡W(this: void, context: 藤原妹红符卡W运�
   const cfg = 藤原妹红单位技能配置.符卡W;
   const caster = context.施法者;
   const target = context.目标;
-  debugLogForce(
-    符卡W诊断模块,
-    "进入符卡W结算",
-    "施法者",
-    取单位句柄ID(caster),
-    "目标",
-    取单位句柄ID(target),
-  );
   const targetX = GetUnitX(target);
   const targetY = GetUnitY(target);
 
@@ -463,14 +431,6 @@ function 结算藤原妹红符卡W(this: void, context: 藤原妹红符卡W运�
   SetUnitY(caster, nearTargetY);
   const casterTargetDistance = 距离XY(GetUnitX(caster), GetUnitY(caster), targetX, targetY);
   if (casterTargetDistance >= 250) {
-    debugLogForce(
-      符卡W诊断模块,
-      "符卡W结算提前退出",
-      "原因",
-      "移动后仍与目标距离过远",
-      "距离",
-      casterTargetDistance,
-    );
     清理藤原妹红符卡W(context);
     return;
   }
@@ -478,11 +438,9 @@ function 结算藤原妹红符卡W(this: void, context: 藤原妹红符卡W运�
   播放藤原妹红配置动作(caster, cfg.命中动作编号, cfg.命中动作速度);
 
   const targets = 获取范围敌军(caster, GetUnitX(caster), GetUnitY(caster), cfg.搜索范围);
-  let hitCount = 0;
   for (let i = 0; i < targets.length; i++) {
     const hitTarget = targets[i];
     if (!符卡W目标允许命中(caster, hitTarget)) continue;
-    hitCount += 1;
     造成单体技能伤害({
       来源: caster,
       目标: hitTarget,
@@ -513,7 +471,6 @@ function 结算藤原妹红符卡W(this: void, context: 藤原妹红符卡W运�
       藤原妹红符卡W位移表[displacementId] = context;
     }
   }
-  debugLogForce(符卡W诊断模块, "符卡W命中目标统计", "枚举数", targets.length, "合法命中数", hitCount);
 
   context.推进回调ID = addPeriodicCallback(cfg.推进表现间隔毫秒, 藤原妹红符卡W推进Tick, context);
 }
@@ -522,24 +479,7 @@ function 释放藤原妹红符卡W(this: void, _context: any, caster: any, skill
   const target = GetSpellTargetUnit();
   const casterValid = 单位有效(caster);
   const targetValid = 单位有效(target);
-  debugLogForce(
-    符卡W诊断模块,
-    "进入符卡W入口",
-    "施法者",
-    取单位句柄ID(caster),
-    "单位类型",
-    casterValid ? GetUnitTypeId(caster) : 0,
-    "符卡W技能等级",
-    读取符卡W技能等级(caster),
-    "目标",
-    取单位句柄ID(target),
-    "施法者有效",
-    casterValid,
-    "目标有效",
-    targetValid,
-  );
   if (!casterValid || !targetValid) {
-    debugLogForce(符卡W诊断模块, "符卡W提前退出", "原因", !casterValid ? "施法者无效" : "目标无效");
     return;
   }
   const casterId = 取单位句柄ID(caster);
@@ -548,17 +488,7 @@ function 释放藤原妹红符卡W(this: void, _context: any, caster: any, skill
   关闭藤原妹红符卡模式(caster, true);
   const cfg = 藤原妹红单位技能配置.符卡W;
   播放藤原妹红单位音效(caster, cfg.全局音效键);
-  const targetWarningEffect = 创建藤原妹红单位特效(target, { 模型路径: cfg.目标预警特效, 持续秒: cfg.命中延迟秒 }, "origin");
-  debugLogForce(
-    符卡W诊断模块,
-    "目标预警特效创建",
-    "目标",
-    取单位句柄ID(target),
-    "路径",
-    cfg.目标预警特效,
-    "成功",
-    targetWarningEffect != null && targetWarningEffect !== 0,
-  );
+  创建藤原妹红单位特效(target, { 模型路径: cfg.目标预警特效, 持续秒: cfg.命中延迟秒 }, "origin");
   const 方向角 = 两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target));
   SetUnitFacing(caster, 方向角);
   SetUnitFacing(target, 方向角 + 180);
@@ -568,16 +498,6 @@ function 释放藤原妹红符卡W(this: void, _context: any, caster: any, skill
     高度偏移: cfg.进度条高度偏移,
     动画速度: cfg.进度条动画速度,
   });
-  debugLogForce(
-    符卡W诊断模块,
-    "施法进度条创建",
-    "施法者",
-    casterId,
-    "成功",
-    progressEffect != null && progressEffect !== 0,
-    "命中延迟秒",
-    cfg.命中延迟秒,
-  );
   const context: 藤原妹红符卡W运行时上下文 = {
     施法者: caster,
     目标: target,
@@ -594,18 +514,6 @@ function 释放藤原妹红符卡W(this: void, _context: any, caster: any, skill
   };
   藤原妹红符卡W上下文表[casterId] = context;
   addDelayedCallback(cfg.命中延迟秒 * 1000, 结算藤原妹红符卡W, context);
-  debugLogForce(
-    符卡W诊断模块,
-    "符卡W上下文已创建",
-    "施法者",
-    casterId,
-    "目标",
-    取单位句柄ID(target),
-    "命中延迟秒",
-    cfg.命中延迟秒,
-    "伤害",
-    context.伤害,
-  );
 }
 
 function 引爆藤原妹红W护盾(this: void, context: 藤原妹红W运行时上下文, caster: any): void {
@@ -637,16 +545,6 @@ function 藤原妹红W单位死亡(this: void, dyingUnit: any, _killingUnit: any
 }
 
 export function 注册藤原妹红W技能(this: void): void {
-  debugLogForce(
-    符卡W诊断模块,
-    "注册W监听",
-    "单位类型ID",
-    藤原妹红单位技能配置.单位类型ID,
-    "符卡W技能ID",
-    藤原妹红单位技能配置.符卡W技能ID,
-    "符卡W数字ID",
-    符卡W技能ID,
-  );
   注册单位技能壳监听({
     名称: "藤原妹红-火焰护盾",
     单位类型ID: 藤原妹红单位类型ID,

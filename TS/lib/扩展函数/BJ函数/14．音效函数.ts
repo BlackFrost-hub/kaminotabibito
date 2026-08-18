@@ -148,4 +148,14 @@ export function PlaySoundOnUnitBJ(this: void, soundHandle: any, volumePercent: n
   PlaySoundBJ(soundHandle);
 }
 
+/**
+ * Blizzard.j 坐标音效 BJ 封装。
+ * 属于 Blizzard.j 函数，禁止从 jass.common 取（运行时为 nil）。
+ */
+export function PlaySoundAtPointBJ(this: void, soundHandle: any, volumePercent: number, x: number, y: number, z: number): void {
+  jass.SetSoundPosition(soundHandle, x, y, z);
+  SetSoundVolume(soundHandle, volumePercent);
+  PlaySoundBJ(soundHandle);
+}
+
 export {};

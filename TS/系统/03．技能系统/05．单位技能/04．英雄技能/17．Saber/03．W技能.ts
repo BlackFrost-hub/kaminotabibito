@@ -80,7 +80,6 @@ const SetUnitY = jass.SetUnitY as (this: void, unit: any, y: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, name: string) => void;
-const ResetUnitAnimation = jass.ResetUnitAnimation as (this: void, unit: any) => void;
 const SetUnitPathing = jass.SetUnitPathing as (this: void, unit: any, enabled: boolean) => void;
 const IsTerrainPathable = jass.IsTerrainPathable as (this: void, x: number, y: number, pathingType: any) => boolean;
 const IsUnitInRange = jass.IsUnitInRange as (this: void, a: any, b: any, range: number) => boolean;
@@ -607,7 +606,7 @@ function 启动W冲击波(this: void, ctx: W敌人上下文): void {
 function W目标硬直表现恢复(this: void, variable?: any): void {
   const target = variable as any;
   if (target == null || target === 0 || !单位存活(target)) return;
-  ResetUnitAnimation(target);
+  SetUnitAnimation(target, "stand");
   SetUnitTimeScale(target, 1.0);
 }
 

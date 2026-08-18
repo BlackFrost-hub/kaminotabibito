@@ -375,10 +375,8 @@ export function 施放食人魔雷霆震怒(this: void, boss: any, 配置: 食�
 
 export function 注册食人魔共享机制(this: void): void {
   if (食人魔共享机制已注册) {
-    debugLogForce('食人魔-共享机制', '重复注册请求已忽略');
     return;
   }
   食人魔共享机制已注册 = true;
   registerDeathListener(on食人魔击杀);
-  debugLogForce('食人魔-共享机制', '共享机制注册完成：击杀啃食与雷霆震怒');
 }

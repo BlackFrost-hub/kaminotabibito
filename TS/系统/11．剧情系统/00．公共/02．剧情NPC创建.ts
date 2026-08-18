@@ -15,9 +15,6 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { 添加单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
 };
@@ -28,13 +25,10 @@ const { 暂停并设置无敌安全 } = require("lib.扩展函数.自定义扩�
 const 中立被动玩家ID = 15;
 const CreateUnit = jass.CreateUnit as (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const Player = jass.Player as (this: void, playerId: number) => any;
-const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, unit: any, order: string) => boolean;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, unit: any, flag: boolean) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, unit: any, x: number, y: number) => void;
-
-const 剧情NPC创建诊断模块 = "剧情NPC创建诊断";
 
 export interface 剧情NPC创建配置 {
   单位ID: string;
@@ -75,20 +69,6 @@ export function 创建剧情场景单位(this: void, 配置: 剧情场景单位�
     const owner = Player(配置.玩家ID ?? 中立被动玩家ID);
     const unitTypeId = stringToFourCCSafe(配置.单位ID);
     if (!(unitTypeId > 0)) return null;
-    debugLogForce(
-      剧情NPC创建诊断模块,
-      "CreateUnit前",
-      "单位ID", 配置.单位ID,
-      "单位码", unitTypeId,
-      "配置玩家ID", 配置.玩家ID ?? 中立被动玩家ID,
-      "实际玩家ID", GetPlayerId(owner),
-      "X", 配置.X,
-      "Y", 配置.Y,
-      "朝向", 配置.朝向,
-      "YD表", 配置.YD表 ?? "",
-      "YD键", 配置.YD键 ?? "",
-      "死亡排泄", 配置.登记死亡排泄 === true,
-    );
     unit = 配置.登记死亡排泄 === true
       ? 创建单位并登记排泄安全(owner, unitTypeId, 配置.X, 配置.Y, 配置.朝向)
       : CreateUnit(owner, unitTypeId, 配置.X, 配置.Y, 配置.朝向);

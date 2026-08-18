@@ -21,10 +21,11 @@
 
 import { 铃仙单位技能配置 } from "./00．配置";
 import { 铃仙BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/12．铃仙";
-import { 播放铃仙全局音效, 播放铃仙配置动作 } from "./00A．表现工具";
+import { 播放铃仙全局音效, 播放铃仙单位绑定音效, 播放铃仙配置动作 } from "./00A．表现工具";
 import { 是铃仙本体, 是有效敌对目标 } from "./00B．分身与状态管理";
 
 const jass = require("jass.common") as any;
+
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
@@ -100,6 +101,7 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_LIGHTNING = jass.DAMAGE_TYPE_LIGHTNING as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
@@ -399,7 +401,8 @@ function on铃仙E生效(this: void, 施法单位: any, 技能ID数值: number):
   const ctx = 创建E上下文(英雄);
 
   // 1) 音效 + 动作 + 施法硬直
-  播放铃仙全局音效("gg_snd_LX_E");
+  // 施法音效（源 JASS：PlaySoundOnUnitBJ(gg_snd_LX_E, 100, 铃仙)）
+  播放铃仙单位绑定音效(英雄, "gg_snd_LX_E", 100);
   SetUnitAnimation(英雄, "spell five");
   播放铃仙配置动作(英雄, -1, 1.0); // 确保时间缩放正常
   SFB_施加通用Buff(英雄, 英雄, 21, cfg.E.施法硬直秒); // 施法硬直（暂停类 Buff，等价 GS_Suspend 0.4 秒）

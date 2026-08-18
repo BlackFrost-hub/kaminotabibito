@@ -5,18 +5,21 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 import { 单位存活, 读取单位攻击力, 两点角度 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
-const { addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
-  removeDelayedCallback: (this: void, id: number) => void;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
+};
+const { 创建限时二段技能壳, 清理限时二段技能壳 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.25．限时二段技能壳") as {
+  创建限时二段技能壳: (this: void, params: any) => any;
+  清理限时二段技能壳: (this: void, controller: any) => boolean;
 };
 const { 开始击退, 停止位移 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口") as {
   开始击退: (this: void, unit: any, params: any) => number;
   停止位移: (this: void, id: number, reason?: string) => boolean;
 };
-const { 开始原地击飞 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.02．原地击飞系统") as {
-  开始原地击飞: (this: void, unit: any, params: any) => number;
+const { 开始线性升降 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.03．线性升降系统") as {
+  开始线性升降: (this: void, unit: any, params: any) => number;
 };
 const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
@@ -48,12 +51,15 @@ const { registerDeathListener } = require("系统.00．核心系统.01．事件�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
+const { CreateDestructableLoc } = require("lib.扩展函数.BJ函数.04．矩形与区域") as {
+  CreateDestructableLoc: (this: void, objectId: number, loc: any, facing: number, scale: number, variation: number) => any;
+};
 
 const cfg = 一方通行单位技能配置;
 const W配置 = cfg.W;
-const 单位类型ID = stringToFourCCSafe(cfg.单位类型ID);
 const W技能ID = stringToFourCCSafe(cfg.W技能ID);
 const W二段技能ID = stringToFourCCSafe(cfg.W二段技能ID);
+const W地形破坏物ID = stringToFourCCSafe(W配置.地形破坏物ID);
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT ?? jass.DAMAGE_TYPE_MAGIC;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS;
@@ -70,30 +76,28 @@ const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFlyHeight = jass.GetUnitFlyHeight as (this: void, unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
-const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, angle: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
-const ResetUnitAnimation = jass.ResetUnitAnimation as (this: void, unit: any) => void;
-const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void, player: any, abilityId: number, available: boolean) => void;
+const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, player: any) => boolean;
-const CreateDestructable = jass.CreateDestructable as (this: void, objectId: number, x: number, y: number, facing: number, scale: number, variation: number) => any;
 const RemoveDestructable = jass.RemoveDestructable as (this: void, destructable: any) => void;
 const GetRandomReal = jass.GetRandomReal as (this: void, min: number, max: number) => number;
-const { 沿角度步进直到地形阻挡 } = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进") as {
-  沿角度步进直到地形阻挡: (this: void, params: any) => { 最终X: number; 最终Y: number; 实际步数: number; 是否提前停止: boolean };
-};
-
+const Location = jass.Location as (this: void, x: number, y: number) => any;
+const RemoveLocation = jass.RemoveLocation as (this: void, loc: any) => void;
 interface 一方通行W上下文 {
   施法者: any;
   技能实例ID?: number;
   已启动: boolean;
   二段窗口中: boolean;
+  二段已确认: boolean;
   方向角: number;
   目标X: number;
   目标Y: number;
-  窗口回调ID: number;
+  二段路径X: number;
+  二段路径Y: number;
   位移ID: number;
   二段回调ID: number;
+  二段技能壳: any;
   二段次数: number;
   已命中单位: Record<number, true | undefined>;
   暂停来源: string;
@@ -101,6 +105,15 @@ interface 一方通行W上下文 {
 }
 
 const 上下文表: Record<number, 一方通行W上下文 | undefined> = {};
+
+interface 一方通行W地面击飞记录 {
+  施法者: any;
+  目标: any;
+  伤害: number;
+  技能实例ID?: number;
+}
+
+const 地面击飞记录表: Record<number, 一方通行W地面击飞记录 | undefined> = {};
 
 function 取单位ID(this: void, unit: any): number {
   return unit == null || unit === 0 ? 0 : GetHandleId(unit) || 0;
@@ -120,12 +133,15 @@ function 获取或创建W上下文(this: void, unit: any): 一方通行W上下�
     施法者: unit,
     已启动: false,
     二段窗口中: false,
+    二段已确认: false,
     方向角: 0,
     目标X: 0,
     目标Y: 0,
-    窗口回调ID: 0,
+    二段路径X: 0,
+    二段路径Y: 0,
     位移ID: 0,
     二段回调ID: 0,
+    二段技能壳: undefined,
     二段次数: 0,
     已命中单位: {},
     暂停来源: `一方通行-W:${id}`,
@@ -135,17 +151,9 @@ function 获取或创建W上下文(this: void, unit: any): 一方通行W上下�
   return created;
 }
 
-function 删除W辅助状态(this: void, caster: any): void {
-  jass.UnitRemoveAbility(caster, W二段技能ID);
-  SetPlayerAbilityAvailable(GetOwningPlayer(caster), W技能ID, true);
-  SetPlayerAbilityAvailable(GetOwningPlayer(caster), W二段技能ID, false);
-}
-
 function 清理W上下文(this: void, context: 一方通行W上下文): void {
-  if (context.窗口回调ID !== 0) {
-    removeDelayedCallback(context.窗口回调ID);
-    context.窗口回调ID = 0;
-  }
+  清理限时二段技能壳(context.二段技能壳);
+  context.二段技能壳 = undefined;
   if (context.位移ID !== 0) {
     停止位移(context.位移ID, "中断");
     context.位移ID = 0;
@@ -156,11 +164,11 @@ function 清理W上下文(this: void, context: 一方通行W上下文): void {
   }
   if (context.施法者 != null && context.施法者 !== 0) {
     移除单位暂停(context.施法者, context.暂停来源);
-    删除W辅助状态(context.施法者);
-    ResetUnitAnimation(context.施法者);
+    SetUnitAnimation(context.施法者, "stand");
   }
   context.已启动 = false;
   context.二段窗口中 = false;
+  context.二段已确认 = false;
   const id = 取单位ID(context.施法者);
   if (id !== 0 && 上下文表[id] === context) delete 上下文表[id];
 }
@@ -210,6 +218,34 @@ function W造成AOE伤害(this: void, caster: any, x: number, y: number, radius:
     参与技能伤害加成: true,
     每目标处理器: (target: any) => W目标允许(caster, target) ? { 伤害: damage } : undefined,
   });
+}
+
+function 一方通行W地面击飞到顶(this: void, target: any, reason: string, liftId: number): void {
+  const record = 地面击飞记录表[liftId];
+  delete 地面击飞记录表[liftId];
+  if (record == null || reason !== "完成" || !单位存活(target)) return;
+  W造成单体伤害(record.施法者, target, record.伤害, record.技能实例ID);
+  开始线性升降(target, {
+    持续时间: W配置.地面击飞持续秒 * 0.5,
+    高度变化: -W配置.地面击飞高度,
+    暂停单位: false,
+    主单位: record.施法者,
+  });
+}
+
+function 开始一方通行W地面击飞(this: void, caster: any, target: any, damage: number, skillInstanceId?: number): boolean {
+  if (!W目标允许(caster, target)) return false;
+  施加眩晕(caster, target, W配置.地面击飞持续秒, "一方通行-W-地面击飞", "技能");
+  const liftId = 开始线性升降(target, {
+    持续时间: W配置.地面击飞持续秒 * 0.5,
+    高度变化: W配置.地面击飞高度,
+    暂停单位: false,
+    主单位: caster,
+    结束回调: 一方通行W地面击飞到顶,
+  });
+  if (liftId === 0) return false;
+  地面击飞记录表[liftId] = { 施法者: caster, 目标: target, 伤害: damage, 技能实例ID: skillInstanceId };
+  return true;
 }
 
 function 一方通行W单位目标结算(this: void, context: 一方通行W上下文, target: any): void {
@@ -270,52 +306,35 @@ function 一方通行W单位目标(this: void, context: 一方通行W上下文, 
 function 一方通行W地面单击(this: void, context: 一方通行W上下文): void {
   const caster = context.施法者;
   context.已启动 = true;
+  const casterX = GetUnitX(caster);
+  const casterY = GetUnitY(caster);
   Sound3DII_UnitPlayReuse(W配置.施法音效路径, caster, W配置.施法音效裁断距离);
-  创建点特效({ 模型路径: W配置.单击雷霆特效模型, X: GetUnitX(caster), Y: GetUnitY(caster), Z: GetUnitFlyHeight(caster), 持续秒: 1 });
-  创建点特效({ 模型路径: W配置.单击沙尘特效模型, X: GetUnitX(caster), Y: GetUnitY(caster), Z: GetUnitFlyHeight(caster), 缩放: 1.4, 持续秒: 1 });
-  const targets = 获取范围敌军(caster, GetUnitX(caster), GetUnitY(caster), W配置.地面单击范围);
+  创建点特效({ 模型路径: W配置.单击雷霆特效模型, X: casterX, Y: casterY, Z: GetUnitFlyHeight(caster), 持续秒: 1 });
+  创建点特效({ 模型路径: W配置.单击沙尘特效模型, X: casterX, Y: casterY, Z: GetUnitFlyHeight(caster), 缩放: 1.4, 持续秒: 1 });
+  const targets = 获取范围敌军(caster, casterX, casterY, W配置.地面单击范围);
   const damage = 读取单位攻击力(caster) * W配置.地面单击伤害攻击力倍率;
-  造成批量AOE技能伤害({
-    来源: caster,
-    目标列表: targets,
-    伤害: damage,
-    伤害类型: DAMAGE_TYPE_PLANT,
-    attack: false,
-    ranged: false,
-    attackType: ATTACK_TYPE_NORMAL,
-    weaponType: WEAPON_TYPE_WHOKNOWS,
-    来源类型: "单位技能",
-    技能ID: W技能ID,
-    技能实例ID: context.技能实例ID,
-    标签: "一方通行-W-地面单击",
-    参与技能伤害加成: true,
-    每目标处理器: (target: any) => W目标允许(caster, target) ? {
-      伤害: damage,
-      伤害类型: DAMAGE_TYPE_PLANT,
-    } : undefined,
-    每目标结算后处理器: (target: any) => {
-      if (W目标允许(caster, target)) {
-        开始原地击飞(target, {
-          持续时间: W配置.地面击飞持续秒,
-          最小高度: 25,
-          最大高度: 25,
-          持续特效模型: W配置.二段践踏特效模型,
-          持续特效间隔: 0.2,
-          暂停单位: true,
-          主单位: caster,
-        });
-      }
-    },
-  });
+  for (const target of targets) {
+    开始一方通行W地面击飞(caster, target, damage, context.技能实例ID);
+  }
   清理W上下文(context);
 }
 
+function 移除一方通行W地形(this: void, variable?: any): void {
+  const destructable = variable;
+  if (destructable != null && destructable !== 0) {
+    RemoveDestructable(destructable);
+  }
+}
+
 function 创建一方通行W地形(this: void, x: number, y: number): void {
-  const destructable = CreateDestructable(stringToFourCCSafe(W配置.地形破坏物ID), x, y, GetRandomReal(0, 360), 1, 0);
+  const loc = Location(x, y);
+  const facing = GetRandomReal(0, 360);
+  const destructable = CreateDestructableLoc(W地形破坏物ID, loc, facing, 1, 0);
+  RemoveLocation(loc);
   创建点特效({ 模型路径: W配置.二段践踏特效模型, X: x, Y: y, 持续秒: 1 });
   创建点特效({ 模型路径: W配置.单击雷霆特效模型, X: x, Y: y, 持续秒: 1 });
   if (destructable != null && destructable !== 0) {
-    addDelayedCallback(5000, () => RemoveDestructable(destructable));
+    addDelayedCallback(5000, 移除一方通行W地形, destructable);
   }
 }
 
@@ -330,21 +349,18 @@ function 一方通行W二段Tick(this: void, variable?: any): void {
     return;
   }
   const caster = context.施法者;
-  const x = GetUnitX(caster);
-  const y = GetUnitY(caster);
-  const next = 沿角度步进直到地形阻挡({ 起点X: x, 起点Y: y, 角度度: context.方向角, 单步距离: W配置.二段每次移动距离, 步数: 1 });
-  if (next.实际步数 <= 0) {
-    清理W上下文(context);
-    return;
-  }
-  jass.SetUnitX(caster, next.最终X);
-  jass.SetUnitY(caster, next.最终Y);
-  SetUnitFacing(caster, context.方向角);
+  const x = context.二段路径X;
+  const y = context.二段路径Y;
+  const radians = (context.方向角 * Math.PI) / 180;
+  const nextX = x + Math.cos(radians) * W配置.二段每次移动距离;
+  const nextY = y + Math.sin(radians) * W配置.二段每次移动距离;
+  context.二段路径X = nextX;
+  context.二段路径Y = nextY;
   context.二段次数 += 1;
   if (context.二段次数 === 13 || context.二段次数 === 26 || context.二段次数 === 39) {
-    创建一方通行W地形(next.最终X, next.最终Y);
+    创建一方通行W地形(nextX, nextY);
   }
-  const targets = 获取范围敌军(caster, next.最终X, next.最终Y, W配置.二段范围);
+  const targets = 获取范围敌军(caster, nextX, nextY, W配置.二段范围);
   const damage = 读取单位攻击力(caster) * W配置.二段伤害攻击力倍率;
   造成批量AOE技能伤害({
     来源: caster,
@@ -371,59 +387,88 @@ function 一方通行W二段Tick(this: void, variable?: any): void {
   });
 }
 
-function 一方通行W二段(this: void, context: 一方通行W上下文, caster: any): void {
-  if (!context.二段窗口中 || context.已启动) return;
-  if (context.窗口回调ID !== 0) {
-    removeDelayedCallback(context.窗口回调ID);
-    context.窗口回调ID = 0;
-  }
+function 执行一方通行W二段(this: void, context: 一方通行W上下文, caster: any): void {
   context.二段窗口中 = false;
   context.已启动 = true;
   context.二段次数 = 0;
+  context.二段路径X = GetUnitX(caster);
+  context.二段路径Y = GetUnitY(caster);
   context.已命中单位 = {};
   const maxMana = jass.GetUnitState(caster, jass.UNIT_STATE_MAX_MANA) || 0;
-  减少魔法值(caster, maxMana * W配置.二段追加魔耗比例, false, false);
+  const requestedMana = maxMana * W配置.二段追加魔耗比例;
+  减少魔法值(caster, requestedMana, false, false);
   移除单位暂停(caster, context.暂停来源);
   添加单位暂停(caster, context.暂停来源);
   SetUnitAnimationByIndex(caster, 10);
   Sound3DII_UnitPlayReuse(W配置.施法音效路径, caster, W配置.施法音效裁断距离);
-  删除W辅助状态(caster);
   context.二段回调ID = addPeriodicCallback(W配置.二段周期毫秒, 一方通行W二段Tick, context);
 }
 
-function 一方通行W单击窗口结束(this: void, variable?: any): void {
-  const context = variable as 一方通行W上下文 | undefined;
-  if (context == null || !context.二段窗口中 || context.已启动) return;
-  context.窗口回调ID = 0;
+function 确认一方通行W二段输入(this: void, context: 一方通行W上下文, _caster: any): void {
+  if (!context.二段窗口中 || context.已启动) {
+    return;
+  }
+  context.二段已确认 = true;
+}
+
+function 一方通行W单击窗口结束(this: void, controller: any): void {
+  const context = controller?.数据 as 一方通行W上下文 | undefined;
+  if (context == null || !context.二段窗口中 || context.已启动) {
+    return;
+  }
+  context.二段技能壳 = undefined;
   context.二段窗口中 = false;
-  删除W辅助状态(context.施法者);
-  一方通行W地面单击(context);
+  if (context.二段已确认) {
+    执行一方通行W二段(context, context.施法者);
+  } else {
+    一方通行W地面单击(context);
+  }
 }
 
 function 释放一方通行W(this: void, context: 一方通行W上下文, caster: any, skillInstanceId?: number): void {
-  if (context.已启动 || context.二段窗口中) return;
+  const spellTarget = GetSpellTargetUnit();
+  const casterX = GetUnitX(caster);
+  const casterY = GetUnitY(caster);
+  const spellTargetX = GetSpellTargetX();
+  const spellTargetY = GetSpellTargetY();
+  if (context.已启动) {
+    return;
+  }
+  if (context.二段窗口中) {
+    确认一方通行W二段输入(context, caster);
+    return;
+  }
   context.技能实例ID = skillInstanceId;
-  const target = GetSpellTargetUnit();
+  const target = spellTarget;
   if (target != null && target !== 0) {
-    if (W目标允许(caster, target)) 一方通行W单位目标(context, target);
+    const allowed = W目标允许(caster, target);
+    if (allowed) 一方通行W单位目标(context, target);
     else 清理W上下文(context);
     return;
   }
 
   context.二段窗口中 = true;
-  context.方向角 = 两点角度(GetUnitX(caster), GetUnitY(caster), GetSpellTargetX(), GetSpellTargetY());
-  context.目标X = GetSpellTargetX();
-  context.目标Y = GetSpellTargetY();
-  添加单位暂停(caster, context.暂停来源);
-  SetUnitAnimationByIndex(caster, 10);
-  jass.UnitAddAbility(caster, W二段技能ID);
-  SetPlayerAbilityAvailable(GetOwningPlayer(caster), W技能ID, false);
-  SetPlayerAbilityAvailable(GetOwningPlayer(caster), W二段技能ID, true);
-  context.窗口回调ID = addDelayedCallback(W配置.二段窗口秒 * 1000, 一方通行W单击窗口结束, context);
+  context.二段已确认 = false;
+  context.方向角 = 两点角度(casterX, casterY, spellTargetX, spellTargetY);
+  context.目标X = spellTargetX;
+  context.目标Y = spellTargetY;
+  context.二段技能壳 = 创建限时二段技能壳({
+    名称: "一方通行-W-地面二段窗口",
+    单位: caster,
+    一段技能ID: W技能ID,
+    二段技能ID: W二段技能ID,
+    持续秒: W配置.二段窗口秒,
+    数据: context,
+    超时回调: 一方通行W单击窗口结束,
+  });
+  if (context.二段技能壳 == null) {
+    context.二段窗口中 = false;
+    一方通行W地面单击(context);
+  }
 }
 
 function 释放一方通行W二段(this: void, context: 一方通行W上下文, caster: any): void {
-  一方通行W二段(context, caster);
+  确认一方通行W二段输入(context, caster);
 }
 
 function 一方通行W单位死亡(this: void, dyingUnit: any, _killingUnit: any): void {

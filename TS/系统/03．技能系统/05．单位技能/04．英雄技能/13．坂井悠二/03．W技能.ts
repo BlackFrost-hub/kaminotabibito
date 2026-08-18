@@ -6,6 +6,7 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 import { 单位存活, 读取单位攻击力 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 
 const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境") as {
   施加眩晕: (this: void, source: any, target: any, duration: number, name?: string, type?: "装备" | "技能") => void;
@@ -19,8 +20,9 @@ const { 创建点特效, 创建单位坐标跟随特效, 销毁单位坐标跟�
   销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
   设置特效颜色: (this: void, effect: any, red: number, green: number, blue: number, alpha?: number) => void;
 };
-const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+// 源 PlaySoundOnUnitBJ(gg_snd_ReviveUndead, 100, 目标)：照源用 jglobals 全局音效句柄 + BJ 封装播放
+const { PlaySoundOnUnitBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundOnUnitBJ: (this: void, soundHandle: any, volumePercent: number, whichUnit: any) => void;
 };
 const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -164,8 +166,9 @@ function 释放W技能(this: void, context: W上下文, caster: any, 技能实�
     });
   }
 
-  // 3. 播放 3D 音效（同步表现）
-  Sound3DII_UnitPlayReuse(配置.音效.路径, target, 配置.音效.裁断距离);
+  // 3. 播放音效（同步表现）：源 PlaySoundOnUnitBJ(gg_snd_ReviveUndead, 100, 目标)
+  const w音效句柄 = (jglobals as any)[配置.音效.全局音效键];
+  if (w音效句柄 != null) PlaySoundOnUnitBJ(w音效句柄, 100, target);
 
   // 4. 壳优化为控制特效：目标模型缩放×2（可选）
   if (配置.壳优化为控制特效.启用) {

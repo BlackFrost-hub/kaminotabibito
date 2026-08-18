@@ -6,7 +6,7 @@ local createSoundInternal = ____02_FF0E_97F3_6548_6C60.createSoundInternal
 local getSoundInternal = ____02_FF0E_97F3_6548_6C60.getSoundInternal
 local getDefaultSoundModel = ____02_FF0E_97F3_6548_6C60.getDefaultSoundModel
 local KEY_COUNT = ____02_FF0E_97F3_6548_6C60.KEY_COUNT
-local KEY_ENABLED_SLOT_BASE = ____02_FF0E_97F3_6548_6C60.KEY_ENABLED_SLOT_BASE
+local KEY_INDEX = ____02_FF0E_97F3_6548_6C60.KEY_INDEX
 local POOL_MAX = ____02_FF0E_97F3_6548_6C60.POOL_MAX
 local hash = ____02_FF0E_97F3_6548_6C60.hash
 local ____03_FF0E3D_97F3_6548_64AD_653E = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
@@ -77,9 +77,10 @@ local function scheduleDestroySoundIfNeeded(sound)
 end
 --- 播放MP3音效（可指定玩家）
 -- 
--- 注意：此入口每次调用都会 CreateSound，并在播放后 KillSoundWhenDone。
--- 高频/同路径重复音效请优先使用 Sound3DII_Mp3PlayReuse，避免大量短时间创建音效句柄。
--- 只有确实需要多实例叠放、不能被 StopSound 打断上一声时，再使用本函数。
+-- 多实例叠放入口：严格使用音效池最多 4 个句柄轮转（同路径同时刻最多 4 声叠放）。
+-- 句柄只在首次占槽时 CreateSound，之后一律复用，绝不每次播放新建句柄（防泄漏）；
+-- 4 槽全占满时轮转复用最早的槽（Stop 后重播），不会创建第 5 个。
+-- 不需要叠放的高频同路径音效请用 Sound3DII_Mp3PlayReuse（单句柄）。
 -- 
 -- @param path 音效路径
 -- @param player 指定玩家（为null时所有玩家都能听到）
@@ -88,88 +89,19 @@ function ____exports.Sound3DII_Mp3Play(path, player, model)
     if model == nil then
         model = getDefaultSoundModel()
     end
-    do
-        local Leak = require("lib.扩展函数.封装函数.05．泄露审计.index")
-        local ____temp_2
-        if Leak and Leak.LeakWatcher then
-            ____temp_2 = Leak.LeakWatcher
-        else
-            ____temp_2 = nil
-        end
-        local LW = ____temp_2
-        local trackedByLeak = false
-        local s = nil
-        if LW and type(LW.createSound) == "function" then
-            s = LW:createSound(
-                "sound_mp3",
-                path,
-                false,
-                false,
-                false,
-                model.fadeInRate,
-                model.fadeOutRate,
-                model.soundType
-            )
-            if s then
-                trackedByLeak = true
-            end
-        else
-            s = jass.CreateSound(
-                path,
-                false,
-                false,
-                false,
-                model.fadeInRate,
-                model.fadeOutRate,
-                model.soundType
-            )
-        end
-        if s then
-            jass.SetSoundChannel(s, model.channel)
-            jass.SetSoundVolume(s, model.volume)
-            jass.SetSoundPitch(s, model.pitch)
-            local shouldPlay = not player or jass.GetLocalPlayer() == player
-            if shouldPlay then
-                jass.StartSound(s)
-            end
-            if LW and type(LW.killSoundWhenDone) == "function" then
-                LW:killSoundWhenDone(s)
-            else
-                jass.KillSoundWhenDone(s)
-                if trackedByLeak and LW and type(LW.releaseSound) == "function" then
-                    LW:releaseSound(s)
-                end
-            end
-            lastPlayedSound = s
-            debugLog(nil, "Sound3DII", "new sound, localPlay=", shouldPlay)
-            return s
-        end
-    end
     local pathHash = jass.StringHash(path)
     local count = jass.LoadInteger(hash, pathHash, KEY_COUNT) or 0
     if count > POOL_MAX then
         count = POOL_MAX
     end
-    local availableIndex = -1
-    do
-        local i = 0
-        while i < count do
-            if jass.LoadBoolean(hash, pathHash, i + KEY_ENABLED_SLOT_BASE) then
-                availableIndex = i
-                break
-            end
-            i = i + 1
-        end
-    end
-    local sound
-    if availableIndex == -1 then
-        if count >= POOL_MAX then
-            return nil
-        end
+    local index = jass.LoadInteger(hash, pathHash, KEY_INDEX) or 0
+    local slot = index % POOL_MAX
+    local sound = nil
+    if slot >= count then
         sound = createSoundInternal(
             path,
             4000,
-            count,
+            slot,
             0,
             0,
             0,
@@ -178,27 +110,42 @@ function ____exports.Sound3DII_Mp3Play(path, player, model)
         )
         if sound then
             jass.SaveInteger(hash, pathHash, KEY_COUNT, count + 1)
+            jass.SaveInteger(hash, pathHash, KEY_INDEX, index + 1)
         end
     else
         sound = getSoundInternal(
             path,
             4000,
-            availableIndex,
+            slot,
             0,
             0,
             0,
             model
         )
+        if sound then
+            jass.SaveInteger(hash, pathHash, KEY_INDEX, index + 1)
+            jass.StopSound(sound, false, false)
+        end
     end
     if sound then
-        if player then
-            if jass.GetLocalPlayer() == player then
-                jass.StartSound(sound)
-            end
-        else
+        jass.SetSoundChannel(sound, model.channel)
+        jass.SetSoundVolume(sound, model.volume)
+        jass.SetSoundPitch(sound, model.pitch)
+        local shouldPlay = not player or jass.GetLocalPlayer() == player
+        if shouldPlay then
             jass.StartSound(sound)
         end
         lastPlayedSound = sound
+        debugLog(
+            nil,
+            "Sound3DII",
+            "pool slot=",
+            slot,
+            "count=",
+            count,
+            "localPlay=",
+            shouldPlay
+        )
     end
     return sound
 end

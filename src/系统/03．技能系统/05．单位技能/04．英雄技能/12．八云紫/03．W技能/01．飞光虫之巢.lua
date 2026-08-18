@@ -12,6 +12,8 @@ local ____01_FF0E_6CE2_4E0E_7C92_7684_5883_754C = require("系统.03．技能系
 local _____53D1_5C04_516B_4E91_7D2B_5F39_5E55 = ____01_FF0E_6CE2_4E0E_7C92_7684_5883_754C["发射八云紫弹幕"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____00A_FF0E_8868_73B0_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00A．表现工具")
+local _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放八云紫随机单位音效"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -158,6 +160,7 @@ local function _____91CA_653EW(_entry, hero, skillInstanceId)
         ["技能实例ID"] = skillInstanceId
     }
     if target ~= nil and target ~= 0 and _____662F_516B_4E91_7D2B_5408_6CD5_654C_4EBA(hero, target) then
+        _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(hero, _____914D_7F6E.W["指定目标语音键"])
         do
             local i = 0
             while i < _____914D_7F6E.W["裂隙数量"] do
@@ -168,12 +171,13 @@ local function _____91CA_653EW(_entry, hero, skillInstanceId)
                     hero,
                     targetX + math.cos(radians) * _____914D_7F6E.W["指定目标裂隙半径"],
                     targetY + math.sin(radians) * _____914D_7F6E.W["指定目标裂隙半径"],
-                    _____914D_7F6E.W["裂隙持续秒"]
+                    _____914D_7F6E.W["裂隙持续秒"] + _____914D_7F6E.W["裂隙清理宽限秒"]
                 )
                 i = i + 1
             end
         end
     else
+        _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(hero, _____914D_7F6E.W["无目标语音键"])
         local heroX = jass.GetUnitX(hero)
         local heroY = jass.GetUnitY(hero)
         local angle = _____4E24_70B9_89D2_5EA6(heroX, heroY, targetX, targetY)
@@ -191,7 +195,7 @@ local function _____91CA_653EW(_entry, hero, skillInstanceId)
                     hero,
                     firstX - math.cos(sideRadians) * _____914D_7F6E.W["横向间距"] * i,
                     firstY - math.sin(sideRadians) * _____914D_7F6E.W["横向间距"] * i,
-                    _____914D_7F6E.W["裂隙持续秒"]
+                    _____914D_7F6E.W["裂隙持续秒"] + _____914D_7F6E.W["裂隙清理宽限秒"]
                 )
                 i = i + 1
             end
@@ -205,7 +209,7 @@ local function _____91CA_653EW(_entry, hero, skillInstanceId)
         end
     end
     if target ~= nil and target ~= 0 and _____662F_516B_4E91_7D2B_5408_6CD5_654C_4EBA(hero, target) then
-        addDelayedCallback(_____914D_7F6E.W["裂隙持续秒"] * 1000, _____7ED3_7B97W_6307_5B9A_76EE_6807, context)
+        addDelayedCallback((_____914D_7F6E.W["每裂隙弹幕数"] + 1) * _____914D_7F6E.W["发射间隔秒"] * 1000, _____7ED3_7B97W_6307_5B9A_76EE_6807, context)
     end
 end
 _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({

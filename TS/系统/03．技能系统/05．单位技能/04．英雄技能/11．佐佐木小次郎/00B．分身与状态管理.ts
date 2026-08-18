@@ -7,7 +7,7 @@
  * - 初始隐藏 Q/W 二段技能（A0GT/A0GR，玩家级可用性开关，模块加载时设置）
  * - 分身创建：复用 SFB_setItemIllusion（幻象物品技能），动态写入输出 10% / 承伤 400%
  * - 分身落地处理：召唤事件中心捕获幻象 → 去碰撞、入场暂停、动作 9 @1.2 倍速、按需传送与结算
- * - 瞬移冷却（D 技能 A0GU 图标增删 + 3 秒倒计时，创建分身时立即刷新）
+ * - 瞬移冷却（单位级状态 + QWERD 被动冷却显示，创建分身时立即刷新）
  * - 「瞬移后」标记（右键换位后 1 秒内 Q 附加剑气）
  * - 普攻计数（7 次普通攻击在敌人身后创建分身，不含技能普攻）
  * - 扇形技能伤害结算（Q / W 共用）
@@ -68,6 +68,9 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, target: any, buffID: string) => void;
 };
+const { 登记被动技能冷却 } = require("系统.03．技能系统.01．技能冷却.03．QWERD冷却显示") as {
+  登记被动技能冷却: (this: void, unit: any, abilityId: number, cooldownSec: number) => void;
+};
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
@@ -76,7 +79,6 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const 佐佐木单位类型ID = stringToFourCCSafe(佐佐木单位技能配置.单位类型ID);
 const Q二段技能ID = stringToFourCCSafe(佐佐木单位技能配置.Q二段技能ID);
 const W二段技能ID = stringToFourCCSafe(佐佐木单位技能配置.W二段技能ID);
-const D技能ID = stringToFourCCSafe(佐佐木单位技能配置.D技能ID);
 const D被动技能ID = stringToFourCCSafe(佐佐木单位技能配置.D被动技能ID);
 /** 幻象原生 Buff（分身判定标志） */
 const 幻象BuffID = stringToFourCCSafe("BIil");
@@ -89,12 +91,7 @@ const SetUnitX = jass.SetUnitX as (this: void, unit: any, x: number) => void;
 const SetUnitY = jass.SetUnitY as (this: void, unit: any, y: number) => void;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void, player: any, abilityId: number, available: boolean) => void;
-const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
-const UnitRemoveAbility = jass.UnitRemoveAbility as (this: void, unit: any, abilityId: number) => boolean;
 const IsUnitIllusion = jass.IsUnitIllusion as (this: void, unit: any) => boolean;
-const { YDWESetUnitAbilityStateSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDWESetUnitAbilityStateSafe: (this: void, unit: any, abilityId: number, level: number, value: number) => boolean;
-};
 
 //=============================================================================
 // 一、初始隐藏 Q/W 二段技能（玩家级可用性，模块加载时对所有玩家生效）
@@ -192,7 +189,7 @@ export function 佐佐木扇形伤害(
 }
 
 //=============================================================================
-// 三、瞬移冷却（D 技能 A0GU 显隐）与「瞬移后」标记
+// 三、瞬移冷却（内部状态 + QWERD 显示）与「瞬移后」标记
 //=============================================================================
 
 interface 瞬移冷却记录 {
@@ -258,21 +255,19 @@ export function 瞬移是否就绪(this: void, 英雄: any): boolean {
   return record == null || record.冷却中 !== true;
 }
 
-/** 禁用瞬移指示：移除 A0GU，恢复被动图标 A0GW，冷却结束 */
-function 禁用瞬移指示(this: void, 英雄: any): void {
-  if (!单位存活(英雄)) return;
-  const owner = GetOwningPlayer(英雄);
-  UnitRemoveAbility(英雄, D技能ID);
-  SetPlayerAbilityAvailable(owner, D被动技能ID, true);
+/** 结束内部瞬移冷却，并清除 D 被动图标上的模拟冷却显示。 */
+function 结束瞬移冷却(this: void, 英雄: any): void {
+  if (英雄 == null || 英雄 === 0) return;
   const id = GetHandleId(英雄);
   const record = 瞬移冷却表[id];
   if (record != null) {
     record.冷却中 = false;
     record.计时器ID = 0;
   }
+  登记被动技能冷却(英雄, D被动技能ID, 0);
 }
 
-/** 启用瞬移指示：显示 A0GU 并挂 3 秒冷却（右键换位后调用） */
+/** 启用 3 秒内部瞬移冷却，并在常驻 A0GW 被动图标上显示倒计时。 */
 export function 启用瞬移冷却(this: void, 英雄: any): void {
   const id = GetHandleId(英雄);
   let record = 瞬移冷却表[id];
@@ -282,23 +277,20 @@ export function 启用瞬移冷却(this: void, 英雄: any): void {
   }
   if (record.计时器ID !== 0) removeDelayedCallback(record.计时器ID);
 
-  const owner = GetOwningPlayer(英雄);
-  SetPlayerAbilityAvailable(owner, D被动技能ID, false);
-  UnitAddAbility(英雄, D技能ID);
-  YDWESetUnitAbilityStateSafe(英雄, D技能ID, 1, 佐佐木单位技能配置.D.瞬移冷却秒);
   record.冷却中 = true;
+  登记被动技能冷却(英雄, D被动技能ID, 佐佐木单位技能配置.D.瞬移冷却秒);
   record.计时器ID = addDelayedCallback(佐佐木单位技能配置.D.瞬移冷却秒 * 1000, () => {
     const current = 瞬移冷却表[id];
     if (current == null) return;
     current.计时器ID = 0;
-    禁用瞬移指示(current.英雄);
+    结束瞬移冷却(current.英雄);
     瞬移冷却表[id] = undefined;
   });
 }
 
 /**
  * 刷新瞬移就绪（Q/W 施法与创建分身时调用）：
- * 源 JASS：Q/W 释放时移除 A0GU 恢复 A0GW；创建分身会提前销毁 3 秒冷却计时器。
+ * 保留源 JASS 的立即刷新语义，但只清内部状态和 QWERD 模拟冷却。
  */
 export function 刷新瞬移就绪(this: void, 英雄: any): void {
   const id = GetHandleId(英雄);
@@ -308,9 +300,7 @@ export function 刷新瞬移就绪(this: void, 英雄: any): void {
     record.计时器ID = 0;
   }
   if (record != null) record.冷却中 = false;
-  const owner = GetOwningPlayer(英雄);
-  UnitRemoveAbility(英雄, D技能ID);
-  SetPlayerAbilityAvailable(owner, D被动技能ID, true);
+  登记被动技能冷却(英雄, D被动技能ID, 0);
 }
 
 //=============================================================================
@@ -329,6 +319,9 @@ interface 分身待落地记录 {
 
 const 分身待落地表: Record<number, 分身待落地记录 | undefined> = {};
 
+/** 当前正在创建分身的佐佐木本体（SFB 幻象召唤事件的召唤单位是全局马甲，无法从召唤单位反推本体） */
+let 当前创建分身的英雄: any = null;
+
 function 分身入场处理(this: void, 分身: any, 记录: 分身待落地记录): void {
   // 去碰撞（几乎不可移动 + 不阻挡）
   if (typeof japi.EXSetUnitCollisionType === "function") {
@@ -336,10 +329,10 @@ function 分身入场处理(this: void, 分身: any, 记录: 分身待落地记�
   }
   添加单位暂停(分身, 分身入场暂停来源);
 
-  if (记录.行为 !== "原地") {
-    SetUnitX(分身, 记录.落点X);
-    SetUnitY(分身, 记录.落点Y);
-  }
+  // 统一传送到落点（SFB 幻象默认创建在全局马甲位置，并非本体位置，必须手动定位到起点/落点）。
+  // Q「原地」= 起点、W「W落地」= 原点、普攻「身后」= 敌人身后；先让分身出现在起点，本体随后才位移。
+  SetUnitX(分身, 记录.落点X);
+  SetUnitY(分身, 记录.落点Y);
   播放佐佐木配置动作(分身, 9, 1.2);
 
   if (记录.行为 === "W落地") {
@@ -373,11 +366,15 @@ function 分身入场处理(this: void, 分身: any, 记录: 分身待落地记�
 
 function on佐佐木分身召唤(this: void, 被召唤单位: any, 召唤单位: any): void {
   if (被召唤单位 == null || 被召唤单位 === 0) return;
-  if (!IsUnitIllusion(被召唤单位)) return;
-  if (GetUnitTypeId(被召唤单位) !== 佐佐木单位类型ID) return;
-  if (!是佐佐木本体(召唤单位)) return;
+  const 是幻象 = IsUnitIllusion(被召唤单位);
+  const 类型匹配 = GetUnitTypeId(被召唤单位) === 佐佐木单位类型ID;
+  if (!是幻象) return;
+  if (!类型匹配) return;
+  const 英雄 = 当前创建分身的英雄;
+  if (英雄 == null || 英雄 === 0) return;
+  if (!是佐佐木本体(英雄)) return;
 
-  const id = GetHandleId(召唤单位);
+  const id = GetHandleId(英雄);
   const 记录 = 分身待落地表[id];
   if (记录 == null) return;
   分身待落地表[id] = undefined;
@@ -404,7 +401,10 @@ export function 创建佐佐木分身(
   const id = GetHandleId(英雄);
   分身待落地表[id] = { 英雄, 落点X, 落点Y, 朝向, 行为, 技能ID };
 
+  // 记录当前创建分身的本体，供召唤事件回调反查（SFB 召唤单位是全局马甲）
+  当前创建分身的英雄 = 英雄;
   const ok = SFB_setItemIllusion(英雄, 英雄, cfg.分身持续秒, cfg.分身输出倍率, cfg.分身承伤倍率);
+  当前创建分身的英雄 = null;
   if (!ok) {
     分身待落地表[id] = undefined;
     return false;
@@ -460,7 +460,7 @@ function on佐佐木普攻命中(this: void, ctx: any): void {
   const 指向角度 = 两点角度(GetUnitX(source), GetUnitY(source), GetUnitX(target), GetUnitY(target));
   const 身后X = GetUnitX(target) + Math.cos(指向角度 * Math.PI / 180) * cfg.普攻分身后方距离;
   const 身后Y = GetUnitY(target) + Math.sin(指向角度 * Math.PI / 180) * cfg.普攻分身后方距离;
-  创建佐佐木分身(source, 身后X, 身后Y, 指向角度, "身后", D技能ID);
+  创建佐佐木分身(source, 身后X, 身后Y, 指向角度, "身后", D被动技能ID);
 }
 
 注册普攻攻击效果监听({

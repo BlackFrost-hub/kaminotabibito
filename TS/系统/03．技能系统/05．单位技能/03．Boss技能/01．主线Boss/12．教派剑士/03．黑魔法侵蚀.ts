@@ -138,5 +138,4 @@ export function 注册教派剑士黑魔法侵蚀(this: void): void {
   黑魔法侵蚀已注册 = true;
   registerAppliedFinalDamageListener(on教派剑士普通攻击最终伤害);
   registerDamageModifier(教派剑士黑魔法暴击修正, 教派剑士技能配置.黑魔法侵蚀.黑魔法暴击修正器优先级);
-  debugLogForce('教派剑士-黑魔法侵蚀', '普通攻击附加暗伤与优先级99黑魔法暴击监听注册完成', 'unitTypeId=', 教派剑士单位类型ID);
 }

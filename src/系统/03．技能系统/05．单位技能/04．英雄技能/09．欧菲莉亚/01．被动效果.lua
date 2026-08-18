@@ -40,7 +40,7 @@ local function _____5904_7406_6B27_83F2_8389_4E9A_6B7B_4EA1_88AB_52A8(dyingUnit,
     if now < cooldownUntil then
         return
     end
-    if not _____76F4_63A5_590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit) then
+    if not _____76F4_63A5_590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, true) then
         return
     end
     _____8BBE_7F6E_6B27_83F2_8389_4E9A_88AB_52A8_590D_6D3B_751F_547D(dyingUnit)

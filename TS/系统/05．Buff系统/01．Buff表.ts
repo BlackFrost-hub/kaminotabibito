@@ -14,11 +14,16 @@ export interface BuffData {
   buffName: string;
   icon: string;
   effect: string;
-  effectMode?: 'attach' | 'point';
+  /** 特效位置：挂单位挂点、按单位当前坐标播放，或固定在首次施加坐标。 */
+  effectMode?: 'attach' | 'follow' | 'point';
   effectAttachPoint?: string;
   effectScale?: number;
   /** 非空时改用单位坐标跟随特效，并以该值作为绝对高度。 */
   effectHeight?: number;
+  /** 大于 0 时按该秒数重复播放一次 Buff 特效；不填写时保持原有一次性/常驻表现。 */
+  effectTick?: number;
+  /** 周期特效每次播放的存活秒数；不填写时使用 effectTick。 */
+  effectTickDuration?: number;
   type: string;
   interval: number;
   maxStack: number;

@@ -19,18 +19,19 @@ local ____require_result_2 = require("系统.00．核心系统.01．事件中心
 local registerSpellEffectListener = ____require_result_2.registerSpellEffectListener
 local ____require_result_3 = require("系统.04．伤害系统.01．伤害事件")
 local registerDamageCallback = ____require_result_3.registerDamageCallback
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
-local _____65BD_52A0_7729_6655 = ____require_result_4["施加眩晕"]
-local ____require_result_5 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-local ____SFB__65BD_52A0_901A_7528Buff = ____require_result_5["SFB_施加通用Buff"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
-local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_6["创建原生弹幕"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
-local ____require_result_8 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_8.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_8["移除单位指定Buff"]
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+local ____SFB__65BD_52A0_901A_7528Buff = ____require_result_4["SFB_施加通用Buff"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
+local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_5["创建原生弹幕"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_6["单位存活"]
+local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_7.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_7["移除单位指定Buff"]
+local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_8["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_8["移除单位暂停"]
 local ____R_6280_80FDID_6570_503C = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["R技能ID"])
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
@@ -67,7 +68,7 @@ local function _____53D1_5C04_71D5_8FD4_5200_5149(_____82F1_96C4, _____8D77_70B9
         GetUnitY(_____82F1_96C4),
         cfg["三击音效裁断"]
     )
-    _____521B_5EFA_539F_751F_5F39_5E55({
+    local _____5F39_5E55_53C2_6570 = {
         ["所有者"] = _____82F1_96C4,
         X = _____8D77_70B9X,
         Y = _____8D77_70B9Y,
@@ -89,36 +90,31 @@ local function _____53D1_5C04_71D5_8FD4_5200_5149(_____82F1_96C4, _____8D77_70B9
         ["伤害形态"] = "单体",
         ["参与技能伤害加成"] = true,
         ["模型"] = cfg["刀光特效模型"],
-        ["缩放"] = _____51FB["缩放"],
+        ["缩放"] = 1.5,
+        ["附加特效1"] = {["模型"] = cfg["剑气伴随模型"], ["缩放"] = _____51FB["缩放"], ["跟随主弹幕参数"] = true},
         ["on命中"] = function(_____76EE_6807_5355_4F4D)
             ____SFB__65BD_52A0_901A_7528Buff(_____82F1_96C4, _____76EE_6807_5355_4F4D, 21, _____51FB["硬直秒"])
         end
-    })
+    }
+    _____521B_5EFA_539F_751F_5F39_5E55(_____5F39_5E55_53C2_6570)
 end
 --- 触发燕返：无敌 + 0.55 倍速 + 三连刀光（源 Trig_zzm_QFunc003Func002Func005T）
 local function _____89E6_53D1_71D5_8FD4(_____82F1_96C4)
     local cfg = _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.R
     SetUnitInvulnerable(_____82F1_96C4, true)
-    SetUnitTimeScale(_____82F1_96C4, 0.55)
-    _____65BD_52A0_7729_6655(
-        _____82F1_96C4,
-        _____82F1_96C4,
-        cfg["三击间隔秒"] * 4,
-        "佐佐木燕返",
-        "技能"
-    )
+    _____64AD_653E_4F50_4F50_6728_914D_7F6E_52A8_4F5C(_____82F1_96C4, cfg["反击动作索引"], cfg["反击动作速度"])
     _____64AD_653E_4F50_4F50_6728_5168_5C40_97F3_6548(cfg["燕返触发音效键"])
     local _____89D2_5EA6 = GetUnitFacing(_____82F1_96C4)
-    local _____5F27_5EA6 = _____89D2_5EA6 * math.pi / 180
-    local _____5782_76F4_5F27_5EA6 = (_____89D2_5EA6 + 90) * math.pi / 180
-    local _____8D77_70B9X = GetUnitX(_____82F1_96C4) + math.cos(_____5782_76F4_5F27_5EA6) * 25 + math.cos(_____5F27_5EA6) * 50
-    local _____8D77_70B9Y = GetUnitY(_____82F1_96C4) + math.sin(_____5782_76F4_5F27_5EA6) * 25 + math.sin(_____5F27_5EA6) * 50
+    local _____5F27_5EA6__89D2_5EA6 = _____89D2_5EA6 * math.pi / 180
+    local _____5F27_5EA6__89D2_5EA6_52A090 = (_____89D2_5EA6 + 90) * math.pi / 180
+    local _____8D77_70B9X = GetUnitX(_____82F1_96C4) + math.cos(_____5F27_5EA6__89D2_5EA6_52A090) * 25 + math.cos(_____5F27_5EA6__89D2_5EA6) * 50
+    local _____8D77_70B9Y = GetUnitY(_____82F1_96C4) + math.sin(_____5F27_5EA6__89D2_5EA6_52A090) * 25 + math.sin(_____5F27_5EA6__89D2_5EA6) * 50
     do
         local _____51FB_5E8F = 0
         while _____51FB_5E8F < #cfg["三击"] do
             addDelayedCallback(
                 math.floor((_____51FB_5E8F + 1) * cfg["三击间隔秒"] * 1000 + 0.5),
-                function()
+                function(_____5F53_524D_51FB_5E8F)
                     if not _____5355_4F4D_5B58_6D3B(_____82F1_96C4) then
                         return
                     end
@@ -127,9 +123,10 @@ local function _____89E6_53D1_71D5_8FD4(_____82F1_96C4)
                         _____8D77_70B9X,
                         _____8D77_70B9Y,
                         _____89D2_5EA6,
-                        _____51FB_5E8F
+                        _____5F53_524D_51FB_5E8F
                     )
-                end
+                end,
+                _____51FB_5E8F
             )
             _____51FB_5E8F = _____51FB_5E8F + 1
         end
@@ -143,6 +140,7 @@ local function _____89E6_53D1_71D5_8FD4(_____82F1_96C4)
             SetUnitInvulnerable(_____82F1_96C4, false)
             SetUnitTimeScale(_____82F1_96C4, 1)
             SetUnitAnimation(_____82F1_96C4, "stand")
+            _____79FB_9664_5355_4F4D_6682_505C(_____82F1_96C4, "佐佐木R燕返防御")
         end
     )
 end
@@ -156,14 +154,8 @@ local function ____on_4F50_4F50_6728R_751F_6548(_____65BD_6CD5_5355_4F4D, _____6
     local cfg = _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.R
     local id = GetHandleId(_____65BD_6CD5_5355_4F4D)
     _____64AD_653E_4F50_4F50_6728_5168_5C40_97F3_6548(cfg["防御姿态音效键"])
-    _____64AD_653E_4F50_4F50_6728_914D_7F6E_52A8_4F5C(_____65BD_6CD5_5355_4F4D, 6, 0)
-    _____65BD_52A0_7729_6655(
-        _____65BD_6CD5_5355_4F4D,
-        _____65BD_6CD5_5355_4F4D,
-        0.7,
-        "佐佐木燕返防御",
-        "技能"
-    )
+    _____64AD_653E_4F50_4F50_6728_914D_7F6E_52A8_4F5C(_____65BD_6CD5_5355_4F4D, cfg["防御动作索引"], 0)
+    _____6DFB_52A0_5355_4F4D_6682_505C(_____65BD_6CD5_5355_4F4D, "佐佐木R燕返防御")
     ____R_9632_5FA1_7A97_53E3_8868[id] = true
     ____R_53CD_51FB_6807_8BB0_8868[id] = false
     registerManualBuff(_____65BD_6CD5_5355_4F4D, _____4F50_4F50_6728_5C0F_6B21_90CEBuffID["燕返守卫"], cfg["防御窗口秒"], 0)
@@ -187,6 +179,7 @@ local function ____on_4F50_4F50_6728R_751F_6548(_____65BD_6CD5_5355_4F4D, _____6
             else
                 SetUnitTimeScale(_____65BD_6CD5_5355_4F4D, 1)
                 SetUnitAnimation(_____65BD_6CD5_5355_4F4D, "stand")
+                _____79FB_9664_5355_4F4D_6682_505C(_____65BD_6CD5_5355_4F4D, "佐佐木R燕返防御")
             end
         end
     )

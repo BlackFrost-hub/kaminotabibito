@@ -31,7 +31,7 @@ local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单�
 local _____5355_4F4D_5B58_6D3B = ____require_result_6["单位存活"]
 local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
 local isUnitEnemy = ____require_result_7.isUnitEnemy
-local ____D_6280_80FDID_6570_503C = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["D技能ID"])
+local ____D_6280_80FDID_6570_503C = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["D被动技能ID"])
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -272,39 +272,14 @@ local function ____on_4F50_4F50_6728_53F3_952E_6307_4EE4(_____6307_4EE4_5355_4F4
     local cfg = _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.D
     local _____672C_4F53X = GetUnitX(_____82F1_96C4)
     local _____672C_4F53Y = GetUnitY(_____82F1_96C4)
-    local candidates = getUnitsInRange(
+    if _____662F_4F50_4F50_6728_5206_8EAB(_____82F1_96C4, _____76EE_6807_5355_4F4D) and _____4E24_70B9_8DDD_79BB(
+        _____672C_4F53X,
+        _____672C_4F53Y,
         GetUnitX(_____76EE_6807_5355_4F4D),
-        GetUnitY(_____76EE_6807_5355_4F4D),
-        100
-    )
-    local _____53EF_9009_5206_8EAB = {}
-    do
-        local i = 0
-        while i < #candidates do
-            do
-                local unit = candidates[i + 1]
-                if not _____662F_4F50_4F50_6728_5206_8EAB(_____82F1_96C4, unit) then
-                    goto __continue36
-                end
-                if _____4E24_70B9_8DDD_79BB(
-                    _____672C_4F53X,
-                    _____672C_4F53Y,
-                    GetUnitX(unit),
-                    GetUnitY(unit)
-                ) > cfg["瞬移最大距离"] then
-                    goto __continue36
-                end
-                _____53EF_9009_5206_8EAB[#_____53EF_9009_5206_8EAB + 1] = unit
-            end
-            ::__continue36::
-            i = i + 1
-        end
+        GetUnitY(_____76EE_6807_5355_4F4D)
+    ) <= cfg["瞬移最大距离"] then
+        _____6267_884C_4F50_4F50_6728_6362_4F4D(_____82F1_96C4, _____76EE_6807_5355_4F4D)
     end
-    if #_____53EF_9009_5206_8EAB == 0 then
-        return
-    end
-    local _____5206_8EAB_5355_4F4D = _____53EF_9009_5206_8EAB[math.floor(math.random() * #_____53EF_9009_5206_8EAB) + 1]
-    _____6267_884C_4F50_4F50_6728_6362_4F4D(_____82F1_96C4, _____5206_8EAB_5355_4F4D)
 end
 registerTargetOrderListener(____on_4F50_4F50_6728_53F3_952E_6307_4EE4)
 return ____exports

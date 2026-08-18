@@ -83,17 +83,20 @@ function 释放瞬步(this: void, context: D上下文, caster: any, _技能实�
     const ty = GetSpellTargetY();
     const dx = tx - x;
     const dy = ty - y;
-    const 点距 = SquareRoot(dx * dx + dy * dy);
-    // 源：沿目标方向全距离滑移；目标点更近时收敛到目标点，避免越过施法意图
-    const 实际距离 = 点距 < 瞬步距离 ? 点距 : 瞬步距离;
+    // 源与技能说明：目标点只决定方向，始终瞬步完整距离。
     const 角度 = Atan2(dy, dx) * bj_RADTODEG;
-    目标X = x + MathCos(角度) * 实际距离;
-    目标Y = y + MathSin(角度) * 实际距离;
+    目标X = x + MathCos(角度) * 瞬步距离;
+    目标Y = y + MathSin(角度) * 瞬步距离;
   }
+
+  const 位移X = 目标X - x;
+  const 位移Y = 目标Y - y;
+  const 实际位移距离 = SquareRoot(位移X * 位移X + 位移Y * 位移Y);
 
   开始冲锋(caster, {
     目标X,
     目标Y,
+    距离: 实际位移距离,
     持续时间: 配置.D.冲锋持续时间秒,
     检查地形: true,
     禁用碰撞: true,

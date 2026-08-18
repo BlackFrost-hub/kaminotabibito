@@ -14,7 +14,7 @@
 
 import { 铃仙单位技能配置 } from "./00．配置";
 import { 铃仙BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/12．铃仙";
-import { 播放铃仙全局音效 } from "./00A．表现工具";
+import { 播放铃仙全局音效, 播放铃仙单位绑定音效 } from "./00A．表现工具";
 import {
   是铃仙本体,
   是铃仙分身,
@@ -27,6 +27,7 @@ import {
 } from "./00B．分身与状态管理";
 
 const jass = require("jass.common") as any;
+
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
@@ -101,6 +102,16 @@ interface 铃仙W会话 {
 }
 
 const 铃仙W会话表: Record<number, 铃仙W会话 | undefined> = {};
+
+/** 当前正在创建分身的铃仙（SFB 马甲回调中无法从召唤单位获取本体，用此变量桥接） */
+let 当前W铃仙: any | null = null;
+/** 获取当前正在创建分身的铃仙句柄（供召唤回调使用，对应 JASS 触发器存储的铃仙引用） */
+function 获取铃仙句柄(this: void, 被召唤单位: any): number | null {
+  if (当前W铃仙 != null && 当前W铃仙 !== 0) {
+    return GetHandleId(当前W铃仙);
+  }
+  return null;
+}
 
 function 单位存活(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && !IsUnitType(unit, UNIT_TYPE_DEAD);
@@ -179,7 +190,7 @@ function 铃仙分身传送出现(this: void, 会话: 铃仙W会话, 分身: any
   const 分身X = GetUnitX(分身);
   const 分身Y = GetUnitY(分身);
   const 朝向 = GetUnitFacing(分身);
-  // 先置位“已出现”，防止 KillUnit 触发的死亡事件走“全灭→原地出现”
+  // 先置位"已出现"，防止 KillUnit 触发的死亡事件走"全灭→原地出现"
   会话.是否出现 = true;
   const 分身组 = 获取铃仙分身组(会话.英雄);
   for (let i = 0; i < 分身组.length; i++) {
@@ -197,15 +208,19 @@ function 铃仙分身传送出现(this: void, 会话: 铃仙W会话, 分身: any
 function on铃仙分身召唤(this: void, 被召唤单位: any, 召唤单位: any): void {
   if (被召唤单位 == null || 被召唤单位 === 0) return;
   if (!是铃仙分身(被召唤单位)) return;
-  if (!是铃仙本体(召唤单位)) return;
-  const 会话 = 铃仙W会话表[GetHandleId(召唤单位)];
-  if (会话 == null || 会话.是否出现) return;
+  // 源 JASS：仅检查被召唤单位类型（E07R），召唤单位是 SFB 马甲，非铃仙本体
+  const 铃仙句柄 = 获取铃仙句柄(被召唤单位);
+  if (铃仙句柄 == null) return;
+  const 会话 = 铃仙W会话表[铃仙句柄];
+  if (会话 == null || 会话.是否出现) {
+    return;
+  }
   const cfg = 铃仙单位技能配置.W;
-  加入铃仙分身(召唤单位, 被召唤单位);
+  加入铃仙分身(会话.英雄, 被召唤单位);
   会话.角度 += 90;
   if (会话.角度 >= 450) {
     // 第 5 个（中心分身）：隐藏本体、置于原位、1 秒后消失
-    ShowUnit(召唤单位, false);
+    ShowUnit(会话.英雄, false);
     SetUnitX(被召唤单位, 会话.原X);
     SetUnitY(被召唤单位, 会话.原Y);
     SetUnitFacing(被召唤单位, 会话.原朝向);
@@ -230,9 +245,12 @@ function on铃仙分身召唤(this: void, 被召唤单位: any, 召唤单位: an
 function on分身死亡(this: void, 死亡单位: any): void {
   if (死亡单位 == null || 死亡单位 === 0) return;
   const 会话 = 查找单位所属会话(死亡单位);
-  if (会话 == null) return;
+  if (会话 == null) {
+    return;
+  }
   移除铃仙分身(会话.英雄, 死亡单位);
-  if (铃仙分身数量(会话.英雄) <= 0) {
+  const 剩余 = 铃仙分身数量(会话.英雄);
+  if (剩余 <= 0) {
     铃仙原地出现(会话);
   }
 }
@@ -266,7 +284,9 @@ function on铃仙W生效(this: void, 施法单位: any, 技能ID数值: number):
 
   // 防御：若存在进行中的旧会话，先恢复本体（正常因 30s 冷却不会触发）
   const 旧会话 = 铃仙W会话表[id];
-  if (旧会话 != null) 铃仙原地出现(旧会话);
+  if (旧会话 != null) {
+    铃仙原地出现(旧会话);
+  }
 
   const 等级 = GetUnitAbilityLevel(英雄, W技能ID);
   const 持续秒 = cfg.分身持续秒[等级 - 1] ?? cfg.分身持续秒[0];
@@ -274,8 +294,8 @@ function on铃仙W生效(this: void, 施法单位: any, 技能ID数值: number):
   const 原Y = GetUnitY(英雄);
   const 原朝向 = GetUnitFacing(英雄);
 
-  // 施法音效 + 施法特效
-  播放铃仙全局音效("gg_snd_LX_W2");
+  // 施法音效（源 JASS：PlaySoundOnUnitBJ(gg_snd_LX_W2, 100, 铃仙)）
+  播放铃仙单位绑定音效(英雄, "gg_snd_LX_W2", 100);
   创建点特效({
     模型路径: cfg.施法特效模型,
     X: 原X,
@@ -300,11 +320,17 @@ function on铃仙W生效(this: void, 施法单位: any, 技能ID数值: number):
   const 会话: 铃仙W会话 = { 英雄, 原X, 原Y, 原朝向, 是否出现: false, 角度: 0, 超时计时器ID: 0 };
   铃仙W会话表[id] = 会话;
 
+  当前W铃仙 = 英雄;
   // 创建 5 个分身（15% 输出 / 400% 承伤）
+  let 创建成功数 = 0;
   for (let i = 0; i < 5; i++) {
     const ok = SFB_setItemIllusion(英雄, 英雄, 持续秒, cfg.分身输出倍率, cfg.分身承伤倍率);
-    if (!ok) break;
+    if (!ok) {
+      break;
+    }
+    创建成功数 += 1;
   }
+  当前W铃仙 = null;
 
   // 超时未选择 → 原地出现
   会话.超时计时器ID = addDelayedCallback(cfg.超时恢复秒 * 1000, () => {

@@ -11,6 +11,7 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
 local ____require_result_1 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
@@ -21,8 +22,8 @@ local ____require_result_3 = require("系统.03．技能系统.00．技能模板
 local _____65BD_52A0_7729_6655 = ____require_result_3["施加眩晕"]
 local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_4.registerManualBuff
-local ____require_result_5 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_CooPlayReuse = ____require_result_5.Sound3DII_CooPlayReuse
+local ____require_result_5 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundAtPointBJ = ____require_result_5.PlaySoundAtPointBJ
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
 local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
@@ -101,12 +102,12 @@ local function _____91CA_653E_7075_538B_7206_53D1(_context, caster, _____6280_80
             ["持续秒"] = _____914D_7F6E.W["连携"]["附加特效"]["持续秒"]
         })
     end
-    Sound3DII_CooPlayReuse(
-        _____914D_7F6E.W["音效"]["路径"],
+    PlaySoundAtPointBJ(
+        jglobals.gg_snd_ThunderClapCaster,
+        100,
         x,
         y,
-        0,
-        _____914D_7F6E.W["音效"]["裁断距离"]
+        0
     )
     local _____4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * _____914D_7F6E.W["伤害攻击力倍率"]
     do

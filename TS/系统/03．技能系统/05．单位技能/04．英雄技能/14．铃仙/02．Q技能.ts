@@ -1,27 +1,29 @@
 /** @noSelfInFile */
 
 /**
- * 铃仙 - Q：幻觉冲击波（A0GK）
+ * 铃仙 - Q：幻觉冲击波（A0GK，源 ReisenQ）
  *
- * 源 JASS：`铃仙.j` 的 ReisenQ 分支。
+ * 源 JASS：`铃仙.j` 的 ReisenQ 分支（入口 1380-1418，主流程 Func001Func012T、
+ * 推进 Func001Func012Func014T、分身模仿 Func001Func012Func002A）。
  *
  * 逻辑：
- * - 施法后本体沿施法方向发射精神波（TS 原生弹幕，直线飞行、命中半径 165）。
- * - 伤害 = 攻击力 × 1.85，每个分身使伤害提高 15%。
- * - 命中目标减速 20% 持续 2 秒；命中英雄额外施加隐身 1 秒。
- * - 非英雄目标伤害 ×1.5；所有伤害为魔法伤害且 attack=true（攻击效果）。
- * - 每个目标整次 Q 只命中一次（命中记录表去重）。
- * - 分身模仿：播放动作 2 @1.8 倍速、施加眩晕 0.35 秒锁身（对应源 JASS YDWEUnitAddStun，到时自动解除）、
- *   在分身位置创建 pinkredlaser 特效。
- * - 命中时在弹幕当前坐标创建 pinkredlaser 特效（缩放 0.3、Z 200、1 秒后消失）。
+ * - 施法：播放 gg_snd_LX_Q2 + gg_snd_LX_q 音效；每个存活分身模仿（面向施法方向、
+ *   0.35s 施法硬直后恢复动作 2、pinkredlaser 特效）。
+ * - 本体 pinkredlaser 特效（缩放 0.3、Z 200、绕 Z 旋转施法方向、3 倍速、1 秒销毁）。
+ * - 底层用 TS 原生弹幕（无模型隐形单位壳）作为伤害发射器，
+ *   沿施法方向飞行 950 码（每 tick 50 码×19 tick），165 码命中半径穿透前进。
+ * - 命中：减速 20% 持续 2 秒；英雄伤害 = 总伤害、非英雄 = 总伤害 × 1.5，魔法伤害 attack=true。
+ * - 总伤害 = 攻击力 × 1.85 × (1 + 0.20 × 分身数)。
+ * - 飞行结束后若命中过英雄则给施法者添加 Agho 隐身 0.6 秒。
  */
 
 import { 铃仙单位技能配置 } from "./00．配置";
 import { 铃仙BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/12．铃仙";
-import { 播放铃仙配置动作 } from "./00A．表现工具";
-import { 是铃仙本体, 铃仙分身数量, 获取铃仙分身组, 是有效敌对目标 } from "./00B．分身与状态管理";
+import { 播放铃仙全局音效, 播放铃仙单位绑定音效 } from "./00A．表现工具";
+import { 是铃仙本体, 铃仙分身数量, 获取铃仙分身组, 移除铃仙分身, 是有效敌对目标 } from "./00B．分身与状态管理";
 
 const jass = require("jass.common") as any;
+
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
@@ -34,27 +36,18 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
 };
-const { 施加减速, 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境") as {
-  施加减速: (this: void, 来源: any, 目标: any, 降低比例: number, 持续时间: number, 效果来源名称?: string, 效果来源类型?: "装备" | "技能") => void;
-  施加眩晕: (this: void, 来源: any, 目标: any, 持续时间: number, 效果来源名称?: string, 效果来源类型?: "装备" | "技能") => void;
-};
-const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
-  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
-  移除单位指定Buff: (this: void, target: any, buffID: string) => void;
-};
-const { 施加隐身 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.15．隐身.index") as {
-  施加隐身: (this: void, 单位: any, 参数: {
-    持续时间: number;
-    来源单位?: any;
-    破隐固定额外伤害?: number;
-    破隐伤害倍率?: number;
-    破隐额外暗属性伤害倍率?: number;
-    技能伤害标记?: any;
-  }) => number;
-};
-const { 创建原生弹幕, 获取原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
+const { 创建原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index") as {
   创建原生弹幕: (this: void, 参数: any) => any;
-  获取原生弹幕: (this: void, 弹幕ID: number) => any;
+};
+const { 施加减速 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境") as {
+  施加减速: (this: void, 来源: any, 目标: any, 降低比例: number, 持续时间: number, 效果来源名称?: string, 效果来源类型?: "装备" | "技能") => void;
+};
+const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+};
+const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
+  添加单位暂停: (this: void, unit: any, source: string) => boolean;
+  移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: {
@@ -65,6 +58,7 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
     面向角度?: number;
     Z轴角度?: number;
     缩放?: number;
+    动画速度?: number;
     持续秒?: number;
   }) => any;
 };
@@ -79,69 +73,69 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
 
 const Q技能ID = stringToFourCCSafe(铃仙单位技能配置.Q技能ID);
+const Agho隐身能力ID = stringToFourCCSafe("Agho");
 
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
+const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
+const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
+const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
+const UnitRemoveAbility = jass.UnitRemoveAbility as (this: void, unit: any, abilityId: number) => boolean;
+
+const 角度转弧度 = Math.PI / 180;
 
 function 两点角度(this: void, x1: number, y1: number, x2: number, y2: number): number {
   return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
 }
 
 //=============================================================================
-// 一、分身模仿（源 JASS：Trig_L______ResenFunc001Func012Func002A）
+// 一、分身模仿（源 JASS：Func001Func012Func002A）
 //=============================================================================
 
-function 铃仙Q分身模仿(this: void, 施法者: any, 分身: any): void {
-  if (分身 == null || 分身 === 0 || !单位存活(分身)) return;
+function 铃仙Q分身模仿(this: void, 施法者: any, 分身: any, 方向角: number): void {
+  if (分身 == null || 分身 === 0) return;
   const cfg = 铃仙单位技能配置.Q;
+  // 分身死亡则从分身组移除（源 JASS：else 分支 GroupRemoveUnit）
+  if (!单位存活(分身)) {
+    移除铃仙分身(施法者, 分身);
+    return;
+  }
 
-  // 播放分身模仿动作（动作 2、倍速 1.8）
-  播放铃仙配置动作(分身, 2, 1.8);
+  // 面向施法方向 + 0.35s 施法硬直（源 JASS：SetUnitFacing + YDWEUnitAddStun）
+  SetUnitFacing(分身, 方向角);
+  添加单位暂停(分身, "铃仙Q分身模仿");
 
-  // 分身施法硬直：施加眩晕 0.35 秒锁身（对应源 JASS YDWEUnitAddStun，0.35 秒后到期自动解除）
-  施加眩晕(施法者, 分身, 0.35, "铃仙Q分身模仿", "技能");
-
-  // 分身特效：pinkredlaser
+  // 分身 pinkredlaser 特效：缩放 0.3、Z 175、绕 Z 旋转施法方向、3 倍速、1 秒销毁
   创建点特效({
     模型路径: cfg.命中特效模型,
     X: GetUnitX(分身),
     Y: GetUnitY(分身),
     Z: cfg.分身特效Z,
     缩放: cfg.分身特效缩放,
+    Z轴角度: 方向角,
+    动画速度: 3,
     持续秒: cfg.分身特效时长,
   });
-}
 
-//=============================================================================
-// 二、Q 施法主流程
-//=============================================================================
-
-function 铃仙Q命中特效(this: void, 弹幕ID: number, 目标: any): void {
-  const cfg = 铃仙单位技能配置.Q;
-  const 实例 = 获取原生弹幕(弹幕ID);
-  let 特效X: number;
-  let 特效Y: number;
-  if (实例 != null) {
-    特效X = 实例.当前X;
-    特效Y = 实例.当前Y;
-  } else if (目标 != null && 目标 !== 0) {
-    特效X = GetUnitX(目标);
-    特效Y = GetUnitY(目标);
-  } else {
-    return;
-  }
-  创建点特效({
-    模型路径: cfg.命中特效模型,
-    X: 特效X,
-    Y: 特效Y,
-    Z: cfg.命中特效Z,
-    缩放: cfg.命中特效缩放,
-    持续秒: cfg.命中特效时长,
+  // 0.35s 后恢复动作 2 并解除硬直（源 JASS：SetUnitAnimationByIndex(2) + YDWEUnitRemoveStun）
+  addDelayedCallback(350, () => {
+    if (分身 == null || 分身 === 0 || !单位存活(分身)) return;
+    SetUnitAnimationByIndex(分身, 2);
+    移除单位暂停(分身, "铃仙Q分身模仿");
   });
+
+  // 恢复倍速（源 JASS 78 行 SetUnitTimeScale 1.00）
+  SetUnitTimeScale(分身, 1.0);
 }
+
+//=============================================================================
+// 二、Q 施法主流程（源 JASS：入口 + Func001Func012T + Func001Func012Func014T）
+//=============================================================================
 
 function on铃仙Q(this: void, 施法者: any, 技能ID数值: number): void {
   if (技能ID数值 !== Q技能ID) return;
@@ -154,52 +148,67 @@ function on铃仙Q(this: void, 施法者: any, 技能ID数值: number): void {
   const 目标Y = GetSpellTargetY();
   const 方向角 = 两点角度(起点X, 起点Y, 目标X, 目标Y);
 
-  // 伤害 = 攻击力 × 1.85；每个分身使伤害提高 15%
-  const 分身数量 = 铃仙分身数量(施法者);
-  const 基础伤害 = 读取单位攻击力(施法者) * cfg.攻击力倍率 * (1 + cfg.每分身伤害加成 * 分身数量);
+  // 1. 施法音效（源 JASS 1387-1388：PlaySoundOnUnitBJ(gg_snd_LX_Q2, 100, unit) + PlaySoundOnUnitBJ(gg_snd_LX_q, 100, unit)）
+  播放铃仙单位绑定音效(施法者, "gg_snd_LX_Q2", 100);
+  播放铃仙单位绑定音效(施法者, "gg_snd_LX_q", 100);
 
-  // 分身模仿（每个存活分身播放动作 + 施法硬直 + 特效）
+  // 2. 分身模仿（源 JASS Func012T：ForGroupBJ 分身单位组 → Func002A）
   const 分身组 = 获取铃仙分身组(施法者);
   for (let i = 0; i < 分身组.length; i++) {
-    铃仙Q分身模仿(施法者, 分身组[i]);
+    铃仙Q分身模仿(施法者, 分身组[i], 方向角);
   }
 
-  // 创建 TS 原生弹幕：沿施法方向直线飞行
+  // 3. 本体 pinkredlaser 特效（源 JASS 209-226）
+  创建点特效({
+    模型路径: cfg.命中特效模型,
+    X: 起点X,
+    Y: 起点Y,
+    Z: cfg.命中特效Z,
+    缩放: cfg.命中特效缩放,
+    Z轴角度: 方向角,
+    动画速度: 3,
+    持续秒: cfg.命中特效时长,
+  });
+
+  // 4. 总伤害 = 攻击力 × 1.85 × (1 + 0.20 × 分身数)
+  const 分身数量 = 铃仙分身数量(施法者);
+  const 总伤害 = 读取单位攻击力(施法者) * cfg.攻击力倍率 * (1 + cfg.每分身伤害加成 * 分身数量);
+
+  // 5. 底层：TS 原生弹幕（无模型隐形单位壳）作为伤害发射器。
+  //    沿施法方向飞行 950 码（50 码/tick × 19 tick），165 命中半径穿透前进。
+  //    pinkredlaser 特效已在上面作为纯表现层播放，弹幕本体不可见。
+  let 命中英雄 = false;
+  let 命中单位数 = 0;
   创建原生弹幕({
     所有者: 施法者,
     X: 起点X,
     Y: 起点Y,
     方向角,
     速度: cfg.弹幕速度,
-    最大距离: cfg.弹幕每tick距离 * cfg.弹幕最大步数,
+    最大距离: cfg.弹幕最大步数 * cfg.弹幕每tick距离, // 19 × 50 = 950
+    生命周期: cfg.弹幕最大步数 * cfg.弹幕tick秒, // 19 × 0.03 ≈ 0.57，兜底结束
     命中半径: cfg.弹幕命中半径,
     影响目标: "敌方",
+    碰撞消失: false, // 穿透直线
     每单位最大命中次数: 1,
-    碰撞消失: false,
-    模型: cfg.弹幕模型,
-    目标筛选: (目标单位: any) => 是有效敌对目标(施法者, 目标单位),
-    on命中: (目标单位: any, 弹幕ID: number) => {
-      if (目标单位 == null || 目标单位 === 0) return;
-
-      // 减速 20% 持续 2 秒
-      施加减速(施法者, 目标单位, cfg.减速比例, cfg.减速持续秒, 铃仙BuffID.Q减速, "技能");
-
-      const 是英雄 = IsUnitType(目标单位, UNIT_TYPE_HERO);
-
-      // 命中英雄：铃仙自身短暂隐身 1 秒（源 JASS：命中英雄时 UnitAddAbility(铃仙, 'Agho')）
-      if (是英雄) {
-        施加隐身(施法者, { 持续时间: cfg.隐身持续秒, 来源单位: 施法者 });
-        // Q 隐身 Buff：命中英雄时登记隐身状态图标
-        registerManualBuff(施法者, 铃仙BuffID.Q隐身, cfg.隐身持续秒, 0);
-        // Q 反隐干扰：命中英雄时干扰附近反隐效果（源 JASS 对命中英雄加 Agho 干扰反隐，此处用隐身持续秒）
-        registerManualBuff(目标单位, 铃仙BuffID.Q反隐干扰, cfg.隐身持续秒, 0);
-      }
-
-      // 伤害：非英雄目标 ×1.5；魔法伤害 + attack=true（攻击效果）
+    最大总命中次数: 0,
+    模型: "", // 无模型隐形单位壳，只做伤害发射器
+    来源类型: "单位技能",
+    技能ID: Q技能ID,
+    技能标签: "铃仙-幻觉冲击波",
+    伤害形态: "单体",
+    参与技能伤害加成: true,
+    on命中: (目标: any) => {
+      // 减速 20% 持续 2 秒（源 JASS 111-117：e00D 马甲 slow 108=0.20 / 102,103=2.00）
+      施加减速(施法者, 目标, cfg.减速比例, cfg.减速持续秒, 铃仙BuffID.Q减速, "技能");
+      // 伤害：英雄 ×1 / 非英雄 ×1.5，魔法伤害 attack=true（源 JASS 118-122）
+      const 是英雄 = IsUnitType(目标, UNIT_TYPE_HERO);
+      if (是英雄) 命中英雄 = true;
+      命中单位数 += 1;
       造成技能伤害({
         来源: 施法者,
-        目标: 目标单位,
-        伤害: 是英雄 ? 基础伤害 : 基础伤害 * cfg.非英雄伤害倍率,
+        目标,
+        伤害: 是英雄 ? 总伤害 : 总伤害 * cfg.非英雄伤害倍率,
         伤害类型: DAMAGE_TYPE_MAGIC,
         attack: true,
         ranged: false,
@@ -211,9 +220,16 @@ function on铃仙Q(this: void, 施法者: any, 技能ID数值: number): void {
         伤害形态: "单体",
         参与技能伤害加成: true,
       });
-
-      // 命中特效：弹幕当前坐标创建 pinkredlaser
-      铃仙Q命中特效(弹幕ID, 目标单位);
+    },
+    on结束: (原因: any) => {
+      // 命中过英雄 → 给施法者添加 Agho 隐身 0.6 秒（源 JASS 143-161：0.60 定时器移除）
+      if (命中英雄) {
+        UnitAddAbility(施法者, Agho隐身能力ID);
+        registerManualBuff(施法者, 铃仙BuffID.Q隐身, cfg.隐身持续秒, 0);
+        addDelayedCallback(Math.round(cfg.隐身持续秒 * 1000), () => {
+          if (施法者 != null && 施法者 !== 0 && 单位存活(施法者)) UnitRemoveAbility(施法者, Agho隐身能力ID);
+        });
+      }
     },
   });
 }

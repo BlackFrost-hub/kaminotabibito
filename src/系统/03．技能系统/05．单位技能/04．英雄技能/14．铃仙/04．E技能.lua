@@ -7,7 +7,7 @@ local _____94C3_4ED9_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["铃�
 local ____12_FF0E_94C3_4ED9 = require("系统.05．Buff系统.03．Buff表.02．英雄.12．铃仙")
 local _____94C3_4ED9BuffID = ____12_FF0E_94C3_4ED9["铃仙BuffID"]
 local ____00A_FF0E_8868_73B0_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．铃仙.00A．表现工具")
-local _____64AD_653E_94C3_4ED9_5168_5C40_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放铃仙全局音效"]
+local _____64AD_653E_94C3_4ED9_5355_4F4D_7ED1_5B9A_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放铃仙单位绑定音效"]
 local _____64AD_653E_94C3_4ED9_914D_7F6E_52A8_4F5C = ____00A_FF0E_8868_73B0_5DE5_5177["播放铃仙配置动作"]
 local ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406 = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．铃仙.00B．分身与状态管理")
 local _____662F_94C3_4ED9_672C_4F53 = ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406["是铃仙本体"]
@@ -126,6 +126,7 @@ local _____89D2_5EA6_8F6C_5F27_5EA6 = math.pi / 180
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_LIGHTNING = jass.DAMAGE_TYPE_LIGHTNING
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
+local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
@@ -360,7 +361,7 @@ local function ____on_94C3_4ED9E_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_8
     end
     local _____82F1_96C4 = _____65BD_6CD5_5355_4F4D
     local ctx = _____521B_5EFAE_4E0A_4E0B_6587(_____82F1_96C4)
-    _____64AD_653E_94C3_4ED9_5168_5C40_97F3_6548("gg_snd_LX_E")
+    _____64AD_653E_94C3_4ED9_5355_4F4D_7ED1_5B9A_97F3_6548(_____82F1_96C4, "gg_snd_LX_E", 100)
     SetUnitAnimation(_____82F1_96C4, "spell five")
     _____64AD_653E_94C3_4ED9_914D_7F6E_52A8_4F5C(_____82F1_96C4, -1, 1)
     ____SFB__65BD_52A0_901A_7528Buff(_____82F1_96C4, _____82F1_96C4, 21, cfg.E["施法硬直秒"])

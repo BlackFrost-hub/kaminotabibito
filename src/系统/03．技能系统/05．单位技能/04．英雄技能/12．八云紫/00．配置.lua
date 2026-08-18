@@ -47,7 +47,7 @@ ____exports["八云紫单位技能配置"] = {
         ["展开范围"] = 175,
         ["展开伤害攻击力比例"] = 0.6,
         ["二次命中窗口秒"] = 3,
-        ["二次命中额外倍率"] = 2.5,
+        ["二次命中额外倍率"] = 2,
         ["二次命中眩晕秒"] = 1,
         ["附近检测范围"] = 1200,
         ["短期持续秒"] = 10,
@@ -102,13 +102,19 @@ ____exports["八云紫单位技能配置"] = {
         ["指定裂隙波数"] = 3,
         ["指定裂隙波间隔秒"] = 0.5,
         ["模型"] = "Abilities\\Spells\\Undead\\OrbOfDeath\\OrbOfDeathMissile.mdl",
-        ["自动追踪裂隙范围"] = 300
+        ["自动追踪裂隙范围"] = 300,
+        ["普通起手音效键"] = "gg_snd_tan2",
+        ["普通语音键"] = {"gg_snd_YakumoYukari_Q1", "gg_snd_YakumoYukari_Q2", "gg_snd_YakumoYukari_Q3"},
+        ["指定裂隙语音键"] = {"gg_snd_YakumoYukari_Q21", "gg_snd_YakumoYukari_Q22", "gg_snd_YakumoYukari_Q23"},
+        ["裂隙爆发音效键"] = "gg_snd_tan",
+        ["裂隙触发音效键"] = "gg_snd_tan2"
     },
     W = {
         ["裂隙数量"] = 4,
         ["每裂隙弹幕数"] = 5,
         ["发射间隔秒"] = 0.33,
         ["裂隙持续秒"] = 1.65,
+        ["裂隙清理宽限秒"] = 0.05,
         ["无目标后方距离"] = 250,
         ["横向起点距离"] = 250,
         ["横向间距"] = 125,
@@ -118,7 +124,9 @@ ____exports["八云紫单位技能配置"] = {
         ["周围伤害范围"] = 500,
         ["周围伤害攻击力比例"] = 3,
         ["结算特效"] = "war3mapImported\\[AKE]war3AKE.com - 2384448388546355503762198.mdl",
-        ["结算特效高度"] = 233
+        ["结算特效高度"] = 233,
+        ["无目标语音键"] = {"gg_snd_YakumoYukari_W3", "gg_snd_YakumoYukari_W4", "gg_snd_YakumoYukari_W5"},
+        ["指定目标语音键"] = {"gg_snd_YakumoYukari_W1", "gg_snd_YakumoYukari_W6", "gg_snd_YakumoYukari_W2"}
     },
     E = {
         ["最大间隙秒"] = 1.6,
@@ -136,16 +144,26 @@ ____exports["八云紫单位技能配置"] = {
         ["自身额外减冷却比例"] = 0.3,
         ["裂隙额外减冷却比例"] = 0.3,
         ["友方额外减冷却比例"] = 0.2,
+        ["隐藏缩放"] = 0.01,
         ["恢复缩放"] = 1.1,
+        ["恢复索敌范围"] = 650,
         ["消失特效"] = "war3mapImported\\ArcaneBurst.mdx",
         ["消失特效缩放"] = 1.5,
         ["消失特效高度"] = 35,
         ["出现特效"] = "war3mapImported\\ancientexplodeblue.mdx",
         ["敌方结算特效"] = "war3mapImported\\dark execution.mdx",
-        BuffID = "YKR1"
+        ["敌方结算特效缩放"] = 2,
+        ["敌方结算特效速度"] = 2,
+        ["敌方结算特效高度"] = 30,
+        ["敌方结算特效持续秒"] = 2.5,
+        BuffID = "YKR1",
+        ["友方出现语音键"] = {"gg_snd_YakumoYukari_E32", "gg_snd_YakumoYukari_E31"},
+        ["敌方出现语音键"] = "gg_snd_YakumoYukari_E4",
+        ["主动出现语音键"] = {"gg_snd_YakumoYukari_ECX2", "gg_snd_YakumoYukari_ECX1"}
     },
     R = {
         ["裂隙选择范围"] = 400,
+        ["无合法裂隙失败冷却秒"] = 5,
         ["主动二段窗口秒"] = 2,
         ["列车Tick毫秒"] = 40,
         ["列车每Tick距离"] = 20,
@@ -163,6 +181,7 @@ ____exports["八云紫单位技能配置"] = {
         ["路径特效B"] = "war3mapImported\\StallordBreathMissile.mdx",
         ["路径特效B缩放"] = 4,
         ["路径特效持续秒"] = 1.1
-    }
+    },
+    D = {["硬直秒"] = 1.2, ["施法动作"] = "attack,2", ["展开音效键"] = {"gg_snd_kira", "gg_snd_SpellShieldImpact1"}}
 }
 return ____exports

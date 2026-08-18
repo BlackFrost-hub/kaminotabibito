@@ -249,5 +249,4 @@ export function 注册沙漠食人魔风暴之锤(this: void): void {
     释放技能: on风暴之锤技能壳释放,
     技能实例持续时间秒: 7,
   });
-  debugLogForce('沙漠食人魔-风暴之锤', '技能监听注册完成', 'skillId=', 风暴之锤技能ID);
 }

@@ -6,6 +6,8 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_1.registerDeathListener
 local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
 local _____529F_80FD_5F00_5173_6A21_5757 = require("系统.00．核心系统.02．功能开关.01．QWERD显示开关")
 local platformAbilityApi = require("平台扩展API取值")
@@ -28,8 +30,59 @@ local TEXT_W = 0.042
 local TEXT_H = 0.02
 local initialized = false
 local _____6587_672C_7EC4_7F13_5B58 = nil
+local _____88AB_52A8_51B7_5374_8868 = {}
 local function isValidHandle(handle)
     return handle ~= nil and handle ~= 0
+end
+local function _____5F53_524D_6BEB_79D2()
+    return os.clock() * 1000
+end
+local function _____88AB_52A8_51B7_5374_952E(whichHero, abilityId)
+    return (tostring(jass.GetHandleId(whichHero)) .. "_") .. tostring(abilityId)
+end
+--- 登记被动/内部冷却到 QWERD 冷却显示（仅本地表现，外部传秒数）。
+-- 
+-- @param whichHero 拥有该被动技能的单位
+-- @param abilityId 被动技能代码（命令卡上实际显示的 ID）
+-- @param cooldownSec 冷却秒数；<=0 清除登记
+____exports["登记被动技能冷却"] = function(whichHero, abilityId, cooldownSec)
+    if not isValidHandle(whichHero) or abilityId == 0 then
+        return
+    end
+    local key = _____88AB_52A8_51B7_5374_952E(whichHero, abilityId)
+    if cooldownSec <= 0 then
+        _____88AB_52A8_51B7_5374_8868[key] = nil
+        return
+    end
+    local totalMs = cooldownSec * 1000
+    _____88AB_52A8_51B7_5374_8868[key] = {
+        ["结束毫秒"] = _____5F53_524D_6BEB_79D2() + totalMs,
+        ["总毫秒"] = totalMs
+    }
+end
+local function _____67E5_8BE2_88AB_52A8_51B7_5374(whichHero, abilityId)
+    local record = _____88AB_52A8_51B7_5374_8868[_____88AB_52A8_51B7_5374_952E(whichHero, abilityId)]
+    if record == nil then
+        return 0
+    end
+    local remainingMs = record["结束毫秒"] - _____5F53_524D_6BEB_79D2()
+    if remainingMs <= 0 then
+        _____88AB_52A8_51B7_5374_8868[_____88AB_52A8_51B7_5374_952E(whichHero, abilityId)] = nil
+        return 0
+    end
+    return remainingMs / 1000
+end
+--- 单位死亡时清掉其名下全部被动冷却登记（防句柄复用后脏键命中）。
+local function _____88AB_52A8_51B7_5374_6B7B_4EA1_6E05_7406(dyingUnit, _killingUnit)
+    if not isValidHandle(dyingUnit) then
+        return
+    end
+    local prefix = tostring(jass.GetHandleId(dyingUnit)) .. "_"
+    for key in pairs(_____88AB_52A8_51B7_5374_8868) do
+        if (string.find(key, prefix, nil, true) or 0) - 1 == 0 then
+            _____88AB_52A8_51B7_5374_8868[key] = nil
+        end
+    end
 end
 local function getLocalHero()
     return selectionSnapshotSystem["获取本地选中技能快照"]().hero
@@ -72,6 +125,10 @@ end
 local function getCooldown(whichHero, abilityId)
     if not isValidHandle(whichHero) or abilityId == 0 then
         return 0
+    end
+    local _____88AB_52A8_5269_4F59 = _____67E5_8BE2_88AB_52A8_51B7_5374(whichHero, abilityId)
+    if _____88AB_52A8_5269_4F59 > 0 then
+        return _____88AB_52A8_5269_4F59
     end
     return _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4(whichHero, abilityId) or 0
 end
@@ -205,6 +262,7 @@ ____exports["初始化QWERD冷却显示"] = function()
     end
     initialized = true
     selectionSnapshotSystem["初始化本地选中技能快照"]()
+    registerDeathListener(_____88AB_52A8_51B7_5374_6B7B_4EA1_6E05_7406)
     addPeriodicCallback(REFRESH_MS, onTick)
 end
 return ____exports

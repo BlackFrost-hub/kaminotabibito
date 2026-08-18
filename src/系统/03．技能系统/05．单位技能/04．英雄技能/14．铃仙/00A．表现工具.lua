@@ -8,6 +8,21 @@ local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("lib.扩展函数.封装函数.02．音效系统.index")
 local Sound3DII_CooPlayReuse = ____require_result_0.Sound3DII_CooPlayReuse
+local ____require_result_1 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundOnUnitBJ = ____require_result_1.PlaySoundOnUnitBJ
+local ____require_result_2 = require("lib.扩展函数.BJ函数.14．音效函数")
+local AttachSoundToUnit = ____require_result_2.AttachSoundToUnit
+--- 播放单位绑定音效（音量百分比，对应 JASS PlaySoundOnUnitBJ）
+____exports["播放铃仙单位绑定音效"] = function(_____5355_4F4D, soundKey, volumePercent)
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 or soundKey == "" then
+        return
+    end
+    local sound = jglobals[soundKey]
+    if sound == nil or sound == 0 then
+        return
+    end
+    PlaySoundOnUnitBJ(sound, volumePercent, _____5355_4F4D)
+end
 --- 播放坐标 3D 音效（单句柄复用，不扩池）
 ____exports["播放铃仙坐标音效"] = function(path, x, y, cutoff)
     if path == "" then

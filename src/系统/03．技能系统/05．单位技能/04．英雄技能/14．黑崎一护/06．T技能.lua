@@ -21,7 +21,8 @@ local _____65BD_52A0_51CF_901F = ____require_result_2["施加减速"]
 local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_3.registerManualBuff
 local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local GS_Suspend = ____require_result_4.GS_Suspend
+local _____8BBE_7F6E_5355_4F4D_6682_505C_65F6_95F4 = ____require_result_4["设置单位暂停时间"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
 local _____5355_4F4D_662F_5426_5B58_5728_5176_4ED6_6682_505C_5360_7528 = ____require_result_4["单位是否存在其他暂停占用"]
 local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_5.YDUserDataGetSafe
@@ -33,6 +34,8 @@ local KEY = ____require_result_7.KEY
 local KEY_STATE = ____require_result_7.KEY_STATE
 local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local ____require_result_9 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_9.IsUnitAliveBJ
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
@@ -41,11 +44,10 @@ local GetPlayerId = jass.GetPlayerId
 local GetUnitState = jass.GetUnitState
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
-local IsUnitAliveBJ = jass.IsUnitAliveBJ
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
+local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_10.stringToFourCCSafe
 local stringToFourCC = stringToFourCCSafe
 local _____914D_7F6E = _____9ED1_5D0E_4E00_62A4_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
@@ -137,6 +139,7 @@ local function _____7ED3_675FT(ctx)
     ctx["已启动"] = false
     local caster = ctx["施法者"]
     if caster ~= nil and caster ~= 0 then
+        _____79FB_9664_5355_4F4D_6682_505C(caster, _____914D_7F6E["暂停来源"]["T施法硬直"])
         SetUnitTimeScale(caster, 1)
         if ctx["减伤已加"] then
             _____8C03_6574_73A9_5BB6_53D7_4F24_51CF_5C11(caster, -_____914D_7F6E.T["受伤减少比例"])
@@ -157,17 +160,16 @@ local function _____63A8_8FDBT_5468_671F(variable)
         _____7ED3_675FT(ctx)
         return
     end
-    ctx["Tick数"] = ctx["Tick数"] + 1
-    if ctx["Tick数"] >= _____914D_7F6E.T["周期"]["次数"] then
-        _____7ED3_675FT(ctx)
-        return
-    end
     _____5237_65B0T_533A_57DF_51CF_901F(ctx)
+    ctx["Tick数"] = ctx["Tick数"] + 1
     if _____5355_4F4D_662F_5426_5B58_5728_5176_4ED6_6682_505C_5360_7528(caster, _____914D_7F6E["暂停来源"]["T施法硬直"]) then
         local _____514D_6253_65AD = _____9ED1_5D0E_4E00_62A4_662F_5426_534D_89E3(caster) and GetUnitState(caster, UNIT_STATE_LIFE) >= GetUnitState(caster, UNIT_STATE_MAX_LIFE) * _____914D_7F6E.T["卍解免打断血量阈值"]
         if not _____514D_6253_65AD then
             ctx["Tick数"] = _____914D_7F6E.T["周期"]["次数"]
         end
+    end
+    if ctx["Tick数"] >= _____914D_7F6E.T["周期"]["次数"] then
+        _____7ED3_675FT(ctx)
     end
 end
 local function ____T_8FDB_5165_4E3B_9636_6BB5(variable)
@@ -215,7 +217,7 @@ local function _____91CA_653E_5730_8E66_88C2_51FB(context, caster, _____6280_80F
     context["减伤已加"] = false
     context["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
     _____5F53_524D_8FDB_884C_4E2D_7684T = context
-    GS_Suspend(caster, _____914D_7F6E.T["硬直持续秒"])
+    _____8BBE_7F6E_5355_4F4D_6682_505C_65F6_95F4(caster, _____914D_7F6E["暂停来源"]["T施法硬直"], _____914D_7F6E.T["硬直持续秒"])
     local x = GetUnitX(caster)
     local y = GetUnitY(caster)
     local _____654C_519B = _____83B7_53D6_8303_56F4_654C_519B(caster, x, y, _____914D_7F6E.T["半径码"])

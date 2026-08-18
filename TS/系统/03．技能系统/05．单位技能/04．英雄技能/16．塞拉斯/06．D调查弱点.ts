@@ -7,6 +7,7 @@ import { 塞拉斯技能配置 } from "./00．配置";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 
 const { 调查Boss弱点 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.03．Boss血条弱点韧性.08．对外接口") as {
   调查Boss弱点: (this: void, Boss单位: any, 来源单位?: any) => {
@@ -21,9 +22,15 @@ const { 调查Boss弱点 } = require("系统.03．技能系统.06．AI自动使�
 const { YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
 };
-const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
-};
+
+// 音效按逆回十六夜模式：地图 war3map.j 已注册 gg_snd_* 句柄，直接取句柄挂单位播放
+function 播放全局音效(this: void, unit: any, soundKey: string): void {
+  const soundHandle = jglobals[soundKey];
+  if (unit == null || unit === 0 || soundHandle == null || soundHandle === 0) return;
+  jass.AttachSoundToUnit(soundHandle, unit);
+  jass.SetSoundVolume(soundHandle, 127);
+  jass.StartSound(soundHandle);
+}
 
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
@@ -70,7 +77,7 @@ function 释放D调查弱点(this: void, _context: D上下文, caster: any): voi
   }
 
   // 播放点与源 JASS 对齐：校验通过后立即在施法者身上播放 D 音效
-  Sound3DII_UnitPlayReuse(配置.D.音效.路径, caster, 配置.D.音效.裁断距离);
+  播放全局音效(caster, 配置.D.音效键);
 
   // 调用 Boss 弱点公共接口：显现未显现弱点并削盾 1 点（接口内部播放弱点发现音效，不重复播放）
   const result = 调查Boss弱点(target, caster);

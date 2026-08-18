@@ -22,25 +22,35 @@ local function ____on_5355_4F4D_6280_80FD_58F3_76D1_542C_65BD_6CD5(castingUnit, 
         return
     end
     local unitTypeId = GetUnitTypeId(castingUnit)
-    local matchedCount = 0
+    if unitTypeId == _____8F6CID("H00F") or unitTypeId == _____8F6CID("H00G") then
+        debugLogForce(
+            "阿伦劳特技能壳诊断",
+            "收到施法",
+            "施法单位类型ID",
+            unitTypeId,
+            "技能ID",
+            spellAbilityId,
+            "监听总数",
+            #_____76D1_542C_5217_8868
+        )
+    end
     do
         local i = 0
         while i < #_____76D1_542C_5217_8868 do
             do
                 local _____53C2_6570 = _____76D1_542C_5217_8868[i + 1]
                 if spellAbilityId ~= _____8F6CID(_____53C2_6570["技能ID"]) then
-                    goto __continue6
+                    goto __continue7
                 end
                 if unitTypeId ~= _____8F6CID(_____53C2_6570["单位类型ID"]) then
-                    goto __continue6
+                    goto __continue7
                 end
-                matchedCount = matchedCount + 1
                 local context = _____53C2_6570["获取或创建上下文"](castingUnit)
                 if context == nil then
-                    goto __continue6
+                    goto __continue7
                 end
                 if _____53C2_6570["可释放"] ~= nil and not _____53C2_6570["可释放"](context, castingUnit) then
-                    goto __continue6
+                    goto __continue7
                 end
                 local ____temp_3
                 if _____53C2_6570["创建独立技能实例"] == false then
@@ -58,21 +68,9 @@ local function ____on_5355_4F4D_6280_80FD_58F3_76D1_542C_65BD_6CD5(castingUnit, 
                 _____7ED1_5B9A_5355_4F4D_5F53_524D_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(castingUnit, _____6280_80FD_5B9E_4F8BID)
                 _____53C2_6570["释放技能"](context, castingUnit, _____6280_80FD_5B9E_4F8BID)
             end
-            ::__continue6::
+            ::__continue7::
             i = i + 1
         end
-    end
-    if unitTypeId == _____8F6CID("H00R") then
-        debugLogForce(
-            "藤原妹红技能壳诊断",
-            "壳层收到施法",
-            "技能ID",
-            spellAbilityId,
-            "匹配数",
-            matchedCount,
-            "监听总数",
-            #_____76D1_542C_5217_8868
-        )
     end
 end
 local function _____786E_4FDD_5355_4F4D_6280_80FD_58F3_603B_76D1_542C()
@@ -85,17 +83,5 @@ end
 ____exports["注册单位技能壳监听"] = function(_____53C2_6570)
     _____786E_4FDD_5355_4F4D_6280_80FD_58F3_603B_76D1_542C()
     _____76D1_542C_5217_8868[#_____76D1_542C_5217_8868 + 1] = _____53C2_6570
-    if _____8F6CID(_____53C2_6570["单位类型ID"]) == _____8F6CID("H00R") then
-        debugLogForce(
-            "藤原妹红技能壳诊断",
-            "注册监听",
-            "名称",
-            _____53C2_6570["名称"],
-            "技能ID",
-            _____8F6CID(_____53C2_6570["技能ID"]),
-            "监听总数",
-            #_____76D1_542C_5217_8868
-        )
-    end
 end
 return ____exports

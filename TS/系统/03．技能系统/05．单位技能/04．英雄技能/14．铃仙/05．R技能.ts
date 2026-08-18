@@ -23,10 +23,11 @@
 
 import { 铃仙单位技能配置 } from "./00．配置";
 import { 铃仙BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/12．铃仙";
-import { 播放铃仙全局音效, 播放铃仙配置动作 } from "./00A．表现工具";
+import { 播放铃仙全局音效, 播放铃仙单位绑定音效, 播放铃仙配置动作 } from "./00A．表现工具";
 import { 是铃仙本体, 是有效敌对目标 } from "./00B．分身与状态管理";
 
 const jass = require("jass.common") as any;
+
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
@@ -377,7 +378,8 @@ function on铃仙R二段生效(this: void, 施法单位: any, 技能ID数值: nu
   });
 
   // 音效 + 蓄力特效（CharmTarget.mdl @1.8 倍速，1.5 秒销毁）
-  播放铃仙全局音效("gg_snd_LX_R");
+  // 施法音效（源 JASS：PlaySoundOnUnitBJ(gg_snd_LX_R, 100, 铃仙)）
+  播放铃仙单位绑定音效(施法单位, "gg_snd_LX_R", 100);
   创建点特效({
     模型路径: cfg.R.蓄力特效模型,
     X: 铃仙X,
