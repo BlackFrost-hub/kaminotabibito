@@ -37,12 +37,6 @@ const {
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
-
-const 日志模块 = "阿伦劳特W";
-
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
@@ -113,9 +107,7 @@ function 阿伦劳特裁决护盾清理(this: void, controller: 主动引爆护�
 }
 
 function 创建裁决护盾(this: void, unit: any): boolean {
-  debugLogForce(日志模块, "创建裁决护盾-入口", "单位句柄", GetHandleId(unit), "类型ID", GetUnitTypeId(unit), "暗形态ID", 暗形态单位ID);
   if (!单位有效(unit) || GetUnitTypeId(unit) !== 暗形态单位ID) {
-    debugLogForce(日志模块, "创建裁决护盾-退出：单位无效或非暗形态");
     return false;
   }
   const context = 获取或创建阿伦劳特上下文(unit);
@@ -125,10 +117,8 @@ function 创建裁决护盾(this: void, unit: any): boolean {
   const 护盾值 = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
     * (强化 ? config.裁决护盾强化最大生命比例 : config.裁决护盾默认最大生命比例);
   if (!(护盾值 > 0)) {
-    debugLogForce(日志模块, "创建裁决护盾-退出：护盾值<=0", 护盾值);
     return false;
   }
-  debugLogForce(日志模块, "创建裁决护盾-参数", "护盾值", 护盾值, "强化", 强化, "最大生命", GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE));
 
   const 控制器 = 创建主动引爆护盾({
     名称: "阿伦劳特-裁决护盾",
@@ -151,12 +141,10 @@ function 创建裁决护盾(this: void, unit: any): boolean {
     on引爆后: 阿伦劳特裁决护盾引爆后,
   });
   if (控制器 == null) {
-    debugLogForce(日志模块, "创建裁决护盾-退出：创建主动引爆护盾返回 null");
     return false;
   }
   context.裁决护盾控制器 = 控制器;
   context.裁决护盾ID = 控制器.护盾ID;
-  debugLogForce(日志模块, "创建裁决护盾-成功", "护盾ID", 控制器.护盾ID);
   return true;
 }
 
@@ -219,27 +207,21 @@ function 结算裁决护盾引爆(this: void, unit: any): void {
 }
 
 function 引爆裁决护盾(this: void, unit: any): void {
-  debugLogForce(日志模块, "引爆裁决护盾-入口", "单位句柄", GetHandleId(unit), "类型ID", GetUnitTypeId(unit), "暗形态ID", 暗形态单位ID);
   if (!单位有效(unit) || GetUnitTypeId(unit) !== 暗形态单位ID) {
-    debugLogForce(日志模块, "引爆裁决护盾-退出：单位无效或非暗形态");
     return;
   }
   const context = 取阿伦劳特上下文(unit);
-  debugLogForce(日志模块, "引爆裁决护盾-控制器存在", context?.裁决护盾控制器 != null);
   引爆主动引爆护盾(context?.裁决护盾控制器);
 }
 
 export function 释放神圣护甲(this: void, unit: any): boolean {
-  debugLogForce(日志模块, "释放神圣护甲-入口", "单位句柄", GetHandleId(unit), "类型ID", GetUnitTypeId(unit), "光形态ID", 光形态单位ID);
   if (!单位有效(unit) || GetUnitTypeId(unit) !== 光形态单位ID) {
-    debugLogForce(日志模块, "释放神圣护甲-退出：单位无效或非光形态");
     return false;
   }
   const duration = 拥有天堂呼唤(unit)
     ? 阿伦劳特单位技能配置.神圣护甲强化持续秒
     : 阿伦劳特单位技能配置.神圣护甲默认持续秒;
   const 结果 = 开始无敌帧(unit, duration) > 0;
-  debugLogForce(日志模块, "释放神圣护甲-结果", "持续", duration, "成功", 结果);
   return 结果;
 }
 
@@ -248,17 +230,14 @@ export function 释放裁决护盾(this: void, unit: any): boolean {
 }
 
 function 阿伦劳特神圣护甲监听(this: void, _context: 阿伦劳特运行时上下文, unit: any): void {
-  debugLogForce(日志模块, "入口触发 神圣护甲(A0D6) 单位类型=", GetUnitTypeId(unit), "光形态ID=", 光形态单位ID);
   释放神圣护甲(unit);
 }
 
 function 阿伦劳特裁决护盾监听(this: void, _context: 阿伦劳特运行时上下文, unit: any): void {
-  debugLogForce(日志模块, "入口触发 裁决护盾(A0D6) 单位类型=", GetUnitTypeId(unit), "暗形态ID=", 暗形态单位ID);
   释放裁决护盾(unit);
 }
 
 function 阿伦劳特护盾引爆监听(this: void, _context: 阿伦劳特运行时上下文, unit: any): void {
-  debugLogForce(日志模块, "入口触发 护盾引爆(A0D3) 单位类型=", GetUnitTypeId(unit));
   引爆裁决护盾(unit);
 }
 
@@ -272,11 +251,9 @@ function 阿伦劳特单位死亡(this: void, dyingUnit: any, _killingUnit: any)
 
 export function 注册阿伦劳特神圣护甲与裁决护盾(this: void): void {
   if (已注册) {
-    debugLogForce(日志模块, "注册-已重复调用，跳过");
     return;
   }
   已注册 = true;
-  debugLogForce(日志模块, "注册-开始 光形态ID=", 光形态单位ID, "暗形态ID=", 暗形态单位ID, "W技能ID=", W技能ID, "引爆技能ID=", 引爆技能ID);
   注册单位技能壳监听({
     名称: "阿伦劳特-神圣护甲",
     单位类型ID: 光形态单位ID,

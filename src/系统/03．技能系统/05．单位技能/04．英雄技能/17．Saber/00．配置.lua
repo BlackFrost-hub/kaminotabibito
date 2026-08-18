@@ -45,7 +45,7 @@ ____exports["Saber技能配置"] = {
             ["技能类型ID"] = stringToFourCCSafe(____Q_6280_80FDID),
             ["物编冷却秒"] = 12,
             ["起手延迟秒"] = 0.05,
-            ["音效"] = {["路径"] = "Sound\\HeroVoice\\Saber\\Saber-Q1.mp3", ["裁断距离"] = 1500},
+            ["音效"] = {["全局音效键"] = "gg_snd_Saber_Q1"},
             ["动作索引"] = 5,
             ["时间流速"] = 3.5,
             ["伤害攻击力倍率"] = 0.5,
@@ -80,7 +80,7 @@ ____exports["Saber技能配置"] = {
         ["连击2"] = {
             ["技能ID"] = ____Q_8FDE_51FB2_6280_80FDID,
             ["技能类型ID"] = stringToFourCCSafe(____Q_8FDE_51FB2_6280_80FDID),
-            ["音效"] = {["路径"] = "Sound\\HeroVoice\\Saber\\SaberQ2.mp3", ["裁断距离"] = 1500},
+            ["音效"] = {["全局音效键"] = "gg_snd_SaberQ2"},
             ["伤害攻击力倍率"] = 0.5,
             ["时间流速"] = 2,
             ["动作索引"] = 2,
@@ -106,14 +106,21 @@ ____exports["Saber技能配置"] = {
                 ["命中特效"] = {["模型路径"] = "war3mapImported\\[ake]gaopin.mdx", ["挂点"] = "origin", ["持续秒"] = 0.35},
                 ["目标动作时间流速"] = 4,
                 ["目标击退"] = {["每次距离"] = 10, ["间隔秒"] = 0.02, ["次数"] = 10},
-                ["表现特效"] = {["模型路径"] = "war3mapImported\\MoonPunish.mdl", ["目标前方偏移"] = 75, ["缩放"] = 2.25, ["持续秒"] = 0.5}
+                ["表现特效"] = {
+                    ["模型路径"] = "war3mapImported\\MoonPunish.mdx",
+                    ["目标前方偏移"] = 75,
+                    ["缩放"] = 1.5,
+                    ["动画速度"] = 1.5,
+                    ["飞行高度"] = 100,
+                    ["持续秒"] = 0.5
+                }
             },
             ["连击窗口秒"] = 0.5
         },
         ["连击3"] = {
             ["技能ID"] = ____Q_8FDE_51FB3_6280_80FDID,
             ["技能类型ID"] = stringToFourCCSafe(____Q_8FDE_51FB3_6280_80FDID),
-            ["音效"] = {["路径"] = "Sound\\HeroVoice\\Saber\\SaberQ3.mp3", ["裁断距离"] = 1500},
+            ["音效"] = {["全局音效键"] = "gg_snd_SaberQ3"},
             ["伤害攻击力倍率"] = 0.5,
             ["时间流速"] = 1.65,
             ["动作索引"] = 10,
@@ -140,7 +147,7 @@ ____exports["Saber技能配置"] = {
                 ["命中特效"] = {["模型路径"] = "war3mapImported\\[ake]gaopin.mdx", ["挂点"] = "origin", ["持续秒"] = 0.35},
                 ["目标动作时间流速"] = 4,
                 ["目标击退"] = {["每次距离"] = 10, ["间隔秒"] = 0.02, ["次数"] = 10},
-                ["刀光持续秒"] = 0.55
+                ["刀光持续秒"] = 0.27
             },
             ["复位延迟秒"] = 0.5
         }
@@ -158,7 +165,7 @@ ____exports["Saber技能配置"] = {
             ["时间流速"] = 3,
             ["龙卷风"] = {
                 ["启动延迟秒"] = 0.4,
-                ["音效"] = {["路径"] = "Sound\\Units\\CombatSoundsFaked\\BansheeMissileLaunch2.wav", ["裁断距离"] = 1500},
+                ["音效"] = {["全局音效键"] = "gg_snd_BansheeMissileLaunch2"},
                 ["数量"] = 6,
                 ["出生朝向步进度"] = 60,
                 ["模型路径"] = "Abilities\\Spells\\Other\\Tornado\\TornadoElemental.mdl",
@@ -174,14 +181,14 @@ ____exports["Saber技能配置"] = {
             }
         },
         ["E联动地面分支"] = {
-            ["音效"] = {["路径"] = "Sound\\HeroVoice\\Saber\\Saber-EW1.mp3", ["裁断距离"] = 1500},
+            ["音效"] = {["全局音效键"] = "gg_snd_Saber_EW1"},
             ["动作索引"] = 7,
             ["路径"] = {["Tick数"] = 12, ["Tick间隔秒"] = 0.15, ["每Tick距离"] = 125, ["伤害半径"] = 250},
             ["表现特效"] = {
-                ["模型路径"] = "war3mapImported\\MoonPunish.mdl",
+                ["模型路径"] = "war3mapImported\\MoonPunish.mdx",
                 ["缩放"] = 7.5,
                 ["飞行高度"] = 100,
-                ["朝向偏移"] = 90,
+                ["朝向偏移"] = 270,
                 ["持续秒"] = 0.5
             },
             ["首次控制秒"] = 2,
@@ -199,7 +206,7 @@ ____exports["Saber技能配置"] = {
             ["目标动作时间流速"] = 5,
             ["命中特效"] = {["模型路径"] = "Objects\\Spawnmodels\\NightElf\\NEDeathMedium\\NEDeath.mdl", ["挂点"] = "origin", ["持续秒"] = 2},
             ["E联动冲击波"] = {
-                ["音效"] = {["路径"] = "Sound\\Abilities\\Weapons\\ChimaeraAcidMissile\\CorrosiveBreathMissileLaunch1.wav", ["裁断距离"] = 1500},
+                ["音效"] = {["全局音效键"] = "gg_snd_CorrosiveBreathMissileLaunch1"},
                 ["模型路径"] = "war3mapImported\\BladeShockwave.mdl",
                 ["缩放"] = 10,
                 ["飞行高度"] = 90,
@@ -234,7 +241,7 @@ ____exports["Saber技能配置"] = {
             ["间隔秒"] = 0.05,
             ["最大Tick数"] = 80,
             ["音效Tick"] = 78,
-            ["音效"] = {["路径"] = "Sound\\HeroVoice\\Saber\\SaberExcalibur.mp3", ["裁断距离"] = 2500},
+            ["音效"] = {["全局音效键"] = "gg_snd_SaberExcalibur"},
             ["聚集粒子"] = {
                 ["模型路径"] = "Abilities\\Weapons\\FaerieDragonMissile\\FaerieDragonMissile.mdl",
                 ["每Tick数量"] = 3,
@@ -245,7 +252,7 @@ ____exports["Saber技能配置"] = {
                 ["移除高度"] = 600
             }
         },
-        ["蓄力结束"] = {["法阵特效"] = {["模型路径"] = "war3mapImported\\GainLife.mdl", ["缩放"] = 3, ["持续秒"] = 3, ["朝向偏移"] = 90}, ["动作索引"] = 18, ["发射准备延迟秒"] = 1.7},
+        ["蓄力结束"] = {["法阵特效"] = {["模型路径"] = "war3mapImported\\GainLife.mdl", ["缩放"] = 3, ["持续秒"] = 3, ["朝向偏移"] = 90}, ["动作索引"] = 18, ["发射准备延迟秒"] = 1.7, ["聚集回收"] = {["Tick间隔秒"] = 0.02, ["每次移动距离"] = 30, ["每次高度变化"] = 30, ["到达距离"] = 40}},
         ["发射"] = {
             ["光束"] = {["模型路径"] = "war3mapImported\\[GH][MX]5.mdl", ["缩放"] = 3.5, ["持续秒"] = 2, ["朝向偏移"] = 90},
             ["能量准备延迟秒"] = 0.5,
@@ -281,7 +288,7 @@ ____exports["Saber技能配置"] = {
         ["技能ID"] = ____D_6280_80FDID,
         ["技能类型ID"] = stringToFourCCSafe(____D_6280_80FDID),
         ["物编冷却秒"] = 120,
-        ["音效"] = {["路径"] = "Sound\\HeroVoice\\Saber\\Saber_Alter_D_Avalon.mp3", ["裁断距离"] = 3000},
+        ["音效"] = {["全局音效键"] = "gg_snd_Saber_Alter_D_Avalon"},
         ["头顶特效"] = {["模型路径"] = "war3mapImported\\cauterize.mdx", ["挂点"] = "overhead"},
         ["原点特效"] = {["模型路径"] = "war3mapImported\\HolyAurora.MDX", ["挂点"] = "origin"},
         ["持续秒"] = 10,

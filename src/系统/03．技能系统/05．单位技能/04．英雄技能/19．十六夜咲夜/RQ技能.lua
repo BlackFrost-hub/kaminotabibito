@@ -15,6 +15,8 @@ local _____6CE8_518C_54B2_591C_5468_671F_4EFB_52A1 = ____01_FF0E_98DE_5200_4E0E_
 local _____79FB_9664_54B2_591C_5468_671F_4EFB_52A1 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["移除咲夜周期任务"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local _____7B26_5361_516C_5171 = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.符卡公共")
+local _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374 = _____7B26_5361_516C_5171["设置十六夜咲夜符卡书冷却"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -54,12 +56,20 @@ local function ____RQ_6E05_7406(context)
     end
     do
         local i = 0
+        while i < #context["收尾飞刀"] do
+            _____5B89_5168_79FB_9664_5355_4F4D_58F3(context["收尾飞刀"][i + 1])
+            i = i + 1
+        end
+    end
+    do
+        local i = 0
         while i < #context["分身"] do
             _____5B89_5168_79FB_9664_5355_4F4D_58F3(context["分身"][i + 1])
             i = i + 1
         end
     end
     context["飞刀"] = {}
+    context["收尾飞刀"] = {}
     context["分身"] = {}
     if context["目标"] ~= nil and context["目标"] ~= 0 then
         _____79FB_9664_5355_4F4D_6682_505C(context["目标"], context["来源"])
@@ -83,7 +93,7 @@ local function ____RQ_6E05_7406(context)
     end
     _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(context["技能实例ID"])
 end
-local function ____RQ_521B_5EFA_98DE_5200_6392(context, centerX, centerY, facing, count, typeId)
+local function ____RQ_521B_5EFA_98DE_5200_6392(context, centerX, centerY, facing, count, typeId, fixedHeight)
     do
         local i = 0
         while i < count do
@@ -106,6 +116,9 @@ local function ____RQ_521B_5EFA_98DE_5200_6392(context, centerX, centerY, facing
                 facing
             )
             if knife ~= nil and knife ~= 0 then
+                if fixedHeight ~= nil then
+                    jass.SetUnitFlyHeight(knife, fixedHeight, 0)
+                end
                 local ____context__98DE_5200_7 = context["飞刀"]
                 ____context__98DE_5200_7[#____context__98DE_5200_7 + 1] = knife
             end
@@ -162,12 +175,14 @@ local function ____RQ_521B_5EFA_56DB_5411_5206_8EAB(variable)
         return
     end
     local context = params["上下文"]
-    local angle = 45 + params["序号"] * 90
+    local angles = {315, 45, 135, 235}
+    local facings = {135, 225, 315, 45}
+    local angle = angles[params["序号"] + 1] or 315
     local targetX = jass.GetUnitX(context["目标"])
     local targetY = jass.GetUnitY(context["目标"])
     local x = _____6781_5750_6807X(targetX, _____914D_7F6E.RQ["分身距离"], angle)
     local y = _____6781_5750_6807Y(targetY, _____914D_7F6E.RQ["分身距离"], angle)
-    local facing = _____4E24_70B9_89D2_5EA6(x, y, targetX, targetY)
+    local facing = facings[params["序号"] + 1] or 135
     local clone = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
         context["施法者"],
         _____914D_7F6E["单位壳"]["侧向分身"],
@@ -175,7 +190,14 @@ local function ____RQ_521B_5EFA_56DB_5411_5206_8EAB(variable)
         y,
         facing
     )
+    local cloneHeight = jass.GetUnitFlyHeight(context["目标"])
     if clone ~= nil and clone ~= 0 then
+        jass.SetUnitFlyHeight(
+            clone,
+            jass.GetUnitDefaultFlyHeight(clone) + jass.GetUnitFlyHeight(context["目标"]),
+            0
+        )
+        cloneHeight = jass.GetUnitFlyHeight(clone)
         jass.SetUnitTimeScale(clone, 2)
         jass.SetUnitAnimation(clone, "attack")
         local ____context__5206_8EAB_8 = context["分身"]
@@ -187,7 +209,8 @@ local function ____RQ_521B_5EFA_56DB_5411_5206_8EAB(variable)
         y,
         facing,
         _____914D_7F6E.RQ["每分身飞刀数"],
-        _____914D_7F6E["单位壳"]["飞行蓝刀"]
+        _____914D_7F6E["单位壳"]["飞行蓝刀"],
+        cloneHeight
     )
 end
 local function ____RQ_521B_5EFA_4E0A_7A7A_5206_8EAB(variable)
@@ -199,7 +222,7 @@ local function ____RQ_521B_5EFA_4E0A_7A7A_5206_8EAB(variable)
     local targetY = jass.GetUnitY(context["目标"])
     local highClone = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
         context["施法者"],
-        _____914D_7F6E["单位壳"]["高空分身"],
+        _____914D_7F6E["单位壳"]["仰视分身"],
         targetX,
         targetY,
         jass.GetRandomReal(0, 360)
@@ -207,7 +230,7 @@ local function ____RQ_521B_5EFA_4E0A_7A7A_5206_8EAB(variable)
     if highClone ~= nil and highClone ~= 0 then
         jass.SetUnitFlyHeight(
             highClone,
-            jass.GetUnitFlyHeight(context["目标"]) + 500,
+            jass.GetUnitDefaultFlyHeight(highClone) + jass.GetUnitFlyHeight(context["目标"]),
             0
         )
         jass.SetUnitTimeScale(highClone, 0.5)
@@ -229,11 +252,11 @@ local function ____RQ_521B_5EFA_4E0A_7A7A_5206_8EAB(variable)
             if knife ~= nil and knife ~= 0 then
                 jass.SetUnitFlyHeight(
                     knife,
-                    jass.GetUnitFlyHeight(context["目标"]) + 500,
+                    jass.GetUnitDefaultFlyHeight(knife) + jass.GetUnitFlyHeight(context["目标"]),
                     0
                 )
-                local ____context__98DE_5200_10 = context["飞刀"]
-                ____context__98DE_5200_10[#____context__98DE_5200_10 + 1] = knife
+                local ____context__6536_5C3E_98DE_5200_10 = context["收尾飞刀"]
+                ____context__6536_5C3E_98DE_5200_10[#____context__6536_5C3E_98DE_5200_10 + 1] = knife
             end
             i = i + 1
         end
@@ -281,7 +304,7 @@ local function ____RQ_63A8_8FDB_98DE_5200(variable)
                 local knife = context["飞刀"][i + 1]
                 if not _____5355_4F4D_5B58_6D3B(knife) then
                     __TS__ArraySplice(context["飞刀"], i, 1)
-                    goto __continue36
+                    goto __continue39
                 end
                 local x = jass.GetUnitX(knife)
                 local y = jass.GetUnitY(knife)
@@ -292,7 +315,7 @@ local function ____RQ_63A8_8FDB_98DE_5200(variable)
                 if dx * dx + dy * dy <= _____914D_7F6E.RQ["飞刀追踪步长"] * _____914D_7F6E.RQ["飞刀追踪步长"] then
                     _____5B89_5168_79FB_9664_5355_4F4D_58F3(knife)
                     __TS__ArraySplice(context["飞刀"], i, 1)
-                    goto __continue36
+                    goto __continue39
                 end
                 local angle = _____4E24_70B9_89D2_5EA6(x, y, tx, ty)
                 jass.SetUnitX(
@@ -315,7 +338,7 @@ local function ____RQ_63A8_8FDB_98DE_5200(variable)
                     )
                 end
             end
-            ::__continue36::
+            ::__continue39::
             i = i - 1
         end
     end
@@ -325,6 +348,15 @@ local function ____RQ_91CA_653E_98DE_5200(variable)
     if context == nil or context["已结束"] then
         return
     end
+    do
+        local i = 0
+        while i < #context["收尾飞刀"] do
+            local ____context__98DE_5200_11 = context["飞刀"]
+            ____context__98DE_5200_11[#____context__98DE_5200_11 + 1] = context["收尾飞刀"][i + 1]
+            i = i + 1
+        end
+    end
+    context["收尾飞刀"] = {}
     context["已释放飞刀"] = true
     do
         local i = 0
@@ -368,6 +400,7 @@ local function ____RQ_6700_7EC8_7ED3_7B97(variable)
     ____RQ_6E05_7406(context)
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRQ(_listener, caster, _____6280_80FD_5B9E_4F8BID)
+    _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(caster, _____914D_7F6E["符卡间隔秒"].RQ)
     local target = jass.GetSpellTargetUnit()
     if not _____5355_4F4D_5B58_6D3B(target) then
         _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(_____6280_80FD_5B9E_4F8BID)
@@ -381,6 +414,7 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRQ(_listener, caster, ____
         ["来源"] = "十六夜咲夜-RQ:" .. tostring(____RQ_5E8F_53F7),
         ["攻击力快照"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster),
         ["飞刀"] = {},
+        ["收尾飞刀"] = {},
         ["分身"] = {},
         ["追踪周期ID"] = 0,
         ["已释放飞刀"] = false,

@@ -4,6 +4,8 @@ local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技�
 local _____914D_7F6E = ____00_FF0E_914D_7F6E["十六夜咲夜基础技能配置"]
 local ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.01．飞刀与时间工具")
 local _____521B_5EFA_76F4_7EBF_98DE_5200 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["创建直线飞刀"]
+local _____521B_5EFA_54B2_591C_5355_4F4D_58F3 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["创建咲夜单位壳"]
+local _____5B89_5168_79FB_9664_5355_4F4D_58F3 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["安全移除单位壳"]
 local _____4E24_70B9_89D2_5EA6 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["两点角度"]
 local _____6781_5750_6807X = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["极坐标Y"]
@@ -13,6 +15,8 @@ local _____6CE8_518C_54B2_591C_5468_671F_4EFB_52A1 = ____01_FF0E_98DE_5200_4E0E_
 local _____79FB_9664_54B2_591C_5468_671F_4EFB_52A1 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["移除咲夜周期任务"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local _____7B26_5361_516C_5171 = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.符卡公共")
+local _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374 = _____7B26_5361_516C_5171["设置十六夜咲夜符卡书冷却"]
 local ____RR_6280_80FD = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.RR技能")
 local _____5341_516D_591C_54B2_591C_5904_4E8E_54B2_591C_4E16_754C = ____RR_6280_80FD["十六夜咲夜处于咲夜世界"]
 local jass = require("jass.common")
@@ -30,6 +34,8 @@ local function _____5C1D_8BD5_7ED3_675FRW(cast)
     end
     cast["已结束"] = true
     _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(cast["技能实例ID"])
+    _____5B89_5168_79FB_9664_5355_4F4D_58F3(cast["分身"])
+    cast["分身"] = nil
 end
 local function ____RW_98DE_5200_7ED3_675F(state)
     local cast = state["自定义数据"]
@@ -91,6 +97,7 @@ local function _____53D1_5C04RW_98DE_5200(variable)
     end
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRW(_listener, caster, _____6280_80FD_5B9E_4F8BID)
+    _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(caster, _____914D_7F6E["符卡间隔秒"].RW)
     local cast = {
         ["施法者"] = caster,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
@@ -100,8 +107,29 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRW(_listener, caster, ____
         ["已发射"] = 0,
         ["活动飞刀"] = 0,
         ["发射周期ID"] = 0,
+        ["分身"] = nil,
         ["已结束"] = false
     }
+    local x = jass.GetUnitX(caster)
+    local y = jass.GetUnitY(caster)
+    local angle = _____4E24_70B9_89D2_5EA6(x, y, cast["目标X"], cast["目标Y"])
+    if _____5341_516D_591C_54B2_591C_5904_4E8E_54B2_591C_4E16_754C(caster) then
+        cast["分身"] = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
+            caster,
+            _____914D_7F6E["单位壳"]["正常分身"],
+            _____6781_5750_6807X(x, 50, angle),
+            _____6781_5750_6807Y(y, 50, angle),
+            angle
+        )
+        if cast["分身"] ~= nil and cast["分身"] ~= 0 then
+            jass.SetUnitFlyHeight(
+                cast["分身"],
+                jass.GetUnitDefaultFlyHeight(cast["分身"]),
+                0
+            )
+            jass.SetUnitAnimation(cast["分身"], "channel")
+        end
+    end
     if not _____5341_516D_591C_54B2_591C_5904_4E8E_54B2_591C_4E16_754C(caster) then
         _____65BD_52A0_77ED_786C_76F4_5E76_64AD_653E_52A8_4F5C(
             caster,

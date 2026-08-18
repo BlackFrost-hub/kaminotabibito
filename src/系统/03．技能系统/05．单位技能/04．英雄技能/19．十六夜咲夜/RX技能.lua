@@ -14,6 +14,9 @@ local _____5355_4F4D_5B58_6D3B = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177[
 local _____64AD_653E_54B2_591C_5355_4F4D_97F3_6548 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["播放咲夜单位音效"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local _____7B26_5361_516C_5171 = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.符卡公共")
+local _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374 = _____7B26_5361_516C_5171["设置十六夜咲夜符卡书冷却"]
+local _____53D6_6D88_5341_516D_591C_54B2_591C_7B26_5361_754C_9762 = _____7B26_5361_516C_5171["取消十六夜咲夜符卡界面"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -282,6 +285,7 @@ local function ____RX_4F24_5BB3_4FEE_6B63(damage)
     end
     context["已触发"] = true
     context["目标"] = damage.attacker
+    _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(context["施法者"], _____914D_7F6E["符卡间隔秒"]["RX成功"], false)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["施法者"], _____5341_516D_591C_54B2_591CBuffID["完美女仆反击窗口"])
     addDelayedCallback(1, ____RX_6267_884C_53CD_51FB, context)
     return 0
@@ -289,10 +293,12 @@ end
 local function ____RX_7A97_53E3_7ED3_675F(variable)
     local context = variable
     if context ~= nil and not context["已触发"] then
+        _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(context["施法者"], _____914D_7F6E["符卡间隔秒"]["RX失败"], false)
         _____6E05_7406RX(context, true)
     end
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRX(_listener, caster, _____6280_80FD_5B9E_4F8BID)
+    _____53D6_6D88_5341_516D_591C_54B2_591C_7B26_5361_754C_9762(caster)
     ____RX_5E8F_53F7 = ____RX_5E8F_53F7 + 1
     local old = ____RX_6D3B_52A8_8868[jass.GetHandleId(caster)]
     if old ~= nil then

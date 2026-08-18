@@ -13,9 +13,6 @@ import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．�
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -126,7 +123,6 @@ function W可释放(this: void, context: W上下文, _caster: any): boolean {
 }
 
 function 结束W路径(this: void, ctx: W上下文): void {
-  debugLogForce("云端W", "结束-路径清理", "施法者", GetHandleId(ctx.施法者), "模式", ctx.模式, "技能实例ID", ctx.技能实例ID);
   if (ctx.回调ID !== 0) removePeriodicCallback(ctx.回调ID);
   ctx.回调ID = 0;
   if (ctx.路径特效 != null && ctx.路径特效 !== 0) 销毁点特效(ctx.路径特效);
@@ -147,14 +143,11 @@ function 结算W范围(this: void, ctx: W上下文, x: number, y: number): void 
   const group = CreateGroup();
   GroupEnumUnitsInRange(group, x, y, 配置.W.路径.结算半径码, null);
   let u = FirstOfGroup(group);
-  let 本Tick命中数 = 0;
   while (u != null && u !== 0) {
     GroupRemoveUnit(group, u);
     if (IsUnitAliveBJ(u) && !IsUnitType(u, UNIT_TYPE_STRUCTURE) && ctx.已命中组[GetHandleId(u)] !== true) {
       ctx.已命中组[GetHandleId(u)] = true;
-      本Tick命中数 += 1;
       const 是敌人 = IsUnitEnemy(u, owner);
-      debugLogForce("云端W", "范围结算-命中", "施法者", GetHandleId(caster), "目标", GetHandleId(u), "模式", ctx.模式, "是敌人", 是敌人, "X", x, "Y", y, "伤害快照", ctx.伤害快照, "技能实例ID", ctx.技能实例ID);
       if (ctx.模式 === "光剑") {
         if (是敌人) {
           造成单体技能伤害({
@@ -201,9 +194,6 @@ function 结算W范围(this: void, ctx: W上下文, x: number, y: number): void 
     u = FirstOfGroup(group);
   }
   DestroyGroup(group);
-  if (本Tick命中数 > 0) {
-    debugLogForce("云端W", "范围结算-本Tick命中数", "施法者", GetHandleId(caster), "模式", ctx.模式, "命中数", 本Tick命中数, "X", x, "Y", y, "技能实例ID", ctx.技能实例ID);
-  }
 }
 
 function 推进W路径(this: void, variable: any): void {
@@ -212,7 +202,6 @@ function 推进W路径(this: void, variable: any): void {
 
   ctx.Tick数 += 1;
   if (ctx.Tick数 > 配置.W.路径.最大Tick数) {
-    debugLogForce("云端W", "推进-达到最大Tick结束", "施法者", GetHandleId(ctx.施法者), "Tick数", ctx.Tick数, "技能实例ID", ctx.技能实例ID);
     结束W路径(ctx);
     return;
   }
@@ -239,11 +228,9 @@ function 启动W路径(this: void, variable: any): void {
   if (ctx == null || ctx.已启动 !== true) return;
   const caster = ctx.施法者;
   if (caster == null || caster === 0 || !IsUnitAliveBJ(caster)) {
-    debugLogForce("云端W", "启动-施法者失效结束", "施法者", GetHandleId(caster), "技能实例ID", ctx.技能实例ID);
     结束W路径(ctx);
     return;
   }
-  debugLogForce("云端W", "启动-路径开始", "施法者", GetHandleId(caster), "模式", ctx.模式, "技能实例ID", ctx.技能实例ID);
   ctx.Tick数 = 0;
   ctx.回调ID = addPeriodicCallback(
     Math.round(配置.W.路径.Tick间隔秒 * 1000),
@@ -263,7 +250,6 @@ function 释放W光暗魔剑(this: void, context: W上下文, caster: any, 技�
   const 模式 = 消耗云端W模式(caster);
   const 等级 = GetUnitAbilityLevel(caster, W类型ID);
   const 伤害快照 = 读取单位攻击力(caster) * 配置.W.伤害公式.攻击力倍率 + GetHeroInt(caster, true) * (配置.W.伤害公式.智力每级系数 * 等级);
-  debugLogForce("云端W", "入口-释放", "施法者", GetHandleId(caster), "技能ID", 配置.W.技能ID, "技能实例ID", 技能实例ID, "模式", 模式, "等级", 等级, "伤害快照", 伤害快照, "角度", 角度, "目标点X", tx, "目标点Y", ty);
 
   context.施法者 = caster;
   context.模式 = 模式;

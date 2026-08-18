@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____64A4_9500R_654F_6377, ____R_654F_6377_56DE_6536, debugLogForce, ModifyHeroStat, GetHandleId, bj_HEROSTAT_AGI, bj_MODIFYMETHOD_SUB
+local _____64A4_9500R_654F_6377, ____R_654F_6377_56DE_6536, ModifyHeroStat, bj_HEROSTAT_AGI, bj_MODIFYMETHOD_SUB
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.18．云端.00．配置")
 local _____4E91_7AEF_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["云端技能配置"]
 local ____18_FF0E_4E91_7AEF = require("系统.05．Buff系统.03．Buff表.02．英雄.18．云端")
@@ -15,16 +15,6 @@ function _____64A4_9500R_654F_6377(ctx)
     end
     ctx["敏捷已撤销"] = true
     local caster = ctx["施法者"]
-    debugLogForce(
-        "云端R",
-        "撤销敏捷",
-        "施法者",
-        GetHandleId(caster),
-        "敏捷增量",
-        ctx["敏捷增量"],
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     if caster ~= nil and caster ~= 0 then
         ModifyHeroStat(bj_HEROSTAT_AGI, caster, bj_MODIFYMETHOD_SUB, ctx["敏捷增量"])
     end
@@ -38,50 +28,48 @@ function ____R_654F_6377_56DE_6536(variable)
 end
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_0.debugLogForce
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
-local removePeriodicCallback = ____require_result_1.removePeriodicCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
-local _____5F00_59CB_51B2_950B = ____require_result_2["开始冲锋"]
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local removePeriodicCallback = ____require_result_0.removePeriodicCallback
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
+local _____5F00_59CB_51B2_950B = ____require_result_1["开始冲锋"]
 local ____ = _____5F00_59CB_51B2_950B
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.冲锋残影表现")
-local _____5F00_59CB_51B2_950B_5E76_9644_5E26_6B8B_5F71_8868_73B0 = ____require_result_3["开始冲锋并附带残影表现"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.03．对外接口")
-local _____5F00_59CB_8DF3_8DC3 = ____require_result_4["开始跳跃"]
-local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_5["造成单体技能伤害"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
-local _____65BD_52A0_7729_6655 = ____require_result_6["施加眩晕"]
-local ____require_result_7 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_7.registerManualBuff
-local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local GS_Suspend = ____require_result_8.GS_Suspend
-local ____require_result_9 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-ModifyHeroStat = ____require_result_9.ModifyHeroStat
-local IsUnitAliveBJ = ____require_result_9.IsUnitAliveBJ
-local ____require_result_10 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetRandomDirectionDeg = ____require_result_10.GetRandomDirectionDeg
-local SetCameraTargetControllerNoZForPlayer = ____require_result_10.SetCameraTargetControllerNoZForPlayer
-local SetCameraFieldForPlayer = ____require_result_10.SetCameraFieldForPlayer
-local ResetToGameCameraForPlayer = ____require_result_10.ResetToGameCameraForPlayer
-local ____require_result_11 = require("lib.扩展函数.封装函数.07．镜头函数.01．镜头震动")
-local CameraSetEQNoiseForPlayer = ____require_result_11.CameraSetEQNoiseForPlayer
-local CameraClearNoiseForPlayer = ____require_result_11.CameraClearNoiseForPlayer
-local ____require_result_12 = require("lib.扩展函数.BJ函数.14．音效函数")
-local PlaySoundOnUnitBJ = ____require_result_12.PlaySoundOnUnitBJ
-local ____require_result_13 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_13["创建点特效"]
-local ____require_result_14 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
-local CreateFloatTextOnUnit = ____require_result_14.CreateFloatTextOnUnit
-local ____require_result_15 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_15.registerDeathListener
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.冲锋残影表现")
+local _____5F00_59CB_51B2_950B_5E76_9644_5E26_6B8B_5F71_8868_73B0 = ____require_result_2["开始冲锋并附带残影表现"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.03．对外接口")
+local _____5F00_59CB_8DF3_8DC3 = ____require_result_3["开始跳跃"]
+local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_4["造成单体技能伤害"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
+local _____65BD_52A0_7729_6655 = ____require_result_5["施加眩晕"]
+local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_6.registerManualBuff
+local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local GS_Suspend = ____require_result_7.GS_Suspend
+local ____require_result_8 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+ModifyHeroStat = ____require_result_8.ModifyHeroStat
+local IsUnitAliveBJ = ____require_result_8.IsUnitAliveBJ
+local ____require_result_9 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetRandomDirectionDeg = ____require_result_9.GetRandomDirectionDeg
+local SetCameraTargetControllerNoZForPlayer = ____require_result_9.SetCameraTargetControllerNoZForPlayer
+local SetCameraFieldForPlayer = ____require_result_9.SetCameraFieldForPlayer
+local ResetToGameCameraForPlayer = ____require_result_9.ResetToGameCameraForPlayer
+local ____require_result_10 = require("lib.扩展函数.封装函数.07．镜头函数.01．镜头震动")
+local CameraSetEQNoiseForPlayer = ____require_result_10.CameraSetEQNoiseForPlayer
+local CameraClearNoiseForPlayer = ____require_result_10.CameraClearNoiseForPlayer
+local ____require_result_11 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundOnUnitBJ = ____require_result_11.PlaySoundOnUnitBJ
+local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_12["创建点特效"]
+local ____require_result_13 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
+local CreateFloatTextOnUnit = ____require_result_13.CreateFloatTextOnUnit
+local ____require_result_14 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_14.registerDeathListener
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-GetHandleId = jass.GetHandleId
+local GetHandleId = jass.GetHandleId
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetUnitFacing = jass.GetUnitFacing
 local GetHeroAgi = jass.GetHeroAgi
@@ -112,8 +100,8 @@ local WEAPON_TYPE_METAL_HEAVY_BASH = jass.WEAPON_TYPE_METAL_HEAVY_BASH
 bj_HEROSTAT_AGI = jass.bj_HEROSTAT_AGI
 local bj_MODIFYMETHOD_ADD = jass.bj_MODIFYMETHOD_ADD
 bj_MODIFYMETHOD_SUB = jass.bj_MODIFYMETHOD_SUB
-local ____require_result_16 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_16.stringToFourCCSafe
+local ____require_result_15 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_15.stringToFourCCSafe
 local _____914D_7F6E = _____4E91_7AEF_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
 local ____R_7C7B_578BID = stringToFourCCSafe(_____914D_7F6E.R["技能ID"])
@@ -181,20 +169,6 @@ local function _____6E05_7406R_5168_90E8(ctx, _____64A4_9500_654F_6377)
         return
     end
     ctx["已清理"] = true
-    debugLogForce(
-        "云端R",
-        "清理全部",
-        "施法者",
-        GetHandleId(ctx["施法者"]),
-        "目标",
-        GetHandleId(ctx["目标"]),
-        "撤销敏捷",
-        _____64A4_9500_654F_6377,
-        "SS",
-        ctx.SS,
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     if ctx["升空回调ID"] ~= 0 then
         removePeriodicCallback(ctx["升空回调ID"])
     end
@@ -221,20 +195,6 @@ local function ____R_7ED3_7B97(variable)
     local caster = ctx["施法者"]
     local target = ctx["目标"]
     local _____76EE_6807_6709_6548 = target ~= nil and target ~= 0 and IsUnitAliveBJ(target)
-    debugLogForce(
-        "云端R",
-        "结算-进入",
-        "施法者",
-        GetHandleId(caster),
-        "目标",
-        GetHandleId(target),
-        "目标有效",
-        _____76EE_6807_6709_6548,
-        "伤害快照",
-        ctx["伤害快照"],
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     ctx["已清理"] = true
     if ctx["升空回调ID"] ~= 0 then
         removePeriodicCallback(ctx["升空回调ID"])
@@ -242,20 +202,6 @@ local function ____R_7ED3_7B97(variable)
     ctx["升空回调ID"] = 0
     _____6062_590DR_53CC_65B9_72B6_6001(ctx)
     if caster ~= nil and caster ~= 0 and IsUnitAliveBJ(caster) and _____76EE_6807_6709_6548 then
-        debugLogForce(
-            "云端R",
-            "结算-造成伤害+眩晕",
-            "施法者",
-            GetHandleId(caster),
-            "目标",
-            GetHandleId(target),
-            "伤害",
-            ctx["伤害快照"],
-            "眩晕秒",
-            _____914D_7F6E.R["眩晕秒"],
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
         _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
             ["来源"] = caster,
             ["目标"] = target,
@@ -277,19 +223,6 @@ local function ____R_7ED3_7B97(variable)
             "技能"
         )
         registerManualBuff(target, _____4E91_7AEFBuffID["暗黑制裁眩晕"], _____914D_7F6E.R["眩晕秒"], 0)
-    else
-        debugLogForce(
-            "云端R",
-            "结算-目标/施法者无效跳过伤害",
-            "施法者",
-            GetHandleId(caster),
-            "目标",
-            GetHandleId(target),
-            "目标有效",
-            _____76EE_6807_6709_6548,
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
     end
     if caster ~= nil and caster ~= 0 then
         local owner = GetOwningPlayer(caster)
@@ -309,20 +242,6 @@ local function ____R_5760_843D_8868_73B0(ctx)
     local target = ctx["目标"]
     local tx = GetUnitX(target)
     local ty = GetUnitY(target)
-    debugLogForce(
-        "云端R",
-        "坠落表现-开始",
-        "施法者",
-        GetHandleId(ctx["施法者"]),
-        "目标",
-        GetHandleId(target),
-        "X",
-        tx,
-        "Y",
-        ty,
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____914D_7F6E.R["坠落"]["表现模型"],
         X = tx,
@@ -356,32 +275,10 @@ local function _____63A8_8FDBR_5347_7A7A(variable)
     local caster = ctx["施法者"]
     local target = ctx["目标"]
     if caster == nil or caster == 0 or not IsUnitAliveBJ(caster) then
-        debugLogForce(
-            "云端R",
-            "升空-施法者失效清理",
-            "施法者",
-            GetHandleId(caster),
-            "SS",
-            ctx.SS,
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
         _____6E05_7406R_5168_90E8(ctx, true)
         return
     end
     if target == nil or target == 0 or not IsUnitAliveBJ(target) then
-        debugLogForce(
-            "云端R",
-            "升空-目标失效清理",
-            "施法者",
-            GetHandleId(caster),
-            "目标",
-            GetHandleId(target),
-            "SS",
-            ctx.SS,
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
         _____6E05_7406R_5168_90E8(ctx, true)
         return
     end
@@ -390,18 +287,6 @@ local function _____63A8_8FDBR_5347_7A7A(variable)
             removePeriodicCallback(ctx["升空回调ID"])
         end
         ctx["升空回调ID"] = 0
-        debugLogForce(
-            "云端R",
-            "升空-达到最大Tick转坠落",
-            "施法者",
-            GetHandleId(caster),
-            "目标",
-            GetHandleId(target),
-            "SS",
-            ctx.SS,
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
         ____R_5760_843D_8868_73B0(ctx)
         return
     end
@@ -410,20 +295,6 @@ local function _____63A8_8FDBR_5347_7A7A(variable)
     local ty = GetUnitY(target)
     SetUnitAnimation(target, "Death")
     SetUnitFlyHeight(target, _____914D_7F6E.R["升空"]["每Tick高度"] * ctx.SS, 0)
-    debugLogForce(
-        "云端R",
-        "升空-推进",
-        "施法者",
-        GetHandleId(caster),
-        "目标",
-        GetHandleId(target),
-        "SS",
-        ctx.SS,
-        "飞行高度",
-        _____914D_7F6E.R["升空"]["每Tick高度"] * ctx.SS,
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     local owner = GetOwningPlayer(caster)
     if GetLocalPlayer() == owner then
         SetCameraFieldForPlayer(owner, CAMERA_FIELD_ZOFFSET, _____914D_7F6E.R["升空"]["每Tick高度"] * ctx.SS, 0)
@@ -454,41 +325,13 @@ local function ____R_5347_7A7A_51C6_5907(variable)
     local caster = ctx["施法者"]
     local target = ctx["目标"]
     if caster == nil or caster == 0 or not IsUnitAliveBJ(caster) then
-        debugLogForce(
-            "云端R",
-            "升空准备-施法者失效清理",
-            "施法者",
-            GetHandleId(caster),
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
         _____6E05_7406R_5168_90E8(ctx, true)
         return
     end
     if target == nil or target == 0 or not IsUnitAliveBJ(target) then
-        debugLogForce(
-            "云端R",
-            "升空准备-目标失效清理",
-            "施法者",
-            GetHandleId(caster),
-            "目标",
-            GetHandleId(target),
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
         _____6E05_7406R_5168_90E8(ctx, true)
         return
     end
-    debugLogForce(
-        "云端R",
-        "升空准备-开始",
-        "施法者",
-        GetHandleId(caster),
-        "目标",
-        GetHandleId(target),
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     PauseUnit(target, true)
     SetUnitInvulnerable(target, true)
     SetUnitTimeScale(caster, 1)
@@ -523,16 +366,6 @@ local function ____R_7B2C_4E8C_6BB5_51B2_523A(variable)
     local caster = ctx["施法者"]
     local target = ctx["目标"]
     if caster == nil or caster == 0 or not IsUnitAliveBJ(caster) or target == nil or target == 0 or not IsUnitAliveBJ(target) then
-        debugLogForce(
-            "云端R",
-            "第二段-施法者/目标失效清理",
-            "施法者",
-            GetHandleId(caster),
-            "目标",
-            GetHandleId(target),
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
         _____6E05_7406R_5168_90E8(ctx, true)
         return
     end
@@ -542,22 +375,6 @@ local function ____R_7B2C_4E8C_6BB5_51B2_523A(variable)
     local dy = GetUnitY(target) - GetUnitY(caster)
     local _____5B9E_65F6_8DDD_79BB = SquareRoot(dx * dx + dy * dy)
     local _____89D2_5EA6 = Atan2(dy, dx) * bj_RADTODEG
-    debugLogForce(
-        "云端 R",
-        "第二段 - 突进冲刺",
-        "施法者",
-        GetHandleId(caster),
-        "目标",
-        GetHandleId(target),
-        "角度",
-        _____89D2_5EA6,
-        "实时距离",
-        _____5B9E_65F6_8DDD_79BB,
-        "总距离",
-        _____914D_7F6E.R["冲刺"]["第二段"]["基础距离"] + _____5B9E_65F6_8DDD_79BB,
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     _____5F00_59CB_51B2_950B_5E76_9644_5E26_6B8B_5F71_8868_73B0(caster, {
         ["角度"] = _____89D2_5EA6,
         ["距离"] = _____914D_7F6E.R["冲刺"]["第二段"]["基础距离"] + _____5B9E_65F6_8DDD_79BB,
@@ -579,16 +396,6 @@ local function ____R_7B2C_4E00_6BB5_51B2_523A(variable)
     local caster = ctx["施法者"]
     local target = ctx["目标"]
     if caster == nil or caster == 0 or not IsUnitAliveBJ(caster) or target == nil or target == 0 or not IsUnitAliveBJ(target) then
-        debugLogForce(
-            "云端R",
-            "第一段-施法者/目标失效清理",
-            "施法者",
-            GetHandleId(caster),
-            "目标",
-            GetHandleId(target),
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
         _____6E05_7406R_5168_90E8(ctx, true)
         return
     end
@@ -598,20 +405,6 @@ local function ____R_7B2C_4E00_6BB5_51B2_523A(variable)
         GetUnitY(caster) - GetUnitY(target),
         GetUnitX(caster) - GetUnitX(target)
     ) * bj_RADTODEG
-    debugLogForce(
-        "云端R",
-        "第一段-退后冲刺",
-        "施法者",
-        GetHandleId(caster),
-        "目标",
-        GetHandleId(target),
-        "角度",
-        _____89D2_5EA6,
-        "距离",
-        _____914D_7F6E.R["冲刺"]["第一段"]["距离"],
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     _____5F00_59CB_51B2_950B_5E76_9644_5E26_6B8B_5F71_8868_73B0(caster, {
         ["角度"] = _____89D2_5EA6,
         ["距离"] = _____914D_7F6E.R["冲刺"]["第一段"]["距离"],
@@ -626,45 +419,13 @@ local function ____R_7B2C_4E00_6BB5_51B2_523A(variable)
     )
 end
 local function _____91CA_653ER_6697_9ED1_5236_88C1(context, caster, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce(
-        "云端R",
-        "入口-释放",
-        "施法者",
-        GetHandleId(caster),
-        "技能ID",
-        _____914D_7F6E.R["技能ID"],
-        "技能实例ID",
-        _____6280_80FD_5B9E_4F8BID
-    )
     local target = GetSpellTargetUnit()
     if target == nil or target == 0 then
-        debugLogForce(
-            "云端R",
-            "入口-目标无效返回",
-            "施法者",
-            GetHandleId(caster),
-            "技能实例ID",
-            _____6280_80FD_5B9E_4F8BID
-        )
         return
     end
     local _____7B49_7EA7 = GetUnitAbilityLevel(caster, ____R_7C7B_578BID)
     local _____4F24_5BB3_5FEB_7167 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * (_____914D_7F6E.R["伤害公式"]["基础倍率"] + _____914D_7F6E.R["伤害公式"]["每级加成"] * _____7B49_7EA7)
     local _____654F_6377_589E_91CF = GetHeroAgi(caster, false)
-    debugLogForce(
-        "云端R",
-        "入口-锁存",
-        "目标",
-        GetHandleId(target),
-        "等级",
-        _____7B49_7EA7,
-        "伤害快照",
-        _____4F24_5BB3_5FEB_7167,
-        "敏捷增量",
-        _____654F_6377_589E_91CF,
-        "技能实例ID",
-        _____6280_80FD_5B9E_4F8BID
-    )
     context["施法者"] = caster
     context["目标"] = target
     context["伤害快照"] = _____4F24_5BB3_5FEB_7167
@@ -736,14 +497,6 @@ local function ____R_5355_4F4D_6B7B_4EA1_6E05_7406(dyingUnit, _killingUnit)
     if ctx == nil or ctx["已清理"] then
         return
     end
-    debugLogForce(
-        "云端R",
-        "死亡清理",
-        "死亡单位",
-        GetHandleId(dyingUnit),
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     _____6E05_7406R_5168_90E8(ctx, true)
 end
 ____exports["注册云端R"] = function()

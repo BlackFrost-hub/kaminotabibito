@@ -7,6 +7,7 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const jglobals = require("jass.globals") as any;
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -37,8 +38,8 @@ const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定�
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
-const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, params: any) => any;
 };
 const { 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
@@ -81,6 +82,20 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const 配置 = 鹿目圆单位技能配置;
+
+/** 播放地图预载全局音效（源 PlaySoundOnUnitBJ gg_snd_*） */
+function 播放E全局音效(this: void, soundKey: string): void {
+  if (soundKey === "") return;
+  const sound = jglobals[soundKey];
+  if (sound == null || sound === 0) return;
+  jass.StartSound(sound);
+}
+
+/** 定时移除单位（樱花雨等不参与下落逻辑的表现壳） */
+function 定时移除单位(this: void, variable?: any): void {
+  const unit = variable as any;
+  if (unit != null && unit !== 0 && GetUnitTypeId(unit) !== 0) RemoveUnit(unit);
+}
 
 interface E上下文 {
   施法者: any;
@@ -168,7 +183,15 @@ function 推进E雨壳(this: void, context: E上下文): void {
 }
 
 function E区域脉冲(this: void, context: E上下文): void {
-  createTimedEffect(配置.E.脉冲特效, context.区域X, context.区域Y, 0, 1.5);
+  // 源 Func004Func008Func003Func001Func008T：dtpink 于技能施放点、EXSetEffectSize 2.00、持续1.5s
+  创建点特效({
+    模型路径: 配置.E.脉冲特效,
+    X: context.区域X,
+    Y: context.区域Y,
+    Z: 0,
+    缩放: 配置.E.脉冲特效缩放,
+    持续秒: 1.5,
+  });
   const owner = GetOwningPlayer(context.施法者);
   const units = getUnitsInRange(context.区域X, context.区域Y, 配置.E.范围);
   const enemies: any[] = [];
@@ -218,7 +241,8 @@ function E区域Tick(this: void, variable?: any): void {
   context.Tick += 1;
   if (context.Tick <= 100) 创建E雨壳(context);
   推进E雨壳(context);
-  if (context.Tick === 20 || context.Tick === 40 || context.Tick === 60 || context.Tick === 80 || context.Tick === 100) {
+  // 源 Func010A/Func011A：脉冲节点为 20/40/60/80/99
+  if (context.Tick === 20 || context.Tick === 40 || context.Tick === 60 || context.Tick === 80 || context.Tick === 99) {
     E区域脉冲(context);
   }
   if (context.Tick >= 100 && !context.区域已结算) E区域结束驱散(context);
@@ -231,9 +255,25 @@ function 开始E区域(this: void, context: E上下文): void {
     return;
   }
   context.区域已启动 = true;
-  context.区域X = GetUnitX(context.施法者);
-  context.区域Y = GetUnitY(context.施法者);
+  // 源：区域/脉冲/伤害/治疗/雨单位均以「技能施放点」为目标中心，樱花雨单独在英雄当前位置
+  context.区域X = context.目标X;
+  context.区域Y = context.目标Y;
   context.Tick = 0;
+  // 源 Func008T：区域开始时 PlaySoundOnUnitBJ(gg_snd_SpellShieldImpact1)
+  播放E全局音效(配置.E.施放音效键);
+  // 源 Func003T ss>=30 分支：在英雄落点创建「虹之雨樱花雨」表现壳（不参与下落）
+  const 樱花雨 = 创建单位并登记排泄安全(
+    jass.Player(12),
+    配置.单位壳.虹之雨,
+    GetUnitX(context.施法者),
+    GetUnitY(context.施法者),
+    0,
+  );
+  if (樱花雨 != null && 樱花雨 !== 0) {
+    SetUnitFlyHeight(樱花雨, 配置.E.雨单位高度, 0);
+    SetUnitScale(樱花雨, 配置.E.雨单位缩放, 配置.E.雨单位缩放, 配置.E.雨单位缩放);
+    addDelayedCallback(配置.E.樱花雨持续秒 * 1000, 定时移除单位, 樱花雨);
+  }
   registerManualBuff(context.施法者, 鹿目圆BuffID.虹之雨, 配置.E.持续秒, context.每次结算值, {
     sourceUnit: context.施法者,
     effectSourceName: "虹之雨",
@@ -320,7 +360,16 @@ function 释放E(this: void, _entry: { 英雄: any }, caster: any, 技能实例I
   SetUnitFacing(caster, facing);
   添加单位暂停(caster, context.暂停来源);
   SetUnitAnimation(caster, "spell");
-  createTimedEffect(配置.E.起手特效, context.目标X, context.目标Y, -300, 配置.E.起手特效持续秒);
+  // 源 EC_CreateEffect Starburst：目标点 Z=-300、面向270、缩放2.00、持续2.00s
+  创建点特效({
+    模型路径: 配置.E.起手特效,
+    X: context.目标X,
+    Y: context.目标Y,
+    Z: -300,
+    面向角度: 270,
+    缩放: 配置.E.起手特效缩放,
+    持续秒: 配置.E.起手特效持续秒,
+  });
   addDelayedCallback(配置.E.起手硬直秒 * 1000, 开始E移动, context);
 }
 

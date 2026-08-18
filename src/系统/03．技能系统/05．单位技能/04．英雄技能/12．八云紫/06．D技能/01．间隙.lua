@@ -9,9 +9,6 @@ local _____521B_5EFA_516B_4E91_7D2B_88C2_9699 = ____01_FF0E_88C2_9699_7CFB_7EDF[
 local _____68C0_67E5_516B_4E91_7D2BD_88C2_9699_653E_7F6E = ____01_FF0E_88C2_9699_7CFB_7EDF["检查八云紫D裂隙放置"]
 local ____00A_FF0E_8868_73B0_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00A．表现工具")
 local _____64AD_653E_516B_4E91_7D2B_5355_4F4D_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放八云紫单位音效"]
-local ____00B_FF0E_8BCA_65AD = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00B．诊断")
-local _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7 = ____00B_FF0E_8BCA_65AD["八云紫诊断日志"]
-local _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4 = ____00B_FF0E_8BCA_65AD["八云紫诊断句柄"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
@@ -47,34 +44,6 @@ local function _____91CA_653ED(_context, hero, skillInstanceId)
         jass.GetSpellTargetY()
     )
     local placement = _____68C0_67E5_516B_4E91_7D2BD_88C2_9699_653E_7F6E(hero, ____end.x, ____end.y)
-    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-        "D",
-        "收到D施法",
-        "英雄",
-        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(hero),
-        "英雄X",
-        startX,
-        "英雄Y",
-        startY,
-        "目标X",
-        jass.GetSpellTargetX(),
-        "目标Y",
-        jass.GetSpellTargetY(),
-        "可达X",
-        ____end.x,
-        "可达Y",
-        ____end.y,
-        "允许创建",
-        placement["可创建"],
-        "长期",
-        placement["长期"],
-        "持续秒",
-        placement["持续秒"],
-        "失败原因",
-        placement["失败原因"] or "无",
-        "技能实例ID",
-        skillInstanceId or 0
-    )
     if not placement["可创建"] then
         jass.DisplayTimedTextToPlayer(
             jass.GetOwningPlayer(hero),
@@ -95,42 +64,12 @@ local function _____91CA_653ED(_context, hero, skillInstanceId)
     end
     _____6DFB_52A0_5355_4F4D_6682_505C(hero, ____D_6682_505C_6765_6E90)
     jass.SetUnitAnimation(hero, _____914D_7F6E.D["施法动作"])
-    local gap = _____521B_5EFA_516B_4E91_7D2B_88C2_9699(
+    _____521B_5EFA_516B_4E91_7D2B_88C2_9699(
         hero,
         ____end.x,
         ____end.y,
         _____914D_7F6E["技能"].D["类型ID"],
         skillInstanceId
-    )
-    local ____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7_11 = _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7
-    local ____temp_10 = gap ~= nil and _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(gap["单位"]) or 0
-    local ____temp_5
-    if gap ~= nil then
-        ____temp_5 = jass.GetUnitX(gap["单位"])
-    else
-        ____temp_5 = 0
-    end
-    local ____temp_6
-    if gap ~= nil then
-        ____temp_6 = jass.GetUnitY(gap["单位"])
-    else
-        ____temp_6 = 0
-    end
-    local ____temp_9 = gap and gap["长期"]
-    if ____temp_9 == nil then
-        ____temp_9 = false
-    end
-    ____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7_11(
-        "D",
-        "D创建间隙结果",
-        "间隙",
-        ____temp_10,
-        "实际X",
-        ____temp_5,
-        "实际Y",
-        ____temp_6,
-        "长期",
-        ____temp_9
     )
     addDelayedCallback(_____914D_7F6E.D["硬直秒"] * 1000, _____89E3_9664D_786C_76F4, hero)
 end

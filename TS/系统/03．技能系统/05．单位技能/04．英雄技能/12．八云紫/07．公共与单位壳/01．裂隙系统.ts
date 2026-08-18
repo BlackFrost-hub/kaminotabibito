@@ -1,7 +1,6 @@
 /** @noSelfInFile */
 
 import { 八云紫单位技能配置 } from "../00．配置";
-import { 八云紫诊断日志, 八云紫诊断句柄 } from "../00B．诊断";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -9,6 +8,9 @@ const japi = require("jass.japi") as any;
 const { addDelayedCallback, getGameTime } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   getGameTime: (this: void) => number;
+};
+const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
+  registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -66,6 +68,8 @@ export type 裂隙创建监听器 = (this: void, hero: any, gap: 八云紫裂隙
 
 const 裂隙记录表: Record<number, 八云紫裂隙记录 | undefined> = {};
 const 英雄长期裂隙数: Record<number, number | undefined> = {};
+const 英雄R期间D排斥豁免: Record<number, boolean | undefined> = {};
+const 英雄E期间D排斥豁免: Record<number, boolean | undefined> = {};
 const 间隙命中次数: Record<number, number | undefined> = {};
 let 已注册裂隙扩散发射器: 裂隙扩散发射器 | undefined;
 const 裂隙创建监听器列表: 裂隙创建监听器[] = [];
@@ -97,6 +101,25 @@ export function 八云紫单位存活(this: void, unit: any): boolean {
 
 export function 是八云紫(this: void, unit: any): boolean {
   return 八云紫单位存活(unit) && jass.GetUnitTypeId(unit) === 配置.单位.英雄类型ID;
+}
+
+export function 设置八云紫R期间D排斥豁免(this: void, hero: any, enabled: boolean): void {
+  const heroId = 句柄ID(hero);
+  if (heroId === 0) return;
+  if (enabled) 英雄R期间D排斥豁免[heroId] = true;
+  else delete 英雄R期间D排斥豁免[heroId];
+}
+
+export function 设置八云紫E期间D排斥豁免(this: void, hero: any, enabled: boolean): void {
+  const heroId = 句柄ID(hero);
+  if (heroId === 0) return;
+  if (enabled) 英雄E期间D排斥豁免[heroId] = true;
+  else delete 英雄E期间D排斥豁免[heroId];
+}
+
+export function 八云紫R期间D排斥已豁免(this: void, hero: any): boolean {
+  const heroId = 句柄ID(hero);
+  return 英雄R期间D排斥豁免[heroId] === true || 英雄E期间D排斥豁免[heroId] === true;
 }
 
 export function 是八云紫合法敌人(this: void, hero: any, target: any): boolean {
@@ -249,16 +272,13 @@ function 选择裂隙持续时间(this: void, hero: any, x: number, y: number): 
 export function 检查八云紫D裂隙放置(this: void, hero: any, x: number, y: number): 八云紫D裂隙放置结果 {
   if (!是八云紫(hero)) return { 可创建: false, 持续秒: 0, 长期: false, 失败原因: "施法者无效。" };
   if (附近存在精英敌人(hero, x, y)) {
-    八云紫诊断日志("裂隙", "D放置判定为短期间隙", "英雄", 八云紫诊断句柄(hero), "X", x, "Y", y, "原因", "附近存在精英敌人");
     return { 可创建: true, 持续秒: 配置.裂隙.短期持续秒, 长期: false };
   }
-  if (附近存在长期裂隙(x, y)) {
-    八云紫诊断日志("裂隙", "D放置被拒绝", "英雄", 八云紫诊断句柄(hero), "X", x, "Y", y, "原因", "附近已有长期裂隙");
+  if (!八云紫R期间D排斥已豁免(hero) && 附近存在长期裂隙(x, y)) {
     return { 可创建: false, 持续秒: 0, 长期: false, 失败原因: "附近已有长期『间隙』，无法再次放置。" };
   }
   const heroId = 句柄ID(hero);
   if ((英雄长期裂隙数[heroId] ?? 0) >= 配置.裂隙.最多长期裂隙) {
-    八云紫诊断日志("裂隙", "D放置被拒绝", "英雄", heroId, "X", x, "Y", y, "原因", "长期裂隙达到上限", "当前数量", 英雄长期裂隙数[heroId] ?? 0);
     return { 可创建: false, 持续秒: 0, 长期: false, 失败原因: "长期『间隙』数量已达到上限。" };
   }
   return { 可创建: true, 持续秒: 配置.裂隙.长期持续秒, 长期: true };
@@ -300,18 +320,15 @@ export function 创建八云紫裂隙(
   let lifetime = 指定寿命 != null
     ? { duration: 指定寿命.持续秒, long: 指定寿命.长期 }
     : 选择裂隙持续时间(hero, x, y);
-  八云紫诊断日志("裂隙", "请求创建间隙", "英雄", 八云紫诊断句柄(hero), "技能ID", skillId, "请求X", x, "请求Y", y, "初选长期", lifetime.long, "初选持续秒", lifetime.duration, "指定寿命", 指定寿命 != null, "技能实例ID", skillInstanceId ?? 0);
   if (skillId === 配置.技能.D.类型ID) {
     const placement = 检查八云紫D裂隙放置(hero, x, y);
     if (!placement.可创建) {
-      八云紫诊断日志("裂隙", "创建间隙终止", "技能ID", skillId, "原因", placement.失败原因 ?? "D放置判定失败");
       return undefined;
     }
     lifetime = { duration: placement.持续秒, long: placement.长期 };
   }
   const gap = 创建单位并登记排泄安全(jass.GetOwningPlayer(hero), 配置.单位.裂隙类型ID, x, y, 0);
   if (gap == null || gap === 0) {
-    八云紫诊断日志("裂隙", "CreateUnit失败", "单位类型ID", 配置.单位.裂隙类型ID, "X", x, "Y", y);
     return undefined;
   }
   const record: 八云紫裂隙记录 = {
@@ -329,7 +346,6 @@ export function 创建八云紫裂隙(
   }
   jass.SetUnitState(gap, UNIT_STATE_MAX_LIFE, lifetime.duration);
   jass.SetUnitState(gap, UNIT_STATE_LIFE, lifetime.duration);
-  八云紫诊断日志("裂隙", "间隙创建成功", "间隙", 八云紫诊断句柄(gap), "单位类型ID", jass.GetUnitTypeId(gap), "实际X", jass.GetUnitX(gap), "实际Y", jass.GetUnitY(gap), "长期", lifetime.long, "持续秒", lifetime.duration, "英雄长期数量", 英雄长期裂隙数[句柄ID(hero)] ?? 0, "监听器数", 裂隙创建监听器列表.length);
   addDelayedCallback(lifetime.duration * 1000, 裂隙到期, record);
   结算八云紫裂隙展开(hero, x, y, skillId, skillInstanceId);
   for (let i = 0; i < 裂隙创建监听器列表.length; i++) {
@@ -417,5 +433,20 @@ export function 触发八云紫裂隙扩散(this: void, hero: any, centerGap: �
   }
   return count;
 }
+
+function 监听八云紫裂隙自毁(this: void, castingUnit: any, spellAbilityId: number): void {
+  if (spellAbilityId !== 配置.技能.Afzy.类型ID || castingUnit == null || castingUnit === 0) return;
+  const unitTypeId = jass.GetUnitTypeId(castingUnit);
+  if (unitTypeId === 配置.单位.裂隙类型ID) {
+    const record = 获取八云紫裂隙记录(castingUnit);
+    if (record != null) 清理裂隙记录(record);
+    return;
+  }
+  if (unitTypeId === 配置.单位.临时裂隙类型ID && unitTypeId !== 0) {
+    jass.RemoveUnit(castingUnit);
+  }
+}
+
+registerSpellEffectListener(监听八云紫裂隙自毁);
 
 export {};

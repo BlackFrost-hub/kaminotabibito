@@ -4,9 +4,6 @@ local ____exports = {}
 local _____79FB_9664_4E34_65F6_88C2_9699, jass
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00．配置")
 local _____516B_4E91_7D2B_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["八云紫单位技能配置"]
-local ____00B_FF0E_8BCA_65AD = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00B．诊断")
-local _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7 = ____00B_FF0E_8BCA_65AD["八云紫诊断日志"]
-local _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4 = ____00B_FF0E_8BCA_65AD["八云紫诊断句柄"]
 function _____79FB_9664_4E34_65F6_88C2_9699(variable)
     local unit = variable
     if unit ~= nil and unit ~= 0 and jass.GetUnitTypeId(unit) ~= 0 then
@@ -18,18 +15,20 @@ local japi = require("jass.japi")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local getGameTime = ____require_result_0.getGameTime
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_1["创建单位并登记排泄安全"]
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getEnemyUnitsInRange = ____require_result_2.getEnemyUnitsInRange
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断")
-local _____662F_5426_7CBE_82F1_5355_4F4D = ____require_result_3["是否精英单位"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
-local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_5["造成单体技能伤害"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
-local _____65BD_52A0_7729_6655 = ____require_result_6["施加眩晕"]
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_2["创建单位并登记排泄安全"]
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getEnemyUnitsInRange = ____require_result_3.getEnemyUnitsInRange
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断")
+local _____662F_5426_7CBE_82F1_5355_4F4D = ____require_result_4["是否精英单位"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
+local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_6["造成单体技能伤害"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
+local _____65BD_52A0_7729_6655 = ____require_result_7["施加眩晕"]
 local _____914D_7F6E = _____516B_4E91_7D2B_5355_4F4D_6280_80FD_914D_7F6E
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND
@@ -42,6 +41,8 @@ local UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 local PATHING_TYPE_WALKABILITY = jass.PATHING_TYPE_WALKABILITY
 local _____88C2_9699_8BB0_5F55_8868 = {}
 local _____82F1_96C4_957F_671F_88C2_9699_6570 = {}
+local _____82F1_96C4R_671F_95F4D_6392_65A5_8C41_514D = {}
+local _____82F1_96C4E_671F_95F4D_6392_65A5_8C41_514D = {}
 local _____95F4_9699_547D_4E2D_6B21_6570 = {}
 local _____5DF2_6CE8_518C_88C2_9699_6269_6563_53D1_5C04_5668
 local _____88C2_9699_521B_5EFA_76D1_542C_5668_5217_8868 = {}
@@ -72,6 +73,32 @@ ____exports["八云紫单位存活"] = function(unit)
 end
 ____exports["是八云紫"] = function(unit)
     return ____exports["八云紫单位存活"](unit) and jass.GetUnitTypeId(unit) == _____914D_7F6E["单位"]["英雄类型ID"]
+end
+____exports["设置八云紫R期间D排斥豁免"] = function(hero, enabled)
+    local heroId = _____53E5_67C4ID(hero)
+    if heroId == 0 then
+        return
+    end
+    if enabled then
+        _____82F1_96C4R_671F_95F4D_6392_65A5_8C41_514D[heroId] = true
+    else
+        __TS__Delete(_____82F1_96C4R_671F_95F4D_6392_65A5_8C41_514D, heroId)
+    end
+end
+____exports["设置八云紫E期间D排斥豁免"] = function(hero, enabled)
+    local heroId = _____53E5_67C4ID(hero)
+    if heroId == 0 then
+        return
+    end
+    if enabled then
+        _____82F1_96C4E_671F_95F4D_6392_65A5_8C41_514D[heroId] = true
+    else
+        __TS__Delete(_____82F1_96C4E_671F_95F4D_6392_65A5_8C41_514D, heroId)
+    end
+end
+____exports["八云紫R期间D排斥已豁免"] = function(hero)
+    local heroId = _____53E5_67C4ID(hero)
+    return _____82F1_96C4R_671F_95F4D_6392_65A5_8C41_514D[heroId] == true or _____82F1_96C4E_671F_95F4D_6392_65A5_8C41_514D[heroId] == true
 end
 ____exports["是八云紫合法敌人"] = function(hero, target)
     return ____exports["八云紫单位存活"](target) and jass.IsUnitEnemy(
@@ -267,51 +294,13 @@ ____exports["检查八云紫D裂隙放置"] = function(hero, x, y)
         return {["可创建"] = false, ["持续秒"] = 0, ["长期"] = false, ["失败原因"] = "施法者无效。"}
     end
     if _____9644_8FD1_5B58_5728_7CBE_82F1_654C_4EBA(hero, x, y) then
-        _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-            "裂隙",
-            "D放置判定为短期间隙",
-            "英雄",
-            _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(hero),
-            "X",
-            x,
-            "Y",
-            y,
-            "原因",
-            "附近存在精英敌人"
-        )
         return {["可创建"] = true, ["持续秒"] = _____914D_7F6E["裂隙"]["短期持续秒"], ["长期"] = false}
     end
-    if _____9644_8FD1_5B58_5728_957F_671F_88C2_9699(x, y) then
-        _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-            "裂隙",
-            "D放置被拒绝",
-            "英雄",
-            _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(hero),
-            "X",
-            x,
-            "Y",
-            y,
-            "原因",
-            "附近已有长期裂隙"
-        )
+    if not ____exports["八云紫R期间D排斥已豁免"](hero) and _____9644_8FD1_5B58_5728_957F_671F_88C2_9699(x, y) then
         return {["可创建"] = false, ["持续秒"] = 0, ["长期"] = false, ["失败原因"] = "附近已有长期『间隙』，无法再次放置。"}
     end
     local heroId = _____53E5_67C4ID(hero)
     if (_____82F1_96C4_957F_671F_88C2_9699_6570[heroId] or 0) >= _____914D_7F6E["裂隙"]["最多长期裂隙"] then
-        _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-            "裂隙",
-            "D放置被拒绝",
-            "英雄",
-            heroId,
-            "X",
-            x,
-            "Y",
-            y,
-            "原因",
-            "长期裂隙达到上限",
-            "当前数量",
-            _____82F1_96C4_957F_671F_88C2_9699_6570[heroId] or 0
-        )
         return {["可创建"] = false, ["持续秒"] = 0, ["长期"] = false, ["失败原因"] = "长期『间隙』数量已达到上限。"}
     end
     return {["可创建"] = true, ["持续秒"] = _____914D_7F6E["裂隙"]["长期持续秒"], ["长期"] = true}
@@ -350,37 +339,9 @@ ____exports["创建八云紫裂隙"] = function(hero, x, y, skillId, skillInstan
         return nil
     end
     local lifetime = _____6307_5B9A_5BFF_547D ~= nil and ({duration = _____6307_5B9A_5BFF_547D["持续秒"], long = _____6307_5B9A_5BFF_547D["长期"]}) or _____9009_62E9_88C2_9699_6301_7EED_65F6_95F4(hero, x, y)
-    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-        "裂隙",
-        "请求创建间隙",
-        "英雄",
-        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(hero),
-        "技能ID",
-        skillId,
-        "请求X",
-        x,
-        "请求Y",
-        y,
-        "初选长期",
-        lifetime.long,
-        "初选持续秒",
-        lifetime.duration,
-        "指定寿命",
-        _____6307_5B9A_5BFF_547D ~= nil,
-        "技能实例ID",
-        skillInstanceId or 0
-    )
     if skillId == _____914D_7F6E["技能"].D["类型ID"] then
         local placement = ____exports["检查八云紫D裂隙放置"](hero, x, y)
         if not placement["可创建"] then
-            _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-                "裂隙",
-                "创建间隙终止",
-                "技能ID",
-                skillId,
-                "原因",
-                placement["失败原因"] or "D放置判定失败"
-            )
             return nil
         end
         lifetime = {duration = placement["持续秒"], long = placement["长期"]}
@@ -393,16 +354,6 @@ ____exports["创建八云紫裂隙"] = function(hero, x, y, skillId, skillInstan
         0
     )
     if gap == nil or gap == 0 then
-        _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-            "裂隙",
-            "CreateUnit失败",
-            "单位类型ID",
-            _____914D_7F6E["单位"]["裂隙类型ID"],
-            "X",
-            x,
-            "Y",
-            y
-        )
         return nil
     end
     local record = {
@@ -420,26 +371,6 @@ ____exports["创建八云紫裂隙"] = function(hero, x, y, skillId, skillInstan
     end
     jass.SetUnitState(gap, UNIT_STATE_MAX_LIFE, lifetime.duration)
     jass.SetUnitState(gap, UNIT_STATE_LIFE, lifetime.duration)
-    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-        "裂隙",
-        "间隙创建成功",
-        "间隙",
-        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(gap),
-        "单位类型ID",
-        jass.GetUnitTypeId(gap),
-        "实际X",
-        jass.GetUnitX(gap),
-        "实际Y",
-        jass.GetUnitY(gap),
-        "长期",
-        lifetime.long,
-        "持续秒",
-        lifetime.duration,
-        "英雄长期数量",
-        _____82F1_96C4_957F_671F_88C2_9699_6570[_____53E5_67C4ID(hero)] or 0,
-        "监听器数",
-        #_____88C2_9699_521B_5EFA_76D1_542C_5668_5217_8868
-    )
     addDelayedCallback(lifetime.duration * 1000, _____88C2_9699_5230_671F, record)
     ____exports["结算八云紫裂隙展开"](
         hero,
@@ -484,13 +415,13 @@ ____exports["查找八云紫裂隙"] = function(x, y, radius, owner)
             do
                 local record = ____exports["获取八云紫裂隙记录"](units[i + 1])
                 if record == nil then
-                    goto __continue71
+                    goto __continue80
                 end
                 if owner == nil or owner == 0 or jass.GetOwningPlayer(record["主人"]) == jass.GetOwningPlayer(owner) then
                     return record
                 end
             end
-            ::__continue71::
+            ::__continue80::
             i = i + 1
         end
     end
@@ -505,14 +436,14 @@ ____exports["获取范围内八云紫裂隙"] = function(x, y, radius, owner)
             do
                 local record = ____exports["获取八云紫裂隙记录"](units[i + 1])
                 if record == nil then
-                    goto __continue76
+                    goto __continue85
                 end
                 if owner ~= nil and owner ~= 0 and jass.GetOwningPlayer(record["主人"]) ~= jass.GetOwningPlayer(owner) then
-                    goto __continue76
+                    goto __continue85
                 end
                 result[#result + 1] = record
             end
-            ::__continue76::
+            ::__continue85::
             i = i + 1
         end
     end
@@ -554,24 +485,41 @@ ____exports["触发八云紫裂隙扩散"] = function(hero, centerGap)
             do
                 local gap = gaps[i + 1]
                 if gap["扩散冷却到"] > now then
-                    goto __continue88
+                    goto __continue97
                 end
                 local life = jass.GetUnitState(gap["单位"], UNIT_STATE_LIFE)
                 local maxLife = jass.GetUnitState(gap["单位"], UNIT_STATE_MAX_LIFE)
                 local cost = maxLife * _____914D_7F6E["裂隙"]["扩散生命消耗比例"]
                 if life <= cost + 0.405 then
                     _____6E05_7406_88C2_9699_8BB0_5F55(gap)
-                    goto __continue88
+                    goto __continue97
                 end
                 jass.SetUnitState(gap["单位"], UNIT_STATE_LIFE, life - cost)
                 gap["扩散冷却到"] = now + _____914D_7F6E["裂隙"]["扩散冷却秒"] * 1000
                 _____5DF2_6CE8_518C_88C2_9699_6269_6563_53D1_5C04_5668(hero, gap)
                 count = count + 1
             end
-            ::__continue88::
+            ::__continue97::
             i = i + 1
         end
     end
     return count
 end
+local function _____76D1_542C_516B_4E91_7D2B_88C2_9699_81EA_6BC1(castingUnit, spellAbilityId)
+    if spellAbilityId ~= _____914D_7F6E["技能"].Afzy["类型ID"] or castingUnit == nil or castingUnit == 0 then
+        return
+    end
+    local unitTypeId = jass.GetUnitTypeId(castingUnit)
+    if unitTypeId == _____914D_7F6E["单位"]["裂隙类型ID"] then
+        local record = ____exports["获取八云紫裂隙记录"](castingUnit)
+        if record ~= nil then
+            _____6E05_7406_88C2_9699_8BB0_5F55(record)
+        end
+        return
+    end
+    if unitTypeId == _____914D_7F6E["单位"]["临时裂隙类型ID"] and unitTypeId ~= 0 then
+        jass.RemoveUnit(castingUnit)
+    end
+end
+registerSpellEffectListener(_____76D1_542C_516B_4E91_7D2B_88C2_9699_81EA_6BC1)
 return ____exports

@@ -1,6 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
+local _____9500_6BC1D_8868_73B0, _____6E05_7406D_8868_73B0, _____53D6_5355_4F4DID, _____5355_4F4D_5B58_6D3B, removePeriodicCallback, _____9500_6BC1_70B9_7279_6548, GetHandleId, GetUnitTypeId, GetUnitState, UNIT_STATE_LIFE, ____D_8868_73B0_8868, ____D_7279_6548_7248_672C_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.15．鹿目圆.00．配置")
 local _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["鹿目圆单位技能配置"]
 local ____01_FF0E_72B6_6001_4E0E_88AB_52A8 = require("系统.03．技能系统.05．单位技能.04．英雄技能.15．鹿目圆.01．状态与被动")
@@ -13,10 +14,47 @@ local _____83B7_53D6_9E7F_76EE_5706_5706_73AF_5F3A_5316_5C42_6570 = ____01_FF0E_
 local _____6D88_8017_9E7F_76EE_5706_5706_73AF_5F3A_5316 = ____01_FF0E_72B6_6001_4E0E_88AB_52A8["消耗鹿目圆圆环强化"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+function _____9500_6BC1D_8868_73B0(hero)
+    if hero == nil or hero == 0 then
+        return
+    end
+    local id = _____53D6_5355_4F4DID(hero)
+    local state = ____D_8868_73B0_8868[id]
+    if state ~= nil then
+        if state["周期ID"] ~= 0 then
+            removePeriodicCallback(state["周期ID"])
+        end
+        if state["特效"] ~= nil and state["特效"] ~= 0 then
+            _____9500_6BC1_70B9_7279_6548(state["特效"])
+        end
+        __TS__Delete(____D_8868_73B0_8868, id)
+    end
+    __TS__Delete(____D_7279_6548_7248_672C_8868, id)
+end
+function _____6E05_7406D_8868_73B0(variable)
+    local data = variable
+    if data == nil then
+        return
+    end
+    local id = _____53D6_5355_4F4DID(data.hero)
+    if id == 0 or ____D_7279_6548_7248_672C_8868[id] ~= data.version then
+        return
+    end
+    _____9500_6BC1D_8868_73B0(data.hero)
+end
+function _____53D6_5355_4F4DID(unit)
+    return (unit == nil or unit == 0) and 0 or GetHandleId(unit)
+end
+function _____5355_4F4D_5B58_6D3B(unit)
+    return unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
+end
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+removePeriodicCallback = ____require_result_0.removePeriodicCallback
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.21．攻击效果.02．攻击效果监听")
 local _____6CE8_518C_666E_653B_653B_51FB_6548_679C_76D1_542C = ____require_result_1["注册普攻攻击效果监听"]
 local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -36,18 +74,20 @@ local getEnemyUnitsInRange = ____require_result_8.getEnemyUnitsInRange
 local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_9["读取单位攻击力"]
 local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_10["创建单位坐标跟随特效"]
-local _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_10["销毁单位坐标跟随特效"]
-local GetHandleId = jass.GetHandleId
-local GetUnitTypeId = jass.GetUnitTypeId
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
+_____9500_6BC1_70B9_7279_6548 = ____require_result_10["销毁点特效"]
+local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedEffect = ____require_result_11.createTimedEffect
+GetHandleId = jass.GetHandleId
+GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
+GetUnitState = jass.GetUnitState
 local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitEnemy = jass.IsUnitEnemy
 local IsUnitAlly = jass.IsUnitAlly
 local IsUnitType = jass.IsUnitType
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
@@ -57,46 +97,63 @@ local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local GetUnitStateJapi = japi.GetUnitState
 local _____914D_7F6E = _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E
-local ____D_7279_6548_952E = "鹿目圆-圆环之力"
-local ____D_7279_6548_7248_672C_8868 = {}
-local function _____53D6_5355_4F4DID(unit)
-    return (unit == nil or unit == 0) and 0 or GetHandleId(unit)
-end
-local function _____5355_4F4D_5B58_6D3B(unit)
-    return unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
-end
-local function _____662FD_5408_6CD5_76EE_6807(target)
-    return _____5355_4F4D_5B58_6D3B(target) and IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true
-end
-local function _____6E05_7406D_8868_73B0(variable)
-    local data = variable
-    if data == nil then
+--- 播放地图预载全局音效（源 PlaySoundAtPointBJ/OnUnitBJ gg_snd_*）
+local function _____64AD_653ED_5168_5C40_97F3_6548(soundKey)
+    if soundKey == "" then
         return
     end
-    local id = _____53D6_5355_4F4DID(data.hero)
-    if id == 0 or ____D_7279_6548_7248_672C_8868[id] ~= data.version then
+    local sound = jglobals[soundKey]
+    if sound == nil or sound == 0 then
         return
     end
-    __TS__Delete(____D_7279_6548_7248_672C_8868, id)
-    _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(data.hero, ____D_7279_6548_952E)
+    jass.StartSound(sound)
+end
+____D_8868_73B0_8868 = {}
+____D_7279_6548_7248_672C_8868 = {}
+--- 源 Func011T：特效每 tick 移到 英雄+40 码（facing+90）位置，Z=240
+local function ____D_73AF_7ED5Tick(variable)
+    local state = variable
+    if state == nil then
+        return
+    end
+    local hero = state["英雄"]
+    if not _____5355_4F4D_5B58_6D3B(hero) or _____83B7_53D6_9E7F_76EE_5706_5706_73AF_5F3A_5316_5C42_6570(hero) <= 0 then
+        _____9500_6BC1D_8868_73B0(hero)
+        return
+    end
+    if state["特效"] == nil or state["特效"] == 0 then
+        return
+    end
+    local _____5F27_5EA6 = (jass.GetUnitFacing(hero) + 90) * math.pi / 180
+    local x = GetUnitX(hero) + math.cos(_____5F27_5EA6) * _____914D_7F6E.D["环绕距离"]
+    local y = GetUnitY(hero) + math.sin(_____5F27_5EA6) * _____914D_7F6E.D["环绕距离"]
+    japi.DzSetEffectPos(state["特效"], x, y, _____914D_7F6E.D["环绕高度"])
 end
 local function _____64AD_653ED_8868_73B0(hero)
     local id = _____53D6_5355_4F4DID(hero)
     if id == 0 then
         return
     end
+    _____9500_6BC1D_8868_73B0(hero)
     local version = (____D_7279_6548_7248_672C_8868[id] or 0) + 1
     ____D_7279_6548_7248_672C_8868[id] = version
-    _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(hero, ____D_7279_6548_952E)
     local goddess = _____662F_9E7F_76EE_5706_5706_795E(hero)
-    _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
-        hero,
-        goddess and _____914D_7F6E.D["圆神特效"] or _____914D_7F6E.D["普通特效"],
-        ____D_7279_6548_952E,
-        goddess and _____914D_7F6E.D["圆神特效缩放"] or _____914D_7F6E.D["普通特效缩放"],
-        _____914D_7F6E.D["特效高度"]
-    )
+    local effect = _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = goddess and _____914D_7F6E.D["圆神特效"] or _____914D_7F6E.D["普通特效"],
+        X = GetUnitX(hero),
+        Y = GetUnitY(hero),
+        Z = _____914D_7F6E.D["特效高度"],
+        ["面向角度"] = 270,
+        ["缩放"] = goddess and _____914D_7F6E.D["圆神特效缩放"] or _____914D_7F6E.D["普通特效缩放"],
+        ["持续秒"] = _____914D_7F6E.D["持续秒"]
+    })
+    local state = {["英雄"] = hero, ["特效"] = effect, ["周期ID"] = 0}
+    ____D_8868_73B0_8868[id] = state
+    state["周期ID"] = addPeriodicCallback(_____914D_7F6E.D["环绕周期毫秒"], ____D_73AF_7ED5Tick, state)
     addDelayedCallback(_____914D_7F6E.D["持续秒"] * 1000, _____6E05_7406D_8868_73B0, {hero = hero, version = version})
+end
+local function _____662FD_5408_6CD5_76EE_6807(target)
+    return _____5355_4F4D_5B58_6D3B(target) and IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true
 end
 local function _____83B7_53D6D_5165_53E3(hero)
     return _____662F_9E7F_76EE_5706(hero) and ({["英雄"] = hero}) or nil
@@ -106,16 +163,39 @@ local function _____91CA_653ED(_entry, caster)
     if layers <= 0 then
         return
     end
+    _____64AD_653ED_5168_5C40_97F3_6548(_____914D_7F6E.D["施放音效键"])
+    if layers >= 2 then
+        local maxMana = GetUnitStateJapi(caster, UNIT_STATE_MAX_MANA)
+        if maxMana > 0 then
+            _____9B54_6CD5_589E_51CF(caster, -maxMana * _____914D_7F6E.D["二次使用魔法消耗比例"])
+        end
+    end
     _____64AD_653ED_8868_73B0(caster)
 end
 local function ____D_654C_65B9_7ED3_7B97(source, target, layers)
     local second = layers >= 2
-    local maxMana = GetUnitStateJapi(target, UNIT_STATE_MAX_MANA)
-    local manaRatio = second and _____914D_7F6E.D["二次敌人最大魔法削减比例"] or _____914D_7F6E.D["一次敌人最大魔法削减比例"]
-    if maxMana > 0 then
-        _____9B54_6CD5_589E_51CF(target, -maxMana * manaRatio)
-    end
+    createTimedEffect(
+        _____914D_7F6E.D["敌方命中特效"],
+        GetUnitX(target),
+        GetUnitY(target),
+        0,
+        1.5
+    )
+    createTimedEffect(
+        second and _____914D_7F6E.D["二次敌方特效"] or _____914D_7F6E.D["一次敌方特效"],
+        GetUnitX(target),
+        GetUnitY(target),
+        0,
+        2
+    )
     if second then
+        createTimedEffect(
+            _____914D_7F6E.D["二次敌方追加特效"],
+            GetUnitX(target),
+            GetUnitY(target),
+            0,
+            2
+        )
         _____65BD_52A0_5FEB_901F_63A7_5236Buff(
             source,
             target,
@@ -127,6 +207,16 @@ local function ____D_654C_65B9_7ED3_7B97(source, target, layers)
         local targetAttack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(target)
         if targetAttack > 0 then
             _____65BD_52A0_4E34_65F6_5C5E_6027_6548_679C(target, _____914D_7F6E.D["二次沉默秒"] * 1000, {{["类型"] = "攻击", ["数值"] = -targetAttack * _____914D_7F6E.D["二次减攻击比例"]}})
+        end
+    end
+    local maxMana = GetUnitStateJapi(target, UNIT_STATE_MAX_MANA)
+    if maxMana > 0 then
+        local _____4FDD_7559_6BD4_4F8B = second and _____914D_7F6E.D["敌方魔法保留比例二次"] or _____914D_7F6E.D["敌方魔法保留比例一次"]
+        local _____76EE_6807_9B54_6CD5 = maxMana * _____4FDD_7559_6BD4_4F8B
+        local _____5F53_524D_9B54_6CD5 = GetUnitStateJapi(target, jass.UNIT_STATE_MANA)
+        local delta = _____76EE_6807_9B54_6CD5 - _____5F53_524D_9B54_6CD5
+        if delta ~= 0 then
+            _____9B54_6CD5_589E_51CF(target, delta)
         end
     end
     local sourceAttack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(source)
@@ -148,11 +238,19 @@ local function ____D_654C_65B9_7ED3_7B97(source, target, layers)
     })
 end
 local function ____D_53CB_65B9_4F4E_751F_547D_51FB_9000(source, ally)
+    createTimedEffect(
+        _____914D_7F6E.D["击退特效"],
+        GetUnitX(ally),
+        GetUnitY(ally),
+        0,
+        1
+    )
+    _____64AD_653ED_5168_5C40_97F3_6548(_____914D_7F6E.D["击退音效键"])
     local enemies = getEnemyUnitsInRange(
         source,
         GetUnitX(ally),
         GetUnitY(ally),
-        _____914D_7F6E.D["低生命友军击退范围"]
+        _____914D_7F6E.D["击退范围"]
     )
     do
         local i = 0
@@ -160,19 +258,19 @@ local function ____D_53CB_65B9_4F4E_751F_547D_51FB_9000(source, ally)
             do
                 local enemy = enemies[i + 1]
                 if not _____662FD_5408_6CD5_76EE_6807(enemy) then
-                    goto __continue19
+                    goto __continue34
                 end
                 _____5F00_59CB_51FB_9000(enemy, {
                     ["来源单位"] = ally,
-                    ["距离"] = _____914D_7F6E.D["低生命友军击退距离"],
-                    ["持续时间"] = 0.5,
+                    ["距离"] = _____914D_7F6E.D["击退距离"],
+                    ["持续时间"] = 0.3,
                     ["检查地形"] = true,
                     ["暂停单位"] = true,
                     ["禁用碰撞"] = true,
                     ["位移特效"] = ""
                 })
             end
-            ::__continue19::
+            ::__continue34::
             i = i + 1
         end
     end
@@ -181,17 +279,13 @@ local function ____D_53CB_65B9_7ED3_7B97(source, target, layers)
     local second = layers >= 2
     local maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE)
     local life = GetUnitState(target, UNIT_STATE_LIFE)
-    local lowLife = maxLife > 0 and life / maxLife < _____914D_7F6E.D["低生命判定比例"]
+    local _____9AD8_751F_547D = maxLife > 0 and life >= maxLife * _____914D_7F6E.D["击退生命阈值比例"]
     local healRatio = second and _____914D_7F6E.D["二次友军治疗攻击力比例"] or _____914D_7F6E.D["一次友军治疗攻击力比例"]
-    _____9E7F_76EE_5706_6CBB_7597_53CB_519B(
-        source,
-        target,
-        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(source) * healRatio,
-        0
-    )
+    local healAmount = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(source) * healRatio
+    _____9E7F_76EE_5706_6CBB_7597_53CB_519B(source, target, healAmount, 0)
     if second then
         _____79FB_9664_5355_4F4D_8D1F_9762Buff(target, false)
-        if lowLife then
+        if _____9AD8_751F_547D then
             ____D_53CB_65B9_4F4E_751F_547D_51FB_9000(source, target)
         end
     end
@@ -206,11 +300,7 @@ local function ____D_666E_653B_547D_4E2D(ctx)
     if layers <= 0 then
         return
     end
-    _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(source, ____D_7279_6548_952E)
-    __TS__Delete(
-        ____D_7279_6548_7248_672C_8868,
-        _____53D6_5355_4F4DID(source)
-    )
+    _____9500_6BC1D_8868_73B0(source)
     local owner = GetOwningPlayer(source)
     if IsUnitEnemy(target, owner) == true then
         ____D_654C_65B9_7ED3_7B97(source, target, layers)

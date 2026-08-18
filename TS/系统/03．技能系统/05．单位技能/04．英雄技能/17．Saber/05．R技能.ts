@@ -11,6 +11,7 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 
 const { addDelayedCallback, addPeriodicCallback, removeDelayedCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -28,8 +29,10 @@ const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Sta
   添加单位暂停: (this: void, u: any, 来源: string) => boolean;
   移除单位暂停: (this: void, u: any, 来源: string) => boolean;
 };
-const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+// 源 PlaySoundOnUnitBJ(gg_snd_SaberExcalibur) / StopSoundBJ：照源用 jglobals 全局音效句柄 + BJ 封装播放
+const { PlaySoundOnUnitBJ, StopSoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundOnUnitBJ: (this: void, soundHandle: any, volumePercent: number, whichUnit: any) => void;
+  StopSoundBJ: (this: void, soundHandle: any, fadeOut: boolean) => void;
 };
 const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
@@ -101,6 +104,7 @@ interface R上下文 {
   蓄力回调ID: number;
   蓄力Tick数: number;
   聚集列表: 聚集粒子[];
+  聚集回调ID: number;
   准备回调ID: number;
   能量回调ID: number;
   光炮回调ID: number;
@@ -126,6 +130,7 @@ function 获取或创建R上下文(this: void, caster: any): R上下文 {
       蓄力回调ID: 0,
       蓄力Tick数: 0,
       聚集列表: [],
+      聚集回调ID: 0,
       准备回调ID: 0,
       能量回调ID: 0,
       光炮回调ID: 0,
@@ -138,6 +143,10 @@ function 获取或创建R上下文(this: void, caster: any): R上下文 {
 }
 
 function 销毁R聚集表现(this: void, ctx: R上下文): void {
+  if (ctx.聚集回调ID !== 0) {
+    removePeriodicCallback(ctx.聚集回调ID);
+    ctx.聚集回调ID = 0;
+  }
   for (const p of ctx.聚集列表) {
     if (p.特效 != null && p.特效 !== 0) 销毁点特效(p.特效);
   }
@@ -169,6 +178,61 @@ function R可释放(this: void, context: R上下文, _caster: any): boolean {
 // 蓄力阶段
 // ---------------------------------------------------------------------------
 
+// 源：蓄力结束后 ForGroupBJ(聚集单位组) 对每个粒子 IssuePointOrder("move", Saber位置)
+// + SetUnitTimeScale(50)，全部粒子高速汇聚回 Saber；TS 用周期回调推进直接特效模拟
+const SquareRoot = jass.SquareRoot as (this: void, x: number) => number;
+
+function 推进R聚集回收(this: void, variable?: any): void {
+  const ctx = variable as R上下文 | undefined;
+  if (ctx == null) return;
+  const caster = ctx.caster;
+  if (ctx.聚集列表.length === 0 || caster == null || caster === 0) {
+    销毁R聚集表现(ctx);
+    return;
+  }
+
+  const cfg = 配置.R.蓄力结束.聚集回收;
+  const 目标X = GetUnitX(caster);
+  const 目标Y = GetUnitY(caster);
+  const 目标高度 = GetUnitFlyHeight(caster);
+  const 剩余: 聚集粒子[] = [];
+  for (const p of ctx.聚集列表) {
+    const dx = 目标X - p.X;
+    const dy = 目标Y - p.Y;
+    const 距离 = SquareRoot(dx * dx + dy * dy);
+    if (距离 <= cfg.到达距离) {
+      if (p.特效 != null && p.特效 !== 0) 销毁点特效(p.特效);
+      continue;
+    }
+    const 步长 = 距离 < cfg.每次移动距离 ? 距离 : cfg.每次移动距离;
+    p.X += dx / 距离 * 步长;
+    p.Y += dy / 距离 * 步长;
+    // 高度同步收拢到 Saber 飞行高度，汇聚视觉不悬空
+    const 高差 = 目标高度 - p.高度;
+    const 限幅高差 = 高差 > cfg.每次高度变化 ? cfg.每次高度变化 : 高差 < -cfg.每次高度变化 ? -cfg.每次高度变化 : 高差;
+    p.高度 += 限幅高差;
+    if (p.特效 != null && p.特效 !== 0) {
+      DzSetEffectPos(p.特效, p.X, p.Y, p.高度);
+    }
+    剩余.push(p);
+  }
+  ctx.聚集列表 = 剩余;
+  if (ctx.聚集列表.length === 0 && ctx.聚集回调ID !== 0) {
+    removePeriodicCallback(ctx.聚集回调ID);
+    ctx.聚集回调ID = 0;
+  }
+}
+
+function 启动R聚集回收(this: void, ctx: R上下文): void {
+  if (ctx.聚集列表.length === 0) return;
+  if (ctx.聚集回调ID !== 0) removePeriodicCallback(ctx.聚集回调ID);
+  ctx.聚集回调ID = addPeriodicCallback(
+    Math.round(配置.R.蓄力结束.聚集回收.Tick间隔秒 * 1000),
+    推进R聚集回收 as unknown as (this: void, variable?: any) => void,
+    ctx,
+  );
+}
+
 function R蓄力结束(this: void, ctx: R上下文): void {
   const caster = ctx.caster;
   if (ctx.蓄力回调ID !== 0) removePeriodicCallback(ctx.蓄力回调ID);
@@ -180,11 +244,12 @@ function R蓄力结束(this: void, ctx: R上下文): void {
   }
 
   if (ctx.阿瓦隆快照) {
-    // 阿瓦隆：跳过普通蓄力，直接播放发射音效
-    Sound3DII_UnitPlayReuse(配置.R.蓄力.音效.路径, caster, 配置.R.蓄力.音效.裁断距离);
+    // 阿瓦隆：跳过普通蓄力，直接播放发射音效（源 PlaySoundOnUnitBJ(gg_snd_SaberExcalibur)）
+    const r阿瓦隆音效句柄 = (jglobals as any)[配置.R.蓄力.音效.全局音效键];
+    if (r阿瓦隆音效句柄 != null) PlaySoundOnUnitBJ(r阿瓦隆音效句柄, 100, caster);
     销毁R聚集表现(ctx);
   } else {
-    // 普通蓄力结束：聚集法阵 + 聚集粒子回收销毁（源的视觉汇聚简化为即时销毁，审计记录见计划进度）
+    // 普通蓄力结束：聚集法阵 + 粒子高速汇聚回 Saber（源 IssuePointOrder move + TimeScale 50）
     创建点特效({
       模型路径: 配置.R.蓄力结束.法阵特效.模型路径,
       X: ctx.Saber点X,
@@ -193,7 +258,7 @@ function R蓄力结束(this: void, ctx: R上下文): void {
       缩放: 配置.R.蓄力结束.法阵特效.缩放,
       持续秒: 配置.R.蓄力结束.法阵特效.持续秒,
     });
-    销毁R聚集表现(ctx);
+    启动R聚集回收(ctx);
   }
 
   SetUnitAnimationByIndex(caster, 配置.R.蓄力结束.动作索引);
@@ -216,7 +281,9 @@ function 推进R蓄力(this: void, variable?: any): void {
 
   ctx.蓄力Tick数 += 1;
   if (ctx.蓄力Tick数 === 配置.R.蓄力.音效Tick) {
-    Sound3DII_UnitPlayReuse(配置.R.蓄力.音效.路径, caster, 配置.R.蓄力.音效.裁断距离);
+    // 源第 78 周期 PlaySoundOnUnitBJ(gg_snd_SaberExcalibur)
+    const r蓄力音效句柄 = (jglobals as any)[配置.R.蓄力.音效.全局音效键];
+    if (r蓄力音效句柄 != null) PlaySoundOnUnitBJ(r蓄力音效句柄, 100, caster);
   }
 
   const cfg = 配置.R.蓄力.聚集粒子;
@@ -380,6 +447,7 @@ function R发射准备(this: void, variable?: any): void {
   const ctx = variable as R上下文 | undefined;
   if (ctx == null) return;
   ctx.准备回调ID = 0;
+  销毁R聚集表现(ctx); // 发射准备时点强制收尾，未汇聚完的粒子一并回收
   const caster = ctx.caster;
   if (caster == null || caster === 0 || !单位存活(caster)) {
     ctx.已启动 = false;
@@ -408,7 +476,9 @@ function R发射准备(this: void, variable?: any): void {
 // ---------------------------------------------------------------------------
 
 function 释放R技能(this: void, context: R上下文, caster: any, 技能实例ID?: number): void {
-  if (context.已启动) return;
+  if (context.已启动) {
+    return;
+  }
   context.已启动 = true;
   context.caster = caster;
   context.技能实例ID = 技能实例ID;
@@ -445,6 +515,9 @@ function R单位死亡清理(this: void, dyingUnit: any, _killingUnit: any): voi
   if (GetUnitTypeId(dyingUnit) !== 英雄单位类型ID) return;
   const ctx = R上下文表[GetHandleId(dyingUnit)];
   if (ctx == null || !ctx.已启动) return;
+  // 源：施法者死亡时 StopSoundBJ(gg_snd_SaberExcalibur, true) 淡出停播
+  const excalibur句柄 = (jglobals as any)[配置.R.蓄力.音效.全局音效键];
+  if (excalibur句柄 != null) StopSoundBJ(excalibur句柄, true);
   清理R全部(ctx);
 }
 

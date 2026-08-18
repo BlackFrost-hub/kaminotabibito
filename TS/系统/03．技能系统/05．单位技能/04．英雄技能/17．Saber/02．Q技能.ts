@@ -18,7 +18,7 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
-const japi = require("jass.japi") as any;
+const jglobals = require("jass.globals") as any;
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -31,6 +31,9 @@ const { 开始冲锋, 开始击退 } = require("系统.03．技能系统.00．�
 };
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, params: any) => boolean;
+};
+const { 确保单位可设置飞行高度 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.00．共享") as {
+  确保单位可设置飞行高度: (this: void, unit: any) => void;
 };
 const { 获取范围敌军 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   获取范围敌军: (this: void, source: any, x: number, y: number, radius: number) => any[];
@@ -51,8 +54,10 @@ const { getCooldownReduction } = require("系统.03．技能系统.01．技能�
 const { 技能_设置技能冷却时间 } = require("平台扩展API动作") as {
   技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
 };
-const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+// 源 PlaySoundOnUnitBJ(gg_snd_Saber_Qx) / StopSoundBJ：照源用 jglobals 全局音效句柄 + BJ 封装播放
+const { PlaySoundOnUnitBJ, StopSoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundOnUnitBJ: (this: void, soundHandle: any, volumePercent: number, whichUnit: any) => void;
+  StopSoundBJ: (this: void, soundHandle: any, fadeOut: boolean) => void;
 };
 const { 创建点特效, createTimedUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
@@ -90,7 +95,6 @@ const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_METAL_HEAVY_BASH = jass.WEAPON_TYPE_METAL_HEAVY_BASH as any;
-const EXSetUnitMoveType = japi.EXSetUnitMoveType as (this: void, unit: any, moveType: number) => void;
 
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
@@ -340,6 +344,8 @@ function Q1未命中收尾(this: void, variable?: any): void {
   SetUnitTimeScale(caster, 1.0);
 
   // 源：未命中停止 Q 音效，Q 冷却设置为 4 - 4×冷却缩减（缩减上限 35%）
+  const q1音效句柄 = (jglobals as any)[配置.Q.初段.音效.全局音效键];
+  if (q1音效句柄 != null) StopSoundBJ(q1音效句柄, false);
   let 缩减 = getCooldownReduction(caster);
   if (缩减 > 配置.Q.初段.未命中冷却.冷却缩减上限) 缩减 = 配置.Q.初段.未命中冷却.冷却缩减上限;
   const 目标冷却 = 配置.Q.初段.未命中冷却.基础冷却秒 - 配置.Q.初段.未命中冷却.基础冷却秒 * 缩减;
@@ -377,7 +383,8 @@ function Q1启动冲锋(this: void, variable?: any): void {
   }
 
   ctx.方向角度 = 计算两点角度(GetUnitX(caster), GetUnitY(caster), ctx.目标点X, ctx.目标点Y);
-  Sound3DII_UnitPlayReuse(配置.Q.初段.音效.路径, caster, 配置.Q.初段.音效.裁断距离);
+  const q1音效句柄播 = (jglobals as any)[配置.Q.初段.音效.全局音效键];
+    if (q1音效句柄播 != null) PlaySoundOnUnitBJ(q1音效句柄播, 100, caster);
   SetUnitTimeScale(caster, 配置.Q.初段.时间流速);
   SetUnitAnimationByIndex(caster, 配置.Q.初段.动作索引);
 
@@ -445,8 +452,9 @@ function Q连击2可释放(this: void, _context: Q连击2上下文, caster: any)
 
 function 沿面向瞬步(this: void, caster: any, 距离: number): void {
   const 弧度 = GetUnitFacing(caster) * bj_DEGTORAD;
-  jass.SetUnitX(caster, GetUnitX(caster) + 距离 * Cos(弧度));
-  jass.SetUnitY(caster, GetUnitY(caster) + 距离 * Sin(弧度));
+  // 源用 SetUnitPositionLoc：不打断当前动画；SetUnitX/SetUnitY 底层坐标直写会重置动画，
+  // 导致 Q2/Q3 入口与过渡动作被瞬步打回 stand（表现为没动作），改用 SetUnitPosition 对齐源语义
+  jass.SetUnitPosition(caster, GetUnitX(caster) + 距离 * Cos(弧度), GetUnitY(caster) + 距离 * Sin(弧度));
 }
 
 function Q2第一段劈砍(this: void, variable?: any): void {
@@ -507,9 +515,11 @@ function Q2第二段劈砍(this: void, variable?: any): void {
       模型路径: 配置.Q.连击2.第二段.表现特效.模型路径,
       X: GetUnitX(target) + 配置.Q.连击2.第二段.表现特效.目标前方偏移 * Cos(弧度),
       Y: GetUnitY(target) + 配置.Q.连击2.第二段.表现特效.目标前方偏移 * Sin(弧度),
-      面向角度: 方向 + 90,
-      X轴角度: -90, // e061 物编 maxRoll=-90 的等效
+      Z: 配置.Q.连击2.第二段.表现特效.飞行高度, // e061 物编 moveHeight，缺省会把模型埋进地面
+      面向角度: 方向 + 90, // 源：GetUnitFacing(saber) + 90（Q2 用 GetUnitFacing 基准，与 W 分支 Atan2 基准不同）
+      Y轴角度: -90, // e061 物编 Y 轴旋转 -90 的等效（源用 facing=角度+90 补偿）
       缩放: 配置.Q.连击2.第二段.表现特效.缩放,
+      动画速度: 配置.Q.连击2.第二段.表现特效.动画速度,
       持续秒: 配置.Q.连击2.第二段.表现特效.持续秒,
     });
     施加眩晕(caster, target, 配置.Q.连击2.第二段.控制秒, SaberBuffID.风王硬直, "技能");
@@ -559,7 +569,9 @@ function Q连击2窗口复位(this: void, variable?: any): void {
 function 释放Q连击2(this: void, context: Q连击2上下文, caster: any, 技能实例ID?: number): void {
   if (context.已启动) return;
   const record = 获取或创建Saber状态(caster);
-  if (record.Q连击 !== 1) return;
+  if (record.Q连击 !== 1) {
+    return;
+  }
   record.Q连击 = 2;
 
   context.已启动 = true;
@@ -568,7 +580,8 @@ function 释放Q连击2(this: void, context: Q连击2上下文, caster: any, 技
   context.伤害快照 = 读取单位攻击力(caster) * 配置.Q.连击2.伤害攻击力倍率;
 
   SetUnitTurnSpeed(caster, 0);
-  Sound3DII_UnitPlayReuse(配置.Q.连击2.音效.路径, caster, 配置.Q.连击2.音效.裁断距离);
+  const q2音效句柄 = (jglobals as any)[配置.Q.连击2.音效.全局音效键];
+    if (q2音效句柄 != null) PlaySoundOnUnitBJ(q2音效句柄, 100, caster);
   添加单位暂停(caster, 配置.暂停来源.Q连击2);
   SetUnitTimeScale(caster, 配置.Q.连击2.时间流速);
   UnitRemoveAbility(caster, Q连击2ID);
@@ -716,10 +729,9 @@ function Q3第二段劈砍(this: void, variable?: any): void {
     技能实例ID: ctx.技能实例ID,
   });
 
-  // 源收尾：恢复时间流速、解除暂停
+  // 源收尾：恢复时间流速、解除暂停；Amrf 启用方式无需恢复移动类型
   SetUnitTimeScale(caster, 1.0);
   移除单位暂停(caster, 配置.暂停来源.Q连击3);
-  EXSetUnitMoveType(caster, 0x01); // 恢复地面移动类型
   SetUnitFlyHeight(caster, 0, 0);
 
   addDelayedCallback(
@@ -747,7 +759,9 @@ function Q3复位(this: void, variable?: any): void {
 function 释放Q连击3(this: void, context: Q连击3上下文, caster: any, 技能实例ID?: number): void {
   if (context.已启动) return;
   const record = 获取或创建Saber状态(caster);
-  if (record.Q连击 !== 2) return;
+  if (record.Q连击 !== 2) {
+    return;
+  }
   record.Q连击 = 3;
 
   context.已启动 = true;
@@ -759,10 +773,13 @@ function 释放Q连击3(this: void, context: Q连击3上下文, caster: any, 技
 
   SetUnitTurnSpeed(caster, 1.0);
   添加单位暂停(caster, 配置.暂停来源.Q连击3);
-  Sound3DII_UnitPlayReuse(配置.Q.连击3.音效.路径, caster, 配置.Q.连击3.音效.裁断距离);
+  const q3音效句柄 = (jglobals as any)[配置.Q.连击3.音效.全局音效键];
+    if (q3音效句柄 != null) PlaySoundOnUnitBJ(q3音效句柄, 100, caster);
   UnitRemoveAbility(caster, Q连击3ID);
   SetPlayerAbilityAvailable(GetOwningPlayer(caster), Q初段ID, true);
-  EXSetUnitMoveType(caster, 0x02); // 源 YDWEFlyEnable：启用飞行以上升表现
+  // 源 YDWEFlyEnable：项目标准做法为加/移除乌鸦形态（Amrf），地面单位不如此处理时
+  // SetUnitFlyHeight 数值生效但视觉不升高；勿用 EXSetUnitMoveType（对英雄无效且多余）。
+  确保单位可设置飞行高度(caster);
   SetUnitTimeScale(caster, 配置.Q.连击3.时间流速);
   SetUnitAnimationByIndex(caster, 配置.Q.连击3.动作索引);
   沿面向瞬步(caster, 配置.Q.连击3.前移距离);

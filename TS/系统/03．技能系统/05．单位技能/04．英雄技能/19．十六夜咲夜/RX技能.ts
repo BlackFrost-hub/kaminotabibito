@@ -3,6 +3,7 @@
 import { 十六夜咲夜基础技能配置 as 配置 } from "./00．配置";
 import { 两点角度, 创建直线飞刀, 创建咲夜单位壳, 安全移除单位壳, 极坐标X, 极坐标Y, 单位存活, 播放咲夜单位音效, type 直线飞刀状态 } from "./01．飞刀与时间工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 设置十六夜咲夜符卡书冷却, 取消十六夜咲夜符卡界面 } from "./符卡公共";
 
 const jass = require("jass.common") as any;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -187,6 +188,7 @@ function RX伤害修正(this: void, damage: any): number {
   if (dx * dx + dy * dy < 配置.RX.最小触发距离 * 配置.RX.最小触发距离) return damage.currentDamage;
   context.已触发 = true;
   context.目标 = damage.attacker;
+  设置十六夜咲夜符卡书冷却(context.施法者, 配置.符卡间隔秒.RX成功, false);
   移除单位指定Buff(context.施法者, 十六夜咲夜BuffID.完美女仆反击窗口);
   addDelayedCallback(1, RX执行反击, context);
   return 0;
@@ -194,10 +196,14 @@ function RX伤害修正(this: void, damage: any): number {
 
 function RX窗口结束(this: void, variable?: any): void {
   const context = variable as RX上下文 | undefined;
-  if (context != null && !context.已触发) 清理RX(context, true);
+  if (context != null && !context.已触发) {
+    设置十六夜咲夜符卡书冷却(context.施法者, 配置.符卡间隔秒.RX失败, false);
+    清理RX(context, true);
+  }
 }
 
 function 释放十六夜咲夜RX(this: void, _listener: RX监听上下文, caster: any, 技能实例ID?: number): void {
+  取消十六夜咲夜符卡界面(caster);
   RX序号 += 1;
   const old = RX活动表[jass.GetHandleId(caster) as number];
   if (old != null) 清理RX(old, true);

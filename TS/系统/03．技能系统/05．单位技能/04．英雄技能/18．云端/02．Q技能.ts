@@ -12,9 +12,6 @@ import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．�
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -144,12 +141,10 @@ function 推进Q灼烧(this: void, variable: any): void {
   if (ctx.灼烧次数 > 配置.Q.火.灼烧.次数) {
     if (ctx.灼烧回调ID !== 0) removePeriodicCallback(ctx.灼烧回调ID);
     ctx.灼烧回调ID = 0;
-    debugLogForce("云端Q", "灼烧-结束", "施法者", GetHandleId(caster), "次数", ctx.灼烧次数, "技能实例ID", ctx.技能实例ID);
     return;
   }
   if (caster == null || caster === 0 || !IsUnitAliveBJ(caster)) return;
   if (target == null || target === 0 || !IsUnitAliveBJ(target)) return;
-  debugLogForce("云端Q", "灼烧-结算", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "次数", ctx.灼烧次数, "伤害", ctx.伤害快照 * 配置.Q.火.灼烧.单次比例, "技能实例ID", ctx.技能实例ID);
   造成单体技能伤害({
     来源: caster,
     目标: target,
@@ -166,7 +161,6 @@ function 推进Q灼烧(this: void, variable: any): void {
 }
 
 function 结算Q命中(this: void, ctx: Q上下文): void {
-  debugLogForce("云端Q", "命中结算", "施法者", GetHandleId(ctx.施法者), "分支", ctx.分支, "技能实例ID", ctx.技能实例ID);
   const caster = ctx.施法者;
   const target = ctx.目标;
 
@@ -176,13 +170,11 @@ function 结算Q命中(this: void, ctx: Q上下文): void {
 
   if (target == null || target === 0 || !IsUnitAliveBJ(target)) {
     ctx.已启动 = false; // 目标失效：只恢复状态不结算（计划第 11 节）
-    debugLogForce("云端Q", "命中结算-目标失效不结算", "目标", GetHandleId(target), "技能实例ID", ctx.技能实例ID);
     return;
   }
 
   const tx = GetUnitX(target);
   const ty = GetUnitY(target);
-  debugLogForce("云端Q", "命中结算-目标有效", "目标", GetHandleId(target), "X", tx, "Y", ty, "伤害快照", ctx.伤害快照, "技能实例ID", ctx.技能实例ID);
   if (ctx.分支 === "火") {
     const 火音效句柄 = (jglobals as any)[配置.Q.火.音效.全局音效键];
     if (火音效句柄 != null) PlaySoundOnUnitBJ(火音效句柄, 100, caster);
@@ -255,10 +247,8 @@ function Q冲锋结束(this: void, 移动单位: any, _原因: string, _位移ID
 }
 
 function 释放Q冰火魔剑(this: void, context: Q上下文, caster: any, 技能实例ID?: number): void {
-  debugLogForce("云端Q", "入口-释放", "施法者", GetHandleId(caster), "技能ID", 配置.Q.技能ID, "技能实例ID", 技能实例ID);
   const target = GetSpellTargetUnit();
   if (target == null || target === 0) {
-    debugLogForce("云端Q", "入口-目标无效返回", "施法者", GetHandleId(caster), "技能实例ID", 技能实例ID);
     return;
   }
 
@@ -266,7 +256,6 @@ function 释放Q冰火魔剑(this: void, context: Q上下文, caster: any, 技�
   const 分支 = GetRandomInt(1, 2) === 1 ? "火" : "冰";
   const 等级 = GetUnitAbilityLevel(caster, Q类型ID);
   const 伤害快照 = 读取单位攻击力(caster) * (配置.Q.伤害公式.基础倍率 + 配置.Q.伤害公式.每级加成 * 等级);
-  debugLogForce("云端Q", "入口-锁存", "目标", GetHandleId(target), "分支", 分支, "等级", 等级, "伤害快照", 伤害快照, "技能实例ID", 技能实例ID);
 
   context.施法者 = caster;
   context.目标 = target;

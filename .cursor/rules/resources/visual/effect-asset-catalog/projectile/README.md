@@ -8,6 +8,7 @@
 
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
+| `Common\\Effect\\Projectile\\File00002142.mdx` | 紫粉高亮的长束状投射物，前端有强光星芒与粒子拖尾，适合作为高空落向目标的箭状弹体。 | `Stand / Death`；运行时沿贝塞尔轨迹从高处落向目标。 | 鹿目圆 Q 圆环射击的三发投射物。 | 源模型内部引用 7 张 `war3mapImported\\ZK_*.blp` 私有贴图；7 张配套贴图已导入 `imports\\war3mapImported\\`，模型内部引用保持不变。 | 9814 | `47B826B876C25387` |
 | `Common\Effect\Projectile\ShalltearBloodMoonCrescent.mdx` | 候选截图观察：红黑月牙轮廓简洁，可作为短促斩痕或扇区边缘；造型偏日式剑气，不能直接当成滴管长枪主体。 | 迁移后序列：`Stand / Death`；保留源动画结构。 | 夏提雅·血枪横扫 / 血月斩痕；源候选 `!blackgetsuga!.mdx`。 | 接入时检查速度与高度。 | 8319 | `5D92DAD8F232FE8B` |
 | `Common\Effect\Projectile\Bloody Fang.mdx` | 候选截图观察：白红双刃和血色尾迹有攻击性，但实体刀片感过强、轨迹偏宽，只适合少量特殊攻击。 | 迁移后序列：`Birth / Stand / Death`；保留源动画结构。 | 夏提雅·血枪飞行体 / 血刃；源候选 `Bloody Fang.mdx`。 | 不作为常规细长枪迹。 | 5046 | `B9E45E0BC19ECE43` |
 | `Common\Effect\Projectile\Red Quick.mdx` | 候选截图观察：红白细长高速轨迹方向明确，厚度远小于普通光炮，适合长枪直刺和高速拖尾。 | 迁移后序列：`Birth / Birth - 2 / Birth - 3 / Stand / Death`；完成 3 项结构修复。 | 夏提雅·滴管长枪拖尾 / 直线反刺；源候选 `Red Quick.mdx`。 | 接入时压低白色亮度，并避免整屏染红。 | 9108 | `78F0D70BFC7BD058` |

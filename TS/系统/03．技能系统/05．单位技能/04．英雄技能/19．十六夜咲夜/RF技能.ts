@@ -3,6 +3,7 @@
 import { 十六夜咲夜基础技能配置 as 配置 } from "./00．配置";
 import { 两点角度, 创建直线飞刀, 创建咲夜单位壳, 安全移除单位壳, 极坐标X, 极坐标Y, 单位存活, 播放咲夜单位音效, type 直线飞刀状态 } from "./01．飞刀与时间工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 设置十六夜咲夜符卡书冷却 } from "./符卡公共";
 import { 创建单位与特效环绕, type 单位与特效环绕实例 } from "../../../00．技能模板+函数/01．技能函数/01．弹幕/05．单位与特效环绕/01．单位与特效环绕";
 
 const jass = require("jass.common") as any;
@@ -173,6 +174,7 @@ function onRF同步F键(this: void, event: { player: any }): void {
 }
 
 function 释放十六夜咲夜RF(this: void, _listener: RF监听上下文, caster: any, 技能实例ID?: number): void {
+  设置十六夜咲夜符卡书冷却(caster, 配置.符卡间隔秒.RF);
   const x = jass.GetUnitX(caster) as number;
   const y = jass.GetUnitY(caster) as number;
   const angle = 两点角度(x, y, jass.GetSpellTargetX(), jass.GetSpellTargetY());

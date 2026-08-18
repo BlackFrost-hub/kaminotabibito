@@ -13,9 +13,6 @@ import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．�
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -171,7 +168,6 @@ function 撤销R敏捷(this: void, ctx: R上下文): void {
   if (ctx.敏捷已撤销) return;
   ctx.敏捷已撤销 = true;
   const caster = ctx.施法者;
-  debugLogForce("云端R", "撤销敏捷", "施法者", GetHandleId(caster), "敏捷增量", ctx.敏捷增量, "技能实例ID", ctx.技能实例ID);
   if (caster != null && caster !== 0) {
     ModifyHeroStat(bj_HEROSTAT_AGI, caster, bj_MODIFYMETHOD_SUB, ctx.敏捷增量);
   }
@@ -196,7 +192,6 @@ function 恢复R双方状态(this: void, ctx: R上下文): void {
 function 清理R全部(this: void, ctx: R上下文, 撤销敏捷: boolean): void {
   if (ctx.已清理) return;
   ctx.已清理 = true;
-  debugLogForce("云端R", "清理全部", "施法者", GetHandleId(ctx.施法者), "目标", GetHandleId(ctx.目标), "撤销敏捷", 撤销敏捷, "SS", ctx.SS, "技能实例ID", ctx.技能实例ID);
   if (ctx.升空回调ID !== 0) removePeriodicCallback(ctx.升空回调ID);
   ctx.升空回调ID = 0;
   恢复R双方状态(ctx);
@@ -218,7 +213,6 @@ function R结算(this: void, variable: any): void {
   const caster = ctx.施法者;
   const target = ctx.目标;
   const 目标有效 = target != null && target !== 0 && IsUnitAliveBJ(target);
-  debugLogForce("云端R", "结算-进入", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "目标有效", 目标有效, "伤害快照", ctx.伤害快照, "技能实例ID", ctx.技能实例ID);
 
   // 恢复双方状态（同步）
   ctx.已清理 = true; // 结算即视为演出清理完成,后续只剩敏捷回收
@@ -227,7 +221,6 @@ function R结算(this: void, variable: any): void {
   恢复R双方状态(ctx);
 
   if (caster != null && caster !== 0 && IsUnitAliveBJ(caster) && 目标有效) {
-    debugLogForce("云端R", "结算-造成伤害+眩晕", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "伤害", ctx.伤害快照, "眩晕秒", 配置.R.眩晕秒, "技能实例ID", ctx.技能实例ID);
     造成单体技能伤害({
       来源: caster,
       目标: target,
@@ -243,8 +236,6 @@ function R结算(this: void, variable: any): void {
     });
     施加眩晕(caster, target, 配置.R.眩晕秒, "云端-暗黑制裁", "技能");
     registerManualBuff(target, 云端BuffID.暗黑制裁眩晕, 配置.R.眩晕秒, 0);
-  } else {
-    debugLogForce("云端R", "结算-目标/施法者无效跳过伤害", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "目标有效", 目标有效, "技能实例ID", ctx.技能实例ID);
   }
 
   if (caster != null && caster !== 0) {
@@ -274,7 +265,6 @@ function R坠落表现(this: void, ctx: R上下文): void {
   const target = ctx.目标;
   const tx = GetUnitX(target);
   const ty = GetUnitY(target);
-  debugLogForce("云端R", "坠落表现-开始", "施法者", GetHandleId(ctx.施法者), "目标", GetHandleId(target), "X", tx, "Y", ty, "技能实例ID", ctx.技能实例ID);
   // 源 e03U（DoomTarget/缩放1.5）按物编参数转直接特效,Z=400（计划 8.4）
   创建点特效({
     模型路径: 配置.R.坠落.表现模型,
@@ -306,13 +296,11 @@ function 推进R升空(this: void, variable: any): void {
   const target = ctx.目标;
 
   if (caster == null || caster === 0 || !IsUnitAliveBJ(caster)) {
-    debugLogForce("云端R", "升空-施法者失效清理", "施法者", GetHandleId(caster), "SS", ctx.SS, "技能实例ID", ctx.技能实例ID);
     清理R全部(ctx, true);
     return;
   }
   if (target == null || target === 0 || !IsUnitAliveBJ(target)) {
     // 目标失效：不再设置飞行高度/伤害,恢复状态并撤销敏捷（计划第 11 节）
-    debugLogForce("云端R", "升空-目标失效清理", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "SS", ctx.SS, "技能实例ID", ctx.技能实例ID);
     清理R全部(ctx, true);
     return;
   }
@@ -320,7 +308,6 @@ function 推进R升空(this: void, variable: any): void {
   if (ctx.SS >= 配置.R.升空.最大Tick数) {
     if (ctx.升空回调ID !== 0) removePeriodicCallback(ctx.升空回调ID);
     ctx.升空回调ID = 0;
-    debugLogForce("云端R", "升空-达到最大Tick转坠落", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "SS", ctx.SS, "技能实例ID", ctx.技能实例ID);
     R坠落表现(ctx);
     return;
   }
@@ -330,7 +317,6 @@ function 推进R升空(this: void, variable: any): void {
   const ty = GetUnitY(target);
   SetUnitAnimation(target, "Death");
   SetUnitFlyHeight(target, 配置.R.升空.每Tick高度 * ctx.SS, 0);
-  debugLogForce("云端R", "升空-推进", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "SS", ctx.SS, "飞行高度", 配置.R.升空.每Tick高度 * ctx.SS, "技能实例ID", ctx.技能实例ID);
 
   const owner = GetOwningPlayer(caster);
   if (GetLocalPlayer() === owner) {
@@ -350,16 +336,13 @@ function R升空准备(this: void, variable: any): void {
   const caster = ctx.施法者;
   const target = ctx.目标;
   if (caster == null || caster === 0 || !IsUnitAliveBJ(caster)) {
-    debugLogForce("云端R", "升空准备-施法者失效清理", "施法者", GetHandleId(caster), "技能实例ID", ctx.技能实例ID);
     清理R全部(ctx, true);
     return;
   }
   if (target == null || target === 0 || !IsUnitAliveBJ(target)) {
-    debugLogForce("云端R", "升空准备-目标失效清理", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "技能实例ID", ctx.技能实例ID);
     清理R全部(ctx, true);
     return;
   }
-  debugLogForce("云端R", "升空准备-开始", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "技能实例ID", ctx.技能实例ID);
 
   PauseUnit(target, true);
   SetUnitInvulnerable(target, true);
@@ -394,7 +377,6 @@ function R第二段冲刺(this: void, variable: any): void {
   const caster = ctx.施法者;
   const target = ctx.目标;
   if (caster == null || caster === 0 || !IsUnitAliveBJ(caster) || target == null || target === 0 || !IsUnitAliveBJ(target)) {
-    debugLogForce("云端R", "第二段-施法者/目标失效清理", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "技能实例ID", ctx.技能实例ID);
     清理R全部(ctx, true);
     return;
   }
@@ -407,7 +389,6 @@ function R第二段冲刺(this: void, variable: any): void {
   const dy = GetUnitY(target) - GetUnitY(caster);
   const 实时距离 = SquareRoot(dx * dx + dy * dy);
   const 角度 = Atan2(dy, dx) * bj_RADTODEG;
-  debugLogForce("云端 R", "第二段 - 突进冲刺", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "角度", 角度,"实时距离", 实时距离,"总距离", 配置.R.冲刺.第二段.基础距离 + 实时距离,"技能实例ID", ctx.技能实例ID);
   开始冲锋并附带残影表现(caster, {
     角度,
     距离: 配置.R.冲刺.第二段.基础距离 + 实时距离,
@@ -433,7 +414,6 @@ function R第一段冲刺(this: void, variable: any): void {
   const caster = ctx.施法者;
   const target = ctx.目标;
   if (caster == null || caster === 0 || !IsUnitAliveBJ(caster) || target == null || target === 0 || !IsUnitAliveBJ(target)) {
-    debugLogForce("云端R", "第一段-施法者/目标失效清理", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "技能实例ID", ctx.技能实例ID);
     清理R全部(ctx, true);
     return;
   }
@@ -443,7 +423,6 @@ function R第一段冲刺(this: void, variable: any): void {
 
   // 源第一段：朝目标反向退后 400（AngleBetweenPoints(b, a)）
   const 角度 = Atan2(GetUnitY(caster) - GetUnitY(target), GetUnitX(caster) - GetUnitX(target)) * bj_RADTODEG;
-  debugLogForce("云端R", "第一段-退后冲刺", "施法者", GetHandleId(caster), "目标", GetHandleId(target), "角度", 角度, "距离", 配置.R.冲刺.第一段.距离, "技能实例ID", ctx.技能实例ID);
   开始冲锋并附带残影表现(caster, {
     角度,
     距离: 配置.R.冲刺.第一段.距离,
@@ -464,10 +443,8 @@ function R第一段冲刺(this: void, variable: any): void {
 }
 
 function 释放R暗黑制裁(this: void, context: R上下文, caster: any, 技能实例ID?: number): void {
-  debugLogForce("云端R", "入口-释放", "施法者", GetHandleId(caster), "技能ID", 配置.R.技能ID, "技能实例ID", 技能实例ID);
   const target = GetSpellTargetUnit();
   if (target == null || target === 0) {
-    debugLogForce("云端R", "入口-目标无效返回", "施法者", GetHandleId(caster), "技能实例ID", 技能实例ID);
     return;
   }
 
@@ -475,7 +452,6 @@ function 释放R暗黑制裁(this: void, context: R上下文, caster: any, 技�
   const 等级 = GetUnitAbilityLevel(caster, R类型ID);
   const 伤害快照 = 读取单位攻击力(caster) * (配置.R.伤害公式.基础倍率 + 配置.R.伤害公式.每级加成 * 等级);
   const 敏捷增量 = GetHeroAgi(caster, false); // 源：基础敏捷立即翻倍,记录本实例增量
-  debugLogForce("云端R", "入口-锁存", "目标", GetHandleId(target), "等级", 等级, "伤害快照", 伤害快照, "敏捷增量", 敏捷增量, "技能实例ID", 技能实例ID);
 
   context.施法者 = caster;
   context.目标 = target;
@@ -544,7 +520,6 @@ function R单位死亡清理(this: void, dyingUnit: any, _killingUnit: any): voi
   if (jass.GetUnitTypeId(dyingUnit) !== 英雄单位类型ID) return;
   const ctx = R上下文表[GetHandleId(dyingUnit)];
   if (ctx == null || ctx.已清理) return;
-  debugLogForce("云端R", "死亡清理", "死亡单位", GetHandleId(dyingUnit), "技能实例ID", ctx.技能实例ID);
   清理R全部(ctx, true);
 }
 

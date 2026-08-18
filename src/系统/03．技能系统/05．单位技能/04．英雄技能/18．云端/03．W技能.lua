@@ -12,27 +12,25 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_0.debugLogForce
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
-local removePeriodicCallback = ____require_result_1.removePeriodicCallback
-local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_2["造成单体技能伤害"]
-local ____require_result_3 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local doHeal = ____require_result_3.doHeal
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
-local _____65BD_52A0_7729_6655 = ____require_result_4["施加眩晕"]
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_5.registerManualBuff
-local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local GS_Suspend = ____require_result_6.GS_Suspend
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
-local _____9500_6BC1_70B9_7279_6548 = ____require_result_7["销毁点特效"]
-local ____require_result_8 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local IsUnitAliveBJ = ____require_result_8.IsUnitAliveBJ
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local addPeriodicCallback = ____require_result_0.addPeriodicCallback
+local removePeriodicCallback = ____require_result_0.removePeriodicCallback
+local ____require_result_1 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_1["造成单体技能伤害"]
+local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_2.doHeal
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
+local _____65BD_52A0_7729_6655 = ____require_result_3["施加眩晕"]
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_4.registerManualBuff
+local ____require_result_5 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local GS_Suspend = ____require_result_5.GS_Suspend
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
+local _____9500_6BC1_70B9_7279_6548 = ____require_result_6["销毁点特效"]
+local ____require_result_7 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_7.IsUnitAliveBJ
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetUnitX = jass.GetUnitX
@@ -62,8 +60,8 @@ local DAMAGE_TYPE_DIVINE = jass.DAMAGE_TYPE_DIVINE
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_METAL_HEAVY_BASH = jass.WEAPON_TYPE_METAL_HEAVY_BASH
 local DzSetEffectPos = japi.DzSetEffectPos
-local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_8.stringToFourCCSafe
 local _____914D_7F6E = _____4E91_7AEF_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
 local ____W_7C7B_578BID = stringToFourCCSafe(_____914D_7F6E.W["技能ID"])
@@ -93,16 +91,6 @@ local function ____W_53EF_91CA_653E(context, _caster)
     return context["已启动"] ~= true
 end
 local function _____7ED3_675FW_8DEF_5F84(ctx)
-    debugLogForce(
-        "云端W",
-        "结束-路径清理",
-        "施法者",
-        GetHandleId(ctx["施法者"]),
-        "模式",
-        ctx["模式"],
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     if ctx["回调ID"] ~= 0 then
         removePeriodicCallback(ctx["回调ID"])
     end
@@ -132,33 +120,11 @@ local function _____7ED3_7B97W_8303_56F4(ctx, x, y)
         nil
     )
     local u = FirstOfGroup(group)
-    local _____672CTick_547D_4E2D_6570 = 0
     while u ~= nil and u ~= 0 do
         GroupRemoveUnit(group, u)
         if IsUnitAliveBJ(u) and not IsUnitType(u, UNIT_TYPE_STRUCTURE) and ctx["已命中组"][GetHandleId(u)] ~= true then
             ctx["已命中组"][GetHandleId(u)] = true
-            _____672CTick_547D_4E2D_6570 = _____672CTick_547D_4E2D_6570 + 1
             local _____662F_654C_4EBA = IsUnitEnemy(u, owner)
-            debugLogForce(
-                "云端W",
-                "范围结算-命中",
-                "施法者",
-                GetHandleId(caster),
-                "目标",
-                GetHandleId(u),
-                "模式",
-                ctx["模式"],
-                "是敌人",
-                _____662F_654C_4EBA,
-                "X",
-                x,
-                "Y",
-                y,
-                "伤害快照",
-                ctx["伤害快照"],
-                "技能实例ID",
-                ctx["技能实例ID"]
-            )
             if ctx["模式"] == "光剑" then
                 if _____662F_654C_4EBA then
                     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
@@ -210,24 +176,6 @@ local function _____7ED3_7B97W_8303_56F4(ctx, x, y)
         u = FirstOfGroup(group)
     end
     DestroyGroup(group)
-    if _____672CTick_547D_4E2D_6570 > 0 then
-        debugLogForce(
-            "云端W",
-            "范围结算-本Tick命中数",
-            "施法者",
-            GetHandleId(caster),
-            "模式",
-            ctx["模式"],
-            "命中数",
-            _____672CTick_547D_4E2D_6570,
-            "X",
-            x,
-            "Y",
-            y,
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
-    end
 end
 local function _____63A8_8FDBW_8DEF_5F84(variable)
     local ctx = variable
@@ -236,16 +184,6 @@ local function _____63A8_8FDBW_8DEF_5F84(variable)
     end
     ctx["Tick数"] = ctx["Tick数"] + 1
     if ctx["Tick数"] > _____914D_7F6E.W["路径"]["最大Tick数"] then
-        debugLogForce(
-            "云端W",
-            "推进-达到最大Tick结束",
-            "施法者",
-            GetHandleId(ctx["施法者"]),
-            "Tick数",
-            ctx["Tick数"],
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
         _____7ED3_675FW_8DEF_5F84(ctx)
         return
     end
@@ -283,27 +221,9 @@ local function _____542F_52A8W_8DEF_5F84(variable)
     end
     local caster = ctx["施法者"]
     if caster == nil or caster == 0 or not IsUnitAliveBJ(caster) then
-        debugLogForce(
-            "云端W",
-            "启动-施法者失效结束",
-            "施法者",
-            GetHandleId(caster),
-            "技能实例ID",
-            ctx["技能实例ID"]
-        )
         _____7ED3_675FW_8DEF_5F84(ctx)
         return
     end
-    debugLogForce(
-        "云端W",
-        "启动-路径开始",
-        "施法者",
-        GetHandleId(caster),
-        "模式",
-        ctx["模式"],
-        "技能实例ID",
-        ctx["技能实例ID"]
-    )
     ctx["Tick数"] = 0
     ctx["回调ID"] = addPeriodicCallback(
         math.floor(_____914D_7F6E.W["路径"]["Tick间隔秒"] * 1000 + 0.5),
@@ -320,28 +240,6 @@ local function _____91CA_653EW_5149_6697_9B54_5251(context, caster, _____6280_80
     local _____6A21_5F0F = _____6D88_8017_4E91_7AEFW_6A21_5F0F(caster)
     local _____7B49_7EA7 = GetUnitAbilityLevel(caster, ____W_7C7B_578BID)
     local _____4F24_5BB3_5FEB_7167 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * _____914D_7F6E.W["伤害公式"]["攻击力倍率"] + GetHeroInt(caster, true) * (_____914D_7F6E.W["伤害公式"]["智力每级系数"] * _____7B49_7EA7)
-    debugLogForce(
-        "云端W",
-        "入口-释放",
-        "施法者",
-        GetHandleId(caster),
-        "技能ID",
-        _____914D_7F6E.W["技能ID"],
-        "技能实例ID",
-        _____6280_80FD_5B9E_4F8BID,
-        "模式",
-        _____6A21_5F0F,
-        "等级",
-        _____7B49_7EA7,
-        "伤害快照",
-        _____4F24_5BB3_5FEB_7167,
-        "角度",
-        _____89D2_5EA6,
-        "目标点X",
-        tx,
-        "目标点Y",
-        ty
-    )
     context["施法者"] = caster
     context["模式"] = _____6A21_5F0F
     context["伤害快照"] = _____4F24_5BB3_5FEB_7167

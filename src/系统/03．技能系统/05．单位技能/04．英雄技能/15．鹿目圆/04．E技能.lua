@@ -13,6 +13,7 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
@@ -35,7 +36,7 @@ local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_
 local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
 local getUnitsInRange = ____require_result_7.getUnitsInRange
 local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedEffect = ____require_result_8.createTimedEffect
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
 local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____4E24_70B9_89D2_5EA6 = ____require_result_9["两点角度"]
 local ____require_result_10 = require("lib.扩展函数.BJ函数.07．杂项")
@@ -76,6 +77,24 @@ local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local GetUnitStateJapi = japi.GetUnitState
 local _____914D_7F6E = _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E
+--- 播放地图预载全局音效（源 PlaySoundOnUnitBJ gg_snd_*）
+local function _____64AD_653EE_5168_5C40_97F3_6548(soundKey)
+    if soundKey == "" then
+        return
+    end
+    local sound = jglobals[soundKey]
+    if sound == nil or sound == 0 then
+        return
+    end
+    jass.StartSound(sound)
+end
+--- 定时移除单位（樱花雨等不参与下落逻辑的表现壳）
+local function _____5B9A_65F6_79FB_9664_5355_4F4D(variable)
+    local unit = variable
+    if unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 then
+        RemoveUnit(unit)
+    end
+end
 local ____E_4E0A_4E0B_6587_8868 = {}
 local function _____53D6_5355_4F4DID(unit)
     return (unit == nil or unit == 0) and 0 or GetHandleId(unit)
@@ -146,30 +165,31 @@ local function _____63A8_8FDBE_96E8_58F3(context)
             do
                 local unit = context["雨单位"][i + 1]
                 if not _____5355_4F4D_5B58_6D3B(unit) then
-                    goto __continue17
+                    goto __continue22
                 end
                 local nextHeight = GetUnitFlyHeight(unit) - _____914D_7F6E.E["雨单位下降步长"]
                 if nextHeight <= _____914D_7F6E.E["雨单位清理高度"] then
                     RemoveUnit(unit)
-                    goto __continue17
+                    goto __continue22
                 end
                 SetUnitFlyHeight(unit, nextHeight, 0)
                 kept[#kept + 1] = unit
             end
-            ::__continue17::
+            ::__continue22::
             i = i + 1
         end
     end
     context["雨单位"] = kept
 end
 local function ____E_533A_57DF_8109_51B2(context)
-    createTimedEffect(
-        _____914D_7F6E.E["脉冲特效"],
-        context["区域X"],
-        context["区域Y"],
-        0,
-        1.5
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = _____914D_7F6E.E["脉冲特效"],
+        X = context["区域X"],
+        Y = context["区域Y"],
+        Z = 0,
+        ["缩放"] = _____914D_7F6E.E["脉冲特效缩放"],
+        ["持续秒"] = 1.5
+    })
     local owner = GetOwningPlayer(context["施法者"])
     local units = getUnitsInRange(context["区域X"], context["区域Y"], _____914D_7F6E.E["范围"])
     local enemies = {}
@@ -179,7 +199,7 @@ local function ____E_533A_57DF_8109_51B2(context)
             do
                 local unit = units[i + 1]
                 if not _____662FE_5408_6CD5_5355_4F4D(unit) then
-                    goto __continue22
+                    goto __continue27
                 end
                 if IsUnitEnemy(unit, owner) == true then
                     enemies[#enemies + 1] = unit
@@ -187,7 +207,7 @@ local function ____E_533A_57DF_8109_51B2(context)
                     _____9E7F_76EE_5706_6CBB_7597_53CB_519B(context["施法者"], unit, context["每次结算值"], 0)
                 end
             end
-            ::__continue22::
+            ::__continue27::
             i = i + 1
         end
     end
@@ -238,7 +258,7 @@ local function ____E_533A_57DFTick(variable)
         _____521B_5EFAE_96E8_58F3(context)
     end
     _____63A8_8FDBE_96E8_58F3(context)
-    if context.Tick == 20 or context.Tick == 40 or context.Tick == 60 or context.Tick == 80 or context.Tick == 100 then
+    if context.Tick == 20 or context.Tick == 40 or context.Tick == 60 or context.Tick == 80 or context.Tick == 99 then
         ____E_533A_57DF_8109_51B2(context)
     end
     if context.Tick >= 100 and not context["区域已结算"] then
@@ -254,9 +274,22 @@ local function _____5F00_59CBE_533A_57DF(context)
         return
     end
     context["区域已启动"] = true
-    context["区域X"] = GetUnitX(context["施法者"])
-    context["区域Y"] = GetUnitY(context["施法者"])
+    context["区域X"] = context["目标X"]
+    context["区域Y"] = context["目标Y"]
     context.Tick = 0
+    _____64AD_653EE_5168_5C40_97F3_6548(_____914D_7F6E.E["施放音效键"])
+    local _____6A31_82B1_96E8 = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
+        jass.Player(12),
+        _____914D_7F6E["单位壳"]["虹之雨"],
+        GetUnitX(context["施法者"]),
+        GetUnitY(context["施法者"]),
+        0
+    )
+    if _____6A31_82B1_96E8 ~= nil and _____6A31_82B1_96E8 ~= 0 then
+        SetUnitFlyHeight(_____6A31_82B1_96E8, _____914D_7F6E.E["雨单位高度"], 0)
+        SetUnitScale(_____6A31_82B1_96E8, _____914D_7F6E.E["雨单位缩放"], _____914D_7F6E.E["雨单位缩放"], _____914D_7F6E.E["雨单位缩放"])
+        addDelayedCallback(_____914D_7F6E.E["樱花雨持续秒"] * 1000, _____5B9A_65F6_79FB_9664_5355_4F4D, _____6A31_82B1_96E8)
+    end
     registerManualBuff(
         context["施法者"],
         _____9E7F_76EE_5706BuffID["虹之雨"],
@@ -354,13 +387,15 @@ local function _____91CA_653EE(_entry, caster, _____6280_80FD_5B9E_4F8BID)
     SetUnitFacing(caster, facing)
     _____6DFB_52A0_5355_4F4D_6682_505C(caster, context["暂停来源"])
     SetUnitAnimation(caster, "spell")
-    createTimedEffect(
-        _____914D_7F6E.E["起手特效"],
-        context["目标X"],
-        context["目标Y"],
-        -300,
-        _____914D_7F6E.E["起手特效持续秒"]
-    )
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = _____914D_7F6E.E["起手特效"],
+        X = context["目标X"],
+        Y = context["目标Y"],
+        Z = -300,
+        ["面向角度"] = 270,
+        ["缩放"] = _____914D_7F6E.E["起手特效缩放"],
+        ["持续秒"] = _____914D_7F6E.E["起手特效持续秒"]
+    })
     addDelayedCallback(_____914D_7F6E.E["起手硬直秒"] * 1000, _____5F00_59CBE_79FB_52A8, context)
 end
 local function _____6CE8_518CE_5355_4F4D_7C7B_578B(unitTypeId)

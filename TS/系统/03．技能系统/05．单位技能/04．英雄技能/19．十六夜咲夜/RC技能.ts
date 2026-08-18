@@ -3,6 +3,7 @@
 import { 十六夜咲夜基础技能配置 as 配置 } from "./00．配置";
 import { 两点角度, 创建咲夜单位壳, 安全移除单位壳, 极坐标X, 极坐标Y, 单位存活, 播放咲夜单位音效, 注册咲夜周期任务, 移除咲夜周期任务, 登记咲夜飞刀, 注销咲夜飞刀 } from "./01．飞刀与时间工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 设置十六夜咲夜符卡书冷却 } from "./符卡公共";
 
 const jass = require("jass.common") as any;
 const { 造成单体技能伤害, 结束独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -106,6 +107,7 @@ function 推进RC(this: void, variable?: any): void {
 }
 
 function 释放十六夜咲夜RC(this: void, _listener: RC监听上下文, caster: any, 技能实例ID?: number): void {
+  设置十六夜咲夜符卡书冷却(caster, 配置.符卡间隔秒.RC);
   const x = jass.GetUnitX(caster) as number;
   const y = jass.GetUnitY(caster) as number;
   const angle = 两点角度(x, y, jass.GetSpellTargetX(), jass.GetSpellTargetY());

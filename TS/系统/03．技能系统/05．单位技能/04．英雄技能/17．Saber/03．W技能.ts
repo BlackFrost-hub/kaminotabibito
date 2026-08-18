@@ -12,6 +12,7 @@ import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const jglobals = require("jass.globals") as any;
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -51,8 +52,9 @@ const { setAbilityCooldown } = require("系统.03．技能系统.01．技能冷�
 const { 技能_设置技能冷却时间 } = require("平台扩展API动作") as {
   技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
 };
-const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+// 源 PlaySoundOnUnitBJ(gg_snd_BansheeMissileLaunch2 / gg_snd_Saber_EW1 / gg_snd_CorrosiveBreathMissileLaunch1)：照源用 jglobals 全局音效句柄
+const { PlaySoundOnUnitBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundOnUnitBJ: (this: void, soundHandle: any, volumePercent: number, whichUnit: any) => void;
 };
 const { 创建点特效, createTimedUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
@@ -66,6 +68,10 @@ const { registerDeathListener } = require("系统.00．核心系统.01．事件�
 };
 
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
+const GetSpellTargetLoc = jass.GetSpellTargetLoc as (this: void) => any;
+const GetLocationX = jass.GetLocationX as (this: void, loc: any) => number;
+const GetLocationY = jass.GetLocationY as (this: void, loc: any) => number;
+const RemoveLocation = jass.RemoveLocation as (this: void, loc: any) => void;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -221,7 +227,8 @@ function W地面启动龙卷风(this: void, variable?: any): void {
   const caster = ctx.caster;
   if (caster == null || caster === 0 || !单位存活(caster)) return;
 
-  Sound3DII_UnitPlayReuse(配置.W.地面分支.龙卷风.音效.路径, caster, 配置.W.地面分支.龙卷风.音效.裁断距离);
+  const w龙卷风音效句柄 = (jglobals as any)[配置.W.地面分支.龙卷风.音效.全局音效键];
+    if (w龙卷风音效句柄 != null) PlaySoundOnUnitBJ(w龙卷风音效句柄, 100, caster);
   SetUnitTimeScale(caster, 1.0);
 
   const cfg = 配置.W.地面分支.龙卷风;
@@ -254,7 +261,25 @@ function W地面启动龙卷风(this: void, variable?: any): void {
 
 const W地面上下文表: Record<number, W地面上下文> = {};
 
-function 释放W地面分支(this: void, caster: any, 技能实例ID?: number): void {
+/**
+ * 读取 W 对地面施放的目标点：A0DE 是单位目标技能（targs=ground,enemies），点击地面时
+ * GetSpellTargetUnit 为 null、GetSpellTargetX/Y 恒返 0,0，必须用 GetSpellTargetLoc 取点。
+ * Lua 运行时无效 location 可能非 null，优先直接取坐标再释放；取到 (0,0) 时回落 X/Y。
+ */
+function 读取W地面目标点(this: void): { X: number; Y: number } {
+  const loc = GetSpellTargetLoc();
+  if (loc != null && loc !== 0) {
+    const X = GetLocationX(loc);
+    const Y = GetLocationY(loc);
+    RemoveLocation(loc);
+    if (X !== 0 || Y !== 0) return { X, Y };
+  }
+  const fx = GetSpellTargetX();
+  const fy = GetSpellTargetY();
+  return { X: fx, Y: fy };
+}
+
+function 释放W地面分支(this: void, caster: any, 目标X: number, 目标Y: number, 技能实例ID?: number): void {
   const cfg = 配置.W.地面分支;
 
   // 地面分支冷却：基础 7 秒，缩减上限 30%（源 YDWESetUnitAbilityDataReal 105=7，迁移为同步冷却接口）
@@ -264,9 +289,7 @@ function 释放W地面分支(this: void, caster: any, 技能实例ID?: number): 
   setAbilityCooldown(caster, W类型ID, 等级, cfg.冷却秒);
   技能_设置技能冷却时间(caster, W类型ID, cfg.冷却秒 - cfg.冷却秒 * 缩减, cfg.冷却秒);
 
-  // 传送：最多 300 码
-  const 目标X = GetSpellTargetX();
-  const 目标Y = GetSpellTargetY();
+  // 传送：最多 300 码（目标点为施法事件入口锁存值）
   const dx = 目标X - GetUnitX(caster);
   const dy = 目标Y - GetUnitY(caster);
   const 距离 = SquareRoot(dx * dx + dy * dy);
@@ -370,13 +393,15 @@ function 推进WE地面冲击(this: void, variable?: any): void {
   const 点Y = ctx.起点Y + cfg.路径.每Tick距离 * ctx.Tick数 * Sin(弧度);
 
   // e061 风王冲击表现（物编缩放 1.5 × 运行时 5）
+  // 物编 e061 烘焙 Y 轴旋转 -90，源用 CreateUnit facing=角度+90 补偿；
+  // 特效无物编数据，用 Y轴角度 -90 复现物编旋转，朝向沿用源 角度+90。
   创建点特效({
     模型路径: cfg.表现特效.模型路径,
     X: 点X,
     Y: 点Y,
     Z: cfg.表现特效.飞行高度,
     面向角度: ctx.方向角度 + cfg.表现特效.朝向偏移,
-    X轴角度: -90, // e061 物编 maxRoll=-90 的等效
+    Y轴角度: -90,
     缩放: cfg.表现特效.缩放,
     持续秒: cfg.表现特效.持续秒,
   });
@@ -436,24 +461,26 @@ function 推进WE地面冲击(this: void, variable?: any): void {
   }
 }
 
-function 释放WE地面分支(this: void, caster: any, 技能实例ID?: number): void {
+function 释放WE地面分支(this: void, caster: any, 目标X: number, 目标Y: number, 技能实例ID?: number): void {
   const cfg = 配置.W.E联动地面分支;
 
   添加单位暂停(caster, 配置.暂停来源.W地面E联动);
-  Sound3DII_UnitPlayReuse(cfg.音效.路径, caster, cfg.音效.裁断距离);
-  const 方向 = 计算两点角度(GetUnitX(caster), GetUnitY(caster), GetSpellTargetX(), GetSpellTargetY());
+  const wE联动音效句柄 = (jglobals as any)[cfg.音效.全局音效键];
+  if (wE联动音效句柄 != null) PlaySoundOnUnitBJ(wE联动音效句柄, 100, caster);
+  // 目标点为施法事件入口锁存值（分支链路里重读 GetSpellTargetLoc 已失效）
+  const 方向 = 计算两点角度(GetUnitX(caster), GetUnitY(caster), 目标X, 目标Y);
   // 消耗并结束魔力放出（源：移除 S009）
   消耗SaberE(caster);
   SetUnitAnimationByIndex(caster, cfg.动作索引);
 
-  // 出生点表现
+  // 出生点表现：物编 e061 烘焙 Y 轴旋转 -90，用 Y轴角度 -90 复现；朝向沿用源 角度+90（见推进处注释）。
   创建点特效({
     模型路径: cfg.表现特效.模型路径,
     X: GetUnitX(caster),
     Y: GetUnitY(caster),
     Z: cfg.表现特效.飞行高度,
     面向角度: 方向 + cfg.表现特效.朝向偏移,
-    X轴角度: -90,
+    Y轴角度: -90,
     缩放: cfg.表现特效.缩放,
     持续秒: cfg.表现特效.持续秒,
   });
@@ -574,7 +601,8 @@ function 推进W冲击波(this: void, variable?: any): void {
 function 启动W冲击波(this: void, ctx: W敌人上下文): void {
   const caster = ctx.caster;
   const cfg = 配置.W.敌人分支.E联动冲击波;
-  Sound3DII_UnitPlayReuse(cfg.音效.路径, caster, cfg.音效.裁断距离);
+  const w冲击波音效句柄 = (jglobals as any)[cfg.音效.全局音效键];
+  if (w冲击波音效句柄 != null) PlaySoundOnUnitBJ(w冲击波音效句柄, 100, caster);
   const 波上下文: 冲击波上下文 = {
     caster,
     技能实例ID: ctx.技能实例ID,
@@ -747,13 +775,16 @@ function 获取或创建W上下文(this: void, caster: any): W上下文 {
 
 function 释放W技能(this: void, _context: W上下文, caster: any, 技能实例ID?: number): void {
   if (!单位存活(caster)) return;
+  // 施法事件入口立即锁存目标点：GetSpellTargetLoc 只在施法事件内有效，
+  // 下层分支链路里重读会拿到无效值（方向指向 0,0 的根源）
+  const 锁存目标点 = 读取W地面目标点();
   const target = GetSpellTargetUnit();
   if (target != null && target !== 0 && 单位存活(target)) {
     释放W敌人分支(caster, target, 技能实例ID);
   } else if (Saber是否E开启(caster)) {
-    释放WE地面分支(caster, 技能实例ID);
+    释放WE地面分支(caster, 锁存目标点.X, 锁存目标点.Y, 技能实例ID);
   } else {
-    释放W地面分支(caster, 技能实例ID);
+    释放W地面分支(caster, 锁存目标点.X, 锁存目标点.Y, 技能实例ID);
   }
 }
 

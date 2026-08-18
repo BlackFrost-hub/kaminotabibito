@@ -3,6 +3,7 @@
 import { 十六夜咲夜基础技能配置 as 配置 } from "./00．配置";
 import { 两点角度, 极坐标X, 极坐标Y, 单位存活, 获取咲夜现存飞刀, 播放咲夜单位音效, 施加短硬直并播放动作, 注册咲夜周期任务, 移除咲夜周期任务, type 咲夜飞刀控制器 } from "./01．飞刀与时间工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 设置十六夜咲夜符卡书冷却 } from "./符卡公共";
 
 const jass = require("jass.common") as any;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -63,6 +64,7 @@ function 推进RS回收(this: void, variable?: any): void {
 }
 
 function 释放十六夜咲夜RS(this: void, _listener: RS监听上下文, caster: any, 技能实例ID?: number): void {
+  设置十六夜咲夜符卡书冷却(caster, 配置.符卡间隔秒.RS);
   const target = jass.GetSpellTargetUnit();
   if (!单位存活(target)) return;
   const targetSource = `十六夜咲夜-RS目标:${技能实例ID ?? jass.GetHandleId(caster)}`;

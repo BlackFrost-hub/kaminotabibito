@@ -16,6 +16,8 @@ local _____767B_8BB0_54B2_591C_98DE_5200 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_
 local _____6CE8_9500_54B2_591C_98DE_5200 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["注销咲夜飞刀"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local _____7B26_5361_516C_5171 = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.符卡公共")
+local _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374 = _____7B26_5361_516C_5171["设置十六夜咲夜符卡书冷却"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
@@ -121,6 +123,7 @@ local function _____63A8_8FDBRC(variable)
     ____RC_6267_884C_53CD_5F39(state, state["角度"] + 180)
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRC(_listener, caster, _____6280_80FD_5B9E_4F8BID)
+    _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(caster, _____914D_7F6E["符卡间隔秒"].RC)
     local x = jass.GetUnitX(caster)
     local y = jass.GetUnitY(caster)
     local angle = _____4E24_70B9_89D2_5EA6(

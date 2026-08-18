@@ -124,6 +124,7 @@ export function registerBridge(): void {
   expose("SelectGroupBJ", unitBjExt.SelectGroupBJ);
   expose("SelectUnitAdd", unitBjExt.SelectUnitAdd);
   expose("SelectUnitRemove", unitBjExt.SelectUnitRemove);
+  expose("ForceUICancelBJ", unitBjExt.ForceUICancelBJ);
   expose("IsUnitHiddenBJ", unitBjExt.IsUnitHiddenBJ);
   expose("ShowUnitHide", unitBjExt.ShowUnitHide);
   expose("IssueTrainOrderByIdBJ", unitBjExt.IssueTrainOrderByIdBJ);

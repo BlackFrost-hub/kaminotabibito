@@ -14,7 +14,6 @@ import {
 } from "../07．公共与单位壳/01．裂隙系统";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 播放八云紫单位音效, 播放八云紫随机单位音效 } from "../00A．表现工具";
-import { 八云紫诊断日志, 八云紫诊断句柄 } from "../00B．诊断";
 
 const jass = require("jass.common") as any;
 
@@ -90,7 +89,6 @@ function 弹幕Tick(this: void, instance: any, _delta: number): void {
     const targetGap = nearby[0];
     if (!context.已记录追踪) {
       context.已记录追踪 = true;
-      八云紫诊断日志("Q", "普通弹幕发现可追踪间隙", "弹幕ID", instance.id, "弹幕X", instance.当前X, "弹幕Y", instance.当前Y, "候选数", nearby.length, "间隙", 八云紫诊断句柄(targetGap.单位), "间隙X", jass.GetUnitX(targetGap.单位), "间隙Y", jass.GetUnitY(targetGap.单位));
     }
     instance.当前方向角 = 两点角度(
       instance.当前X,
@@ -105,10 +103,8 @@ function 弹幕Tick(this: void, instance: any, _delta: number): void {
   const gapId = jass.GetHandleId(touched.单位);
   if (context.已触发裂隙[gapId] === true) return;
   context.已触发裂隙[gapId] = true;
-  八云紫诊断日志("Q", "普通弹幕进入间隙", "弹幕ID", instance.id, "间隙", gapId, "弹幕X", instance.当前X, "弹幕Y", instance.当前Y, "已飞距离", instance.已飞行距离);
   播放八云紫单位音效(context.施法者, 配置.Q.裂隙触发音效键);
-  const spreadCount = 触发八云紫裂隙扩散(context.施法者, touched);
-  八云紫诊断日志("Q", "间隙扩散结算", "中心间隙", gapId, "触发间隙数", spreadCount);
+  触发八云紫裂隙扩散(context.施法者, touched);
 }
 
 export function 发射八云紫弹幕(this: void, options: 八云紫弹幕选项): number {
@@ -152,7 +148,6 @@ export function 发射八云紫弹幕(this: void, options: 八云紫弹幕选项
     已触发裂隙: {},
     已记录追踪: false,
   };
-  八云紫诊断日志("Q", "创建弹幕", "弹幕ID", instance.弹幕ID, "普通弹幕", options.普通弹幕, "X", options.X, "Y", options.Y, "方向", options.方向角, "速度", options.速度, "最大距离", options.最大距离 ?? 配置.Q.飞行距离, "命中半径", options.命中半径, "最短判伤距离", minDistance);
   return instance.弹幕ID;
 }
 
@@ -226,14 +221,11 @@ function 释放Q(this: void, _context: { 英雄: any }, hero: any, skillInstance
   const targetY = jass.GetSpellTargetY();
   const targetGap = 查找八云紫裂隙(targetX, targetY, 100, hero);
 
-  八云紫诊断日志("Q", "收到Q施法", "英雄", 八云紫诊断句柄(hero), "起点X", heroX, "起点Y", heroY, "目标X", targetX, "目标Y", targetY, "目标间隙", targetGap != null ? 八云紫诊断句柄(targetGap.单位) : 0, "目标间隙有效", targetGap != null);
-
   添加单位暂停(hero, Q暂停来源);
   jass.SetUnitAnimation(hero, "attack,2");
   addDelayedCallback(配置.Q.硬直秒 * 1000, 解除Q硬直, hero);
 
   if (targetGap != null) {
-    八云紫诊断日志("Q", "进入指定间隙三波分支", "间隙", 八云紫诊断句柄(targetGap.单位), "波数", 配置.Q.指定裂隙波数);
     播放八云紫随机单位音效(hero, 配置.Q.指定裂隙语音键);
     for (let i = 1; i <= 配置.Q.指定裂隙波数; i++) {
       addDelayedCallback(i * 配置.Q.指定裂隙波间隔秒 * 1000, 发射指定裂隙波, {
@@ -248,7 +240,6 @@ function 释放Q(this: void, _context: { 英雄: any }, hero: any, skillInstance
   播放八云紫单位音效(hero, 配置.Q.普通起手音效键);
   播放八云紫随机单位音效(hero, 配置.Q.普通语音键);
   const baseAngle = 两点角度(heroX, heroY, targetX, targetY);
-  八云紫诊断日志("Q", "进入普通六弹幕分支", "基础角度", baseAngle, "数量", 配置.Q.普通弹幕数量, "自动追踪范围", 配置.Q.自动追踪裂隙范围, "接触半径", 配置.裂隙.扩散触发半径);
   for (let i = 0; i < 配置.Q.普通弹幕数量; i++) {
     const angle = baseAngle + 配置.Q.普通角度偏移[i];
     const distance = 配置.Q.普通创建距离[i];

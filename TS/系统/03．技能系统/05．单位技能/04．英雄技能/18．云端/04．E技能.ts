@@ -14,10 +14,6 @@ import { 云端BuffID } from "../../../../05．Buff系统/03．Buff表/02．英�
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
 
-const { debugLog, debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLog: (this: void, module: string, ...args: any[]) => void;
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removeDelayedCallback: (this: void, id: number) => void;
@@ -101,7 +97,6 @@ function 回收E增益(this: void, variable: any): void {
   ctx.已回收 = true;
   const caster = ctx.施法者;
   if (caster == null || caster === 0) return;
-  debugLogForce("云端E", "回收增益", "施法者", GetHandleId(caster), "分支", ctx.分支, "增量", ctx.增量);
   // 只撤销本次实例的增量（计划 7.3.3）：暴击走 player 属性增量对，攻击/护甲走临时调整增量对
   if (ctx.分支 === "洞察") {
     const player = GetOwningPlayer(caster);
@@ -126,27 +121,22 @@ function 处理无双剑法触发(this: void, unit: any, _damage: number, damage
     return; // 非云端英雄的伤害，与 E 无关（源：仅特定英雄列表）
   }
   if (isNormalAttack !== true) {
-    debugLog("云端E", "触发-非普攻忽略", "受击单位", GetHandleId(unit), "来源", GetHandleId(source), "伤害类型", damageType, "isNormalAttack", isNormalAttack);
     return;
   }
   // 2026-08-17 修复“E被动没效果”：伤害事件回调的 damageType 被派发层硬编码为 0，
   // 原判断 damageType !== DAMAGE_TYPE_NORMAL 必然拦下所有普攻；源条件实为 OR 关系
   // （伤害>0.01 或 类型=NORMAL），普攻标记已覆盖语义，不再单独判 damageType
   if (GetUnitAbilityLevel(source, E类型ID) < 1) {
-    debugLog("云端E", "触发-无E技能等级忽略", "施法者", GetHandleId(source), "E等级", GetUnitAbilityLevel(source, E类型ID));
     return;
   }
   // 源：目标是施法者的敌人且非其拥有单位
   const attackerPlayer = GetOwningPlayer(source);
   if (IsUnitAlly(unit, attackerPlayer) || IsUnitOwnedByPlayer(unit, attackerPlayer)) {
-    debugLog("云端E", "触发-友军目标忽略", "受击单位", GetHandleId(unit), "施法者", GetHandleId(source));
     return;
   }
   if (云端E是否冷却中(source)) {
-    debugLog("云端E", "触发-冷却中忽略", "施法者", GetHandleId(source), "受击单位", GetHandleId(unit));
     return;
   }
-  debugLogForce("云端E", "触发-命中有效", "施法者", GetHandleId(source), "受击单位", GetHandleId(unit), "伤害", _damage, "伤害类型", damageType);
 
   // 8 秒触发冷却（单位级标记，多实例互不影响，计划 7.3.4）；同步登记到 QWERD 冷却 UI 显示
   设置云端E冷却(source, true);
@@ -190,7 +180,6 @@ function 处理无双剑法触发(this: void, unit: any, _damage: number, damage
     YDUserDataSetSafe("player", player, "暴击伤害", "real", 当前暴击伤害 + 提升);
     registerManualBuff(source, 云端BuffID.无双洞察, 配置.E.增益持续秒, 提升);
     ctx = { 施法者: source, 分支: "洞察", 增量: 提升, 已回收: false };
-    debugLogForce("云端E", "分支-洞察", "施法者", GetHandleId(source), "受击单位", GetHandleId(unit), "生命百分比", 生命百分比, "等级", 等级, "提升", 提升, "暴击率前", 当前暴击率, "暴击伤害前", 当前暴击伤害);
   } else if (生命百分比 <= 配置.E.低生命阈值) {
     // 破势：攻击力 + 当前敏捷×(0.4×级)（源误用智力，按介绍修正，计划 7.2）
     // 源漂浮字（TRIGSTR_957）在施法者头顶，红色
@@ -208,7 +197,6 @@ function 处理无双剑法触发(this: void, unit: any, _damage: number, damage
     临时调整攻击(source, 增量);
     registerManualBuff(source, 云端BuffID.无双破势, 配置.E.增益持续秒, 增量);
     ctx = { 施法者: source, 分支: "破势", 增量, 已回收: false };
-    debugLogForce("云端E", "分支-破势", "施法者", GetHandleId(source), "受击单位", GetHandleId(unit), "生命百分比", 生命百分比, "等级", 等级, "增量", 增量);
   } else {
     // 御势：护甲 + 3×级
     // 源漂浮字（TRIGSTR_956）在施法者头顶，蓝色，高度 20
@@ -226,7 +214,6 @@ function 处理无双剑法触发(this: void, unit: any, _damage: number, damage
     临时调整护甲(source, 增量);
     registerManualBuff(source, 云端BuffID.无双御势, 配置.E.增益持续秒, 增量);
     ctx = { 施法者: source, 分支: "御势", 增量, 已回收: false };
-    debugLogForce("云端E", "分支-御势", "施法者", GetHandleId(source), "受击单位", GetHandleId(unit), "生命百分比", 生命百分比, "等级", 等级, "增量", 增量);
   }
 
   addDelayedCallback(

@@ -35,6 +35,7 @@ function _____963F_74E6_9686_7B49_91CF_6062_590D(variable)
     })
 end
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
@@ -51,8 +52,8 @@ local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用�
 local createUnitEffect = ____require_result_4.createUnitEffect
 local destroyUnitEffect = ____require_result_4.destroyUnitEffect
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
-local ____require_result_5 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_5.Sound3DII_UnitPlayReuse
+local ____require_result_5 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundBJ = ____require_result_5.PlaySoundBJ
 local ____require_result_6 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_6.registerDeathListener
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -171,7 +172,10 @@ local function _____91CA_653ED_6280_80FD(_context, caster, ______6280_80FD_5B9E_
     if ____Saber_662F_5426_963F_74E6_9686(caster) then
         _____7ED3_675F_963F_74E6_9686(caster)
     end
-    Sound3DII_UnitPlayReuse(_____914D_7F6E.D["音效"]["路径"], caster, _____914D_7F6E.D["音效"]["裁断距离"])
+    local ____d_97F3_6548_53E5_67C4 = jglobals[_____914D_7F6E.D["音效"]["全局音效键"]]
+    if ____d_97F3_6548_53E5_67C4 ~= nil then
+        PlaySoundBJ(____d_97F3_6548_53E5_67C4)
+    end
     createUnitEffect(
         caster,
         _____914D_7F6E.D["头顶特效"]["挂点"],

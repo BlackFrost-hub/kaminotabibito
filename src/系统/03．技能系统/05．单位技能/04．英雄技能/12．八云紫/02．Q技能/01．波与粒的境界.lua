@@ -17,9 +17,6 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____00A_FF0E_8868_73B0_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00A．表现工具")
 local _____64AD_653E_516B_4E91_7D2B_5355_4F4D_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放八云紫单位音效"]
 local _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放八云紫随机单位音效"]
-local ____00B_FF0E_8BCA_65AD = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00B．诊断")
-local _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7 = ____00B_FF0E_8BCA_65AD["八云紫诊断日志"]
-local _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4 = ____00B_FF0E_8BCA_65AD["八云紫诊断句柄"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -61,24 +58,6 @@ local function _____5F39_5E55Tick(instance, _delta)
         local targetGap = nearby[1]
         if not context["已记录追踪"] then
             context["已记录追踪"] = true
-            _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-                "Q",
-                "普通弹幕发现可追踪间隙",
-                "弹幕ID",
-                instance.id,
-                "弹幕X",
-                instance["当前X"],
-                "弹幕Y",
-                instance["当前Y"],
-                "候选数",
-                #nearby,
-                "间隙",
-                _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(targetGap["单位"]),
-                "间隙X",
-                jass.GetUnitX(targetGap["单位"]),
-                "间隙Y",
-                jass.GetUnitY(targetGap["单位"])
-            )
         end
         instance["当前方向角"] = _____4E24_70B9_89D2_5EA6(
             instance["当前X"],
@@ -96,30 +75,8 @@ local function _____5F39_5E55Tick(instance, _delta)
         return
     end
     context["已触发裂隙"][gapId] = true
-    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-        "Q",
-        "普通弹幕进入间隙",
-        "弹幕ID",
-        instance.id,
-        "间隙",
-        gapId,
-        "弹幕X",
-        instance["当前X"],
-        "弹幕Y",
-        instance["当前Y"],
-        "已飞距离",
-        instance["已飞行距离"]
-    )
     _____64AD_653E_516B_4E91_7D2B_5355_4F4D_97F3_6548(context["施法者"], _____914D_7F6E.Q["裂隙触发音效键"])
-    local spreadCount = _____89E6_53D1_516B_4E91_7D2B_88C2_9699_6269_6563(context["施法者"], touched)
-    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-        "Q",
-        "间隙扩散结算",
-        "中心间隙",
-        gapId,
-        "触发间隙数",
-        spreadCount
-    )
+    _____89E6_53D1_516B_4E91_7D2B_88C2_9699_6269_6563(context["施法者"], touched)
 end
 ____exports["发射八云紫弹幕"] = function(options)
     local minDistance = options["最短飞行距离"] or 0
@@ -164,28 +121,6 @@ ____exports["发射八云紫弹幕"] = function(options)
         ["已触发裂隙"] = {},
         ["已记录追踪"] = false
     }
-    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-        "Q",
-        "创建弹幕",
-        "弹幕ID",
-        instance["弹幕ID"],
-        "普通弹幕",
-        options["普通弹幕"],
-        "X",
-        options.X,
-        "Y",
-        options.Y,
-        "方向",
-        options["方向角"],
-        "速度",
-        options["速度"],
-        "最大距离",
-        options["最大距离"] or _____914D_7F6E.Q["飞行距离"],
-        "命中半径",
-        options["命中半径"],
-        "最短判伤距离",
-        minDistance
-    )
     return instance["弹幕ID"]
 end
 local function _____53D1_5C04_516D_5411_5F3A_5316_5F39_5E55(hero, gap)
@@ -271,36 +206,10 @@ local function _____91CA_653EQ(_context, hero, skillInstanceId)
     local targetX = jass.GetSpellTargetX()
     local targetY = jass.GetSpellTargetY()
     local targetGap = _____67E5_627E_516B_4E91_7D2B_88C2_9699(targetX, targetY, 100, hero)
-    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-        "Q",
-        "收到Q施法",
-        "英雄",
-        _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(hero),
-        "起点X",
-        heroX,
-        "起点Y",
-        heroY,
-        "目标X",
-        targetX,
-        "目标Y",
-        targetY,
-        "目标间隙",
-        targetGap ~= nil and _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(targetGap["单位"]) or 0,
-        "目标间隙有效",
-        targetGap ~= nil
-    )
     _____6DFB_52A0_5355_4F4D_6682_505C(hero, ____Q_6682_505C_6765_6E90)
     jass.SetUnitAnimation(hero, "attack,2")
     addDelayedCallback(_____914D_7F6E.Q["硬直秒"] * 1000, _____89E3_9664Q_786C_76F4, hero)
     if targetGap ~= nil then
-        _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-            "Q",
-            "进入指定间隙三波分支",
-            "间隙",
-            _____516B_4E91_7D2B_8BCA_65AD_53E5_67C4(targetGap["单位"]),
-            "波数",
-            _____914D_7F6E.Q["指定裂隙波数"]
-        )
         _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(hero, _____914D_7F6E.Q["指定裂隙语音键"])
         do
             local i = 1
@@ -314,18 +223,6 @@ local function _____91CA_653EQ(_context, hero, skillInstanceId)
     _____64AD_653E_516B_4E91_7D2B_5355_4F4D_97F3_6548(hero, _____914D_7F6E.Q["普通起手音效键"])
     _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(hero, _____914D_7F6E.Q["普通语音键"])
     local baseAngle = _____4E24_70B9_89D2_5EA6(heroX, heroY, targetX, targetY)
-    _____516B_4E91_7D2B_8BCA_65AD_65E5_5FD7(
-        "Q",
-        "进入普通六弹幕分支",
-        "基础角度",
-        baseAngle,
-        "数量",
-        _____914D_7F6E.Q["普通弹幕数量"],
-        "自动追踪范围",
-        _____914D_7F6E.Q["自动追踪裂隙范围"],
-        "接触半径",
-        _____914D_7F6E["裂隙"]["扩散触发半径"]
-    )
     do
         local i = 0
         while i < _____914D_7F6E.Q["普通弹幕数量"] do

@@ -49,7 +49,7 @@ export const Saber技能配置 = {
       技能类型ID: stringToFourCCSafe(Q技能ID),
       物编冷却秒: 12,
       起手延迟秒: 0.05, // 源：0.05 秒后计算方向并启动冲锋
-      音效: { 路径: "Sound\\HeroVoice\\Saber\\Saber-Q1.mp3", 裁断距离: 1500 },
+      音效: { 全局音效键: "gg_snd_Saber_Q1" }, // 源 PlaySoundOnUnitBJ(gg_snd_Saber_Q1)；未命中时 StopSoundBJ(它, false)
       动作索引: 5,
       时间流速: 3.5,
       伤害攻击力倍率: 0.5, // 初段保存攻击力×0.5 作为整段基础伤害
@@ -91,7 +91,7 @@ export const Saber技能配置 = {
     连击2: {
       技能ID: Q连击2技能ID,
       技能类型ID: stringToFourCCSafe(Q连击2技能ID),
-      音效: { 路径: "Sound\\HeroVoice\\Saber\\SaberQ2.mp3", 裁断距离: 1500 },
+      音效: { 全局音效键: "gg_snd_SaberQ2" }, // 源 PlaySoundOnUnitBJ(gg_snd_SaberQ2)
       伤害攻击力倍率: 0.5, // 重新快照攻击力×0.5
       时间流速: 2.0,
       动作索引: 2,
@@ -121,11 +121,13 @@ export const Saber技能配置 = {
         命中特效: { 模型路径: "war3mapImported\\[ake]gaopin.mdx", 挂点: "origin", 持续秒: 0.35 },
         目标动作时间流速: 4.0,
         目标击退: { 每次距离: 10, 间隔秒: 0.02, 次数: 10 },
-        // 源在目标前方 75 创建 e061（MoonPunish，物编缩放1.5×运行时1.5）作为第二段表现
+        // 源在目标前方 75 创建 e061（MoonPunish）；物编缩放为 1.5，运行时 SetUnitTimeScale(1.5) 仅改变动画速度。
         表现特效: {
-          模型路径: "war3mapImported\\MoonPunish.mdl",
+          模型路径: "war3mapImported\\MoonPunish.mdx", // e061 物编模型；资源为 .mdx（.mdl 会导致特效静默不显示）
           目标前方偏移: 75,
-          缩放: 2.25, // 物编 1.5 × 运行时 SetUnitTimeScale(1.5) 的等效显示倍率（审计保留）
+          缩放: 1.5, // 对齐 e061 的 modelScale=1.5；SetUnitTimeScale 不会改变模型大小
+          动画速度: 1.5, // 对齐源 SetUnitTimeScale(e061, 1.50)
+          飞行高度: 100, // e061 物编 moveHeight=100；缺省 0 会把模型压进地面看不见
           持续秒: 0.5,
         },
       },
@@ -134,7 +136,7 @@ export const Saber技能配置 = {
     连击3: {
       技能ID: Q连击3技能ID,
       技能类型ID: stringToFourCCSafe(Q连击3技能ID),
-      音效: { 路径: "Sound\\HeroVoice\\Saber\\SaberQ3.mp3", 裁断距离: 1500 },
+      音效: { 全局音效键: "gg_snd_SaberQ3" }, // 源 PlaySoundOnUnitBJ(gg_snd_SaberQ3)
       伤害攻击力倍率: 0.5, // 重新快照攻击力×0.5
       时间流速: 1.65,
       动作索引: 10,
@@ -165,7 +167,7 @@ export const Saber技能配置 = {
         命中特效: { 模型路径: "war3mapImported\\[ake]gaopin.mdx", 挂点: "origin", 持续秒: 0.35 },
         目标动作时间流速: 4.0,
         目标击退: { 每次距离: 10, 间隔秒: 0.02, 次数: 10 },
-        刀光持续秒: 0.55,
+        刀光持续秒: 0.27, // 用户要求：源 0.55 秒减半，缩短三连Q刀光残留
       },
       复位延迟秒: 0.5, // 源：0.5 秒后 Q连击=0、恢复 A0DB、移除 A0DD、清空命中组
     },
@@ -185,7 +187,7 @@ export const Saber技能配置 = {
       时间流速: 3.0,
       龙卷风: {
         启动延迟秒: 0.4, // 源：0.40 秒后创建 6 个龙卷风
-        音效: { 路径: "Sound\\Units\\CombatSoundsFaked\\BansheeMissileLaunch2.wav", 裁断距离: 1500 }, // gg_snd_BansheeMissileLaunch2（待核对 soundlist）
+        音效: { 全局音效键: "gg_snd_BansheeMissileLaunch2" }, // 源 PlaySoundOnUnitBJ(gg_snd_BansheeMissileLaunch2)
         数量: 6,
         出生朝向步进度: 60, // 60°×序号
         模型路径: "Abilities\\Spells\\Other\\Tornado\\TornadoElemental.mdl", // e065 物编模型
@@ -201,7 +203,7 @@ export const Saber技能配置 = {
       },
     },
     E联动地面分支: {
-      音效: { 路径: "Sound\\HeroVoice\\Saber\\Saber-EW1.mp3", 裁断距离: 1500 },
+      音效: { 全局音效键: "gg_snd_Saber_EW1" }, // 源 PlaySoundOnUnitBJ(gg_snd_Saber_EW1)
       动作索引: 7,
       路径: {
         Tick数: 12, // 源 12 个周期
@@ -210,10 +212,10 @@ export const Saber技能配置 = {
         伤害半径: 250, // 说明宽 500
       },
       表现特效: {
-        模型路径: "war3mapImported\\MoonPunish.mdl", // e061 物编模型
+        模型路径: "war3mapImported\\MoonPunish.mdx", // e061 物编模型；资源为 .mdx（.mdl 会导致特效静默不显示）
         缩放: 7.5, // 物编 1.5 × 运行时 SetUnitScale(5)
         飞行高度: 100, // e061 物编 moveHeight
-        朝向偏移: 90, // 源：路径角度 +90
+        朝向偏移: 270, // 源 CreateUnit facing=角度+90 再 +180 修正实测反向（补偿物编 e061 的 Y 轴旋转 -90）
         持续秒: 0.5,
       },
       首次控制秒: 2.0, // 说明硬直 2 秒（源 id=0 1.5 秒，以说明为准）
@@ -236,7 +238,7 @@ export const Saber技能配置 = {
       目标动作时间流速: 5.0,
       命中特效: { 模型路径: "Objects\\Spawnmodels\\NightElf\\NEDeathMedium\\NEDeath.mdl", 挂点: "origin", 持续秒: 2.0 },
       E联动冲击波: {
-        音效: { 路径: "Sound\\Abilities\\Weapons\\ChimaeraAcidMissile\\CorrosiveBreathMissileLaunch1.wav", 裁断距离: 1500 }, // gg_snd_CorrosiveBreathMissileLaunch1（待核对 soundlist）
+        音效: { 全局音效键: "gg_snd_CorrosiveBreathMissileLaunch1" }, // 源 PlaySoundOnUnitBJ(gg_snd_CorrosiveBreathMissileLaunch1)
         模型路径: "war3mapImported\\BladeShockwave.mdl", // e062 物编模型
         缩放: 10.0, // 物编 2 × 运行时 SetUnitScale(5)
         飞行高度: 90, // e062 物编 moveHeight
@@ -277,7 +279,7 @@ export const Saber技能配置 = {
       间隔秒: 0.05,
       最大Tick数: 80, // 约 4 秒
       音效Tick: 78, // 第 78 周期播放 Excalibur 音效
-      音效: { 路径: "Sound\\HeroVoice\\Saber\\SaberExcalibur.mp3", 裁断距离: 2500 },
+      音效: { 全局音效键: "gg_snd_SaberExcalibur" }, // 源 PlaySoundOnUnitBJ(gg_snd_SaberExcalibur)；施法者死亡时 StopSoundBJ(它, true)
       聚集粒子: {
         模型路径: "Abilities\\Weapons\\FaerieDragonMissile\\FaerieDragonMissile.mdl", // e063 物编模型
         每Tick数量: 3,
@@ -292,6 +294,8 @@ export const Saber技能配置 = {
       法阵特效: { 模型路径: "war3mapImported\\GainLife.mdl", 缩放: 3.0, 持续秒: 3.0, 朝向偏移: 90 }, // 非阿瓦隆阶段
       动作索引: 18,
       发射准备延迟秒: 1.7,
+      // 源：蓄力结束后全部聚集粒子 IssuePointOrder("move", Saber位置) + SetUnitTimeScale(50) 高速汇聚回 Saber
+      聚集回收: { Tick间隔秒: 0.02, 每次移动距离: 30, 每次高度变化: 30, 到达距离: 40 },
     },
     发射: {
       光束: { 模型路径: "war3mapImported\\[GH][MX]5.mdl", 缩放: 3.5, 持续秒: 2.0, 朝向偏移: 90 },
@@ -316,7 +320,7 @@ export const Saber技能配置 = {
     技能ID: D技能ID,
     技能类型ID: stringToFourCCSafe(D技能ID),
     物编冷却秒: 120,
-    音效: { 路径: "Sound\\HeroVoice\\Saber\\Saber_Alter_D_Avalon.mp3", 裁断距离: 3000 },
+    音效: { 全局音效键: "gg_snd_Saber_Alter_D_Avalon" }, // 源 PlaySoundBJ(gg_snd_Saber_Alter_D_Avalon) 全局播放（不挂单位）
     头顶特效: { 模型路径: "war3mapImported\\cauterize.mdx", 挂点: "overhead" },
     原点特效: { 模型路径: "war3mapImported\\HolyAurora.MDX", 挂点: "origin" },
     持续秒: 10,

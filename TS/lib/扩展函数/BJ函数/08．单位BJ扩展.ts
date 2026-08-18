@@ -76,6 +76,12 @@ export function SelectUnitRemove(unit: any): void {
     jass.SelectUnit(unit, false);
 }
 
+/** 对齐 Blizzard.j 的 ForceUICancelBJ：取消指定玩家当前打开的技能/目标选择界面。 */
+export function ForceUICancelBJ(player: any): void {
+    if (player == null || player === 0) return;
+    jass.ForceUICancel(player);
+}
+
 export function IsUnitHiddenBJ(unit: any): boolean {
     return jass.IsUnitHidden(unit);
 }

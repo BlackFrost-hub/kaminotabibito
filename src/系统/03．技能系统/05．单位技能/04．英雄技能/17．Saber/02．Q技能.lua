@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8BA1_7B97_4E24_70B9_89D2_5EA6, _____5728_524D_65B9_534A_5706, _____8FC7_6EE4Q_5288_780D_76EE_6807, _____8BA1_7B97_5200_5149_70B9, _____64AD_653E_5200_5149, _____6062_590DQ_76EE_6807_8868_73B0, _____5E94_7528Q_76EE_6807_547D_4E2D_8868_73B0, _____7ED3_7B97Q_524D_65B9_5288_780D, ____Q_521D_6BB5_7A97_53E3_590D_4F4D, _____6CBF_9762_5411_77AC_6B65, ____Q2_8FC7_6E21, ____Q2_7B2C_4E8C_6BB5_5288_780D, ____Q_8FDE_51FB2_7A97_53E3_590D_4F4D, _____63A8_8FDBQ3_4E0B_964D, ____Q3_8FC7_6E21, ____Q3_7B2C_4E8C_6BB5_5288_780D, ____Q3_590D_4F4D, jass, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____5F00_59CB_51FB_9000, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____83B7_53D6_8303_56F4_654C_519B, _____65BD_52A0_7729_6655, registerManualBuff, _____79FB_9664_5355_4F4D_6682_505C, _____521B_5EFA_70B9_7279_6548, createTimedUnitEffect, GetUnitX, GetUnitY, GetUnitFacing, GetUnitFlyHeight, GetOwningPlayer, SetUnitTimeScale, SetUnitAnimationByIndex, SetUnitAnimation, SetUnitTurnSpeed, SetUnitFlyHeight, SetPlayerAbilityAvailable, UnitAddAbility, UnitRemoveAbility, IsUnitType, IsUnitVisible, Atan2, Cos, Sin, bj_RADTODEG, bj_DEGTORAD, UNIT_TYPE_ANCIENT, UNIT_TYPE_MECHANICAL, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_METAL_HEAVY_BASH, EXSetUnitMoveType, _____914D_7F6E, ____Q_521D_6BB5ID, ____Q_8FDE_51FB2ID, ____Q_8FDE_51FB3ID
+local _____8BA1_7B97_4E24_70B9_89D2_5EA6, _____5728_524D_65B9_534A_5706, _____8FC7_6EE4Q_5288_780D_76EE_6807, _____8BA1_7B97_5200_5149_70B9, _____64AD_653E_5200_5149, _____6062_590DQ_76EE_6807_8868_73B0, _____5E94_7528Q_76EE_6807_547D_4E2D_8868_73B0, _____7ED3_7B97Q_524D_65B9_5288_780D, ____Q_521D_6BB5_7A97_53E3_590D_4F4D, _____6CBF_9762_5411_77AC_6B65, ____Q2_8FC7_6E21, ____Q2_7B2C_4E8C_6BB5_5288_780D, ____Q_8FDE_51FB2_7A97_53E3_590D_4F4D, _____63A8_8FDBQ3_4E0B_964D, ____Q3_8FC7_6E21, ____Q3_7B2C_4E8C_6BB5_5288_780D, ____Q3_590D_4F4D, jass, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____5F00_59CB_51FB_9000, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____83B7_53D6_8303_56F4_654C_519B, _____65BD_52A0_7729_6655, registerManualBuff, _____79FB_9664_5355_4F4D_6682_505C, _____521B_5EFA_70B9_7279_6548, createTimedUnitEffect, GetUnitX, GetUnitY, GetUnitFacing, GetUnitFlyHeight, GetOwningPlayer, SetUnitTimeScale, SetUnitAnimationByIndex, SetUnitAnimation, SetUnitTurnSpeed, SetUnitFlyHeight, SetPlayerAbilityAvailable, UnitAddAbility, UnitRemoveAbility, IsUnitType, IsUnitVisible, Atan2, Cos, Sin, bj_RADTODEG, bj_DEGTORAD, UNIT_TYPE_ANCIENT, UNIT_TYPE_MECHANICAL, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_METAL_HEAVY_BASH, _____914D_7F6E, ____Q_521D_6BB5ID, ____Q_8FDE_51FB2ID, ____Q_8FDE_51FB3ID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.17．Saber.00．配置")
 local ____Saber_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["Saber技能配置"]
 local ____08_FF0ESaber = require("系统.05．Buff系统.03．Buff表.02．英雄.08．Saber")
@@ -188,12 +188,9 @@ function ____Q_521D_6BB5_7A97_53E3_590D_4F4D(variable)
 end
 function _____6CBF_9762_5411_77AC_6B65(caster, _____8DDD_79BB)
     local _____5F27_5EA6 = GetUnitFacing(caster) * bj_DEGTORAD
-    jass.SetUnitX(
+    jass.SetUnitPosition(
         caster,
-        GetUnitX(caster) + _____8DDD_79BB * Cos(_____5F27_5EA6)
-    )
-    jass.SetUnitY(
-        caster,
+        GetUnitX(caster) + _____8DDD_79BB * Cos(_____5F27_5EA6),
         GetUnitY(caster) + _____8DDD_79BB * Sin(_____5F27_5EA6)
     )
 end
@@ -243,9 +240,11 @@ function ____Q2_7B2C_4E8C_6BB5_5288_780D(variable)
             ["模型路径"] = _____914D_7F6E.Q["连击2"]["第二段"]["表现特效"]["模型路径"],
             X = GetUnitX(target) + _____914D_7F6E.Q["连击2"]["第二段"]["表现特效"]["目标前方偏移"] * Cos(_____5F27_5EA6),
             Y = GetUnitY(target) + _____914D_7F6E.Q["连击2"]["第二段"]["表现特效"]["目标前方偏移"] * Sin(_____5F27_5EA6),
+            Z = _____914D_7F6E.Q["连击2"]["第二段"]["表现特效"]["飞行高度"],
             ["面向角度"] = _____65B9_5411 + 90,
-            ["X轴角度"] = -90,
+            ["Y轴角度"] = -90,
             ["缩放"] = _____914D_7F6E.Q["连击2"]["第二段"]["表现特效"]["缩放"],
+            ["动画速度"] = _____914D_7F6E.Q["连击2"]["第二段"]["表现特效"]["动画速度"],
             ["持续秒"] = _____914D_7F6E.Q["连击2"]["第二段"]["表现特效"]["持续秒"]
         })
         _____65BD_52A0_7729_6655(
@@ -380,7 +379,6 @@ function ____Q3_7B2C_4E8C_6BB5_5288_780D(variable)
     })
     SetUnitTimeScale(caster, 1)
     _____79FB_9664_5355_4F4D_6682_505C(caster, _____914D_7F6E["暂停来源"]["Q连击3"])
-    EXSetUnitMoveType(caster, 1)
     SetUnitFlyHeight(caster, 0, 0)
     addDelayedCallback(
         math.floor(_____914D_7F6E.Q["连击3"]["复位延迟秒"] * 1000 + 0.5),
@@ -413,7 +411,7 @@ function ____Q3_590D_4F4D(variable)
     ____Saber_6E05_7A7AQ_547D_4E2D_7EC4(caster)
 end
 jass = require("jass.common")
-local japi = require("jass.japi")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 addDelayedCallback = ____require_result_0.addDelayedCallback
 addPeriodicCallback = ____require_result_0.addPeriodicCallback
@@ -423,26 +421,29 @@ local _____5F00_59CB_51B2_950B = ____require_result_1["开始冲锋"]
 _____5F00_59CB_51FB_9000 = ____require_result_1["开始击退"]
 local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_2["造成单体技能伤害"]
-local ____require_result_3 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-_____83B7_53D6_8303_56F4_654C_519B = ____require_result_3["获取范围敌军"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
-_____65BD_52A0_7729_6655 = ____require_result_4["施加眩晕"]
-local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_5.registerManualBuff
-local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_6["添加单位暂停"]
-_____79FB_9664_5355_4F4D_6682_505C = ____require_result_6["移除单位暂停"]
-local ____require_result_7 = require("系统.03．技能系统.01．技能冷却.01．冷却缩减计算")
-local getCooldownReduction = ____require_result_7.getCooldownReduction
-local ____require_result_8 = require("平台扩展API动作")
-local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_8["技能_设置技能冷却时间"]
-local ____require_result_9 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_9.Sound3DII_UnitPlayReuse
-local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
-createTimedUnitEffect = ____require_result_10.createTimedUnitEffect
-local ____require_result_11 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_11.registerDeathListener
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.00．共享")
+local _____786E_4FDD_5355_4F4D_53EF_8BBE_7F6E_98DE_884C_9AD8_5EA6 = ____require_result_3["确保单位可设置飞行高度"]
+local ____require_result_4 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+_____83B7_53D6_8303_56F4_654C_519B = ____require_result_4["获取范围敌军"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
+_____65BD_52A0_7729_6655 = ____require_result_5["施加眩晕"]
+local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_6.registerManualBuff
+local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_7["添加单位暂停"]
+_____79FB_9664_5355_4F4D_6682_505C = ____require_result_7["移除单位暂停"]
+local ____require_result_8 = require("系统.03．技能系统.01．技能冷却.01．冷却缩减计算")
+local getCooldownReduction = ____require_result_8.getCooldownReduction
+local ____require_result_9 = require("平台扩展API动作")
+local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_9["技能_设置技能冷却时间"]
+local ____require_result_10 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundOnUnitBJ = ____require_result_10.PlaySoundOnUnitBJ
+local StopSoundBJ = ____require_result_10.StopSoundBJ
+local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
+createTimedUnitEffect = ____require_result_11.createTimedUnitEffect
+local ____require_result_12 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_12.registerDeathListener
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 GetUnitX = jass.GetUnitX
@@ -471,9 +472,8 @@ UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 WEAPON_TYPE_METAL_HEAVY_BASH = jass.WEAPON_TYPE_METAL_HEAVY_BASH
-EXSetUnitMoveType = japi.EXSetUnitMoveType
-local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_12.stringToFourCCSafe
+local ____require_result_13 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_13.stringToFourCCSafe
 local stringToFourCC = stringToFourCCSafe
 _____914D_7F6E = ____Saber_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
@@ -570,6 +570,10 @@ local function ____Q1_672A_547D_4E2D_6536_5C3E(variable)
         record["Q连击"] = 0
     end
     SetUnitTimeScale(caster, 1)
+    local ____q1_97F3_6548_53E5_67C4 = jglobals[_____914D_7F6E.Q["初段"]["音效"]["全局音效键"]]
+    if ____q1_97F3_6548_53E5_67C4 ~= nil then
+        StopSoundBJ(____q1_97F3_6548_53E5_67C4, false)
+    end
     local _____7F29_51CF = getCooldownReduction(caster)
     if _____7F29_51CF > _____914D_7F6E.Q["初段"]["未命中冷却"]["冷却缩减上限"] then
         _____7F29_51CF = _____914D_7F6E.Q["初段"]["未命中冷却"]["冷却缩减上限"]
@@ -612,7 +616,10 @@ local function ____Q1_542F_52A8_51B2_950B(variable)
         ctx["目标点X"],
         ctx["目标点Y"]
     )
-    Sound3DII_UnitPlayReuse(_____914D_7F6E.Q["初段"]["音效"]["路径"], caster, _____914D_7F6E.Q["初段"]["音效"]["裁断距离"])
+    local ____q1_97F3_6548_53E5_67C4_64AD = jglobals[_____914D_7F6E.Q["初段"]["音效"]["全局音效键"]]
+    if ____q1_97F3_6548_53E5_67C4_64AD ~= nil then
+        PlaySoundOnUnitBJ(____q1_97F3_6548_53E5_67C4_64AD, 100, caster)
+    end
     SetUnitTimeScale(caster, _____914D_7F6E.Q["初段"]["时间流速"])
     SetUnitAnimationByIndex(caster, _____914D_7F6E.Q["初段"]["动作索引"])
     _____5F00_59CB_51B2_950B(caster, {
@@ -700,7 +707,10 @@ local function _____91CA_653EQ_8FDE_51FB2(context, caster, _____6280_80FD_5B9E_4
     context["技能实例ID"] = _____6280_80FD_5B9E_4F8BID
     context["伤害快照"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * _____914D_7F6E.Q["连击2"]["伤害攻击力倍率"]
     SetUnitTurnSpeed(caster, 0)
-    Sound3DII_UnitPlayReuse(_____914D_7F6E.Q["连击2"]["音效"]["路径"], caster, _____914D_7F6E.Q["连击2"]["音效"]["裁断距离"])
+    local ____q2_97F3_6548_53E5_67C4 = jglobals[_____914D_7F6E.Q["连击2"]["音效"]["全局音效键"]]
+    if ____q2_97F3_6548_53E5_67C4 ~= nil then
+        PlaySoundOnUnitBJ(____q2_97F3_6548_53E5_67C4, 100, caster)
+    end
     _____6DFB_52A0_5355_4F4D_6682_505C(caster, _____914D_7F6E["暂停来源"]["Q连击2"])
     SetUnitTimeScale(caster, _____914D_7F6E.Q["连击2"]["时间流速"])
     UnitRemoveAbility(caster, ____Q_8FDE_51FB2ID)
@@ -802,14 +812,17 @@ local function _____91CA_653EQ_8FDE_51FB3(context, caster, _____6280_80FD_5B9E_4
     context["下降次数"] = 0
     SetUnitTurnSpeed(caster, 1)
     _____6DFB_52A0_5355_4F4D_6682_505C(caster, _____914D_7F6E["暂停来源"]["Q连击3"])
-    Sound3DII_UnitPlayReuse(_____914D_7F6E.Q["连击3"]["音效"]["路径"], caster, _____914D_7F6E.Q["连击3"]["音效"]["裁断距离"])
+    local ____q3_97F3_6548_53E5_67C4 = jglobals[_____914D_7F6E.Q["连击3"]["音效"]["全局音效键"]]
+    if ____q3_97F3_6548_53E5_67C4 ~= nil then
+        PlaySoundOnUnitBJ(____q3_97F3_6548_53E5_67C4, 100, caster)
+    end
     UnitRemoveAbility(caster, ____Q_8FDE_51FB3ID)
     SetPlayerAbilityAvailable(
         GetOwningPlayer(caster),
         ____Q_521D_6BB5ID,
         true
     )
-    EXSetUnitMoveType(caster, 2)
+    _____786E_4FDD_5355_4F4D_53EF_8BBE_7F6E_98DE_884C_9AD8_5EA6(caster)
     SetUnitTimeScale(caster, _____914D_7F6E.Q["连击3"]["时间流速"])
     SetUnitAnimationByIndex(caster, _____914D_7F6E.Q["连击3"]["动作索引"])
     _____6CBF_9762_5411_77AC_6B65(caster, _____914D_7F6E.Q["连击3"]["前移距离"])

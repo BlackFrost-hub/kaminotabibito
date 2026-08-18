@@ -21,6 +21,8 @@ local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_1["添加单位暂停"]
 local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_1["移除单位暂停"]
+local ____require_result_2 = require("平台扩展API动作")
+local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_2["技能_设置技能冷却时间"]
 local ____RR_5019_9009_8868 = {}
 local _____54B2_591C_4E16_754C_8BA1_6570 = {}
 local ____RR_5355_4F4D_5168_5C40_72B6_6001_8868 = {}
@@ -29,11 +31,11 @@ local ____RR_5019_9009_81EA_589E_5E8F_53F7 = 0
 local _____653B_51FB_95F4_9694_72B6_6001 = jass.ConvertUnitState(37)
 local GetUnitStateJapi = japi.GetUnitState
 local SetUnitStateJapi = japi.SetUnitState
-local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_2.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
-local ____require_result_3 = require("系统.05．Buff系统.03．Buff表.02．英雄.19．十六夜咲夜")
-local _____5341_516D_591C_54B2_591CBuffID = ____require_result_3["十六夜咲夜BuffID"]
+local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_3.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_3["移除单位指定Buff"]
+local ____require_result_4 = require("系统.05．Buff系统.03．Buff表.02．英雄.19．十六夜咲夜")
+local _____5341_516D_591C_54B2_591CBuffID = ____require_result_4["十六夜咲夜BuffID"]
 ____exports["十六夜咲夜处于咲夜世界"] = function(caster)
     return caster ~= nil and caster ~= 0 and (_____54B2_591C_4E16_754C_8BA1_6570[jass.GetHandleId(caster)] or 0) > 0
 end
@@ -288,7 +290,6 @@ local function _____542F_52A8RR_533A_57DF(caster, perfect, sequence)
     if world == nil or world == 0 then
         return
     end
-    jass.SetUnitScale(world, 1, 1, 1)
     if not perfect then
         jass.SetUnitVertexColor(
             world,
@@ -337,6 +338,12 @@ local function _____7ED3_7B97RR_5019_9009(variable)
         return
     end
     __TS__Delete(____RR_5019_9009_8868, id)
+    local owner = jass.GetOwningPlayer(candidate["施法者"])
+    jass.UnitRemoveAbility(candidate["施法者"], _____914D_7F6E["技能"].RR["二段容器类型ID"])
+    jass.SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["二段容器类型ID"], false)
+    if not candidate["完美空间"] then
+        jass.SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["类型ID"], true)
+    end
     if _____5355_4F4D_5B58_6D3B(candidate["施法者"]) then
         _____542F_52A8RR_533A_57DF(candidate["施法者"], candidate["完美空间"], candidate["序号"])
     end
@@ -347,13 +354,23 @@ local function _____91CA_653ERR(listener, caster)
         local candidate = ____RR_5019_9009_8868[id]
         if candidate ~= nil then
             candidate["完美空间"] = true
+            jass.SetPlayerAbilityAvailable(
+                jass.GetOwningPlayer(caster),
+                _____914D_7F6E["技能"].RR["二段容器类型ID"],
+                false
+            )
+            _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(caster, _____914D_7F6E["技能"].RR["类型ID"], _____914D_7F6E.RR["双击冷却秒"], _____914D_7F6E.RR["双击冷却秒"])
         end
         return
     end
+    local owner = jass.GetOwningPlayer(caster)
+    jass.UnitAddAbility(caster, _____914D_7F6E["技能"].RR["二段容器类型ID"])
+    jass.SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["类型ID"], false)
+    jass.SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["二段容器类型ID"], true)
     ____RR_5019_9009_81EA_589E_5E8F_53F7 = ____RR_5019_9009_81EA_589E_5E8F_53F7 + 1
     local candidate = {["施法者"] = caster, ["序号"] = ____RR_5019_9009_81EA_589E_5E8F_53F7, ["完美空间"] = false}
     ____RR_5019_9009_8868[id] = candidate
-    addDelayedCallback(600, _____7ED3_7B97RR_5019_9009, candidate)
+    addDelayedCallback(_____914D_7F6E.RR["双击窗口毫秒"], _____7ED3_7B97RR_5019_9009, candidate)
 end
 ____exports["注册十六夜咲夜RR"] = function()
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({

@@ -23,7 +23,7 @@
 | --- | --- | ---: | --- |
 | 云端 | `Yunduan` | 8 | `cloud_blaze_burn`、`cloud_frost_slow`、`cloud_shadow_stun`、`cloud_light_dark_state`、`cloud_insight`、`cloud_breach`、`cloud_guard`、`cloud_agility` |
 | 佐佐木小次郎 | `Sasaki` | 2 | `sasaki_heartless_sight`、`sasaki_tsubame_guard` |
-| 八云紫 | `YakumoYukari` | 1 | `yakumo_yukari_hidden_gap` |
+| 八云紫 | `YakumoYukari` | 2 | `yakumo_yukari_hidden_gap`、`yakumo_yukari_r_second_window` |
 | 坂井悠二 | `SakaiYuuji` | 8 | `sakai_q_control`、`sakai_silver_prison`、`sakai_grammatica_guard`、`sakai_divine_gate`、`sakai_misty_shock`、`sakai_snake_descent`、`sakai_snake_aura`、`sakai_ally_command` |
 | 铃仙 | `Reisen` | 10 | `reisen_q_stealth`、`reisen_q_slow`、`reisen_q_anti_stealth`、`reisen_w_decoy`、`reisen_w_madness`、`reisen_e_air_dodge`、`reisen_e_stun`、`reisen_r_roll`、`reisen_r_stun`、`reisen_d_wave` |
 | 黑崎一护 | `KurosakiIchigo` | 7 | `ichigo_bankai`、`ichigo_spirit_repulse`、`ichigo_flash_invulnerable`、`ichigo_flash_end_stun`、`ichigo_ground_channel`、`ichigo_damage_guard`、`ichigo_slow_field` |
@@ -34,7 +34,9 @@
 | 安斯艾尔 | `Ansel` | 2 | `ansel_holy_enchantment`、`ansel_peerless_warrior` |
 | 欧尔贝克 | `Olberic` | 4 | `olberic_accumulation`、`olberic_defense`、`olberic_cover`、`olberic_provoke` |
 
-总计：**62 张**。
+总计：**63 张**。
+
+八云紫新增 `yakumo_yukari_r_second_window.blp`：对应 R 列车进入间隙后、允许玩家在窗口内用 D 发动第二段列车的可见倒计时 Buff。图标只在实际二段等待上下文创建时登记，并在二段触发、窗口超时、替换窗口或英雄死亡清理时同步移除。
 
 克劳德图标为后续补充项：对应“超究武神霸斩伤害免疫”，已同时登记到英雄 Buff 表；这不表示 T 技能逻辑已经实现。
 

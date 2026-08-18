@@ -92,41 +92,39 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_2.debugLogForce
-local ____require_result_3 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_3.registerSpellEffectListener
-local ____require_result_4 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_4.registerDeathListener
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_5.addDelayedCallback
-local removeDelayedCallback = ____require_result_5.removeDelayedCallback
-local addPeriodicCallback = ____require_result_5.addPeriodicCallback
-removePeriodicCallback = ____require_result_5.removePeriodicCallback
-local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_6["造成技能伤害"]
-local ____require_result_7 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
-local doHeal = ____require_result_7.doHeal
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
-local _____65BD_52A0_51CF_901F = ____require_result_8["施加减速"]
-local _____65BD_52A0_7729_6655 = ____require_result_8["施加眩晕"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
-local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_9["临时调整攻击"]
-local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_9["调整玩家属性"]
-local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
-local _____5F00_59CB_51FB_9000 = ____require_result_10["开始击退"]
-local ____require_result_11 = require("系统.05．Buff系统.05．Buff清除函数")
-local _____79FB_9664_5355_4F4D_8D1F_9762Buff = ____require_result_11["移除单位负面Buff"]
-local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getUnitsInRange = ____require_result_12.getUnitsInRange
-local ____require_result_13 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_13["读取单位攻击力"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_13["单位存活"]
-local ____require_result_14 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
-local ResetUnitAnimation = ____require_result_14.ResetUnitAnimation
-local ____require_result_15 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_15["创建点特效"]
-local createTimedUnitEffect = ____require_result_15.createTimedUnitEffect
+local ____require_result_2 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local registerSpellEffectListener = ____require_result_2.registerSpellEffectListener
+local ____require_result_3 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_3.registerDeathListener
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_4.addDelayedCallback
+local removeDelayedCallback = ____require_result_4.removeDelayedCallback
+local addPeriodicCallback = ____require_result_4.addPeriodicCallback
+removePeriodicCallback = ____require_result_4.removePeriodicCallback
+local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_5["造成技能伤害"]
+local ____require_result_6 = require("系统.04．伤害系统.02．治疗系统.01．核心功能")
+local doHeal = ____require_result_6.doHeal
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
+local _____65BD_52A0_51CF_901F = ____require_result_7["施加减速"]
+local _____65BD_52A0_7729_6655 = ____require_result_7["施加眩晕"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
+local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_8["临时调整攻击"]
+local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_8["调整玩家属性"]
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.击退系统")
+local _____5F00_59CB_51FB_9000 = ____require_result_9["开始击退"]
+local ____require_result_10 = require("系统.05．Buff系统.05．Buff清除函数")
+local _____79FB_9664_5355_4F4D_8D1F_9762Buff = ____require_result_10["移除单位负面Buff"]
+local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_11.getUnitsInRange
+local ____require_result_12 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_12["读取单位攻击力"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_12["单位存活"]
+local ____require_result_13 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+local ResetUnitAnimation = ____require_result_13.ResetUnitAnimation
+local ____require_result_14 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_14["创建点特效"]
+local createTimedUnitEffect = ____require_result_14.createTimedUnitEffect
 local ____R_6280_80FDID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["R技能ID"])
 local ____R_4E8C_6BB5_6280_80FDID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["R二段技能ID"])
 local _____5929_5802_547C_5524_5F3A_5316BuffID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["天堂呼唤强化BuffID"])
@@ -177,13 +175,13 @@ local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
 end
 local function _____83B7_53D6R_6280_80FD_4E0A_4E0B_6587(unit)
     local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    local ____temp_16
+    local ____temp_15
     if unitId == 0 then
-        ____temp_16 = nil
+        ____temp_15 = nil
     else
-        ____temp_16 = ____R_6280_80FD_4E0A_4E0B_6587_8868[unitId]
+        ____temp_15 = ____R_6280_80FD_4E0A_4E0B_6587_8868[unitId]
     end
-    return ____temp_16
+    return ____temp_15
 end
 --- 每次施放都新建独立上下文（覆盖旧引用），旧回调通过“表引用一致”判定自身已过期。
 local function _____521B_5EFAR_6280_80FD_4E0A_4E0B_6587(unit, ____type)
@@ -290,14 +288,6 @@ local function _____5149_5F3A_5316_5230_671F(_____65BD_6CD5_8005, ctx)
     if ctx["已结束"] then
         return
     end
-    debugLogForce(
-        "阿伦劳特R",
-        "光强化到期",
-        "类型",
-        ctx["类型"],
-        "光加攻值",
-        ctx["光加攻值"]
-    )
     _____6E05_7406R_6280_80FD_4E0A_4E0B_6587(ctx, _____65BD_6CD5_8005, _____7ED3_675F_5149_5F62_6001_6548_679C)
 end
 local function _____5149_7948_7977_5B8C_6210(_____65BD_6CD5_8005, rctx)
@@ -312,14 +302,7 @@ local function _____5149_7948_7977_5B8C_6210(_____65BD_6CD5_8005, rctx)
         )
         return
     end
-    debugLogForce("阿伦劳特R", "光祈祷完成，开始添加强化buff")
     _____6DFB_52A0_539F_751FBuff_6301_7EED(_____65BD_6CD5_8005, _____5929_5802_547C_5524_5F3A_5316BuffID, cfg["光强化持续秒"])
-    debugLogForce(
-        "阿伦劳特R",
-        "添加原生Buff后检查",
-        "拥有天堂呼唤",
-        _____62E5_6709_5929_5802_547C_5524(_____65BD_6CD5_8005)
-    )
     local _____653B_51FB_529B = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005)
     local _____52A0_653B_503C = _____653B_51FB_529B * cfg["光强化攻击倍率"]
     if _____52A0_653B_503C > 0 then
@@ -372,14 +355,6 @@ local function _____5149_7948_7977_5B8C_6210(_____65BD_6CD5_8005, rctx)
             end
             local _____6709buff = _____62E5_6709_5929_5802_547C_5524(_____65BD_6CD5_8005)
             if not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) or not _____6709buff then
-                debugLogForce(
-                    "阿伦劳特R",
-                    "光强化周期检查失败",
-                    "存活",
-                    _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005),
-                    "拥有天堂呼唤",
-                    _____6709buff
-                )
                 _____5149_5F3A_5316_5230_671F(_____65BD_6CD5_8005, rctx)
             end
         end
@@ -389,10 +364,8 @@ local function _____5149_5F62_6001R(_____65BD_6CD5_8005)
     local cfg = _____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E.R
     local _____5F53_524Dctx = _____83B7_53D6R_6280_80FD_4E0A_4E0B_6587(_____65BD_6CD5_8005)
     if _____5F53_524Dctx ~= nil and not _____5F53_524Dctx["已结束"] and _____5F53_524Dctx["类型"] == "光强化" then
-        debugLogForce("阿伦劳特R", "光强化期间忽略SPELL_EFFECT重放", "类型", _____5F53_524Dctx["类型"])
         return
     end
-    debugLogForce("阿伦劳特R", "光形态R入口", "当前ctx类型", _____5F53_524Dctx and _____5F53_524Dctx["类型"] or "无")
     local _____65E7ctx = _____5F53_524Dctx
     if _____65E7ctx ~= nil and not _____65E7ctx["已结束"] then
         _____6E05_7406R_6280_80FD_4E0A_4E0B_6587(_____65E7ctx, _____65BD_6CD5_8005, _____7ED3_675F_5149_5F62_6001_6548_679C)
@@ -654,8 +627,8 @@ local function _____5F00_59CB_6697_6C72_53D6_5F39_9053(_____65BD_6CD5_8005, ____
         ["进度"] = 0,
         ["弧线侧偏"] = _____5F27_7EBF_4FA7_504F
     }
-    local ____6240_5C5ER_4E0A_4E0B_6587__6697_6C72_53D6_5F39_9053_5217_8868_19 = _____6240_5C5ER_4E0A_4E0B_6587["暗汲取弹道列表"]
-    ____6240_5C5ER_4E0A_4E0B_6587__6697_6C72_53D6_5F39_9053_5217_8868_19[#____6240_5C5ER_4E0A_4E0B_6587__6697_6C72_53D6_5F39_9053_5217_8868_19 + 1] = _____5F39_9053_4E0A_4E0B_6587
+    local ____6240_5C5ER_4E0A_4E0B_6587__6697_6C72_53D6_5F39_9053_5217_8868_16 = _____6240_5C5ER_4E0A_4E0B_6587["暗汲取弹道列表"]
+    ____6240_5C5ER_4E0A_4E0B_6587__6697_6C72_53D6_5F39_9053_5217_8868_16[#____6240_5C5ER_4E0A_4E0B_6587__6697_6C72_53D6_5F39_9053_5217_8868_16 + 1] = _____5F39_9053_4E0A_4E0B_6587
     _____5F39_9053_4E0A_4E0B_6587["回调ID"] = addPeriodicCallback(20, _____63A8_8FDB_6697_6C72_53D6_5F39_9053, _____5F39_9053_4E0A_4E0B_6587)
 end
 local function _____5EF6_8FDF_5F00_59CB_6697_6C72_53D6_5F39_9053(variable)
@@ -786,8 +759,8 @@ local function _____6697_5F62_6001R(_____65BD_6CD5_8005)
                     ["所属R上下文"] = rctx,
                     ["弧线侧偏"] = i % 2 == 0 and cfg["暗汲取弹道贝塞尔侧偏"] or -cfg["暗汲取弹道贝塞尔侧偏"]
                 })
-                local ____rctx__6697_6C72_53D6_5F39_9053_5EF6_8FDF_56DE_8C03ID_5217_8868_20 = rctx["暗汲取弹道延迟回调ID列表"]
-                ____rctx__6697_6C72_53D6_5F39_9053_5EF6_8FDF_56DE_8C03ID_5217_8868_20[#____rctx__6697_6C72_53D6_5F39_9053_5EF6_8FDF_56DE_8C03ID_5217_8868_20 + 1] = _____5F39_9053_5EF6_8FDF_56DE_8C03ID
+                local ____rctx__6697_6C72_53D6_5F39_9053_5EF6_8FDF_56DE_8C03ID_5217_8868_17 = rctx["暗汲取弹道延迟回调ID列表"]
+                ____rctx__6697_6C72_53D6_5F39_9053_5EF6_8FDF_56DE_8C03ID_5217_8868_17[#____rctx__6697_6C72_53D6_5F39_9053_5EF6_8FDF_56DE_8C03ID_5217_8868_17 + 1] = _____5F39_9053_5EF6_8FDF_56DE_8C03ID
             end
             ::__continue116::
             i = i + 1

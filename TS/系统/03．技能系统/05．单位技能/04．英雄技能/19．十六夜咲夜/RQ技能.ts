@@ -3,6 +3,7 @@
 import { 十六夜咲夜基础技能配置 as 配置 } from "./00．配置";
 import { 两点角度, 创建咲夜单位壳, 安全移除单位壳, 极坐标X, 极坐标Y, 单位存活, 播放咲夜单位音效, 注册咲夜周期任务, 移除咲夜周期任务 } from "./01．飞刀与时间工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 设置十六夜咲夜符卡书冷却 } from "./符卡公共";
 
 const jass = require("jass.common") as any;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -38,6 +39,7 @@ interface RQ上下文 {
   来源: string;
   攻击力快照: number;
   飞刀: any[];
+  收尾飞刀: any[];
   分身: any[];
   追踪周期ID: number;
   已释放飞刀: boolean;
@@ -53,8 +55,10 @@ function RQ清理(this: void, context: RQ上下文): void {
   context.已结束 = true;
   if (context.追踪周期ID !== 0) 移除咲夜周期任务(context.追踪周期ID);
   for (let i = 0; i < context.飞刀.length; i++) 安全移除单位壳(context.飞刀[i]);
+  for (let i = 0; i < context.收尾飞刀.length; i++) 安全移除单位壳(context.收尾飞刀[i]);
   for (let i = 0; i < context.分身.length; i++) 安全移除单位壳(context.分身[i]);
   context.飞刀 = [];
+  context.收尾飞刀 = [];
   context.分身 = [];
   if (context.目标 != null && context.目标 !== 0) {
     移除单位暂停(context.目标, context.来源);
@@ -73,13 +77,17 @@ function RQ清理(this: void, context: RQ上下文): void {
   结束独立技能伤害实例(context.技能实例ID);
 }
 
-function RQ创建飞刀排(this: void, context: RQ上下文, centerX: number, centerY: number, facing: number, count: number, typeId: number): void {
+function RQ创建飞刀排(this: void, context: RQ上下文, centerX: number, centerY: number, facing: number, count: number, typeId: number, fixedHeight?: number): void {
   for (let i = 0; i < count; i++) {
     const side = (i - (count - 1) * 0.5) * 15;
     const x = 极坐标X(极坐标X(centerX, 70, facing), side, facing + 90);
     const y = 极坐标Y(极坐标Y(centerY, 70, facing), side, facing + 90);
     const knife = 创建咲夜单位壳(context.施法者, typeId, x, y, facing);
-    if (knife != null && knife !== 0) context.飞刀.push(knife);
+    if (knife != null && knife !== 0) {
+      // 源 RQ 的四向飞刀高度跟随 e00G 分身，而不是跟随施法者。
+      if (fixedHeight != null) jass.SetUnitFlyHeight(knife, fixedHeight, 0);
+      context.飞刀.push(knife);
+    }
   }
 }
 
@@ -106,19 +114,25 @@ function RQ创建四向分身(this: void, variable?: any): void {
   const params = variable as RQ分身参数 | undefined;
   if (params == null || params.上下文.已结束 || !单位存活(params.上下文.目标)) return;
   const context = params.上下文;
-  const angle = 45 + params.序号 * 90;
+  const angles = [315, 45, 135, 235];
+  const facings = [135, 225, 315, 45];
+  const angle = angles[params.序号] ?? 315;
   const targetX = jass.GetUnitX(context.目标) as number;
   const targetY = jass.GetUnitY(context.目标) as number;
   const x = 极坐标X(targetX, 配置.RQ.分身距离, angle);
   const y = 极坐标Y(targetY, 配置.RQ.分身距离, angle);
-  const facing = 两点角度(x, y, targetX, targetY);
+  const facing = facings[params.序号] ?? 135;
   const clone = 创建咲夜单位壳(context.施法者, 配置.单位壳.侧向分身, x, y, facing);
+  let cloneHeight = jass.GetUnitFlyHeight(context.目标) as number;
   if (clone != null && clone !== 0) {
+    // e00G 的源创建公式：默认高度 575 + 目标当前飞行高度。
+    jass.SetUnitFlyHeight(clone, jass.GetUnitDefaultFlyHeight(clone) + jass.GetUnitFlyHeight(context.目标), 0);
+    cloneHeight = jass.GetUnitFlyHeight(clone) as number;
     jass.SetUnitTimeScale(clone, 2);
     jass.SetUnitAnimation(clone, "attack");
     context.分身.push(clone);
   }
-  RQ创建飞刀排(context, x, y, facing, 配置.RQ.每分身飞刀数, 配置.单位壳.飞行蓝刀);
+  RQ创建飞刀排(context, x, y, facing, 配置.RQ.每分身飞刀数, 配置.单位壳.飞行蓝刀, cloneHeight);
 }
 
 function RQ创建上空分身(this: void, variable?: any): void {
@@ -126,9 +140,10 @@ function RQ创建上空分身(this: void, variable?: any): void {
   if (context == null || context.已结束 || !单位存活(context.目标)) return;
   const targetX = jass.GetUnitX(context.目标) as number;
   const targetY = jass.GetUnitY(context.目标) as number;
-  const highClone = 创建咲夜单位壳(context.施法者, 配置.单位壳.高空分身, targetX, targetY, jass.GetRandomReal(0, 360));
+  const highClone = 创建咲夜单位壳(context.施法者, 配置.单位壳.仰视分身, targetX, targetY, jass.GetRandomReal(0, 360));
   if (highClone != null && highClone !== 0) {
-    jass.SetUnitFlyHeight(highClone, jass.GetUnitFlyHeight(context.目标) + 500, 0);
+    // 源 RQ 使用 e00F：默认高度 700 + 目标当前飞行高度。
+    jass.SetUnitFlyHeight(highClone, jass.GetUnitDefaultFlyHeight(highClone) + jass.GetUnitFlyHeight(context.目标), 0);
     jass.SetUnitTimeScale(highClone, 0.5);
     jass.SetUnitAnimation(highClone, "morph");
     context.分身.push(highClone);
@@ -137,8 +152,10 @@ function RQ创建上空分身(this: void, variable?: any): void {
     const angle = i * 36;
     const knife = 创建咲夜单位壳(context.施法者, 配置.单位壳.环绕蓝刀, 极坐标X(targetX, 250, angle), 极坐标Y(targetY, 250, angle), angle + 180);
     if (knife != null && knife !== 0) {
-      jass.SetUnitFlyHeight(knife, jass.GetUnitFlyHeight(context.目标) + 500, 0);
-      context.飞刀.push(knife);
+      // 源 RQ 的环绕刀是 e00M：默认高度 200 + 目标当前飞行高度。
+      jass.SetUnitFlyHeight(knife, jass.GetUnitDefaultFlyHeight(knife) + jass.GetUnitFlyHeight(context.目标), 0);
+      // 这批刀在最终收尾时才开始飞向目标，不能提前交给普通追踪周期。
+      context.收尾飞刀.push(knife);
     }
   }
 }
@@ -194,6 +211,8 @@ function RQ推进飞刀(this: void, variable?: any): void {
 function RQ释放飞刀(this: void, variable?: any): void {
   const context = variable as RQ上下文 | undefined;
   if (context == null || context.已结束) return;
+  for (let i = 0; i < context.收尾飞刀.length; i++) context.飞刀.push(context.收尾飞刀[i]);
+  context.收尾飞刀 = [];
   context.已释放飞刀 = true;
   for (let i = 0; i < context.分身.length; i++) 安全移除单位壳(context.分身[i]);
   context.分身 = [];
@@ -225,6 +244,7 @@ function RQ最终结算(this: void, variable?: any): void {
 }
 
 function 释放十六夜咲夜RQ(this: void, _listener: RQ监听上下文, caster: any, 技能实例ID?: number): void {
+  设置十六夜咲夜符卡书冷却(caster, 配置.符卡间隔秒.RQ);
   const target = jass.GetSpellTargetUnit();
   if (!单位存活(target)) {
     结束独立技能伤害实例(技能实例ID);
@@ -238,6 +258,7 @@ function 释放十六夜咲夜RQ(this: void, _listener: RQ监听上下文, caste
     来源: `十六夜咲夜-RQ:${RQ序号}`,
     攻击力快照: 读取单位攻击力(caster),
     飞刀: [],
+    收尾飞刀: [],
     分身: [],
     追踪周期ID: 0,
     已释放飞刀: false,

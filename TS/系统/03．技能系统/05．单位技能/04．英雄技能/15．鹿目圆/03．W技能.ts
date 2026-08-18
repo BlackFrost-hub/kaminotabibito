@@ -14,6 +14,12 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 import { 开始充能, 停止充能 } from "../../../00．技能模板+函数/01．技能函数/06．施法·蓄力·充能/充能系统";
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
+const { StopSoundBJ, PlaySoundAtPointBJ, PlaySoundOnUnitBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  StopSoundBJ: (this: void, soundHandle: any, fadeOut: boolean) => void;
+  PlaySoundAtPointBJ: (this: void, soundHandle: any, volumePercent: number, x: number, y: number, z: number) => void;
+  PlaySoundOnUnitBJ: (this: void, soundHandle: any, volumePercent: number, unit: any) => void;
+};
 
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -75,6 +81,28 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const 配置 = 鹿目圆单位技能配置;
 
+function 获取W全局音效(this: void, soundKey: string): any {
+  if (soundKey === "") return;
+  const sound = jglobals[soundKey];
+  if (sound == null || sound === 0) return;
+  return sound;
+}
+
+/** 源 A01S：StopSoundBJ 后在施法者位置播放发射音效。 */
+function 播放W发射音效(this: void, soundKey: string, x: number, y: number): void {
+  const sound = 获取W全局音效(soundKey);
+  if (sound == null) return;
+  StopSoundBJ(sound, false);
+  PlaySoundAtPointBJ(sound, 100, x, y, 0);
+}
+
+/** 源 Func019A：每个敌人命中时用 PlaySoundOnUnitBJ 播放命中音效。 */
+function 播放W命中音效(this: void, soundKey: string, target: any): void {
+  const sound = 获取W全局音效(soundKey);
+  if (sound == null) return;
+  PlaySoundOnUnitBJ(sound, 100, target);
+}
+
 type W阶段 = "蓄力" | "待发" | "发射中" | "结束";
 
 interface W蓄力上下文 {
@@ -86,6 +114,11 @@ interface W蓄力上下文 {
   已蓄力秒: number;
   立即满蓄: boolean;
   待发版本: number;
+  /** 待发期系数（源 WSHSJ：2.0 起每 0.05s +0.1，上限 5.0） */
+  系数: number;
+  成长周期ID: number;
+  成长Tick: number;
+  表现已移除: boolean;
 }
 
 interface W弹道上下文 {
@@ -129,6 +162,9 @@ function 清理W蓄力上下文(this: void, context: W蓄力上下文): void {
   const chargeId = context.充能ID;
   context.充能ID = 0;
   if (chargeId !== 0) 停止充能(chargeId);
+  const growId = context.成长周期ID;
+  context.成长周期ID = 0;
+  if (growId !== 0) removePeriodicCallback(growId);
   移除单位壳(context.蓄力箭);
   context.蓄力箭 = null;
   移除单位指定Buff(context.施法者, 鹿目圆BuffID.因果之矢蓄力);
@@ -149,12 +185,49 @@ function W待发到期(this: void, variable?: any): void {
   清理W蓄力上下文(context);
 }
 
+/** 源 Func007T 循环实数2>=30 分支：移除进度条/蓄力箭、恢复移速；系数已在成长终点锁定为最高 */
+function W待发表现移除(this: void, variable?: any): void {
+  const data = variable as { context: W蓄力上下文; version: number } | undefined;
+  if (data == null) return;
+  const context = data.context;
+  if (context.阶段 !== "待发" || context.待发版本 !== data.version || context.表现已移除) return;
+  context.表现已移除 = true;
+  const growId = context.成长周期ID;
+  context.成长周期ID = 0;
+  if (growId !== 0) removePeriodicCallback(growId);
+  context.系数 = 配置.W.系数最高;
+  移除单位壳(context.蓄力箭);
+  context.蓄力箭 = null;
+  if (context.施法者 != null && context.施法者 !== 0) {
+    SetUnitMoveSpeed(context.施法者, context.原移动速度);
+  }
+}
+
+/** 源 Func007T 待发循环：每 0.05s WSHSJ = 2.0 + 0.1×n，上限 5.0 */
+function W待发成长Tick(this: void, variable?: any): void {
+  const context = variable as W蓄力上下文 | undefined;
+  if (context == null || context.阶段 !== "待发" || context.表现已移除) return;
+  context.成长Tick += 1;
+  const next = 配置.W.系数最低 + 配置.W.系数成长每秒 * (context.成长Tick * 0.05);
+  context.系数 = next >= 配置.W.系数最高 ? 配置.W.系数最高 : next;
+  if (context.系数 >= 配置.W.系数最高 && context.成长周期ID !== 0) {
+    removePeriodicCallback(context.成长周期ID);
+    context.成长周期ID = 0;
+  }
+  // 源 Func007T：蓄力箭每 tick 跟随小圆；施法进度条由充能封装驱动。
+  刷新W蓄力表现(context);
+}
+
 function 刷新W蓄力表现(this: void, context: W蓄力上下文): void {
-  if (!单位存活(context.施法者) || !单位存活(context.蓄力箭)) return;
-  const full = 配置.W.满蓄力秒;
+  if (!单位存活(context.施法者)) return;
+  if (!单位存活(context.蓄力箭)) return;
+  const full = 配置.W.蓄力秒;
   const progress = context.已蓄力秒 >= full ? 1 : context.已蓄力秒 / full;
-  const scale = 配置.W.蓄力箭基础缩放
-    + (配置.W.蓄力箭满蓄力缩放 - 配置.W.蓄力箭基础缩放) * progress;
+  // 源 Func002T：蓄力期缩放 1.00+0.04×循环实数（满蓄 2.0）；待发期固定 2.75
+  const scale = context.阶段 === "待发"
+    ? 配置.W.蓄力箭待发缩放
+    : 配置.W.蓄力箭基础缩放
+      + (配置.W.蓄力箭满蓄力缩放 - 配置.W.蓄力箭基础缩放) * progress;
   SetUnitX(context.蓄力箭, GetUnitX(context.施法者));
   SetUnitY(context.蓄力箭, GetUnitY(context.施法者));
   SetUnitFacing(context.蓄力箭, GetUnitFacing(context.施法者));
@@ -165,8 +238,7 @@ function 刷新W蓄力表现(this: void, context: W蓄力上下文): void {
 function W充能周期(this: void, unit: any, chargeId: number, elapsed: number): void {
   const context = W蓄力上下文表[取单位ID(unit)];
   if (context == null || context.充能ID !== chargeId || context.阶段 !== "蓄力") return;
-  context.已蓄力秒 = context.立即满蓄 ? 配置.W.满蓄力秒 : elapsed;
-  if (context.已蓄力秒 >= 配置.W.最低蓄力秒) 切换W技能(unit, true);
+  context.已蓄力秒 = context.立即满蓄 ? 配置.W.蓄力秒 : elapsed;
   刷新W蓄力表现(context);
 }
 
@@ -174,18 +246,24 @@ function W充能完成(this: void, unit: any, chargeId: number): void {
   const context = W蓄力上下文表[取单位ID(unit)];
   if (context == null || context.充能ID !== chargeId || context.阶段 !== "蓄力") return;
   context.充能ID = 0;
-  context.已蓄力秒 = 配置.W.满蓄力秒;
+  context.已蓄力秒 = 配置.W.蓄力秒;
   context.阶段 = "待发";
+  context.系数 = 配置.W.系数最低;
   context.待发版本 = ++W待发版本;
   刷新W蓄力表现(context);
   移除单位指定Buff(unit, 鹿目圆BuffID.因果之矢蓄力);
-  registerManualBuff(unit, 鹿目圆BuffID.因果之矢待发, 配置.W.满蓄力后保留秒, 1, {
+  // A01S 可用窗口 4.5s（源 4.50s 切回计时）
+  registerManualBuff(unit, 鹿目圆BuffID.因果之矢待发, 配置.W.待发窗口秒, 1, {
     sourceUnit: unit,
     effectSourceName: "因果之矢",
     effectSourceType: "技能",
   });
   切换W技能(unit, true);
-  addDelayedCallback(配置.W.满蓄力后保留秒 * 1000, W待发到期, { context, version: context.待发版本 });
+  // 系数成长循环（源 0.05s×30：2.0→5.0）
+  context.成长周期ID = addPeriodicCallback(50, W待发成长Tick, context);
+  // 1.5s 后移除蓄力箭并恢复移速（源循环实数2>=30 分支）
+  addDelayedCallback(配置.W.待发表现移除秒 * 1000, W待发表现移除, { context, version: context.待发版本 });
+  addDelayedCallback(配置.W.待发窗口秒 * 1000, W待发到期, { context, version: context.待发版本 });
 }
 
 function W充能结束(this: void, unit: any, reason: string, chargeId: number): void {
@@ -213,7 +291,9 @@ function 释放W蓄力(this: void, _entry: { 英雄: any }, caster: any): void {
     GetUnitY(caster),
     GetUnitFacing(caster),
   );
-  if (arrow == null || arrow === 0) return;
+  if (arrow == null || arrow === 0) {
+    return;
+  }
 
   const immediate = 消耗鹿目圆W立即满蓄标记(caster);
   const context: W蓄力上下文 = {
@@ -222,15 +302,19 @@ function 释放W蓄力(this: void, _entry: { 英雄: any }, caster: any): void {
     充能ID: 0,
     原移动速度: GetUnitMoveSpeed(caster),
     蓄力箭: arrow,
-    已蓄力秒: immediate ? 配置.W.满蓄力秒 : 0,
+    已蓄力秒: immediate ? 配置.W.蓄力秒 : 0,
     立即满蓄: immediate,
     待发版本: 0,
+    系数: 配置.W.系数最低,
+    成长周期ID: 0,
+    成长Tick: 0,
+    表现已移除: false,
   };
   W蓄力上下文表[id] = context;
   SetUnitMoveSpeed(caster, 配置.W.蓄力移动速度);
   切换W技能(caster, immediate);
   刷新W蓄力表现(context);
-  registerManualBuff(caster, 鹿目圆BuffID.因果之矢蓄力, immediate ? 0.1 : 配置.W.满蓄力秒, 1, {
+  registerManualBuff(caster, 鹿目圆BuffID.因果之矢蓄力, immediate ? 0.1 : 配置.W.蓄力秒, 1, {
     sourceUnit: caster,
     effectSourceName: "因果之矢",
     effectSourceType: "技能",
@@ -240,10 +324,9 @@ function 释放W蓄力(this: void, _entry: { 英雄: any }, caster: any): void {
   }
 
   context.充能ID = 开始充能(caster, {
-    持续时间: immediate ? 0.02 : 配置.W.满蓄力秒,
+    持续时间: immediate ? 0.02 : 配置.W.蓄力秒,
     强制硬直: false,
     指令中断: false,
-    显示进度条特效: true,
     周期回调间隔: 配置.W.周期间隔毫秒 / 1000,
     周期回调: W充能周期,
     充能完成回调: W充能完成,
@@ -256,6 +339,15 @@ function 是W合法碰撞单位(this: void, unit: any): boolean {
   return 单位存活(unit)
     && IsUnitType(unit, UNIT_TYPE_MECHANICAL) !== true
     && IsUnitType(unit, UNIT_TYPE_ANCIENT) !== true;
+}
+
+/** 序列化已命中表（unitId 逗号分隔），游戏 Lua 环境无全局 JSON */
+function 序列化W命中记录(this: void, record: Record<number, true | undefined>): string {
+  const parts: string[] = [];
+  for (const key in record) {
+    if (record[key] === true) parts.push(key);
+  }
+  return parts.join(",");
 }
 
 function 结束W弹道(this: void, context: W弹道上下文): void {
@@ -291,6 +383,8 @@ function 推进W弹道(this: void, variable?: any): void {
     if (context.已命中[targetId] === true) continue;
     if (IsUnitEnemy(target, owner) === true) {
       context.已命中[targetId] = true;
+      // 源 Func011A：每个敌人命中时 PlaySoundOnUnitBJ(gg_snd_TheBlackArrow)
+      播放W命中音效(配置.W.命中音效键, target);
       造成单体技能伤害({
         来源: context.施法者,
         目标: target,
@@ -322,7 +416,8 @@ function 获取W发射入口(this: void, hero: any): { 英雄: any } | undefined
 
 function 释放W发射(this: void, _entry: { 英雄: any }, caster: any, 技能实例ID?: number): void {
   const context = W蓄力上下文表[取单位ID(caster)];
-  if (context == null || 技能实例ID == null || context.阶段 === "结束" || context.已蓄力秒 < 配置.W.最低蓄力秒) {
+  // 源：A01S 仅在蓄满后的待发窗口内可用；窗口外/已结束直接失败
+  if (context == null || 技能实例ID == null || context.阶段 !== "待发") {
     结束独立技能伤害实例(技能实例ID);
     return;
   }
@@ -332,24 +427,25 @@ function 释放W发射(this: void, _entry: { 英雄: any }, caster: any, 技能�
   const startX = GetUnitX(caster);
   const startY = GetUnitY(caster);
   const direction = 两点角度(startX, startY, targetX, targetY);
-  const chargeRate = context.已蓄力秒 >= 配置.W.满蓄力秒
-    ? 1
-    : (context.已蓄力秒 - 配置.W.最低蓄力秒) / (配置.W.满蓄力秒 - 配置.W.最低蓄力秒);
-  const normalizedCharge = chargeRate > 0 ? chargeRate : 0;
+  // 源：系数 = WSHSJ（蓄满后待发窗口内 2.0→5.0），发射瞬间读取
+  const 系数 = context.系数;
+  // 源 A01S：圆环之力hit==2 → ×1.20 并清零；==1 → ×1.10 并清零
   const dLayers = 消耗鹿目圆圆环强化(caster);
   const dMultiplier = 1 + dLayers * 配置.W.D伤害额外比例;
   const attack = 读取单位攻击力(caster);
-  const damageRatio = 配置.W.最低伤害攻击力比例
-    + (配置.W.满伤害攻击力比例 - 配置.W.最低伤害攻击力比例) * normalizedCharge;
-  const healRatio = 配置.W.最低治疗攻击力比例
-    + (配置.W.满治疗攻击力比例 - 配置.W.最低治疗攻击力比例) * normalizedCharge;
-  const projectileTicks = 配置.W.最低弹道Tick
-    + jass.R2I(配置.W.满蓄力额外弹道Tick * normalizedCharge + 0.5);
+  const 伤害 = attack * 系数 * dMultiplier;
+  // 源 Func013A：治疗 = 数据×0.60（数据含 D 倍率）
+  const 治疗 = 伤害 * 配置.W.治疗占伤害比例;
+  // 源 Func019T：弹道最长 20+系数×6 tick
+  const projectileTicks = 配置.W.弹道基础Tick + jass.R2I(配置.W.每系数弹道Tick * 系数 + 0.5);
 
   context.阶段 = "发射中";
   const chargeId = context.充能ID;
   context.充能ID = 0;
   if (chargeId !== 0) 停止充能(chargeId);
+  const growId = context.成长周期ID;
+  context.成长周期ID = 0;
+  if (growId !== 0) removePeriodicCallback(growId);
   移除单位壳(context.蓄力箭);
   context.蓄力箭 = null;
   移除单位指定Buff(caster, 鹿目圆BuffID.因果之矢蓄力);
@@ -359,14 +455,16 @@ function 释放W发射(this: void, _entry: { 英雄: any }, caster: any, 技能�
   delete W蓄力上下文表[取单位ID(caster)];
   context.阶段 = "结束";
 
+  // 源 A01S：发射音效 gg_snd_FrostArrowLaunch1
+  播放W发射音效(配置.W.发射音效键, startX, startY);
   const arrow = 创建单位并登记排泄安全(GetOwningPlayer(caster), 配置.单位壳.W发射箭, startX, startY, direction);
   if (arrow == null || arrow === 0) {
     结束独立技能伤害实例(技能实例ID);
     return;
   }
-  const scale = 配置.W.发射箭基础缩放 + 配置.W.发射箭满蓄力额外缩放 * normalizedCharge;
+  // 源：尺寸 = 1.00 + 系数×0.25；射击箭 e01I 默认 moveHeight 125，源未改射击箭高度
+  const scale = 配置.W.发射箭基础缩放 + 配置.W.发射箭每系数缩放 * 系数;
   SetUnitFacing(arrow, direction);
-  SetUnitFlyHeight(arrow, 配置.W.发射箭高度, 0);
   SetUnitScale(arrow, scale, scale, scale);
 
   const projectile: W弹道上下文 = {
@@ -375,8 +473,8 @@ function 释放W发射(this: void, _entry: { 英雄: any }, caster: any, 技能�
     箭单位: arrow,
     方向: direction,
     剩余Tick: projectileTicks,
-    伤害: attack * damageRatio * dMultiplier,
-    治疗: attack * healRatio,
+    伤害,
+    治疗,
     忽略魔抗: 鹿目圆伤害无视魔抗(caster),
     已命中: {},
     周期ID: 0,

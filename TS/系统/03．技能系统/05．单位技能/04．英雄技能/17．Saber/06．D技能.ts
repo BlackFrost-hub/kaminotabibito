@@ -13,6 +13,7 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 import { 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
+const jglobals = require("jass.globals") as any;
 const japi = require("jass.japi") as any;
 
 const { addPeriodicCallback, addDelayedCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -35,8 +36,9 @@ const { createUnitEffect, destroyUnitEffect, 创建点特效 } = require("lib.�
   destroyUnitEffect: (this: void, unit: any, effectKey?: string) => void;
   创建点特效: (this: void, params: any) => any;
 };
-const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
-  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+// 源 PlaySoundBJ(gg_snd_Saber_Alter_D_Avalon)：全局播放（不挂单位），照源用 jglobals 全局音效句柄 + BJ 封装
+const { PlaySoundBJ } = require("lib.扩展函数.BJ函数.14．音效函数") as {
+  PlaySoundBJ: (this: void, soundHandle: any) => void;
 };
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
@@ -201,7 +203,8 @@ function 释放D技能(this: void, _context: D上下文, caster: any, _技能实
     结束阿瓦隆(caster);
   }
 
-  Sound3DII_UnitPlayReuse(配置.D.音效.路径, caster, 配置.D.音效.裁断距离);
+  const d音效句柄 = (jglobals as any)[配置.D.音效.全局音效键];
+    if (d音效句柄 != null) PlaySoundBJ(d音效句柄);
   createUnitEffect(caster, 配置.D.头顶特效.挂点, 配置.D.头顶特效.模型路径, undefined, D头顶特效键);
   createUnitEffect(caster, 配置.D.原点特效.挂点, 配置.D.原点特效.模型路径, undefined, D原点特效键);
 

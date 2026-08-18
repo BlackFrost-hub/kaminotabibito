@@ -14,9 +14,12 @@ import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/0
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const jglobals = require("jass.globals") as any;
 
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
 };
 const { 注册普攻攻击效果监听 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.21．攻击效果.02．攻击效果监听") as {
   注册普攻攻击效果监听: (this: void, params: any) => void;
@@ -46,11 +49,14 @@ const { 读取单位攻击力 } = require("系统.03．技能系统.00．技能�
   读取单位攻击力: (this: void, unit: any) => number;
 };
 const {
-  创建单位坐标跟随特效,
-  销毁单位坐标跟随特效,
+  创建点特效,
+  销毁点特效,
 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  创建单位坐标跟随特效: (this: void, unit: any, model: string, key?: string, scale?: number, height?: number) => any;
-  销毁单位坐标跟随特效: (this: void, unit: any, key?: string) => void;
+  创建点特效: (this: void, params: any) => any;
+  销毁点特效: (this: void, effect: any) => void;
+};
+const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
 };
 
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
@@ -73,8 +79,81 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 
 const 配置 = 鹿目圆单位技能配置;
-const D特效键 = "鹿目圆-圆环之力";
+
+/** 播放地图预载全局音效（源 PlaySoundAtPointBJ/OnUnitBJ gg_snd_*） */
+function 播放D全局音效(this: void, soundKey: string): void {
+  if (soundKey === "") return;
+  const sound = jglobals[soundKey];
+  if (sound == null || sound === 0) return;
+  jass.StartSound(sound);
+}
+
+interface D表现状态 {
+  英雄: any;
+  特效: any;
+  周期ID: number;
+}
+
+const D表现表: Record<number, D表现状态 | undefined> = {};
 const D特效版本表: Record<number, number | undefined> = {};
+
+/** 源 Func011T：特效每 tick 移到 英雄+40 码（facing+90）位置，Z=240 */
+function D环绕Tick(this: void, variable?: any): void {
+  const state = variable as D表现状态 | undefined;
+  if (state == null) return;
+  const hero = state.英雄;
+  if (!单位存活(hero) || 获取鹿目圆圆环强化层数(hero) <= 0) {
+    销毁D表现(hero);
+    return;
+  }
+  if (state.特效 == null || state.特效 === 0) return;
+  const 弧度 = (jass.GetUnitFacing(hero) + 90) * Math.PI / 180;
+  const x = GetUnitX(hero) + Math.cos(弧度) * 配置.D.环绕距离;
+  const y = GetUnitY(hero) + Math.sin(弧度) * 配置.D.环绕距离;
+  japi.DzSetEffectPos(state.特效, x, y, 配置.D.环绕高度);
+}
+
+function 销毁D表现(this: void, hero: any): void {
+  if (hero == null || hero === 0) return;
+  const id = 取单位ID(hero);
+  const state = D表现表[id];
+  if (state != null) {
+    if (state.周期ID !== 0) removePeriodicCallback(state.周期ID);
+    if (state.特效 != null && state.特效 !== 0) 销毁点特效(state.特效);
+    delete D表现表[id];
+  }
+  delete D特效版本表[id];
+}
+
+function 播放D表现(this: void, hero: any): void {
+  const id = 取单位ID(hero);
+  if (id === 0) return;
+  销毁D表现(hero);
+  const version = (D特效版本表[id] ?? 0) + 1;
+  D特效版本表[id] = version;
+  const goddess = 是鹿目圆圆神(hero);
+  const effect = 创建点特效({
+    模型路径: goddess ? 配置.D.圆神特效 : 配置.D.普通特效,
+    X: GetUnitX(hero),
+    Y: GetUnitY(hero),
+    Z: 配置.D.特效高度,
+    面向角度: 270,
+    缩放: goddess ? 配置.D.圆神特效缩放 : 配置.D.普通特效缩放,
+    持续秒: 配置.D.持续秒,
+  });
+  const state: D表现状态 = { 英雄: hero, 特效: effect, 周期ID: 0 };
+  D表现表[id] = state;
+  state.周期ID = addPeriodicCallback(配置.D.环绕周期毫秒, D环绕Tick, state);
+  addDelayedCallback(配置.D.持续秒 * 1000, 清理D表现, { hero, version });
+}
+
+function 清理D表现(this: void, variable?: any): void {
+  const data = variable as { hero: any; version: number } | undefined;
+  if (data == null) return;
+  const id = 取单位ID(data.hero);
+  if (id === 0 || D特效版本表[id] !== data.version) return;
+  销毁D表现(data.hero);
+}
 
 function 取单位ID(this: void, unit: any): number {
   return unit == null || unit === 0 ? 0 : GetHandleId(unit);
@@ -90,49 +169,32 @@ function 是D合法目标(this: void, target: any): boolean {
     && IsUnitType(target, UNIT_TYPE_ANCIENT) !== true;
 }
 
-function 清理D表现(this: void, variable?: any): void {
-  const data = variable as { hero: any; version: number } | undefined;
-  if (data == null) return;
-  const id = 取单位ID(data.hero);
-  if (id === 0 || D特效版本表[id] !== data.version) return;
-  delete D特效版本表[id];
-  销毁单位坐标跟随特效(data.hero, D特效键);
-}
-
-function 播放D表现(this: void, hero: any): void {
-  const id = 取单位ID(hero);
-  if (id === 0) return;
-  const version = (D特效版本表[id] ?? 0) + 1;
-  D特效版本表[id] = version;
-  销毁单位坐标跟随特效(hero, D特效键);
-  const goddess = 是鹿目圆圆神(hero);
-  创建单位坐标跟随特效(
-    hero,
-    goddess ? 配置.D.圆神特效 : 配置.D.普通特效,
-    D特效键,
-    goddess ? 配置.D.圆神特效缩放 : 配置.D.普通特效缩放,
-    配置.D.特效高度,
-  );
-  addDelayedCallback(配置.D.持续秒 * 1000, 清理D表现, { hero, version });
-}
-
 function 获取D入口(this: void, hero: any): { 英雄: any } | undefined {
   return 是鹿目圆(hero) ? { 英雄: hero } : undefined;
 }
 
 function 释放D(this: void, _entry: { 英雄: any }, caster: any): void {
   const layers = 激活鹿目圆圆环强化(caster);
-  if (layers <= 0) return;
+  if (layers <= 0) {
+    return;
+  }
+  // 源 A01X：PlaySoundAtPointBJ(gg_snd_AbsorbMana)
+  播放D全局音效(配置.D.施放音效键);
+  // 源 A01X 二次分支：第二次使用额外消耗最大魔法 8%（走项目统一魔法增减 API）
+  if (layers >= 2) {
+    const maxMana = GetUnitStateJapi(caster, UNIT_STATE_MAX_MANA);
+    if (maxMana > 0) 魔法增减(caster, -maxMana * 配置.D.二次使用魔法消耗比例);
+  }
   播放D表现(caster);
 }
 
 function D敌方结算(this: void, source: any, target: any, layers: number): void {
   const second = layers >= 2;
-  const maxMana = GetUnitStateJapi(target, UNIT_STATE_MAX_MANA);
-  const manaRatio = second ? 配置.D.二次敌人最大魔法削减比例 : 配置.D.一次敌人最大魔法削减比例;
-  if (maxMana > 0) 魔法增减(target, -maxMana * manaRatio);
-
+  // 源被动效果2.j：dtpink 命中特效；敌方魔法直接设为 max×0.80/0.70（走统一魔法增减 API）
+  createTimedEffect(配置.D.敌方命中特效, GetUnitX(target), GetUnitY(target), 0, 1.5);
+  createTimedEffect(second ? 配置.D.二次敌方特效 : 配置.D.一次敌方特效, GetUnitX(target), GetUnitY(target), 0, 2);
   if (second) {
+    createTimedEffect(配置.D.二次敌方追加特效, GetUnitX(target), GetUnitY(target), 0, 2);
     施加快速控制Buff(source, target, 2, 配置.D.二次沉默秒, "鹿目圆-圆环之力", "技能");
     const targetAttack = 读取单位攻击力(target);
     if (targetAttack > 0) {
@@ -141,6 +203,14 @@ function D敌方结算(this: void, source: any, target: any, layers: number): vo
         数值: -targetAttack * 配置.D.二次减攻击比例,
       }]);
     }
+  }
+  const maxMana = GetUnitStateJapi(target, UNIT_STATE_MAX_MANA);
+  if (maxMana > 0) {
+    const 保留比例 = second ? 配置.D.敌方魔法保留比例二次 : 配置.D.敌方魔法保留比例一次;
+    const 目标魔法 = maxMana * 保留比例;
+    const 当前魔法 = GetUnitStateJapi(target, jass.UNIT_STATE_MANA);
+    const delta = 目标魔法 - 当前魔法;
+    if (delta !== 0) 魔法增减(target, delta);
   }
 
   const sourceAttack = 读取单位攻击力(source);
@@ -163,14 +233,17 @@ function D敌方结算(this: void, source: any, target: any, layers: number): vo
 }
 
 function D友方低生命击退(this: void, source: any, ally: any): void {
-  const enemies = getEnemyUnitsInRange(source, GetUnitX(ally), GetUnitY(ally), 配置.D.低生命友军击退范围);
+  // 源被动效果2.j：dtpink + gg_snd_LightningBolt，击退友军周围 500 码内敌人 500 码
+  createTimedEffect(配置.D.击退特效, GetUnitX(ally), GetUnitY(ally), 0, 1);
+  播放D全局音效(配置.D.击退音效键);
+  const enemies = getEnemyUnitsInRange(source, GetUnitX(ally), GetUnitY(ally), 配置.D.击退范围);
   for (let i = 0; i < enemies.length; i++) {
     const enemy = enemies[i];
     if (!是D合法目标(enemy)) continue;
     开始击退(enemy, {
       来源单位: ally,
-      距离: 配置.D.低生命友军击退距离,
-      持续时间: 0.5,
+      距离: 配置.D.击退距离,
+      持续时间: 0.3,
       检查地形: true,
       暂停单位: true,
       禁用碰撞: true,
@@ -183,12 +256,14 @@ function D友方结算(this: void, source: any, target: any, layers: number): vo
   const second = layers >= 2;
   const maxLife = GetUnitStateJapi(target, UNIT_STATE_MAX_LIFE);
   const life = GetUnitState(target, UNIT_STATE_LIFE);
-  const lowLife = maxLife > 0 && life / maxLife < 配置.D.低生命判定比例;
+  // 源被动效果2.j：二次强化命中友军且 生命 >= max×0.50 → 驱散 + 击退其周围敌人
+  const 高生命 = maxLife > 0 && life >= maxLife * 配置.D.击退生命阈值比例;
   const healRatio = second ? 配置.D.二次友军治疗攻击力比例 : 配置.D.一次友军治疗攻击力比例;
-  鹿目圆治疗友军(source, target, 读取单位攻击力(source) * healRatio, 0);
+  const healAmount = 读取单位攻击力(source) * healRatio;
+  鹿目圆治疗友军(source, target, healAmount, 0);
   if (second) {
     移除单位负面Buff(target, false);
-    if (lowLife) D友方低生命击退(source, target);
+    if (高生命) D友方低生命击退(source, target);
   }
 }
 
@@ -204,9 +279,10 @@ function D普攻命中(this: void, ctx: any): void {
   const source = ctx.source;
   const target = ctx.target;
   const layers = 消耗鹿目圆圆环强化(source);
-  if (layers <= 0) return;
-  销毁单位坐标跟随特效(source, D特效键);
-  delete D特效版本表[取单位ID(source)];
+  if (layers <= 0) {
+    return;
+  }
+  销毁D表现(source);
   const owner = GetOwningPlayer(source);
   if (IsUnitEnemy(target, owner) === true) D敌方结算(source, target, layers);
   else if (IsUnitAlly(target, owner) === true) D友方结算(source, target, layers);

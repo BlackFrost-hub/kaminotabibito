@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____R_521B_5EFA_80FD_91CF_8868_73B0, _____63A8_8FDBR_5149_70AE, ____R_80FD_91CF_4E0E_5149_70AE_542F_52A8, ____R_53D1_5C04_51C6_5907, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3, _____83B7_53D6_8303_56F4_654C_519B, _____79FB_9664_5355_4F4D_6682_505C, _____521B_5EFA_70B9_7279_6548, GetUnitFacing, GetHandleId, Cos, Sin, bj_DEGTORAD, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_DIVINE, WEAPON_TYPE_WHOKNOWS, _____914D_7F6E, ____R_7C7B_578BID
+local _____9500_6BC1R_805A_96C6_8868_73B0, ____R_521B_5EFA_80FD_91CF_8868_73B0, _____63A8_8FDBR_5149_70AE, ____R_80FD_91CF_4E0E_5149_70AE_542F_52A8, ____R_53D1_5C04_51C6_5907, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3, _____83B7_53D6_8303_56F4_654C_519B, _____79FB_9664_5355_4F4D_6682_505C, _____521B_5EFA_70B9_7279_6548, _____9500_6BC1_70B9_7279_6548, GetUnitFacing, GetHandleId, Cos, Sin, bj_DEGTORAD, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_DIVINE, WEAPON_TYPE_WHOKNOWS, _____914D_7F6E, ____R_7C7B_578BID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.17．Saber.00．配置")
 local ____Saber_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["Saber技能配置"]
 local ____01_FF0E_72B6_6001_8868 = require("系统.03．技能系统.05．单位技能.04．英雄技能.17．Saber.01．状态表")
@@ -10,6 +10,18 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+function _____9500_6BC1R_805A_96C6_8868_73B0(ctx)
+    if ctx["聚集回调ID"] ~= 0 then
+        removePeriodicCallback(ctx["聚集回调ID"])
+        ctx["聚集回调ID"] = 0
+    end
+    for ____, p in ipairs(ctx["聚集列表"]) do
+        if p["特效"] ~= nil and p["特效"] ~= 0 then
+            _____9500_6BC1_70B9_7279_6548(p["特效"])
+        end
+    end
+    ctx["聚集列表"] = {}
+end
 function ____R_521B_5EFA_80FD_91CF_8868_73B0(ctx, _____89D2_5EA6)
     local _____9762_5411_5F27_5EA6 = (_____89D2_5EA6 + 180) * bj_DEGTORAD
     local _____70B91X = ctx["Saber点X"] + _____914D_7F6E.R["发射"]["能量A"]["后方偏移"] * Cos(_____9762_5411_5F27_5EA6)
@@ -79,15 +91,15 @@ function _____63A8_8FDBR_5149_70AE(variable)
     for ____, target in ipairs(_____654C_519B_5217_8868) do
         do
             if target == nil or target == 0 then
-                goto __continue44
+                goto __continue59
             end
             if ctx["命中组"][GetHandleId(target)] == true then
-                goto __continue44
+                goto __continue59
             end
             ctx["命中组"][GetHandleId(target)] = true
             _____65B0_76EE_6807[#_____65B0_76EE_6807 + 1] = target
         end
-        ::__continue44::
+        ::__continue59::
     end
     if #_____65B0_76EE_6807 > 0 then
         local _____500D_7387 = ctx["阿瓦隆快照"] and _____914D_7F6E.R["光炮"]["阿瓦隆伤害攻击力倍率"] or _____914D_7F6E.R["光炮"]["伤害攻击力倍率"]
@@ -133,6 +145,7 @@ function ____R_53D1_5C04_51C6_5907(variable)
         return
     end
     ctx["准备回调ID"] = 0
+    _____9500_6BC1R_805A_96C6_8868_73B0(ctx)
     local caster = ctx.caster
     if caster == nil or caster == 0 or not _____5355_4F4D_5B58_6D3B(caster) then
         ctx["已启动"] = false
@@ -153,6 +166,7 @@ function ____R_53D1_5C04_51C6_5907(variable)
     )
 end
 local jass = require("jass.common")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 addDelayedCallback = ____require_result_0.addDelayedCallback
 addPeriodicCallback = ____require_result_0.addPeriodicCallback
@@ -165,11 +179,12 @@ _____83B7_53D6_8303_56F4_654C_519B = ____require_result_2["获取范围敌军"]
 local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_3["添加单位暂停"]
 _____79FB_9664_5355_4F4D_6682_505C = ____require_result_3["移除单位暂停"]
-local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_4.Sound3DII_UnitPlayReuse
+local ____require_result_4 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundOnUnitBJ = ____require_result_4.PlaySoundOnUnitBJ
+local StopSoundBJ = ____require_result_4.StopSoundBJ
 local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
-local _____9500_6BC1_70B9_7279_6548 = ____require_result_5["销毁点特效"]
+_____9500_6BC1_70B9_7279_6548 = ____require_result_5["销毁点特效"]
 local ____require_result_6 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_6.registerDeathListener
 local ____require_result_7 = require("lib.扩展函数.BJ函数.07．杂项")
@@ -220,6 +235,7 @@ local function _____83B7_53D6_6216_521B_5EFAR_4E0A_4E0B_6587(caster)
             ["蓄力回调ID"] = 0,
             ["蓄力Tick数"] = 0,
             ["聚集列表"] = {},
+            ["聚集回调ID"] = 0,
             ["准备回调ID"] = 0,
             ["能量回调ID"] = 0,
             ["光炮回调ID"] = 0,
@@ -229,14 +245,6 @@ local function _____83B7_53D6_6216_521B_5EFAR_4E0A_4E0B_6587(caster)
         ____R_4E0A_4E0B_6587_8868[id] = record
     end
     return record
-end
-local function _____9500_6BC1R_805A_96C6_8868_73B0(ctx)
-    for ____, p in ipairs(ctx["聚集列表"]) do
-        if p["特效"] ~= nil and p["特效"] ~= 0 then
-            _____9500_6BC1_70B9_7279_6548(p["特效"])
-        end
-    end
-    ctx["聚集列表"] = {}
 end
 local function _____6E05_7406R_5168_90E8(ctx)
     local caster = ctx.caster
@@ -265,6 +273,65 @@ end
 local function ____R_53EF_91CA_653E(context, _caster)
     return not context["已启动"]
 end
+local SquareRoot = jass.SquareRoot
+local function _____63A8_8FDBR_805A_96C6_56DE_6536(variable)
+    local ctx = variable
+    if ctx == nil then
+        return
+    end
+    local caster = ctx.caster
+    if #ctx["聚集列表"] == 0 or caster == nil or caster == 0 then
+        _____9500_6BC1R_805A_96C6_8868_73B0(ctx)
+        return
+    end
+    local cfg = _____914D_7F6E.R["蓄力结束"]["聚集回收"]
+    local _____76EE_6807X = GetUnitX(caster)
+    local _____76EE_6807Y = GetUnitY(caster)
+    local _____76EE_6807_9AD8_5EA6 = GetUnitFlyHeight(caster)
+    local _____5269_4F59 = {}
+    for ____, p in ipairs(ctx["聚集列表"]) do
+        do
+            local dx = _____76EE_6807X - p.X
+            local dy = _____76EE_6807Y - p.Y
+            local _____8DDD_79BB = SquareRoot(dx * dx + dy * dy)
+            if _____8DDD_79BB <= cfg["到达距离"] then
+                if p["特效"] ~= nil and p["特效"] ~= 0 then
+                    _____9500_6BC1_70B9_7279_6548(p["特效"])
+                end
+                goto __continue20
+            end
+            local _____6B65_957F = _____8DDD_79BB < cfg["每次移动距离"] and _____8DDD_79BB or cfg["每次移动距离"]
+            p.X = p.X + dx / _____8DDD_79BB * _____6B65_957F
+            p.Y = p.Y + dy / _____8DDD_79BB * _____6B65_957F
+            local _____9AD8_5DEE = _____76EE_6807_9AD8_5EA6 - p["高度"]
+            local _____9650_5E45_9AD8_5DEE = _____9AD8_5DEE > cfg["每次高度变化"] and cfg["每次高度变化"] or (_____9AD8_5DEE < -cfg["每次高度变化"] and -cfg["每次高度变化"] or _____9AD8_5DEE)
+            p["高度"] = p["高度"] + _____9650_5E45_9AD8_5DEE
+            if p["特效"] ~= nil and p["特效"] ~= 0 then
+                DzSetEffectPos(p["特效"], p.X, p.Y, p["高度"])
+            end
+            _____5269_4F59[#_____5269_4F59 + 1] = p
+        end
+        ::__continue20::
+    end
+    ctx["聚集列表"] = _____5269_4F59
+    if #ctx["聚集列表"] == 0 and ctx["聚集回调ID"] ~= 0 then
+        removePeriodicCallback(ctx["聚集回调ID"])
+        ctx["聚集回调ID"] = 0
+    end
+end
+local function _____542F_52A8R_805A_96C6_56DE_6536(ctx)
+    if #ctx["聚集列表"] == 0 then
+        return
+    end
+    if ctx["聚集回调ID"] ~= 0 then
+        removePeriodicCallback(ctx["聚集回调ID"])
+    end
+    ctx["聚集回调ID"] = addPeriodicCallback(
+        math.floor(_____914D_7F6E.R["蓄力结束"]["聚集回收"]["Tick间隔秒"] * 1000 + 0.5),
+        _____63A8_8FDBR_805A_96C6_56DE_6536,
+        ctx
+    )
+end
 local function ____R_84C4_529B_7ED3_675F(ctx)
     local caster = ctx.caster
     if ctx["蓄力回调ID"] ~= 0 then
@@ -276,7 +343,10 @@ local function ____R_84C4_529B_7ED3_675F(ctx)
         return
     end
     if ctx["阿瓦隆快照"] then
-        Sound3DII_UnitPlayReuse(_____914D_7F6E.R["蓄力"]["音效"]["路径"], caster, _____914D_7F6E.R["蓄力"]["音效"]["裁断距离"])
+        local ____r_963F_74E6_9686_97F3_6548_53E5_67C4 = jglobals[_____914D_7F6E.R["蓄力"]["音效"]["全局音效键"]]
+        if ____r_963F_74E6_9686_97F3_6548_53E5_67C4 ~= nil then
+            PlaySoundOnUnitBJ(____r_963F_74E6_9686_97F3_6548_53E5_67C4, 100, caster)
+        end
         _____9500_6BC1R_805A_96C6_8868_73B0(ctx)
     else
         _____521B_5EFA_70B9_7279_6548({
@@ -287,7 +357,7 @@ local function ____R_84C4_529B_7ED3_675F(ctx)
             ["缩放"] = _____914D_7F6E.R["蓄力结束"]["法阵特效"]["缩放"],
             ["持续秒"] = _____914D_7F6E.R["蓄力结束"]["法阵特效"]["持续秒"]
         })
-        _____9500_6BC1R_805A_96C6_8868_73B0(ctx)
+        _____542F_52A8R_805A_96C6_56DE_6536(ctx)
     end
     SetUnitAnimationByIndex(caster, _____914D_7F6E.R["蓄力结束"]["动作索引"])
     ctx["准备回调ID"] = addDelayedCallback(
@@ -308,7 +378,10 @@ local function _____63A8_8FDBR_84C4_529B(variable)
     end
     ctx["蓄力Tick数"] = ctx["蓄力Tick数"] + 1
     if ctx["蓄力Tick数"] == _____914D_7F6E.R["蓄力"]["音效Tick"] then
-        Sound3DII_UnitPlayReuse(_____914D_7F6E.R["蓄力"]["音效"]["路径"], caster, _____914D_7F6E.R["蓄力"]["音效"]["裁断距离"])
+        local ____r_84C4_529B_97F3_6548_53E5_67C4 = jglobals[_____914D_7F6E.R["蓄力"]["音效"]["全局音效键"]]
+        if ____r_84C4_529B_97F3_6548_53E5_67C4 ~= nil then
+            PlaySoundOnUnitBJ(____r_84C4_529B_97F3_6548_53E5_67C4, 100, caster)
+        end
     end
     local cfg = _____914D_7F6E.R["蓄力"]["聚集粒子"]
     do
@@ -341,7 +414,7 @@ local function _____63A8_8FDBR_84C4_529B(variable)
                 if p["特效"] ~= nil and p["特效"] ~= 0 then
                     _____9500_6BC1_70B9_7279_6548(p["特效"])
                 end
-                goto __continue27
+                goto __continue42
             end
             p["高度"] = p["高度"] + (ctx["蓄力Tick数"] >= cfg["上升段Tick数"] and cfg["下降每次高度"] or cfg["上升每次高度"])
             if p["高度"] < 0 then
@@ -352,7 +425,7 @@ local function _____63A8_8FDBR_84C4_529B(variable)
             end
             _____5269_4F59[#_____5269_4F59 + 1] = p
         end
-        ::__continue27::
+        ::__continue42::
     end
     ctx["聚集列表"] = _____5269_4F59
 end
@@ -397,6 +470,10 @@ local function ____R_5355_4F4D_6B7B_4EA1_6E05_7406(dyingUnit, _killingUnit)
     local ctx = ____R_4E0A_4E0B_6587_8868[GetHandleId(dyingUnit)]
     if ctx == nil or not ctx["已启动"] then
         return
+    end
+    local ____excalibur_53E5_67C4 = jglobals[_____914D_7F6E.R["蓄力"]["音效"]["全局音效键"]]
+    if ____excalibur_53E5_67C4 ~= nil then
+        StopSoundBJ(____excalibur_53E5_67C4, true)
     end
     _____6E05_7406R_5168_90E8(ctx)
 end

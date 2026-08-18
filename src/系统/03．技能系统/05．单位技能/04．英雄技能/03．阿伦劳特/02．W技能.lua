@@ -94,9 +94,6 @@ local _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_resul
 createTimedUnitEffect = ____require_result_4.createTimedUnitEffect
 local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_5.registerDeathListener
-local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_6.debugLogForce
-local _____65E5_5FD7_6A21_5757 = "阿伦劳特W"
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetHandleId = jass.GetHandleId
@@ -135,13 +132,13 @@ ____exports["获取或创建阿伦劳特上下文"] = function(unit)
 end
 local function _____53D6_963F_4F26_52B3_7279_4E0A_4E0B_6587(unit)
     local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    local ____temp_7
+    local ____temp_6
     if unitId == 0 then
-        ____temp_7 = nil
+        ____temp_6 = nil
     else
-        ____temp_7 = _____963F_4F26_52B3_7279_4E0A_4E0B_6587_8868[unitId]
+        ____temp_6 = _____963F_4F26_52B3_7279_4E0A_4E0B_6587_8868[unitId]
     end
-    return ____temp_7
+    return ____temp_6
 end
 local function _____6E05_7406_88C1_51B3_62A4_76FE_6280_80FD_72B6_6001(unit, shieldId)
     local context = _____53D6_963F_4F26_52B3_7279_4E0A_4E0B_6587(unit)
@@ -168,18 +165,7 @@ local function _____963F_4F26_52B3_7279_88C1_51B3_62A4_76FE_6E05_7406(controller
     context["裁决护盾控制器"] = nil
 end
 local function _____521B_5EFA_88C1_51B3_62A4_76FE(unit)
-    debugLogForce(
-        _____65E5_5FD7_6A21_5757,
-        "创建裁决护盾-入口",
-        "单位句柄",
-        GetHandleId(unit),
-        "类型ID",
-        GetUnitTypeId(unit),
-        "暗形态ID",
-        _____6697_5F62_6001_5355_4F4DID
-    )
     if not _____5355_4F4D_6709_6548(unit) or GetUnitTypeId(unit) ~= _____6697_5F62_6001_5355_4F4DID then
-        debugLogForce(_____65E5_5FD7_6A21_5757, "创建裁决护盾-退出：单位无效或非暗形态")
         return false
     end
     local context = ____exports["获取或创建阿伦劳特上下文"](unit)
@@ -190,19 +176,8 @@ local function _____521B_5EFA_88C1_51B3_62A4_76FE(unit)
     local _____5F3A_5316 = _____62E5_6709_88C1_51B3_5BA1_5224(unit)
     local _____62A4_76FE_503C = GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE) * (_____5F3A_5316 and config["裁决护盾强化最大生命比例"] or config["裁决护盾默认最大生命比例"])
     if not (_____62A4_76FE_503C > 0) then
-        debugLogForce(_____65E5_5FD7_6A21_5757, "创建裁决护盾-退出：护盾值<=0", _____62A4_76FE_503C)
         return false
     end
-    debugLogForce(
-        _____65E5_5FD7_6A21_5757,
-        "创建裁决护盾-参数",
-        "护盾值",
-        _____62A4_76FE_503C,
-        "强化",
-        _____5F3A_5316,
-        "最大生命",
-        GetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE)
-    )
     local _____63A7_5236_5668 = _____521B_5EFA_4E3B_52A8_5F15_7206_62A4_76FE({
         ["名称"] = "阿伦劳特-裁决护盾",
         ["施法者"] = unit,
@@ -224,89 +199,37 @@ local function _____521B_5EFA_88C1_51B3_62A4_76FE(unit)
         ["on引爆后"] = _____963F_4F26_52B3_7279_88C1_51B3_62A4_76FE_5F15_7206_540E
     })
     if _____63A7_5236_5668 == nil then
-        debugLogForce(_____65E5_5FD7_6A21_5757, "创建裁决护盾-退出：创建主动引爆护盾返回 null")
         return false
     end
     context["裁决护盾控制器"] = _____63A7_5236_5668
     context["裁决护盾ID"] = _____63A7_5236_5668["护盾ID"]
-    debugLogForce(_____65E5_5FD7_6A21_5757, "创建裁决护盾-成功", "护盾ID", _____63A7_5236_5668["护盾ID"])
     return true
 end
 local function _____5F15_7206_88C1_51B3_62A4_76FE(unit)
-    debugLogForce(
-        _____65E5_5FD7_6A21_5757,
-        "引爆裁决护盾-入口",
-        "单位句柄",
-        GetHandleId(unit),
-        "类型ID",
-        GetUnitTypeId(unit),
-        "暗形态ID",
-        _____6697_5F62_6001_5355_4F4DID
-    )
     if not _____5355_4F4D_6709_6548(unit) or GetUnitTypeId(unit) ~= _____6697_5F62_6001_5355_4F4DID then
-        debugLogForce(_____65E5_5FD7_6A21_5757, "引爆裁决护盾-退出：单位无效或非暗形态")
         return
     end
     local context = _____53D6_963F_4F26_52B3_7279_4E0A_4E0B_6587(unit)
-    debugLogForce(_____65E5_5FD7_6A21_5757, "引爆裁决护盾-控制器存在", (context and context["裁决护盾控制器"]) ~= nil)
     _____5F15_7206_4E3B_52A8_5F15_7206_62A4_76FE(context and context["裁决护盾控制器"])
 end
 ____exports["释放神圣护甲"] = function(unit)
-    debugLogForce(
-        _____65E5_5FD7_6A21_5757,
-        "释放神圣护甲-入口",
-        "单位句柄",
-        GetHandleId(unit),
-        "类型ID",
-        GetUnitTypeId(unit),
-        "光形态ID",
-        _____5149_5F62_6001_5355_4F4DID
-    )
     if not _____5355_4F4D_6709_6548(unit) or GetUnitTypeId(unit) ~= _____5149_5F62_6001_5355_4F4DID then
-        debugLogForce(_____65E5_5FD7_6A21_5757, "释放神圣护甲-退出：单位无效或非光形态")
         return false
     end
     local duration = _____62E5_6709_5929_5802_547C_5524(unit) and _____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["神圣护甲强化持续秒"] or _____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["神圣护甲默认持续秒"]
     local _____7ED3_679C = _____5F00_59CB_65E0_654C_5E27(unit, duration) > 0
-    debugLogForce(
-        _____65E5_5FD7_6A21_5757,
-        "释放神圣护甲-结果",
-        "持续",
-        duration,
-        "成功",
-        _____7ED3_679C
-    )
     return _____7ED3_679C
 end
 ____exports["释放裁决护盾"] = function(unit)
     return _____521B_5EFA_88C1_51B3_62A4_76FE(unit)
 end
 local function _____963F_4F26_52B3_7279_795E_5723_62A4_7532_76D1_542C(_context, unit)
-    debugLogForce(
-        _____65E5_5FD7_6A21_5757,
-        "入口触发 神圣护甲(A0D6) 单位类型=",
-        GetUnitTypeId(unit),
-        "光形态ID=",
-        _____5149_5F62_6001_5355_4F4DID
-    )
     ____exports["释放神圣护甲"](unit)
 end
 local function _____963F_4F26_52B3_7279_88C1_51B3_62A4_76FE_76D1_542C(_context, unit)
-    debugLogForce(
-        _____65E5_5FD7_6A21_5757,
-        "入口触发 裁决护盾(A0D6) 单位类型=",
-        GetUnitTypeId(unit),
-        "暗形态ID=",
-        _____6697_5F62_6001_5355_4F4DID
-    )
     ____exports["释放裁决护盾"](unit)
 end
 local function _____963F_4F26_52B3_7279_62A4_76FE_5F15_7206_76D1_542C(_context, unit)
-    debugLogForce(
-        _____65E5_5FD7_6A21_5757,
-        "入口触发 护盾引爆(A0D3) 单位类型=",
-        GetUnitTypeId(unit)
-    )
     _____5F15_7206_88C1_51B3_62A4_76FE(unit)
 end
 local function _____963F_4F26_52B3_7279_5355_4F4D_6B7B_4EA1(dyingUnit, _killingUnit)
@@ -322,21 +245,9 @@ local function _____963F_4F26_52B3_7279_5355_4F4D_6B7B_4EA1(dyingUnit, _killingU
 end
 ____exports["注册阿伦劳特神圣护甲与裁决护盾"] = function()
     if _____5DF2_6CE8_518C then
-        debugLogForce(_____65E5_5FD7_6A21_5757, "注册-已重复调用，跳过")
         return
     end
     _____5DF2_6CE8_518C = true
-    debugLogForce(
-        _____65E5_5FD7_6A21_5757,
-        "注册-开始 光形态ID=",
-        _____5149_5F62_6001_5355_4F4DID,
-        "暗形态ID=",
-        _____6697_5F62_6001_5355_4F4DID,
-        "W技能ID=",
-        ____W_6280_80FDID,
-        "引爆技能ID=",
-        _____5F15_7206_6280_80FDID
-    )
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "阿伦劳特-神圣护甲",
         ["单位类型ID"] = _____5149_5F62_6001_5355_4F4DID,

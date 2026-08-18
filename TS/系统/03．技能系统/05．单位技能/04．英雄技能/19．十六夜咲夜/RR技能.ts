@@ -13,6 +13,9 @@ const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Sta
   添加单位暂停: (this: void, unit: any, source: string) => boolean;
   移除单位暂停: (this: void, unit: any, source: string) => boolean;
 };
+const { 技能_设置技能冷却时间 } = require("平台扩展API动作") as {
+  技能_设置技能冷却时间: (this: void, unit: any, abilityId: number, cooldown: number, maxCooldown: number) => boolean;
+};
 
 interface RR监听上下文 { 二段: boolean; }
 interface RR候选 {
@@ -235,7 +238,6 @@ function 启动RR区域(this: void, caster: any, perfect: boolean, sequence: num
   const y = jass.GetUnitY(caster) as number;
   const world = 创建咲夜单位壳(caster, 配置.单位壳.咲夜的世界, x, y, 0);
   if (world == null || world === 0) return;
-  jass.SetUnitScale(world, 1, 1, 1);
   if (!perfect) jass.SetUnitVertexColor(world, 255, 255, 125, 255);
   else {
     const id = jass.GetHandleId(caster) as number;
@@ -268,6 +270,10 @@ function 结算RR候选(this: void, variable?: any): void {
   const id = jass.GetHandleId(candidate.施法者) as number;
   if (RR候选表[id] !== candidate) return;
   delete RR候选表[id];
+  const owner = jass.GetOwningPlayer(candidate.施法者);
+  jass.UnitRemoveAbility(candidate.施法者, 配置.技能.RR.二段容器类型ID);
+  jass.SetPlayerAbilityAvailable(owner, 配置.技能.RR.二段容器类型ID, false);
+  if (!candidate.完美空间) jass.SetPlayerAbilityAvailable(owner, 配置.技能.RR.类型ID, true);
   if (单位存活(candidate.施法者)) 启动RR区域(candidate.施法者, candidate.完美空间, candidate.序号);
 }
 
@@ -275,13 +281,21 @@ function 释放RR(this: void, listener: RR监听上下文, caster: any): void {
   const id = jass.GetHandleId(caster) as number;
   if (listener.二段) {
     const candidate = RR候选表[id];
-    if (candidate != null) candidate.完美空间 = true;
+    if (candidate != null) {
+      candidate.完美空间 = true;
+      jass.SetPlayerAbilityAvailable(jass.GetOwningPlayer(caster), 配置.技能.RR.二段容器类型ID, false);
+      技能_设置技能冷却时间(caster, 配置.技能.RR.类型ID, 配置.RR.双击冷却秒, 配置.RR.双击冷却秒);
+    }
     return;
   }
+  const owner = jass.GetOwningPlayer(caster);
+  jass.UnitAddAbility(caster, 配置.技能.RR.二段容器类型ID);
+  jass.SetPlayerAbilityAvailable(owner, 配置.技能.RR.类型ID, false);
+  jass.SetPlayerAbilityAvailable(owner, 配置.技能.RR.二段容器类型ID, true);
   RR候选自增序号 += 1;
   const candidate: RR候选 = { 施法者: caster, 序号: RR候选自增序号, 完美空间: false };
   RR候选表[id] = candidate;
-  addDelayedCallback(600, 结算RR候选, candidate);
+  addDelayedCallback(配置.RR.双击窗口毫秒, 结算RR候选, candidate);
 }
 
 export function 注册十六夜咲夜RR(this: void): void {

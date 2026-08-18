@@ -40,9 +40,6 @@ const japi = require("jass.japi") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
@@ -269,7 +266,6 @@ function 结束光形态效果(this: void, 施法者: any, ctx: R技能上下文
 
 function 光强化到期(this: void, 施法者: any, ctx: R技能上下文): void {
   if (ctx.已结束) return;
-  debugLogForce("阿伦劳特R", "光强化到期", "类型", ctx.类型, "光加攻值", ctx.光加攻值);
   清理R技能上下文(ctx, 施法者, 结束光形态效果);
 }
 
@@ -283,11 +279,8 @@ function 光祈祷完成(this: void, 施法者: any, rctx: R技能上下文): vo
     return;
   }
 
-  debugLogForce("阿伦劳特R", "光祈祷完成，开始添加强化buff");
-
   // 1. 天堂呼唤 Buff 6 秒（开放后续强化判定）
   添加原生Buff持续(施法者, 天堂呼唤强化BuffID, cfg.光强化持续秒);
-  debugLogForce("阿伦劳特R", "添加原生Buff后检查", "拥有天堂呼唤", 拥有天堂呼唤(施法者));
 
   // 2. 临时攻击力增幅（攻击力 × 2.0，叠加基础攻击后总攻击力约 300%）
   const 攻击力 = 读取单位攻击力(施法者);
@@ -332,7 +325,6 @@ function 光祈祷完成(this: void, 施法者: any, rctx: R技能上下文): vo
     if (施法者 == null || 施法者 === 0) return;
     const 有buff = 拥有天堂呼唤(施法者);
     if (!单位存活(施法者) || !有buff) {
-      debugLogForce("阿伦劳特R", "光强化周期检查失败", "存活", 单位存活(施法者), "拥有天堂呼唤", 有buff);
       光强化到期(施法者, rctx);
     }
   });
@@ -345,10 +337,8 @@ function 光形态R(this: void, 施法者: any): void {
   // 光强化期间忽略重复 SPELL_EFFECT，避免 buff 立即结束 + 蓄力动作循环
   const 当前ctx = 获取R技能上下文(施法者);
   if (当前ctx != null && !当前ctx.已结束 && 当前ctx.类型 === "光强化") {
-    debugLogForce("阿伦劳特R", "光强化期间忽略SPELL_EFFECT重放", "类型", 当前ctx.类型);
     return;
   }
-  debugLogForce("阿伦劳特R", "光形态R入口", "当前ctx类型", 当前ctx?.类型 ?? "无");
 
   // 重复施放：先清理旧状态（含暂停/强化），再重新开始
   const 旧ctx = 当前ctx;

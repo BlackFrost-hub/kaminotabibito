@@ -15,6 +15,7 @@ local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
@@ -42,8 +43,8 @@ local ____require_result_9 = require("系统.03．技能系统.01．技能冷却
 local setAbilityCooldown = ____require_result_9.setAbilityCooldown
 local ____require_result_10 = require("平台扩展API动作")
 local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_10["技能_设置技能冷却时间"]
-local ____require_result_11 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_11.Sound3DII_UnitPlayReuse
+local ____require_result_11 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundOnUnitBJ = ____require_result_11.PlaySoundOnUnitBJ
 local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_12["创建点特效"]
 local createTimedUnitEffect = ____require_result_12.createTimedUnitEffect
@@ -52,6 +53,10 @@ local _____9500_6BC1_70B9_7279_6548 = ____require_result_13["销毁点特效"]
 local ____require_result_14 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_14.registerDeathListener
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
+local GetSpellTargetLoc = jass.GetSpellTargetLoc
+local GetLocationX = jass.GetLocationX
+local GetLocationY = jass.GetLocationY
+local RemoveLocation = jass.RemoveLocation
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetUnitX = jass.GetUnitX
@@ -202,7 +207,10 @@ local function ____W_5730_9762_542F_52A8_9F99_5377_98CE(variable)
     if caster == nil or caster == 0 or not _____5355_4F4D_5B58_6D3B(caster) then
         return
     end
-    Sound3DII_UnitPlayReuse(_____914D_7F6E.W["地面分支"]["龙卷风"]["音效"]["路径"], caster, _____914D_7F6E.W["地面分支"]["龙卷风"]["音效"]["裁断距离"])
+    local ____w_9F99_5377_98CE_97F3_6548_53E5_67C4 = jglobals[_____914D_7F6E.W["地面分支"]["龙卷风"]["音效"]["全局音效键"]]
+    if ____w_9F99_5377_98CE_97F3_6548_53E5_67C4 ~= nil then
+        PlaySoundOnUnitBJ(____w_9F99_5377_98CE_97F3_6548_53E5_67C4, 100, caster)
+    end
     SetUnitTimeScale(caster, 1)
     local cfg = _____914D_7F6E.W["地面分支"]["龙卷风"]
     local x = GetUnitX(caster)
@@ -237,7 +245,24 @@ local function ____W_5730_9762_542F_52A8_9F99_5377_98CE(variable)
     )
 end
 local ____W_5730_9762_4E0A_4E0B_6587_8868 = {}
-local function _____91CA_653EW_5730_9762_5206_652F(caster, _____6280_80FD_5B9E_4F8BID)
+--- 读取 W 对地面施放的目标点：A0DE 是单位目标技能（targs=ground,enemies），点击地面时
+-- GetSpellTargetUnit 为 null、GetSpellTargetX/Y 恒返 0,0，必须用 GetSpellTargetLoc 取点。
+-- Lua 运行时无效 location 可能非 null，优先直接取坐标再释放；取到 (0,0) 时回落 X/Y。
+local function _____8BFB_53D6W_5730_9762_76EE_6807_70B9()
+    local loc = GetSpellTargetLoc()
+    if loc ~= nil and loc ~= 0 then
+        local X = GetLocationX(loc)
+        local Y = GetLocationY(loc)
+        RemoveLocation(loc)
+        if X ~= 0 or Y ~= 0 then
+            return {X = X, Y = Y}
+        end
+    end
+    local fx = GetSpellTargetX()
+    local fy = GetSpellTargetY()
+    return {X = fx, Y = fy}
+end
+local function _____91CA_653EW_5730_9762_5206_652F(caster, _____76EE_6807X, _____76EE_6807Y, _____6280_80FD_5B9E_4F8BID)
     local cfg = _____914D_7F6E.W["地面分支"]
     local _____7F29_51CF = getCooldownReduction(caster)
     if _____7F29_51CF > cfg["冷却缩减上限"] then
@@ -246,8 +271,6 @@ local function _____91CA_653EW_5730_9762_5206_652F(caster, _____6280_80FD_5B9E_4
     local _____7B49_7EA7 = GetUnitAbilityLevel(caster, ____W_7C7B_578BID)
     setAbilityCooldown(caster, ____W_7C7B_578BID, _____7B49_7EA7, cfg["冷却秒"])
     _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4(caster, ____W_7C7B_578BID, cfg["冷却秒"] - cfg["冷却秒"] * _____7F29_51CF, cfg["冷却秒"])
-    local _____76EE_6807X = GetSpellTargetX()
-    local _____76EE_6807Y = GetSpellTargetY()
     local dx = _____76EE_6807X - GetUnitX(caster)
     local dy = _____76EE_6807Y - GetUnitY(caster)
     local _____8DDD_79BB = SquareRoot(dx * dx + dy * dy)
@@ -294,7 +317,7 @@ local function ____WE_5730_9762_6062_590D_95EA_907F_7387(ctx)
     for ____, item in ipairs(ctx["闪避率记录"]) do
         do
             if item.unit == nil or item.unit == 0 or not _____5355_4F4D_5B58_6D3B(item.unit) then
-                goto __continue31
+                goto __continue35
             end
             YDUserDataSetSafe(
                 "unit",
@@ -304,7 +327,7 @@ local function ____WE_5730_9762_6062_590D_95EA_907F_7387(ctx)
                 item["原值"]
             )
         end
-        ::__continue31::
+        ::__continue35::
     end
     ctx["闪避率记录"] = {}
 end
@@ -344,7 +367,7 @@ local function _____63A8_8FDBWE_5730_9762_51B2_51FB(variable)
         Y = _____70B9Y,
         Z = cfg["表现特效"]["飞行高度"],
         ["面向角度"] = ctx["方向角度"] + cfg["表现特效"]["朝向偏移"],
-        ["X轴角度"] = -90,
+        ["Y轴角度"] = -90,
         ["缩放"] = cfg["表现特效"]["缩放"],
         ["持续秒"] = cfg["表现特效"]["持续秒"]
     })
@@ -353,7 +376,7 @@ local function _____63A8_8FDBWE_5730_9762_51B2_51FB(variable)
     for ____, target in ipairs(_____654C_519B_5217_8868) do
         do
             if target == nil or target == 0 then
-                goto __continue41
+                goto __continue45
             end
             if ctx["重复组"][GetHandleId(target)] == true then
                 _____5F00_59CB_51FB_9000(target, {
@@ -364,7 +387,7 @@ local function _____63A8_8FDBWE_5730_9762_51B2_51FB(variable)
                     ["暂停单位"] = false,
                     ["禁用碰撞"] = false
                 })
-                goto __continue41
+                goto __continue45
             end
             ctx["重复组"][GetHandleId(target)] = true
             if IsUnitType(target, UNIT_TYPE_HERO) then
@@ -381,7 +404,7 @@ local function _____63A8_8FDBWE_5730_9762_51B2_51FB(variable)
             end
             _____65B0_76EE_6807[#_____65B0_76EE_6807 + 1] = target
         end
-        ::__continue41::
+        ::__continue45::
     end
     for ____, target in ipairs(_____65B0_76EE_6807) do
         _____65BD_52A0_7729_6655(
@@ -404,14 +427,14 @@ local function _____63A8_8FDBWE_5730_9762_51B2_51FB(variable)
     for ____, target in ipairs(_____5168_90E8_654C_519B) do
         do
             if target == nil or target == 0 then
-                goto __continue48
+                goto __continue52
             end
             if ctx["重复组"][GetHandleId(target)] ~= true then
-                goto __continue48
+                goto __continue52
             end
             _____91CD_590D_76EE_6807[#_____91CD_590D_76EE_6807 + 1] = target
         end
-        ::__continue48::
+        ::__continue52::
     end
     if #_____91CD_590D_76EE_6807 > 0 then
         _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
@@ -428,15 +451,18 @@ local function _____63A8_8FDBWE_5730_9762_51B2_51FB(variable)
         })
     end
 end
-local function _____91CA_653EWE_5730_9762_5206_652F(caster, _____6280_80FD_5B9E_4F8BID)
+local function _____91CA_653EWE_5730_9762_5206_652F(caster, _____76EE_6807X, _____76EE_6807Y, _____6280_80FD_5B9E_4F8BID)
     local cfg = _____914D_7F6E.W["E联动地面分支"]
     _____6DFB_52A0_5355_4F4D_6682_505C(caster, _____914D_7F6E["暂停来源"]["W地面E联动"])
-    Sound3DII_UnitPlayReuse(cfg["音效"]["路径"], caster, cfg["音效"]["裁断距离"])
+    local ____wE_8054_52A8_97F3_6548_53E5_67C4 = jglobals[cfg["音效"]["全局音效键"]]
+    if ____wE_8054_52A8_97F3_6548_53E5_67C4 ~= nil then
+        PlaySoundOnUnitBJ(____wE_8054_52A8_97F3_6548_53E5_67C4, 100, caster)
+    end
     local _____65B9_5411 = _____8BA1_7B97_4E24_70B9_89D2_5EA6(
         GetUnitX(caster),
         GetUnitY(caster),
-        GetSpellTargetX(),
-        GetSpellTargetY()
+        _____76EE_6807X,
+        _____76EE_6807Y
     )
     _____6D88_8017SaberE(caster)
     SetUnitAnimationByIndex(caster, cfg["动作索引"])
@@ -446,7 +472,7 @@ local function _____91CA_653EWE_5730_9762_5206_652F(caster, _____6280_80FD_5B9E_
         Y = GetUnitY(caster),
         Z = cfg["表现特效"]["飞行高度"],
         ["面向角度"] = _____65B9_5411 + cfg["表现特效"]["朝向偏移"],
-        ["X轴角度"] = -90,
+        ["Y轴角度"] = -90,
         ["缩放"] = cfg["表现特效"]["缩放"],
         ["持续秒"] = cfg["表现特效"]["持续秒"]
     })
@@ -505,7 +531,7 @@ local function _____63A8_8FDBW_51B2_51FB_6CE2(variable)
     for ____, target in ipairs(_____654C_519B_5217_8868) do
         do
             if target == nil or target == 0 then
-                goto __continue62
+                goto __continue67
             end
             if ctx["命中组"][GetHandleId(target)] == true then
                 _____5F00_59CB_51FB_9000(target, {
@@ -516,12 +542,12 @@ local function _____63A8_8FDBW_51B2_51FB_6CE2(variable)
                     ["暂停单位"] = false,
                     ["禁用碰撞"] = false
                 })
-                goto __continue62
+                goto __continue67
             end
             ctx["命中组"][GetHandleId(target)] = true
             _____65B0_76EE_6807[#_____65B0_76EE_6807 + 1] = target
         end
-        ::__continue62::
+        ::__continue67::
     end
     if #_____65B0_76EE_6807 > 0 then
         _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
@@ -541,7 +567,10 @@ end
 local function _____542F_52A8W_51B2_51FB_6CE2(ctx)
     local caster = ctx.caster
     local cfg = _____914D_7F6E.W["敌人分支"]["E联动冲击波"]
-    Sound3DII_UnitPlayReuse(cfg["音效"]["路径"], caster, cfg["音效"]["裁断距离"])
+    local ____w_51B2_51FB_6CE2_97F3_6548_53E5_67C4 = jglobals[cfg["音效"]["全局音效键"]]
+    if ____w_51B2_51FB_6CE2_97F3_6548_53E5_67C4 ~= nil then
+        PlaySoundOnUnitBJ(____w_51B2_51FB_6CE2_97F3_6548_53E5_67C4, 100, caster)
+    end
     local _____6CE2_4E0A_4E0B_6587 = {
         caster = caster,
         ["技能实例ID"] = ctx["技能实例ID"],
@@ -728,13 +757,14 @@ local function _____91CA_653EW_6280_80FD(_context, caster, _____6280_80FD_5B9E_4
     if not _____5355_4F4D_5B58_6D3B(caster) then
         return
     end
+    local _____9501_5B58_76EE_6807_70B9 = _____8BFB_53D6W_5730_9762_76EE_6807_70B9()
     local target = GetSpellTargetUnit()
     if target ~= nil and target ~= 0 and _____5355_4F4D_5B58_6D3B(target) then
         _____91CA_653EW_654C_4EBA_5206_652F(caster, target, _____6280_80FD_5B9E_4F8BID)
     elseif ____Saber_662F_5426E_5F00_542F(caster) then
-        _____91CA_653EWE_5730_9762_5206_652F(caster, _____6280_80FD_5B9E_4F8BID)
+        _____91CA_653EWE_5730_9762_5206_652F(caster, _____9501_5B58_76EE_6807_70B9.X, _____9501_5B58_76EE_6807_70B9.Y, _____6280_80FD_5B9E_4F8BID)
     else
-        _____91CA_653EW_5730_9762_5206_652F(caster, _____6280_80FD_5B9E_4F8BID)
+        _____91CA_653EW_5730_9762_5206_652F(caster, _____9501_5B58_76EE_6807_70B9.X, _____9501_5B58_76EE_6807_70B9.Y, _____6280_80FD_5B9E_4F8BID)
     end
 end
 local ____W_6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
