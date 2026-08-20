@@ -37,23 +37,25 @@ const { 造成单体技能伤害, 结束独立技能伤害实例 } = require("�
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
-const { 读取单位攻击力, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 两点角度, 取单位ID, 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  取单位ID: (this: void, unit: any) => number;
+  单位存活: (this: void, unit: any) => boolean;
 };
 const { createTimedUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
 };
 
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
-const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
-const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitMoveSpeed = jass.GetUnitMoveSpeed as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
@@ -65,14 +67,12 @@ const SetUnitY = jass.SetUnitY as (this: void, unit: any, y: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
 const SetUnitFlyHeight = jass.SetUnitFlyHeight as (this: void, unit: any, height: number, rate: number) => void;
 const SetUnitScale = jass.SetUnitScale as (this: void, unit: any, x: number, y: number, z: number) => void;
-const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, player: any) => boolean;
 const IsUnitAlly = jass.IsUnitAlly as (this: void, unit: any, player: any) => boolean;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const Sin = jass.Sin as (this: void, radians: number) => number;
 const bj_DEGTORAD = (jass.bj_DEGTORAD ?? 0.017453292519943295) as number;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
 const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -137,16 +137,8 @@ interface W弹道上下文 {
 const W蓄力上下文表: Record<number, W蓄力上下文 | undefined> = {};
 let W待发版本 = 0;
 
-function 单位存活(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && GetUnitTypeId(unit) !== 0 && GetUnitState(unit, UNIT_STATE_LIFE) > 0.405;
-}
-
-function 取单位ID(this: void, unit: any): number {
-  return unit == null || unit === 0 ? 0 : GetHandleId(unit);
-}
-
 function 移除单位壳(this: void, unit: any): void {
-  if (unit != null && unit !== 0) RemoveUnit(unit);
+  if (unit != null && unit !== 0) 立即移除单位并取消排泄登记(unit);
 }
 
 function 切换W技能(this: void, hero: any, 可发射: boolean): void {

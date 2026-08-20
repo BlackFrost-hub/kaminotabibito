@@ -7,6 +7,7 @@
 import { 黑崎一护技能配置 } from "./00．配置";
 import { 获取或创建黑崎一护状态, 开启瞬步连携, 关闭瞬步连携, 月牙是否飞行中 } from "./01．状态表";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 
 const jass = require("jass.common") as any;
 
@@ -106,7 +107,7 @@ function 释放瞬步(this: void, context: D上下文, caster: any, _技能实�
   开启瞬步连携(caster);
   if (context.连携窗口回调ID !== 0) removeDelayedCallback(context.连携窗口回调ID);
   context.连携窗口回调ID = addDelayedCallback(
-    Math.round(配置.D.连携窗口秒 * 1000),
+    秒转毫秒(配置.D.连携窗口秒),
     关闭瞬步连携窗口 as unknown as (this: void, variable?: any) => void,
     caster,
   );

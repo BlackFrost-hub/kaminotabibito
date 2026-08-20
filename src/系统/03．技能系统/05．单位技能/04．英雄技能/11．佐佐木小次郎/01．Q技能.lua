@@ -23,6 +23,10 @@ local _____65BD_52A0_7729_6655 = ____require_result_3["施加眩晕"]
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
 local _____5355_4F4D_5B58_6D3B = ____require_result_4["单位存活"]
+local _____8DDD_79BBXY = ____require_result_4["距离XY"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_4["两点角度"]
+local _____6781_5750_6807X = ____require_result_4["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_4["极坐标Y"]
 local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口")
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_5["创建原生弹幕"]
 local _____83B7_53D6_539F_751F_5F39_5E55 = ____require_result_5["获取原生弹幕"]
@@ -32,6 +36,7 @@ local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWESetUnitAbilityStateSafe = ____require_result_7.YDWESetUnitAbilityStateSafe
 local ____Q_672C_4F53_6280_80FDID = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["Q技能ID"])
 local ____Q_4E8C_6BB5_6280_80FDID_6570_503C = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["Q二段技能ID"])
+local _____968F_673A_6574_6570 = jass.GetRandomInt
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local SetUnitX = jass.SetUnitX
@@ -41,14 +46,6 @@ local SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local function _____4E24_70B9_8DDD_79BB(x1, y1, x2, y2)
-    local dx = x2 - x1
-    local dy = y2 - y1
-    return math.sqrt(dx * dx + dy * dy)
-end
-local function _____4E24_70B9_89D2_5EA6(x1, y1, x2, y2)
-    return math.atan(y2 - y1, x2 - x1) * 180 / math.pi
-end
 --- 地形可通行判定（不可通行 = 阻挡）
 local function _____5730_5F62_53EF_901A_884C(x, y)
     if type(jass.IsTerrainPathable) ~= "function" then
@@ -61,13 +58,12 @@ end
 local function _____8BA1_7B97_77AC_79FB_843D_70B9(_____8D77_70B9X, _____8D77_70B9Y, _____89D2_5EA6, _____8DDD_79BB)
     local _____843D_70B9X = _____8D77_70B9X
     local _____843D_70B9Y = _____8D77_70B9Y
-    local _____6B65_6570 = math.floor(_____8DDD_79BB / 40)
-    local _____5F27_5EA6 = _____89D2_5EA6 * math.pi / 180
+    local _____6B65_6570 = jass.R2I(_____8DDD_79BB / 40)
     do
         local i = 1
         while i <= _____6B65_6570 do
-            local _____5019_9009X = _____8D77_70B9X + math.cos(_____5F27_5EA6) * 40 * i
-            local _____5019_9009Y = _____8D77_70B9Y + math.sin(_____5F27_5EA6) * 40 * i
+            local _____5019_9009X = _____6781_5750_6807X(_____8D77_70B9X, _____89D2_5EA6, 40 * i)
+            local _____5019_9009Y = _____6781_5750_6807Y(_____8D77_70B9Y, _____89D2_5EA6, 40 * i)
             if not _____5730_5F62_53EF_901A_884C(_____5019_9009X, _____5019_9009Y) then
                 break
             end
@@ -148,7 +144,7 @@ local function ____on_4F50_4F50_6728Q_751F_6548(_____65BD_6CD5_5355_4F4D, _____6
     local _____76EE_6807X = jass.GetSpellTargetX()
     local _____76EE_6807Y = jass.GetSpellTargetY()
     local _____89D2_5EA6 = _____4E24_70B9_89D2_5EA6(_____8D77_70B9X, _____8D77_70B9Y, _____76EE_6807X, _____76EE_6807Y)
-    local _____8DDD_79BB = _____4E24_70B9_8DDD_79BB(_____8D77_70B9X, _____8D77_70B9Y, _____76EE_6807X, _____76EE_6807Y)
+    local _____8DDD_79BB = _____8DDD_79BBXY(_____8D77_70B9X, _____8D77_70B9Y, _____76EE_6807X, _____76EE_6807Y)
     _____5237_65B0_77AC_79FB_5C31_7EEA(_____65BD_6CD5_5355_4F4D)
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.D["换位特效模型"],
@@ -172,7 +168,7 @@ local function ____on_4F50_4F50_6728Q_751F_6548(_____65BD_6CD5_5355_4F4D, _____6
             )
             _____64AD_653E_4F50_4F50_6728_914D_7F6E_52A8_4F5C(
                 _____65BD_6CD5_5355_4F4D,
-                math.floor(math.random() * 2) == 0 and 8 or 7,
+                _____968F_673A_6574_6570(0, 1) == 0 and 8 or 7,
                 0
             )
             _____521B_5EFA_70B9_7279_6548({
@@ -206,7 +202,7 @@ local function ____on_4F50_4F50_6728Q_751F_6548(_____65BD_6CD5_5355_4F4D, _____6
             if not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_5355_4F4D) then
                 return
             end
-            if math.floor(math.random() * 2) == 0 then
+            if _____968F_673A_6574_6570(0, 1) == 0 then
                 _____64AD_653E_4F50_4F50_6728_5750_6807_97F3_6548(
                     cfg["挥砍音效路径1"],
                     GetUnitX(_____65BD_6CD5_5355_4F4D),

@@ -8,6 +8,7 @@ local _____857E_7C73_8389_4E9ABuffID = ____03_FF0E_857E_7C73_8389_4E9A["蕾米�
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____require_result_0 = require("lib.扩展函数.Star扩展函数.02．GS单位属性")
@@ -61,21 +62,15 @@ local ____W_914D_7F6E = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.W
 local ____W_6280_80FD_7C7B_578BID = ____W_914D_7F6E["技能类型ID"]
 local _____4E0A_4E0B_6587_8868 = {}
 local _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
-local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 local function _____83B7_53D6W_4E0A_4E0B_6587(unit)
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local unitId = _____53D6_5355_4F4DID(unit)
     if unitId == 0 then
         return nil
     end
     return _____4E0A_4E0B_6587_8868[unitId]
 end
 local function _____83B7_53D6_6216_521B_5EFAW_4E0A_4E0B_6587(unit)
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local unitId = _____53D6_5355_4F4DID(unit)
     if unitId == 0 then
         return nil
     end
@@ -158,7 +153,7 @@ local function _____6E05_7406W_4E0A_4E0B_6587(context)
         context["已启动"] = false
     end
     context["目标属性记录"] = {}
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
+    local unitId = _____53D6_5355_4F4DID(context["施法者"])
     if unitId ~= 0 and _____4E0A_4E0B_6587_8868[unitId] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, unitId)
     end

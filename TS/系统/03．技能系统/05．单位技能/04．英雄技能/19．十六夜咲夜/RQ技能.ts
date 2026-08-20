@@ -204,7 +204,11 @@ function RQ推进飞刀(this: void, variable?: any): void {
     jass.SetUnitX(knife, 极坐标X(x, 配置.RQ.飞刀追踪步长, angle));
     jass.SetUnitY(knife, 极坐标Y(y, 配置.RQ.飞刀追踪步长, angle));
     jass.SetUnitFacing(knife, angle);
-    if (jass.GetUnitFlyHeight(knife) > jass.GetUnitFlyHeight(context.目标)) jass.SetUnitFlyHeight(knife, Math.max(jass.GetUnitFlyHeight(context.目标), jass.GetUnitFlyHeight(knife) - 18), 0);
+    if (jass.GetUnitFlyHeight(knife) > jass.GetUnitFlyHeight(context.目标)) {
+      const 目标高度 = jass.GetUnitFlyHeight(context.目标);
+      const 下降高度 = jass.GetUnitFlyHeight(knife) - 18;
+      jass.SetUnitFlyHeight(knife, 目标高度 > 下降高度 ? 目标高度 : 下降高度, 0);
+    }
   }
 }
 

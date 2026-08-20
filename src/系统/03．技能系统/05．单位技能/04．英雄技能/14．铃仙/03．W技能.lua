@@ -31,18 +31,21 @@ local SFB_setItemIllusion = ____require_result_5.SFB_setItemIllusion
 local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_6.addDelayedCallback
 local removeDelayedCallback = ____require_result_6.removeDelayedCallback
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
-local createTimedUnitEffect = ____require_result_7.createTimedUnitEffect
-local ____require_result_8 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local SetUnitVertexColorBJ = ____require_result_8.SetUnitVertexColorBJ
-local ____require_result_9 = require("lib.扩展函数.BJ函数.index")
-local SelectUnitForPlayerSingle = ____require_result_9.SelectUnitForPlayerSingle
-local ____require_result_10 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_10.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_10["移除单位指定Buff"]
-local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getUnitsInRange = ____require_result_11.getUnitsInRange
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____6781_5750_6807X = ____require_result_7["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_7["极坐标Y"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local createTimedUnitEffect = ____require_result_8.createTimedUnitEffect
+local ____require_result_9 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local SetUnitVertexColorBJ = ____require_result_9.SetUnitVertexColorBJ
+local ____require_result_10 = require("lib.扩展函数.BJ函数.index")
+local SelectUnitForPlayerSingle = ____require_result_10.SelectUnitForPlayerSingle
+local ____require_result_11 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_11.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_11["移除单位指定Buff"]
+local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_12.getUnitsInRange
 local ____W_6280_80FDID = stringToFourCCSafe(_____94C3_4ED9_5355_4F4D_6280_80FD_914D_7F6E["W技能ID"])
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
@@ -227,8 +230,8 @@ local function ____on_94C3_4ED9_5206_8EAB_53EC_5524(_____88AB_53EC_5524_5355_4F4
         )
     else
         local _____5206_8EAB_89D2_5EA6 = _____4F1A_8BDD["角度"]
-        local _____5206_8EABX = _____4F1A_8BDD["原X"] + cfg["分身半径"] * math.cos(_____5206_8EAB_89D2_5EA6 * math.pi / 180)
-        local _____5206_8EABY = _____4F1A_8BDD["原Y"] + cfg["分身半径"] * math.sin(_____5206_8EAB_89D2_5EA6 * math.pi / 180)
+        local _____5206_8EABX = _____6781_5750_6807X(_____4F1A_8BDD["原X"], _____5206_8EAB_89D2_5EA6, cfg["分身半径"])
+        local _____5206_8EABY = _____6781_5750_6807Y(_____4F1A_8BDD["原Y"], _____5206_8EAB_89D2_5EA6, cfg["分身半径"])
         SetUnitX(_____88AB_53EC_5524_5355_4F4D, _____5206_8EABX)
         SetUnitY(_____88AB_53EC_5524_5355_4F4D, _____5206_8EABY)
         SetUnitFacing(_____88AB_53EC_5524_5355_4F4D, _____5206_8EAB_89D2_5EA6)

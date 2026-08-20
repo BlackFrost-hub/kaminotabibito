@@ -15,6 +15,8 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
@@ -146,7 +148,7 @@ local function _____91CA_653EE_6280_80FD(_context, caster, ______6280_80FD_5B9E_
     }
     ____E_8FD0_884C_65F6_8868[GetHandleId(caster)] = runtime
     runtime["周期回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.E["周期间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.E["周期间隔秒"]),
         _____63A8_8FDBE_5468_671F,
         runtime
     )

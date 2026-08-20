@@ -56,7 +56,8 @@ local function ____RF_8BA1_7B97_4F24_5BB3_500D_7387(knife, target)
         jass.GetUnitX(target),
         jass.GetUnitY(target)
     )
-    local difference = math.abs(_____6807_51C6_5316_89D2_5DEE(jass.GetUnitFacing(target) - knifeFacing))
+    local _____89D2_5DEE = _____6807_51C6_5316_89D2_5DEE(jass.GetUnitFacing(target) - knifeFacing)
+    local difference = _____89D2_5DEE < 0 and -_____89D2_5DEE or _____89D2_5DEE
     if difference > _____914D_7F6E.RF["背刺边界角度"] then
         return {["倍率"] = _____914D_7F6E.RF["中心伤害攻击力倍率"], ["正中心"] = false}
     end

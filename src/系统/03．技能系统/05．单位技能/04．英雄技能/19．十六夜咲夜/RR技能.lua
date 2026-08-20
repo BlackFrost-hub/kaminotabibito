@@ -115,10 +115,12 @@ local function ____RR_79BB_5F00_5355_4F4D(context, record)
     if context["完美空间"] then
         _____79FB_9664_5355_4F4D_6682_505C(record["单位"], context["来源"])
         if global ~= nil then
-            global["完美计数"] = math.max(0, global["完美计数"] - 1)
+            local _____65B0_5B8C_7F8E = global["完美计数"] - 1
+            global["完美计数"] = _____65B0_5B8C_7F8E > 0 and _____65B0_5B8C_7F8E or 0
         end
     elseif global ~= nil then
-        global["缓速计数"] = math.max(0, global["缓速计数"] - 1)
+        local _____65B0_7F13_901F = global["缓速计数"] - 1
+        global["缓速计数"] = _____65B0_7F13_901F > 0 and _____65B0_7F13_901F or 0
     end
     if global ~= nil then
         ____RR_5237_65B0_5355_4F4D_5168_5C40_72B6_6001(global)
@@ -165,10 +167,12 @@ local function ____RR_79BB_5F00_98DE_5200(context, record)
     if context["完美空间"] then
         _____79FB_9664_5355_4F4D_6682_505C(record["控制器"]["单位"], context["来源"])
         if global ~= nil then
-            global["完美计数"] = math.max(0, global["完美计数"] - 1)
+            local _____65B0_5B8C_7F8E = global["完美计数"] - 1
+            global["完美计数"] = _____65B0_5B8C_7F8E > 0 and _____65B0_5B8C_7F8E or 0
         end
     elseif global ~= nil then
-        global["缓速计数"] = math.max(0, global["缓速计数"] - 1)
+        local _____65B0_7F13_901F = global["缓速计数"] - 1
+        global["缓速计数"] = _____65B0_7F13_901F > 0 and _____65B0_7F13_901F or 0
     end
     if global ~= nil then
         if global["缓速计数"] > 0 then

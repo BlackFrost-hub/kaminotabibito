@@ -12,6 +12,7 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 local _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位最大生命"]
 local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local ____23_FF0E_77AC_79FB_8DEF_5F84_9884_8BA1_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.23．瞬移路径预计算")
 local _____8BA1_7B97_77AC_79FB_8DEF_5F84 = ____23_FF0E_77AC_79FB_8DEF_5F84_9884_8BA1_7B97["计算瞬移路径"]
 function GetUnitTypeIdLocal(unit)
@@ -46,7 +47,6 @@ local registerDeathListener = ____require_result_8.registerDeathListener
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
-local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
@@ -71,21 +71,15 @@ local ____E_62B5_6321BuffID = _____5742_4E95_60A0_4E8CBuffID["E抵挡"]
 local _____4E0A_4E0B_6587_8868 = {}
 local _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
 local _____4F24_5BB3_56DE_8C03_5DF2_6CE8_518C = false
-local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 local function _____83B7_53D6E_4E0A_4E0B_6587(unit)
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local id = _____53D6_5355_4F4DID(unit)
     if id == 0 then
         return nil
     end
     return _____4E0A_4E0B_6587_8868[id]
 end
 local function _____83B7_53D6_6216_521B_5EFAE_4E0A_4E0B_6587(unit)
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local id = _____53D6_5355_4F4DID(unit)
     if id == 0 then
         return nil
     end
@@ -110,7 +104,7 @@ local function _____6E05_7406E_4E0A_4E0B_6587(context)
         context["延迟回调ID"] = 0
     end
     context["已启动"] = false
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
+    local id = _____53D6_5355_4F4DID(context["施法者"])
     if id ~= 0 and _____4E0A_4E0B_6587_8868[id] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, id)
     end

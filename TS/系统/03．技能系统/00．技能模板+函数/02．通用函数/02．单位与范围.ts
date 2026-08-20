@@ -18,6 +18,7 @@ export {
   getUnitsInRange,
   getEnemyUnitsInRangeOfUnit,
   getEnemyUnitsInRange,
+  getUnitsInRangeWithFilter,
 } from "../../../../lib/扩展函数/自定义扩展函数/01．选取中心范围";
 
 export {
@@ -45,6 +46,7 @@ import {
   getUnitsInRange,
   getEnemyUnitsInRangeOfUnit,
   getEnemyUnitsInRange,
+  getUnitsInRangeWithFilter,
 } from "../../../../lib/扩展函数/自定义扩展函数/01．选取中心范围";
 
 import {
@@ -61,6 +63,8 @@ import {
   createUnitFilter,
   isNotUsingInventoryItem,
 } from "../../../../lib/扩展函数/自定义扩展函数/02．条件判断函数";
+
+export type { UnitFilterOptions } from "../../../../lib/扩展函数/自定义扩展函数/02．条件判断函数";
 
 export function isSameUnit(a: any, b: any): boolean {
   return a != null && a !== 0 && b != null && b !== 0 && a === b;
@@ -87,6 +91,7 @@ export const 获取单位周围单位 = getUnitsInRangeOfUnit;
 export const 获取坐标范围单位 = getUnitsInRange;
 export const 获取单位周围敌人 = getEnemyUnitsInRangeOfUnit;
 export const 获取坐标范围敌人 = getEnemyUnitsInRange;
+export const 获取坐标范围单位按筛选 = getUnitsInRangeWithFilter;
 
 export const 单位是否有效 = isValidUnit;
 export const 是否同一单位 = isSameUnit;

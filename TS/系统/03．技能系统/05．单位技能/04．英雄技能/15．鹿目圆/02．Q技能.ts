@@ -37,19 +37,22 @@ const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
 const { getUnitsInRange, getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
   getEnemyUnitsInRange: (this: void, source: any, x: number, y: number, radius: number) => any[];
 };
-const { 读取单位攻击力, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 两点角度, 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  单位存活: (this: void, unit: any) => boolean;
 };
 
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
-const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
@@ -57,10 +60,8 @@ const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetHeroLevel = jass.GetHeroLevel as (this: void, hero: any) => number;
 const GetRandomInt = jass.GetRandomInt as (this: void, min: number, max: number) => number;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
-const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const IsUnitAlly = jass.IsUnitAlly as (this: void, unit: any, player: any) => boolean;
-const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
 const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -102,10 +103,6 @@ interface Q箭飞行状态 {
 const Q上下文表: Record<number, Q上下文 | undefined> = {};
 const Q箭弹幕状态表: Record<number, Q箭飞行状态 | undefined> = {};
 
-function 单位存活(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && GetUnitState(unit, UNIT_STATE_LIFE) > 0.405;
-}
-
 function 是Q有效敌人(this: void, source: any, target: any): boolean {
   return 单位存活(target)
     && IsUnitType(target, UNIT_TYPE_MECHANICAL) !== true
@@ -133,7 +130,7 @@ function 选择Q锁定目标(this: void, source: any, x: number, y: number): any
 }
 
 function 移除Q单位壳(this: void, unit: any): void {
-  if (unit != null && unit !== 0) RemoveUnit(unit);
+  if (unit != null && unit !== 0) 立即移除单位并取消排泄登记(unit);
 }
 
 function 结束Q技能(this: void, context: Q上下文): void {

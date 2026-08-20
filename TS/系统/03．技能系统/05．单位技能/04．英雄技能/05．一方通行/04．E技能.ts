@@ -5,8 +5,10 @@ import {
   两点角度,
   单位存活,
   读取单位攻击力,
+  取单位ID,
 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 获取坐标范围单位按筛选 } from "../../../00．技能模板+函数/02．通用函数/02．单位与范围";
 const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
@@ -61,10 +63,7 @@ const { 技能_设置技能冷却时间 } = require("平台扩展API动作") as 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 
-const CreateGroup = jass.CreateGroup as (this: void) => any;
 const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (this: void, player: any, x: number, y: number, duration: number, text: string) => void;
-const FirstOfGroup = jass.FirstOfGroup as (this: void, group: any) => any;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetUnitDefaultFlyHeight = jass.GetUnitDefaultFlyHeight as (this: void, unit: any) => number;
 const GetUnitFlyHeight = jass.GetUnitFlyHeight as (this: void, unit: any) => number;
@@ -72,9 +71,6 @@ const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) =>
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
-const GroupClear = jass.GroupClear as (this: void, group: any) => void;
-const GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange as (this: void, group: any, x: number, y: number, radius: number, filter: any) => void;
-const GroupRemoveUnit = jass.GroupRemoveUnit as (this: void, group: any, unit: any) => void;
 const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, player: any) => boolean;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void, player: any, abilityId: number, available: boolean) => void;
@@ -99,7 +95,6 @@ const YDWE对象类型单位 = 2;
 const 一方通行单位类型ID = stringToFourCCSafe(一方通行单位技能配置.单位类型ID);
 const 矢量反射开启技能ID = stringToFourCCSafe(一方通行单位技能配置.矢量反射开启技能ID);
 const 矢量反射关闭技能ID = stringToFourCCSafe(一方通行单位技能配置.矢量反射关闭技能ID);
-const 弹幕枚举组 = CreateGroup();
 
 interface 一方通行矢量反射上下文 {
   单位: any;
@@ -120,13 +115,8 @@ const 矢量反射上下文表: Record<number, 一方通行矢量反射上下文
 const 矢量反射上下文列表: 一方通行矢量反射上下文[] = [];
 let 矢量反射系统已注册 = false;
 
-function 取单位句柄ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 export function 获取或创建一方通行矢量反射上下文(this: void, unit: any): 一方通行矢量反射上下文 | undefined {
-  const unitId = 取单位句柄ID(unit);
+  const unitId = 取单位ID(unit);
   if (unitId === 0) return undefined;
   const current = 矢量反射上下文表[unitId];
   if (current != null) return current;
@@ -140,12 +130,12 @@ export function 获取或创建一方通行矢量反射上下文(this: void, uni
 }
 
 function 获取一方通行矢量反射上下文(this: void, unit: any): 一方通行矢量反射上下文 | undefined {
-  const unitId = 取单位句柄ID(unit);
+  const unitId = 取单位ID(unit);
   return unitId === 0 ? undefined : 矢量反射上下文表[unitId];
 }
 
 function 移除一方通行矢量反射上下文(this: void, unit: any): void {
-  const unitId = 取单位句柄ID(unit);
+  const unitId = 取单位ID(unit);
   if (unitId === 0) return;
   const context = 矢量反射上下文表[unitId];
   if (context == null) return;
@@ -441,22 +431,27 @@ function 扫描单个一方通行周围弹幕(this: void, context: 一方通行�
   }
   if (!检查魔法并按需强制关闭(context)) return;
 
-  GroupClear(弹幕枚举组);
-  GroupEnumUnitsInRange(
-    弹幕枚举组,
+  // 需包含弹幕马甲（机械/古树/建筑等），仅排除死亡单位；筛选用公共配置型范围查询
+  const 候选单位 = 获取坐标范围单位按筛选(
     GetUnitX(unit),
     GetUnitY(unit),
     一方通行单位技能配置.矢量反射范围,
-    null,
+    unit,
+    {
+      要求有效单位: false,
+      允许死亡: false,
+      允许无敌: true,
+      允许建筑: true,
+      允许机械: true,
+      允许古树: true,
+    },
   );
-  let projectile = FirstOfGroup(弹幕枚举组);
-  while (projectile != null && projectile !== 0) {
-    GroupRemoveUnit(弹幕枚举组, projectile);
+  for (let i = 0; i < 候选单位.length; i++) {
+    const projectile = 候选单位[i];
+    if (projectile == null || projectile === 0) continue;
     尝试反射范围内弹幕(context, projectile);
     if (!context.已开启) break;
-    projectile = FirstOfGroup(弹幕枚举组);
   }
-  GroupClear(弹幕枚举组);
 }
 
 function 矢量反射弹幕扫描Tick(this: void): void {

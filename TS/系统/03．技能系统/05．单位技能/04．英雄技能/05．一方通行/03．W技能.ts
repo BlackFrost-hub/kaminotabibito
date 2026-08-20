@@ -2,7 +2,7 @@
 
 import { 一方通行单位技能配置 } from "./00．配置";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 单位存活, 读取单位攻击力, 两点角度 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 单位存活, 读取单位攻击力, 两点角度, 取单位ID, 极坐标X, 极坐标Y } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -68,7 +68,6 @@ const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL;
 const UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
@@ -114,10 +113,6 @@ interface 一方通行W地面击飞记录 {
 }
 
 const 地面击飞记录表: Record<number, 一方通行W地面击飞记录 | undefined> = {};
-
-function 取单位ID(this: void, unit: any): number {
-  return unit == null || unit === 0 ? 0 : GetHandleId(unit) || 0;
-}
 
 function 获取W上下文(this: void, unit: any): 一方通行W上下文 | undefined {
   const id = 取单位ID(unit);
@@ -351,9 +346,8 @@ function 一方通行W二段Tick(this: void, variable?: any): void {
   const caster = context.施法者;
   const x = context.二段路径X;
   const y = context.二段路径Y;
-  const radians = (context.方向角 * Math.PI) / 180;
-  const nextX = x + Math.cos(radians) * W配置.二段每次移动距离;
-  const nextY = y + Math.sin(radians) * W配置.二段每次移动距离;
+  const nextX = 极坐标X(x, context.方向角, W配置.二段每次移动距离);
+  const nextY = 极坐标Y(y, context.方向角, W配置.二段每次移动距离);
   context.二段路径X = nextX;
   context.二段路径Y = nextY;
   context.二段次数 += 1;

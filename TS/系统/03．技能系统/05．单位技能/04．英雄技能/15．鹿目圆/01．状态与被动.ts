@@ -34,6 +34,9 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
 const { 确保单位可设置飞行高度 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.00．共享") as {
   确保单位可设置飞行高度: (this: void, unit: any) => void;
 };
@@ -52,12 +55,14 @@ const { 延后一帧执行伤害派生效果 } = require("系统.04．伤害系�
 const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成单体技能伤害: (this: void, params: any) => boolean;
 };
+const { 取单位ID, 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+  取单位ID: (this: void, unit: any) => number;
+  单位存活: (this: void, unit: any) => boolean;
+};
 
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
-const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const GetUnitFlyHeight = jass.GetUnitFlyHeight as (this: void, unit: any) => number;
 const GetUnitDefaultFlyHeight = jass.GetUnitDefaultFlyHeight as (this: void, unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
@@ -72,7 +77,6 @@ const ShowUnit = jass.ShowUnit as (this: void, unit: any, show: boolean) => void
 const PauseUnit = jass.PauseUnit as (this: void, unit: any, flag: boolean) => void;
 const UnitRemoveBuffsEx = jass.UnitRemoveBuffsEx as (this: void, unit: any, removePositive: boolean, removeNegative: boolean, magic: boolean, physical: boolean, timedLife: boolean, aura: boolean, autoDispel: boolean) => void;
 const UnitApplyTimedLife = jass.UnitApplyTimedLife as (this: void, unit: any, buffId: number, duration: number) => void;
-const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 const ConvertUnitState = jass.ConvertUnitState as (this: void, stateId: number) => any;
 const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
@@ -142,16 +146,8 @@ let 圆环强化版本 = 0;
 let 被动层数驱动已注册 = false;
 let 共享状态已注册 = false;
 
-function 取单位ID(this: void, unit: any): number {
-  return unit == null || unit === 0 ? 0 : GetHandleId(unit);
-}
-
 function 因果层状态键(this: void, source: any, target: any): string {
   return String(取单位ID(source)) + "#" + String(取单位ID(target));
-}
-
-function 单位存活(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && GetUnitTypeId(unit) !== 0 && GetUnitState(unit, UNIT_STATE_LIFE) > 0.405;
 }
 
 export function 是鹿目圆(this: void, unit: any): boolean {
@@ -423,7 +419,7 @@ export function 结束鹿目圆圆神(this: void, hero: any, 原因: string = "�
       state.持续跟随ID = 0;
     }
     if (state.圆神樱花特效 != null && state.圆神樱花特效 !== 0 && GetUnitTypeId(state.圆神樱花特效) !== 0) {
-      RemoveUnit(state.圆神樱花特效);
+      立即移除单位并取消排泄登记(state.圆神樱花特效);
       state.圆神樱花特效 = null;
     }
     if (state.阶段 === "降临中") {
@@ -511,7 +507,8 @@ export function 激活鹿目圆圆环强化(this: void, hero: any): number {
     if (是鹿目圆圆神(hero)) state.W立即满蓄 = true;
   }
   刷新圆环强化Buff(state);
-  addDelayedCallback(Math.max(1, state.到期毫秒 - now), 圆环强化到期, { hero, version: state.版本 });
+  const 剩余毫秒 = state.到期毫秒 - now;
+  addDelayedCallback(剩余毫秒 >= 1 ? 剩余毫秒 : 1, 圆环强化到期, { hero, version: state.版本 });
   return state.层数;
 }
 
@@ -556,7 +553,8 @@ function 刷新因果层Buff(this: void, state: 因果层状态): void {
   for (let i = 0; i < state.到期毫秒列表.length; i++) {
     if (state.到期毫秒列表[i] > maxExpiry) maxExpiry = state.到期毫秒列表[i];
   }
-  registerManualBuff(state.目标, 鹿目圆BuffID.因果之力, Math.max(0.1, (maxExpiry - now) / 1000), 配置.被动.每层攻速, {
+  const 剩余秒 = (maxExpiry - now) / 1000;
+  registerManualBuff(state.目标, 鹿目圆BuffID.因果之力, 剩余秒 >= 0.1 ? 剩余秒 : 0.1, 配置.被动.每层攻速, {
     sourceUnit: state.来源,
     stack: count,
   });

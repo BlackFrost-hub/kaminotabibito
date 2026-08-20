@@ -29,8 +29,9 @@ const jass = require("jass.common") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
+const { registerSpellEffectListener, registerSpellEndcastListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
+  registerSpellEndcastListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -65,6 +66,19 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
     缩放?: number;
   }) => any;
 };
+const { 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
+};
+const { 秒转毫秒 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  秒转毫秒: (this: void, seconds: number) => number;
+};
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
 const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境") as {
   施加眩晕: (this: void, 来源: any, 目标: any, 持续时间: number, 效果来源名称?: string, 效果来源类型?: "装备" | "技能") => void;
 };
@@ -95,8 +109,6 @@ const 弹幕马甲ID = stringToFourCCSafe("e07O"); // Bullet.mdl 马甲
 const 蝗虫技能ID = stringToFourCCSafe("Aloc");
 const 限时生命BuffID = stringToFourCCSafe("BHwe");
 
-const 角度转弧度 = Math.PI / 180;
-
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_LIGHTNING = jass.DAMAGE_TYPE_LIGHTNING as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -110,8 +122,6 @@ const GetUnitDefaultFlyHeight = jass.GetUnitDefaultFlyHeight as (this: void, uni
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, unit: any, x: number, y: number) => void;
-const CreateUnit = jass.CreateUnit as (this: void, player: any, unitTypeId: number, x: number, y: number, facing: number) => any;
-const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
 const UnitApplyTimedLife = jass.UnitApplyTimedLife as (this: void, unit: any, buffId: number, duration: number) => void;
 
@@ -157,6 +167,9 @@ interface E上下文 {
   已结束: boolean;
 }
 
+/** 单英雄活动 E 实例表（按英雄 handleId 索引，重复释放先收尾旧实例再建新实例） */
+const E上下文表: { [handleId: number]: E上下文 } = {};
+
 function 创建E上下文(this: void, 施法者: any): E上下文 {
   return {
     施法者,
@@ -183,12 +196,12 @@ function 清理E上下文(this: void, ctx: E上下文): void {
   // 清理所有弹幕马甲
   for (let i = 0; i < ctx.子弹列表.length; i++) {
     const b = ctx.子弹列表[i];
-    if (b != null && b.单位 != null && b.单位 !== 0) RemoveUnit(b.单位);
+    if (b != null && b.单位 != null && b.单位 !== 0) 立即移除单位并取消排泄登记(b.单位);
   }
   ctx.子弹列表 = [];
   for (let i = 0; i < ctx.爆炸列表.length; i++) {
     const b = ctx.爆炸列表[i];
-    if (b != null && b.单位 != null && b.单位 !== 0) RemoveUnit(b.单位);
+    if (b != null && b.单位 != null && b.单位 !== 0) 立即移除单位并取消排泄登记(b.单位);
   }
   ctx.爆炸列表 = [];
   // 恢复飞行高度
@@ -196,50 +209,62 @@ function 清理E上下文(this: void, ctx: E上下文): void {
   if (施法者 != null && 施法者 !== 0 && 单位存活(施法者)) {
     SU_SetUnitFlyHeight(施法者, GetUnitDefaultFlyHeight(施法者), 0);
   }
+  // 从实例表摘除（仅当表中仍是本实例，防止旧清理误删新实例）
+  if (施法者 != null && 施法者 !== 0 && E上下文表[GetHandleId(施法者)] === ctx) {
+    delete E上下文表[GetHandleId(施法者)];
+  }
 }
 
 //=============================================================================
 // 二、跳跃（上升 + 下降）
 //=============================================================================
 
-function 开始跳跃上升(this: void, ctx: E上下文): void {
+function 推进E上升(this: void, variable?: any): void {
+  const ctx = variable as E上下文;
+  if (ctx.已结束) return;
   const 施法者 = ctx.施法者;
+  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) {
+    清理E上下文(ctx);
+    return;
+  }
+  const 当前高度 = GetUnitFlyHeight(施法者);
+  if (当前高度 >= cfg.E.最大飞行高度) {
+    // 达到最大高度 → 转为下降
+    removePeriodicCallback(ctx.上升回调ID);
+    ctx.上升回调ID = 0;
+    开始跳跃下降(ctx);
+    return;
+  }
+  SU_SetUnitFlyHeight(施法者, 当前高度 + cfg.E.飞行高度变化, 0);
+}
+
+function 开始跳跃上升(this: void, ctx: E上下文): void {
   if (ctx.上升回调ID !== 0) return;
-  ctx.上升回调ID = addPeriodicCallback(20, () => {
-    if (ctx.已结束 || 施法者 == null || 施法者 === 0 || !单位存活(施法者)) {
-      清理E上下文(ctx);
-      return;
-    }
-    const 当前高度 = GetUnitFlyHeight(施法者);
-    if (当前高度 >= cfg.E.最大飞行高度) {
-      // 达到最大高度 → 转为下降
-      removePeriodicCallback(ctx.上升回调ID);
-      ctx.上升回调ID = 0;
-      开始跳跃下降(ctx);
-      return;
-    }
-    SU_SetUnitFlyHeight(施法者, 当前高度 + cfg.E.飞行高度变化, 0);
-  });
+  ctx.上升回调ID = addPeriodicCallback(20, 推进E上升, ctx);
+}
+
+function 推进E下降(this: void, variable?: any): void {
+  const ctx = variable as E上下文;
+  if (ctx.已结束) return;
+  const 施法者 = ctx.施法者;
+  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) {
+    清理E上下文(ctx);
+    return;
+  }
+  const 当前高度 = GetUnitFlyHeight(施法者);
+  const 默认高度 = GetUnitDefaultFlyHeight(施法者);
+  if (当前高度 <= 默认高度) {
+    removePeriodicCallback(ctx.下降回调ID);
+    ctx.下降回调ID = 0;
+    SU_SetUnitFlyHeight(施法者, 默认高度, 0);
+    return;
+  }
+  SU_SetUnitFlyHeight(施法者, 当前高度 - cfg.E.飞行高度变化, 0);
 }
 
 function 开始跳跃下降(this: void, ctx: E上下文): void {
-  const 施法者 = ctx.施法者;
   if (ctx.下降回调ID !== 0) return;
-  ctx.下降回调ID = addPeriodicCallback(20, () => {
-    if (ctx.已结束 || 施法者 == null || 施法者 === 0 || !单位存活(施法者)) {
-      清理E上下文(ctx);
-      return;
-    }
-    const 当前高度 = GetUnitFlyHeight(施法者);
-    const 默认高度 = GetUnitDefaultFlyHeight(施法者);
-    if (当前高度 <= 默认高度) {
-      removePeriodicCallback(ctx.下降回调ID);
-      ctx.下降回调ID = 0;
-      SU_SetUnitFlyHeight(施法者, 默认高度, 0);
-      return;
-    }
-    SU_SetUnitFlyHeight(施法者, 当前高度 - cfg.E.飞行高度变化, 0);
-  });
+  ctx.下降回调ID = addPeriodicCallback(20, 推进E下降, ctx);
 }
 
 //=============================================================================
@@ -262,7 +287,7 @@ function 发射一波弹幕(this: void, ctx: E上下文): void {
 
   for (let i = 1; i <= cfg.E.每波弹幕数; i++) {
     const 角度 = 面朝 + cfg.E.弹幕角度间隔 * i;
-    const 弹幕单位 = CreateUnit(玩家, 弹幕马甲ID, 中心X, 中心Y, 角度);
+    const 弹幕单位 = 创建单位并登记排泄安全(玩家, 弹幕马甲ID, 中心X, 中心Y, 角度);
     if (弹幕单位 == null || 弹幕单位 === 0) continue;
     // 添加蝗虫技能 + 限时生命周期（兜底清理）
     UnitAddAbility(弹幕单位, 蝗虫技能ID);
@@ -306,8 +331,8 @@ function 推进所有弹幕(this: void, ctx: E上下文): void {
     }
     // 推进
     子弹.已飞行距离 += 每tick距离;
-    子弹.X += Math.cos(子弹.角度 * 角度转弧度) * 每tick距离;
-    子弹.Y += Math.sin(子弹.角度 * 角度转弧度) * 每tick距离;
+    子弹.X = 极坐标X(子弹.X, 子弹.角度, 每tick距离);
+    子弹.Y = 极坐标Y(子弹.Y, 子弹.角度, 每tick距离);
     SetUnitPosition(弹幕单位, 子弹.X, 子弹.Y);
 
     // 超过最远距离 → 移入爆炸组
@@ -321,6 +346,11 @@ function 推进所有弹幕(this: void, ctx: E上下文): void {
 //=============================================================================
 // 五、爆炸阶段
 //=============================================================================
+
+function 移除E无敌修正(this: void, variable?: any): void {
+  const 修正ID = variable as number;
+  if (修正ID !== 0) unregisterDamageModifier(修正ID);
+}
 
 function 执行爆炸(this: void, ctx: E上下文): void {
   if (ctx.已爆炸) return;
@@ -381,7 +411,7 @@ function 执行爆炸(this: void, ctx: E上下文): void {
     }
 
     // 移除弹幕马甲
-    if (弹幕单位 != null && 弹幕单位 !== 0) RemoveUnit(弹幕单位);
+    if (弹幕单位 != null && 弹幕单位 !== 0) 立即移除单位并取消排泄登记(弹幕单位);
   }
   ctx.爆炸列表 = [];
 
@@ -393,12 +423,32 @@ function 执行爆炸(this: void, ctx: E上下文): void {
 // 六、施法入口
 //=============================================================================
 
+function 推进E发射(this: void, variable?: any): void {
+  const ctx = variable as E上下文;
+  if (ctx.已结束) return;
+  if (ctx.波次 >= cfg.E.波数) {
+    // 全部发射完毕 → 标记 over，延迟 0.2 秒后统一爆炸
+    removePeriodicCallback(ctx.发射回调ID);
+    ctx.发射回调ID = 0;
+    ctx.over = true;
+    addDelayedCallback(秒转毫秒(cfg.E.爆炸延迟秒), 执行爆炸, ctx);
+    return;
+  }
+  发射一波弹幕(ctx);
+}
+
 function on铃仙E生效(this: void, 施法单位: any, 技能ID数值: number): void {
   if (技能ID数值 !== E技能ID数值) return;
   if (!是铃仙本体(施法单位)) return;
 
   const 英雄 = 施法单位;
+  // 重复释放：先收尾旧实例（防飞行高度/弹幕/爆炸清理冲突），再创建新实例
+  const 旧ctx = E上下文表[GetHandleId(英雄)];
+  if (旧ctx != null && !旧ctx.已结束) {
+    清理E上下文(旧ctx);
+  }
   const ctx = 创建E上下文(英雄);
+  E上下文表[GetHandleId(英雄)] = ctx;
 
   // 1) 音效 + 动作 + 施法硬直
   // 施法音效（源 JASS：PlaySoundOnUnitBJ(gg_snd_LX_E, 100, 铃仙)）
@@ -412,31 +462,32 @@ function on铃仙E生效(this: void, 施法单位: any, 技能ID数值: number):
     if (伤害上下文 != null && 伤害上下文.target === 英雄) return 0;
     return 伤害上下文 != null && typeof 伤害上下文.currentDamage === "number" ? 伤害上下文.currentDamage : 0;
   }, 2000);
-  addDelayedCallback(Math.round(cfg.E.无敌秒 * 1000), () => {
-    if (无敌修正ID !== 0) unregisterDamageModifier(无敌修正ID);
-  });
+  addDelayedCallback(秒转毫秒(cfg.E.无敌秒), 移除E无敌修正, 无敌修正ID);
 
   // 3) 跳跃上升
   开始跳跃上升(ctx);
 
   // 4) 弹幕发射周期（0.05 秒发射 1 波，共 6 波）
-  ctx.发射回调ID = addPeriodicCallback(50, () => {
-    if (ctx.已结束) return;
-    if (ctx.波次 >= cfg.E.波数) {
-      // 全部发射完毕 → 标记 over，延迟 0.2 秒后统一爆炸
-      removePeriodicCallback(ctx.发射回调ID);
-      ctx.发射回调ID = 0;
-      ctx.over = true;
-      addDelayedCallback(Math.round(cfg.E.爆炸延迟秒 * 1000), () => 执行爆炸(ctx));
-      return;
-    }
-    发射一波弹幕(ctx);
-  });
+  ctx.发射回调ID = addPeriodicCallback(50, 推进E发射, ctx);
 
   // 5) 弹幕推进周期（0.02 秒）
-  ctx.推进回调ID = addPeriodicCallback(Math.round(cfg.E.弹幕tick秒 * 1000), () => 推进所有弹幕(ctx));
+  ctx.推进回调ID = addPeriodicCallback(秒转毫秒(cfg.E.弹幕tick秒), 推进所有弹幕, ctx);
 }
 
 registerSpellEffectListener(on铃仙E生效);
+
+/**
+ * 施法中断清理（SPELL_ENDCAST 触发，正常爆炸后已结束=true 幂等跳过）。
+ * 复用 `清理E上下文`：移除上升/下降/发射/推进全部回调、清理弹幕马甲、恢复飞行高度、
+ * 从 E上下文表 摘除（带 === ctx 校验）。旧实例中断后不能创建新阶段/移除新实例单位。
+ * 施法硬直（SFB_施加通用Buff）与 0.3 秒无敌修正（registerDamageModifier）均有独立到期路径，不在此触碰。
+ */
+function 铃仙E中断清理(this: void, 施法单位: any, 技能ID数值: number): void {
+  if (技能ID数值 !== E技能ID数值) return;
+  const ctx = E上下文表[GetHandleId(施法单位)];
+  if (ctx == null || ctx.已结束) return;
+  清理E上下文(ctx);
+}
+registerSpellEndcastListener(铃仙E中断清理);
 
 export {};

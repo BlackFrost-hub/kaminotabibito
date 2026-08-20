@@ -42,6 +42,10 @@ const { 临时调整攻击, 临时调整护甲 } = require("系统.03．技能�
 const { 读取单位敏捷 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位敏捷: (this: void, unit: any) => number;
 };
+const { 秒转毫秒, 向下取整整数 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  秒转毫秒: (this: void, seconds: number) => number;
+  向下取整整数: (this: void, value: number) => number;
+};
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
   YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
@@ -145,7 +149,7 @@ function 处理无双剑法触发(this: void, unit: any, _damage: number, damage
   if (record != null) {
     if (record.E冷却回调ID !== 0) removeDelayedCallback(record.E冷却回调ID);
     record.E冷却回调ID = addDelayedCallback(
-      Math.round(配置.E.触发冷却秒 * 1000),
+      秒转毫秒(配置.E.触发冷却秒),
       结束E触发冷却 as unknown as (this: void, variable?: any) => void,
       source,
     );
@@ -193,7 +197,7 @@ function 处理无双剑法触发(this: void, unit: any, _damage: number, damage
       speedY: 配置.E.漂浮字.上浮速度,
       height: 40,
     });
-    const 增量 = Math.floor(读取单位敏捷(source) * (配置.E.破势.每级敏捷系数 * 等级));
+    const 增量 = 向下取整整数(读取单位敏捷(source) * (配置.E.破势.每级敏捷系数 * 等级));
     临时调整攻击(source, 增量);
     registerManualBuff(source, 云端BuffID.无双破势, 配置.E.增益持续秒, 增量);
     ctx = { 施法者: source, 分支: "破势", 增量, 已回收: false };
@@ -217,7 +221,7 @@ function 处理无双剑法触发(this: void, unit: any, _damage: number, damage
   }
 
   addDelayedCallback(
-    Math.round(配置.E.增益持续秒 * 1000),
+    秒转毫秒(配置.E.增益持续秒),
     回收E增益 as unknown as (this: void, variable?: any) => void,
     ctx,
   );

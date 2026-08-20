@@ -13,6 +13,8 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
 function _____963F_74E6_9686_7B49_91CF_6062_590D(variable)
     local ctx = variable
     if ctx == nil then
@@ -212,7 +214,7 @@ local function _____91CA_653ED_6280_80FD(_context, caster, ______6280_80FD_5B9E_
     local runtime = {caster = caster, ["回蓝回调ID"] = 0, ["Tick数"] = 0, ["已启动"] = true}
     ____D_8FD0_884C_65F6_8868[GetHandleId(caster)] = runtime
     runtime["回蓝回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.D["回蓝"]["间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.D["回蓝"]["间隔秒"]),
         _____63A8_8FDBD_56DE_84DD_4E0E_7C92_5B50,
         runtime
     )

@@ -3,7 +3,7 @@
 import { 坂井悠二技能配置 } from "./00．配置";
 import { 坂井悠二BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/05．坂井悠二";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 单位存活, 读取单位最大生命, 两点角度 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 单位存活, 读取单位最大生命, 两点角度, 取单位ID } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 计算瞬移路径 } from "../../../00．技能模板+函数/02．通用函数/23．瞬移路径预计算";
 
 const jass = require("jass.common") as any;
@@ -51,7 +51,6 @@ const { registerDeathListener } = require("系统.00．核心系统.01．事件�
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
@@ -91,19 +90,14 @@ const 上下文表: Record<number, E上下文 | undefined> = {};
 let 死亡监听已注册 = false;
 let 伤害回调已注册 = false;
 
-function 取单位句柄ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 function 获取E上下文(this: void, unit: any): E上下文 | undefined {
-  const id = 取单位句柄ID(unit);
+  const id = 取单位ID(unit);
   if (id === 0) return undefined;
   return 上下文表[id];
 }
 
 function 获取或创建E上下文(this: void, unit: any): E上下文 | undefined {
-  const id = 取单位句柄ID(unit);
+  const id = 取单位ID(unit);
   if (id === 0) return undefined;
   const current = 上下文表[id];
   if (current != null) return current;
@@ -125,7 +119,7 @@ function 清理E上下文(this: void, context: E上下文): void {
     context.延迟回调ID = 0;
   }
   context.已启动 = false;
-  const id = 取单位句柄ID(context.施法者);
+  const id = 取单位ID(context.施法者);
   if (id !== 0 && 上下文表[id] === context) delete 上下文表[id];
 }
 

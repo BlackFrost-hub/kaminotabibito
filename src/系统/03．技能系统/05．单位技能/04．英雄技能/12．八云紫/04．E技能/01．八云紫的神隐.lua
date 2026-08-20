@@ -27,13 +27,11 @@ function _____53CB_65B9_5171_540C_6D88_5931(variable)
     end
     context["友方已隐藏"] = true
     jass.ShowUnit(context["目标"], false)
+    local _____5269_4F59_79D2 = (context["到期时间"] - getGameTime()) / 1000
     registerManualBuff(
         context["目标"],
         _____516B_4E91_7D2BBuffID["神隐"],
-        math.max(
-            0.1,
-            (context["到期时间"] - getGameTime()) / 1000
-        ),
+        _____5269_4F59_79D2 >= 0.1 and _____5269_4F59_79D2 or 0.1,
         0,
         {sourceUnit = context["英雄"], effectSourceType = "技能"}
     )
@@ -65,6 +63,8 @@ local _____6280_80FD__83B7_53D6_6280_80FD_5F53_524D_51B7_5374_65F6_95F4 = ____re
 local _____6280_80FD__83B7_53D6_6280_80FD_6700_5927_51B7_5374_65F6_95F4 = ____require_result_7["技能_获取技能最大冷却时间"]
 local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
+local _____6781_5750_6807X = ____require_result_8["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_8["极坐标Y"]
 local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
 local getEnemyUnitsInRange = ____require_result_9.getEnemyUnitsInRange
 local ____require_result_10 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -184,14 +184,30 @@ local function _____6062_590D_516B_4E91_7D2B(context)
     _____79FB_9664_5355_4F4D_6682_505C(hero, ____E_6682_505C_6765_6E90)
 end
 local function _____83B7_53D6_654C_65B9_80CC_540E_70B9(target)
-    local radians = (jass.GetUnitFacing(target) + 180) * math.pi / 180
+    local _____80CC_540E_89D2_5EA6 = jass.GetUnitFacing(target) + 180
     local distance = _____914D_7F6E.E["敌方背后距离"]
-    local x = jass.GetUnitX(target) + math.cos(radians) * distance
-    local y = jass.GetUnitY(target) + math.sin(radians) * distance
+    local x = _____6781_5750_6807X(
+        jass.GetUnitX(target),
+        _____80CC_540E_89D2_5EA6,
+        distance
+    )
+    local y = _____6781_5750_6807Y(
+        jass.GetUnitY(target),
+        _____80CC_540E_89D2_5EA6,
+        distance
+    )
     if jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY) == true then
         distance = _____914D_7F6E.E["敌方阻挡回退距离"]
-        x = jass.GetUnitX(target) + math.cos(radians) * distance
-        y = jass.GetUnitY(target) + math.sin(radians) * distance
+        x = _____6781_5750_6807X(
+            jass.GetUnitX(target),
+            _____80CC_540E_89D2_5EA6,
+            distance
+        )
+        y = _____6781_5750_6807Y(
+            jass.GetUnitY(target),
+            _____80CC_540E_89D2_5EA6,
+            distance
+        )
     end
     return {x = x, y = y}
 end
@@ -223,10 +239,8 @@ local function _____7ED3_7B97_654C_65B9_5206_652F(context)
         ["持续秒"] = _____914D_7F6E.E["敌方结算特效持续秒"]
     })
     local attack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(context["英雄"])
-    local missingLife = math.max(
-        0,
-        jass.GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass.GetUnitState(target, UNIT_STATE_LIFE)
-    )
+    local _____7F3A_5931_751F_547D = jass.GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass.GetUnitState(target, UNIT_STATE_LIFE)
+    local missingLife = _____7F3A_5931_751F_547D > 0 and _____7F3A_5931_751F_547D or 0
     _____9020_6210E_4F24_5BB3(context, target, attack * _____914D_7F6E.E["敌方额外伤害攻击力比例"] + missingLife * _____914D_7F6E.E["敌方已损失生命比例"], "八云紫-E-敌方神隐突袭")
 end
 local function _____7ED3_7B97_6700_7EC8_5C55_5F00(context)

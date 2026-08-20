@@ -38,6 +38,10 @@ const { 沿角度步进直到地形阻挡 } = require("lib.扩展函数.封装�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
+const { 取单位ID, 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+  取单位ID: (this: void, unit: any) => number;
+  单位存活: (this: void, unit: any) => boolean;
+};
 
 const 单位类型ID = stringToFourCCSafe(一方通行单位技能配置.单位类型ID);
 const Q技能ID = stringToFourCCSafe(一方通行单位技能配置.Q技能ID);
@@ -46,7 +50,6 @@ const Q状态技能ID = stringToFourCCSafe(一方通行单位技能配置.Q状�
 const 配置 = 一方通行单位技能配置.Q;
 const Q运行时表: Record<number, Q运行时 | undefined> = {};
 
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
@@ -65,7 +68,6 @@ const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const IsTerrainPathable = jass.IsTerrainPathable as (this: void, x: number, y: number, pathingType: any) => boolean;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
-const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const PATHING_TYPE_FLOATABILITY = jass.PATHING_TYPE_FLOATABILITY as any;
 const EXSetUnitMoveType = japi.EXSetUnitMoveType as (this: void, unit: any, moveType: number) => void;
 
@@ -75,16 +77,6 @@ interface Q运行时 {
   targetX: number;
   targetY: number;
   tickId: number;
-}
-
-function 取单位ID(this: void, unit: any): number {
-  return unit == null || unit === 0 ? 0 : GetHandleId(unit) || 0;
-}
-
-function 单位存活(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && GetUnitTypeId(unit) !== 0
-    && !jass.IsUnitType(unit, UNIT_TYPE_DEAD)
-    && GetUnitState(unit, jass.UNIT_STATE_LIFE) > 0.405;
 }
 
 function 获取Q运行时(this: void, unit: any): Q运行时 | undefined {
@@ -135,15 +127,15 @@ function 矢量移动Tick(this: void, variable?: any): void {
   const currentY = GetUnitY(caster);
   const dx = runtime.targetX - currentX;
   const dy = runtime.targetY - currentY;
-  const distance = Math.sqrt(dx * dx + dy * dy);
+  const distance = jass.SquareRoot(dx * dx + dy * dy);
   if (distance <= 配置.到达距离) {
     停止Q当前移动(caster);
     return;
   }
 
-  const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+  const angle = jass.Atan2(dy, dx) * jass.bj_RADTODEG;
   const speedPerTick = ((GetUnitMoveSpeed(caster) || 0) + 配置.额外移动速度) * 配置.移动周期毫秒 / 1000;
-  const step = Math.min(distance, speedPerTick);
+  const step = distance < speedPerTick ? distance : speedPerTick;
   const next = 沿角度步进直到地形阻挡({
     起点X: currentX,
     起点Y: currentY,

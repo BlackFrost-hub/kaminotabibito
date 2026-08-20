@@ -11,6 +11,8 @@ import { SaberBuffID } from "../../../../05．Buff系统/03．Buff表/02．英�
 import { Saber设置阿瓦隆, Saber是否阿瓦隆 } from "./01．状态表";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
+
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
@@ -232,7 +234,7 @@ function 释放D技能(this: void, _context: D上下文, caster: any, _技能实
   };
   D运行时表[GetHandleId(caster)] = runtime;
   runtime.回蓝回调ID = addPeriodicCallback(
-    Math.round(配置.D.回蓝.间隔秒 * 1000),
+    秒转毫秒(配置.D.回蓝.间隔秒),
     推进D回蓝与粒子 as unknown as (this: void, variable?: any) => void,
     runtime,
   );

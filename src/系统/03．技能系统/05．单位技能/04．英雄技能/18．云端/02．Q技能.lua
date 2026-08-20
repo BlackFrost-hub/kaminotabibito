@@ -9,6 +9,8 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
+local ____08_FF0E_6280_80FD_4E8B_4EF6_4E2D_5FC3 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local registerSpellEndcastListener = ____08_FF0E_6280_80FD_4E8B_4EF6_4E2D_5FC3.registerSpellEndcastListener
 function CosDeg(_____89D2_5EA6)
     return Cos(_____89D2_5EA6 * bj_DEGTORAD)
 end
@@ -81,6 +83,9 @@ local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
 local WEAPON_TYPE_METAL_HEAVY_BASH = jass.WEAPON_TYPE_METAL_HEAVY_BASH
 local ____require_result_13 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_13.stringToFourCCSafe
+local ____require_result_14 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____require_result_14["秒转毫秒"]
+local _____5411_4E0B_53D6_6574_6574_6570 = ____require_result_14["向下取整整数"]
 local _____914D_7F6E = _____4E91_7AEF_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
 local ____Q_7C7B_578BID = stringToFourCCSafe(_____914D_7F6E.Q["技能ID"])
@@ -210,9 +215,13 @@ local function _____7ED3_7B97Q_547D_4E2D(ctx)
         )
         createTimedUnitEffect(target, "origin", _____914D_7F6E.Q["火"]["灼烧挂点模型"], _____914D_7F6E.Q["火"]["灼烧挂点持续秒"])
         registerManualBuff(target, _____4E91_7AEFBuffID["火剑灼烧"], _____914D_7F6E.Q["火"]["灼烧挂点持续秒"], 0)
+        if ctx["灼烧回调ID"] ~= 0 then
+            removePeriodicCallback(ctx["灼烧回调ID"])
+            ctx["灼烧回调ID"] = 0
+        end
         ctx["灼烧次数"] = 0
         ctx["灼烧回调ID"] = addPeriodicCallback(
-            math.floor(_____914D_7F6E.Q["火"]["灼烧"]["间隔秒"] * 1000 + 0.5),
+            _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["火"]["灼烧"]["间隔秒"]),
             _____63A8_8FDBQ_707C_70E7,
             ctx
         )
@@ -260,7 +269,7 @@ local function _____7ED3_7B97Q_547D_4E2D(ctx)
     end
     _____5168_5458_9707_5C4F(_____914D_7F6E.Q["摄像机震动强度"])
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["震动清除延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["震动清除延迟秒"]),
         _____5168_5458_6E05_9664_9707_5C4F,
         nil
     )
@@ -333,14 +342,14 @@ local function _____91CA_653EQ_51B0_706B_9B54_5251(context, caster, _____6280_80
         ["结束回调"] = ____Q_51B2_950B_7ED3_675F
     })
     local _____62D6_5C3E_53C2_6570 = _____5206_652F == "火" and _____914D_7F6E.Q["火"]["移动特效"] or _____914D_7F6E.Q["冰"]["移动特效"]
-    local _____62D6_5C3E_6B21_6570 = math.floor(_____8DDD_79BB / _____914D_7F6E.Q["冲锋"]["每Tick距离"])
+    local _____62D6_5C3E_6B21_6570 = _____5411_4E0B_53D6_6574_6574_6570(_____8DDD_79BB / _____914D_7F6E.Q["冲锋"]["每Tick距离"])
     do
         local i = 1
         while i <= _____62D6_5C3E_6B21_6570 do
             local px = sx + CosDeg(_____89D2_5EA6) * (i * _____914D_7F6E.Q["冲锋"]["每Tick距离"])
             local py = sy + SinDeg(_____89D2_5EA6) * (i * _____914D_7F6E.Q["冲锋"]["每Tick距离"])
             addDelayedCallback(
-                math.floor(i * _____914D_7F6E.Q["冲锋"]["Tick间隔秒"] * 1000 + 0.5),
+                _____79D2_8F6C_6BEB_79D2(i * _____914D_7F6E.Q["冲锋"]["Tick间隔秒"]),
                 ____Q_94FA_62D6_5C3E,
                 {
                     ["模型"] = _____62D6_5C3E_53C2_6570["模型"],
@@ -358,6 +367,24 @@ end
 Cos = jass.Cos
 Sin = jass.Sin
 bj_DEGTORAD = jass.bj_DEGTORAD
+--- 施法中断清理（SPELL_ENDCAST 触发，正常结算后已启动=false 幂等跳过）。
+-- 冲锋被取消/打断时只恢复本技能状态：不结算伤害、不启动灼烧、不移除他人暂停。
+-- GS_Suspend 为具名暂停来源（只清本技能硬直），SetUnitInvulnerable 恢复 Q 自己给的冲锋无敌。
+local function _____4E91_7AEFQ_4E2D_65AD_6E05_7406(_____65BD_6CD5_5355_4F4D, _____6280_80FDID_6570_503C)
+    if _____6280_80FDID_6570_503C ~= ____Q_7C7B_578BID then
+        return
+    end
+    local ctx = ____Q_4E0A_4E0B_6587_8868[GetHandleId(_____65BD_6CD5_5355_4F4D)]
+    if ctx == nil or ctx["已启动"] ~= true then
+        return
+    end
+    ctx["已启动"] = false
+    local caster = ctx["施法者"]
+    if caster ~= nil and caster ~= 0 then
+        GS_Suspend(caster, 0)
+        SetUnitInvulnerable(caster, false)
+    end
+end
 ____exports["注册云端Q"] = function()
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "云端-冰火魔剑（Q）",
@@ -370,6 +397,7 @@ ____exports["注册云端Q"] = function()
         ["独立技能来源类型"] = "单位技能",
         ["技能实例持续时间秒"] = 6
     })
+    registerSpellEndcastListener(_____4E91_7AEFQ_4E2D_65AD_6E05_7406)
 end
 ____exports["注册云端Q"]()
 return ____exports

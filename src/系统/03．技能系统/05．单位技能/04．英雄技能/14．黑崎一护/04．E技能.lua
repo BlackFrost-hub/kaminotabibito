@@ -12,6 +12,8 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
@@ -32,11 +34,15 @@ local Sound3DII_CooPlayPool4MultiInstanceRare = ____require_result_5.Sound3DII_C
 local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
 local _____9500_6BC1_70B9_7279_6548 = ____require_result_6["销毁点特效"]
-local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_7.registerDeathListener
-local ____require_result_8 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local IsUnitAliveBJ = ____require_result_8.IsUnitAliveBJ
-local SelectUnitForPlayerSingle = ____require_result_8.SelectUnitForPlayerSingle
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_7["创建单位并登记排泄安全"]
+local ____require_result_8 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_8["立即移除单位并取消排泄登记"]
+local ____require_result_9 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_9.registerDeathListener
+local ____require_result_10 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_10.IsUnitAliveBJ
+local SelectUnitForPlayerSingle = ____require_result_10.SelectUnitForPlayerSingle
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
@@ -44,7 +50,6 @@ local GetUnitState = jass.GetUnitState
 local GetRandomInt = jass.GetRandomInt
 local GetRandomReal = jass.GetRandomReal
 local GetOwningPlayer = jass.GetOwningPlayer
-local CreateUnit = jass.CreateUnit
 local UnitApplyTimedLife = jass.UnitApplyTimedLife
 local ShowUnit = jass.ShowUnit
 local SquareRoot = jass.SquareRoot
@@ -64,8 +69,8 @@ local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_ENHANCED = jass.DAMAGE_TYPE_ENHANCED
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
+local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_11.stringToFourCCSafe
 local stringToFourCC = stringToFourCCSafe
 local _____914D_7F6E = _____9ED1_5D0E_4E00_62A4_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
@@ -106,7 +111,7 @@ local function _____6062_590DE_65BD_6CD5_8005_663E_793A(ctx)
         )
     end
     if ctx["视野马甲"] ~= nil and ctx["视野马甲"] ~= 0 then
-        jass.RemoveUnit(ctx["视野马甲"])
+        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(ctx["视野马甲"])
         ctx["视野马甲"] = nil
     end
 end
@@ -424,7 +429,7 @@ local function ____E_8FDE_643A_8D77_624B_51B2_950B(variable)
     end
     ctx["冲锋Tick数"] = 0
     ctx["冲锋回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.E["连携"]["推进间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.E["连携"]["推进间隔秒"]),
         _____63A8_8FDBE_5E7B_5F71_51B2_950B,
         ctx
     )
@@ -488,7 +493,7 @@ local function _____91CA_653E_77AC_6B65_65A9(context, caster, _____6280_80FD_5B9
         _____8FDE_643A_76EE_6807 = _____9009_53D6E_8FDE_643A_76EE_6807(caster, x, y)
     end
     ShowUnit(caster, false)
-    context["视野马甲"] = CreateUnit(
+    context["视野马甲"] = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
         GetOwningPlayer(caster),
         _____89C6_91CE_9A6C_7532_7C7B_578BID,
         x,
@@ -526,8 +531,8 @@ local function _____91CA_653E_77AC_6B65_65A9(context, caster, _____6280_80FD_5B9
                     ["缩放"] = _____914D_7F6E.E["连携"]["幻影缩放"],
                     ["透明度"] = _____914D_7F6E.E["连携"]["幻影透明度"]
                 })
-                local ____context__5E7B_5F71_5217_8868_10 = context["幻影列表"]
-                ____context__5E7B_5F71_5217_8868_10[#____context__5E7B_5F71_5217_8868_10 + 1] = {
+                local ____context__5E7B_5F71_5217_8868_12 = context["幻影列表"]
+                ____context__5E7B_5F71_5217_8868_12[#____context__5E7B_5F71_5217_8868_12 + 1] = {
                     X = px,
                     Y = py,
                     ["面向角度"] = faceDeg,
@@ -538,7 +543,7 @@ local function _____91CA_653E_77AC_6B65_65A9(context, caster, _____6280_80FD_5B9
             end
         end
         addDelayedCallback(
-            math.floor(_____914D_7F6E.E["连携"]["冲锋延迟秒"] * 1000 + 0.5),
+            _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.E["连携"]["冲锋延迟秒"]),
             ____E_8FDE_643A_8D77_624B_51B2_950B,
             context
         )
@@ -554,7 +559,7 @@ local function _____91CA_653E_77AC_6B65_65A9(context, caster, _____6280_80FD_5B9
             ["持续秒"] = 1.2
         })
         context["普通回调ID"] = addPeriodicCallback(
-            math.floor(_____914D_7F6E.E["普通"]["斩击间隔秒"] * 1000 + 0.5),
+            _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.E["普通"]["斩击间隔秒"]),
             _____63A8_8FDBE_666E_901A_65A9_51FB,
             context
         )
@@ -583,7 +588,7 @@ local function ____E_5355_4F4D_6B7B_4EA1_6E05_7406(dyingUnit, _killingUnit)
     ctx["已启动"] = false
     _____6E05_7406E_5E7B_5F71(ctx)
     if ctx["视野马甲"] ~= nil and ctx["视野马甲"] ~= 0 then
-        jass.RemoveUnit(ctx["视野马甲"])
+        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(ctx["视野马甲"])
         ctx["视野马甲"] = nil
     end
 end

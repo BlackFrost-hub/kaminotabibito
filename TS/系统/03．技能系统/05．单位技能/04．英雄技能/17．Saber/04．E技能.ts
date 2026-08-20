@@ -14,6 +14,7 @@ import {
 } from "./01．状态表";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 
 const jass = require("jass.common") as any;
 
@@ -173,7 +174,7 @@ function 释放E技能(this: void, _context: E上下文, caster: any, _技能实
   };
   E运行时表[GetHandleId(caster)] = runtime;
   runtime.周期回调ID = addPeriodicCallback(
-    Math.round(配置.E.周期间隔秒 * 1000),
+    秒转毫秒(配置.E.周期间隔秒),
     推进E周期 as unknown as (this: void, variable?: any) => void,
     runtime,
   );

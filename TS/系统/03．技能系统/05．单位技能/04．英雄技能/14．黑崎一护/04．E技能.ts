@@ -9,6 +9,7 @@ import { 是否瞬步连携中, 关闭瞬步连携, 黑崎一护是否卍解 } f
 import { 黑崎一护BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/09．黑崎一护";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -38,6 +39,12 @@ const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函
   创建点特效: (this: void, params: any) => any;
   销毁点特效: (this: void, effect: any) => void;
 };
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
@@ -54,7 +61,6 @@ const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) =>
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
 const GetRandomReal = jass.GetRandomReal as (this: void, low: number, high: number) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
-const CreateUnit = jass.CreateUnit as (this: void, p: any, typeId: number, x: number, y: number, facing: number) => any;
 const UnitApplyTimedLife = jass.UnitApplyTimedLife as (this: void, unit: any, buffId: number, duration: number) => void;
 const ShowUnit = jass.ShowUnit as (this: void, unit: any, show: boolean) => void;
 const SquareRoot = jass.SquareRoot as (this: void, x: number) => number;
@@ -147,7 +153,7 @@ function 恢复E施法者显示(this: void, ctx: E上下文): void {
     SelectUnitForPlayerSingle(caster, GetOwningPlayer(caster));
   }
   if (ctx.视野马甲 != null && ctx.视野马甲 !== 0) {
-    jass.RemoveUnit(ctx.视野马甲);
+    立即移除单位并取消排泄登记(ctx.视野马甲);
     ctx.视野马甲 = null;
   }
 }
@@ -385,7 +391,7 @@ function E连携起手冲锋(this: void, variable: any): void {
   }
   ctx.冲锋Tick数 = 0;
   ctx.冲锋回调ID = addPeriodicCallback(
-    Math.round(配置.E.连携.推进间隔秒 * 1000),
+    秒转毫秒(配置.E.连携.推进间隔秒),
     推进E幻影冲锋 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -439,7 +445,7 @@ function 释放瞬步斩(this: void, context: E上下文, caster: any, 技能实
 
   // 源：隐藏本体，创建视野马甲保持视野
   ShowUnit(caster, false);
-  context.视野马甲 = CreateUnit(GetOwningPlayer(caster), 视野马甲类型ID, x, y, 0);
+  context.视野马甲 = 创建单位并登记排泄安全(GetOwningPlayer(caster), 视野马甲类型ID, x, y, 0);
   UnitApplyTimedLife(context.视野马甲, 定时生命BuffID, 2.5);
 
   if (连携目标 != null && 连携目标 !== 0) {
@@ -472,7 +478,7 @@ function 释放瞬步斩(this: void, context: E上下文, caster: any, 技能实
     }
 
     addDelayedCallback(
-      Math.round(配置.E.连携.冲锋延迟秒 * 1000),
+      秒转毫秒(配置.E.连携.冲锋延迟秒),
       E连携起手冲锋 as unknown as (this: void, variable?: any) => void,
       context,
     );
@@ -480,7 +486,7 @@ function 释放瞬步斩(this: void, context: E上下文, caster: any, 技能实
     // 普通分支：1.5 秒范围斩击
     创建点特效({ 模型路径: "war3mapImported\\dustwaveanimate.mdl", X: x, Y: y, Z: 0, 面向角度: GetRandomReal(1, 360), 缩放: 2, 动画速度: 2.5, 持续秒: 1.2 });
     context.普通回调ID = addPeriodicCallback(
-      Math.round(配置.E.普通.斩击间隔秒 * 1000),
+      秒转毫秒(配置.E.普通.斩击间隔秒),
       推进E普通斩击 as unknown as (this: void, variable?: any) => void,
       context,
     );
@@ -505,7 +511,7 @@ function E单位死亡清理(this: void, dyingUnit: any, _killingUnit: any): voi
   ctx.已启动 = false;
   清理E幻影(ctx);
   if (ctx.视野马甲 != null && ctx.视野马甲 !== 0) {
-    jass.RemoveUnit(ctx.视野马甲);
+    立即移除单位并取消排泄登记(ctx.视野马甲);
     ctx.视野马甲 = null;
   }
 }

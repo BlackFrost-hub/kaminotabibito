@@ -1,7 +1,6 @@
 /** @noSelfInFile */
 
 export * from "./00．配置";
-export * from "./00B．诊断";
 export * from "./Q技能";
 export * from "./W技能";
 export * from "./E技能";

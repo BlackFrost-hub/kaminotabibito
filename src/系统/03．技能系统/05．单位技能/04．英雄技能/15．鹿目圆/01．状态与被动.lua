@@ -1,21 +1,15 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____53D6_5355_4F4DID, _____56E0_679C_5C42_72B6_6001_952E, _____5355_4F4D_5B58_6D3B, _____786E_4FDD_9E7F_76EE_5706_5F62_6001_6280_80FD, _____540C_6B65_5706_795E_6280_80FD_53EF_7528_6027, _____53D6_5706_795E_72B6_6001, _____64AD_653E_5706_795E_964D_4E34_70B9_7279_6548, _____5706_795E_964D_4E34_5C55_793A_82F1_96C4, _____521B_5EFA_5706_795E_6A31_82B1_5355_4F4D, _____5706_795E_964D_4E34_4E0B_964D, _____5706_795E_6301_7EED_8DDF_968F, _____8BBE_7F6E_5706_795E_653B_51FB_529B, _____5706_795E_72B6_6001_5230_671F, _____5237_65B0_56E0_679C_5C42Buff, _____89E6_53D1_56E0_679C_6EE1_5C42, jass, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime, doHeal, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____79FB_9664_5355_4F4D_8D1F_9762Buff, _____4E34_65F6_8C03_6574_653B_901F, _____8C03_6574_73A9_5BB6_5C5E_6027, _____521B_5EFA_70B9_7279_6548, _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168, _____786E_4FDD_5355_4F4D_53EF_8BBE_7F6E_98DE_884C_9AD8_5EA6, GetHandleId, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, GetUnitFlyHeight, GetUnitDefaultFlyHeight, GetOwningPlayer, SetPlayerAbilityAvailable, SetUnitState, SetUnitPosition, SetUnitFlyHeight, SetUnitScale, SetUnitInvulnerable, ShowUnit, PauseUnit, UnitApplyTimedLife, RemoveUnit, UnitAddAbility, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_STATE_ATTACK1_BASE, DzSetUnitID, GetUnitStateJapi, SetUnitStateJapi, DzSetUnitModel, UNIT_TIMED_LIFE_BUFF, BJ_DEGTORAD, Cos, Sin, _____914D_7F6E, _____5706_795E_72B6_6001_8868, _____5706_73AF_5F3A_5316_72B6_6001_8868, _____56E0_679C_5C42_72B6_6001_8868, _____5706_73AF_4E4B_7406_65BD_6CD5_4E2D_8868
+local _____56E0_679C_5C42_72B6_6001_952E, _____786E_4FDD_9E7F_76EE_5706_5F62_6001_6280_80FD, _____540C_6B65_5706_795E_6280_80FD_53EF_7528_6027, _____53D6_5706_795E_72B6_6001, _____64AD_653E_5706_795E_964D_4E34_70B9_7279_6548, _____5706_795E_964D_4E34_5C55_793A_82F1_96C4, _____521B_5EFA_5706_795E_6A31_82B1_5355_4F4D, _____5706_795E_964D_4E34_4E0B_964D, _____5706_795E_6301_7EED_8DDF_968F, _____8BBE_7F6E_5706_795E_653B_51FB_529B, _____5706_795E_72B6_6001_5230_671F, _____5237_65B0_56E0_679C_5C42Buff, _____89E6_53D1_56E0_679C_6EE1_5C42, jass, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback, getServerTime, doHeal, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____79FB_9664_5355_4F4D_8D1F_9762Buff, _____4E34_65F6_8C03_6574_653B_901F, _____8C03_6574_73A9_5BB6_5C5E_6027, _____521B_5EFA_70B9_7279_6548, _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168, _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0, _____786E_4FDD_5355_4F4D_53EF_8BBE_7F6E_98DE_884C_9AD8_5EA6, _____53D6_5355_4F4DID, _____5355_4F4D_5B58_6D3B, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitFlyHeight, GetUnitDefaultFlyHeight, GetOwningPlayer, SetPlayerAbilityAvailable, SetUnitState, SetUnitPosition, SetUnitFlyHeight, SetUnitScale, SetUnitInvulnerable, ShowUnit, PauseUnit, UnitApplyTimedLife, UnitAddAbility, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_STATE_ATTACK1_BASE, DzSetUnitID, GetUnitStateJapi, SetUnitStateJapi, DzSetUnitModel, UNIT_TIMED_LIFE_BUFF, BJ_DEGTORAD, Cos, Sin, _____914D_7F6E, _____5706_795E_72B6_6001_8868, _____5706_73AF_5F3A_5316_72B6_6001_8868, _____56E0_679C_5C42_72B6_6001_8868, _____5706_73AF_4E4B_7406_65BD_6CD5_4E2D_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.15．鹿目圆.00．配置")
 local _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["鹿目圆单位技能配置"]
 local ____10_FF0E_9E7F_76EE_5706 = require("系统.05．Buff系统.03．Buff表.02．英雄.10．鹿目圆")
 local _____9E7F_76EE_5706BuffID = ____10_FF0E_9E7F_76EE_5706["鹿目圆BuffID"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
-function _____53D6_5355_4F4DID(unit)
-    return (unit == nil or unit == 0) and 0 or GetHandleId(unit)
-end
 function _____56E0_679C_5C42_72B6_6001_952E(source, target)
     return (tostring(_____53D6_5355_4F4DID(source)) .. "#") .. tostring(_____53D6_5355_4F4DID(target))
-end
-function _____5355_4F4D_5B58_6D3B(unit)
-    return unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
 end
 function _____786E_4FDD_9E7F_76EE_5706_5F62_6001_6280_80FD(hero)
     if hero == nil or hero == 0 then
@@ -222,7 +216,7 @@ ____exports["结束鹿目圆圆神"] = function(hero, _____539F_56E0)
             state["持续跟随ID"] = 0
         end
         if state["圆神樱花特效"] ~= nil and state["圆神樱花特效"] ~= 0 and GetUnitTypeId(state["圆神樱花特效"]) ~= 0 then
-            RemoveUnit(state["圆神樱花特效"])
+            _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(state["圆神樱花特效"])
             state["圆神樱花特效"] = nil
         end
         if state["阶段"] == "降临中" then
@@ -278,10 +272,11 @@ function _____5237_65B0_56E0_679C_5C42Buff(state)
             i = i + 1
         end
     end
+    local _____5269_4F59_79D2 = (maxExpiry - now) / 1000
     registerManualBuff(
         state["目标"],
         _____9E7F_76EE_5706BuffID["因果之力"],
-        math.max(0.1, (maxExpiry - now) / 1000),
+        _____5269_4F59_79D2 >= 0.1 and _____5269_4F59_79D2 or 0.1,
         _____914D_7F6E["被动"]["每层攻速"],
         {sourceUnit = state["来源"], stack = count}
     )
@@ -316,8 +311,8 @@ ____exports["添加鹿目圆因果层"] = function(source, target)
         _____56E0_679C_5C42_72B6_6001_8868[key] = state
     end
     if #state["到期毫秒列表"] < _____914D_7F6E["被动"]["最大层数"] then
-        local ____state__5230_671F_6BEB_79D2_5217_8868_18 = state["到期毫秒列表"]
-        ____state__5230_671F_6BEB_79D2_5217_8868_18[#____state__5230_671F_6BEB_79D2_5217_8868_18 + 1] = getServerTime() + _____914D_7F6E["被动"]["单层持续秒"] * 1000
+        local ____state__5230_671F_6BEB_79D2_5217_8868_20 = state["到期毫秒列表"]
+        ____state__5230_671F_6BEB_79D2_5217_8868_20[#____state__5230_671F_6BEB_79D2_5217_8868_20 + 1] = getServerTime() + _____914D_7F6E["被动"]["单层持续秒"] * 1000
         _____4E34_65F6_8C03_6574_653B_901F(target, _____914D_7F6E["被动"]["每层攻速"])
     end
     _____5237_65B0_56E0_679C_5C42Buff(state)
@@ -345,23 +340,26 @@ local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用�
 _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
 local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
 _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_6["创建单位并登记排泄安全"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.00．共享")
-_____786E_4FDD_5355_4F4D_53EF_8BBE_7F6E_98DE_884C_9AD8_5EA6 = ____require_result_7["确保单位可设置飞行高度"]
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_8.stringToFourCCSafe
-local ____require_result_9 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_9.registerDeathListener
-local ____require_result_10 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_10.registerDamageModifier
-local ____require_result_11 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local _____5EF6_540E_4E00_5E27_6267_884C_4F24_5BB3_6D3E_751F_6548_679C = ____require_result_11["延后一帧执行伤害派生效果"]
-local ____require_result_12 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_12["造成单体技能伤害"]
-GetHandleId = jass.GetHandleId
+local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+_____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_7["立即移除单位并取消排泄登记"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.00．共享")
+_____786E_4FDD_5355_4F4D_53EF_8BBE_7F6E_98DE_884C_9AD8_5EA6 = ____require_result_8["确保单位可设置飞行高度"]
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
+local ____require_result_10 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_10.registerDeathListener
+local ____require_result_11 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_11.registerDamageModifier
+local ____require_result_12 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local _____5EF6_540E_4E00_5E27_6267_884C_4F24_5BB3_6D3E_751F_6548_679C = ____require_result_12["延后一帧执行伤害派生效果"]
+local ____require_result_13 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_13["造成单体技能伤害"]
+local ____require_result_14 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+_____53D6_5355_4F4DID = ____require_result_14["取单位ID"]
+_____5355_4F4D_5B58_6D3B = ____require_result_14["单位存活"]
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
-GetUnitState = jass.GetUnitState
 GetUnitFlyHeight = jass.GetUnitFlyHeight
 GetUnitDefaultFlyHeight = jass.GetUnitDefaultFlyHeight
 GetOwningPlayer = jass.GetOwningPlayer
@@ -376,7 +374,6 @@ ShowUnit = jass.ShowUnit
 PauseUnit = jass.PauseUnit
 local UnitRemoveBuffsEx = jass.UnitRemoveBuffsEx
 UnitApplyTimedLife = jass.UnitApplyTimedLife
-RemoveUnit = jass.RemoveUnit
 local ConvertUnitState = jass.ConvertUnitState
 UnitAddAbility = jass.UnitAddAbility
 local SetUnitAnimation = jass.SetUnitAnimation
@@ -391,11 +388,11 @@ GetUnitStateJapi = japi.GetUnitState
 SetUnitStateJapi = japi.SetUnitState
 DzSetUnitModel = japi.DzSetUnitModel
 UNIT_TIMED_LIFE_BUFF = stringToFourCCSafe("BHwe")
-local ____jass_bj_DEGTORAD_13 = jass.bj_DEGTORAD
-if ____jass_bj_DEGTORAD_13 == nil then
-    ____jass_bj_DEGTORAD_13 = 0.017453292519943295
+local ____jass_bj_DEGTORAD_15 = jass.bj_DEGTORAD
+if ____jass_bj_DEGTORAD_15 == nil then
+    ____jass_bj_DEGTORAD_15 = 0.017453292519943295
 end
-BJ_DEGTORAD = ____jass_bj_DEGTORAD_13
+BJ_DEGTORAD = ____jass_bj_DEGTORAD_15
 Cos = jass.Cos
 Sin = jass.Sin
 _____914D_7F6E = _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E
@@ -491,10 +488,10 @@ ____exports["进入鹿目圆圆神"] = function(hero)
     _____786E_4FDD_9E7F_76EE_5706_5F62_6001_6280_80FD(hero)
     DzSetUnitID(hero, _____914D_7F6E["单位"]["圆神类型ID"])
     _____786E_4FDD_9E7F_76EE_5706_5F62_6001_6280_80FD(hero)
-    local ____hero_14 = hero
+    local ____hero_16 = hero
     _____5706_795E_72B6_6001_7248_672C = _____5706_795E_72B6_6001_7248_672C + 1
     local state = {
-        ["英雄"] = ____hero_14,
+        ["英雄"] = ____hero_16,
         ["到期毫秒"] = 0,
         ["版本"] = _____5706_795E_72B6_6001_7248_672C,
         ["阶段"] = "降临中",
@@ -575,13 +572,13 @@ ____exports["激活鹿目圆圆环强化"] = function(hero)
     local id = _____53D6_5355_4F4DID(hero)
     local state = _____5706_73AF_5F3A_5316_72B6_6001_8868[id]
     if state == nil or state["到期毫秒"] <= now then
-        local ____hero_15 = hero
-        local ____temp_16 = now + _____914D_7F6E.D["持续秒"] * 1000
+        local ____hero_17 = hero
+        local ____temp_18 = now + _____914D_7F6E.D["持续秒"] * 1000
         _____5706_73AF_5F3A_5316_7248_672C = _____5706_73AF_5F3A_5316_7248_672C + 1
         state = {
-            ["英雄"] = ____hero_15,
+            ["英雄"] = ____hero_17,
             ["层数"] = 1,
-            ["到期毫秒"] = ____temp_16,
+            ["到期毫秒"] = ____temp_18,
             ["版本"] = _____5706_73AF_5F3A_5316_7248_672C,
             ["W立即满蓄"] = ____exports["是鹿目圆圆神"](hero)
         }
@@ -589,19 +586,16 @@ ____exports["激活鹿目圆圆环强化"] = function(hero)
     else
         state["层数"] = state["层数"] + 1
         state["到期毫秒"] = now + _____914D_7F6E.D["持续秒"] * 1000
-        local ____state_17 = state
+        local ____state_19 = state
         _____5706_73AF_5F3A_5316_7248_672C = _____5706_73AF_5F3A_5316_7248_672C + 1
-        ____state_17["版本"] = _____5706_73AF_5F3A_5316_7248_672C
+        ____state_19["版本"] = _____5706_73AF_5F3A_5316_7248_672C
         if ____exports["是鹿目圆圆神"](hero) then
             state["W立即满蓄"] = true
         end
     end
     _____5237_65B0_5706_73AF_5F3A_5316Buff(state)
-    addDelayedCallback(
-        math.max(1, state["到期毫秒"] - now),
-        _____5706_73AF_5F3A_5316_5230_671F,
-        {hero = hero, version = state["版本"]}
-    )
+    local _____5269_4F59_6BEB_79D2 = state["到期毫秒"] - now
+    addDelayedCallback(_____5269_4F59_6BEB_79D2 >= 1 and _____5269_4F59_6BEB_79D2 or 1, _____5706_73AF_5F3A_5316_5230_671F, {hero = hero, version = state["版本"]})
     return state["层数"]
 end
 ____exports["获取鹿目圆圆环强化层数"] = function(hero)
@@ -671,11 +665,11 @@ local function _____63A8_8FDB_9E7F_76EE_5706_56E0_679C_5C42()
         do
             local state = _____56E0_679C_5C42_72B6_6001_8868[key]
             if state == nil then
-                goto __continue105
+                goto __continue103
             end
             if not _____5355_4F4D_5B58_6D3B(state["来源"]) or not _____5355_4F4D_5B58_6D3B(state["目标"]) then
                 _____6E05_7406_56E0_679C_5C42_72B6_6001(key, state)
-                goto __continue105
+                goto __continue103
             end
             local removed = 0
             local kept = {}
@@ -695,12 +689,12 @@ local function _____63A8_8FDB_9E7F_76EE_5706_56E0_679C_5C42()
                 _____4E34_65F6_8C03_6574_653B_901F(state["目标"], -_____914D_7F6E["被动"]["每层攻速"] * removed)
                 if #kept <= 0 then
                     _____6E05_7406_56E0_679C_5C42_72B6_6001(key, state)
-                    goto __continue105
+                    goto __continue103
                 end
                 _____5237_65B0_56E0_679C_5C42Buff(state)
             end
         end
-        ::__continue105::
+        ::__continue103::
     end
 end
 local function _____7ED3_7B97_5706_795E_666E_653B_6D3E_751F_961F_5217()
@@ -708,7 +702,7 @@ local function _____7ED3_7B97_5706_795E_666E_653B_6D3E_751F_961F_5217()
         do
             local record = table.remove(_____5706_795E_666E_653B_6D3E_751F_961F_5217, 1)
             if record == nil or not _____5355_4F4D_5B58_6D3B(record["来源"]) or not _____5355_4F4D_5B58_6D3B(record["目标"]) then
-                goto __continue116
+                goto __continue114
             end
             _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
                 ["来源"] = record["来源"],
@@ -726,46 +720,46 @@ local function _____7ED3_7B97_5706_795E_666E_653B_6D3E_751F_961F_5217()
                 ["忽略魔法抗性"] = true
             })
         end
-        ::__continue116::
+        ::__continue114::
     end
 end
 local function _____5706_795E_666E_653B_4F24_5BB3_4FEE_6B63(context)
-    local ____opt_result_21
+    local ____opt_result_23
     if context ~= nil then
-        ____opt_result_21 = context.attacker
+        ____opt_result_23 = context.attacker
     end
-    local attacker = ____opt_result_21
+    local attacker = ____opt_result_23
     if not ____exports["是鹿目圆圆神"](attacker) then
-        local ____opt_result_24
+        local ____opt_result_26
         if context ~= nil then
-            ____opt_result_24 = context.currentDamage
+            ____opt_result_26 = context.currentDamage
         end
-        local ____opt_result_24_25 = ____opt_result_24
-        if ____opt_result_24_25 == nil then
-            ____opt_result_24_25 = 0
+        local ____opt_result_26_27 = ____opt_result_26
+        if ____opt_result_26_27 == nil then
+            ____opt_result_26_27 = 0
         end
-        return ____opt_result_24_25
+        return ____opt_result_26_27
     end
-    local ____opt_result_28
+    local ____opt_result_30
     if context ~= nil then
-        ____opt_result_28 = context.isNormalAttack
+        ____opt_result_30 = context.isNormalAttack
     end
-    local ____temp_32 = ____opt_result_28 ~= true
-    if not ____temp_32 then
-        local ____opt_result_31
+    local ____temp_34 = ____opt_result_30 ~= true
+    if not ____temp_34 then
+        local ____opt_result_33
         if context ~= nil then
-            ____opt_result_31 = context.isPhysicalDamage
+            ____opt_result_33 = context.isPhysicalDamage
         end
-        ____temp_32 = ____opt_result_31 ~= true
+        ____temp_34 = ____opt_result_33 ~= true
     end
-    if ____temp_32 then
+    if ____temp_34 then
         return context.currentDamage
     end
-    local ____opt_result_35
+    local ____opt_result_37
     if context ~= nil then
-        ____opt_result_35 = context.isWrappedSkillDamage
+        ____opt_result_37 = context.isWrappedSkillDamage
     end
-    if ____opt_result_35 == true then
+    if ____opt_result_37 == true then
         return context.currentDamage
     end
     local target = context.target
@@ -787,13 +781,13 @@ local function _____9E7F_76EE_5706_6B7B_4EA1_6E05_7406(dyingUnit, _killingUnit)
         do
             local state = _____56E0_679C_5C42_72B6_6001_8868[key]
             if state == nil then
-                goto __continue125
+                goto __continue123
             end
             if state["来源"] == dyingUnit or state["目标"] == dyingUnit then
                 _____6E05_7406_56E0_679C_5C42_72B6_6001(key, state)
             end
         end
-        ::__continue125::
+        ::__continue123::
     end
 end
 ____exports["注册鹿目圆状态与被动"] = function()

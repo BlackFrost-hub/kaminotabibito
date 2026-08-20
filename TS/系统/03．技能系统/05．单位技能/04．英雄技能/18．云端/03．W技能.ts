@@ -9,6 +9,9 @@ import { 消耗云端W模式 } from "./01．状态表";
 import { 云端BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/18．云端";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
+import { 获取坐标范围单位按筛选 } from "../../../00．技能模板+函数/02．通用函数/02．单位与范围";
+import { registerSpellEndcastListener } from "../../../../00．核心系统/01．事件中心/08．技能事件中心";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -51,21 +54,14 @@ const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, 
 const GetHeroInt = jass.GetHeroInt as (this: void, unit: any, includeBonuses: boolean) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, p: any) => boolean;
-const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, unit: any, flag: boolean) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, name: string) => void;
-const CreateGroup = jass.CreateGroup as (this: void) => any;
-const DestroyGroup = jass.DestroyGroup as (this: void, g: any) => void;
-const GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange as (this: void, g: any, x: number, y: number, radius: number, filter: any) => void;
-const FirstOfGroup = jass.FirstOfGroup as (this: void, g: any) => any;
-const GroupRemoveUnit = jass.GroupRemoveUnit as (this: void, g: any, u: any) => void;
 const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const Sin = jass.Sin as (this: void, radians: number) => number;
 const bj_RADTODEG = jass.bj_RADTODEG as number;
 const bj_DEGTORAD = jass.bj_DEGTORAD as number;
-const UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_DIVINE = jass.DAMAGE_TYPE_DIVINE as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
@@ -140,15 +136,20 @@ function 结束W路径(this: void, ctx: W上下文): void {
 function 结算W范围(this: void, ctx: W上下文, x: number, y: number): void {
   const caster = ctx.施法者;
   const owner = GetOwningPlayer(caster);
-  const group = CreateGroup();
-  GroupEnumUnitsInRange(group, x, y, 配置.W.路径.结算半径码, null);
-  let u = FirstOfGroup(group);
-  while (u != null && u !== 0) {
-    GroupRemoveUnit(group, u);
-    if (IsUnitAliveBJ(u) && !IsUnitType(u, UNIT_TYPE_STRUCTURE) && ctx.已命中组[GetHandleId(u)] !== true) {
-      ctx.已命中组[GetHandleId(u)] = true;
-      const 是敌人 = IsUnitEnemy(u, owner);
-      if (ctx.模式 === "光剑") {
+  const 单位列表 = 获取坐标范围单位按筛选(x, y, 配置.W.路径.结算半径码, caster, {
+    要求有效单位: true,
+    允许建筑: false,
+    允许机械: true,
+    允许古树: true,
+    允许无敌: true, // 源语义 IsUnitAliveBJ+非建筑，不排除无敌单位
+  });
+  for (let i = 0; i < 单位列表.length; i++) {
+    const u = 单位列表[i];
+    if (u == null || u === 0) continue;
+    if (ctx.已命中组[GetHandleId(u)] === true) continue;
+    ctx.已命中组[GetHandleId(u)] = true;
+    const 是敌人 = IsUnitEnemy(u, owner);
+    if (ctx.模式 === "光剑") {
         if (是敌人) {
           造成单体技能伤害({
             来源: caster,
@@ -190,10 +191,7 @@ function 结算W范围(this: void, ctx: W上下文, x: number, y: number): void 
         施加眩晕(caster, u, 配置.W.暗剑.眩晕秒, "云端-暗剑", "技能");
         registerManualBuff(u, 云端BuffID.暗剑眩晕, 配置.W.暗剑.眩晕秒, 0);
       }
-    }
-    u = FirstOfGroup(group);
   }
-  DestroyGroup(group);
 }
 
 function 推进W路径(this: void, variable: any): void {
@@ -233,7 +231,7 @@ function 启动W路径(this: void, variable: any): void {
   }
   ctx.Tick数 = 0;
   ctx.回调ID = addPeriodicCallback(
-    Math.round(配置.W.路径.Tick间隔秒 * 1000),
+    秒转毫秒(配置.W.路径.Tick间隔秒),
     推进W路径 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -293,10 +291,22 @@ function 释放W光暗魔剑(this: void, context: W上下文, caster: any, 技�
   });
 
   addDelayedCallback(
-    Math.round(配置.W.路径.启动延迟秒 * 1000),
+    秒转毫秒(配置.W.路径.启动延迟秒),
     启动W路径 as unknown as (this: void, variable?: any) => void,
     context,
   );
+}
+
+/**
+ * 施法中断清理（SPELL_ENDCAST 触发，正常结束路径已启动=false 幂等跳过）。
+ * 复用 `结束W路径`：移除路径回调、销毁路径特效、复位已命中组/已启动、
+ * 恢复 GS_Suspend/无敌/时间缩放。不提前结算路径伤害。
+ */
+function 云端W中断清理(this: void, 施法单位: any, 技能ID数值: number): void {
+  if (技能ID数值 !== W类型ID) return;
+  const ctx = W上下文表[GetHandleId(施法单位)];
+  if (ctx == null || ctx.已启动 !== true) return;
+  结束W路径(ctx);
 }
 
 export function 注册云端W(this: void): void {
@@ -311,6 +321,7 @@ export function 注册云端W(this: void): void {
     独立技能来源类型: "单位技能",
     技能实例持续时间秒: 3,
   });
+  registerSpellEndcastListener(云端W中断清理);
 }
 
 注册云端W();

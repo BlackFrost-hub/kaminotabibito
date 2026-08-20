@@ -8,7 +8,9 @@ import { Saber技能配置 } from "./00．配置";
 import { SaberBuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/08．Saber";
 import { Saber是否E开启, 消耗SaberE } from "./04．E技能";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 读取单位攻击力, 单位存活, 两点角度 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
+
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -90,11 +92,9 @@ const SetUnitPathing = jass.SetUnitPathing as (this: void, unit: any, enabled: b
 const IsTerrainPathable = jass.IsTerrainPathable as (this: void, x: number, y: number, pathingType: any) => boolean;
 const IsUnitInRange = jass.IsUnitInRange as (this: void, a: any, b: any, range: number) => boolean;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
-const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const Sin = jass.Sin as (this: void, radians: number) => number;
 const SquareRoot = jass.SquareRoot as (this: void, x: number) => number;
-const bj_RADTODEG = jass.bj_RADTODEG as number;
 const bj_DEGTORAD = jass.bj_DEGTORAD as number;
 const PATHING_TYPE_WALKABILITY = jass.PATHING_TYPE_WALKABILITY as any;
 const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
@@ -114,10 +114,6 @@ const stringToFourCC = stringToFourCCSafe;
 const 配置 = Saber技能配置;
 const 英雄单位类型ID = 配置.单位类型ID;
 const W类型ID = stringToFourCC(配置.W.技能ID);
-
-function 计算两点角度(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  return Atan2(y2 - y1, x2 - x1) * bj_RADTODEG;
-}
 
 // ---------------------------------------------------------------------------
 // W 地面分支（无 E）：传送 + 6 路龙卷风
@@ -253,7 +249,7 @@ function W地面启动龙卷风(this: void, variable?: any): void {
   }
   ctx.Tick数 = 0;
   ctx.周期回调ID = addPeriodicCallback(
-    Math.round(cfg.推进间隔秒 * 1000),
+    秒转毫秒(cfg.推进间隔秒),
     推进W龙卷风 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -294,7 +290,7 @@ function 释放W地面分支(this: void, caster: any, 目标X: number, 目标Y: 
   const dy = 目标Y - GetUnitY(caster);
   const 距离 = SquareRoot(dx * dx + dy * dy);
   const 实际距离 = 距离 > cfg.传送最大距离 ? cfg.传送最大距离 : 距离;
-  const 方向 = 计算两点角度(GetUnitX(caster), GetUnitY(caster), 目标X, 目标Y);
+  const 方向 = 两点角度(GetUnitX(caster), GetUnitY(caster), 目标X, 目标Y);
   const 弧度 = 方向 * bj_DEGTORAD;
   const 落点X = GetUnitX(caster) + 实际距离 * Cos(弧度);
   const 落点Y = GetUnitY(caster) + 实际距离 * Sin(弧度);
@@ -322,7 +318,7 @@ function 释放W地面分支(this: void, caster: any, 目标X: number, 目标Y: 
   };
   W地面上下文表[GetHandleId(caster)] = ctx;
   addDelayedCallback(
-    Math.round(cfg.龙卷风.启动延迟秒 * 1000),
+    秒转毫秒(cfg.龙卷风.启动延迟秒),
     W地面启动龙卷风 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -468,7 +464,7 @@ function 释放WE地面分支(this: void, caster: any, 目标X: number, 目标Y:
   const wE联动音效句柄 = (jglobals as any)[cfg.音效.全局音效键];
   if (wE联动音效句柄 != null) PlaySoundOnUnitBJ(wE联动音效句柄, 100, caster);
   // 目标点为施法事件入口锁存值（分支链路里重读 GetSpellTargetLoc 已失效）
-  const 方向 = 计算两点角度(GetUnitX(caster), GetUnitY(caster), 目标X, 目标Y);
+  const 方向 = 两点角度(GetUnitX(caster), GetUnitY(caster), 目标X, 目标Y);
   // 消耗并结束魔力放出（源：移除 S009）
   消耗SaberE(caster);
   SetUnitAnimationByIndex(caster, cfg.动作索引);
@@ -498,7 +494,7 @@ function 释放WE地面分支(this: void, caster: any, 目标X: number, 目标Y:
     Tick数: 0,
   };
   ctx.周期回调ID = addPeriodicCallback(
-    Math.round(cfg.路径.Tick间隔秒 * 1000),
+    秒转毫秒(cfg.路径.Tick间隔秒),
     推进WE地面冲击 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -625,7 +621,7 @@ function 启动W冲击波(this: void, ctx: W敌人上下文): void {
     Tick数: 0,
   };
   波上下文.周期回调ID = addPeriodicCallback(
-    Math.round(cfg.推进间隔秒 * 1000),
+    秒转毫秒(cfg.推进间隔秒),
     推进W冲击波 as unknown as (this: void, variable?: any) => void,
     波上下文,
   );
@@ -651,7 +647,7 @@ function 推进W敌人追击(this: void, variable?: any): void {
     if (ctx.捕捉成功 && 单位存活(caster) && target != null && target !== 0 && 单位存活(target)) {
       // 捕捉成功：解除暂停、面向目标、主伤害单体、控制与击退
       移除单位暂停(caster, 配置.暂停来源.W敌人追击);
-      SetUnitFacing(caster, 计算两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target)));
+      SetUnitFacing(caster, 两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target)));
       造成单体技能伤害({
         来源: caster,
         目标: target,
@@ -671,7 +667,7 @@ function 推进W敌人追击(this: void, variable?: any): void {
       SetUnitAnimation(target, "death");
       SetUnitTimeScale(target, 0);
       addDelayedCallback(
-        Math.round(配置.W.敌人分支.主控制秒 * 1000),
+        秒转毫秒(配置.W.敌人分支.主控制秒),
         W目标硬直表现恢复 as unknown as (this: void, variable?: any) => void,
         target,
       );
@@ -736,7 +732,7 @@ function 释放W敌人分支(this: void, caster: any, target: any, 技能实例I
     目标: target,
     技能实例ID,
     伤害快照: 读取单位攻击力(caster),
-    冲锋角度: 计算两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target)),
+    冲锋角度: 两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target)),
     捕捉成功: false,
     周期回调ID: 0,
     Tick数: 0,
@@ -747,7 +743,7 @@ function 释放W敌人分支(this: void, caster: any, target: any, 技能实例I
   SetUnitTimeScale(caster, 配置.W.敌人分支.时间流速);
   SetUnitPathing(caster, false);
   ctx.周期回调ID = addPeriodicCallback(
-    Math.round(配置.W.敌人分支.追击.间隔秒 * 1000),
+    秒转毫秒(配置.W.敌人分支.追击.间隔秒),
     推进W敌人追击 as unknown as (this: void, variable?: any) => void,
     ctx,
   );

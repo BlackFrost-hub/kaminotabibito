@@ -29,13 +29,15 @@ local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用�
 local _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321 = ____require_result_6["沿角度步进直到地形阻挡"]
 local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____53D6_5355_4F4DID = ____require_result_8["取单位ID"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
 local _____5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____4E00_65B9_901A_884C_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_6280_80FDID = stringToFourCCSafe(_____4E00_65B9_901A_884C_5355_4F4D_6280_80FD_914D_7F6E["Q技能ID"])
 local ____Q_5173_95ED_6280_80FDID = stringToFourCCSafe(_____4E00_65B9_901A_884C_5355_4F4D_6280_80FD_914D_7F6E["Q关闭技能ID"])
 local ____Q_72B6_6001_6280_80FDID = stringToFourCCSafe(_____4E00_65B9_901A_884C_5355_4F4D_6280_80FD_914D_7F6E["Q状态技能ID"])
 local _____914D_7F6E = _____4E00_65B9_901A_884C_5355_4F4D_6280_80FD_914D_7F6E.Q
 local ____Q_8FD0_884C_65F6_8868 = {}
-local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -54,15 +56,8 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local IsTerrainPathable = jass.IsTerrainPathable
 local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
-local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local PATHING_TYPE_FLOATABILITY = jass.PATHING_TYPE_FLOATABILITY
 local EXSetUnitMoveType = japi.EXSetUnitMoveType
-local function _____53D6_5355_4F4DID(unit)
-    return (unit == nil or unit == 0) and 0 or (GetHandleId(unit) or 0)
-end
-local function _____5355_4F4D_5B58_6D3B(unit)
-    return unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 and not jass.IsUnitType(unit, UNIT_TYPE_DEAD) and GetUnitState(unit, jass.UNIT_STATE_LIFE) > 0.405
-end
 local function _____83B7_53D6Q_8FD0_884C_65F6(unit)
     return ____Q_8FD0_884C_65F6_8868[_____53D6_5355_4F4DID(unit)]
 end
@@ -116,14 +111,20 @@ local function _____77E2_91CF_79FB_52A8Tick(variable)
     local currentY = GetUnitY(caster)
     local dx = runtime.targetX - currentX
     local dy = runtime.targetY - currentY
-    local distance = math.sqrt(dx * dx + dy * dy)
+    local distance = jass.SquareRoot(dx * dx + dy * dy)
     if distance <= _____914D_7F6E["到达距离"] then
         _____505C_6B62Q_5F53_524D_79FB_52A8(caster)
         return
     end
-    local angle = math.atan(dy, dx) * 180 / math.pi
+    local angle = jass.Atan2(dy, dx) * jass.bj_RADTODEG
     local speedPerTick = ((GetUnitMoveSpeed(caster) or 0) + _____914D_7F6E["额外移动速度"]) * _____914D_7F6E["移动周期毫秒"] / 1000
-    local step = math.min(distance, speedPerTick)
+    local ____temp_9
+    if distance < speedPerTick then
+        ____temp_9 = distance
+    else
+        ____temp_9 = speedPerTick
+    end
+    local step = ____temp_9
     local next = _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321({
         ["起点X"] = currentX,
         ["起点Y"] = currentY,
@@ -192,8 +193,8 @@ local function _____91CA_653E_77E2_91CF_79FB_52A8(_context, caster)
     if GetUnitTypeId(caster) ~= _____5355_4F4D_7C7B_578BID or not _____5355_4F4D_5B58_6D3B(caster) then
         return
     end
-    local ____opt_8 = _____83B7_53D6Q_8FD0_884C_65F6(caster)
-    if (____opt_8 and ____opt_8.active) == true then
+    local ____opt_10 = _____83B7_53D6Q_8FD0_884C_65F6(caster)
+    if (____opt_10 and ____opt_10.active) == true then
         return
     end
     local maxMana = GetUnitState(caster, UNIT_STATE_MAX_MANA) or 0

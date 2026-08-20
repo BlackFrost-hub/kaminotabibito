@@ -16,32 +16,40 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
-local ____require_result_1 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_2.addDelayedCallback
-local addPeriodicCallback = ____require_result_2.addPeriodicCallback
-local removePeriodicCallback = ____require_result_2.removePeriodicCallback
-local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWESetUnitAbilityStateSafe = ____require_result_3.YDWESetUnitAbilityStateSafe
-local YDWEGetUnitAbilityStateSafe = ____require_result_3.YDWEGetUnitAbilityStateSafe
-local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_4["造成技能伤害"]
-local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getUnitsInRange = ____require_result_5.getUnitsInRange
-local ____require_result_6 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_6.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_6["移除单位指定Buff"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____6781_5750_6807X = ____require_result_1["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_1["极坐标Y"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____require_result_2["秒转毫秒"]
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_3["创建单位并登记排泄安全"]
+local ____require_result_4 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_4["立即移除单位并取消排泄登记"]
+local ____require_result_5 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local registerSpellEffectListener = ____require_result_5.registerSpellEffectListener
+local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_6.addDelayedCallback
+local addPeriodicCallback = ____require_result_6.addPeriodicCallback
+local removePeriodicCallback = ____require_result_6.removePeriodicCallback
+local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWESetUnitAbilityStateSafe = ____require_result_7.YDWESetUnitAbilityStateSafe
+local YDWEGetUnitAbilityStateSafe = ____require_result_7.YDWEGetUnitAbilityStateSafe
+local ____require_result_8 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_8["造成技能伤害"]
+local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_9.getUnitsInRange
+local ____require_result_10 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_10.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_10["移除单位指定Buff"]
+local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_11["读取单位攻击力"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_11["单位存活"]
 local cfg = _____94C3_4ED9_5355_4F4D_6280_80FD_914D_7F6E
 local ____D_6280_80FDID_6570_503C = stringToFourCCSafe(cfg["D技能ID"])
 local ____Q_6280_80FDID_6570_503C = stringToFourCCSafe(cfg["Q技能ID"])
 local ____W_6280_80FDID_6570_503C = stringToFourCCSafe(cfg["W技能ID"])
 local _____5F39_5E55_9A6C_7532ID = stringToFourCCSafe(cfg.D["弹幕马甲ID"])
 local _____6280_80FD_51B7_5374_72B6_6001 = 1
-local _____89D2_5EA6_8F6C_5F27_5EA6 = math.pi / 180
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -51,14 +59,12 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 local GetOwningPlayer = jass.GetOwningPlayer
-local CreateUnit = jass.CreateUnit
-local RemoveUnit = jass.RemoveUnit
 local SetUnitPosition = jass.SetUnitPosition
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 local DestroyEffect = jass.DestroyEffect
 local DisplayCineFilter = jass.DisplayCineFilter
-local ____require_result_8 = require("lib.扩展函数.BJ函数.05A．电影函数")
-local CinematicFilterGenericBJ = ____require_result_8.CinematicFilterGenericBJ
+local ____require_result_12 = require("lib.扩展函数.BJ函数.05A．电影函数")
+local CinematicFilterGenericBJ = ____require_result_12.CinematicFilterGenericBJ
 local BLEND_MODE_BLEND = jass.BLEND_MODE_BLEND
 --- 结束 D：移除推进回调、清理所有剩余弹幕（英雄死亡 / 弹幕全消 / 5 波后清理）
 local function _____7ED3_675FD_5F39_5E55(ctx)
@@ -75,7 +81,7 @@ local function _____7ED3_675FD_5F39_5E55(ctx)
         while i < #ctx["弹幕列表"] do
             local _____5F39_5E55 = ctx["弹幕列表"][i + 1]
             if _____5F39_5E55 ~= nil and _____5F39_5E55 ~= 0 then
-                RemoveUnit(_____5F39_5E55)
+                _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(_____5F39_5E55)
             end
             i = i + 1
         end
@@ -96,7 +102,7 @@ local function _____53D1_5C04D_4E00_6CE2(ctx)
         while N <= cfg.D["每波弹幕数"] do
             do
                 local _____89D2_5EA6 = N * cfg.D["弹幕角度间隔"]
-                local _____5F39_5E55 = CreateUnit(
+                local _____5F39_5E55 = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
                     _____73A9_5BB6,
                     _____5F39_5E55_9A6C_7532ID,
                     _____4E2D_5FC3X,
@@ -109,8 +115,8 @@ local function _____53D1_5C04D_4E00_6CE2(ctx)
                 if DzSetUnitModel ~= nil then
                     DzSetUnitModel(_____5F39_5E55, cfg.D["弹幕模型"])
                 end
-                local ____ctx__5F39_5E55_5217_8868_9 = ctx["弹幕列表"]
-                ____ctx__5F39_5E55_5217_8868_9[#____ctx__5F39_5E55_5217_8868_9 + 1] = _____5F39_5E55
+                local ____ctx__5F39_5E55_5217_8868_13 = ctx["弹幕列表"]
+                ____ctx__5F39_5E55_5217_8868_13[#____ctx__5F39_5E55_5217_8868_13 + 1] = _____5F39_5E55
                 _____521B_5EFA_6570 = _____521B_5EFA_6570 + 1
             end
             ::__continue10::
@@ -136,14 +142,16 @@ local function _____53D1_5C04D_4E0B_4E00_6CE2(ctx)
     _____53D1_5C04D_4E00_6CE2(ctx)
     if ctx["波次数"] >= cfg.D["持续秒"] then
         addDelayedCallback(
-            math.floor(cfg.D["清理延迟秒"] * 1000 + 0.5),
-            function() return _____7ED3_675FD_5F39_5E55(ctx) end
+            _____79D2_8F6C_6BEB_79D2(cfg.D["清理延迟秒"]),
+            _____7ED3_675FD_5F39_5E55,
+            ctx
         )
         return
     end
     addDelayedCallback(
-        math.floor(cfg.D["波次间隔秒"] * 1000 + 0.5),
-        function() return _____53D1_5C04D_4E0B_4E00_6CE2(ctx) end
+        _____79D2_8F6C_6BEB_79D2(cfg.D["波次间隔秒"]),
+        _____53D1_5C04D_4E0B_4E00_6CE2,
+        ctx
     )
 end
 --- 弹幕推进：每 0.03 秒前移 30 码并检测 127 码内敌人（首次全额 / 重复 10%）
@@ -164,11 +172,19 @@ local function _____63A8_8FDBD_5F39_5E55(ctx)
                 local _____5F39_5E55 = _____5217_8868[i + 1]
                 if _____5F39_5E55 == nil or _____5F39_5E55 == 0 or not _____5355_4F4D_5B58_6D3B(_____5F39_5E55) then
                     __TS__ArraySplice(_____5217_8868, i, 1)
-                    goto __continue23
+                    goto __continue21
                 end
                 local _____671D_5411 = GetUnitFacing(_____5F39_5E55)
-                local _____65B0X = GetUnitX(_____5F39_5E55) + math.cos(_____671D_5411 * _____89D2_5EA6_8F6C_5F27_5EA6) * cfg.D["弹幕每tick距离"]
-                local _____65B0Y = GetUnitY(_____5F39_5E55) + math.sin(_____671D_5411 * _____89D2_5EA6_8F6C_5F27_5EA6) * cfg.D["弹幕每tick距离"]
+                local _____65B0X = _____6781_5750_6807X(
+                    GetUnitX(_____5F39_5E55),
+                    _____671D_5411,
+                    cfg.D["弹幕每tick距离"]
+                )
+                local _____65B0Y = _____6781_5750_6807Y(
+                    GetUnitY(_____5F39_5E55),
+                    _____671D_5411,
+                    cfg.D["弹幕每tick距离"]
+                )
                 SetUnitPosition(_____5F39_5E55, _____65B0X, _____65B0Y)
                 local _____5355_4F4D_5217_8868 = getUnitsInRange(_____65B0X, _____65B0Y, cfg.D["弹幕命中半径"])
                 local _____5DF2_547D_4E2D = false
@@ -178,14 +194,14 @@ local function _____63A8_8FDBD_5F39_5E55(ctx)
                         do
                             local _____76EE_6807 = _____5355_4F4D_5217_8868[j + 1]
                             if not _____662F_6709_6548_654C_5BF9_76EE_6807(_____65BD_6CD5_8005, _____76EE_6807) then
-                                goto __continue26
+                                goto __continue24
                             end
                             local id = GetHandleId(_____76EE_6807)
                             local _____91CD_590D_547D_4E2D = ctx["重复命中表"][id] == true
                             ctx["重复命中表"][id] = true
                             local _____4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * cfg.D["攻击力倍率"] * (_____91CD_590D_547D_4E2D and cfg.D["重复命中比例"] or 1)
                             if not (_____4F24_5BB3 > 0) then
-                                goto __continue26
+                                goto __continue24
                             end
                             _____9020_6210_6280_80FD_4F24_5BB3({
                                 ["来源"] = _____65BD_6CD5_8005,
@@ -203,22 +219,25 @@ local function _____63A8_8FDBD_5F39_5E55(ctx)
                             })
                             _____5DF2_547D_4E2D = true
                         end
-                        ::__continue26::
+                        ::__continue24::
                         j = j + 1
                     end
                 end
                 if _____5DF2_547D_4E2D then
-                    RemoveUnit(_____5F39_5E55)
+                    _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(_____5F39_5E55)
                     __TS__ArraySplice(_____5217_8868, i, 1)
                 end
             end
-            ::__continue23::
+            ::__continue21::
             i = i - 1
         end
     end
     if #_____5217_8868 <= 0 and ctx["波次数"] >= cfg.D["持续秒"] then
         _____7ED3_675FD_5F39_5E55(ctx)
     end
+end
+local function _____5173_95EDD_5C4F_5E55_6EE4_955C()
+    DisplayCineFilter(false)
 end
 local function _____542F_52A8D_5F39_5E55(_____65BD_6CD5_8005)
     local ctx = {
@@ -230,8 +249,9 @@ local function _____542F_52A8D_5F39_5E55(_____65BD_6CD5_8005)
         ["已结束"] = false
     }
     ctx["推进回调ID"] = addPeriodicCallback(
-        math.floor(cfg.D["弹幕tick秒"] * 1000 + 0.5),
-        function() return _____63A8_8FDBD_5F39_5E55(ctx) end
+        _____79D2_8F6C_6BEB_79D2(cfg.D["弹幕tick秒"]),
+        _____63A8_8FDBD_5F39_5E55,
+        ctx
     )
     _____53D1_5C04D_4E0B_4E00_6CE2(ctx)
 end
@@ -243,19 +263,11 @@ local function ____on_94C3_4ED9D_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_8
         return
     end
     local ____q_51B7_5374 = YDWEGetUnitAbilityStateSafe(_____65BD_6CD5_5355_4F4D, ____Q_6280_80FDID_6570_503C, _____6280_80FD_51B7_5374_72B6_6001)
-    YDWESetUnitAbilityStateSafe(
-        _____65BD_6CD5_5355_4F4D,
-        ____Q_6280_80FDID_6570_503C,
-        _____6280_80FD_51B7_5374_72B6_6001,
-        math.max(0, ____q_51B7_5374 - cfg.D["Q冷却减少"])
-    )
+    local ____q_5269_4F59 = ____q_51B7_5374 - cfg.D["Q冷却减少"]
+    YDWESetUnitAbilityStateSafe(_____65BD_6CD5_5355_4F4D, ____Q_6280_80FDID_6570_503C, _____6280_80FD_51B7_5374_72B6_6001, ____q_5269_4F59 > 0 and ____q_5269_4F59 or 0)
     local ____w_51B7_5374 = YDWEGetUnitAbilityStateSafe(_____65BD_6CD5_5355_4F4D, ____W_6280_80FDID_6570_503C, _____6280_80FD_51B7_5374_72B6_6001)
-    YDWESetUnitAbilityStateSafe(
-        _____65BD_6CD5_5355_4F4D,
-        ____W_6280_80FDID_6570_503C,
-        _____6280_80FD_51B7_5374_72B6_6001,
-        math.max(0, ____w_51B7_5374 - cfg.D["W冷却减少"])
-    )
+    local ____w_5269_4F59 = ____w_51B7_5374 - cfg.D["W冷却减少"]
+    YDWESetUnitAbilityStateSafe(_____65BD_6CD5_5355_4F4D, ____W_6280_80FDID_6570_503C, _____6280_80FD_51B7_5374_72B6_6001, ____w_5269_4F59 > 0 and ____w_5269_4F59 or 0)
     _____5168_56FE_82F1_96C4_514D_75AB_4F24_5BB3(cfg.D["免伤秒"])
     _____64AD_653E_94C3_4ED9_5168_5C40_97F3_6548("gg_snd_LX_D_24343")
     _____64AD_653E_94C3_4ED9_5168_5C40_97F3_6548("gg_snd_LX_D")
@@ -272,10 +284,7 @@ local function ____on_94C3_4ED9D_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_8
         0,
         0
     )
-    addDelayedCallback(
-        1100,
-        function() return DisplayCineFilter(false) end
-    )
+    addDelayedCallback(1100, _____5173_95EDD_5C4F_5E55_6EE4_955C)
     registerManualBuff(_____65BD_6CD5_5355_4F4D, _____94C3_4ED9BuffID["D波次"], cfg.D["持续秒"], 0)
     _____542F_52A8D_5F39_5E55(_____65BD_6CD5_5355_4F4D)
 end

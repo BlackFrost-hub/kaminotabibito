@@ -8,6 +8,7 @@ local getUnitsInRangeOfUnit = ____01_FF0E_9009_53D6_4E2D_5FC3_8303_56F4.getUnits
 local getUnitsInRange = ____01_FF0E_9009_53D6_4E2D_5FC3_8303_56F4.getUnitsInRange
 local getEnemyUnitsInRangeOfUnit = ____01_FF0E_9009_53D6_4E2D_5FC3_8303_56F4.getEnemyUnitsInRangeOfUnit
 local getEnemyUnitsInRange = ____01_FF0E_9009_53D6_4E2D_5FC3_8303_56F4.getEnemyUnitsInRange
+local getUnitsInRangeWithFilter = ____01_FF0E_9009_53D6_4E2D_5FC3_8303_56F4.getUnitsInRangeWithFilter
 local ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
 local isValidUnit = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isValidUnit
 local isUnitEnemy = ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570.isUnitEnemy
@@ -38,6 +39,7 @@ do
     ____exports.getUnitsInRange = ____01_FF0E_9009_53D6_4E2D_5FC3_8303_56F4.getUnitsInRange
     ____exports.getEnemyUnitsInRangeOfUnit = ____01_FF0E_9009_53D6_4E2D_5FC3_8303_56F4.getEnemyUnitsInRangeOfUnit
     ____exports.getEnemyUnitsInRange = ____01_FF0E_9009_53D6_4E2D_5FC3_8303_56F4.getEnemyUnitsInRange
+    ____exports.getUnitsInRangeWithFilter = ____01_FF0E_9009_53D6_4E2D_5FC3_8303_56F4.getUnitsInRangeWithFilter
 end
 do
     local ____02_FF0E_6761_4EF6_5224_65AD_51FD_6570 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
@@ -81,6 +83,7 @@ ____exports["获取单位周围单位"] = getUnitsInRangeOfUnit
 ____exports["获取坐标范围单位"] = getUnitsInRange
 ____exports["获取单位周围敌人"] = getEnemyUnitsInRangeOfUnit
 ____exports["获取坐标范围敌人"] = getEnemyUnitsInRange
+____exports["获取坐标范围单位按筛选"] = getUnitsInRangeWithFilter
 ____exports["单位是否有效"] = isValidUnit
 ____exports["是否同一单位"] = ____exports.isSameUnit
 ____exports["单位是否友军"] = ____exports.isUnitAlly

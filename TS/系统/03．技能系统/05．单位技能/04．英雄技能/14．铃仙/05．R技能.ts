@@ -81,12 +81,18 @@ const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统")
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
-const { 读取单位攻击力, 读取单位敏捷, 单位存活, 距离XY, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 读取单位敏捷, 单位存活, 距离XY, 两点角度, 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   读取单位敏捷: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
   距离XY: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
+};
+const { 秒转毫秒, 向下取整整数 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  秒转毫秒: (this: void, seconds: number) => number;
+  向下取整整数: (this: void, value: number) => number;
 };
 
 const cfg = 铃仙单位技能配置;
@@ -96,7 +102,6 @@ const 准心马甲ID = stringToFourCCSafe(cfg.R.准心马甲ID); // e03N
 const 弹幕马甲ID = stringToFourCCSafe(cfg.R.弹幕马甲ID); // e07Q
 
 const 技能冷却状态 = 1; // YDWE ABILITY_STATE_COOLDOWN（技能冷却状态）
-const 角度转弧度 = Math.PI / 180;
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
@@ -157,8 +162,8 @@ function 执行翻滚(this: void, 铃仙: any, 方向角: number, 翻滚次数: 
       return;
     }
     // 从单位当前位置沿施法方向推进 70 码（源 GetUnitLoc + PolarProjectionBJ）
-    const x = GetUnitX(铃仙) + Math.cos(方向角 * 角度转弧度) * 每tick距离;
-    const y = GetUnitY(铃仙) + Math.sin(方向角 * 角度转弧度) * 每tick距离;
+    const x = 极坐标X(GetUnitX(铃仙), 方向角, 每tick距离);
+    const y = 极坐标Y(GetUnitY(铃仙), 方向角, 每tick距离);
     SetUnitPosition(铃仙, x, y);
     剩余次数 -= 1;
   });
@@ -193,8 +198,9 @@ function on铃仙R生效(this: void, 施法单位: any, 技能ID数值: number):
   const 施法距离 = 距离XY(起始X, 起始Y, 目标X, 目标Y);
   const 方向角 = 两点角度(起始X, 起始Y, 目标X, 目标Y);
   // 翻滚距离 = min(400 + 敏捷×0.8, 施法距离)，翻滚次数 = 翻滚距离 / 70
-  const 翻滚距离 = Math.min(cfg.R.翻滚基础距离 + 读取单位敏捷(施法单位) * cfg.R.翻滚敏捷系数, 施法距离);
-  const 翻滚次数 = Math.floor(翻滚距离 / cfg.R.翻滚每tick距离);
+  const 翻滚距离基础 = cfg.R.翻滚基础距离 + 读取单位敏捷(施法单位) * cfg.R.翻滚敏捷系数;
+  const 翻滚距离 = 翻滚距离基础 < 施法距离 ? 翻滚距离基础 : 施法距离;
+  const 翻滚次数 = 向下取整整数(翻滚距离 / cfg.R.翻滚每tick距离);
 
   const 玩家 = GetOwningPlayer(施法单位);
 
@@ -210,7 +216,7 @@ function on铃仙R生效(this: void, 施法单位: any, 技能ID数值: number):
   执行翻滚(施法单位, 方向角, 翻滚次数);
 
   // 开启 2 秒瞄准窗口
-  addDelayedCallback(Math.round(cfg.R.瞄准窗口秒 * 1000), () => 瞄准窗口超时(施法单位, 玩家));
+  addDelayedCallback(秒转毫秒(cfg.R.瞄准窗口秒), () => 瞄准窗口超时(施法单位, 玩家));
 }
 
 //=============================================================================
@@ -329,8 +335,8 @@ function 开始发射弹幕(
       return;
     }
     // 1) 沿目标方向推进 60 码（源先移动再结算）
-    弹幕X += Math.cos(方向角 * 角度转弧度) * cfg.R.弹幕每tick距离;
-    弹幕Y += Math.sin(方向角 * 角度转弧度) * cfg.R.弹幕每tick距离;
+    弹幕X += 极坐标X(0, 方向角, cfg.R.弹幕每tick距离);
+    弹幕Y += 极坐标Y(0, 方向角, cfg.R.弹幕每tick距离);
     SetUnitPosition(弹幕, 弹幕X, 弹幕Y);
     // 2) 路径伤害检测（140 码）
     处理路径伤害(铃仙, 弹幕, 重复单位表);
@@ -396,7 +402,7 @@ function on铃仙R二段生效(this: void, 施法单位: any, 技能ID数值: nu
   const 准心 = CreateUnit(玩家, 准心马甲ID, 目标X, 目标Y, 0);
 
   // 0.55 秒蓄力后创建弹幕并发射
-  addDelayedCallback(Math.round(cfg.R.蓄力秒 * 1000), () => {
+  addDelayedCallback(秒转毫秒(cfg.R.蓄力秒), () => {
     UnitShareVision(施法单位, Player(PLAYER_NEUTRAL_AGGRESSIVE), false);
     播放铃仙配置动作(施法单位, -1, 1.0); // 恢复动画倍速
     开始发射弹幕(施法单位, 玩家, 方向角, 目标X, 目标Y, 准心);

@@ -3,7 +3,7 @@
 import { 一方通行单位技能配置 } from "./00．配置";
 import { 一方通行BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/07．一方通行";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 单位存活, 读取单位最大生命 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 单位存活, 读取单位最大生命, 取单位ID } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -67,7 +67,6 @@ const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL;
 const UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
@@ -101,10 +100,6 @@ interface 一方通行R上下文 {
 }
 
 const 上下文表: Record<number, 一方通行R上下文 | undefined> = {};
-
-function 取单位ID(this: void, unit: any): number {
-  return unit == null || unit === 0 ? 0 : GetHandleId(unit) || 0;
-}
 
 function 获取R上下文(this: void, unit: any): 一方通行R上下文 | undefined {
   const id = 取单位ID(unit);
@@ -159,10 +154,15 @@ function 创建R目标特效(this: void, target: any, modelPath: string, duratio
   });
 }
 
+function 销毁R闪电(this: void, variable?: any): void {
+  const lightning = variable as any;
+  if (lightning != null && lightning !== 0) DestroyLightning(lightning);
+}
+
 function 创建R闪电(this: void, caster: any, target: any): void {
   const lightning = AddLightning(R配置.闪电特效模型, false, GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target));
   if (lightning != null && lightning !== 0) {
-    addDelayedCallback(100, () => DestroyLightning(lightning));
+    addDelayedCallback(100, 销毁R闪电, lightning);
   }
 }
 
@@ -251,7 +251,8 @@ function 释放一方通行R(this: void, context: 一方通行R上下文, caster
   context.目标 = target;
   context.目标X = GetUnitX(target);
   context.目标Y = GetUnitY(target);
-  context.总伤害 = Math.max(0, maxLife - life) * R配置.目标已损失生命总倍率;
+  const 已损失生命 = maxLife - life;
+  context.总伤害 = (已损失生命 > 0 ? 已损失生命 : 0) * R配置.目标已损失生命总倍率;
   context.当前次数 = 0;
   context.已启动 = true;
   const maxMana = GetUnitState(caster, jass.UNIT_STATE_MAX_MANA) || 0;

@@ -2,7 +2,7 @@
 
 import { 蕾米莉亚单位技能配置 } from "./00．配置";
 import { 蕾米莉亚BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/03．蕾米莉亚";
-import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 读取单位攻击力, 单位存活, 取单位ID } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 
 const { GS_UnitPry } = require("lib.扩展函数.Star扩展函数.02．GS单位属性") as {
@@ -86,19 +86,14 @@ const W技能类型ID = W配置.技能类型ID;
 const 上下文表: Record<number, 蕾米莉亚W上下文 | undefined> = {};
 let 死亡监听已注册 = false;
 
-function 取单位句柄ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 function 获取W上下文(this: void, unit: any): 蕾米莉亚W上下文 | undefined {
-  const unitId = 取单位句柄ID(unit);
+  const unitId = 取单位ID(unit);
   if (unitId === 0) return undefined;
   return 上下文表[unitId];
 }
 
 function 获取或创建W上下文(this: void, unit: any): 蕾米莉亚W上下文 | undefined {
-  const unitId = 取单位句柄ID(unit);
+  const unitId = 取单位ID(unit);
   if (unitId === 0) return undefined;
   const current = 上下文表[unitId];
   if (current != null) return current;
@@ -166,7 +161,7 @@ function 清理W上下文(this: void, context: 蕾米莉亚W上下文): void {
     context.已启动 = false;
   }
   context.目标属性记录 = {};
-  const unitId = 取单位句柄ID(context.施法者);
+  const unitId = 取单位ID(context.施法者);
   if (unitId !== 0 && 上下文表[unitId] === context) delete 上下文表[unitId];
 }
 

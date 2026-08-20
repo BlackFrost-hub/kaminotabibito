@@ -48,8 +48,10 @@ const { 技能_获取技能当前冷却时间, 技能_获取技能最大冷却�
   技能_获取技能当前冷却时间: (this: void, unit: any, abilityId: number) => number;
   技能_获取技能最大冷却时间: (this: void, unit: any, abilityId: number) => number;
 };
-const { 读取单位攻击力 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
 };
 const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getEnemyUnitsInRange: (this: void, source: any, x: number, y: number, radius: number) => any[];
@@ -170,14 +172,14 @@ function 恢复八云紫(this: void, context: 神隐上下文): void {
 }
 
 function 获取敌方背后点(this: void, target: any): { x: number; y: number } {
-  const radians = (jass.GetUnitFacing(target) + 180) * Math.PI / 180;
+  const 背后角度 = jass.GetUnitFacing(target) + 180;
   let distance: number = 配置.E.敌方背后距离;
-  let x = jass.GetUnitX(target) + Math.cos(radians) * distance;
-  let y = jass.GetUnitY(target) + Math.sin(radians) * distance;
+  let x = 极坐标X(jass.GetUnitX(target), 背后角度, distance);
+  let y = 极坐标Y(jass.GetUnitY(target), 背后角度, distance);
   if (jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY) === true) {
     distance = 配置.E.敌方阻挡回退距离;
-    x = jass.GetUnitX(target) + Math.cos(radians) * distance;
-    y = jass.GetUnitY(target) + Math.sin(radians) * distance;
+    x = 极坐标X(jass.GetUnitX(target), 背后角度, distance);
+    y = 极坐标Y(jass.GetUnitY(target), 背后角度, distance);
   }
   return { x, y };
 }
@@ -202,7 +204,8 @@ function 结算敌方分支(this: void, context: 神隐上下文): void {
     持续秒: 配置.E.敌方结算特效持续秒,
   });
   const attack = 读取单位攻击力(context.英雄);
-  const missingLife = Math.max(0, jass.GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass.GetUnitState(target, UNIT_STATE_LIFE));
+  const 缺失生命 = jass.GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass.GetUnitState(target, UNIT_STATE_LIFE);
+  const missingLife = 缺失生命 > 0 ? 缺失生命 : 0;
   造成E伤害(
     context,
     target,
@@ -281,7 +284,8 @@ function 友方共同消失(this: void, variable?: any): void {
   if (context == null || context.已结束 || !八云紫单位存活(context.目标)) return;
   context.友方已隐藏 = true;
   jass.ShowUnit(context.目标, false);
-  registerManualBuff(context.目标, 八云紫BuffID.神隐, Math.max(0.1, (context.到期时间 - getGameTime()) / 1000), 0, {
+  const 剩余秒 = (context.到期时间 - getGameTime()) / 1000;
+  registerManualBuff(context.目标, 八云紫BuffID.神隐, 剩余秒 >= 0.1 ? 剩余秒 : 0.1, 0, {
     sourceUnit: context.英雄,
     effectSourceType: "技能",
   });

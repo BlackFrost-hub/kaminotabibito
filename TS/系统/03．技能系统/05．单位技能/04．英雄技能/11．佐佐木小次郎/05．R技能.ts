@@ -28,8 +28,9 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
+const { registerSpellEffectListener, registerSpellEndcastListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
+  registerSpellEndcastListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
 const { registerDamageCallback } = require("系统.04．伤害系统.01．伤害事件") as {
   registerDamageCallback: (this: void, cb: (this: void, unit: any, damage: number, damageType: number, fromDotTickBatch?: boolean, source?: any, isNormalAttack?: boolean) => void, intervalSeconds?: number) => void;
@@ -40,9 +41,14 @@ const { SFB_施加通用Buff } = require("lib.扩展函数.Star扩展函数.Star
 const { 创建原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
   创建原生弹幕: (this: void, 参数: any) => any;
 };
-const { 读取单位攻击力, 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 单位存活, 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
+};
+const { 秒转毫秒 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  秒转毫秒: (this: void, seconds: number) => number;
 };
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -75,18 +81,88 @@ const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, name: 
 const R防御窗口表: Record<number, boolean | undefined> = {};
 /** 窗口内已受击（燕返触发标记，0.70 秒结算时消耗） */
 const R反击标记表: Record<number, boolean | undefined> = {};
+/** 施法中断标记：endcast 打断后使 燕返三击/结束恢复/窗口结算 回调全部失效（新施法时重置） */
+const R中断取消表: Record<number, boolean | undefined> = {};
 
-registerDamageCallback((unit: any) => {
+function 佐佐木R受击标记(this: void, unit: any): void {
   if (unit == null || unit === 0) return;
   const id = GetHandleId(unit);
   if (R防御窗口表[id] !== true) return;
   R防御窗口表[id] = false;
   R反击标记表[id] = true;
-});
+}
+
+registerDamageCallback(佐佐木R受击标记);
 
 //=============================================================================
 // 二、燕返三击
 //=============================================================================
+
+interface 燕返三击参数 {
+  英雄: any;
+  起点X: number;
+  起点Y: number;
+  角度: number;
+  击序: number;
+}
+
+interface 燕返恢复参数 {
+  英雄: any;
+}
+
+interface R防御窗口参数 {
+  单位ID: number;
+}
+
+interface R结算参数 {
+  施法单位: any;
+  单位ID: number;
+}
+
+function 发射燕返第N击(this: void, variable?: any): void {
+  const 参数 = variable as 燕返三击参数 | undefined;
+  if (参数 == null || !单位存活(参数.英雄)) return;
+  if (R中断取消表[GetHandleId(参数.英雄)] === true) return; // 施法被打断：不再发射后续刀光
+  发射燕返刀光(参数.英雄, 参数.起点X, 参数.起点Y, 参数.角度, 参数.击序);
+}
+
+function 燕返结束恢复(this: void, variable?: any): void {
+  const 参数 = variable as 燕返恢复参数 | undefined;
+  if (参数 == null) return;
+  const 英雄 = 参数.英雄;
+  if (英雄 == null || 英雄 === 0 || !单位存活(英雄)) return;
+  if (R中断取消表[GetHandleId(英雄)] === true) return; // 施法被打断：恢复已由中断清理完成
+  SetUnitInvulnerable(英雄, false);
+  SetUnitTimeScale(英雄, 1.0);
+  SetUnitAnimation(英雄, "stand");
+  移除单位暂停(英雄, "佐佐木R燕返防御"); // 源 JASS: YDWEUnitRemoveStun 解除防御姿态硬直
+}
+
+function 关闭R防御窗口(this: void, variable?: any): void {
+  const 参数 = variable as R防御窗口参数 | undefined;
+  if (参数 == null) return;
+  R防御窗口表[参数.单位ID] = false;
+}
+
+function 结算R防御窗口(this: void, variable?: any): void {
+  const 参数 = variable as R结算参数 | undefined;
+  if (参数 == null) return;
+  const 施法单位 = 参数.施法单位;
+  const id = 参数.单位ID;
+  R防御窗口表[id] = false;
+  移除单位指定Buff(施法单位, 佐佐木小次郎BuffID.燕返守卫);
+  if (!单位存活(施法单位)) return;
+  if (R中断取消表[id] === true) return; // 施法被打断：不触发燕返，恢复已由中断清理完成
+  if (R反击标记表[id] === true) {
+    R反击标记表[id] = false;
+    触发燕返(施法单位);
+  } else {
+    // 源 JASS 未触发分支：重置动作 + 时间缩放 + YDWEUnitRemoveStun（→ 移除单位暂停）解除硬直
+    SetUnitTimeScale(施法单位, 1.0);
+    SetUnitAnimation(施法单位, "stand");
+    移除单位暂停(施法单位, "佐佐木R燕返防御");
+  }
+}
 
 /** 发射一道燕返刀光弹幕（源 e07V/e07U 刀光对 → TS 原生弹幕） */
 function 发射燕返刀光(this: void, 英雄: any, 起点X: number, 起点Y: number, 角度: number, 击序: number): void {
@@ -147,27 +223,24 @@ function 触发燕返(this: void, 英雄: any): void {
   // 刀光起点：本体位置 + 25 码（面朝+90°方向）再 +50 码（面朝方向）
   // 源 JASS: PolarProjectionBJ(saber位置, 25.00, 角度+90) → 结果再 PolarProjectionBJ(50, 角度+0)
   const 角度 = GetUnitFacing(英雄);
-  const 弧度_角度 = 角度 * Math.PI / 180;
-  const 弧度_角度加90 = (角度 + 90) * Math.PI / 180;
-  const 起点X = GetUnitX(英雄) + Math.cos(弧度_角度加90) * 25 + Math.cos(弧度_角度) * 50;
-  const 起点Y = GetUnitY(英雄) + Math.sin(弧度_角度加90) * 25 + Math.sin(弧度_角度) * 50;
+  const 起点X = 极坐标X(极坐标X(GetUnitX(英雄), 角度 + 90, 25), 角度, 50);
+  const 起点Y = 极坐标Y(极坐标Y(GetUnitY(英雄), 角度 + 90, 25), 角度, 50);
 
   for (let 击序 = 0; 击序 < cfg.三击.length; 击序++) {
-    // 通过 variable 参数按迭代捕获击序，避免 Lua 闭包捕获共享循环变量导致越界
-    addDelayedCallback(Math.round((击序 + 1) * cfg.三击间隔秒 * 1000), (当前击序: any) => {
-      if (!单位存活(英雄)) return;
-      发射燕返刀光(英雄, 起点X, 起点Y, 角度, 当前击序 as number);
-    }, 击序);
+    // 参数对象按迭代快照（英雄/起点/角度/击序），防止后一次释放覆盖前一次参数
+    addDelayedCallback(
+      秒转毫秒((击序 + 1) * cfg.三击间隔秒),
+      发射燕返第N击,
+      { 英雄, 起点X, 起点Y, 角度, 击序 } as 燕返三击参数,
+    );
   }
 
   // 三击结束后恢复（源 0.40×4 时长后清理，即最后一击后再过一个间隔）
-  addDelayedCallback(Math.round((cfg.三击.length + 1) * cfg.三击间隔秒 * 1000), () => {
-    if (英雄 == null || 英雄 === 0 || !单位存活(英雄)) return;
-    SetUnitInvulnerable(英雄, false);
-    SetUnitTimeScale(英雄, 1.0);
-    SetUnitAnimation(英雄, "stand");
-    移除单位暂停(英雄, "佐佐木R燕返防御"); // 源 JASS: YDWEUnitRemoveStun 解除防御姿态硬直
-  });
+  addDelayedCallback(
+    秒转毫秒((cfg.三击.length + 1) * cfg.三击间隔秒),
+    燕返结束恢复,
+    { 英雄 } as 燕返恢复参数,
+  );
 }
 
 //=============================================================================
@@ -180,6 +253,7 @@ function on佐佐木R生效(this: void, 施法单位: any, 技能ID数值: numbe
 
   const cfg = 佐佐木单位技能配置.R;
   const id = GetHandleId(施法单位);
+  delete R中断取消表[id]; // 新施法重置中断标记（句柄复用安全）
 
   // 防御姿态：ZZMR1 + 动作 6 + 自身暂停（硬直），开启 0.68 秒受击窗口
   // 源 JASS: YDWEUnitAddStun 永久硬直 → TS 走项目暂停系统（添加单位暂停），
@@ -190,27 +264,35 @@ function on佐佐木R生效(this: void, 施法单位: any, 技能ID数值: numbe
   R防御窗口表[id] = true;
   R反击标记表[id] = false;
   registerManualBuff(施法单位, 佐佐木小次郎BuffID.燕返守卫, cfg.防御窗口秒, 0);
-  addDelayedCallback(Math.round(cfg.防御窗口秒 * 1000), () => {
-    R防御窗口表[id] = false;
-  });
+  addDelayedCallback(秒转毫秒(cfg.防御窗口秒), 关闭R防御窗口, { 单位ID: id } as R防御窗口参数);
 
   // 0.70 秒后结算：受击 → 燕返；未受击 → 恢复
-  addDelayedCallback(700, () => {
-    R防御窗口表[id] = false;
-    移除单位指定Buff(施法单位, 佐佐木小次郎BuffID.燕返守卫);
-    if (!单位存活(施法单位)) return;
-    if (R反击标记表[id] === true) {
-      R反击标记表[id] = false;
-      触发燕返(施法单位);
-    } else {
-      // 源 JASS 未触发分支：重置动作 + 时间缩放 + YDWEUnitRemoveStun（→ 移除单位暂停）解除硬直
-      SetUnitTimeScale(施法单位, 1.0);
-      SetUnitAnimation(施法单位, "stand");
-      移除单位暂停(施法单位, "佐佐木R燕返防御");
-    }
-  });
+  addDelayedCallback(700, 结算R防御窗口, { 施法单位, 单位ID: id } as R结算参数);
 }
 
 registerSpellEffectListener(on佐佐木R生效);
+
+/**
+ * 施法中断清理（SPELL_ENDCAST 触发，正常结算/燕返结束后标记复位幂等跳过）。
+ * 只清理本技能创建的防御状态：窗口/反击/中断标记复位、防御暂停（具名来源）、
+ * 燕返守卫 Buff、燕返无敌/倍速/动作恢复。不影响其他技能暂停来源与 Buff。
+ * 中断后 燕返三击/结束恢复/窗口结算 回调由 R中断取消表 失效。
+ */
+function 佐佐木R中断清理(this: void, 施法单位: any, 技能ID数值: number): void {
+  if (技能ID数值 !== R技能ID数值) return;
+  if (施法单位 == null || 施法单位 === 0) return;
+  const id = GetHandleId(施法单位);
+  R防御窗口表[id] = false;
+  R反击标记表[id] = false;
+  R中断取消表[id] = true;
+  移除单位暂停(施法单位, "佐佐木R燕返防御");
+  移除单位指定Buff(施法单位, 佐佐木小次郎BuffID.燕返守卫);
+  if (单位存活(施法单位)) {
+    SetUnitInvulnerable(施法单位, false);
+    SetUnitTimeScale(施法单位, 1.0);
+    SetUnitAnimation(施法单位, "stand");
+  }
+}
+registerSpellEndcastListener(佐佐木R中断清理);
 
 export {};

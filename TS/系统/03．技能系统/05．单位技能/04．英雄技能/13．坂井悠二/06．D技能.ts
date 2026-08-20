@@ -3,7 +3,8 @@
 import { 坂井悠二技能配置 } from "./00．配置";
 import { 坂井悠二BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/05．坂井悠二";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 单位存活, 取单位ID, 极坐标X, 极坐标Y } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 向下取整整数 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 import { 确保单位可设置飞行高度 } from "../../../00．技能模板+函数/01．技能函数/03．跳跃·击飞/01．跳跃系统/00．共享";
 import { 技能强制调试输出 } from "../../../00．技能模板+函数/02．通用函数/04．调试输出";
 
@@ -31,7 +32,6 @@ const { registerDeathListener } = require("系统.00．核心系统.01．事件�
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
 
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
@@ -118,19 +118,14 @@ interface D上下文 {
 const 上下文表: Record<number, D上下文 | undefined> = {};
 let 死亡监听已注册 = false;
 
-function 取单位句柄ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 function 获取D上下文(this: void, unit: any): D上下文 | undefined {
-  const id = 取单位句柄ID(unit);
+  const id = 取单位ID(unit);
   if (id === 0) return undefined;
   return 上下文表[id];
 }
 
 function 获取或创建D上下文(this: void, unit: any): D上下文 | undefined {
-  const id = 取单位句柄ID(unit);
+  const id = 取单位ID(unit);
   if (id === 0) return undefined;
   const current = 上下文表[id];
   if (current != null) return current;
@@ -228,7 +223,7 @@ function 清理D上下文(this: void, context: D上下文): void {
   技能强制调试输出(D日志模块, "清理D上下文完成");
 
   context.已启动 = false;
-  const id = 取单位句柄ID(caster);
+  const id = 取单位ID(caster);
   if (id !== 0 && 上下文表[id] === context) delete 上下文表[id];
 }
 
@@ -260,10 +255,10 @@ function 执行鼓舞(this: void, context?: any): void {
     if (!IsUnitAlly(u, owner)) return;
     if (IsUnitType(u, UNIT_TYPE_DEAD) || IsUnitType(u, UNIT_TYPE_STRUCTURE)) return;
     if (!单位存活(u)) return;
-    const hid = 取单位句柄ID(u);
+    const hid = 取单位ID(u);
     if (hid === 0 || ctx.已鼓舞友军[hid] != null) return;
 
-    const 攻击加成 = Math.floor((Number(GetUnitStateJapi(u, UNIT_STATE_ATTACK1_BASE)) || 0) * 配置.鼓舞.攻击力基础倍率);
+    const 攻击加成 = 向下取整整数((Number(GetUnitStateJapi(u, UNIT_STATE_ATTACK1_BASE)) || 0) * 配置.鼓舞.攻击力基础倍率);
     临时调整攻击(u, 攻击加成);
     SetUnitMoveSpeed(u, GetUnitMoveSpeed(u) + 配置.鼓舞.移动速度加值);
     registerManualBuff(u, 坂井悠二BuffID.D鼓舞, 配置.持续秒, 配置.鼓舞.攻击力基础倍率, {
@@ -308,9 +303,8 @@ function 更新D马甲群(this: void, context?: any): void {
       const 参 = ctx.马甲二参数[i];
       if (参.马甲 == null || 参.马甲 === 0) continue;
       const 角度3 = 一面向 + 180 + 参.角度符号 * 参.角度;
-      const 弧度 = 角度3 * (3.14159265358979 / 180);
-      SetUnitX(参.马甲, 一X + 参.距离 * Math.cos(弧度));
-      SetUnitY(参.马甲, 一Y + 参.距离 * Math.sin(弧度));
+      SetUnitX(参.马甲, 极坐标X(一X, 角度3, 参.距离));
+      SetUnitY(参.马甲, 极坐标Y(一Y, 角度3, 参.距离));
       SetUnitFacing(参.马甲, 一面向 + 参.面向角度);
     }
   }
@@ -401,9 +395,8 @@ function 创建马甲(this: void, context: D上下文): void {
     const 角度符号 = 角度 < 31 ? 1 : -1; // 源：角度<31 取 +，否则 -
     // 初始位置按马甲一当前状态投影
     const 角度3 = 施法者面向 + 180 + 角度符号 * 角度;
-    const 弧度 = 角度3 * (3.14159265358979 / 180);
-    const 初始X = x + 距离 * Math.cos(弧度);
-    const 初始Y = y + 距离 * Math.sin(弧度);
+    const 初始X = 极坐标X(x, 角度3, 距离);
+    const 初始Y = 极坐标Y(y, 角度3, 距离);
 
     const 马甲 = CreateUnit(owner, 二四CC, 初始X, 初始Y, 施法者面向 + 面向角度);
     context.马甲二参数.push({ 马甲, 距离, 角度, 角度符号, 面向角度, 蛇身特效: null, 光束特效: null });

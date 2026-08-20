@@ -12,10 +12,12 @@ const GroupEnumUnitsInRange = jass["GroupEnumUnitsInRange"] as (this: void, grou
 const FirstOfGroup = jass["FirstOfGroup"] as (this: void, group: any) => any;
 const GroupRemoveUnit = jass["GroupRemoveUnit"] as (this: void, group: any, unit: any) => void;
 const DestroyGroup = jass["DestroyGroup"] as (this: void, group: any) => void;
-const { isValidUnit, isUnitEnemy } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
+const { isValidUnit, isUnitEnemy, matchUnitFilter } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
     isValidUnit: (this: void, unit: any) => boolean;
     isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
+    matchUnitFilter: (this: void, targetUnit: any, sourceUnit: any, options: UnitFilterOptions) => boolean;
 };
+import type { UnitFilterOptions } from "./02．条件判断函数";
 
 /**
  * 获取以指定单位为中心、指定半径范围内的所有有效单位
@@ -106,6 +108,38 @@ export function getEnemyUnitsInRange(this: void, centerUnit: any, x: number, y: 
 
     DestroyGroup(group);
 
+    return units;
+}
+
+/**
+ * 配置型范围查询：以坐标为中心枚举半径内单位，按 UnitFilterOptions 筛选。
+ * 不改变既有 getUnitsInRange / getEnemyUnitsInRange 行为。
+ * @param x 中心 x
+ * @param y 中心 y
+ * @param radius 搜索半径
+ * @param sourceUnit 参照单位（用于仅敌人/仅友军/排除自身）
+ * @param options 筛选配置（matchUnitFilter 的 UnitFilterOptions）
+ * @returns 符合条件的单位数组
+ */
+export function getUnitsInRangeWithFilter(this: void, x: number, y: number, radius: number, sourceUnit: any, options: UnitFilterOptions): any[] {
+    const group = CreateGroup();
+    GroupEnumUnitsInRange(group, x, y, radius, null);
+
+    const units: any[] = [];
+    let unit = FirstOfGroup(group);
+
+    while (true) {
+        if (unit == null || unit === 0) {
+            break;
+        }
+        if (matchUnitFilter(unit, sourceUnit, options)) {
+            units.push(unit);
+        }
+        GroupRemoveUnit(group, unit);
+        unit = FirstOfGroup(group);
+    }
+
+    DestroyGroup(group);
     return units;
 }
 

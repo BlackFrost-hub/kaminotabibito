@@ -14,6 +14,7 @@ import { 阿伦劳特单位技能配置 } from "./00．配置";
 
 const jass = require("jass.common") as any;
 const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
+const SquareRoot = jass.SquareRoot as (this: void, value: number) => number;
 const 弧度转角度 = 57.29577951308232;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
@@ -22,6 +23,24 @@ const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核�
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removeDelayedCallback: (this: void, id: number) => void;
 };
+const { 秒转毫秒 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  秒转毫秒: (this: void, seconds: number) => number;
+};
+
+interface 原生Buff到期参数 {
+  单位: any;
+  技能ID: number;
+  单位ID: number;
+  BuffID: number;
+}
+
+function 原生Buff到期移除(this: void, variable?: any): void {
+  const 参数 = variable as 原生Buff到期参数 | undefined;
+  if (参数 == null) return;
+  UnitRemoveAbility(参数.单位, 参数.技能ID);
+  const map = 原生Buff定时表[参数.单位ID];
+  if (map != null) map[参数.BuffID] = undefined;
+}
 
 const 光形态单位ID = stringToFourCCSafe(阿伦劳特单位技能配置.光形态单位ID);
 const 暗形态单位ID = stringToFourCCSafe(阿伦劳特单位技能配置.暗形态单位ID);
@@ -97,11 +116,11 @@ export function 添加原生Buff持续(this: void, unit: any, buffId: number, du
   }
   const old = unitMap[buffId];
   if (old != null && old.定时器ID !== 0) removeDelayedCallback(old.定时器ID);
-  const timerId = addDelayedCallback(Math.round(duration * 1000), () => {
-    UnitRemoveAbility(unit, abilityId);
-    const map = 原生Buff定时表[unitId];
-    if (map != null) map[buffId] = undefined;
-  });
+  const timerId = addDelayedCallback(
+    秒转毫秒(duration),
+    原生Buff到期移除,
+    { 单位: unit, 技能ID: abilityId, 单位ID: unitId, BuffID: buffId } as 原生Buff到期参数,
+  );
   unitMap[buffId] = { 定时器ID: timerId };
 }
 
@@ -146,7 +165,7 @@ export function 两点角度(this: void, x1: number, y1: number, x2: number, y2:
 export function 两点距离(this: void, x1: number, y1: number, x2: number, y2: number): number {
   const dx = x2 - x1;
   const dy = y2 - y1;
-  return Math.sqrt(dx * dx + dy * dy);
+  return SquareRoot(dx * dx + dy * dy);
 }
 
 export {};

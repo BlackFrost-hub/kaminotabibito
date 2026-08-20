@@ -8,7 +8,8 @@
 import { 黑崎一护技能配置 } from "./00．配置";
 import { 黑崎一护是否卍解, 记录月牙位置, 清除月牙位置 } from "./01．状态表";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 读取单位攻击力, 两点角度 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -46,10 +47,8 @@ const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
-const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const Sin = jass.Sin as (this: void, radians: number) => number;
-const bj_RADTODEG = jass.bj_RADTODEG as number;
 const bj_DEGTORAD = jass.bj_DEGTORAD as number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
@@ -60,10 +59,6 @@ const 配置 = 黑崎一护技能配置;
 const 英雄单位类型ID = 配置.单位类型ID;
 const Q类型ID = stringToFourCCSafe(配置.Q.技能ID);
 const D类型ID = stringToFourCCSafe(配置.D.技能ID);
-
-function 计算两点角度(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  return Atan2(y2 - y1, x2 - x1) * bj_RADTODEG;
-}
 
 interface Q弹道上下文 {
   施法者: any;
@@ -200,7 +195,7 @@ function 释放Q月牙天冲(this: void, context: Q弹道上下文, caster: any,
   const ty = GetSpellTargetY();
   const sx = GetUnitX(caster);
   const sy = GetUnitY(caster);
-  const 角度 = 计算两点角度(sx, sy, tx, ty);
+  const 角度 = 两点角度(sx, sy, tx, ty);
   const 卍解 = 黑崎一护是否卍解(caster);
   const 参数 = 卍解 ? 配置.Q.解放后 : 配置.Q.未解放;
 
@@ -244,7 +239,7 @@ function 释放Q月牙天冲(this: void, context: Q弹道上下文, caster: any,
 
   记录月牙位置(caster, sx, sy);
   context.回调ID = addPeriodicCallback(
-    Math.round(配置.Q.推进间隔秒 * 1000),
+    秒转毫秒(配置.Q.推进间隔秒),
     推进Q月牙 as unknown as (this: void, variable?: any) => void,
     context,
   );

@@ -49,12 +49,26 @@ const { SFB_施加通用Buff } = require("lib.扩展函数.Star扩展函数.Star
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
-const { 读取单位攻击力, 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 单位存活, 距离XY, 两点角度, 极坐标X, 极坐标Y, 取单位ID } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
+  距离XY: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
+  取单位ID: (this: void, unit: any) => number;
 };
 const { isUnitEnemy } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
   isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
+};
+const { X_SetUnitMovableSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
+  X_SetUnitMovableSafe: (this: void, unit: any, movable: boolean) => void;
+};
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
 };
 
 const D技能ID数值 = stringToFourCCSafe(佐佐木单位技能配置.D被动技能ID);
@@ -70,8 +84,6 @@ const SetUnitX = jass.SetUnitX as (this: void, unit: any, x: number) => void;
 const SetUnitY = jass.SetUnitY as (this: void, unit: any, y: number) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, unit: any, x: number, y: number) => void;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
-const CreateUnit = jass.CreateUnit as (this: void, player: any, unitId: number, x: number, y: number, face: number) => any;
-const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 const SetUnitVertexColor = jass.SetUnitVertexColor as (this: void, unit: any, r: number, g: number, b: number, a: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
@@ -80,16 +92,6 @@ const IssueImmediateOrder = jass.IssueImmediateOrder as (this: void, unit: any, 
 const 残影马甲ID = stringToFourCCSafe(佐佐木单位技能配置.D.残影马甲ID);
 const 快速刀光前ID = stringToFourCCSafe(佐佐木单位技能配置.D.快速刀光前ID);
 const 快速刀光后ID = stringToFourCCSafe(佐佐木单位技能配置.D.快速刀光后ID);
-
-function 两点距离(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-function 两点角度(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-}
 
 function 是有效敌人(this: void, 施法者: any, target: any): boolean {
   if (target == null || target === 0 || target === 施法者) return false;
@@ -102,6 +104,106 @@ function 是有效敌人(this: void, 施法者: any, target: any): boolean {
 }
 
 /** 执行换位与残影冲刺（源 JASS Trig_1ZZMSYFunc002Func002Func005T） */
+interface D冲刺实例参数 {
+  英雄: any;
+  残影: any;
+  残影ID: number;
+  刀光: any;
+  刀光ID: number;
+  /** 快速模式起点慢刀光（e07T），与刀光一同在实例结束时清理 */
+  慢刀光: any;
+  慢刀光ID: number;
+  步长X: number;
+  步长Y: number;
+  每tick距离: number;
+  快速模式: boolean;
+  总步数: number;
+  命中表: Record<number, boolean | undefined>;
+  燕返表: Record<number, boolean | undefined>;
+  当前X: number;
+  当前Y: number;
+  已走步数: number;
+  回调ID: number;
+}
+
+/**
+ * 佐佐木 D 残影冲刺周期推进。实例参数对象快照本技能创建的单位与句柄ID，
+ * 英雄死亡或重复释放时旧回调不得移除句柄已被复用的新实例单位。
+ */
+function 推进D冲刺(this: void, variable?: any): void {
+  const 实例 = variable as D冲刺实例参数 | undefined;
+  if (实例 == null) return;
+  实例.已走步数 += 1;
+  if (实例.已走步数 > 实例.总步数 || !单位存活(实例.英雄)) {
+  // 句柄复用防护：仅当句柄仍指向本实例创建的单位时才移除
+  if (取单位ID(实例.残影) === 实例.残影ID) 立即移除单位并取消排泄登记(实例.残影);
+  if (实例.刀光 != null && 实例.刀光 !== 0 && 取单位ID(实例.刀光) === 实例.刀光ID) 立即移除单位并取消排泄登记(实例.刀光);
+  if (实例.慢刀光 != null && 实例.慢刀光 !== 0 && 取单位ID(实例.慢刀光) === 实例.慢刀光ID) 立即移除单位并取消排泄登记(实例.慢刀光);
+  removePeriodicCallback(实例.回调ID);
+  return;
+  }
+
+  实例.当前X += 实例.步长X;
+  实例.当前Y += 实例.步长Y;
+  SetUnitX(实例.残影, 实例.当前X);
+  SetUnitY(实例.残影, 实例.当前Y);
+  if (实例.刀光 != null && 实例.刀光 !== 0) {
+    SetUnitX(实例.刀光, 实例.当前X + 实例.步长X * (100 / 实例.每tick距离));
+    SetUnitY(实例.刀光, 实例.当前Y + 实例.步长Y * (100 / 实例.每tick距离));
+  }
+
+  // 路径及附近敌人：换位冲刺伤害（每单位一次）
+  const cfg = 佐佐木单位技能配置.D;
+  const units = getUnitsInRange(实例.当前X, 实例.当前Y, cfg.换位伤害半径);
+  for (let i = 0; i < units.length; i++) {
+    const enemy = units[i];
+    if (!是有效敌人(实例.英雄, enemy)) continue;
+    const enemyId = GetHandleId(enemy);
+    if (实例.命中表[enemyId] === true) continue;
+    实例.命中表[enemyId] = true;
+    造成技能伤害({
+      来源: 实例.英雄,
+      目标: enemy,
+      伤害: 读取单位攻击力(实例.英雄) * cfg.换位攻击倍率,
+      伤害类型: DAMAGE_TYPE_NORMAL,
+      ranged: false,
+      attackType: ATTACK_TYPE_NORMAL,
+      weaponType: WEAPON_TYPE_WHOKNOWS,
+      来源类型: "单位技能",
+      技能ID: D技能ID数值,
+      标签: "佐佐木小次郎-换位冲刺",
+      伤害形态: "AOE",
+      参与技能伤害加成: true,
+    });
+  }
+
+  // 快速模式追加「燕返」被动：攻击力×2 + 0.5 秒硬直（每单位一次）
+  if (实例.快速模式) {
+    for (let i = 0; i < units.length; i++) {
+      const enemy = units[i];
+      if (!是有效敌人(实例.英雄, enemy)) continue;
+      const enemyId = GetHandleId(enemy);
+      if (实例.燕返表[enemyId] === true) continue;
+      实例.燕返表[enemyId] = true;
+      SFB_施加通用Buff(实例.英雄, enemy, 21, cfg.燕返硬直秒);
+      造成技能伤害({
+        来源: 实例.英雄,
+        目标: enemy,
+        伤害: 读取单位攻击力(实例.英雄) * cfg.燕返攻击倍率,
+        伤害类型: DAMAGE_TYPE_NORMAL,
+        ranged: false,
+        attackType: ATTACK_TYPE_NORMAL,
+        weaponType: WEAPON_TYPE_WHOKNOWS,
+        来源类型: "单位技能",
+        技能ID: D技能ID数值,
+        标签: "佐佐木小次郎-燕返被动",
+        伤害形态: "AOE",
+        参与技能伤害加成: true,
+      });
+    }
+  }
+}
+
 function 执行佐佐木换位(this: void, 英雄: any, 分身单位: any): void {
   const cfg = 佐佐木单位技能配置.D;
   const owner = GetOwningPlayer(英雄);
@@ -109,26 +211,27 @@ function 执行佐佐木换位(this: void, 英雄: any, 分身单位: any): void
   const 本体Y = GetUnitY(英雄);
   const 分身X = GetUnitX(分身单位);
   const 分身Y = GetUnitY(分身单位);
-  const 距离 = 两点距离(本体X, 本体Y, 分身X, 分身Y);
+  const 距离 = 距离XY(本体X, 本体Y, 分身X, 分身Y);
   const 角度 = 两点角度(本体X, 本体Y, 分身X, 分身Y);
-  const 弧度 = 角度 * Math.PI / 180;
   const 快速模式 = 距离 >= cfg.快速模式距离;
   const 每tick距离 = 快速模式 ? cfg.快速每tick距离 : cfg.冲刺每tick距离;
-  const 总步数 = Math.ceil(距离 / 每tick距离);
+  const 总步数 = jass.R2I((距离 + 每tick距离 - 1) / 每tick距离);
 
   // 残影马甲：顶点色 alpha 225、动作 9 @2.2 倍速
-  const 残影 = CreateUnit(owner, 残影马甲ID, 本体X, 本体Y, 角度);
+  const 残影 = 创建单位并登记排泄安全(owner, 残影马甲ID, 本体X, 本体Y, 角度);
   if (残影 == null || 残影 === 0) return;
+  X_SetUnitMovableSafe(残影, false);
   SetUnitVertexColor(残影, 255, 255, 255, 225);
   SetUnitAnimationByIndex(残影, 9);
   SetUnitTimeScale(残影, 2.2);
 
   // 快速模式：前方 100 码快速刀光（e07S）+ 起点 0.1 倍速慢刀光（e07T）
   let 刀光: any = null;
+  let 慢刀光: any = null;
   if (快速模式) {
-    刀光 = CreateUnit(owner, 快速刀光前ID, 本体X + Math.cos(弧度) * 100, 本体Y + Math.sin(弧度) * 100, 角度);
-    const 刀光后 = CreateUnit(owner, 快速刀光后ID, 本体X, 本体Y, 角度);
-    SetUnitTimeScale(刀光后, 0.1);
+    刀光 = 创建单位并登记排泄安全(owner, 快速刀光前ID, 极坐标X(本体X, 角度, 100), 极坐标Y(本体Y, 角度, 100), 角度);
+    慢刀光 = 创建单位并登记排泄安全(owner, 快速刀光后ID, 本体X, 本体Y, 角度);
+    if (慢刀光 != null && 慢刀光 !== 0) SetUnitTimeScale(慢刀光, 0.1);
     if (刀光 != null && 刀光 !== 0) {
       播放佐佐木坐标音效(cfg.快速刀光音效路径, GetUnitX(刀光), GetUnitY(刀光), cfg.快速刀光音效裁断);
     }
@@ -150,83 +253,29 @@ function 执行佐佐木换位(this: void, 英雄: any, 分身单位: any): void
   // 配合 Q 技能的「瞬移后」窗口
   设置瞬移后标记(英雄);
 
-  // 残影冲刺 + 路径伤害（源 0.02 秒循环计时器）
-  const 冲刺命中表: Record<number, boolean | undefined> = {};
-  const 燕返命中表: Record<number, boolean | undefined> = {};
-  const 步长X = Math.cos(弧度) * 每tick距离;
-  const 步长Y = Math.sin(弧度) * 每tick距离;
-  let 当前X = 本体X;
-  let 当前Y = 本体Y;
-  let 已走步数 = 0;
-
-  const loopId = addPeriodicCallback(cfg.冲刺tick毫秒, () => {
-    已走步数++;
-    if (已走步数 > 总步数 || !单位存活(英雄)) {
-      RemoveUnit(残影);
-      if (刀光 != null && 刀光 !== 0) RemoveUnit(刀光);
-      removePeriodicCallback(loopId);
-      return;
-    }
-
-    当前X += 步长X;
-    当前Y += 步长Y;
-    SetUnitX(残影, 当前X);
-    SetUnitY(残影, 当前Y);
-    if (刀光 != null && 刀光 !== 0) {
-      SetUnitX(刀光, 当前X + 步长X * (100 / 每tick距离));
-      SetUnitY(刀光, 当前Y + 步长Y * (100 / 每tick距离));
-    }
-
-    // 路径及附近敌人：换位冲刺伤害（每单位一次）
-    const units = getUnitsInRange(当前X, 当前Y, cfg.换位伤害半径);
-    for (let i = 0; i < units.length; i++) {
-      const enemy = units[i];
-      if (!是有效敌人(英雄, enemy)) continue;
-      const enemyId = GetHandleId(enemy);
-      if (冲刺命中表[enemyId] === true) continue;
-      冲刺命中表[enemyId] = true;
-      造成技能伤害({
-        来源: 英雄,
-        目标: enemy,
-        伤害: 读取单位攻击力(英雄) * cfg.换位攻击倍率,
-        伤害类型: DAMAGE_TYPE_NORMAL,
-        ranged: false,
-        attackType: ATTACK_TYPE_NORMAL,
-        weaponType: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "单位技能",
-        技能ID: D技能ID数值,
-        标签: "佐佐木小次郎-换位冲刺",
-        伤害形态: "AOE",
-        参与技能伤害加成: true,
-      });
-    }
-
-    // 快速模式追加「燕返」被动：攻击力×2 + 0.5 秒硬直（每单位一次）
-    if (快速模式) {
-      for (let i = 0; i < units.length; i++) {
-        const enemy = units[i];
-        if (!是有效敌人(英雄, enemy)) continue;
-        const enemyId = GetHandleId(enemy);
-        if (燕返命中表[enemyId] === true) continue;
-        燕返命中表[enemyId] = true;
-        SFB_施加通用Buff(英雄, enemy, 21, cfg.燕返硬直秒);
-        造成技能伤害({
-          来源: 英雄,
-          目标: enemy,
-          伤害: 读取单位攻击力(英雄) * cfg.燕返攻击倍率,
-          伤害类型: DAMAGE_TYPE_NORMAL,
-          ranged: false,
-          attackType: ATTACK_TYPE_NORMAL,
-          weaponType: WEAPON_TYPE_WHOKNOWS,
-          来源类型: "单位技能",
-          技能ID: D技能ID数值,
-          标签: "佐佐木小次郎-燕返被动",
-          伤害形态: "AOE",
-          参与技能伤害加成: true,
-        });
-      }
-    }
-  });
+  // 残影冲刺 + 路径伤害（源 0.02 秒循环计时器）；实例参数对象承载本技能单位与状态，
+  // 旧回调（英雄死亡/重复释放）不得移除句柄已被复用的新实例单位
+  const 冲刺实例: D冲刺实例参数 = {
+    英雄,
+    残影,
+    残影ID: 取单位ID(残影),
+    刀光,
+    刀光ID: 刀光 != null && 刀光 !== 0 ? 取单位ID(刀光) : 0,
+    慢刀光,
+    慢刀光ID: 慢刀光 != null && 慢刀光 !== 0 ? 取单位ID(慢刀光) : 0,
+    步长X: 极坐标X(0, 角度, 每tick距离),
+    步长Y: 极坐标Y(0, 角度, 每tick距离),
+    每tick距离,
+    快速模式,
+    总步数,
+    命中表: {},
+    燕返表: {},
+    当前X: 本体X,
+    当前Y: 本体Y,
+    已走步数: 0,
+    回调ID: 0,
+  };
+  冲刺实例.回调ID = addPeriodicCallback(cfg.冲刺tick毫秒, 推进D冲刺, 冲刺实例);
 }
 
 function on佐佐木右键指令(this: void, 指令单位: any, orderId: number, 目标单位: any, 目标物品: any, 目标可破坏物: any): void {
@@ -252,7 +301,7 @@ function on佐佐木右键指令(this: void, 指令单位: any, orderId: number,
   const cfg = 佐佐木单位技能配置.D;
   const 本体X = GetUnitX(英雄);
   const 本体Y = GetUnitY(英雄);
-  if (是佐佐木分身(英雄, 目标单位) && 两点距离(本体X, 本体Y, GetUnitX(目标单位), GetUnitY(目标单位)) <= cfg.瞬移最大距离) {
+  if (是佐佐木分身(英雄, 目标单位) && 距离XY(本体X, 本体Y, GetUnitX(目标单位), GetUnitY(目标单位)) <= cfg.瞬移最大距离) {
     执行佐佐木换位(英雄, 目标单位);
   }
 }

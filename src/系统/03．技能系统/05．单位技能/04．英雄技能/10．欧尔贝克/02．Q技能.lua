@@ -30,6 +30,10 @@ local ____require_result_8 = require("系统.03．技能系统.00．技能模板
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
 local _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
 local _____4E24_70B9_89D2_5EA6 = ____require_result_8["两点角度"]
+local _____8DDD_79BBXY = ____require_result_8["距离XY"]
+local _____6781_5750_6807X = ____require_result_8["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_8["极坐标Y"]
+local _____89D2_5EA6_5DEE_7EDD_5BF9_503C = ____require_result_8["角度差绝对值"]
 local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
 local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
@@ -58,21 +62,6 @@ local IsUnitType = jass.IsUnitType
 local UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 local UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
-local function _____5F52_4E00_5316_89D2_5EA6(angle)
-    local result = angle % 360
-    if result < 0 then
-        result = result + 360
-    end
-    return result
-end
---- 返回两角度在 0~180 范围内的最小夹角
-local function _____89D2_5EA6_5DEE(a, b)
-    local diff = math.abs(_____5F52_4E00_5316_89D2_5EA6(a) - _____5F52_4E00_5316_89D2_5EA6(b))
-    if diff > 180 then
-        diff = 360 - diff
-    end
-    return diff
-end
 --- 目标类型过滤：排除建筑/机械/古树等无效目标（路径与扇形共用）
 local function _____662F_6709_6548_4F24_5BB3_76EE_6807(_____4E0A_4E0B_6587, target)
     if target == nil or target == 0 or target == _____4E0A_4E0B_6587["施法者"] then
@@ -187,8 +176,8 @@ local function _____7ED3_7B97Q_843D_70B9(_____4E0A_4E0B_6587)
     if _____4E0A_4E0B_6587["十字斩"] then
         _____521B_5EFA_70B9_7279_6548({
             ["模型路径"] = cfg["冲刺特效模型"],
-            X = casterX + math.cos(_____4E0A_4E0B_6587["方向角"] * math.pi / 180) * 125,
-            Y = casterY + math.sin(_____4E0A_4E0B_6587["方向角"] * math.pi / 180) * 125,
+            X = _____6781_5750_6807X(casterX, _____4E0A_4E0B_6587["方向角"], 125),
+            Y = _____6781_5750_6807Y(casterY, _____4E0A_4E0B_6587["方向角"], 125),
             Z = 175,
             ["面向角度"] = _____4E0A_4E0B_6587["方向角"],
             ["缩放"] = cfg["冲刺特效缩放X"],
@@ -202,10 +191,10 @@ local function _____7ED3_7B97Q_843D_70B9(_____4E0A_4E0B_6587)
             do
                 local target = targets[i + 1]
                 if not _____662F_6709_6548_4F24_5BB3_76EE_6807(_____4E0A_4E0B_6587, target) then
-                    goto __continue26
+                    goto __continue22
                 end
                 if _____5DF2_547D_4E2D_8FC7(_____4E0A_4E0B_6587, target) then
-                    goto __continue26
+                    goto __continue22
                 end
                 local _____6307_5411_76EE_6807_89D2_5EA6 = _____4E24_70B9_89D2_5EA6(
                     casterX,
@@ -213,12 +202,12 @@ local function _____7ED3_7B97Q_843D_70B9(_____4E0A_4E0B_6587)
                     GetUnitX(target),
                     GetUnitY(target)
                 )
-                if _____89D2_5EA6_5DEE(_____6307_5411_76EE_6807_89D2_5EA6, _____4E0A_4E0B_6587["方向角"]) > _____4E0A_4E0B_6587["扇形半角"] then
-                    goto __continue26
+                if _____89D2_5EA6_5DEE_7EDD_5BF9_503C(_____6307_5411_76EE_6807_89D2_5EA6, _____4E0A_4E0B_6587["方向角"]) > _____4E0A_4E0B_6587["扇形半角"] then
+                    goto __continue22
                 end
                 _____7ED3_7B97Q_5355_4F53_4F24_5BB3(_____4E0A_4E0B_6587, target)
             end
-            ::__continue26::
+            ::__continue22::
             i = i + 1
         end
     end
@@ -253,7 +242,7 @@ local function ____on_6B27_5C14_8D1D_514BQ(caster, abilityId)
     local targetX = GetSpellTargetX()
     local targetY = GetSpellTargetY()
     local _____65B9_5411_89D2 = _____4E24_70B9_89D2_5EA6(startX, startY, targetX, targetY)
-    local _____8DDD_79BB = math.sqrt((targetX - startX) * (targetX - startX) + (targetY - startY) * (targetY - startY))
+    local _____8DDD_79BB = _____8DDD_79BBXY(startX, startY, targetX, targetY)
     local _____4F24_5BB3_503C = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * (cfg["基础攻击力倍率"] + cfg["每级攻击力倍率"] * level)
     local _____5341_5B57_65A9 = _____5355_4F4D_62E5_6709_539F_751FBuff(caster, _____79EF_6512Buff_7C7B_578BID)
     if _____5341_5B57_65A9 then

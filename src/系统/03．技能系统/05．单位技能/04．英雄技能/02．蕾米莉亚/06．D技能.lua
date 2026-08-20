@@ -31,6 +31,7 @@ local Sound3DII_UnitPlayReuse = ____require_result_9.Sound3DII_UnitPlayReuse
 local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_5B58_6D3B = ____require_result_10["单位存活"]
 local _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D = ____require_result_10["读取单位最大生命"]
+local _____53D6_5355_4F4DID = ____require_result_10["取单位ID"]
 local ____D_914D_7F6E = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.D
 local ____D_6280_80FDID = stringToFourCCSafe(____D_914D_7F6E["技能ID"])
 local _____5355_4F4D_7C7B_578BID = _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"]
@@ -52,9 +53,6 @@ local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local GetUnitStateJapi = japi.GetUnitState
 local ____D_4E0A_4E0B_6587_8868 = {}
-local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    return (unit == nil or unit == 0) and 0 or (jass.GetHandleId(unit) or 0)
-end
 local function _____6E05_7406_857E_7C73_8389_4E9AD_4E0A_4E0B_6587(context)
     if context["中段回调ID"] ~= 0 then
         removeDelayedCallback(context["中段回调ID"])
@@ -68,7 +66,7 @@ local function _____6E05_7406_857E_7C73_8389_4E9AD_4E0A_4E0B_6587(context)
         removeDelayedCallback(context["结果回调ID"])
         context["结果回调ID"] = 0
     end
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
+    local unitId = _____53D6_5355_4F4DID(context["施法者"])
     if unitId ~= 0 and ____D_4E0A_4E0B_6587_8868[unitId] == context then
         __TS__Delete(____D_4E0A_4E0B_6587_8868, unitId)
     end
@@ -226,7 +224,7 @@ local function _____5904_7406_857E_7C73_8389_4E9AD(caster, abilityId)
     if abilityId ~= ____D_6280_80FDID or GetUnitTypeId(caster) ~= _____5355_4F4D_7C7B_578BID or not _____5355_4F4D_5B58_6D3B(caster) then
         return
     end
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(caster)
+    local unitId = _____53D6_5355_4F4DID(caster)
     if unitId == 0 or ____D_4E0A_4E0B_6587_8868[unitId] ~= nil then
         return
     end
@@ -236,7 +234,7 @@ local function _____5904_7406_857E_7C73_8389_4E9AD(caster, abilityId)
     context["中段回调ID"] = addDelayedCallback(____D_914D_7F6E["中段延迟秒"] * 1000, _____857E_7C73_8389_4E9AD_4E2D_6BB5, context)
 end
 local function _____857E_7C73_8389_4E9AD_5355_4F4D_6B7B_4EA1(dyingUnit, _killingUnit)
-    local context = ____D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4ID(dyingUnit)]
+    local context = ____D_4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(dyingUnit)]
     if context ~= nil then
         _____6E05_7406_857E_7C73_8389_4E9AD_4E0A_4E0B_6587(context)
     end

@@ -8,6 +8,7 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
 local _____5F00_59CB_5145_80FD = ____require_result_0["开始充能"]
@@ -37,7 +38,6 @@ local UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 local UNIT_STATE_MANA = jass.UNIT_STATE_MANA
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
-local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFlyHeight = jass.GetUnitFlyHeight
@@ -48,9 +48,6 @@ local IsUnitEnemy = jass.IsUnitEnemy
 local IsUnitType = jass.IsUnitType
 local GetOwningPlayer = jass.GetOwningPlayer
 local _____4E0A_4E0B_6587_8868 = {}
-local function _____53D6_5355_4F4DID(unit)
-    return (unit == nil or unit == 0) and 0 or (GetHandleId(unit) or 0)
-end
 local function _____83B7_53D6D_4E0A_4E0B_6587(unit)
     local id = _____53D6_5355_4F4DID(unit)
     local ____temp_8

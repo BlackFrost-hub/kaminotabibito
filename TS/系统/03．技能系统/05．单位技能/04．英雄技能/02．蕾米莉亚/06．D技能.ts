@@ -35,9 +35,10 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
-const { 单位存活, 读取单位最大生命 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 单位存活, 读取单位最大生命, 取单位ID } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   单位存活: (this: void, unit: any) => boolean;
   读取单位最大生命: (this: void, unit: any) => number;
+  取单位ID: (this: void, unit: any) => number;
 };
 
 const D配置 = 蕾米莉亚单位技能配置.D;
@@ -70,10 +71,6 @@ interface 蕾米莉亚D上下文 {
 
 const D上下文表: Record<number, 蕾米莉亚D上下文 | undefined> = {};
 
-function 取单位句柄ID(this: void, unit: any): number {
-  return unit == null || unit === 0 ? 0 : (jass.GetHandleId(unit) || 0);
-}
-
 function 清理蕾米莉亚D上下文(this: void, context: 蕾米莉亚D上下文): void {
   if (context.中段回调ID !== 0) {
     removeDelayedCallback(context.中段回调ID);
@@ -87,7 +84,7 @@ function 清理蕾米莉亚D上下文(this: void, context: 蕾米莉亚D上下�
     removeDelayedCallback(context.结果回调ID);
     context.结果回调ID = 0;
   }
-  const unitId = 取单位句柄ID(context.施法者);
+  const unitId = 取单位ID(context.施法者);
   if (unitId !== 0 && D上下文表[unitId] === context) delete D上下文表[unitId];
 }
 
@@ -210,7 +207,7 @@ function 蕾米莉亚D中段(this: void, variable?: any): void {
 
 function 处理蕾米莉亚D(this: void, caster: any, abilityId: number): void {
   if (abilityId !== D技能ID || GetUnitTypeId(caster) !== 单位类型ID || !单位存活(caster)) return;
-  const unitId = 取单位句柄ID(caster);
+  const unitId = 取单位ID(caster);
   if (unitId === 0 || D上下文表[unitId] != null) return;
   const context = {
     施法者: caster,
@@ -224,7 +221,7 @@ function 处理蕾米莉亚D(this: void, caster: any, abilityId: number): void {
 }
 
 function 蕾米莉亚D单位死亡(this: void, dyingUnit: any, _killingUnit: any): void {
-  const context = D上下文表[取单位句柄ID(dyingUnit)];
+  const context = D上下文表[取单位ID(dyingUnit)];
   if (context != null) 清理蕾米莉亚D上下文(context);
 }
 

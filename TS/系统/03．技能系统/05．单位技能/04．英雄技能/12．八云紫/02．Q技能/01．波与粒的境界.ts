@@ -20,6 +20,10 @@ const jass = require("jass.common") as any;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
+const { 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
+};
 const { 创建原生弹幕, 获取原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
   创建原生弹幕: (this: void, params: any) => any;
   获取原生弹幕: (this: void, projectileId: number) => any;
@@ -243,11 +247,10 @@ function 释放Q(this: void, _context: { 英雄: any }, hero: any, skillInstance
   for (let i = 0; i < 配置.Q.普通弹幕数量; i++) {
     const angle = baseAngle + 配置.Q.普通角度偏移[i];
     const distance = 配置.Q.普通创建距离[i];
-    const radians = angle * Math.PI / 180;
     发射八云紫弹幕({
       施法者: hero,
-      X: heroX + Math.cos(radians) * distance,
-      Y: heroY + Math.sin(radians) * distance,
+      X: 极坐标X(heroX, angle, distance),
+      Y: 极坐标Y(heroY, angle, distance),
       方向角: angle,
       速度: 配置.Q.普通速度,
       高度: 配置.Q.普通高度,

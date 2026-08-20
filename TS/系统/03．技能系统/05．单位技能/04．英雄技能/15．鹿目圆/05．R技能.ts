@@ -53,6 +53,9 @@ const { 技能_获取技能最大冷却时间 } = require("平台扩展API取值
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
@@ -91,7 +94,6 @@ const SetUnitFlyHeight = jass.SetUnitFlyHeight as (this: void, unit: any, height
 const SetUnitScale = jass.SetUnitScale as (this: void, unit: any, x: number, y: number, z: number) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, animation: string) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
-const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 const GetRandomReal = jass.GetRandomReal as (this: void, min: number, max: number) => number;
 const SquareRoot = jass.SquareRoot as (this: void, value: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
@@ -150,7 +152,7 @@ interface R运行上下文 extends R入口上下文 {
 }
 
 function 移除单位壳(this: void, unit: any): void {
-  if (unit != null && unit !== 0 && GetUnitTypeId(unit) !== 0) RemoveUnit(unit);
+  if (unit != null && unit !== 0 && GetUnitTypeId(unit) !== 0) 立即移除单位并取消排泄登记(unit);
 }
 
 function 两点距离(this: void, x1: number, y1: number, x2: number, y2: number): number {

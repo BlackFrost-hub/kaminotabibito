@@ -129,8 +129,14 @@ function RR离开单位(this: void, context: RR区域上下文, record: RR单位
   const global = RR单位全局状态表[id];
   if (context.完美空间) {
     移除单位暂停(record.单位, context.来源);
-    if (global != null) global.完美计数 = Math.max(0, global.完美计数 - 1);
-  } else if (global != null) global.缓速计数 = Math.max(0, global.缓速计数 - 1);
+    if (global != null) {
+      const 新完美 = global.完美计数 - 1;
+      global.完美计数 = 新完美 > 0 ? 新完美 : 0;
+    }
+  } else if (global != null) {
+    const 新缓速 = global.缓速计数 - 1;
+    global.缓速计数 = 新缓速 > 0 ? 新缓速 : 0;
+  }
   if (global != null) {
     RR刷新单位全局状态(global);
     if (global.完美计数 <= 0) 移除单位指定Buff(record.单位, 十六夜咲夜BuffID.完美空间时间停止);
@@ -164,8 +170,14 @@ function RR离开飞刀(this: void, context: RR区域上下文, record: RR飞刀
   const global = RR飞刀全局状态表[id];
   if (context.完美空间) {
     移除单位暂停(record.控制器.单位, context.来源);
-    if (global != null) global.完美计数 = Math.max(0, global.完美计数 - 1);
-  } else if (global != null) global.缓速计数 = Math.max(0, global.缓速计数 - 1);
+    if (global != null) {
+      const 新完美 = global.完美计数 - 1;
+      global.完美计数 = 新完美 > 0 ? 新完美 : 0;
+    }
+  } else if (global != null) {
+    const 新缓速 = global.缓速计数 - 1;
+    global.缓速计数 = 新缓速 > 0 ? 新缓速 : 0;
+  }
   if (global != null) {
     if (global.缓速计数 > 0) record.控制器.设置每Tick位移(global.原速度 * 0.4);
     else record.控制器.设置每Tick位移(global.原速度);

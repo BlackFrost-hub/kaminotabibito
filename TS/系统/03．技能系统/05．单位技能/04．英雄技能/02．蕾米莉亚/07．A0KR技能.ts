@@ -23,10 +23,11 @@ const { 开始冲锋, 停止位移 } = require("系统.03．技能系统.00．�
 const { 获取范围敌军 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   获取范围敌军: (this: void, source: any, x: number, y: number, radius: number) => any[];
 };
-const { 单位存活, 读取单位攻击力, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 单位存活, 读取单位攻击力, 两点角度, 取单位ID } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   单位存活: (this: void, unit: any) => boolean;
   读取单位攻击力: (this: void, unit: any) => number;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  取单位ID: (this: void, unit: any) => number;
 };
 const { 造成批量AOE技能伤害, 创建独立技能伤害实例, 结束独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成批量AOE技能伤害: (this: void, params: any) => number;
@@ -61,7 +62,6 @@ const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
 const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
 const UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE as any;
 const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
@@ -91,12 +91,8 @@ interface A0KR吸血到期记录 {
 const 上下文表: Record<number, 蕾米莉亚A0KR上下文 | undefined> = {};
 const 吸血层数表: Record<number, number | undefined> = {};
 
-function 取单位句柄ID(this: void, unit: any): number {
-  return unit == null || unit === 0 ? 0 : GetHandleId(unit) || 0;
-}
-
 function 获取或创建A0KR上下文(this: void, unit: any): 蕾米莉亚A0KR上下文 | undefined {
-  const unitId = 取单位句柄ID(unit);
+  const unitId = 取单位ID(unit);
   if (unitId === 0) return undefined;
   const old = 上下文表[unitId];
   if (old != null) return old;
@@ -116,7 +112,7 @@ function 获取或创建A0KR上下文(this: void, unit: any): 蕾米莉亚A0KR�
 }
 
 function A0KR目标允许(this: void, caster: any, target: any, context: 蕾米莉亚A0KR上下文): boolean {
-  const targetId = 取单位句柄ID(target);
+  const targetId = 取单位ID(target);
   return targetId !== 0
     && context.已命中[targetId] !== true
     && 单位存活(target)
@@ -129,7 +125,7 @@ function A0KR目标允许(this: void, caster: any, target: any, context: 蕾米�
 function A0KR准备目标(this: void, target: any, _index: number, variable?: any): any {
   const context = variable as 蕾米莉亚A0KR上下文 | undefined;
   if (context == null || !A0KR目标允许(context.施法者, target, context)) return undefined;
-  const targetId = 取单位句柄ID(target);
+  const targetId = 取单位ID(target);
   context.已命中[targetId] = true;
   createTimedUnitEffect(target, A0KR配置.命中特效.挂点, A0KR配置.命中特效.模型路径, A0KR配置.命中特效持续秒);
   return {
@@ -145,7 +141,7 @@ function A0KR准备目标(this: void, target: any, _index: number, variable?: an
 function A0KR吸血到期(this: void, variable?: any): void {
   const record = variable as A0KR吸血到期记录 | undefined;
   if (record == null || record.施法者 == null || record.施法者 === 0) return;
-  const unitId = 取单位句柄ID(record.施法者);
+  const unitId = 取单位ID(record.施法者);
   const current = 吸血层数表[unitId] ?? 0;
   if (current <= 0) return;
   调整玩家属性(record.施法者, "伤害吸血", -record.数值);
@@ -167,7 +163,7 @@ function A0KR目标结算后(this: void, target: any, _index: number, success: b
   const context = variable as 蕾米莉亚A0KR上下文 | undefined;
   if (context == null || !success) return;
   const value = IsUnitType(target, UNIT_TYPE_HERO) ? A0KR配置.英雄吸血 : A0KR配置.普通单位吸血;
-  const unitId = 取单位句柄ID(context.施法者);
+  const unitId = 取单位ID(context.施法者);
   const next = (吸血层数表[unitId] ?? 0) + 1;
   吸血层数表[unitId] = next;
   调整玩家属性(context.施法者, "伤害吸血", value);
@@ -190,7 +186,7 @@ function A0KR收尾(this: void, variable?: any): void {
     销毁单位坐标跟随特效(context.施法者, A0KR配置.表现[i].特效键);
   }
   context.已启动 = false;
-  const casterId = 取单位句柄ID(context.施法者);
+  const casterId = 取单位ID(context.施法者);
   if (casterId !== 0 && 上下文表[casterId] === context) delete 上下文表[casterId];
 }
 
@@ -215,7 +211,7 @@ function 清理A0KR上下文(this: void, context: 蕾米莉亚A0KR上下文): vo
     销毁单位坐标跟随特效(context.施法者, A0KR配置.表现[i].特效键);
   }
   context.已启动 = false;
-  const casterId = 取单位句柄ID(context.施法者);
+  const casterId = 取单位ID(context.施法者);
   if (casterId !== 0 && 上下文表[casterId] === context) delete 上下文表[casterId];
 }
 
@@ -250,7 +246,7 @@ function A0KR周期Tick(this: void, variable?: any): void {
 }
 
 function 释放蕾米莉亚A0KR(this: void, caster: any): void {
-  const existing = 上下文表[取单位句柄ID(caster)];
+  const existing = 上下文表[取单位ID(caster)];
   if (existing != null && existing.已启动) 清理A0KR上下文(existing);
   const context = 获取或创建A0KR上下文(caster);
   if (context == null) return;
@@ -295,7 +291,7 @@ function 处理蕾米莉亚A0KR(this: void, caster: any, abilityId: number): voi
 }
 
 function 蕾米莉亚A0KR单位死亡(this: void, dyingUnit: any, _killingUnit: any): void {
-  const context = 上下文表[取单位句柄ID(dyingUnit)];
+  const context = 上下文表[取单位ID(dyingUnit)];
   if (context != null) 清理A0KR上下文(context);
 }
 

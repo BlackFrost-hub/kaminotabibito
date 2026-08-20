@@ -10,6 +10,7 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -53,7 +54,6 @@ local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 local UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local GetHandleId = jass.GetHandleId
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -71,9 +71,6 @@ local DestroyLightning = jass.DestroyLightning
 local IsUnitEnemy = jass.IsUnitEnemy
 local IsUnitType = jass.IsUnitType
 local _____4E0A_4E0B_6587_8868 = {}
-local function _____53D6_5355_4F4DID(unit)
-    return (unit == nil or unit == 0) and 0 or (GetHandleId(unit) or 0)
-end
 local function _____83B7_53D6R_4E0A_4E0B_6587(unit)
     local id = _____53D6_5355_4F4DID(unit)
     local ____temp_13
@@ -136,6 +133,12 @@ local function _____521B_5EFAR_76EE_6807_7279_6548(target, modelPath, duration)
         ["持续秒"] = duration
     })
 end
+local function _____9500_6BC1R_95EA_7535(variable)
+    local lightning = variable
+    if lightning ~= nil and lightning ~= 0 then
+        DestroyLightning(lightning)
+    end
+end
 local function _____521B_5EFAR_95EA_7535(caster, target)
     local lightning = AddLightning(
         ____R_914D_7F6E["闪电特效模型"],
@@ -146,10 +149,7 @@ local function _____521B_5EFAR_95EA_7535(caster, target)
         GetUnitY(target)
     )
     if lightning ~= nil and lightning ~= 0 then
-        addDelayedCallback(
-            100,
-            function() return DestroyLightning(lightning) end
-        )
+        addDelayedCallback(100, _____9500_6BC1R_95EA_7535, lightning)
     end
 end
 local function _____6E05_7406R_4E0A_4E0B_6587(context, _____65BD_52A0_540E_7EED_865A_5F31)
@@ -252,7 +252,8 @@ local function _____91CA_653E_4E00_65B9_901A_884CR(context, caster, skillInstanc
     context["目标"] = target
     context["目标X"] = GetUnitX(target)
     context["目标Y"] = GetUnitY(target)
-    context["总伤害"] = math.max(0, maxLife - life) * ____R_914D_7F6E["目标已损失生命总倍率"]
+    local _____5DF2_635F_5931_751F_547D = maxLife - life
+    context["总伤害"] = (_____5DF2_635F_5931_751F_547D > 0 and _____5DF2_635F_5931_751F_547D or 0) * ____R_914D_7F6E["目标已损失生命总倍率"]
     context["当前次数"] = 0
     context["已启动"] = true
     local maxMana = GetUnitState(caster, jass.UNIT_STATE_MAX_MANA) or 0

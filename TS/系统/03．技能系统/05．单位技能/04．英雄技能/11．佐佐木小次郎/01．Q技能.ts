@@ -38,9 +38,13 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
 const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境") as {
   施加眩晕: (this: void, source: any, target: any, duration: number, name?: string, type?: "装备" | "技能") => void;
 };
-const { 读取单位攻击力, 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 单位存活, 距离XY, 两点角度, 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
+  距离XY: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
 };
 const { 创建原生弹幕, 获取原生弹幕 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.03．对外接口") as {
   创建原生弹幕: (this: void, 参数: any) => any;
@@ -64,6 +68,7 @@ const { YDWESetUnitAbilityStateSafe } = require("lib.扩展函数.YDWE函数.09�
 
 const Q本体技能ID = stringToFourCCSafe(佐佐木单位技能配置.Q技能ID);
 const Q二段技能ID数值 = stringToFourCCSafe(佐佐木单位技能配置.Q二段技能ID);
+const 随机整数 = jass.GetRandomInt as (this: void, low: number, high: number) => number;
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
@@ -75,16 +80,6 @@ const SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable as (this: void,
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-
-function 两点距离(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-function 两点角度(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-}
 
 /** 地形可通行判定（不可通行 = 阻挡） */
 function 地形可通行(this: void, x: number, y: number): boolean {
@@ -99,11 +94,10 @@ function 地形可通行(this: void, x: number, y: number): boolean {
 function 计算瞬移落点(this: void, 起点X: number, 起点Y: number, 角度: number, 距离: number): [number, number] {
   let 落点X = 起点X;
   let 落点Y = 起点Y;
-  const 步数 = Math.floor(距离 / 40);
-  const 弧度 = 角度 * Math.PI / 180;
+  const 步数 = jass.R2I(距离 / 40);
   for (let i = 1; i <= 步数; i++) {
-    const 候选X = 起点X + Math.cos(弧度) * 40 * i;
-    const 候选Y = 起点Y + Math.sin(弧度) * 40 * i;
+    const 候选X = 极坐标X(起点X, 角度, 40 * i);
+    const 候选Y = 极坐标Y(起点Y, 角度, 40 * i);
     if (!地形可通行(候选X, 候选Y)) break;
     落点X = 候选X;
     落点Y = 候选Y;
@@ -176,7 +170,7 @@ function on佐佐木Q生效(this: void, 施法单位: any, 技能ID数值: numbe
   const 目标X = jass.GetSpellTargetX() as number;
   const 目标Y = jass.GetSpellTargetY() as number;
   const 角度 = 两点角度(起点X, 起点Y, 目标X, 目标Y);
-  const 距离 = 两点距离(起点X, 起点Y, 目标X, 目标Y);
+  const 距离 = 距离XY(起点X, 起点Y, 目标X, 目标Y);
 
   // 刷新瞬移技能间隔 + 黑闪特效
   刷新瞬移就绪(施法单位);
@@ -192,7 +186,7 @@ function on佐佐木Q生效(this: void, 施法单位: any, 技能ID数值: numbe
   addDelayedCallback(10, () => {
     if (!单位存活(施法单位)) return;
     施加眩晕(施法单位, 施法单位, 0.6, "佐佐木前斩", "技能");
-    播放佐佐木配置动作(施法单位, Math.floor(Math.random() * 2) === 0 ? 8 : 7, 0);
+    播放佐佐木配置动作(施法单位, 随机整数(0, 1) === 0 ? 8 : 7, 0);
     创建点特效({
       模型路径: cfg.蓄力特效模型,
       X: GetUnitX(施法单位),
@@ -211,7 +205,7 @@ function on佐佐木Q生效(this: void, 施法单位: any, 技能ID数值: numbe
   // t≈310ms：挥砍音效 → 地形检查瞬移 → 落点扇形伤害 → 瞬移后窗口附加剑气
   addDelayedCallback(310, () => {
     if (!单位存活(施法单位)) return;
-    if (Math.floor(Math.random() * 2) === 0) {
+    if (随机整数(0, 1) === 0) {
       播放佐佐木坐标音效(cfg.挥砍音效路径1, GetUnitX(施法单位), GetUnitY(施法单位), cfg.挥砍音效裁断);
     } else {
       播放佐佐木坐标音效(cfg.挥砍音效路径2, GetUnitX(施法单位), GetUnitY(施法单位), cfg.挥砍音效裁断);

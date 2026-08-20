@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____79FB_9664Q_5355_4F4D_58F3, _____8BB0_5F55Q_8FDE_7EED_547D_4E2D, _____6E05_7406Q_7206_70B8_5355_4F4D_58F3, ____Q_6BCF_76EE_6807_7ED3_7B97_540E, _____65BD_52A0_7729_6655, GetHandleId, RemoveUnit, _____914D_7F6E
+local _____79FB_9664Q_5355_4F4D_58F3, _____8BB0_5F55Q_8FDE_7EED_547D_4E2D, _____6E05_7406Q_7206_70B8_5355_4F4D_58F3, ____Q_6BCF_76EE_6807_7ED3_7B97_540E, _____65BD_52A0_7729_6655, _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0, GetHandleId, _____914D_7F6E
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.15．鹿目圆.00．配置")
 local _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["鹿目圆单位技能配置"]
 local ____01_FF0E_72B6_6001_4E0E_88AB_52A8 = require("系统.03．技能系统.05．单位技能.04．英雄技能.15．鹿目圆.01．状态与被动")
@@ -17,7 +17,7 @@ local _____521B_5EFA_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["�
 local _____521B_5EFA_4E8C_9636_8D1D_585E_5C14_629B_7269_7EBF_8F68_8FF9 = ____01_FF0ETS_539F_751F_5F39_5E55["创建二阶贝塞尔抛物线轨迹"]
 function _____79FB_9664Q_5355_4F4D_58F3(unit)
     if unit ~= nil and unit ~= 0 then
-        RemoveUnit(unit)
+        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
     end
 end
 function _____8BB0_5F55Q_8FDE_7EED_547D_4E2D(context, target)
@@ -64,16 +64,18 @@ local ____require_result_4 = require("系统.03．技能系统.00．技能模板
 _____65BD_52A0_7729_6655 = ____require_result_4["施加眩晕"]
 local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
 local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_5["创建单位并登记排泄安全"]
-local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getUnitsInRange = ____require_result_6.getUnitsInRange
-local getEnemyUnitsInRange = ____require_result_6.getEnemyUnitsInRange
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_7["两点角度"]
+local ____require_result_6 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+_____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_6["立即移除单位并取消排泄登记"]
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_7.getUnitsInRange
+local getEnemyUnitsInRange = ____require_result_7.getEnemyUnitsInRange
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_8["两点角度"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
 GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
@@ -81,10 +83,8 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local GetHeroLevel = jass.GetHeroLevel
 local GetRandomInt = jass.GetRandomInt
 local SetUnitAnimation = jass.SetUnitAnimation
-RemoveUnit = jass.RemoveUnit
 local IsUnitType = jass.IsUnitType
 local IsUnitAlly = jass.IsUnitAlly
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 local UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -107,9 +107,6 @@ local ____Q_4F24_5BB3_6807_7B7E = "鹿目圆-Q-区域"
 local ____Q_795E_5723_4F24_5BB3_6807_7B7E = "鹿目圆-Q-锁定神圣"
 local ____Q_4E0A_4E0B_6587_8868 = {}
 local ____Q_7BAD_5F39_5E55_72B6_6001_8868 = {}
-local function _____5355_4F4D_5B58_6D3B(unit)
-    return unit ~= nil and unit ~= 0 and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
-end
 local function _____662FQ_6709_6548_654C_4EBA(source, target)
     return _____5355_4F4D_5B58_6D3B(target) and IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true and jass.IsUnitEnemy(
         target,
@@ -340,15 +337,15 @@ local function _____91CA_653EQ_6280_80FD(_entry, caster, _____6280_80FD_5B9E_4F8
     addDelayedCallback(_____914D_7F6E.Q["收尾毫秒"], ____Q_6536_5C3E, context)
 end
 local function ____Q_6700_7EC8_4F24_5BB3_6CBB_7597_53CB_519B(target, attacker, applied, snapshot)
-    local ____temp_11 = applied < 1
-    if not ____temp_11 then
-        local ____opt_result_10
+    local ____temp_12 = applied < 1
+    if not ____temp_12 then
+        local ____opt_result_11
         if snapshot ~= nil then
-            ____opt_result_10 = snapshot.skillDamageTag
+            ____opt_result_11 = snapshot.skillDamageTag
         end
-        ____temp_11 = ____opt_result_10 ~= ____Q_795E_5723_4F24_5BB3_6807_7B7E
+        ____temp_12 = ____opt_result_11 ~= ____Q_795E_5723_4F24_5BB3_6807_7B7E
     end
-    if ____temp_11 then
+    if ____temp_12 then
         return
     end
     if not _____662F_9E7F_76EE_5706(attacker) or not _____5355_4F4D_5B58_6D3B(target) then
@@ -369,11 +366,11 @@ local function ____Q_6700_7EC8_4F24_5BB3_6CBB_7597_53CB_519B(target, attacker, a
                     friend,
                     GetOwningPlayer(attacker)
                 ) ~= true then
-                    goto __continue52
+                    goto __continue51
                 end
                 _____9E7F_76EE_5706_6CBB_7597_53CB_519B(attacker, friend, amount, amount)
             end
-            ::__continue52::
+            ::__continue51::
             i = i + 1
         end
     end

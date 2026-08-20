@@ -88,6 +88,7 @@ ____exports.CROW_FORM_ABILITY_ID = 1097691750
 ____exports["活动跳跃列表"] = {}
 ____exports["跳跃映射"] = {}
 ____exports["单位当前跳跃"] = {}
+____exports["单位当前跳跃位移类型"] = {}
 local _____5355_4F4D_7EC4_5FEB_7167_7F13_5B58 = {}
 local _____4E0B_4E00_4E2A_8DF3_8DC3ID = 0
 ____exports["分配新跳跃ID"] = function()

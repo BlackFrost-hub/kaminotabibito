@@ -4,6 +4,7 @@ import { 十六夜咲夜基础技能配置 as 配置 } from "./00．配置";
 import { 创建咲夜单位壳, 安全移除单位壳, 极坐标X, 极坐标Y, 单位存活, 播放咲夜单位音效, 注册咲夜周期任务, 移除咲夜周期任务 } from "./01．飞刀与时间工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 设置十六夜咲夜符卡书冷却 } from "./符卡公共";
+import { 获取坐标范围单位按筛选 } from "../../../00．技能模板+函数/02．通用函数/02．单位与范围";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -99,19 +100,22 @@ function RD设置碰撞(this: void, unit: any, enabled: boolean): void {
   }
 }
 
+/**
+ * 刀光范围敌军枚举。源规则：存活 + 敌对 + 排除牛头人（不排除建筑/机械/古树/无敌）。
+ * 配置型筛选逐项等价：要求有效单位=false 跳过四重过滤、允许死亡=false 排除死亡、
+ * 允许无敌=true 保持源语义、仅敌人 排除非敌对（含施法者自身）、自定义条件 排除牛头人。
+ */
 function RD枚举切割敌军(this: void, context: RD上下文): any[] {
-  const result: any[] = [];
-  const group = jass.CreateGroup();
-  jass.GroupEnumUnitsInRange(group, context.目标中心X, context.目标中心Y, RD配置.伤害半径, null);
-  while (true) {
-    const unit = jass.FirstOfGroup(group);
-    if (unit == null || unit === 0) break;
-    jass.GroupRemoveUnit(group, unit);
-    if (!单位存活(unit) || !jass.IsUnitEnemy(unit, jass.GetOwningPlayer(context.施法者)) || jass.IsUnitType(unit, jass.UNIT_TYPE_TAUREN)) continue;
-    result.push(unit);
-  }
-  jass.DestroyGroup(group);
-  return result;
+  return 获取坐标范围单位按筛选(context.目标中心X, context.目标中心Y, RD配置.伤害半径, context.施法者, {
+    要求有效单位: false,
+    允许死亡: false,
+    允许建筑: true,
+    允许机械: true,
+    允许古树: true,
+    允许无敌: true,
+    仅敌人: true,
+    自定义条件: (u: any) => !jass.IsUnitType(u, jass.UNIT_TYPE_TAUREN),
+  });
 }
 
 function RD记录被切单位(this: void, context: RD上下文, unit: any): void {

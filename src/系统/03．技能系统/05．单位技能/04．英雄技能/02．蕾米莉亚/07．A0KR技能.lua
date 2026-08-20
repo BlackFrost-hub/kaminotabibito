@@ -24,6 +24,7 @@ local ____require_result_5 = require("系统.03．技能系统.00．技能模板
 local _____5355_4F4D_5B58_6D3B = ____require_result_5["单位存活"]
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
 local _____4E24_70B9_89D2_5EA6 = ____require_result_5["两点角度"]
+local _____53D6_5355_4F4DID = ____require_result_5["取单位ID"]
 local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3 = ____require_result_6["造成批量AOE技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_6["创建独立技能伤害实例"]
@@ -50,7 +51,6 @@ local UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 local UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
-local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
@@ -60,11 +60,8 @@ local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitType = jass.IsUnitType
 local _____4E0A_4E0B_6587_8868 = {}
 local _____5438_8840_5C42_6570_8868 = {}
-local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    return (unit == nil or unit == 0) and 0 or (GetHandleId(unit) or 0)
-end
 local function _____83B7_53D6_6216_521B_5EFAA0KR_4E0A_4E0B_6587(unit)
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local unitId = _____53D6_5355_4F4DID(unit)
     if unitId == 0 then
         return nil
     end
@@ -87,7 +84,7 @@ local function _____83B7_53D6_6216_521B_5EFAA0KR_4E0A_4E0B_6587(unit)
     return created
 end
 local function ____A0KR_76EE_6807_5141_8BB8(caster, target, context)
-    local targetId = _____53D6_5355_4F4D_53E5_67C4ID(target)
+    local targetId = _____53D6_5355_4F4DID(target)
     return targetId ~= 0 and context["已命中"][targetId] ~= true and _____5355_4F4D_5B58_6D3B(target) and not IsUnitType(target, UNIT_TYPE_ANCIENT) and not IsUnitType(target, UNIT_TYPE_MECHANICAL) and not IsUnitType(target, UNIT_TYPE_STRUCTURE) and jass.IsUnitEnemy(
         target,
         GetOwningPlayer(caster)
@@ -98,7 +95,7 @@ local function ____A0KR_51C6_5907_76EE_6807(target, _index, variable)
     if context == nil or not ____A0KR_76EE_6807_5141_8BB8(context["施法者"], target, context) then
         return nil
     end
-    local targetId = _____53D6_5355_4F4D_53E5_67C4ID(target)
+    local targetId = _____53D6_5355_4F4DID(target)
     context["已命中"][targetId] = true
     createTimedUnitEffect(target, ____A0KR_914D_7F6E["命中特效"]["挂点"], ____A0KR_914D_7F6E["命中特效"]["模型路径"], ____A0KR_914D_7F6E["命中特效持续秒"])
     return {
@@ -115,7 +112,7 @@ local function ____A0KR_5438_8840_5230_671F(variable)
     if record == nil or record["施法者"] == nil or record["施法者"] == 0 then
         return
     end
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(record["施法者"])
+    local unitId = _____53D6_5355_4F4DID(record["施法者"])
     local current = _____5438_8840_5C42_6570_8868[unitId] or 0
     if current <= 0 then
         return
@@ -140,7 +137,7 @@ local function ____A0KR_76EE_6807_7ED3_7B97_540E(target, _index, success, variab
         return
     end
     local value = IsUnitType(target, UNIT_TYPE_HERO) and ____A0KR_914D_7F6E["英雄吸血"] or ____A0KR_914D_7F6E["普通单位吸血"]
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
+    local unitId = _____53D6_5355_4F4DID(context["施法者"])
     local next = (_____5438_8840_5C42_6570_8868[unitId] or 0) + 1
     _____5438_8840_5C42_6570_8868[unitId] = next
     _____8C03_6574_73A9_5BB6_5C5E_6027(context["施法者"], "伤害吸血", value)
@@ -171,7 +168,7 @@ local function ____A0KR_6536_5C3E(variable)
         end
     end
     context["已启动"] = false
-    local casterId = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
+    local casterId = _____53D6_5355_4F4DID(context["施法者"])
     if casterId ~= 0 and _____4E0A_4E0B_6587_8868[casterId] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, casterId)
     end
@@ -201,7 +198,7 @@ local function _____6E05_7406A0KR_4E0A_4E0B_6587(context)
         end
     end
     context["已启动"] = false
-    local casterId = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
+    local casterId = _____53D6_5355_4F4DID(context["施法者"])
     if casterId ~= 0 and _____4E0A_4E0B_6587_8868[casterId] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, casterId)
     end
@@ -243,7 +240,7 @@ local function ____A0KR_5468_671FTick(variable)
     })
 end
 local function _____91CA_653E_857E_7C73_8389_4E9AA0KR(caster)
-    local existing = _____4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4ID(caster)]
+    local existing = _____4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(caster)]
     if existing ~= nil and existing["已启动"] then
         _____6E05_7406A0KR_4E0A_4E0B_6587(existing)
     end
@@ -316,7 +313,7 @@ local function _____5904_7406_857E_7C73_8389_4E9AA0KR(caster, abilityId)
     _____91CA_653E_857E_7C73_8389_4E9AA0KR(caster)
 end
 local function _____857E_7C73_8389_4E9AA0KR_5355_4F4D_6B7B_4EA1(dyingUnit, _killingUnit)
-    local context = _____4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4ID(dyingUnit)]
+    local context = _____4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(dyingUnit)]
     if context ~= nil then
         _____6E05_7406A0KR_4E0A_4E0B_6587(context)
     end

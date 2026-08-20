@@ -10,6 +10,12 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
+local ____02_FF0E_5355_4F4D_4E0E_8303_56F4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009 = ____02_FF0E_5355_4F4D_4E0E_8303_56F4["获取坐标范围单位按筛选"]
+local ____08_FF0E_6280_80FD_4E8B_4EF6_4E2D_5FC3 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local registerSpellEndcastListener = ____08_FF0E_6280_80FD_4E8B_4EF6_4E2D_5FC3.registerSpellEndcastListener
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
@@ -40,21 +46,14 @@ local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetHeroInt = jass.GetHeroInt
 local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitEnemy = jass.IsUnitEnemy
-local IsUnitType = jass.IsUnitType
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitTimeScale = jass.SetUnitTimeScale
 local SetUnitAnimation = jass.SetUnitAnimation
-local CreateGroup = jass.CreateGroup
-local DestroyGroup = jass.DestroyGroup
-local GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange
-local FirstOfGroup = jass.FirstOfGroup
-local GroupRemoveUnit = jass.GroupRemoveUnit
 local Atan2 = jass.Atan2
 local Cos = jass.Cos
 local Sin = jass.Sin
 local bj_RADTODEG = jass.bj_RADTODEG
 local bj_DEGTORAD = jass.bj_DEGTORAD
-local UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_DIVINE = jass.DAMAGE_TYPE_DIVINE
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
@@ -111,71 +110,84 @@ end
 local function _____7ED3_7B97W_8303_56F4(ctx, x, y)
     local caster = ctx["施法者"]
     local owner = GetOwningPlayer(caster)
-    local group = CreateGroup()
-    GroupEnumUnitsInRange(
-        group,
+    local _____5355_4F4D_5217_8868 = _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009(
         x,
         y,
         _____914D_7F6E.W["路径"]["结算半径码"],
-        nil
+        caster,
+        {
+            ["要求有效单位"] = true,
+            ["允许建筑"] = false,
+            ["允许机械"] = true,
+            ["允许古树"] = true,
+            ["允许无敌"] = true
+        }
     )
-    local u = FirstOfGroup(group)
-    while u ~= nil and u ~= 0 do
-        GroupRemoveUnit(group, u)
-        if IsUnitAliveBJ(u) and not IsUnitType(u, UNIT_TYPE_STRUCTURE) and ctx["已命中组"][GetHandleId(u)] ~= true then
-            ctx["已命中组"][GetHandleId(u)] = true
-            local _____662F_654C_4EBA = IsUnitEnemy(u, owner)
-            if ctx["模式"] == "光剑" then
-                if _____662F_654C_4EBA then
+    do
+        local i = 0
+        while i < #_____5355_4F4D_5217_8868 do
+            do
+                local u = _____5355_4F4D_5217_8868[i + 1]
+                if u == nil or u == 0 then
+                    goto __continue11
+                end
+                if ctx["已命中组"][GetHandleId(u)] == true then
+                    goto __continue11
+                end
+                ctx["已命中组"][GetHandleId(u)] = true
+                local _____662F_654C_4EBA = IsUnitEnemy(u, owner)
+                if ctx["模式"] == "光剑" then
+                    if _____662F_654C_4EBA then
+                        _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
+                            ["来源"] = caster,
+                            ["目标"] = u,
+                            ["伤害"] = ctx["伤害快照"],
+                            ["伤害类型"] = DAMAGE_TYPE_DIVINE,
+                            attack = false,
+                            attackType = ATTACK_TYPE_NORMAL,
+                            weaponType = WEAPON_TYPE_METAL_HEAVY_BASH,
+                            ["来源类型"] = "单位技能",
+                            ["标签"] = "云端-W光剑",
+                            ["技能ID"] = ____W_7C7B_578BID,
+                            ["技能实例ID"] = ctx["技能实例ID"]
+                        })
+                    else
+                        doHeal({
+                            HealSource = caster,
+                            HealTarget = u,
+                            HealAmount = ctx["伤害快照"] * _____914D_7F6E.W["光剑"]["治疗比例"],
+                            ItemHeal = false,
+                            HealEffect = true
+                        })
+                    end
+                elseif _____662F_654C_4EBA then
                     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
                         ["来源"] = caster,
                         ["目标"] = u,
                         ["伤害"] = ctx["伤害快照"],
-                        ["伤害类型"] = DAMAGE_TYPE_DIVINE,
+                        ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
                         attack = false,
                         attackType = ATTACK_TYPE_NORMAL,
                         weaponType = WEAPON_TYPE_METAL_HEAVY_BASH,
                         ["来源类型"] = "单位技能",
-                        ["标签"] = "云端-W光剑",
+                        ["标签"] = "云端-W暗剑",
                         ["技能ID"] = ____W_7C7B_578BID,
                         ["技能实例ID"] = ctx["技能实例ID"]
                     })
-                else
-                    doHeal({
-                        HealSource = caster,
-                        HealTarget = u,
-                        HealAmount = ctx["伤害快照"] * _____914D_7F6E.W["光剑"]["治疗比例"],
-                        ItemHeal = false,
-                        HealEffect = true
-                    })
+                    _____65BD_52A0_7729_6655(
+                        caster,
+                        u,
+                        _____914D_7F6E.W["暗剑"]["眩晕秒"],
+                        "云端-暗剑",
+                        "技能"
+                    )
+                    registerManualBuff(u, _____4E91_7AEFBuffID["暗剑眩晕"], _____914D_7F6E.W["暗剑"]["眩晕秒"], 0)
                 end
-            elseif _____662F_654C_4EBA then
-                _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
-                    ["来源"] = caster,
-                    ["目标"] = u,
-                    ["伤害"] = ctx["伤害快照"],
-                    ["伤害类型"] = DAMAGE_TYPE_SHADOW_STRIKE,
-                    attack = false,
-                    attackType = ATTACK_TYPE_NORMAL,
-                    weaponType = WEAPON_TYPE_METAL_HEAVY_BASH,
-                    ["来源类型"] = "单位技能",
-                    ["标签"] = "云端-W暗剑",
-                    ["技能ID"] = ____W_7C7B_578BID,
-                    ["技能实例ID"] = ctx["技能实例ID"]
-                })
-                _____65BD_52A0_7729_6655(
-                    caster,
-                    u,
-                    _____914D_7F6E.W["暗剑"]["眩晕秒"],
-                    "云端-暗剑",
-                    "技能"
-                )
-                registerManualBuff(u, _____4E91_7AEFBuffID["暗剑眩晕"], _____914D_7F6E.W["暗剑"]["眩晕秒"], 0)
             end
+            ::__continue11::
+            i = i + 1
         end
-        u = FirstOfGroup(group)
     end
-    DestroyGroup(group)
 end
 local function _____63A8_8FDBW_8DEF_5F84(variable)
     local ctx = variable
@@ -226,7 +238,7 @@ local function _____542F_52A8W_8DEF_5F84(variable)
     end
     ctx["Tick数"] = 0
     ctx["回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.W["路径"]["Tick间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.W["路径"]["Tick间隔秒"]),
         _____63A8_8FDBW_8DEF_5F84,
         ctx
     )
@@ -277,10 +289,23 @@ local function _____91CA_653EW_5149_6697_9B54_5251(context, caster, _____6280_80
         ["透明度"] = _____5206_652F["护场颜色"]["透明度"]
     })
     addDelayedCallback(
-        math.floor(_____914D_7F6E.W["路径"]["启动延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.W["路径"]["启动延迟秒"]),
         _____542F_52A8W_8DEF_5F84,
         context
     )
+end
+--- 施法中断清理（SPELL_ENDCAST 触发，正常结束路径已启动=false 幂等跳过）。
+-- 复用 `结束W路径`：移除路径回调、销毁路径特效、复位已命中组/已启动、
+-- 恢复 GS_Suspend/无敌/时间缩放。不提前结算路径伤害。
+local function _____4E91_7AEFW_4E2D_65AD_6E05_7406(_____65BD_6CD5_5355_4F4D, _____6280_80FDID_6570_503C)
+    if _____6280_80FDID_6570_503C ~= ____W_7C7B_578BID then
+        return
+    end
+    local ctx = ____W_4E0A_4E0B_6587_8868[GetHandleId(_____65BD_6CD5_5355_4F4D)]
+    if ctx == nil or ctx["已启动"] ~= true then
+        return
+    end
+    _____7ED3_675FW_8DEF_5F84(ctx)
 end
 ____exports["注册云端W"] = function()
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
@@ -294,6 +319,7 @@ ____exports["注册云端W"] = function()
         ["独立技能来源类型"] = "单位技能",
         ["技能实例持续时间秒"] = 3
     })
+    registerSpellEndcastListener(_____4E91_7AEFW_4E2D_65AD_6E05_7406)
 end
 ____exports["注册云端W"]()
 return ____exports

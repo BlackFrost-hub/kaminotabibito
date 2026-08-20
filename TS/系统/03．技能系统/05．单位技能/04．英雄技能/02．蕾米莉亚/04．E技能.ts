@@ -33,9 +33,10 @@ const { 获取范围敌军, 读取单位攻击力 } = require("系统.03．技�
   获取范围敌军: (this: void, source: any, x: number, y: number, radius: number) => any[];
   读取单位攻击力: (this: void, unit: any) => number;
 };
-const { 单位存活, 读取单位最大生命 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 单位存活, 读取单位最大生命, 取单位ID } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   单位存活: (this: void, unit: any) => boolean;
   读取单位最大生命: (this: void, unit: any) => number;
+  取单位ID: (this: void, unit: any) => number;
 };
 const { 造成批量AOE技能伤害, 创建独立技能伤害实例, 结束独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成批量AOE技能伤害: (this: void, params: any) => number;
@@ -104,18 +105,14 @@ interface 蕾米莉亚E上下文 {
 const 上下文表: Record<number, 蕾米莉亚E上下文 | undefined> = {};
 let 死亡监听已注册 = false;
 
-function 取单位句柄ID(this: void, unit: any): number {
-  return unit == null || unit === 0 ? 0 : GetHandleId(unit) || 0;
-}
-
 const 血雾替身本体表: Record<number, any> = {};
 
 export function 获取血雾本体(this: void, unit: any): any {
-  return 血雾替身本体表[取单位句柄ID(unit)];
+  return 血雾替身本体表[取单位ID(unit)];
 }
 
 function 获取或创建E上下文(this: void, unit: any): 蕾米莉亚E上下文 | undefined {
-  const id = 取单位句柄ID(unit);
+  const id = 取单位ID(unit);
   if (id === 0) return undefined;
   const old = 上下文表[id];
   if (old != null) return old;
@@ -194,7 +191,7 @@ function 清理E上下文(this: void, context: 蕾米莉亚E上下文): void {
     context.已启动 = false;
   }
   if (context.替身 != null && context.替身 !== 0) {
-    delete 血雾替身本体表[取单位句柄ID(context.替身)];
+    delete 血雾替身本体表[取单位ID(context.替身)];
     立即移除单位并注销排泄监听(context.替身);
     context.替身 = undefined;
   }
@@ -207,7 +204,7 @@ function 清理E上下文(this: void, context: 蕾米莉亚E上下文): void {
   结束独立技能伤害实例(context.技能实例ID);
   context.技能实例ID = undefined;
   context.目标属性记录 = {};
-  const id = 取单位句柄ID(context.施法者);
+  const id = 取单位ID(context.施法者);
   if (id !== 0 && 上下文表[id] === context) delete 上下文表[id];
 }
 
@@ -258,7 +255,7 @@ function 蕾米莉亚E延迟启动(this: void, variable?: any): void {
   );
   if (context.替身 != null && context.替身 !== 0) {
     UnitAddAbility(context.替身, 替身技能ID);
-    血雾替身本体表[取单位句柄ID(context.替身)] = context.施法者;
+    血雾替身本体表[取单位ID(context.替身)] = context.施法者;
     SelectUnitForPlayerSingle(context.替身, GetOwningPlayer(context.施法者));
   }
   ShowUnit(context.施法者, false);
@@ -282,7 +279,7 @@ function 释放蕾米莉亚E(this: void, context: 蕾米莉亚E上下文, caster
 }
 
 function 蕾米莉亚E单位死亡(this: void, dyingUnit: any, _killingUnit: any): void {
-  const context = 上下文表[取单位句柄ID(dyingUnit)];
+  const context = 上下文表[取单位ID(dyingUnit)];
   if (context != null) 清理E上下文(context);
 }
 

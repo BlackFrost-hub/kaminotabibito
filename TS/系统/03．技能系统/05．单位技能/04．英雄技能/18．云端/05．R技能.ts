@@ -9,6 +9,7 @@ import { 云端技能配置 } from "./00．配置";
 import { 云端BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/18．云端";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
@@ -249,7 +250,7 @@ function R结算(this: void, variable: any): void {
 
   // 结算后敏捷再保留 5 秒（计划 8.2.10：只撤销本实例增量）
   addDelayedCallback(
-    Math.round(配置.R.阶段.敏捷保留秒 * 1000),
+    秒转毫秒(配置.R.阶段.敏捷保留秒),
     R敏捷回收 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -283,7 +284,7 @@ function R坠落表现(this: void, ctx: R上下文): void {
   });
   全员震屏R(配置.R.坠落.震屏强度);
   addDelayedCallback(
-    Math.round(配置.R.阶段.结算延迟秒 * 1000),
+    秒转毫秒(配置.R.阶段.结算延迟秒),
     R结算 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -365,7 +366,7 @@ function R升空准备(this: void, variable: any): void {
 
   ctx.SS = 0;
   ctx.升空回调ID = addPeriodicCallback(
-    Math.round(配置.R.升空.Tick间隔秒 * 1000),
+    秒转毫秒(配置.R.升空.Tick间隔秒),
     推进R升空 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -402,7 +403,7 @@ function R第二段冲刺(this: void, variable: any): void {
   });
 
   addDelayedCallback(
-    Math.round(配置.R.阶段.升空准备延迟秒 * 1000),
+    秒转毫秒(配置.R.阶段.升空准备延迟秒),
     R升空准备 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -436,7 +437,7 @@ function R第一段冲刺(this: void, variable: any): void {
   });
 
   addDelayedCallback(
-    Math.round(配置.R.阶段.第二段延迟秒 * 1000),
+    秒转毫秒(配置.R.阶段.第二段延迟秒),
     R第二段冲刺 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -503,7 +504,7 @@ function 释放R暗黑制裁(this: void, context: R上下文, caster: any, 技�
   if (r音效句柄 != null) PlaySoundOnUnitBJ(r音效句柄, 100, caster);
 
   addDelayedCallback(
-    Math.round(配置.R.阶段.第一段延迟秒 * 1000),
+    秒转毫秒(配置.R.阶段.第一段延迟秒),
     R第一段冲刺 as unknown as (this: void, variable?: any) => void,
     context,
   );

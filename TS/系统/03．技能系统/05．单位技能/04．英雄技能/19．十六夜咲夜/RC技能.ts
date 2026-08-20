@@ -4,6 +4,7 @@ import { 十六夜咲夜基础技能配置 as 配置 } from "./00．配置";
 import { 两点角度, 创建咲夜单位壳, 安全移除单位壳, 极坐标X, 极坐标Y, 单位存活, 播放咲夜单位音效, 注册咲夜周期任务, 移除咲夜周期任务, 登记咲夜飞刀, 注销咲夜飞刀 } from "./01．飞刀与时间工具";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 设置十六夜咲夜符卡书冷却 } from "./符卡公共";
+import { 获取坐标范围单位按筛选 } from "../../../00．技能模板+函数/02．通用函数/02．单位与范围";
 
 const jass = require("jass.common") as any;
 const { 造成单体技能伤害, 结束独立技能伤害实例 } = require("系统.04．伤害系统.08．技能伤害系统") as {
@@ -27,7 +28,6 @@ interface RC状态 {
   反弹次数: number;
   上次命中单位: any;
   周期ID: number;
-  枚举组: any;
   已结束: boolean;
 }
 
@@ -39,21 +39,27 @@ function 结束RC(this: void, state: RC状态): void {
   if (state.周期ID !== 0) 移除咲夜周期任务(state.周期ID);
   注销咲夜飞刀(state.飞刀);
   安全移除单位壳(state.飞刀);
-  if (state.枚举组 != null && state.枚举组 !== 0) jass.DestroyGroup(state.枚举组);
   结束独立技能伤害实例(state.技能实例ID);
 }
 
+/**
+ * 命中目标选取。源规则：排除上次命中 + 存活 + 敌对 + 排除 Ancient（放行建筑/机械/古树），
+ * 返回第一个合法目标。配置型筛选逐项等价：要求有效单位=false 跳过四重过滤、
+ * 允许死亡=false 排除死亡、允许无敌=true 保持源语义、仅敌人 排除非敌对（含施法者自身）、
+ * 自定义条件 排除上次命中与 Ancient。
+ */
 function RC取命中目标(this: void, state: RC状态, x: number, y: number): any {
-  jass.GroupClear(state.枚举组);
-  jass.GroupEnumUnitsInRange(state.枚举组, x, y, 配置.RC.命中半径, null);
-  while (true) {
-    const unit = jass.FirstOfGroup(state.枚举组);
-    if (unit == null || unit === 0) return null;
-    jass.GroupRemoveUnit(state.枚举组, unit);
-    if (unit === state.上次命中单位 || !单位存活(unit)) continue;
-    if (!jass.IsUnitEnemy(unit, jass.GetOwningPlayer(state.施法者)) || jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT)) continue;
-    return unit;
-  }
+  const 候选 = 获取坐标范围单位按筛选(x, y, 配置.RC.命中半径, state.施法者, {
+    要求有效单位: false,
+    允许死亡: false,
+    允许建筑: true,
+    允许机械: true,
+    允许古树: true,
+    允许无敌: true,
+    仅敌人: true,
+    自定义条件: (u: any) => u !== state.上次命中单位 && !jass.IsUnitType(u, jass.UNIT_TYPE_ANCIENT),
+  });
+  return 候选.length > 0 ? 候选[0] : null;
 }
 
 function RC执行反弹(this: void, state: RC状态, nextAngle: number): void {
@@ -129,7 +135,6 @@ function 释放十六夜咲夜RC(this: void, _listener: RC监听上下文, caste
     反弹次数: 0,
     上次命中单位: null,
     周期ID: 0,
-    枚举组: jass.CreateGroup(),
     已结束: false,
   };
   登记咲夜飞刀({

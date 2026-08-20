@@ -41,10 +41,14 @@ const { 施加眩晕 } = require("系统.03．技能系统.00．技能模板+函
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
-const { 读取单位攻击力, 单位存活, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 单位存活, 两点角度, 距离XY, 极坐标X, 极坐标Y, 角度差绝对值 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  距离XY: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
+  角度差绝对值: (this: void, a: number, b: number) => number;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: {
@@ -89,19 +93,6 @@ const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => 
 const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
 const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
 const UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE as any;
-
-function 归一化角度(this: void, angle: number): number {
-  let result = angle % 360;
-  if (result < 0) result += 360;
-  return result;
-}
-
-/** 返回两角度在 0~180 范围内的最小夹角 */
-function 角度差(this: void, a: number, b: number): number {
-  let diff = Math.abs(归一化角度(a) - 归一化角度(b));
-  if (diff > 180) diff = 360 - diff;
-  return diff;
-}
 
 interface 结算上下文 {
   施法者: any;
@@ -203,8 +194,8 @@ function 结算Q落点(this: void, 上下文: 结算上下文): void {
   if (上下文.十字斩) {
     创建点特效({
       模型路径: cfg.冲刺特效模型,
-      X: casterX + Math.cos(上下文.方向角 * Math.PI / 180) * 125,
-      Y: casterY + Math.sin(上下文.方向角 * Math.PI / 180) * 125,
+      X: 极坐标X(casterX, 上下文.方向角, 125),
+      Y: 极坐标Y(casterY, 上下文.方向角, 125),
       Z: 175,
       面向角度: 上下文.方向角,
       缩放: cfg.冲刺特效缩放X,
@@ -219,7 +210,7 @@ function 结算Q落点(this: void, 上下文: 结算上下文): void {
     if (!是有效伤害目标(上下文, target)) continue;
     if (已命中过(上下文, target)) continue;
     const 指向目标角度 = 两点角度(casterX, casterY, GetUnitX(target), GetUnitY(target));
-    if (角度差(指向目标角度, 上下文.方向角) > 上下文.扇形半角) continue;
+    if (角度差绝对值(指向目标角度, 上下文.方向角) > 上下文.扇形半角) continue;
     结算Q单体伤害(上下文, target);
   }
 }
@@ -249,7 +240,7 @@ function on欧尔贝克Q(this: void, caster: any, abilityId: number): void {
   const targetX = GetSpellTargetX();
   const targetY = GetSpellTargetY();
   const 方向角 = 两点角度(startX, startY, targetX, targetY);
-  const 距离 = Math.sqrt((targetX - startX) * (targetX - startX) + (targetY - startY) * (targetY - startY));
+  const 距离 = 距离XY(startX, startY, targetX, targetY);
   const 伤害值 = 读取单位攻击力(caster) * (cfg.基础攻击力倍率 + cfg.每级攻击力倍率 * level);
 
   const 十字斩 = 单位拥有原生Buff(caster, 积攒Buff类型ID);

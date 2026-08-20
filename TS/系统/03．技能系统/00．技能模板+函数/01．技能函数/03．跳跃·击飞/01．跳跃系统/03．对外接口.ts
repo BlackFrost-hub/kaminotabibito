@@ -10,6 +10,7 @@ import {
   活动跳跃列表,
   跳跃映射,
   单位当前跳跃,
+  单位当前跳跃位移类型,
   取句柄ID,
   快照单位组,
   GetUnitX,
@@ -49,6 +50,24 @@ export function 开始定向跳跃(单位: any, 参数: 跳跃参数): number {
   return 开始跳跃(单位, 参数);
 }
 
+/** 沿指定方向跳跃，并明确标记为可识别的被击退/被击飞效果。 */
+export function 开始跳跃作为被击退击飞(this: void, 单位: any, 参数: 跳跃参数): number {
+  return 开始跳跃(单位, {
+    ...参数,
+    位移类型: "被击退击飞",
+  });
+}
+
+/** 沿指定角度反向跳跃，并明确标记为可识别的被击退/被击飞效果。 */
+export function 开始反向跳跃作为被击退击飞(this: void, 单位: any, 参数: 跳跃参数): number {
+  if (参数.角度 == null) return 0;
+  return 开始跳跃(单位, {
+    ...参数,
+    角度: 参数.角度 + 180,
+    位移类型: "被击退击飞",
+  });
+}
+
 export function 开始单位组跳跃(单位组: any, 参数: 跳跃参数): number[] {
   const 单位列表 = 快照单位组(单位组);
   const 结果: number[] = [];
@@ -86,6 +105,15 @@ export function 单位是否正在跳跃(单位: any): boolean {
 
 export function 获取单位当前跳跃ID(单位: any): number {
   return 单位当前跳跃[取句柄ID(单位)] ?? 0;
+}
+
+export function 获取单位当前跳跃位移类型(this: void, 单位: any): string {
+  return 单位当前跳跃位移类型[取句柄ID(单位)] ?? "普通";
+}
+
+export function 单位是否处于被击退击飞(this: void, 单位: any): boolean {
+  const id = 取句柄ID(单位);
+  return 单位当前跳跃[id] != null && 单位当前跳跃位移类型[id] === "被击退击飞";
 }
 
 export function 获取活跃跳跃数量(): number {

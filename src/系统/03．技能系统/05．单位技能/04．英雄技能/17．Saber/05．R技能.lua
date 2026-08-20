@@ -10,6 +10,9 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
 function _____9500_6BC1R_805A_96C6_8868_73B0(ctx)
     if ctx["聚集回调ID"] ~= 0 then
         removePeriodicCallback(ctx["聚集回调ID"])
@@ -91,15 +94,15 @@ function _____63A8_8FDBR_5149_70AE(variable)
     for ____, target in ipairs(_____654C_519B_5217_8868) do
         do
             if target == nil or target == 0 then
-                goto __continue59
+                goto __continue58
             end
             if ctx["命中组"][GetHandleId(target)] == true then
-                goto __continue59
+                goto __continue58
             end
             ctx["命中组"][GetHandleId(target)] = true
             _____65B0_76EE_6807[#_____65B0_76EE_6807 + 1] = target
         end
-        ::__continue59::
+        ::__continue58::
     end
     if #_____65B0_76EE_6807 > 0 then
         local _____500D_7387 = ctx["阿瓦隆快照"] and _____914D_7F6E.R["光炮"]["阿瓦隆伤害攻击力倍率"] or _____914D_7F6E.R["光炮"]["伤害攻击力倍率"]
@@ -134,7 +137,7 @@ function ____R_80FD_91CF_4E0E_5149_70AE_542F_52A8(variable)
     ctx["光炮Tick数"] = 0
     ctx["命中组"] = {}
     ctx["光炮回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.R["光炮"]["间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.R["光炮"]["间隔秒"]),
         _____63A8_8FDBR_5149_70AE,
         ctx
     )
@@ -160,7 +163,7 @@ function ____R_53D1_5C04_51C6_5907(variable)
         ["持续秒"] = _____914D_7F6E.R["发射"]["光束"]["持续秒"]
     })
     ctx["能量回调ID"] = addDelayedCallback(
-        math.floor(_____914D_7F6E.R["发射"]["能量准备延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.R["发射"]["能量准备延迟秒"]),
         ____R_80FD_91CF_4E0E_5149_70AE_542F_52A8,
         ctx
     )
@@ -200,10 +203,8 @@ GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local GetRandomReal = jass.GetRandomReal
-local Atan2 = jass.Atan2
 Cos = jass.Cos
 Sin = jass.Sin
-local bj_RADTODEG = jass.bj_RADTODEG
 bj_DEGTORAD = jass.bj_DEGTORAD
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_DIVINE = jass.DAMAGE_TYPE_DIVINE
@@ -215,9 +216,6 @@ local stringToFourCC = stringToFourCCSafe
 _____914D_7F6E = ____Saber_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
 ____R_7C7B_578BID = stringToFourCC(_____914D_7F6E.R["技能ID"])
-local function _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2)
-    return Atan2(y2 - y1, x2 - x1) * bj_RADTODEG
-end
 local ____R_4E0A_4E0B_6587_8868 = {}
 local function _____83B7_53D6_6216_521B_5EFAR_4E0A_4E0B_6587(caster)
     local id = GetHandleId(caster)
@@ -298,7 +296,7 @@ local function _____63A8_8FDBR_805A_96C6_56DE_6536(variable)
                 if p["特效"] ~= nil and p["特效"] ~= 0 then
                     _____9500_6BC1_70B9_7279_6548(p["特效"])
                 end
-                goto __continue20
+                goto __continue19
             end
             local _____6B65_957F = _____8DDD_79BB < cfg["每次移动距离"] and _____8DDD_79BB or cfg["每次移动距离"]
             p.X = p.X + dx / _____8DDD_79BB * _____6B65_957F
@@ -311,7 +309,7 @@ local function _____63A8_8FDBR_805A_96C6_56DE_6536(variable)
             end
             _____5269_4F59[#_____5269_4F59 + 1] = p
         end
-        ::__continue20::
+        ::__continue19::
     end
     ctx["聚集列表"] = _____5269_4F59
     if #ctx["聚集列表"] == 0 and ctx["聚集回调ID"] ~= 0 then
@@ -327,7 +325,7 @@ local function _____542F_52A8R_805A_96C6_56DE_6536(ctx)
         removePeriodicCallback(ctx["聚集回调ID"])
     end
     ctx["聚集回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.R["蓄力结束"]["聚集回收"]["Tick间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.R["蓄力结束"]["聚集回收"]["Tick间隔秒"]),
         _____63A8_8FDBR_805A_96C6_56DE_6536,
         ctx
     )
@@ -361,7 +359,7 @@ local function ____R_84C4_529B_7ED3_675F(ctx)
     end
     SetUnitAnimationByIndex(caster, _____914D_7F6E.R["蓄力结束"]["动作索引"])
     ctx["准备回调ID"] = addDelayedCallback(
-        math.floor(_____914D_7F6E.R["蓄力结束"]["发射准备延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.R["蓄力结束"]["发射准备延迟秒"]),
         ____R_53D1_5C04_51C6_5907,
         ctx
     )
@@ -414,7 +412,7 @@ local function _____63A8_8FDBR_84C4_529B(variable)
                 if p["特效"] ~= nil and p["特效"] ~= 0 then
                     _____9500_6BC1_70B9_7279_6548(p["特效"])
                 end
-                goto __continue42
+                goto __continue41
             end
             p["高度"] = p["高度"] + (ctx["蓄力Tick数"] >= cfg["上升段Tick数"] and cfg["下降每次高度"] or cfg["上升每次高度"])
             if p["高度"] < 0 then
@@ -425,7 +423,7 @@ local function _____63A8_8FDBR_84C4_529B(variable)
             end
             _____5269_4F59[#_____5269_4F59 + 1] = p
         end
-        ::__continue42::
+        ::__continue41::
     end
     ctx["聚集列表"] = _____5269_4F59
 end
@@ -439,7 +437,7 @@ local function _____91CA_653ER_6280_80FD(context, caster, _____6280_80FD_5B9E_4F
     context["伤害快照"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster)
     context["Saber点X"] = GetUnitX(caster)
     context["Saber点Y"] = GetUnitY(caster)
-    context["方向角度"] = _____8BA1_7B97_4E24_70B9_89D2_5EA6(
+    context["方向角度"] = _____4E24_70B9_89D2_5EA6(
         context["Saber点X"],
         context["Saber点Y"],
         GetSpellTargetX(),
@@ -454,7 +452,7 @@ local function _____91CA_653ER_6280_80FD(context, caster, _____6280_80FD_5B9E_4F
     _____6DFB_52A0_5355_4F4D_6682_505C(caster, _____914D_7F6E["暂停来源"]["R蓄力"])
     SetUnitAnimationByIndex(caster, _____914D_7F6E.R["起手"]["动作索引"])
     context["蓄力回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.R["蓄力"]["间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.R["蓄力"]["间隔秒"]),
         _____63A8_8FDBR_84C4_529B,
         context
     )

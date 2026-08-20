@@ -13,13 +13,18 @@ local ____require_result_0 = require("系统.00．核心系统.05．中心计时
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local removePeriodicCallback = ____require_result_0.removePeriodicCallback
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
-local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_1["创建单位并登记排泄安全"]
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____5355_4F4D_662F_5426_6682_505C = ____require_result_2["单位是否暂停"]
-local ____require_result_3 = require("lib.扩展函数.BJ函数.14．音效函数")
-local PlaySoundOnUnitBJ = ____require_result_3.PlaySoundOnUnitBJ
-local PlaySoundAtPointBJ = ____require_result_3.PlaySoundAtPointBJ
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____56DB_820D_4E94_5165_6574_6570 = ____require_result_1["四舍五入整数"]
+local _____79D2_8F6C_6B63_6BEB_79D2 = ____require_result_1["秒转正毫秒"]
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
+local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_2["创建单位并登记排泄安全"]
+local ____require_result_3 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_3["立即移除单位并取消排泄登记"]
+local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____5355_4F4D_662F_5426_6682_505C = ____require_result_4["单位是否暂停"]
+local ____require_result_5 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundOnUnitBJ = ____require_result_5.PlaySoundOnUnitBJ
+local PlaySoundAtPointBJ = ____require_result_5.PlaySoundAtPointBJ
 local bj_DEGTORAD = jass.bj_DEGTORAD
 local Cos = jass.Cos
 local Sin = jass.Sin
@@ -34,7 +39,6 @@ local SetUnitY = jass.SetUnitY
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitFlyHeight = jass.SetUnitFlyHeight
 local SetUnitPathing = jass.SetUnitPathing
-local RemoveUnit = jass.RemoveUnit
 UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
@@ -120,12 +124,10 @@ end
 ____exports["注册咲夜周期任务"] = function(intervalMs, callback, variable)
     _____54B2_591C_5468_671F_4EFB_52A1_81EA_589EID = _____54B2_591C_5468_671F_4EFB_52A1_81EA_589EID + 1
     local id = _____54B2_591C_5468_671F_4EFB_52A1_81EA_589EID
+    local _____53D6_6574_95F4_9694_6BEB_79D2 = _____56DB_820D_4E94_5165_6574_6570(intervalMs)
     _____54B2_591C_5468_671F_4EFB_52A1_8868[id] = {
         ID = id,
-        ["间隔毫秒"] = math.max(
-            _____54B2_591C_5468_671F_9A71_52A8_95F4_9694_6BEB_79D2,
-            math.floor(intervalMs + 0.5)
-        ),
+        ["间隔毫秒"] = _____53D6_6574_95F4_9694_6BEB_79D2 < _____54B2_591C_5468_671F_9A71_52A8_95F4_9694_6BEB_79D2 and _____54B2_591C_5468_671F_9A71_52A8_95F4_9694_6BEB_79D2 or _____53D6_6574_95F4_9694_6BEB_79D2,
         ["已累计毫秒"] = 0,
         ["回调"] = callback,
         ["变量"] = variable
@@ -178,7 +180,7 @@ ____exports["创建咲夜单位壳"] = function(caster, unitTypeId, x, y, facing
 end
 ____exports["安全移除单位壳"] = function(unit)
     if unit ~= nil and unit ~= 0 then
-        RemoveUnit(unit)
+        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
     end
 end
 ____exports["播放咲夜单位音效"] = function(globalName, unit)
@@ -200,9 +202,9 @@ ____exports["播放咲夜坐标音效"] = function(globalName, x, y)
         0
     )
 end
-local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
+local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_6["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_6["移除单位暂停"]
 local function _____6062_590D_77ED_786C_76F4(variable)
     local params = variable
     if params == nil then
@@ -216,10 +218,7 @@ ____exports["施加短硬直并播放动作"] = function(unit, source, seconds, 
         jass.SetUnitAnimation(unit, animation)
     end
     addDelayedCallback(
-        math.max(
-            1,
-            math.floor(seconds * 1000 + 0.5)
-        ),
+        _____79D2_8F6C_6B63_6BEB_79D2(seconds, 1),
         _____6062_590D_77ED_786C_76F4,
         {["单位"] = unit, ["来源"] = source}
     )

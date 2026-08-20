@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local _____53D6_5355_4F4D_53E5_67C4ID, _____6E05_9664_5355_4E2A_9F13_821E, _____6E05_7406D_4E0A_4E0B_6587, _____6E05_7406D_5230_671F, _____79FB_9664_5355_4F4D_6307_5B9ABuff, YDWESetUnitAbilityStateSafe, _____4E34_65F6_8C03_6574_653B_51FB, _____8C03_6574_73A9_5BB6_5C5E_6027, removeDelayedCallback, removePeriodicCallback, GetHandleId, RemoveUnit, UnitRemoveAbility, SetUnitFlyHeight, DestroyEffect, stringToFourCC, GetUnitMoveSpeed, SetUnitMoveSpeed, _____914D_7F6E, ____E_6280_80FD_7C7B_578BID, ____D_65E5_5FD7_6A21_5757, _____4E0A_4E0B_6587_8868
+local _____6E05_9664_5355_4E2A_9F13_821E, _____6E05_7406D_4E0A_4E0B_6587, _____6E05_7406D_5230_671F, _____79FB_9664_5355_4F4D_6307_5B9ABuff, YDWESetUnitAbilityStateSafe, _____4E34_65F6_8C03_6574_653B_51FB, _____8C03_6574_73A9_5BB6_5C5E_6027, removeDelayedCallback, removePeriodicCallback, RemoveUnit, UnitRemoveAbility, SetUnitFlyHeight, DestroyEffect, stringToFourCC, GetUnitMoveSpeed, SetUnitMoveSpeed, _____914D_7F6E, ____E_6280_80FD_7C7B_578BID, ____D_65E5_5FD7_6A21_5757, _____4E0A_4E0B_6587_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.13．坂井悠二.00．配置")
 local _____5742_4E95_60A0_4E8C_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["坂井悠二技能配置"]
 local ____05_FF0E_5742_4E95_60A0_4E8C = require("系统.05．Buff系统.03．Buff表.02．英雄.05．坂井悠二")
@@ -11,16 +11,15 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local _____6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
+local _____6781_5750_6807Y = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标Y"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____5411_4E0B_53D6_6574_6574_6570 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["向下取整整数"]
 local ____00_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.00．共享")
 local _____786E_4FDD_5355_4F4D_53EF_8BBE_7F6E_98DE_884C_9AD8_5EA6 = ____00_FF0E_5171_4EAB["确保单位可设置飞行高度"]
 local ____04_FF0E_8C03_8BD5_8F93_51FA = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.04．调试输出")
 local _____6280_80FD_5F3A_5236_8C03_8BD5_8F93_51FA = ____04_FF0E_8C03_8BD5_8F93_51FA["技能强制调试输出"]
-function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 function _____6E05_9664_5355_4E2A_9F13_821E(context, hid)
     local record = context["已鼓舞友军"][hid]
     if record == nil then
@@ -110,7 +109,7 @@ function _____6E05_7406D_4E0A_4E0B_6587(context)
     context["已鼓舞友军"] = {}
     _____6280_80FD_5F3A_5236_8C03_8BD5_8F93_51FA(____D_65E5_5FD7_6A21_5757, "清理D上下文完成")
     context["已启动"] = false
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(caster)
+    local id = _____53D6_5355_4F4DID(caster)
     if id ~= 0 and _____4E0A_4E0B_6587_8868[id] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, id)
     end
@@ -138,7 +137,6 @@ local addPeriodicCallback = ____require_result_3.addPeriodicCallback
 removePeriodicCallback = ____require_result_3.removePeriodicCallback
 local ____require_result_4 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_4.registerDeathListener
-GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
@@ -203,14 +201,14 @@ ____D_65E5_5FD7_6A21_5757 = "坂井悠二D排查"
 _____4E0A_4E0B_6587_8868 = {}
 local _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
 local function _____83B7_53D6D_4E0A_4E0B_6587(unit)
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local id = _____53D6_5355_4F4DID(unit)
     if id == 0 then
         return nil
     end
     return _____4E0A_4E0B_6587_8868[id]
 end
 local function _____83B7_53D6_6216_521B_5EFAD_4E0A_4E0B_6587(unit)
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local id = _____53D6_5355_4F4DID(unit)
     if id == 0 then
         return nil
     end
@@ -283,11 +281,11 @@ local function _____6267_884C_9F13_821E(context)
             if not _____5355_4F4D_5B58_6D3B(u) then
                 return
             end
-            local hid = _____53D6_5355_4F4D_53E5_67C4ID(u)
+            local hid = _____53D6_5355_4F4DID(u)
             if hid == 0 or ctx["已鼓舞友军"][hid] ~= nil then
                 return
             end
-            local _____653B_51FB_52A0_6210 = math.floor((__TS__Number(GetUnitStateJapi(u, UNIT_STATE_ATTACK1_BASE)) or 0) * _____914D_7F6E["鼓舞"]["攻击力基础倍率"])
+            local _____653B_51FB_52A0_6210 = _____5411_4E0B_53D6_6574_6574_6570((__TS__Number(GetUnitStateJapi(u, UNIT_STATE_ATTACK1_BASE)) or 0) * _____914D_7F6E["鼓舞"]["攻击力基础倍率"])
             _____4E34_65F6_8C03_6574_653B_51FB(u, _____653B_51FB_52A0_6210)
             SetUnitMoveSpeed(
                 u,
@@ -342,21 +340,20 @@ local function _____66F4_65B0D_9A6C_7532_7FA4(context)
                 do
                     local _____53C2 = ctx["马甲二参数"][i + 1]
                     if _____53C2["马甲"] == nil or _____53C2["马甲"] == 0 then
-                        goto __continue52
+                        goto __continue50
                     end
                     local _____89D2_5EA63 = _____4E00_9762_5411 + 180 + _____53C2["角度符号"] * _____53C2["角度"]
-                    local _____5F27_5EA6 = _____89D2_5EA63 * (3.14159265358979 / 180)
                     SetUnitX(
                         _____53C2["马甲"],
-                        _____4E00X + _____53C2["距离"] * math.cos(_____5F27_5EA6)
+                        _____6781_5750_6807X(_____4E00X, _____89D2_5EA63, _____53C2["距离"])
                     )
                     SetUnitY(
                         _____53C2["马甲"],
-                        _____4E00Y + _____53C2["距离"] * math.sin(_____5F27_5EA6)
+                        _____6781_5750_6807Y(_____4E00Y, _____89D2_5EA63, _____53C2["距离"])
                     )
                     SetUnitFacing(_____53C2["马甲"], _____4E00_9762_5411 + _____53C2["面向角度"])
                 end
-                ::__continue52::
+                ::__continue50::
                 i = i + 1
             end
         end
@@ -415,7 +412,7 @@ local function _____5EF6_8FDF_9644_52A0D_9A6C_7532_7279_6548(context)
             do
                 local _____9A6C_7532 = ctx["马甲二参数"][i + 1]["马甲"]
                 if _____9A6C_7532 == nil or _____9A6C_7532 == 0 or not _____5355_4F4D_5B58_6D3B(_____9A6C_7532) then
-                    goto __continue63
+                    goto __continue61
                 end
                 do
                     local j = 0
@@ -442,7 +439,7 @@ local function _____5EF6_8FDF_9644_52A0D_9A6C_7532_7279_6548(context)
                 end
                 _____6210_529F_9A6C_7532_6570 = _____6210_529F_9A6C_7532_6570 + 1
             end
-            ::__continue63::
+            ::__continue61::
             i = i + 1
         end
     end
@@ -534,9 +531,8 @@ local function _____521B_5EFA_9A6C_7532(context)
             end
             local _____89D2_5EA6_7B26_53F7 = _____89D2_5EA6 < 31 and 1 or -1
             local _____89D2_5EA63 = _____65BD_6CD5_8005_9762_5411 + 180 + _____89D2_5EA6_7B26_53F7 * _____89D2_5EA6
-            local _____5F27_5EA6 = _____89D2_5EA63 * (3.14159265358979 / 180)
-            local _____521D_59CBX = x + _____8DDD_79BB * math.cos(_____5F27_5EA6)
-            local _____521D_59CBY = y + _____8DDD_79BB * math.sin(_____5F27_5EA6)
+            local _____521D_59CBX = _____6781_5750_6807X(x, _____89D2_5EA63, _____8DDD_79BB)
+            local _____521D_59CBY = _____6781_5750_6807Y(y, _____89D2_5EA63, _____8DDD_79BB)
             local _____9A6C_7532 = CreateUnit(
                 owner,
                 _____4E8C_56DBCC,

@@ -25,6 +25,9 @@ const { 造成单体技能伤害, 结束独立技能伤害实例 } = require("�
 const { 读取单位攻击力 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
 };
+const { 向下取整整数 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  向下取整整数: (this: void, value: number) => number;
+};
 const { 单位是否暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   单位是否暂停: (this: void, unit: any) => boolean;
 };
@@ -127,7 +130,8 @@ function 登记Q飞刀(this: void, state: Q飞刀状态): void {
     设置已飞行距离: function 设置Q飞刀距离(this: void, value: number): void { state.已飞行距离 = value; },
     取最大距离: function 取Q飞刀最大距离(this: void): number { return 配置.Q.追踪步长 * 配置.Q.追踪最大Tick; },
     设置最大距离: function 设置Q飞刀最大距离(this: void, value: number): void {
-      state.追踪Tick = Math.max(0, 配置.Q.追踪最大Tick - Math.floor(value / 配置.Q.追踪步长));
+      const 剩余Tick = 配置.Q.追踪最大Tick - 向下取整整数(value / 配置.Q.追踪步长);
+      state.追踪Tick = 剩余Tick > 0 ? 剩余Tick : 0;
     },
     结束: function 结束已登记Q飞刀(this: void): void { Q单刀结束(state); },
   });

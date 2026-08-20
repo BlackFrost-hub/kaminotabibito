@@ -9,6 +9,9 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local _____6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
+local _____6781_5750_6807Y = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标Y"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -62,7 +65,6 @@ local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 local UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
-local GetHandleId = jass.GetHandleId
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
@@ -80,9 +82,6 @@ local Location = jass.Location
 local RemoveLocation = jass.RemoveLocation
 local _____4E0A_4E0B_6587_8868 = {}
 local _____5730_9762_51FB_98DE_8BB0_5F55_8868 = {}
-local function _____53D6_5355_4F4DID(unit)
-    return (unit == nil or unit == 0) and 0 or (GetHandleId(unit) or 0)
-end
 local function _____83B7_53D6W_4E0A_4E0B_6587(unit)
     local id = _____53D6_5355_4F4DID(unit)
     local ____temp_15
@@ -362,9 +361,8 @@ local function _____4E00_65B9_901A_884CW_4E8C_6BB5Tick(variable)
     local caster = context["施法者"]
     local x = context["二段路径X"]
     local y = context["二段路径Y"]
-    local radians = context["方向角"] * math.pi / 180
-    local nextX = x + math.cos(radians) * ____W_914D_7F6E["二段每次移动距离"]
-    local nextY = y + math.sin(radians) * ____W_914D_7F6E["二段每次移动距离"]
+    local nextX = _____6781_5750_6807X(x, context["方向角"], ____W_914D_7F6E["二段每次移动距离"])
+    local nextY = _____6781_5750_6807Y(y, context["方向角"], ____W_914D_7F6E["二段每次移动距离"])
     context["二段路径X"] = nextX
     context["二段路径Y"] = nextY
     context["二段次数"] = context["二段次数"] + 1

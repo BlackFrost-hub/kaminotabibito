@@ -16,6 +16,9 @@ import { 八云紫BuffID } from "../../../../../05．Buff系统/03．Buff表/02�
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const Cos = jass.Cos as (this: void, radians: number) => number;
+const Sin = jass.Sin as (this: void, radians: number) => number;
+const bj_DEGTORAD = jass.bj_DEGTORAD as number;
 const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -121,8 +124,8 @@ function 清除二段等待(this: void, context: 二段等待上下文): void {
 }
 
 function 推动目标(this: void, target: any, directionRadians: number): void {
-  const nextX = jass.GetUnitX(target) + Math.cos(directionRadians) * 配置.R.推动距离;
-  const nextY = jass.GetUnitY(target) + Math.sin(directionRadians) * 配置.R.推动距离;
+  const nextX = jass.GetUnitX(target) + Cos(directionRadians) * 配置.R.推动距离;
+  const nextY = jass.GetUnitY(target) + Sin(directionRadians) * 配置.R.推动距离;
   if (jass.IsTerrainPathable(nextX, nextY, PATHING_TYPE_WALKABILITY) === true) return;
   jass.SetUnitPosition(target, nextX, nextY);
 }
@@ -201,9 +204,9 @@ function 二段窗口超时(this: void, variable?: any): void {
   const heroX = jass.GetUnitX(context.英雄);
   const heroY = jass.GetUnitY(context.英雄);
   const heroFacing = jass.GetUnitFacing(context.英雄);
-  const behindRadians = (heroFacing + 180) * Math.PI / 180;
-  const targetX = heroX + Math.cos(behindRadians) * 配置.R.自动裂隙身后距离;
-  const targetY = heroY + Math.sin(behindRadians) * 配置.R.自动裂隙身后距离;
+  const behindRadians = (heroFacing + 180) * bj_DEGTORAD;
+  const targetX = heroX + Cos(behindRadians) * 配置.R.自动裂隙身后距离;
+  const targetY = heroY + Sin(behindRadians) * 配置.R.自动裂隙身后距离;
   const gap = 创建八云紫裂隙(context.英雄, targetX, targetY, 配置.技能.R.类型ID, context.技能实例ID);
   if (gap == null || !创建二段列车(context.英雄, gap, context.技能实例ID, heroFacing)) {
     设置八云紫R期间D排斥豁免(context.英雄, false);
@@ -234,7 +237,8 @@ function 点到线段距离(this: void, px: number, py: number, x1: number, y1: 
   const dy = y2 - y1;
   const lengthSquared = dx * dx + dy * dy;
   if (lengthSquared <= 0.0001) return 距离XY(px, py, x1, y1);
-  const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / lengthSquared));
+  const rawT = ((px - x1) * dx + (py - y1) * dy) / lengthSquared;
+  const t = rawT < 0 ? 0 : rawT > 1 ? 1 : rawT;
   const closestX = x1 + t * dx;
   const closestY = y1 + t * dy;
   return 距离XY(px, py, closestX, closestY);
@@ -272,8 +276,8 @@ function 列车Tick(this: void, variable?: any): void {
 
   context.上次X = context.X;
   context.上次Y = context.Y;
-  context.X += Math.cos(context.方向弧度) * 配置.R.列车每Tick距离;
-  context.Y += Math.sin(context.方向弧度) * 配置.R.列车每Tick距离;
+  context.X += Cos(context.方向弧度) * 配置.R.列车每Tick距离;
+  context.Y += Sin(context.方向弧度) * 配置.R.列车每Tick距离;
   context.剩余Tick -= 1;
   if (context.特效 != null && context.特效 !== 0) DzSetEffectPos(context.特效, context.X, context.Y, 0);
   创建列车路径表现(context);
@@ -326,7 +330,7 @@ function 启动列车(
     X: x,
     Y: y,
     方向角: direction,
-    方向弧度: direction * Math.PI / 180,
+    方向弧度: direction * bj_DEGTORAD,
     剩余Tick: 配置.R.列车Tick数,
     伤害: 读取单位攻击力(hero) * 配置.R.伤害攻击力比例,
     特效: effect,

@@ -20,7 +20,7 @@
 import { 铃仙单位技能配置 } from "./00．配置";
 import { 铃仙BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/12．铃仙";
 import { 播放铃仙全局音效, 播放铃仙单位绑定音效 } from "./00A．表现工具";
-import { 是铃仙本体, 铃仙分身数量, 获取铃仙分身组, 移除铃仙分身, 是有效敌对目标 } from "./00B．分身与状态管理";
+import { 是铃仙本体, 是铃仙分身, 铃仙分身数量, 获取铃仙分身组, 移除铃仙分身, 是有效敌对目标 } from "./00B．分身与状态管理";
 
 const jass = require("jass.common") as any;
 
@@ -62,9 +62,14 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
     持续秒?: number;
   }) => any;
 };
-const { 读取单位攻击力, 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 单位存活, 两点角度, 取单位ID } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
+  两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  取单位ID: (this: void, unit: any) => number;
+};
+const { 秒转毫秒 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  秒转毫秒: (this: void, seconds: number) => number;
 };
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -75,7 +80,6 @@ const UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO as any;
 const Q技能ID = stringToFourCCSafe(铃仙单位技能配置.Q技能ID);
 const Agho隐身能力ID = stringToFourCCSafe("Agho");
 
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
@@ -87,15 +91,41 @@ const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => 
 const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
 const UnitRemoveAbility = jass.UnitRemoveAbility as (this: void, unit: any, abilityId: number) => boolean;
 
-const 角度转弧度 = Math.PI / 180;
-
-function 两点角度(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-}
-
 //=============================================================================
 // 一、分身模仿（源 JASS：Func001Func012Func002A）
 //=============================================================================
+
+interface 分身模仿参数 {
+  分身: any;
+}
+
+interface Q隐身到期参数 {
+  施法者: any;
+  代次: number;
+}
+
+/** Q 隐身代次表：重复命中/重复施法时旧回调不得移除新一轮仍有效的隐身能力 */
+const Q隐身代次表: Record<number, number | undefined> = {};
+
+function 铃仙Q分身模仿恢复(this: void, variable?: any): void {
+  const 参数 = variable as 分身模仿参数 | undefined;
+  if (参数 == null) return;
+  const 分身 = 参数.分身;
+  // 句柄可能被复用：仅当仍是存活铃仙分身时才恢复动作与解除暂停
+  if (分身 == null || 分身 === 0 || !单位存活(分身) || !是铃仙分身(分身)) return;
+  SetUnitAnimationByIndex(分身, 2);
+  移除单位暂停(分身, "铃仙Q分身模仿");
+}
+
+function 铃仙Q隐身到期(this: void, variable?: any): void {
+  const 参数 = variable as Q隐身到期参数 | undefined;
+  if (参数 == null) return;
+  const 施法者 = 参数.施法者;
+  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
+  // 旧回调代次落后于当前代次 → 新一轮隐身仍有效，不移除
+  if (Q隐身代次表[取单位ID(施法者)] !== 参数.代次) return;
+  UnitRemoveAbility(施法者, Agho隐身能力ID);
+}
 
 function 铃仙Q分身模仿(this: void, 施法者: any, 分身: any, 方向角: number): void {
   if (分身 == null || 分身 === 0) return;
@@ -123,11 +153,7 @@ function 铃仙Q分身模仿(this: void, 施法者: any, 分身: any, 方向角:
   });
 
   // 0.35s 后恢复动作 2 并解除硬直（源 JASS：SetUnitAnimationByIndex(2) + YDWEUnitRemoveStun）
-  addDelayedCallback(350, () => {
-    if (分身 == null || 分身 === 0 || !单位存活(分身)) return;
-    SetUnitAnimationByIndex(分身, 2);
-    移除单位暂停(分身, "铃仙Q分身模仿");
-  });
+  addDelayedCallback(350, 铃仙Q分身模仿恢复, { 分身 } as 分身模仿参数);
 
   // 恢复倍速（源 JASS 78 行 SetUnitTimeScale 1.00）
   SetUnitTimeScale(分身, 1.0);
@@ -224,11 +250,12 @@ function on铃仙Q(this: void, 施法者: any, 技能ID数值: number): void {
     on结束: (原因: any) => {
       // 命中过英雄 → 给施法者添加 Agho 隐身 0.6 秒（源 JASS 143-161：0.60 定时器移除）
       if (命中英雄) {
+        const 施法者ID = 取单位ID(施法者);
+        const 代次 = (Q隐身代次表[施法者ID] ?? 0) + 1;
+        Q隐身代次表[施法者ID] = 代次;
         UnitAddAbility(施法者, Agho隐身能力ID);
         registerManualBuff(施法者, 铃仙BuffID.Q隐身, cfg.隐身持续秒, 0);
-        addDelayedCallback(Math.round(cfg.隐身持续秒 * 1000), () => {
-          if (施法者 != null && 施法者 !== 0 && 单位存活(施法者)) UnitRemoveAbility(施法者, Agho隐身能力ID);
-        });
+        addDelayedCallback(秒转毫秒(cfg.隐身持续秒), 铃仙Q隐身到期, { 施法者, 代次 } as Q隐身到期参数);
       }
     },
   });

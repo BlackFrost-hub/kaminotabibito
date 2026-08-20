@@ -17,6 +17,8 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local _____7B26_5361_516C_5171 = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.符卡公共")
 local _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374 = _____7B26_5361_516C_5171["设置十六夜咲夜符卡书冷却"]
+local ____02_FF0E_5355_4F4D_4E0E_8303_56F4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009 = ____02_FF0E_5355_4F4D_4E0E_8303_56F4["获取坐标范围单位按筛选"]
 function _____53D6_5207_5272_6682_505C_6765_6E90(context)
     return context["来源"] .. ____RD_6765_6E90_540E_7F00
 end
@@ -29,34 +31,22 @@ function ____RD_8BBE_7F6E_78B0_649E(unit, enabled)
     end
 end
 function ____RD_679A_4E3E_5207_5272_654C_519B(context)
-    local result = {}
-    local group = jass.CreateGroup()
-    jass.GroupEnumUnitsInRange(
-        group,
+    return _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009(
         context["目标中心X"],
         context["目标中心Y"],
         ____RD_914D_7F6E["伤害半径"],
-        nil
+        context["施法者"],
+        {
+            ["要求有效单位"] = false,
+            ["允许死亡"] = false,
+            ["允许建筑"] = true,
+            ["允许机械"] = true,
+            ["允许古树"] = true,
+            ["允许无敌"] = true,
+            ["仅敌人"] = true,
+            ["自定义条件"] = function(____, u) return not jass.IsUnitType(u, jass.UNIT_TYPE_TAUREN) end
+        }
     )
-    while true do
-        do
-            local unit = jass.FirstOfGroup(group)
-            if unit == nil or unit == 0 then
-                break
-            end
-            jass.GroupRemoveUnit(group, unit)
-            if not _____5355_4F4D_5B58_6D3B(unit) or not jass.IsUnitEnemy(
-                unit,
-                jass.GetOwningPlayer(context["施法者"])
-            ) or jass.IsUnitType(unit, jass.UNIT_TYPE_TAUREN) then
-                goto __continue8
-            end
-            result[#result + 1] = unit
-        end
-        ::__continue8::
-    end
-    jass.DestroyGroup(group)
-    return result
 end
 function ____RD_8BB0_5F55_88AB_5207_5355_4F4D(context, unit)
     local id = jass.GetHandleId(unit)
@@ -75,14 +65,14 @@ function ____RD_6062_590D_88AB_5207_5355_4F4D(context)
             do
                 local unit = context["记录单位"][i + 1]
                 if unit == nil or unit == 0 then
-                    goto __continue15
+                    goto __continue13
                 end
                 ____RD_8BBE_7F6E_78B0_649E(unit, true)
                 _____79FB_9664_5355_4F4D_6682_505C(unit, source)
                 jass.SetUnitTimeScale(unit, 1)
                 jass.SetUnitPathing(unit, true)
             end
-            ::__continue15::
+            ::__continue13::
             i = i + 1
         end
     end
@@ -257,7 +247,7 @@ function ____RD_6267_884C_5207_5272(variable)
                 local slash = context["待切刀光"][index + 1]
                 __TS__ArraySplice(context["待切刀光"], index, 1)
                 if slash == nil or slash == 0 or not _____5355_4F4D_5B58_6D3B(slash) then
-                    goto __continue59
+                    goto __continue57
                 end
                 jass.SetUnitTimeScale(slash, 0.4)
                 local angle = GetRandomDirectionDeg()
@@ -280,7 +270,7 @@ function ____RD_6267_884C_5207_5272(variable)
                     GetRandomDirectionDeg()
                 )
             end
-            ::__continue59::
+            ::__continue57::
             i = i + 1
         end
     end
@@ -322,7 +312,7 @@ function ____RD_521B_5EFA_5200_5149(variable)
                     GetRandomDirectionDeg()
                 )
                 if slash == nil or slash == 0 then
-                    goto __continue69
+                    goto __continue67
                 end
                 jass.SetUnitScale(slash, ____RD_914D_7F6E["刀光缩放"], ____RD_914D_7F6E["刀光缩放"], ____RD_914D_7F6E["刀光缩放"])
                 jass.SetUnitFacing(
@@ -336,7 +326,7 @@ function ____RD_521B_5EFA_5200_5149(variable)
                 context["刀光计数"] = context["刀光计数"] + 1
                 lastSlash = slash
             end
-            ::__continue69::
+            ::__continue67::
             i = i + 1
         end
     end

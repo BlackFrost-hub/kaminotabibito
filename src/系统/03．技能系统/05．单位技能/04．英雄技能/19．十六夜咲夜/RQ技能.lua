@@ -328,14 +328,16 @@ local function ____RQ_63A8_8FDB_98DE_5200(variable)
                 )
                 jass.SetUnitFacing(knife, angle)
                 if jass.GetUnitFlyHeight(knife) > jass.GetUnitFlyHeight(context["目标"]) then
-                    jass.SetUnitFlyHeight(
-                        knife,
-                        math.max(
-                            jass.GetUnitFlyHeight(context["目标"]),
-                            jass.GetUnitFlyHeight(knife) - 18
-                        ),
-                        0
-                    )
+                    local _____76EE_6807_9AD8_5EA6 = jass.GetUnitFlyHeight(context["目标"])
+                    local _____4E0B_964D_9AD8_5EA6 = jass.GetUnitFlyHeight(knife) - 18
+                    local ____jass_SetUnitFlyHeight_12 = jass.SetUnitFlyHeight
+                    local ____temp_11
+                    if _____76EE_6807_9AD8_5EA6 > _____4E0B_964D_9AD8_5EA6 then
+                        ____temp_11 = _____76EE_6807_9AD8_5EA6
+                    else
+                        ____temp_11 = _____4E0B_964D_9AD8_5EA6
+                    end
+                    ____jass_SetUnitFlyHeight_12(jass, knife, ____temp_11, 0)
                 end
             end
             ::__continue39::
@@ -351,8 +353,8 @@ local function ____RQ_91CA_653E_98DE_5200(variable)
     do
         local i = 0
         while i < #context["收尾飞刀"] do
-            local ____context__98DE_5200_11 = context["飞刀"]
-            ____context__98DE_5200_11[#____context__98DE_5200_11 + 1] = context["收尾飞刀"][i + 1]
+            local ____context__98DE_5200_13 = context["飞刀"]
+            ____context__98DE_5200_13[#____context__98DE_5200_13 + 1] = context["收尾飞刀"][i + 1]
             i = i + 1
         end
     end

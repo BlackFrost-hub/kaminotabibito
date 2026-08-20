@@ -36,16 +36,22 @@ const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Sta
   添加单位暂停: (this: void, unit: any, 来源: string) => boolean;
   移除单位暂停: (this: void, unit: any, 来源: string) => boolean;
 };
+const { X_SetUnitMovableSafe } = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版") as {
+  X_SetUnitMovableSafe: (this: void, unit: any, movable: boolean) => void;
+};
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
 };
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
-const { 读取单位攻击力, 单位存活, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 单位存活, 两点角度, 角度差绝对值, 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  角度差绝对值: (this: void, a: number, b: number) => number;
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: {
@@ -106,18 +112,6 @@ for (let playerId = 0; playerId <= 15; playerId++) {
 // 二、通用工具
 //=============================================================================
 
-function 归一化角度(this: void, angle: number): number {
-  let result = angle % 360;
-  if (result < 0) result += 360;
-  return result;
-}
-
-function 角度差(this: void, a: number, b: number): number {
-  let diff = Math.abs(归一化角度(a) - 归一化角度(b));
-  if (diff > 180) diff = 360 - diff;
-  return diff;
-}
-
 function 是有效伤害目标(this: void, 施法者: any, target: any): boolean {
   if (target == null || target === 0 || target === 施法者) return false;
   if (!单位存活(target)) return false;
@@ -153,7 +147,7 @@ export function 佐佐木扇形伤害(
     const target = targets[i];
     if (!是有效伤害目标(施法者, target)) continue;
     const 指向目标角度 = 两点角度(中心X, 中心Y, GetUnitX(target), GetUnitY(target));
-    if (角度差(指向目标角度, 面向角度) > 半角) continue;
+    if (角度差绝对值(指向目标角度, 面向角度) > 半角) continue;
 
     if (硬直秒 > 0) {
       const { SFB_施加通用Buff } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
@@ -323,6 +317,8 @@ const 分身待落地表: Record<number, 分身待落地记录 | undefined> = {}
 let 当前创建分身的英雄: any = null;
 
 function 分身入场处理(this: void, 分身: any, 记录: 分身待落地记录): void {
+  // 所有佐佐木分身都锁定转向窗口；直接 SetUnitX/SetUnitY 仍可用于技能位移。
+  X_SetUnitMovableSafe(分身, false);
   // 去碰撞（几乎不可移动 + 不阻挡）
   if (typeof japi.EXSetUnitCollisionType === "function") {
     japi.EXSetUnitCollisionType(false, 分身, 1);
@@ -458,8 +454,8 @@ function on佐佐木普攻命中(this: void, ctx: any): void {
   // 在敌人身后创建分身
   const cfg = 佐佐木单位技能配置.D;
   const 指向角度 = 两点角度(GetUnitX(source), GetUnitY(source), GetUnitX(target), GetUnitY(target));
-  const 身后X = GetUnitX(target) + Math.cos(指向角度 * Math.PI / 180) * cfg.普攻分身后方距离;
-  const 身后Y = GetUnitY(target) + Math.sin(指向角度 * Math.PI / 180) * cfg.普攻分身后方距离;
+  const 身后X = 极坐标X(GetUnitX(target), 指向角度, cfg.普攻分身后方距离);
+  const 身后Y = 极坐标Y(GetUnitY(target), 指向角度, cfg.普攻分身后方距离);
   创建佐佐木分身(source, 身后X, 身后Y, 指向角度, "身后", D被动技能ID);
 }
 

@@ -24,6 +24,7 @@ export * from "./20．位移技能限制";
 export * from "./21．组合技能伤害";
 export * from "./22．Boss技能伤害执行器";
 export * from "./23．瞬移路径预计算";
+export * from "./24．整数与时间换算";
 export {
   stringToFourCC as BossStringToFourCC,
   取单位ID as Boss取单位ID,

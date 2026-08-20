@@ -8,7 +8,9 @@
 import { Saber技能配置 } from "./00．配置";
 import { Saber是否阿瓦隆 } from "./01．状态表";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 读取单位攻击力, 单位存活, 两点角度 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
+
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
@@ -58,10 +60,8 @@ const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
 const GetRandomReal = jass.GetRandomReal as (this: void, low: number, high: number) => number;
-const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const Sin = jass.Sin as (this: void, radians: number) => number;
-const bj_RADTODEG = jass.bj_RADTODEG as number;
 const bj_DEGTORAD = jass.bj_DEGTORAD as number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_DIVINE = jass.DAMAGE_TYPE_DIVINE as any;
@@ -75,10 +75,6 @@ const stringToFourCC = stringToFourCCSafe;
 const 配置 = Saber技能配置;
 const 英雄单位类型ID = 配置.单位类型ID;
 const R类型ID = stringToFourCC(配置.R.技能ID);
-
-function 计算两点角度(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  return Atan2(y2 - y1, x2 - x1) * bj_RADTODEG;
-}
 
 // ---------------------------------------------------------------------------
 // R 上下文
@@ -227,7 +223,7 @@ function 启动R聚集回收(this: void, ctx: R上下文): void {
   if (ctx.聚集列表.length === 0) return;
   if (ctx.聚集回调ID !== 0) removePeriodicCallback(ctx.聚集回调ID);
   ctx.聚集回调ID = addPeriodicCallback(
-    Math.round(配置.R.蓄力结束.聚集回收.Tick间隔秒 * 1000),
+    秒转毫秒(配置.R.蓄力结束.聚集回收.Tick间隔秒),
     推进R聚集回收 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -263,7 +259,7 @@ function R蓄力结束(this: void, ctx: R上下文): void {
 
   SetUnitAnimationByIndex(caster, 配置.R.蓄力结束.动作索引);
   ctx.准备回调ID = addDelayedCallback(
-    Math.round(配置.R.蓄力结束.发射准备延迟秒 * 1000),
+    秒转毫秒(配置.R.蓄力结束.发射准备延迟秒),
     R发射准备 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -437,7 +433,7 @@ function R能量与光炮启动(this: void, variable?: any): void {
   ctx.光炮Tick数 = 0;
   ctx.命中组 = {};
   ctx.光炮回调ID = addPeriodicCallback(
-    Math.round(配置.R.光炮.间隔秒 * 1000),
+    秒转毫秒(配置.R.光炮.间隔秒),
     推进R光炮 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -465,7 +461,7 @@ function R发射准备(this: void, variable?: any): void {
   });
 
   ctx.能量回调ID = addDelayedCallback(
-    Math.round(配置.R.发射.能量准备延迟秒 * 1000),
+    秒转毫秒(配置.R.发射.能量准备延迟秒),
     R能量与光炮启动 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -485,7 +481,7 @@ function 释放R技能(this: void, context: R上下文, caster: any, 技能实�
   context.伤害快照 = 读取单位攻击力(caster);
   context.Saber点X = GetUnitX(caster);
   context.Saber点Y = GetUnitY(caster);
-  context.方向角度 = 计算两点角度(context.Saber点X, context.Saber点Y, GetSpellTargetX(), GetSpellTargetY());
+  context.方向角度 = 两点角度(context.Saber点X, context.Saber点Y, GetSpellTargetX(), GetSpellTargetY());
   context.飞行高度快照 = GetUnitFlyHeight(caster);
   context.阿瓦隆快照 = Saber是否阿瓦隆(caster);
   context.蓄力Tick数 = 0;
@@ -498,7 +494,7 @@ function 释放R技能(this: void, context: R上下文, caster: any, 技能实�
   SetUnitAnimationByIndex(caster, 配置.R.起手.动作索引);
 
   context.蓄力回调ID = addPeriodicCallback(
-    Math.round(配置.R.蓄力.间隔秒 * 1000),
+    秒转毫秒(配置.R.蓄力.间隔秒),
     推进R蓄力 as unknown as (this: void, variable?: any) => void,
     context,
   );

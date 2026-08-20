@@ -10,6 +10,10 @@ const { 注册聊天命令监听 } = require("系统.00．核心系统.01．事�
 const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any | null;
 };
+// 恢复魔法百分比：最大魔法走 JAPI、当前魔法走 JASS（unit-state-jass-japi-boundary 规则）
+const { SetUnitManaPercentBJ } = require("lib.扩展函数.BJ函数.02．单位与英雄") as {
+  SetUnitManaPercentBJ: (this: void, whichUnit: any, percent: number) => void;
+};
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
@@ -28,7 +32,9 @@ function on重置玩家英雄技能冷却(this: void, player: any, _command: str
   }
 
   UnitResetCooldown(hero);
-  debugLogForce(模块名, "已重置当前玩家英雄全部技能冷却");
+  // -cd 附带把英雄当前魔法恢复到 100%（SetUnitManaPercentBJ 内部已按边界处理）
+  SetUnitManaPercentBJ(hero, 100);
+  debugLogForce(模块名, "已重置当前玩家英雄全部技能冷却并回满魔法");
 }
 
 注册聊天命令监听(测试命令, on重置玩家英雄技能冷却);

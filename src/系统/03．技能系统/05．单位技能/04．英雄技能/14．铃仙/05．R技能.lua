@@ -39,13 +39,17 @@ local _____8BFB_53D6_5355_4F4D_654F_6377 = ____require_result_9["读取单位敏
 local _____5355_4F4D_5B58_6D3B = ____require_result_9["单位存活"]
 local _____8DDD_79BBXY = ____require_result_9["距离XY"]
 local _____4E24_70B9_89D2_5EA6 = ____require_result_9["两点角度"]
+local _____6781_5750_6807X = ____require_result_9["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_9["极坐标Y"]
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____require_result_10["秒转毫秒"]
+local _____5411_4E0B_53D6_6574_6574_6570 = ____require_result_10["向下取整整数"]
 local cfg = _____94C3_4ED9_5355_4F4D_6280_80FD_914D_7F6E
 local ____R_6280_80FDID_6570_503C = stringToFourCCSafe(cfg["R技能ID"])
 local ____R_4E8C_6BB5_6280_80FDID_6570_503C = stringToFourCCSafe(cfg["R二段技能ID"])
 local _____51C6_5FC3_9A6C_7532ID = stringToFourCCSafe(cfg.R["准心马甲ID"])
 local _____5F39_5E55_9A6C_7532ID = stringToFourCCSafe(cfg.R["弹幕马甲ID"])
 local _____6280_80FD_51B7_5374_72B6_6001 = 1
-local _____89D2_5EA6_8F6C_5F27_5EA6 = math.pi / 180
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -101,8 +105,16 @@ local function _____6267_884C_7FFB_6EDA(_____94C3_4ED9, _____65B9_5411_89D2, ___
                 _____7ED3_675F_7FFB_6EDA(_____94C3_4ED9)
                 return
             end
-            local x = GetUnitX(_____94C3_4ED9) + math.cos(_____65B9_5411_89D2 * _____89D2_5EA6_8F6C_5F27_5EA6) * _____6BCFtick_8DDD_79BB
-            local y = GetUnitY(_____94C3_4ED9) + math.sin(_____65B9_5411_89D2 * _____89D2_5EA6_8F6C_5F27_5EA6) * _____6BCFtick_8DDD_79BB
+            local x = _____6781_5750_6807X(
+                GetUnitX(_____94C3_4ED9),
+                _____65B9_5411_89D2,
+                _____6BCFtick_8DDD_79BB
+            )
+            local y = _____6781_5750_6807Y(
+                GetUnitY(_____94C3_4ED9),
+                _____65B9_5411_89D2,
+                _____6BCFtick_8DDD_79BB
+            )
             SetUnitPosition(_____94C3_4ED9, x, y)
             _____5269_4F59_6B21_6570 = _____5269_4F59_6B21_6570 - 1
         end
@@ -133,11 +145,9 @@ local function ____on_94C3_4ED9R_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_8
     local _____76EE_6807Y = GetSpellTargetY()
     local _____65BD_6CD5_8DDD_79BB = _____8DDD_79BBXY(_____8D77_59CBX, _____8D77_59CBY, _____76EE_6807X, _____76EE_6807Y)
     local _____65B9_5411_89D2 = _____4E24_70B9_89D2_5EA6(_____8D77_59CBX, _____8D77_59CBY, _____76EE_6807X, _____76EE_6807Y)
-    local _____7FFB_6EDA_8DDD_79BB = math.min(
-        cfg.R["翻滚基础距离"] + _____8BFB_53D6_5355_4F4D_654F_6377(_____65BD_6CD5_5355_4F4D) * cfg.R["翻滚敏捷系数"],
-        _____65BD_6CD5_8DDD_79BB
-    )
-    local _____7FFB_6EDA_6B21_6570 = math.floor(_____7FFB_6EDA_8DDD_79BB / cfg.R["翻滚每tick距离"])
+    local _____7FFB_6EDA_8DDD_79BB_57FA_7840 = cfg.R["翻滚基础距离"] + _____8BFB_53D6_5355_4F4D_654F_6377(_____65BD_6CD5_5355_4F4D) * cfg.R["翻滚敏捷系数"]
+    local _____7FFB_6EDA_8DDD_79BB = _____7FFB_6EDA_8DDD_79BB_57FA_7840 < _____65BD_6CD5_8DDD_79BB and _____7FFB_6EDA_8DDD_79BB_57FA_7840 or _____65BD_6CD5_8DDD_79BB
+    local _____7FFB_6EDA_6B21_6570 = _____5411_4E0B_53D6_6574_6574_6570(_____7FFB_6EDA_8DDD_79BB / cfg.R["翻滚每tick距离"])
     local _____73A9_5BB6 = GetOwningPlayer(_____65BD_6CD5_5355_4F4D)
     SetUnitPathing(_____65BD_6CD5_5355_4F4D, false)
     _____64AD_653E_94C3_4ED9_914D_7F6E_52A8_4F5C(_____65BD_6CD5_5355_4F4D, -1, cfg.R["翻滚动画倍速"])
@@ -145,7 +155,7 @@ local function ____on_94C3_4ED9R_751F_6548(_____65BD_6CD5_5355_4F4D, _____6280_8
     SetPlayerAbilityAvailable(_____73A9_5BB6, ____R_6280_80FDID_6570_503C, false)
     _____6267_884C_7FFB_6EDA(_____65BD_6CD5_5355_4F4D, _____65B9_5411_89D2, _____7FFB_6EDA_6B21_6570)
     addDelayedCallback(
-        math.floor(cfg.R["瞄准窗口秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(cfg.R["瞄准窗口秒"]),
         function() return _____7784_51C6_7A97_53E3_8D85_65F6(_____65BD_6CD5_5355_4F4D, _____73A9_5BB6) end
     )
 end
@@ -287,8 +297,8 @@ local function _____5F00_59CB_53D1_5C04_5F39_5E55(_____94C3_4ED9, _____73A9_5BB6
                 end
                 return
             end
-            _____5F39_5E55X = _____5F39_5E55X + math.cos(_____65B9_5411_89D2 * _____89D2_5EA6_8F6C_5F27_5EA6) * cfg.R["弹幕每tick距离"]
-            _____5F39_5E55Y = _____5F39_5E55Y + math.sin(_____65B9_5411_89D2 * _____89D2_5EA6_8F6C_5F27_5EA6) * cfg.R["弹幕每tick距离"]
+            _____5F39_5E55X = _____5F39_5E55X + _____6781_5750_6807X(0, _____65B9_5411_89D2, cfg.R["弹幕每tick距离"])
+            _____5F39_5E55Y = _____5F39_5E55Y + _____6781_5750_6807Y(0, _____65B9_5411_89D2, cfg.R["弹幕每tick距离"])
             SetUnitPosition(_____5F39_5E55, _____5F39_5E55X, _____5F39_5E55Y)
             _____5904_7406_8DEF_5F84_4F24_5BB3(_____94C3_4ED9, _____5F39_5E55, _____91CD_590D_5355_4F4D_8868)
             if _____8DDD_79BBXY(_____5F39_5E55X, _____5F39_5E55Y, _____76EE_6807X, _____76EE_6807Y) <= cfg.R["暴击半径"] then
@@ -371,7 +381,7 @@ local function ____on_94C3_4ED9R_4E8C_6BB5_751F_6548(_____65BD_6CD5_5355_4F4D, _
         0
     )
     addDelayedCallback(
-        math.floor(cfg.R["蓄力秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(cfg.R["蓄力秒"]),
         function()
             UnitShareVision(
                 _____65BD_6CD5_5355_4F4D,

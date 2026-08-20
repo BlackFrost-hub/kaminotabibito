@@ -15,6 +15,8 @@ local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用�
 local forEachUnitInGroup = ____require_result_2.forEachUnitInGroup
 local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_3.addDelayedCallback
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____require_result_4["秒转毫秒"]
 local _____94C3_4ED9_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____94C3_4ED9_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -139,7 +141,7 @@ ____exports["全图英雄免疫伤害"] = function(_____6301_7EED_79D2)
         end
     end
     addDelayedCallback(
-        math.floor(_____6301_7EED_79D2 * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____6301_7EED_79D2),
         function()
             do
                 local i = 0

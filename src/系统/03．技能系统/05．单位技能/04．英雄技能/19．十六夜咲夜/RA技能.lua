@@ -7,13 +7,14 @@ local ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177 = require("系统.03．技�
 local _____4E24_70B9_89D2_5EA6 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["两点角度"]
 local _____6781_5750_6807X = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["极坐标Y"]
-local _____5355_4F4D_5B58_6D3B = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["单位存活"]
 local _____83B7_53D6_54B2_591C_73B0_5B58_98DE_5200 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["获取咲夜现存飞刀"]
 local _____64AD_653E_54B2_591C_5750_6807_97F3_6548 = ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177["播放咲夜坐标音效"]
 local _____7B26_5361_516C_5171 = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.符卡公共")
 local _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374 = _____7B26_5361_516C_5171["设置十六夜咲夜符卡书冷却"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____02_FF0E_5355_4F4D_4E0E_8303_56F4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009 = ____02_FF0E_5355_4F4D_4E0E_8303_56F4["获取坐标范围单位按筛选"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -34,27 +35,22 @@ local function _____83B7_53D6RA_76D1_542C_4E0A_4E0B_6587(_caster)
     return {["占位"] = true}
 end
 local function _____679A_4E3E_8303_56F4_5355_4F4D(caster, x, y, radius)
-    local result = {}
-    local group = jass.CreateGroup()
-    jass.GroupEnumUnitsInRange(
-        group,
+    return _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009(
         x,
         y,
         radius,
-        nil
+        caster,
+        {
+            ["要求有效单位"] = false,
+            ["允许死亡"] = false,
+            ["允许建筑"] = true,
+            ["允许机械"] = true,
+            ["允许古树"] = true,
+            ["允许无敌"] = true,
+            ["排除自身"] = true,
+            ["自定义条件"] = function(____, u) return not jass.IsUnitType(u, jass.UNIT_TYPE_TAUREN) end
+        }
     )
-    while true do
-        local unit = jass.FirstOfGroup(group)
-        if unit == nil or unit == 0 then
-            break
-        end
-        jass.GroupRemoveUnit(group, unit)
-        if unit ~= caster and _____5355_4F4D_5B58_6D3B(unit) and not jass.IsUnitType(unit, jass.UNIT_TYPE_TAUREN) then
-            result[#result + 1] = unit
-        end
-    end
-    jass.DestroyGroup(group)
-    return result
 end
 local function _____7ED3_675FRA(variable)
     local context = variable
@@ -89,13 +85,9 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRA(_listener, caster, ____
     local dx = targetX - startX
     local dy = targetY - startY
     local targetDistance = jass.SquareRoot(dx * dx + dy * dy)
-    local moveDistance = math.min(
-        targetDistance,
-        math.min(
-            _____914D_7F6E.RA["基础位移"] + jass.GetHeroAgi(caster, true) * _____914D_7F6E.RA["敏捷位移倍率"],
-            _____914D_7F6E.RA["最大位移"]
-        )
-    )
+    local _____654F_6377_4F4D_79FB = _____914D_7F6E.RA["基础位移"] + jass.GetHeroAgi(caster, true) * _____914D_7F6E.RA["敏捷位移倍率"]
+    local _____4F4D_79FB_4E0A_9650 = _____654F_6377_4F4D_79FB < _____914D_7F6E.RA["最大位移"] and _____654F_6377_4F4D_79FB or _____914D_7F6E.RA["最大位移"]
+    local moveDistance = targetDistance < _____4F4D_79FB_4E0A_9650 and targetDistance or _____4F4D_79FB_4E0A_9650
     _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(
         caster,
         _____6781_5750_6807X(startX, moveDistance, angle),
@@ -123,10 +115,8 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRA(_listener, caster, ____
                 targetX,
                 targetY
             ))
-            knife["设置已飞行距离"](math.max(
-                0,
-                knife["取已飞行距离"]() - _____914D_7F6E.RA["返还飞行距离"]
-            ))
+            local _____5269_4F59_8DDD_79BB = knife["取已飞行距离"]() - _____914D_7F6E.RA["返还飞行距离"]
+            knife["设置已飞行距离"](_____5269_4F59_8DDD_79BB > 0 and _____5269_4F59_8DDD_79BB or 0)
             i = i + 1
         end
     end

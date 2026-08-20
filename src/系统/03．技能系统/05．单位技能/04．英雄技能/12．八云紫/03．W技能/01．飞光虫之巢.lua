@@ -20,6 +20,8 @@ local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
 local _____4E24_70B9_89D2_5EA6 = ____require_result_1["两点角度"]
+local _____6781_5750_6807X = ____require_result_1["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_1["极坐标Y"]
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
 local getEnemyUnitsInRange = ____require_result_2.getEnemyUnitsInRange
 local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
@@ -94,10 +96,8 @@ local function _____7ED3_7B97W_6307_5B9A_76EE_6807(variable)
     local target = context["目标单位"]
     local targetX = jass.GetUnitX(target)
     local targetY = jass.GetUnitY(target)
-    local missingLife = math.max(
-        0,
-        jass.GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass.GetUnitState(target, UNIT_STATE_LIFE)
-    )
+    local _____7F3A_5931_751F_547D = jass.GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass.GetUnitState(target, UNIT_STATE_LIFE)
+    local missingLife = _____7F3A_5931_751F_547D > 0 and _____7F3A_5931_751F_547D or 0
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = context["英雄"],
         ["目标"] = target,
@@ -165,12 +165,11 @@ local function _____91CA_653EW(_entry, hero, skillInstanceId)
             local i = 0
             while i < _____914D_7F6E.W["裂隙数量"] do
                 local angle = 45 + 90 * (i + 1)
-                local radians = angle * math.pi / 180
                 local ____context__88C2_9699_6 = context["裂隙"]
                 ____context__88C2_9699_6[#____context__88C2_9699_6 + 1] = _____521B_5EFA_516B_4E91_7D2B_4E34_65F6_88C2_9699(
                     hero,
-                    targetX + math.cos(radians) * _____914D_7F6E.W["指定目标裂隙半径"],
-                    targetY + math.sin(radians) * _____914D_7F6E.W["指定目标裂隙半径"],
+                    _____6781_5750_6807X(targetX, angle, _____914D_7F6E.W["指定目标裂隙半径"]),
+                    _____6781_5750_6807Y(targetY, angle, _____914D_7F6E.W["指定目标裂隙半径"]),
                     _____914D_7F6E.W["裂隙持续秒"] + _____914D_7F6E.W["裂隙清理宽限秒"]
                 )
                 i = i + 1
@@ -181,20 +180,18 @@ local function _____91CA_653EW(_entry, hero, skillInstanceId)
         local heroX = jass.GetUnitX(hero)
         local heroY = jass.GetUnitY(hero)
         local angle = _____4E24_70B9_89D2_5EA6(heroX, heroY, targetX, targetY)
-        local radians = angle * math.pi / 180
-        local sideRadians = (angle + 90) * math.pi / 180
-        local backX = heroX - math.cos(radians) * _____914D_7F6E.W["无目标后方距离"]
-        local backY = heroY - math.sin(radians) * _____914D_7F6E.W["无目标后方距离"]
-        local firstX = backX + math.cos(sideRadians) * _____914D_7F6E.W["横向起点距离"]
-        local firstY = backY + math.sin(sideRadians) * _____914D_7F6E.W["横向起点距离"]
+        local backX = _____6781_5750_6807X(heroX, angle + 180, _____914D_7F6E.W["无目标后方距离"])
+        local backY = _____6781_5750_6807Y(heroY, angle + 180, _____914D_7F6E.W["无目标后方距离"])
+        local firstX = _____6781_5750_6807X(backX, angle + 90, _____914D_7F6E.W["横向起点距离"])
+        local firstY = _____6781_5750_6807Y(backY, angle + 90, _____914D_7F6E.W["横向起点距离"])
         do
             local i = 1
             while i <= _____914D_7F6E.W["裂隙数量"] do
                 local ____context__88C2_9699_7 = context["裂隙"]
                 ____context__88C2_9699_7[#____context__88C2_9699_7 + 1] = _____521B_5EFA_516B_4E91_7D2B_4E34_65F6_88C2_9699(
                     hero,
-                    firstX - math.cos(sideRadians) * _____914D_7F6E.W["横向间距"] * i,
-                    firstY - math.sin(sideRadians) * _____914D_7F6E.W["横向间距"] * i,
+                    _____6781_5750_6807X(firstX, angle + 90, -(_____914D_7F6E.W["横向间距"] * i)),
+                    _____6781_5750_6807Y(firstY, angle + 90, -(_____914D_7F6E.W["横向间距"] * i)),
                     _____914D_7F6E.W["裂隙持续秒"] + _____914D_7F6E.W["裂隙清理宽限秒"]
                 )
                 i = i + 1

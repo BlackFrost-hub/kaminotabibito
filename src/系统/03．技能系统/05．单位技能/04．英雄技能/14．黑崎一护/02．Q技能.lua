@@ -10,6 +10,9 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local jglobals = require("jass.globals")
@@ -36,10 +39,8 @@ local GetSpellTargetY = jass.GetSpellTargetY
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
-local Atan2 = jass.Atan2
 local Cos = jass.Cos
 local Sin = jass.Sin
-local bj_RADTODEG = jass.bj_RADTODEG
 local bj_DEGTORAD = jass.bj_DEGTORAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
@@ -49,9 +50,6 @@ local _____914D_7F6E = _____9ED1_5D0E_4E00_62A4_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
 local ____Q_7C7B_578BID = stringToFourCCSafe(_____914D_7F6E.Q["技能ID"])
 local ____D_7C7B_578BID = stringToFourCCSafe(_____914D_7F6E.D["技能ID"])
-local function _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2)
-    return Atan2(y2 - y1, x2 - x1) * bj_RADTODEG
-end
 local ____Q_5F39_9053_4E0A_4E0B_6587_8868 = {}
 local function _____83B7_53D6_6216_521B_5EFAQ_4E0A_4E0B_6587(unit)
     local id = GetHandleId(unit)
@@ -115,11 +113,11 @@ local function _____7ED3_7B97Q_6708_7259_78B0_649E(ctx)
             do
                 local target = _____654C_519B[i + 1]
                 if target == nil or target == 0 then
-                    goto __continue13
+                    goto __continue12
                 end
                 local tid = GetHandleId(target)
                 if ctx["已命中组"][tid] == true then
-                    goto __continue13
+                    goto __continue12
                 end
                 ctx["已命中组"][tid] = true
                 _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
@@ -137,7 +135,7 @@ local function _____7ED3_7B97Q_6708_7259_78B0_649E(ctx)
                     ["技能实例ID"] = ctx["技能实例ID"]
                 })
             end
-            ::__continue13::
+            ::__continue12::
             i = i + 1
         end
     end
@@ -199,7 +197,7 @@ local function _____91CA_653EQ_6708_7259_5929_51B2(context, caster, _____6280_80
     local ty = GetSpellTargetY()
     local sx = GetUnitX(caster)
     local sy = GetUnitY(caster)
-    local _____89D2_5EA6 = _____8BA1_7B97_4E24_70B9_89D2_5EA6(sx, sy, tx, ty)
+    local _____89D2_5EA6 = _____4E24_70B9_89D2_5EA6(sx, sy, tx, ty)
     local _____534D_89E3 = _____9ED1_5D0E_4E00_62A4_662F_5426_534D_89E3(caster)
     local _____53C2_6570 = _____534D_89E3 and _____914D_7F6E.Q["解放后"] or _____914D_7F6E.Q["未解放"]
     local _____534D_89E3_8
@@ -251,7 +249,7 @@ local function _____91CA_653EQ_6708_7259_5929_51B2(context, caster, _____6280_80
     end
     _____8BB0_5F55_6708_7259_4F4D_7F6E(caster, sx, sy)
     context["回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.Q["推进间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["推进间隔秒"]),
         _____63A8_8FDBQ_6708_7259,
         context
     )

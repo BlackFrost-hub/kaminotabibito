@@ -37,6 +37,9 @@ const { 读取单位攻击力, 单位存活 } = require("系统.03．技能系�
   读取单位攻击力: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
 };
+const { 向下取整整数 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  向下取整整数: (this: void, value: number) => number;
+};
 const { 单位拥有原生Buff, 单位是指定类型 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   单位拥有原生Buff: (this: void, unit: any, buffId: number) => boolean;
   单位是指定类型: (this: void, unit: any, typeId: number) => boolean;
@@ -97,7 +100,7 @@ function on欧尔贝克W(this: void, caster: any, abilityId: number): void {
 
   const cfg = 欧尔贝克单位技能配置.W;
   const level = GetUnitAbilityLevel(caster, W技能ID);
-  const 攻击加成 = Math.floor(读取单位攻击力(caster) * (cfg.基础攻击力倍率 + cfg.每级攻击力倍率 * level));
+  const 攻击加成 = 向下取整整数(读取单位攻击力(caster) * (cfg.基础攻击力倍率 + cfg.每级攻击力倍率 * level));
   const 暴击加成 = cfg.基础暴击率 + cfg.每级暴击率 * level;
 
   const id = GetHandleId(caster);

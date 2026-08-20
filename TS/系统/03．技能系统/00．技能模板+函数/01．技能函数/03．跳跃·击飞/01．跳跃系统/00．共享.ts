@@ -75,6 +75,7 @@ export const DEFAULT_JUMP_EFFECT_MODEL = "";
 export const CROW_FORM_ABILITY_ID = 1097691750;
 
 export type 跳跃结束原因 = "完成" | "中断" | "死亡" | "阻挡" | "主单位死亡";
+export type 跳跃位移类型 = "普通" | "被击退击飞";
 
 export type 跳跃结束回调 = (单位: any, 原因: 跳跃结束原因, 跳跃ID: number) => void;
 export type 跳跃落点过滤 = (x: number, y: number, 单位: any, 跳跃ID: number) => boolean;
@@ -90,6 +91,8 @@ export interface 通用跳跃参数 {
   暂停单位?: boolean;
   朝向跟随跳跃?: boolean;
   跳跃特效?: string;
+  /** 标记此次跳跃是否属于可被受击系统识别的击退/击飞效果。 */
+  位移类型?: 跳跃位移类型;
   落点过滤?: 跳跃落点过滤;
   结束回调?: 跳跃结束回调;
   开始回调?: 跳跃开始回调;
@@ -118,6 +121,7 @@ export interface 跳跃实例 {
   暂停来源: string;
   朝向跟随跳跃: boolean;
   跳跃特效: string;
+  位移类型: 跳跃位移类型;
   落点过滤?: 跳跃落点过滤;
   结束回调?: 跳跃结束回调;
   开始回调?: 跳跃开始回调;
@@ -126,6 +130,7 @@ export interface 跳跃实例 {
 export const 活动跳跃列表: 跳跃实例[] = [];
 export const 跳跃映射: Record<number, 跳跃实例 | undefined> = {};
 export const 单位当前跳跃: Record<number, number | undefined> = {};
+export const 单位当前跳跃位移类型: Record<number, 跳跃位移类型 | undefined> = {};
 
 let 单位组快照缓存: any[] = [];
 let 下一个跳跃ID = 0;

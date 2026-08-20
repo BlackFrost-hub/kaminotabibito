@@ -100,6 +100,8 @@ export interface 原生弹幕参数 {
   最大总命中次数?: number;
 
   伤害值?: number;
+  /** 是否按攻击伤害提交；搭配普通攻击类型时会被伤害系统识别为技能攻击。 */
+  attack?: boolean;
   攻击类型?: any;
   伤害类型?: any;
   武器类型?: any;

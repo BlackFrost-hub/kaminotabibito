@@ -27,6 +27,19 @@ const japi = require("jass.japi") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
+const { 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
+};
+const { 秒转毫秒 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  秒转毫秒: (this: void, seconds: number) => number;
+};
+const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
+  创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
 const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
@@ -75,7 +88,6 @@ const W技能ID数值 = stringToFourCCSafe(cfg.W技能ID); // A0GI
 const 弹幕马甲ID = stringToFourCCSafe(cfg.D.弹幕马甲ID); // e07N
 
 const 技能冷却状态 = 1; // YDWE ABILITY_STATE_COOLDOWN（技能冷却状态）
-const 角度转弧度 = Math.PI / 180;
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
@@ -88,8 +100,6 @@ const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
-const CreateUnit = jass.CreateUnit as (this: void, player: any, unitTypeId: number, x: number, y: number, facing: number) => any;
-const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, unit: any, x: number, y: number) => void;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (this: void, model: string, target: any, attachPoint: string) => any;
 const DestroyEffect = jass.DestroyEffect as (this: void, effect: any) => void;
@@ -126,7 +136,7 @@ function 结束D弹幕(this: void, ctx: D弹幕上下文): void {
   }
   for (let i = 0; i < ctx.弹幕列表.length; i++) {
     const 弹幕 = ctx.弹幕列表[i];
-    if (弹幕 != null && 弹幕 !== 0) RemoveUnit(弹幕);
+    if (弹幕 != null && 弹幕 !== 0) 立即移除单位并取消排泄登记(弹幕);
   }
   ctx.弹幕列表 = [];
   ctx.重复命中表 = {};
@@ -143,7 +153,7 @@ function 发射D一波(this: void, ctx: D弹幕上下文): void {
   let 创建数 = 0;
   for (let N = 1; N <= cfg.D.每波弹幕数; N++) {
     const 角度 = N * cfg.D.弹幕角度间隔;
-    const 弹幕 = CreateUnit(玩家, 弹幕马甲ID, 中心X, 中心Y, 角度);
+    const 弹幕 = 创建单位并登记排泄安全(玩家, 弹幕马甲ID, 中心X, 中心Y, 角度);
     if (弹幕 == null || 弹幕 === 0) continue;
     if (DzSetUnitModel != null) DzSetUnitModel(弹幕, cfg.D.弹幕模型);
     ctx.弹幕列表.push(弹幕);
@@ -170,10 +180,10 @@ function 发射D下一波(this: void, ctx: D弹幕上下文): void {
   发射D一波(ctx);
   if (ctx.波次数 >= cfg.D.持续秒) {
     // 5 波射完，延迟 1 秒清理
-    addDelayedCallback(Math.round(cfg.D.清理延迟秒 * 1000), () => 结束D弹幕(ctx));
+    addDelayedCallback(秒转毫秒(cfg.D.清理延迟秒), 结束D弹幕, ctx);
     return;
   }
-  addDelayedCallback(Math.round(cfg.D.波次间隔秒 * 1000), () => 发射D下一波(ctx));
+  addDelayedCallback(秒转毫秒(cfg.D.波次间隔秒), 发射D下一波, ctx);
 }
 
 /** 弹幕推进：每 0.03 秒前移 30 码并检测 127 码内敌人（首次全额 / 重复 10%） */
@@ -194,8 +204,8 @@ function 推进D弹幕(this: void, ctx: D弹幕上下文): void {
     }
     // 沿朝向前移 30 码
     const 朝向 = GetUnitFacing(弹幕);
-    const 新X = GetUnitX(弹幕) + Math.cos(朝向 * 角度转弧度) * cfg.D.弹幕每tick距离;
-    const 新Y = GetUnitY(弹幕) + Math.sin(朝向 * 角度转弧度) * cfg.D.弹幕每tick距离;
+    const 新X = 极坐标X(GetUnitX(弹幕), 朝向, cfg.D.弹幕每tick距离);
+    const 新Y = 极坐标Y(GetUnitY(弹幕), 朝向, cfg.D.弹幕每tick距离);
     SetUnitPosition(弹幕, 新X, 新Y);
 
     // 检测 127 码内敌人
@@ -227,7 +237,7 @@ function 推进D弹幕(this: void, ctx: D弹幕上下文): void {
     }
     // 命中后移除该弹幕
     if (已命中) {
-      RemoveUnit(弹幕);
+      立即移除单位并取消排泄登记(弹幕);
       列表.splice(i, 1);
     }
   }
@@ -242,6 +252,10 @@ function 推进D弹幕(this: void, ctx: D弹幕上下文): void {
 // 二、施法入口
 //=============================================================================
 
+function 关闭D屏幕滤镜(this: void): void {
+  DisplayCineFilter(false);
+}
+
 function 启动D弹幕(this: void, 施法者: any): void {
   const ctx: D弹幕上下文 = {
     施法者,
@@ -252,7 +266,7 @@ function 启动D弹幕(this: void, 施法者: any): void {
     已结束: false,
   };
   // 弹幕推进回调（0.03 秒）
-  ctx.推进回调ID = addPeriodicCallback(Math.round(cfg.D.弹幕tick秒 * 1000), () => 推进D弹幕(ctx));
+  ctx.推进回调ID = addPeriodicCallback(秒转毫秒(cfg.D.弹幕tick秒), 推进D弹幕, ctx);
   // 发射第一波（后续波次链式间隔 1 秒）
   发射D下一波(ctx);
 }
@@ -263,9 +277,11 @@ function on铃仙D生效(this: void, 施法单位: any, 技能ID数值: number):
 
   // 立即：减少 Q 冷却 4 秒、W 冷却 8 秒
   const q冷却 = YDWEGetUnitAbilityStateSafe(施法单位, Q技能ID数值, 技能冷却状态);
-  YDWESetUnitAbilityStateSafe(施法单位, Q技能ID数值, 技能冷却状态, Math.max(0, q冷却 - cfg.D.Q冷却减少));
+  const q剩余 = q冷却 - cfg.D.Q冷却减少;
+  YDWESetUnitAbilityStateSafe(施法单位, Q技能ID数值, 技能冷却状态, q剩余 > 0 ? q剩余 : 0);
   const w冷却 = YDWEGetUnitAbilityStateSafe(施法单位, W技能ID数值, 技能冷却状态);
-  YDWESetUnitAbilityStateSafe(施法单位, W技能ID数值, 技能冷却状态, Math.max(0, w冷却 - cfg.D.W冷却减少));
+  const w剩余 = w冷却 - cfg.D.W冷却减少;
+  YDWESetUnitAbilityStateSafe(施法单位, W技能ID数值, 技能冷却状态, w剩余 > 0 ? w剩余 : 0);
 
   // 全图玩家英雄免疫伤害 1 秒
   全图英雄免疫伤害(cfg.D.免伤秒);
@@ -276,7 +292,7 @@ function on铃仙D生效(this: void, 施法单位: any, 技能ID数值: number):
 
   // 屏幕滤镜（源 JASS CinematicFilterGenericBJ）
   CinematicFilterGenericBJ(1.10, BLEND_MODE_BLEND, "222.blp", 100, 100, 100.00, 0.00, 0, 0, 0, 0);
-  addDelayedCallback(1100, () => DisplayCineFilter(false));
+  addDelayedCallback(1100, 关闭D屏幕滤镜);
 
   // D 波次状态：持续弹幕期间显示状态图标
   registerManualBuff(施法单位, 铃仙BuffID.D波次, cfg.D.持续秒, 0);

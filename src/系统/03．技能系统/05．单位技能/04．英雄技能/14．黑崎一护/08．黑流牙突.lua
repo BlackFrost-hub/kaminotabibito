@@ -20,14 +20,16 @@ local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_3["造成单体技能伤害"]
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
-local _____9500_6BC1_70B9_7279_6548 = ____require_result_5["销毁点特效"]
-local ____require_result_6 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_6.registerDeathListener
-local ____require_result_7 = require("lib.扩展函数.BJ函数.02．单位与英雄")
-local IsUnitAliveBJ = ____require_result_7.IsUnitAliveBJ
-local SelectUnitForPlayerSingle = ____require_result_7.SelectUnitForPlayerSingle
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____require_result_5["秒转毫秒"]
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
+local _____9500_6BC1_70B9_7279_6548 = ____require_result_6["销毁点特效"]
+local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_7.registerDeathListener
+local ____require_result_8 = require("lib.扩展函数.BJ函数.02．单位与英雄")
+local IsUnitAliveBJ = ____require_result_8.IsUnitAliveBJ
+local SelectUnitForPlayerSingle = ____require_result_8.SelectUnitForPlayerSingle
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
@@ -141,7 +143,7 @@ local function _____7ED3_7B97_9ED1_6D41_7259_7A81_547D_4E2D(ctx)
     _____76EE_6807_72EC_7ACB_51B7_5374_8868[_____76EE_6807ID] = true
     local _____51B7_5374_4E0A_4E0B_6587 = {["目标"] = target, ["目标ID"] = _____76EE_6807ID}
     addDelayedCallback(
-        math.floor(_____914D_7F6E["黑流牙突"]["标记持续秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E["黑流牙突"]["标记持续秒"]),
         _____6E05_9664_9ED1_6D41_7259_7A81_6807_8BB0,
         _____51B7_5374_4E0A_4E0B_6587
     )
@@ -223,7 +225,7 @@ local function _____53D1_8D77_9ED1_6D41_7259_7A81(caster, target)
     }
     _____7A81_8FDB_4E0A_4E0B_6587_8868[GetHandleId(caster)] = ctx
     ctx["回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E["黑流牙突"]["推进间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E["黑流牙突"]["推进间隔秒"]),
         _____63A8_8FDB_9ED1_6D41_7259_7A81,
         ctx
     )

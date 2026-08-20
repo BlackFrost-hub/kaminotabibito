@@ -3,7 +3,7 @@
 import { 坂井悠二技能配置 } from "./00．配置";
 import { 坂井悠二BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/05．坂井悠二";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 单位存活, 读取单位攻击力, 两点角度 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 单位存活, 读取单位攻击力, 两点角度, 取单位ID, 极坐标X, 极坐标Y } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 
 const jass = require("jass.common") as any;
 
@@ -74,19 +74,14 @@ interface Q上下文 {
 const 上下文表: Record<number, Q上下文 | undefined> = {};
 let 死亡监听已注册 = false;
 
-function 取单位句柄ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 function 获取Q上下文(this: void, unit: any): Q上下文 | undefined {
-  const id = 取单位句柄ID(unit);
+  const id = 取单位ID(unit);
   if (id === 0) return undefined;
   return 上下文表[id];
 }
 
 function 获取或创建Q上下文(this: void, unit: any): Q上下文 | undefined {
-  const id = 取单位句柄ID(unit);
+  const id = 取单位ID(unit);
   if (id === 0) return undefined;
   const current = 上下文表[id];
   if (current != null) return current;
@@ -110,7 +105,7 @@ function 清理Q上下文(this: void, context: Q上下文): void {
     context.周期回调ID = 0;
   }
   context.已启动 = false;
-  const id = 取单位句柄ID(context.施法者);
+  const id = 取单位ID(context.施法者);
   if (id !== 0 && 上下文表[id] === context) delete 上下文表[id];
 }
 
@@ -168,10 +163,9 @@ function Q段内扫描(this: void, variable?: any): void {
   }
 
   // 源：特效点 = PolarProjectionBJ(saber点, 40×循环实数2, 角度)
-  const 弧度 = scan.方向角度 * (3.14159265358979 / 180);
   const 距离 = 配置.主动.每次扫描推进距离 * scan.扫描次数;
-  const 判定X = scan.起点X + 距离 * Math.cos(弧度);
-  const 判定Y = scan.起点Y + 距离 * Math.sin(弧度);
+  const 判定X = 极坐标X(scan.起点X, scan.方向角度, 距离);
+  const 判定Y = 极坐标Y(scan.起点Y, scan.方向角度, 距离);
 
   // AOE 伤害：当前半径内未命中过的敌人，单次伤害为总伤害的 20%
   const 单次伤害 = scan.伤害攻击力快照 * 配置.主动.总伤害攻击力倍率 * 配置.主动.单段伤害比例;

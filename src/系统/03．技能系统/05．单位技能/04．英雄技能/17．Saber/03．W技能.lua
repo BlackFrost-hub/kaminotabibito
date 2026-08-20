@@ -13,6 +13,9 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local jglobals = require("jass.globals")
@@ -75,11 +78,9 @@ local SetUnitPathing = jass.SetUnitPathing
 local IsTerrainPathable = jass.IsTerrainPathable
 local IsUnitInRange = jass.IsUnitInRange
 local IsUnitType = jass.IsUnitType
-local Atan2 = jass.Atan2
 local Cos = jass.Cos
 local Sin = jass.Sin
 local SquareRoot = jass.SquareRoot
-local bj_RADTODEG = jass.bj_RADTODEG
 local bj_DEGTORAD = jass.bj_DEGTORAD
 local PATHING_TYPE_WALKABILITY = jass.PATHING_TYPE_WALKABILITY
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
@@ -97,9 +98,6 @@ local stringToFourCC = stringToFourCCSafe
 local _____914D_7F6E = ____Saber_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
 local ____W_7C7B_578BID = stringToFourCC(_____914D_7F6E.W["技能ID"])
-local function _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2)
-    return Atan2(y2 - y1, x2 - x1) * bj_RADTODEG
-end
 local function _____6E05_7406_9F99_5377_98CE_8868_73B0(ctx)
     for ____, path in ipairs(ctx["龙卷风列表"]) do
         if path["特效"] ~= nil and path["特效"] ~= 0 then
@@ -144,7 +142,7 @@ local function _____63A8_8FDBW_9F99_5377_98CE(variable)
         for ____, target in ipairs(_____654C_519B_5217_8868) do
             do
                 if target == nil or target == 0 then
-                    goto __continue15
+                    goto __continue14
                 end
                 if ctx["命中组"][GetHandleId(target)] == true then
                     _____5F00_59CB_51FB_9000(target, {
@@ -155,12 +153,12 @@ local function _____63A8_8FDBW_9F99_5377_98CE(variable)
                         ["暂停单位"] = false,
                         ["禁用碰撞"] = false
                     })
-                    goto __continue15
+                    goto __continue14
                 end
                 ctx["命中组"][GetHandleId(target)] = true
                 _____65B0_76EE_6807[#_____65B0_76EE_6807 + 1] = target
             end
-            ::__continue15::
+            ::__continue14::
         end
         if #_____65B0_76EE_6807 > 0 then
             _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
@@ -239,7 +237,7 @@ local function ____W_5730_9762_542F_52A8_9F99_5377_98CE(variable)
     end
     ctx["Tick数"] = 0
     ctx["周期回调ID"] = addPeriodicCallback(
-        math.floor(cfg["推进间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(cfg["推进间隔秒"]),
         _____63A8_8FDBW_9F99_5377_98CE,
         ctx
     )
@@ -275,7 +273,7 @@ local function _____91CA_653EW_5730_9762_5206_652F(caster, _____76EE_6807X, ____
     local dy = _____76EE_6807Y - GetUnitY(caster)
     local _____8DDD_79BB = SquareRoot(dx * dx + dy * dy)
     local _____5B9E_9645_8DDD_79BB = _____8DDD_79BB > cfg["传送最大距离"] and cfg["传送最大距离"] or _____8DDD_79BB
-    local _____65B9_5411 = _____8BA1_7B97_4E24_70B9_89D2_5EA6(
+    local _____65B9_5411 = _____4E24_70B9_89D2_5EA6(
         GetUnitX(caster),
         GetUnitY(caster),
         _____76EE_6807X,
@@ -305,7 +303,7 @@ local function _____91CA_653EW_5730_9762_5206_652F(caster, _____76EE_6807X, ____
     }
     ____W_5730_9762_4E0A_4E0B_6587_8868[GetHandleId(caster)] = ctx
     addDelayedCallback(
-        math.floor(cfg["龙卷风"]["启动延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(cfg["龙卷风"]["启动延迟秒"]),
         ____W_5730_9762_542F_52A8_9F99_5377_98CE,
         ctx
     )
@@ -317,7 +315,7 @@ local function ____WE_5730_9762_6062_590D_95EA_907F_7387(ctx)
     for ____, item in ipairs(ctx["闪避率记录"]) do
         do
             if item.unit == nil or item.unit == 0 or not _____5355_4F4D_5B58_6D3B(item.unit) then
-                goto __continue35
+                goto __continue34
             end
             YDUserDataSetSafe(
                 "unit",
@@ -327,7 +325,7 @@ local function ____WE_5730_9762_6062_590D_95EA_907F_7387(ctx)
                 item["原值"]
             )
         end
-        ::__continue35::
+        ::__continue34::
     end
     ctx["闪避率记录"] = {}
 end
@@ -376,7 +374,7 @@ local function _____63A8_8FDBWE_5730_9762_51B2_51FB(variable)
     for ____, target in ipairs(_____654C_519B_5217_8868) do
         do
             if target == nil or target == 0 then
-                goto __continue45
+                goto __continue44
             end
             if ctx["重复组"][GetHandleId(target)] == true then
                 _____5F00_59CB_51FB_9000(target, {
@@ -387,7 +385,7 @@ local function _____63A8_8FDBWE_5730_9762_51B2_51FB(variable)
                     ["暂停单位"] = false,
                     ["禁用碰撞"] = false
                 })
-                goto __continue45
+                goto __continue44
             end
             ctx["重复组"][GetHandleId(target)] = true
             if IsUnitType(target, UNIT_TYPE_HERO) then
@@ -404,7 +402,7 @@ local function _____63A8_8FDBWE_5730_9762_51B2_51FB(variable)
             end
             _____65B0_76EE_6807[#_____65B0_76EE_6807 + 1] = target
         end
-        ::__continue45::
+        ::__continue44::
     end
     for ____, target in ipairs(_____65B0_76EE_6807) do
         _____65BD_52A0_7729_6655(
@@ -427,14 +425,14 @@ local function _____63A8_8FDBWE_5730_9762_51B2_51FB(variable)
     for ____, target in ipairs(_____5168_90E8_654C_519B) do
         do
             if target == nil or target == 0 then
-                goto __continue52
+                goto __continue51
             end
             if ctx["重复组"][GetHandleId(target)] ~= true then
-                goto __continue52
+                goto __continue51
             end
             _____91CD_590D_76EE_6807[#_____91CD_590D_76EE_6807 + 1] = target
         end
-        ::__continue52::
+        ::__continue51::
     end
     if #_____91CD_590D_76EE_6807 > 0 then
         _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
@@ -458,7 +456,7 @@ local function _____91CA_653EWE_5730_9762_5206_652F(caster, _____76EE_6807X, ___
     if ____wE_8054_52A8_97F3_6548_53E5_67C4 ~= nil then
         PlaySoundOnUnitBJ(____wE_8054_52A8_97F3_6548_53E5_67C4, 100, caster)
     end
-    local _____65B9_5411 = _____8BA1_7B97_4E24_70B9_89D2_5EA6(
+    local _____65B9_5411 = _____4E24_70B9_89D2_5EA6(
         GetUnitX(caster),
         GetUnitY(caster),
         _____76EE_6807X,
@@ -489,7 +487,7 @@ local function _____91CA_653EWE_5730_9762_5206_652F(caster, _____76EE_6807X, ___
         ["Tick数"] = 0
     }
     ctx["周期回调ID"] = addPeriodicCallback(
-        math.floor(cfg["路径"]["Tick间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(cfg["路径"]["Tick间隔秒"]),
         _____63A8_8FDBWE_5730_9762_51B2_51FB,
         ctx
     )
@@ -531,7 +529,7 @@ local function _____63A8_8FDBW_51B2_51FB_6CE2(variable)
     for ____, target in ipairs(_____654C_519B_5217_8868) do
         do
             if target == nil or target == 0 then
-                goto __continue67
+                goto __continue66
             end
             if ctx["命中组"][GetHandleId(target)] == true then
                 _____5F00_59CB_51FB_9000(target, {
@@ -542,12 +540,12 @@ local function _____63A8_8FDBW_51B2_51FB_6CE2(variable)
                     ["暂停单位"] = false,
                     ["禁用碰撞"] = false
                 })
-                goto __continue67
+                goto __continue66
             end
             ctx["命中组"][GetHandleId(target)] = true
             _____65B0_76EE_6807[#_____65B0_76EE_6807 + 1] = target
         end
-        ::__continue67::
+        ::__continue66::
     end
     if #_____65B0_76EE_6807 > 0 then
         _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
@@ -593,7 +591,7 @@ local function _____542F_52A8W_51B2_51FB_6CE2(ctx)
         ["Tick数"] = 0
     }
     _____6CE2_4E0A_4E0B_6587["周期回调ID"] = addPeriodicCallback(
-        math.floor(cfg["推进间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(cfg["推进间隔秒"]),
         _____63A8_8FDBW_51B2_51FB_6CE2,
         _____6CE2_4E0A_4E0B_6587
     )
@@ -623,7 +621,7 @@ local function _____63A8_8FDBW_654C_4EBA_8FFD_51FB(variable)
             _____79FB_9664_5355_4F4D_6682_505C(caster, _____914D_7F6E["暂停来源"]["W敌人追击"])
             SetUnitFacing(
                 caster,
-                _____8BA1_7B97_4E24_70B9_89D2_5EA6(
+                _____4E24_70B9_89D2_5EA6(
                     GetUnitX(caster),
                     GetUnitY(caster),
                     GetUnitX(target),
@@ -660,7 +658,7 @@ local function _____63A8_8FDBW_654C_4EBA_8FFD_51FB(variable)
             SetUnitAnimation(target, "death")
             SetUnitTimeScale(target, 0)
             addDelayedCallback(
-                math.floor(_____914D_7F6E.W["敌人分支"]["主控制秒"] * 1000 + 0.5),
+                _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.W["敌人分支"]["主控制秒"]),
                 ____W_76EE_6807_786C_76F4_8868_73B0_6062_590D,
                 target
             )
@@ -722,7 +720,7 @@ local function _____91CA_653EW_654C_4EBA_5206_652F(caster, target, _____6280_80F
         ["目标"] = target,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["伤害快照"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster),
-        ["冲锋角度"] = _____8BA1_7B97_4E24_70B9_89D2_5EA6(
+        ["冲锋角度"] = _____4E24_70B9_89D2_5EA6(
             GetUnitX(caster),
             GetUnitY(caster),
             GetUnitX(target),
@@ -738,7 +736,7 @@ local function _____91CA_653EW_654C_4EBA_5206_652F(caster, target, _____6280_80F
     SetUnitTimeScale(caster, _____914D_7F6E.W["敌人分支"]["时间流速"])
     SetUnitPathing(caster, false)
     ctx["周期回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.W["敌人分支"]["追击"]["间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.W["敌人分支"]["追击"]["间隔秒"]),
         _____63A8_8FDBW_654C_4EBA_8FFD_51FB,
         ctx
     )

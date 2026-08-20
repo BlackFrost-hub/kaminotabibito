@@ -1,9 +1,10 @@
 /** @noSelfInFile */
 
 import { 十六夜咲夜基础技能配置 as 配置 } from "./00．配置";
-import { 两点角度, 极坐标X, 极坐标Y, 单位存活, 获取咲夜现存飞刀, 播放咲夜坐标音效 } from "./01．飞刀与时间工具";
+import { 两点角度, 极坐标X, 极坐标Y, 获取咲夜现存飞刀, 播放咲夜坐标音效 } from "./01．飞刀与时间工具";
 import { 设置十六夜咲夜符卡书冷却 } from "./符卡公共";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 获取坐标范围单位按筛选 } from "../../../00．技能模板+函数/02．通用函数/02．单位与范围";
 
 const jass = require("jass.common") as any;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -38,17 +39,19 @@ export function 十六夜咲夜处于RA强化(this: void, caster: any): boolean 
 function 获取RA监听上下文(this: void, _caster: any): RA监听上下文 { return { 占位: true }; }
 
 function 枚举范围单位(this: void, caster: any, x: number, y: number, radius: number): any[] {
-  const result: any[] = [];
-  const group = jass.CreateGroup();
-  jass.GroupEnumUnitsInRange(group, x, y, radius, null);
-  while (true) {
-    const unit = jass.FirstOfGroup(group);
-    if (unit == null || unit === 0) break;
-    jass.GroupRemoveUnit(group, unit);
-    if (unit !== caster && 单位存活(unit) && !jass.IsUnitType(unit, jass.UNIT_TYPE_TAUREN)) result.push(unit);
-  }
-  jass.DestroyGroup(group);
-  return result;
+  // 源规则：排除自身 + 存活 + 排除牛头人（不排除建筑/机械/古树/无敌）。
+  // 配置型筛选等价表达：要求有效单位=false 跳过四重过滤，允许死亡=false 排除死亡，
+  // 允许无敌=true + 排除自身 + 自定义条件（牛头人）保持原语义。
+  return 获取坐标范围单位按筛选(x, y, radius, caster, {
+    要求有效单位: false,
+    允许死亡: false,
+    允许建筑: true,
+    允许机械: true,
+    允许古树: true,
+    允许无敌: true,
+    排除自身: true,
+    自定义条件: (u: any) => !jass.IsUnitType(u, jass.UNIT_TYPE_TAUREN),
+  });
 }
 
 function 结束RA(this: void, variable?: any): void {
@@ -71,7 +74,9 @@ function 释放十六夜咲夜RA(this: void, _listener: RA监听上下文, caste
   const dx = targetX - startX;
   const dy = targetY - startY;
   const targetDistance = jass.SquareRoot(dx * dx + dy * dy) as number;
-  const moveDistance = Math.min(targetDistance, Math.min(配置.RA.基础位移 + jass.GetHeroAgi(caster, true) * 配置.RA.敏捷位移倍率, 配置.RA.最大位移));
+  const 敏捷位移 = 配置.RA.基础位移 + jass.GetHeroAgi(caster, true) * 配置.RA.敏捷位移倍率;
+  const 位移上限 = 敏捷位移 < 配置.RA.最大位移 ? 敏捷位移 : 配置.RA.最大位移;
+  const moveDistance = targetDistance < 位移上限 ? targetDistance : 位移上限;
   执行战斗自身传送到坐标(caster, 极坐标X(startX, moveDistance, angle), 极坐标Y(startY, moveDistance, angle));
 
   const source = `十六夜咲夜-RA:${技能实例ID ?? jass.GetHandleId(caster)}`;
@@ -85,7 +90,8 @@ function 释放十六夜咲夜RA(this: void, _listener: RA监听上下文, caste
   for (let i = 0; i < knives.length; i++) {
     const knife = knives[i];
     knife.设置角度(两点角度(jass.GetUnitX(knife.单位), jass.GetUnitY(knife.单位), targetX, targetY));
-    knife.设置已飞行距离(Math.max(0, knife.取已飞行距离() - 配置.RA.返还飞行距离));
+    const 剩余距离 = knife.取已飞行距离() - 配置.RA.返还飞行距离;
+    knife.设置已飞行距离(剩余距离 > 0 ? 剩余距离 : 0);
   }
   RA强化令牌自增 += 1;
   RA强化令牌表[jass.GetHandleId(caster) as number] = RA强化令牌自增;

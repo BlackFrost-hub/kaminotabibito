@@ -9,6 +9,7 @@ import { 黑崎一护技能配置 } from "./00．配置";
 import { 黑崎一护是否卍解 } from "./01．状态表";
 import { 黑崎一护BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/09．黑崎一护";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 
 const jass = require("jass.common") as any;
 
@@ -171,7 +172,7 @@ function T进入主阶段(this: void, variable: any): void {
   SetUnitTimeScale(caster, 0); // 源：主阶段动作冻结
   ctx.Tick数 = 0;
   ctx.周期回调ID = addPeriodicCallback(
-    Math.round(配置.T.周期.间隔秒 * 1000),
+    秒转毫秒(配置.T.周期.间隔秒),
     推进T周期 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -190,7 +191,7 @@ function T完成准备(this: void, variable: any): void {
   ctx.减伤已加 = true;
   registerManualBuff(caster, 黑崎一护BuffID.地蹦裂击防御, 配置.T.周期.间隔秒 * 配置.T.周期.次数 + 0.75, 0);
   addDelayedCallback(
-    Math.round(配置.T.准备第二延迟秒 * 1000),
+    秒转毫秒(配置.T.准备第二延迟秒),
     T进入主阶段 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -219,7 +220,7 @@ function 释放地蹦裂击(this: void, context: T上下文, caster: any, 技能
   }
 
   addDelayedCallback(
-    Math.round(配置.T.准备第一延迟秒 * 1000),
+    秒转毫秒(配置.T.准备第一延迟秒),
     T完成准备 as unknown as (this: void, variable?: any) => void,
     context,
   );

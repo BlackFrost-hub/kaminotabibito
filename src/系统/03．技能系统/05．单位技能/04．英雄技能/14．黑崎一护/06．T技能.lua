@@ -9,6 +9,8 @@ local ____09_FF0E_9ED1_5D0E_4E00_62A4 = require("系统.05．Buff系统.03．Buf
 local _____9ED1_5D0E_4E00_62A4BuffID = ____09_FF0E_9ED1_5D0E_4E00_62A4["黑崎一护BuffID"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -185,7 +187,7 @@ local function ____T_8FDB_5165_4E3B_9636_6BB5(variable)
     SetUnitTimeScale(caster, 0)
     ctx["Tick数"] = 0
     ctx["周期回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.T["周期"]["间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.T["周期"]["间隔秒"]),
         _____63A8_8FDBT_5468_671F,
         ctx
     )
@@ -205,7 +207,7 @@ local function ____T_5B8C_6210_51C6_5907(variable)
     ctx["减伤已加"] = true
     registerManualBuff(caster, _____9ED1_5D0E_4E00_62A4BuffID["地蹦裂击防御"], _____914D_7F6E.T["周期"]["间隔秒"] * _____914D_7F6E.T["周期"]["次数"] + 0.75, 0)
     addDelayedCallback(
-        math.floor(_____914D_7F6E.T["准备第二延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.T["准备第二延迟秒"]),
         ____T_8FDB_5165_4E3B_9636_6BB5,
         ctx
     )
@@ -246,7 +248,7 @@ local function _____91CA_653E_5730_8E66_88C2_51FB(context, caster, _____6280_80F
         end
     end
     addDelayedCallback(
-        math.floor(_____914D_7F6E.T["准备第一延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.T["准备第一延迟秒"]),
         ____T_5B8C_6210_51C6_5907,
         context
     )

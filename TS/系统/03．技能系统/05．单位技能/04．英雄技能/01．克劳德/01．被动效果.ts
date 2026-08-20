@@ -2,7 +2,6 @@
 
 const {
   转四位ID,
-  单位拥有原生Buff,
   获取范围敌军,
   在坐标播放特效,
   取单位X,
@@ -10,7 +9,6 @@ const {
   注册指定单位暴击后监听,
 } = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具") as {
   转四位ID: (this: void, rawIdText: string) => number;
-  单位拥有原生Buff: (this: void, unit: any, buffId: number) => boolean;
   获取范围敌军: (this: void, source: any, x: number, y: number, radius: number) => any[];
   在坐标播放特效: (this: void, model: string, x: number, y: number, z: number, size: number, lifeSec: number) => void;
   取单位X: (this: void, unit: any) => number;
@@ -31,7 +29,6 @@ const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函
 const { 克劳德单位技能配置 } = require("系统.03．技能系统.05．单位技能.04．英雄技能.01．克劳德.00．配置") as {
   克劳德单位技能配置: {
     单位ID: string;
-    触发BuffID: string;
     溅射半径: number;
     特效路径: string;
     动作序号: number;
@@ -41,7 +38,6 @@ const { 克劳德单位技能配置 } = require("系统.03．技能系统.05．�
 };
 
 const 克劳德单位类型ID = 转四位ID(克劳德单位技能配置.单位ID);
-const 克劳德触发BuffID = 转四位ID(克劳德单位技能配置.触发BuffID);
 
 interface 克劳德溅射伤害变量 {
   主目标: any;
@@ -54,7 +50,7 @@ function 准备克劳德溅射伤害目标(this: void, target: any, _index: numb
 }
 
 function 克劳德暴击后处理(this: void, record: any, applied: number, _snapshot: any): void {
-  if (!单位拥有原生Buff(record.attacker, 克劳德触发BuffID)) return;
+  if (record?.isNormalAttack !== true || !(applied > 0)) return;
   开始硬直(record.attacker, 克劳德单位技能配置.硬直毫秒 * 0.001);
   播放限时单位动画({
     单位: record.attacker,

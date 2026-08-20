@@ -10,6 +10,8 @@ local _____5173_95ED_77AC_6B65_8FDE_643A = ____01_FF0E_72B6_6001_8868["关闭瞬
 local _____6708_7259_662F_5426_98DE_884C_4E2D = ____01_FF0E_72B6_6001_8868["月牙是否飞行中"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
 function MathCos(_____89D2_5EA6)
     return Cos(_____89D2_5EA6 * bj_DEGTORAD)
 end
@@ -103,7 +105,7 @@ local function _____91CA_653E_77AC_6B65(context, caster, ______6280_80FD_5B9E_4F
         removeDelayedCallback(context["连携窗口回调ID"])
     end
     context["连携窗口回调ID"] = addDelayedCallback(
-        math.floor(_____914D_7F6E.D["连携窗口秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.D["连携窗口秒"]),
         _____5173_95ED_77AC_6B65_8FDE_643A_7A97_53E3,
         caster
     )

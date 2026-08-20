@@ -1,13 +1,13 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____79FB_9664_4E34_65F6_88C2_9699, jass
+local _____79FB_9664_4E34_65F6_88C2_9699, jass, _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00．配置")
 local _____516B_4E91_7D2B_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["八云紫单位技能配置"]
 function _____79FB_9664_4E34_65F6_88C2_9699(variable)
     local unit = variable
     if unit ~= nil and unit ~= 0 and jass.GetUnitTypeId(unit) ~= 0 then
-        jass.RemoveUnit(unit)
+        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
     end
 end
 jass = require("jass.common")
@@ -19,16 +19,20 @@ local ____require_result_1 = require("系统.00．核心系统.01．事件中心
 local registerSpellEffectListener = ____require_result_1.registerSpellEffectListener
 local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
 local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_2["创建单位并登记排泄安全"]
-local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getEnemyUnitsInRange = ____require_result_3.getEnemyUnitsInRange
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断")
-local _____662F_5426_7CBE_82F1_5355_4F4D = ____require_result_4["是否精英单位"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
-local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_6["造成单体技能伤害"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
-local _____65BD_52A0_7729_6655 = ____require_result_7["施加眩晕"]
+local ____require_result_3 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+_____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_3["立即移除单位并取消排泄登记"]
+local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getEnemyUnitsInRange = ____require_result_4.getEnemyUnitsInRange
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断")
+local _____662F_5426_7CBE_82F1_5355_4F4D = ____require_result_6["是否精英单位"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
+local ____require_result_8 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_8["造成单体技能伤害"]
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
+local _____65BD_52A0_7729_6655 = ____require_result_9["施加眩晕"]
 local _____914D_7F6E = _____516B_4E91_7D2B_5355_4F4D_6280_80FD_914D_7F6E
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MIND = jass.DAMAGE_TYPE_MIND
@@ -106,12 +110,6 @@ ____exports["是八云紫合法敌人"] = function(hero, target)
         jass.GetOwningPlayer(hero)
     ) == true and jass.IsUnitType(target, UNIT_TYPE_STRUCTURE) ~= true and jass.IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and jass.IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true
 end
-local function _____9500_6BC1_70B9_7279_6548(variable)
-    local effect = variable
-    if effect ~= nil and effect ~= 0 then
-        jass.DestroyEffect(effect)
-    end
-end
 ____exports["创建八云紫点特效"] = function(model, x, y, durationSec, scale, height)
     if scale == nil then
         scale = 1
@@ -119,18 +117,14 @@ ____exports["创建八云紫点特效"] = function(model, x, y, durationSec, sca
     if height == nil then
         height = 0
     end
-    local effect = jass.AddSpecialEffect(model, x, y)
-    if effect == nil or effect == 0 then
-        return effect
-    end
-    if scale ~= 1 and japi.EXSetEffectSize ~= nil then
-        japi.EXSetEffectSize(effect, scale)
-    end
-    if height ~= 0 and japi.EXSetEffectZ ~= nil then
-        japi.EXSetEffectZ(effect, height)
-    end
-    addDelayedCallback(durationSec * 1000, _____9500_6BC1_70B9_7279_6548, effect)
-    return effect
+    return _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = model,
+        X = x,
+        Y = y,
+        Z = height,
+        ["缩放"] = scale,
+        ["持续秒"] = durationSec
+    })
 end
 local function _____6E05_7406_95F4_9699_547D_4E2D_5C42(variable)
     local targetId = variable
@@ -240,7 +234,7 @@ local function _____6E05_7406_88C2_9699_8BB0_5F55(record)
         end
     end
     if record["单位"] ~= nil and record["单位"] ~= 0 and jass.GetUnitTypeId(record["单位"]) ~= 0 then
-        jass.RemoveUnit(record["单位"])
+        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(record["单位"])
     end
 end
 local function _____88C2_9699_5230_671F(variable)
@@ -308,18 +302,25 @@ end
 ____exports["计算裂隙可达终点"] = function(startX, startY, targetX, targetY)
     local dx = targetX - startX
     local dy = targetY - startY
-    local distance = math.sqrt(dx * dx + dy * dy)
+    local distance = jass.SquareRoot(dx * dx + dy * dy)
     if distance <= 0.01 then
         return {x = startX, y = startY}
     end
-    local maxDistance = math.min(distance, _____914D_7F6E["裂隙"]["放置距离"])
+    local ____temp_10
+    if distance < _____914D_7F6E["裂隙"]["放置距离"] then
+        ____temp_10 = distance
+    else
+        ____temp_10 = _____914D_7F6E["裂隙"]["放置距离"]
+    end
+    local maxDistance = ____temp_10
     local ux = dx / distance
     local uy = dy / distance
     local x = startX
     local y = startY
     local travelled = 0
     while travelled < maxDistance do
-        local step = math.min(_____914D_7F6E["裂隙"]["移动步长"], maxDistance - travelled)
+        local _____5269_4F59 = maxDistance - travelled
+        local step = _____914D_7F6E["裂隙"]["移动步长"] < _____5269_4F59 and _____914D_7F6E["裂隙"]["移动步长"] or _____5269_4F59
         local nextX = x + ux * step
         local nextY = y + uy * step
         if jass.IsTerrainPathable(nextX, nextY, PATHING_TYPE_WALKABILITY) == true then
@@ -415,13 +416,13 @@ ____exports["查找八云紫裂隙"] = function(x, y, radius, owner)
             do
                 local record = ____exports["获取八云紫裂隙记录"](units[i + 1])
                 if record == nil then
-                    goto __continue80
+                    goto __continue75
                 end
                 if owner == nil or owner == 0 or jass.GetOwningPlayer(record["主人"]) == jass.GetOwningPlayer(owner) then
                     return record
                 end
             end
-            ::__continue80::
+            ::__continue75::
             i = i + 1
         end
     end
@@ -436,14 +437,14 @@ ____exports["获取范围内八云紫裂隙"] = function(x, y, radius, owner)
             do
                 local record = ____exports["获取八云紫裂隙记录"](units[i + 1])
                 if record == nil then
-                    goto __continue85
+                    goto __continue80
                 end
                 if owner ~= nil and owner ~= 0 and jass.GetOwningPlayer(record["主人"]) ~= jass.GetOwningPlayer(owner) then
-                    goto __continue85
+                    goto __continue80
                 end
                 result[#result + 1] = record
             end
-            ::__continue85::
+            ::__continue80::
             i = i + 1
         end
     end
@@ -485,21 +486,21 @@ ____exports["触发八云紫裂隙扩散"] = function(hero, centerGap)
             do
                 local gap = gaps[i + 1]
                 if gap["扩散冷却到"] > now then
-                    goto __continue97
+                    goto __continue92
                 end
                 local life = jass.GetUnitState(gap["单位"], UNIT_STATE_LIFE)
                 local maxLife = jass.GetUnitState(gap["单位"], UNIT_STATE_MAX_LIFE)
                 local cost = maxLife * _____914D_7F6E["裂隙"]["扩散生命消耗比例"]
                 if life <= cost + 0.405 then
                     _____6E05_7406_88C2_9699_8BB0_5F55(gap)
-                    goto __continue97
+                    goto __continue92
                 end
                 jass.SetUnitState(gap["单位"], UNIT_STATE_LIFE, life - cost)
                 gap["扩散冷却到"] = now + _____914D_7F6E["裂隙"]["扩散冷却秒"] * 1000
                 _____5DF2_6CE8_518C_88C2_9699_6269_6563_53D1_5C04_5668(hero, gap)
                 count = count + 1
             end
-            ::__continue97::
+            ::__continue92::
             i = i + 1
         end
     end
@@ -518,7 +519,7 @@ local function _____76D1_542C_516B_4E91_7D2B_88C2_9699_81EA_6BC1(castingUnit, sp
         return
     end
     if unitTypeId == _____914D_7F6E["单位"]["临时裂隙类型ID"] and unitTypeId ~= 0 then
-        jass.RemoveUnit(castingUnit)
+        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(castingUnit)
     end
 end
 registerSpellEffectListener(_____76D1_542C_516B_4E91_7D2B_88C2_9699_81EA_6BC1)

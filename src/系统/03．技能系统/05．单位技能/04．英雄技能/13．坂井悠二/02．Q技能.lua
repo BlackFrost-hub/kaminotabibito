@@ -11,6 +11,9 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local _____6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
+local _____6781_5750_6807Y = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标Y"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.15．表现控制与环境")
 local _____65BD_52A0_7729_6655 = ____require_result_0["施加眩晕"]
@@ -55,21 +58,15 @@ local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____5742_4E95_60A0_4E8C_6280_80FD_
 local ____Q_6280_80FDID_5B57_7B26_4E32 = _____914D_7F6E["技能ID"]
 local _____4E0A_4E0B_6587_8868 = {}
 local _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
-local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 local function _____83B7_53D6Q_4E0A_4E0B_6587(unit)
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local id = _____53D6_5355_4F4DID(unit)
     if id == 0 then
         return nil
     end
     return _____4E0A_4E0B_6587_8868[id]
 end
 local function _____83B7_53D6_6216_521B_5EFAQ_4E0A_4E0B_6587(unit)
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local id = _____53D6_5355_4F4DID(unit)
     if id == 0 then
         return nil
     end
@@ -96,7 +93,7 @@ local function _____6E05_7406Q_4E0A_4E0B_6587(context)
         context["周期回调ID"] = 0
     end
     context["已启动"] = false
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
+    local id = _____53D6_5355_4F4DID(context["施法者"])
     if id ~= 0 and _____4E0A_4E0B_6587_8868[id] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, id)
     end
@@ -109,14 +106,14 @@ local function _____8FC7_6EE4Q_547D_4E2D_6807_7684(_____654C_519B_5217_8868)
             do
                 local u = _____654C_519B_5217_8868[i + 1]
                 if u == nil or u == 0 then
-                    goto __continue14
+                    goto __continue12
                 end
                 if IsUnitType(u, UNIT_TYPE_ANCIENT) or IsUnitType(u, UNIT_TYPE_MECHANICAL) or IsUnitType(u, UNIT_TYPE_STRUCTURE) then
-                    goto __continue14
+                    goto __continue12
                 end
                 result[#result + 1] = u
             end
-            ::__continue14::
+            ::__continue12::
             i = i + 1
         end
     end
@@ -157,10 +154,9 @@ local function ____Q_6BB5_5185_626B_63CF(variable)
         scan["已命中句柄表"] = {}
         return
     end
-    local _____5F27_5EA6 = scan["方向角度"] * (3.14159265358979 / 180)
     local _____8DDD_79BB = _____914D_7F6E["主动"]["每次扫描推进距离"] * scan["扫描次数"]
-    local _____5224_5B9AX = scan["起点X"] + _____8DDD_79BB * math.cos(_____5F27_5EA6)
-    local _____5224_5B9AY = scan["起点Y"] + _____8DDD_79BB * math.sin(_____5F27_5EA6)
+    local _____5224_5B9AX = _____6781_5750_6807X(scan["起点X"], scan["方向角度"], _____8DDD_79BB)
+    local _____5224_5B9AY = _____6781_5750_6807Y(scan["起点Y"], scan["方向角度"], _____8DDD_79BB)
     local _____5355_6B21_4F24_5BB3 = scan["伤害攻击力快照"] * _____914D_7F6E["主动"]["总伤害攻击力倍率"] * _____914D_7F6E["主动"]["单段伤害比例"]
     if _____5355_6B21_4F24_5BB3 <= 0 then
         return
@@ -173,18 +169,18 @@ local function ____Q_6BB5_5185_626B_63CF(variable)
             do
                 local u = _____654C_519B_5217_8868[i + 1]
                 if u == nil or u == 0 then
-                    goto __continue26
+                    goto __continue24
                 end
                 local hid = GetHandleId(u) or 0
                 if hid ~= 0 and scan["已命中句柄表"][hid] == true then
-                    goto __continue26
+                    goto __continue24
                 end
                 if hid ~= 0 then
                     scan["已命中句柄表"][hid] = true
                 end
                 _____672C_6B21_76EE_6807[#_____672C_6B21_76EE_6807 + 1] = u
             end
-            ::__continue26::
+            ::__continue24::
             i = i + 1
         end
     end

@@ -18,6 +18,8 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local _____7B26_5361_516C_5171 = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.符卡公共")
 local _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374 = _____7B26_5361_516C_5171["设置十六夜咲夜符卡书冷却"]
+local ____02_FF0E_5355_4F4D_4E0E_8303_56F4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009 = ____02_FF0E_5355_4F4D_4E0E_8303_56F4["获取坐标范围单位按筛选"]
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单体技能伤害"]
@@ -37,40 +39,36 @@ local function _____7ED3_675FRC(state)
     end
     _____6CE8_9500_54B2_591C_98DE_5200(state["飞刀"])
     _____5B89_5168_79FB_9664_5355_4F4D_58F3(state["飞刀"])
-    if state["枚举组"] ~= nil and state["枚举组"] ~= 0 then
-        jass.DestroyGroup(state["枚举组"])
-    end
     _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(state["技能实例ID"])
 end
+--- 命中目标选取。源规则：排除上次命中 + 存活 + 敌对 + 排除 Ancient（放行建筑/机械/古树），
+-- 返回第一个合法目标。配置型筛选逐项等价：要求有效单位=false 跳过四重过滤、
+-- 允许死亡=false 排除死亡、允许无敌=true 保持源语义、仅敌人 排除非敌对（含施法者自身）、
+-- 自定义条件 排除上次命中与 Ancient。
 local function ____RC_53D6_547D_4E2D_76EE_6807(state, x, y)
-    jass.GroupClear(state["枚举组"])
-    jass.GroupEnumUnitsInRange(
-        state["枚举组"],
+    local _____5019_9009 = _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009(
         x,
         y,
         _____914D_7F6E.RC["命中半径"],
-        nil
+        state["施法者"],
+        {
+            ["要求有效单位"] = false,
+            ["允许死亡"] = false,
+            ["允许建筑"] = true,
+            ["允许机械"] = true,
+            ["允许古树"] = true,
+            ["允许无敌"] = true,
+            ["仅敌人"] = true,
+            ["自定义条件"] = function(____, u) return u ~= state["上次命中单位"] and not jass.IsUnitType(u, jass.UNIT_TYPE_ANCIENT) end
+        }
     )
-    while true do
-        do
-            local unit = jass.FirstOfGroup(state["枚举组"])
-            if unit == nil or unit == 0 then
-                return nil
-            end
-            jass.GroupRemoveUnit(state["枚举组"], unit)
-            if unit == state["上次命中单位"] or not _____5355_4F4D_5B58_6D3B(unit) then
-                goto __continue8
-            end
-            if not jass.IsUnitEnemy(
-                unit,
-                jass.GetOwningPlayer(state["施法者"])
-            ) or jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) then
-                goto __continue8
-            end
-            return unit
-        end
-        ::__continue8::
+    local ____temp_2
+    if #_____5019_9009 > 0 then
+        ____temp_2 = _____5019_9009[1]
+    else
+        ____temp_2 = nil
     end
+    return ____temp_2
 end
 local function ____RC_6267_884C_53CD_5F39(state, nextAngle)
     state["反弹次数"] = state["反弹次数"] + 1
@@ -156,7 +154,6 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRC(_listener, caster, ____
         ["反弹次数"] = 0,
         ["上次命中单位"] = nil,
         ["周期ID"] = 0,
-        ["枚举组"] = jass.CreateGroup(),
         ["已结束"] = false
     }
     _____767B_8BB0_54B2_591C_98DE_5200({

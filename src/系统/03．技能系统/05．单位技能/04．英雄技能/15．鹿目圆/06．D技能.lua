@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____9500_6BC1D_8868_73B0, _____6E05_7406D_8868_73B0, _____53D6_5355_4F4DID, _____5355_4F4D_5B58_6D3B, removePeriodicCallback, _____9500_6BC1_70B9_7279_6548, GetHandleId, GetUnitTypeId, GetUnitState, UNIT_STATE_LIFE, ____D_8868_73B0_8868, ____D_7279_6548_7248_672C_8868
+local _____9500_6BC1D_8868_73B0, _____6E05_7406D_8868_73B0, removePeriodicCallback, _____53D6_5355_4F4DID, _____9500_6BC1_70B9_7279_6548, ____D_8868_73B0_8868, ____D_7279_6548_7248_672C_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.15．鹿目圆.00．配置")
 local _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["鹿目圆单位技能配置"]
 local ____01_FF0E_72B6_6001_4E0E_88AB_52A8 = require("系统.03．技能系统.05．单位技能.04．英雄技能.15．鹿目圆.01．状态与被动")
@@ -42,12 +42,6 @@ function _____6E05_7406D_8868_73B0(variable)
     end
     _____9500_6BC1D_8868_73B0(data.hero)
 end
-function _____53D6_5355_4F4DID(unit)
-    return (unit == nil or unit == 0) and 0 or GetHandleId(unit)
-end
-function _____5355_4F4D_5B58_6D3B(unit)
-    return unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
-end
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local jglobals = require("jass.globals")
@@ -73,21 +67,23 @@ local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.01�
 local getEnemyUnitsInRange = ____require_result_8.getEnemyUnitsInRange
 local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_9["读取单位攻击力"]
+_____53D6_5355_4F4DID = ____require_result_9["取单位ID"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_9["单位存活"]
+local _____6781_5750_6807X = ____require_result_9["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_9["极坐标Y"]
 local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
 _____9500_6BC1_70B9_7279_6548 = ____require_result_10["销毁点特效"]
 local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local createTimedEffect = ____require_result_11.createTimedEffect
-GetHandleId = jass.GetHandleId
-GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-GetUnitState = jass.GetUnitState
+local GetUnitState = jass.GetUnitState
 local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitEnemy = jass.IsUnitEnemy
 local IsUnitAlly = jass.IsUnitAlly
 local IsUnitType = jass.IsUnitType
-UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
@@ -124,9 +120,17 @@ local function ____D_73AF_7ED5Tick(variable)
     if state["特效"] == nil or state["特效"] == 0 then
         return
     end
-    local _____5F27_5EA6 = (jass.GetUnitFacing(hero) + 90) * math.pi / 180
-    local x = GetUnitX(hero) + math.cos(_____5F27_5EA6) * _____914D_7F6E.D["环绕距离"]
-    local y = GetUnitY(hero) + math.sin(_____5F27_5EA6) * _____914D_7F6E.D["环绕距离"]
+    local _____73AF_7ED5_89D2_5EA6 = jass.GetUnitFacing(hero) + 90
+    local x = _____6781_5750_6807X(
+        GetUnitX(hero),
+        _____73AF_7ED5_89D2_5EA6,
+        _____914D_7F6E.D["环绕距离"]
+    )
+    local y = _____6781_5750_6807Y(
+        GetUnitY(hero),
+        _____73AF_7ED5_89D2_5EA6,
+        _____914D_7F6E.D["环绕距离"]
+    )
     japi.DzSetEffectPos(state["特效"], x, y, _____914D_7F6E.D["环绕高度"])
 end
 local function _____64AD_653ED_8868_73B0(hero)
@@ -258,7 +262,7 @@ local function ____D_53CB_65B9_4F4E_751F_547D_51FB_9000(source, ally)
             do
                 local enemy = enemies[i + 1]
                 if not _____662FD_5408_6CD5_76EE_6807(enemy) then
-                    goto __continue34
+                    goto __continue32
                 end
                 _____5F00_59CB_51FB_9000(enemy, {
                     ["来源单位"] = ally,
@@ -270,7 +274,7 @@ local function ____D_53CB_65B9_4F4E_751F_547D_51FB_9000(source, ally)
                     ["位移特效"] = ""
                 })
             end
-            ::__continue34::
+            ::__continue32::
             i = i + 1
         end
     end

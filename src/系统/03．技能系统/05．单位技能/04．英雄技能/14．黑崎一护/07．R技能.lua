@@ -14,6 +14,9 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____08_FF0E_9ED1_6D41_7259_7A81 = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．黑崎一护.08．黑流牙突")
 local _____6CE8_518C_73A9_5BB6_9ED1_6D41_7259_7A81A_952E = ____08_FF0E_9ED1_6D41_7259_7A81["注册玩家黑流牙突A键"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
+local _____79D2_8F6CTick_6570 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转Tick数"]
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
@@ -83,7 +86,7 @@ local function _____63A8_8FDB_534D_89E3_5012_8BA1_65F6(variable)
     end
     local caster = ctx["施法者"]
     ctx["Tick数"] = ctx["Tick数"] + 1
-    if caster == nil or caster == 0 or not IsUnitAliveBJ(caster) or ctx["Tick数"] >= math.floor(_____914D_7F6E.R["持续秒"] * 10 + 0.5) then
+    if caster == nil or caster == 0 or not IsUnitAliveBJ(caster) or ctx["Tick数"] >= _____79D2_8F6CTick_6570(_____914D_7F6E.R["持续秒"], 100) then
         if caster ~= nil and caster ~= 0 then
             ____exports["结束卍解"](caster)
         elseif ctx["倒计时回调ID"] ~= 0 then
@@ -148,7 +151,7 @@ local function _____91CA_653E_89E3_653E(context, caster, ______6280_80FD_5B9E_4F
     SOS_SetUnitSpeed(caster, _____914D_7F6E.R["移速"])
     _____83B7_53D6_6216_521B_5EFA_9ED1_5D0E_4E00_62A4_72B6_6001(caster)["移速已突破"] = true
     addDelayedCallback(
-        math.floor(_____914D_7F6E.R["卍解延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.R["卍解延迟秒"]),
         _____542F_52A8_534D_89E3,
         context
     )

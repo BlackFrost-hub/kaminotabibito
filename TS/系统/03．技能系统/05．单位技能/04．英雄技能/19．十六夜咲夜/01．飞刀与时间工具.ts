@@ -8,8 +8,15 @@ const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = requ
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removePeriodicCallback: (this: void, id: number) => void;
 };
+const { 四舍五入整数, 秒转正毫秒 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  四舍五入整数: (this: void, value: number) => number;
+  秒转正毫秒: (this: void, seconds: number, 最小值?: number) => number;
+};
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
+};
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
 };
 const { 单位是否暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   单位是否暂停: (this: void, unit: any) => boolean;
@@ -34,7 +41,6 @@ const SetUnitY = jass.SetUnitY as (this: void, unit: any, y: number) => void;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, facing: number) => void;
 const SetUnitFlyHeight = jass.SetUnitFlyHeight as (this: void, unit: any, height: number, rate: number) => void;
 const SetUnitPathing = jass.SetUnitPathing as (this: void, unit: any, enabled: boolean) => void;
-const RemoveUnit = jass.RemoveUnit as (this: void, unit: any) => void;
 const UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE as any;
 const UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE as any;
 const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
@@ -98,9 +104,10 @@ export function 注册咲夜周期任务(
 ): number {
   咲夜周期任务自增ID += 1;
   const id = 咲夜周期任务自增ID;
+  const 取整间隔毫秒 = 四舍五入整数(intervalMs);
   咲夜周期任务表[id] = {
     ID: id,
-    间隔毫秒: Math.max(咲夜周期驱动间隔毫秒, Math.round(intervalMs)),
+    间隔毫秒: 取整间隔毫秒 < 咲夜周期驱动间隔毫秒 ? 咲夜周期驱动间隔毫秒 : 取整间隔毫秒,
     已累计毫秒: 0,
     回调: callback,
     变量: variable,
@@ -148,7 +155,7 @@ export function 创建咲夜单位壳(this: void, caster: any, unitTypeId: numbe
 }
 
 export function 安全移除单位壳(this: void, unit: any): void {
-  if (unit != null && unit !== 0) RemoveUnit(unit);
+  if (unit != null && unit !== 0) 立即移除单位并取消排泄登记(unit);
 }
 
 export function 播放咲夜单位音效(this: void, globalName: string, unit: any): void {
@@ -182,7 +189,7 @@ function 恢复短硬直(this: void, variable?: any): void {
 export function 施加短硬直并播放动作(this: void, unit: any, source: string, seconds: number, animation?: string): void {
   添加单位暂停(unit, source);
   if (animation != null && animation !== "") jass.SetUnitAnimation(unit, animation);
-  addDelayedCallback(Math.max(1, Math.round(seconds * 1000)), 恢复短硬直, { 单位: unit, 来源: source } as 硬直恢复参数);
+  addDelayedCallback(秒转正毫秒(seconds, 1), 恢复短硬直, { 单位: unit, 来源: source } as 硬直恢复参数);
 }
 
 export type 直线飞刀命中结果 = "结束" | "反弹" | "继续";

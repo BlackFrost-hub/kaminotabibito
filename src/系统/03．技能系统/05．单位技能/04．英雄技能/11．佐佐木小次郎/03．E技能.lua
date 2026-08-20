@@ -22,23 +22,25 @@ local ____require_result_4 = require("系统.03．技能系统.00．技能模板
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
 local _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D = ____require_result_4["读取单位最大生命"]
 local _____5355_4F4D_5B58_6D3B = ____require_result_4["单位存活"]
-local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getUnitsInRange = ____require_result_5.getUnitsInRange
-local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-local isUnitEnemy = ____require_result_6.isUnitEnemy
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
-local _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_7["单位是否正在原生施法"]
-local ____require_result_8 = require("系统.01．单位系统.06．仇恨系统.06．对外接口")
-local _____589E_52A0_5355_4F4D_4EC7_6068 = ____require_result_8["增加单位仇恨"]
-local ____require_result_9 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
-local getThreat = ____require_result_9.getThreat
-local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.index")
-local _____65BD_52A0_5632_8BBD = ____require_result_10["施加嘲讽"]
-local ____require_result_11 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWESetUnitAbilityStateSafe = ____require_result_11.YDWESetUnitAbilityStateSafe
-local ____require_result_12 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_12.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_12["移除单位指定Buff"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____5411_4E0B_53D6_6574_6574_6570 = ____require_result_5["向下取整整数"]
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_6.getUnitsInRange
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+local isUnitEnemy = ____require_result_7.isUnitEnemy
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
+local _____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_8["单位是否正在原生施法"]
+local ____require_result_9 = require("系统.01．单位系统.06．仇恨系统.06．对外接口")
+local _____589E_52A0_5355_4F4D_4EC7_6068 = ____require_result_9["增加单位仇恨"]
+local ____require_result_10 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
+local getThreat = ____require_result_10.getThreat
+local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.index")
+local _____65BD_52A0_5632_8BBD = ____require_result_11["施加嘲讽"]
+local ____require_result_12 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDWESetUnitAbilityStateSafe = ____require_result_12.YDWESetUnitAbilityStateSafe
+local ____require_result_13 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_13.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_13["移除单位指定Buff"]
 local ____E_6280_80FDID_6570_503C = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E["E技能ID"])
 local _____65BD_6CD5_8FDB_5EA6_6761ID = stringToFourCCSafe(_____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.E["施法进度条ID"])
 local GetUnitX = jass.GetUnitX
@@ -82,9 +84,10 @@ local function _____7ED3_675F_6B62_6C34(_____82F1_96C4, _____65BD_6CD5_8FDB_5EA6
     end
     local _____5F53_524D_751F_547D = GetUnitState(_____82F1_96C4, UNIT_STATE_LIFE)
     local _____6700_5927_751F_547D = _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D(_____82F1_96C4)
-    local _____65B0_751F_547D = math.min(_____6700_5927_751F_547D, _____5F53_524D_751F_547D + _____6700_5927_751F_547D * cfg["恢复生命比例"])
+    local _____6062_590D_540E_751F_547D = _____5F53_524D_751F_547D + _____6700_5927_751F_547D * cfg["恢复生命比例"]
+    local _____65B0_751F_547D = _____6062_590D_540E_751F_547D > _____6700_5927_751F_547D and _____6700_5927_751F_547D or _____6062_590D_540E_751F_547D
     SetUnitState(_____82F1_96C4, UNIT_STATE_LIFE, _____65B0_751F_547D)
-    local _____653B_51FB_52A0_6210 = math.floor(_____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____82F1_96C4) * cfg["增攻比例"])
+    local _____653B_51FB_52A0_6210 = _____5411_4E0B_53D6_6574_6574_6570(_____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____82F1_96C4) * cfg["增攻比例"])
     if _____653B_51FB_52A0_6210 > 0 then
         _____4E34_65F6_8C03_6574_653B_51FB(_____82F1_96C4, _____653B_51FB_52A0_6210)
         registerManualBuff(

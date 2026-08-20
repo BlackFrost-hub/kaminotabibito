@@ -25,13 +25,10 @@ const { spellHeal } = require("系统.04．伤害系统.02．治疗系统.01．�
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
-const { YDWETimerDestroyEffectSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
-  YDWETimerDestroyEffectSafe: (this: void, duration: number, effect: any) => void;
-};
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
-const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+const { 创建点特效, createTimedUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: {
     模型路径: string;
     X: number;
@@ -40,6 +37,7 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
     缩放?: number;
     持续秒?: number;
   }) => any;
+  createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
 };
 
 const Q技能ID = stringToFourCCSafe(提米诺斯单位技能配置.Q技能ID);
@@ -100,10 +98,7 @@ function on提米诺斯Q(this: void, caster: any, abilityId: number): void {
     spellHeal(caster, target, cost * cfg.实际魔耗治疗倍率, false);
     for (let j = 0; j < cfg.特效.length; j++) {
       const effectCfg = cfg.特效[j];
-      const effect = jass.AddSpecialEffectTarget(effectCfg.模型, target, effectCfg.挂点);
-      if (effect != null) {
-        YDWETimerDestroyEffectSafe(cfg.特效持续秒, effect);
-      }
+      createTimedUnitEffect(target, effectCfg.挂点, effectCfg.模型, cfg.特效持续秒);
     }
   }
 }

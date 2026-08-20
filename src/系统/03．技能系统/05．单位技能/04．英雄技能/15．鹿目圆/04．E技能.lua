@@ -33,19 +33,21 @@ local _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3 = ____require_result_5["�
 local _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_5["结束独立技能伤害实例"]
 local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
 local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_6["创建单位并登记排泄安全"]
-local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getUnitsInRange = ____require_result_7.getUnitsInRange
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____4E24_70B9_89D2_5EA6 = ____require_result_9["两点角度"]
-local ____require_result_10 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetRandomDirectionDeg = ____require_result_10.GetRandomDirectionDeg
-local GetHandleId = jass.GetHandleId
+local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_7["立即移除单位并取消排泄登记"]
+local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_8.getUnitsInRange
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____4E24_70B9_89D2_5EA6 = ____require_result_10["两点角度"]
+local _____53D6_5355_4F4DID = ____require_result_10["取单位ID"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_10["单位存活"]
+local ____require_result_11 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetRandomDirectionDeg = ____require_result_11.GetRandomDirectionDeg
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitState = jass.GetUnitState
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -56,19 +58,17 @@ local SetUnitAnimation = jass.SetUnitAnimation
 local SetUnitFlyHeight = jass.SetUnitFlyHeight
 local SetUnitScale = jass.SetUnitScale
 local GetUnitFlyHeight = jass.GetUnitFlyHeight
-local RemoveUnit = jass.RemoveUnit
 local IsUnitType = jass.IsUnitType
 local IsUnitEnemy = jass.IsUnitEnemy
 local IsUnitAlly = jass.IsUnitAlly
 local SquareRoot = jass.SquareRoot
 local Cos = jass.Cos
 local Sin = jass.Sin
-local ____jass_bj_DEGTORAD_11 = jass.bj_DEGTORAD
-if ____jass_bj_DEGTORAD_11 == nil then
-    ____jass_bj_DEGTORAD_11 = 0.017453292519943295
+local ____jass_bj_DEGTORAD_12 = jass.bj_DEGTORAD
+if ____jass_bj_DEGTORAD_12 == nil then
+    ____jass_bj_DEGTORAD_12 = 0.017453292519943295
 end
-local bj_DEGTORAD = ____jass_bj_DEGTORAD_11
-local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
+local bj_DEGTORAD = ____jass_bj_DEGTORAD_12
 local UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 local UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
@@ -92,16 +92,10 @@ end
 local function _____5B9A_65F6_79FB_9664_5355_4F4D(variable)
     local unit = variable
     if unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 then
-        RemoveUnit(unit)
+        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
     end
 end
 local ____E_4E0A_4E0B_6587_8868 = {}
-local function _____53D6_5355_4F4DID(unit)
-    return (unit == nil or unit == 0) and 0 or GetHandleId(unit)
-end
-local function _____5355_4F4D_5B58_6D3B(unit)
-    return unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 and GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
-end
 local function _____662FE_5408_6CD5_5355_4F4D(unit)
     return _____5355_4F4D_5B58_6D3B(unit) and IsUnitType(unit, UNIT_TYPE_MECHANICAL) ~= true and IsUnitType(unit, UNIT_TYPE_ANCIENT) ~= true
 end
@@ -111,7 +105,7 @@ local function _____6E05_7406E_96E8_5355_4F4D(context)
         while i < #context["雨单位"] do
             local unit = context["雨单位"][i + 1]
             if unit ~= nil and unit ~= 0 then
-                RemoveUnit(unit)
+                _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
             end
             i = i + 1
         end
@@ -154,8 +148,8 @@ local function _____521B_5EFAE_96E8_58F3(context)
     end
     SetUnitFlyHeight(rain, _____914D_7F6E.E["雨单位高度"], 0)
     SetUnitScale(rain, _____914D_7F6E.E["雨单位缩放"], _____914D_7F6E.E["雨单位缩放"], _____914D_7F6E.E["雨单位缩放"])
-    local ____context__96E8_5355_4F4D_12 = context["雨单位"]
-    ____context__96E8_5355_4F4D_12[#____context__96E8_5355_4F4D_12 + 1] = rain
+    local ____context__96E8_5355_4F4D_13 = context["雨单位"]
+    ____context__96E8_5355_4F4D_13[#____context__96E8_5355_4F4D_13 + 1] = rain
 end
 local function _____63A8_8FDBE_96E8_58F3(context)
     local kept = {}
@@ -165,17 +159,17 @@ local function _____63A8_8FDBE_96E8_58F3(context)
             do
                 local unit = context["雨单位"][i + 1]
                 if not _____5355_4F4D_5B58_6D3B(unit) then
-                    goto __continue22
+                    goto __continue20
                 end
                 local nextHeight = GetUnitFlyHeight(unit) - _____914D_7F6E.E["雨单位下降步长"]
                 if nextHeight <= _____914D_7F6E.E["雨单位清理高度"] then
-                    RemoveUnit(unit)
-                    goto __continue22
+                    _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
+                    goto __continue20
                 end
                 SetUnitFlyHeight(unit, nextHeight, 0)
                 kept[#kept + 1] = unit
             end
-            ::__continue22::
+            ::__continue20::
             i = i + 1
         end
     end
@@ -199,7 +193,7 @@ local function ____E_533A_57DF_8109_51B2(context)
             do
                 local unit = units[i + 1]
                 if not _____662FE_5408_6CD5_5355_4F4D(unit) then
-                    goto __continue27
+                    goto __continue25
                 end
                 if IsUnitEnemy(unit, owner) == true then
                     enemies[#enemies + 1] = unit
@@ -207,7 +201,7 @@ local function ____E_533A_57DF_8109_51B2(context)
                     _____9E7F_76EE_5706_6CBB_7597_53CB_519B(context["施法者"], unit, context["每次结算值"], 0)
                 end
             end
-            ::__continue27::
+            ::__continue25::
             i = i + 1
         end
     end

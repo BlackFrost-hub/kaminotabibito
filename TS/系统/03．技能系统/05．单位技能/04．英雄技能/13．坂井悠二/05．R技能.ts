@@ -3,7 +3,7 @@
 import { 坂井悠二技能配置 } from "./00．配置";
 import { 坂井悠二BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/05．坂井悠二";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 单位存活, 读取单位攻击力, 两点角度 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 单位存活, 读取单位攻击力, 两点角度, 取单位ID, 极坐标X, 极坐标Y } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 技能强制调试输出 } from "../../../00．技能模板+函数/02．通用函数/04．调试输出";
 
 const jass = require("jass.common") as any;
@@ -45,7 +45,6 @@ const { registerDeathListener } = require("系统.00．核心系统.01．事件�
 
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
@@ -103,19 +102,14 @@ interface R上下文 {
 const 上下文表: Record<number, R上下文 | undefined> = {};
 let 死亡监听已注册 = false;
 
-function 取单位句柄ID(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 0;
-  return GetHandleId(unit) || 0;
-}
-
 function 获取R上下文(this: void, unit: any): R上下文 | undefined {
-  const id = 取单位句柄ID(unit);
+  const id = 取单位ID(unit);
   if (id === 0) return undefined;
   return 上下文表[id];
 }
 
 function 获取或创建R上下文(this: void, unit: any): R上下文 | undefined {
-  const id = 取单位句柄ID(unit);
+  const id = 取单位ID(unit);
   if (id === 0) return undefined;
   const current = 上下文表[id];
   if (current != null) return current;
@@ -155,7 +149,7 @@ function 清理R上下文(this: void, context: R上下文): void {
   }
   context.已切二段 = false;
   context.已启动 = false;
-  const id = 取单位句柄ID(context.施法者);
+  const id = 取单位ID(context.施法者);
   if (id !== 0 && 上下文表[id] === context) delete 上下文表[id];
 }
 
@@ -179,10 +173,10 @@ function 推进R周期伤害(this: void, context?: any): void {
   const 中心X = GetUnitX(神门);
   const 中心Y = GetUnitY(神门);
   const 落点半径 = 配置.周期.随机落点半径;
-  const 角度 = GetRandomReal(0, 360) * (3.14159265358979 / 180);
+  const 随机角度 = GetRandomReal(0, 360);
   const 半径 = GetRandomReal(0, 落点半径);
-  const 落点X = 中心X + 半径 * Math.cos(角度);
-  const 落点Y = 中心Y + 半径 * Math.sin(角度);
+  const 落点X = 极坐标X(中心X, 随机角度, 半径);
+  const 落点Y = 极坐标Y(中心Y, 随机角度, 半径);
 
   // 制裁特效（高度 = 施法时锁存的飞行高度，源 EXSetEffectZ）
   for (let i = 0; i < 配置.周期.制裁特效.length; i++) {

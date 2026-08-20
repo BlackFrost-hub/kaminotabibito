@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____53E5_67C4ID, _____7ED3_675F_5217_8F66, _____6E05_9664_4E8C_6BB5_7B49_5F85, _____63A8_52A8_76EE_6807, _____62E5_6709_5217_8F66_7729_6655, _____7ED3_7B97_5217_8F66_78B0_649E, _____521B_5EFA_5217_8F66_8DEF_5F84_8868_73B0, _____521B_5EFA_4E8C_6BB5_5217_8F66, _____4E8C_6BB5_7A97_53E3_8D85_65F6, _____5F00_542F_4E8C_6BB5_7A97_53E3, _____70B9_5230_7EBF_6BB5_8DDD_79BB, _____67E5_627E_5217_8F66_7ECF_8FC7_7684_53E6_4E00_95F4_9699, _____5217_8F66Tick, _____542F_52A8_5217_8F66, jass, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____521B_5EFA_70B9_7279_6548, _____9500_6BC1_70B9_7279_6548, getEnemyUnitsInRange, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____4E24_70B9_89D2_5EA6, _____8DDD_79BBXY, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____65BD_52A0_7729_6655, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____914D_7F6E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_ROCK_HEAVY_BASH, PATHING_TYPE_WALKABILITY, STUN_BUFF_ID, PSEUDO_STUN_BUFF_ID, DzSetEffectPos, EXSetEffectSize, _____4E8C_6BB5_7B49_5F85_8868
+local _____53E5_67C4ID, _____7ED3_675F_5217_8F66, _____6E05_9664_4E8C_6BB5_7B49_5F85, _____63A8_52A8_76EE_6807, _____62E5_6709_5217_8F66_7729_6655, _____7ED3_7B97_5217_8F66_78B0_649E, _____521B_5EFA_5217_8F66_8DEF_5F84_8868_73B0, _____521B_5EFA_4E8C_6BB5_5217_8F66, _____4E8C_6BB5_7A97_53E3_8D85_65F6, _____5F00_542F_4E8C_6BB5_7A97_53E3, _____70B9_5230_7EBF_6BB5_8DDD_79BB, _____67E5_627E_5217_8F66_7ECF_8FC7_7684_53E6_4E00_95F4_9699, _____5217_8F66Tick, _____542F_52A8_5217_8F66, jass, Cos, Sin, bj_DEGTORAD, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____521B_5EFA_70B9_7279_6548, _____9500_6BC1_70B9_7279_6548, getEnemyUnitsInRange, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____4E24_70B9_89D2_5EA6, _____8DDD_79BBXY, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____65BD_52A0_7729_6655, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____914D_7F6E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_ROCK_HEAVY_BASH, PATHING_TYPE_WALKABILITY, STUN_BUFF_ID, PSEUDO_STUN_BUFF_ID, DzSetEffectPos, EXSetEffectSize, _____4E8C_6BB5_7B49_5F85_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00．配置")
 local _____516B_4E91_7D2B_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["八云紫单位技能配置"]
 local ____01_FF0E_88C2_9699_7CFB_7EDF = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.07．公共与单位壳.01．裂隙系统")
@@ -52,8 +52,8 @@ function _____6E05_9664_4E8C_6BB5_7B49_5F85(context)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["英雄"], _____516B_4E91_7D2BBuffID["R二段窗口"])
 end
 function _____63A8_52A8_76EE_6807(target, directionRadians)
-    local nextX = jass.GetUnitX(target) + math.cos(directionRadians) * _____914D_7F6E.R["推动距离"]
-    local nextY = jass.GetUnitY(target) + math.sin(directionRadians) * _____914D_7F6E.R["推动距离"]
+    local nextX = jass.GetUnitX(target) + Cos(directionRadians) * _____914D_7F6E.R["推动距离"]
+    local nextY = jass.GetUnitY(target) + Sin(directionRadians) * _____914D_7F6E.R["推动距离"]
     if jass.IsTerrainPathable(nextX, nextY, PATHING_TYPE_WALKABILITY) == true then
         return
     end
@@ -156,9 +156,9 @@ function _____4E8C_6BB5_7A97_53E3_8D85_65F6(variable)
     local heroX = jass.GetUnitX(context["英雄"])
     local heroY = jass.GetUnitY(context["英雄"])
     local heroFacing = jass.GetUnitFacing(context["英雄"])
-    local behindRadians = (heroFacing + 180) * math.pi / 180
-    local targetX = heroX + math.cos(behindRadians) * _____914D_7F6E.R["自动裂隙身后距离"]
-    local targetY = heroY + math.sin(behindRadians) * _____914D_7F6E.R["自动裂隙身后距离"]
+    local behindRadians = (heroFacing + 180) * bj_DEGTORAD
+    local targetX = heroX + Cos(behindRadians) * _____914D_7F6E.R["自动裂隙身后距离"]
+    local targetY = heroY + Sin(behindRadians) * _____914D_7F6E.R["自动裂隙身后距离"]
     local gap = _____521B_5EFA_516B_4E91_7D2B_88C2_9699(
         context["英雄"],
         targetX,
@@ -194,10 +194,8 @@ function _____70B9_5230_7EBF_6BB5_8DDD_79BB(px, py, x1, y1, x2, y2)
     if lengthSquared <= 0.0001 then
         return _____8DDD_79BBXY(px, py, x1, y1)
     end
-    local t = math.max(
-        0,
-        math.min(1, ((px - x1) * dx + (py - y1) * dy) / lengthSquared)
-    )
+    local rawT = ((px - x1) * dx + (py - y1) * dy) / lengthSquared
+    local t = rawT < 0 and 0 or (rawT > 1 and 1 or rawT)
     local closestX = x1 + t * dx
     local closestY = y1 + t * dy
     return _____8DDD_79BBXY(px, py, closestX, closestY)
@@ -247,8 +245,8 @@ function _____5217_8F66Tick(variable)
     end
     context["上次X"] = context.X
     context["上次Y"] = context.Y
-    context.X = context.X + math.cos(context["方向弧度"]) * _____914D_7F6E.R["列车每Tick距离"]
-    context.Y = context.Y + math.sin(context["方向弧度"]) * _____914D_7F6E.R["列车每Tick距离"]
+    context.X = context.X + Cos(context["方向弧度"]) * _____914D_7F6E.R["列车每Tick距离"]
+    context.Y = context.Y + Sin(context["方向弧度"]) * _____914D_7F6E.R["列车每Tick距离"]
     context["剩余Tick"] = context["剩余Tick"] - 1
     if context["特效"] ~= nil and context["特效"] ~= 0 then
         DzSetEffectPos(context["特效"], context.X, context.Y, 0)
@@ -296,7 +294,7 @@ function _____542F_52A8_5217_8F66(hero, startGap, direction, canTriggerSecond, s
         X = x,
         Y = y,
         ["方向角"] = direction,
-        ["方向弧度"] = direction * math.pi / 180,
+        ["方向弧度"] = direction * bj_DEGTORAD,
         ["剩余Tick"] = _____914D_7F6E.R["列车Tick数"],
         ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(hero) * _____914D_7F6E.R["伤害攻击力比例"],
         ["特效"] = effect,
@@ -310,6 +308,9 @@ function _____542F_52A8_5217_8F66(hero, startGap, direction, canTriggerSecond, s
 end
 jass = require("jass.common")
 local japi = require("jass.japi")
+Cos = jass.Cos
+Sin = jass.Sin
+bj_DEGTORAD = jass.bj_DEGTORAD
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 addDelayedCallback = ____require_result_0.addDelayedCallback
 addPeriodicCallback = ____require_result_0.addPeriodicCallback

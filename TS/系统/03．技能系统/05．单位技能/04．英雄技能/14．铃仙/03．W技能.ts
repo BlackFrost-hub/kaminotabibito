@@ -50,6 +50,10 @@ const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核�
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removeDelayedCallback: (this: void, id: number) => void;
 };
+const { 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
+};
 const { 创建点特效, createTimedUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
   createTimedUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number) => any;
@@ -230,8 +234,8 @@ function on铃仙分身召唤(this: void, 被召唤单位: any, 召唤单位: an
   } else {
     // 其余 4 个：300 码圆周分布，面朝圆心方向
     const 分身角度 = 会话.角度;
-    const 分身X = 会话.原X + cfg.分身半径 * Math.cos((分身角度 * Math.PI) / 180);
-    const 分身Y = 会话.原Y + cfg.分身半径 * Math.sin((分身角度 * Math.PI) / 180);
+    const 分身X = 极坐标X(会话.原X, 分身角度, cfg.分身半径);
+    const 分身Y = 极坐标Y(会话.原Y, 分身角度, cfg.分身半径);
     SetUnitX(被召唤单位, 分身X);
     SetUnitY(被召唤单位, 分身Y);
     SetUnitFacing(被召唤单位, 分身角度);

@@ -8,8 +8,11 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
+local ____02_FF0E_5355_4F4D_4E0E_8303_56F4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009 = ____02_FF0E_5355_4F4D_4E0E_8303_56F4["获取坐标范围单位按筛选"]
 local ____require_result_0 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 local Sound3DII_UnitPlayReuse = ____require_result_0.Sound3DII_UnitPlayReuse
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
@@ -40,10 +43,7 @@ local ____require_result_9 = require("平台扩展API动作")
 local _____6280_80FD__8BBE_7F6E_6280_80FD_51B7_5374_65F6_95F4 = ____require_result_9["技能_设置技能冷却时间"]
 local jass = require("jass.common")
 local japi = require("jass.japi")
-local CreateGroup = jass.CreateGroup
 local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
-local FirstOfGroup = jass.FirstOfGroup
-local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetUnitDefaultFlyHeight = jass.GetUnitDefaultFlyHeight
 local GetUnitFlyHeight = jass.GetUnitFlyHeight
@@ -51,9 +51,6 @@ local GetUnitState = jass.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GroupClear = jass.GroupClear
-local GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange
-local GroupRemoveUnit = jass.GroupRemoveUnit
 local IsUnitEnemy = jass.IsUnitEnemy
 local IsUnitType = jass.IsUnitType
 local SetPlayerAbilityAvailable = jass.SetPlayerAbilityAvailable
@@ -77,18 +74,11 @@ local ____YDWE_5BF9_8C61_7C7B_578B_5355_4F4D = 2
 local _____4E00_65B9_901A_884C_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____4E00_65B9_901A_884C_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local _____77E2_91CF_53CD_5C04_5F00_542F_6280_80FDID = stringToFourCCSafe(_____4E00_65B9_901A_884C_5355_4F4D_6280_80FD_914D_7F6E["矢量反射开启技能ID"])
 local _____77E2_91CF_53CD_5C04_5173_95ED_6280_80FDID = stringToFourCCSafe(_____4E00_65B9_901A_884C_5355_4F4D_6280_80FD_914D_7F6E["矢量反射关闭技能ID"])
-local _____5F39_5E55_679A_4E3E_7EC4 = CreateGroup()
 local _____77E2_91CF_53CD_5C04_4E0A_4E0B_6587_8868 = {}
 local _____77E2_91CF_53CD_5C04_4E0A_4E0B_6587_5217_8868 = {}
 local _____77E2_91CF_53CD_5C04_7CFB_7EDF_5DF2_6CE8_518C = false
-local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 ____exports["获取或创建一方通行矢量反射上下文"] = function(unit)
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local unitId = _____53D6_5355_4F4DID(unit)
     if unitId == 0 then
         return nil
     end
@@ -102,7 +92,7 @@ ____exports["获取或创建一方通行矢量反射上下文"] = function(unit)
     return created
 end
 local function _____83B7_53D6_4E00_65B9_901A_884C_77E2_91CF_53CD_5C04_4E0A_4E0B_6587(unit)
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local unitId = _____53D6_5355_4F4DID(unit)
     local ____temp_10
     if unitId == 0 then
         ____temp_10 = nil
@@ -112,7 +102,7 @@ local function _____83B7_53D6_4E00_65B9_901A_884C_77E2_91CF_53CD_5C04_4E0A_4E0B_
     return ____temp_10
 end
 local function _____79FB_9664_4E00_65B9_901A_884C_77E2_91CF_53CD_5C04_4E0A_4E0B_6587(unit)
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local unitId = _____53D6_5355_4F4DID(unit)
     if unitId == 0 then
         return
     end
@@ -548,24 +538,37 @@ local function _____626B_63CF_5355_4E2A_4E00_65B9_901A_884C_5468_56F4_5F39_5E55(
     if not _____68C0_67E5_9B54_6CD5_5E76_6309_9700_5F3A_5236_5173_95ED(context) then
         return
     end
-    GroupClear(_____5F39_5E55_679A_4E3E_7EC4)
-    GroupEnumUnitsInRange(
-        _____5F39_5E55_679A_4E3E_7EC4,
+    local _____5019_9009_5355_4F4D = _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009(
         GetUnitX(unit),
         GetUnitY(unit),
         _____4E00_65B9_901A_884C_5355_4F4D_6280_80FD_914D_7F6E["矢量反射范围"],
-        nil
+        unit,
+        {
+            ["要求有效单位"] = false,
+            ["允许死亡"] = false,
+            ["允许无敌"] = true,
+            ["允许建筑"] = true,
+            ["允许机械"] = true,
+            ["允许古树"] = true
+        }
     )
-    local projectile = FirstOfGroup(_____5F39_5E55_679A_4E3E_7EC4)
-    while projectile ~= nil and projectile ~= 0 do
-        GroupRemoveUnit(_____5F39_5E55_679A_4E3E_7EC4, projectile)
-        _____5C1D_8BD5_53CD_5C04_8303_56F4_5185_5F39_5E55(context, projectile)
-        if not context["已开启"] then
-            break
+    do
+        local i = 0
+        while i < #_____5019_9009_5355_4F4D do
+            do
+                local projectile = _____5019_9009_5355_4F4D[i + 1]
+                if projectile == nil or projectile == 0 then
+                    goto __continue73
+                end
+                _____5C1D_8BD5_53CD_5C04_8303_56F4_5185_5F39_5E55(context, projectile)
+                if not context["已开启"] then
+                    break
+                end
+            end
+            ::__continue73::
+            i = i + 1
         end
-        projectile = FirstOfGroup(_____5F39_5E55_679A_4E3E_7EC4)
     end
-    GroupClear(_____5F39_5E55_679A_4E3E_7EC4)
 end
 local function _____77E2_91CF_53CD_5C04_5F39_5E55_626B_63CFTick()
     do

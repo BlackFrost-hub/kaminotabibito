@@ -33,6 +33,7 @@ local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单�
 local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
 local _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D = ____require_result_8["读取单位最大生命"]
+local _____53D6_5355_4F4DID = ____require_result_8["取单位ID"]
 local ____require_result_9 = require("系统.04．伤害系统.08．技能伤害系统")
 local _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3 = ____require_result_9["造成批量AOE技能伤害"]
 local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_9["创建独立技能伤害实例"]
@@ -93,15 +94,12 @@ end
 local _____66FF_8EAB_6280_80FDID = ____stringToFourCCSafe_20(____E_914D_7F6E__66FF_8EAB_6280_80FDID_19)
 local _____4E0A_4E0B_6587_8868 = {}
 local _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
-local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    return (unit == nil or unit == 0) and 0 or (GetHandleId(unit) or 0)
-end
 local _____8840_96FE_66FF_8EAB_672C_4F53_8868 = {}
 ____exports["获取血雾本体"] = function(unit)
-    return _____8840_96FE_66FF_8EAB_672C_4F53_8868[_____53D6_5355_4F4D_53E5_67C4ID(unit)]
+    return _____8840_96FE_66FF_8EAB_672C_4F53_8868[_____53D6_5355_4F4DID(unit)]
 end
 local function _____83B7_53D6_6216_521B_5EFAE_4E0A_4E0B_6587(unit)
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local id = _____53D6_5355_4F4DID(unit)
     if id == 0 then
         return nil
     end
@@ -246,7 +244,7 @@ local function _____6E05_7406E_4E0A_4E0B_6587(context)
     if context["替身"] ~= nil and context["替身"] ~= 0 then
         __TS__Delete(
             _____8840_96FE_66FF_8EAB_672C_4F53_8868,
-            _____53D6_5355_4F4D_53E5_67C4ID(context["替身"])
+            _____53D6_5355_4F4DID(context["替身"])
         )
         _____7ACB_5373_79FB_9664_5355_4F4D_5E76_6CE8_9500_6392_6CC4_76D1_542C(context["替身"])
         context["替身"] = nil
@@ -269,7 +267,7 @@ local function _____6E05_7406E_4E0A_4E0B_6587(context)
     _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(context["技能实例ID"])
     context["技能实例ID"] = nil
     context["目标属性记录"] = {}
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
+    local id = _____53D6_5355_4F4DID(context["施法者"])
     if id ~= 0 and _____4E0A_4E0B_6587_8868[id] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, id)
     end
@@ -376,7 +374,7 @@ local function _____857E_7C73_8389_4E9AE_5EF6_8FDF_542F_52A8(variable)
     )
     if context["替身"] ~= nil and context["替身"] ~= 0 then
         UnitAddAbility(context["替身"], _____66FF_8EAB_6280_80FDID)
-        _____8840_96FE_66FF_8EAB_672C_4F53_8868[_____53D6_5355_4F4D_53E5_67C4ID(context["替身"])] = context["施法者"]
+        _____8840_96FE_66FF_8EAB_672C_4F53_8868[_____53D6_5355_4F4DID(context["替身"])] = context["施法者"]
         SelectUnitForPlayerSingle(
             context["替身"],
             GetOwningPlayer(context["施法者"])
@@ -464,7 +462,7 @@ local function _____91CA_653E_857E_7C73_8389_4E9AE(context, caster, _____6280_80
     ____context_68["延迟回调ID"] = ____addDelayedCallback_67(____E_914D_7F6E__5EF6_8FDF_542F_52A8_6BEB_79D2_66, _____857E_7C73_8389_4E9AE_5EF6_8FDF_542F_52A8, context)
 end
 local function _____857E_7C73_8389_4E9AE_5355_4F4D_6B7B_4EA1(dyingUnit, _killingUnit)
-    local context = _____4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4ID(dyingUnit)]
+    local context = _____4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(dyingUnit)]
     if context ~= nil then
         _____6E05_7406E_4E0A_4E0B_6587(context)
     end

@@ -29,10 +29,11 @@ const { 获取范围敌军 } = require("系统.03．技能系统.05．单位技�
 const { 造成批量AOE技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成批量AOE技能伤害: (this: void, params: any) => number;
 };
-const { 单位存活, 读取单位攻击力, 读取单位最大生命 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 单位存活, 读取单位攻击力, 读取单位最大生命, 取单位ID } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   单位存活: (this: void, unit: any) => boolean;
   读取单位攻击力: (this: void, unit: any) => number;
   读取单位最大生命: (this: void, unit: any) => number;
+  取单位ID: (this: void, unit: any) => number;
 };
 const { 开始原地击飞 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.02．原地击飞系统") as {
   开始原地击飞: (this: void, unit: any, params: any) => number;
@@ -80,7 +81,6 @@ const WEAPON_TYPE_METAL_HEAVY_BASH = jass.WEAPON_TYPE_METAL_HEAVY_BASH as any;
 const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
 const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
 const UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE as any;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
@@ -112,12 +112,8 @@ interface R目标处理变量 {
 
 const 上下文表: Record<number, 蕾米莉亚R上下文 | undefined> = {};
 
-function 取单位句柄ID(this: void, unit: any): number {
-  return unit == null || unit === 0 ? 0 : GetHandleId(unit) || 0;
-}
-
 function 获取或创建R上下文(this: void, unit: any): 蕾米莉亚R上下文 | undefined {
-  const unitId = 取单位句柄ID(unit);
+  const unitId = 取单位ID(unit);
   if (unitId === 0) return undefined;
   const old = 上下文表[unitId];
   if (old != null) return old;
@@ -233,7 +229,7 @@ function 清理R上下文(this: void, context: 蕾米莉亚R上下文, 缩短冷
     }
     context.已启动 = false;
   }
-  const unitId = 取单位句柄ID(context.施法者);
+  const unitId = 取单位ID(context.施法者);
   if (unitId !== 0 && 上下文表[unitId] === context) delete 上下文表[unitId];
 }
 
@@ -270,7 +266,7 @@ function 蕾米莉亚R硬直结束(this: void, variable?: any): void {
 }
 
 function 蕾米莉亚R单位死亡(this: void, dyingUnit: any, _killingUnit: any): void {
-  const context = 上下文表[取单位句柄ID(dyingUnit)];
+  const context = 上下文表[取单位ID(dyingUnit)];
   if (context != null) 清理R上下文(context, false);
 }
 

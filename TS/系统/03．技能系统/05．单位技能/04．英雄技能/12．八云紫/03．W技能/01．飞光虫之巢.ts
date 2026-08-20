@@ -10,9 +10,11 @@ const jass = require("jass.common") as any;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
-const { 读取单位攻击力, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 两点角度, 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
 };
 const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getEnemyUnitsInRange: (this: void, source: any, x: number, y: number, radius: number) => any[];
@@ -83,7 +85,8 @@ function 结算W指定目标(this: void, variable?: any): void {
   const target = context.目标单位;
   const targetX = jass.GetUnitX(target);
   const targetY = jass.GetUnitY(target);
-  const missingLife = Math.max(0, jass.GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass.GetUnitState(target, UNIT_STATE_LIFE));
+  const 缺失生命 = jass.GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass.GetUnitState(target, UNIT_STATE_LIFE);
+  const missingLife = 缺失生命 > 0 ? 缺失生命 : 0;
   造成单体技能伤害({
     来源: context.英雄,
     目标: target,
@@ -135,11 +138,10 @@ function 释放W(this: void, _entry: { 英雄: any }, hero: any, skillInstanceId
     播放八云紫随机单位音效(hero, 配置.W.指定目标语音键);
     for (let i = 0; i < 配置.W.裂隙数量; i++) {
       const angle = 45 + 90 * (i + 1);
-      const radians = angle * Math.PI / 180;
       context.裂隙.push(创建八云紫临时裂隙(
         hero,
-        targetX + Math.cos(radians) * 配置.W.指定目标裂隙半径,
-        targetY + Math.sin(radians) * 配置.W.指定目标裂隙半径,
+        极坐标X(targetX, angle, 配置.W.指定目标裂隙半径),
+        极坐标Y(targetY, angle, 配置.W.指定目标裂隙半径),
         配置.W.裂隙持续秒 + 配置.W.裂隙清理宽限秒,
       ));
     }
@@ -148,17 +150,16 @@ function 释放W(this: void, _entry: { 英雄: any }, hero: any, skillInstanceId
     const heroX = jass.GetUnitX(hero);
     const heroY = jass.GetUnitY(hero);
     const angle = 两点角度(heroX, heroY, targetX, targetY);
-    const radians = angle * Math.PI / 180;
-    const sideRadians = (angle + 90) * Math.PI / 180;
-    const backX = heroX - Math.cos(radians) * 配置.W.无目标后方距离;
-    const backY = heroY - Math.sin(radians) * 配置.W.无目标后方距离;
-    const firstX = backX + Math.cos(sideRadians) * 配置.W.横向起点距离;
-    const firstY = backY + Math.sin(sideRadians) * 配置.W.横向起点距离;
+    // 后方点 = 施法方向反向 180 度；横向 = 施法方向侧向 90 度；循环内沿侧向反向递减
+    const backX = 极坐标X(heroX, angle + 180, 配置.W.无目标后方距离);
+    const backY = 极坐标Y(heroY, angle + 180, 配置.W.无目标后方距离);
+    const firstX = 极坐标X(backX, angle + 90, 配置.W.横向起点距离);
+    const firstY = 极坐标Y(backY, angle + 90, 配置.W.横向起点距离);
     for (let i = 1; i <= 配置.W.裂隙数量; i++) {
       context.裂隙.push(创建八云紫临时裂隙(
         hero,
-        firstX - Math.cos(sideRadians) * 配置.W.横向间距 * i,
-        firstY - Math.sin(sideRadians) * 配置.W.横向间距 * i,
+        极坐标X(firstX, angle + 90, -(配置.W.横向间距 * i)),
+        极坐标Y(firstY, angle + 90, -(配置.W.横向间距 * i)),
         配置.W.裂隙持续秒 + 配置.W.裂隙清理宽限秒,
       ));
     }

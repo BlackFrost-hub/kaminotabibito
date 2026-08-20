@@ -13,6 +13,7 @@ import { 欧尔贝克单位技能配置 } from "./00．配置";
 import { 获取欧尔贝克积攒计数, 消耗欧尔贝克积攒 } from "./00B．积攒状态";
 
 const jass = require("jass.common") as any;
+const GetRandomReal = jass.GetRandomReal as (this: void, lowBound: number, highBound: number) => number;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
 };
@@ -113,7 +114,7 @@ function 尝试触发欧尔贝克剑气(this: void, caster: any): void {
   const cfg = 欧尔贝克单位技能配置.E;
   const hasBuff = 单位拥有原生Buff(caster, 积攒Buff类型ID);
   const probability = hasBuff ? cfg.积攒触发概率 : cfg.普攻触发概率;
-  if (Math.random() >= probability) return;
+  if (GetRandomReal(0, 1) >= probability) return;
   释放欧尔贝克剑气(caster, level);
 }
 

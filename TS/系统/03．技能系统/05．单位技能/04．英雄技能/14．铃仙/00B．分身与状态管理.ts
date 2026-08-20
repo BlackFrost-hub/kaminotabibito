@@ -26,6 +26,9 @@ const { forEachUnitInGroup } = require("lib.扩展函数.封装函数.01．通�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
+const { 秒转毫秒 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  秒转毫秒: (this: void, seconds: number) => number;
+};
 
 const 铃仙单位类型ID = stringToFourCCSafe(铃仙单位技能配置.单位类型ID);
 
@@ -132,7 +135,7 @@ export function 全图英雄免疫伤害(this: void, 持续秒: number): void {
     const hero = 快照[i];
     YDUserDataSetSafe("unit", hero, "免疫伤害", "boolean", true);
   }
-  addDelayedCallback(Math.round(持续秒 * 1000), () => {
+  addDelayedCallback(秒转毫秒(持续秒), () => {
     for (let i = 0; i < 快照.length; i++) {
       const hero = 快照[i];
       if (hero == null || hero === 0) continue;

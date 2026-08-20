@@ -15,7 +15,9 @@ import {
   Saber清空Q命中组,
 } from "./01．状态表";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 读取单位攻击力, 单位存活, 两点角度 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
+
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
@@ -88,7 +90,6 @@ const IsUnitVisible = jass.IsUnitVisible as (this: void, unit: any, player: any)
 const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const Sin = jass.Sin as (this: void, radians: number) => number;
-const bj_RADTODEG = jass.bj_RADTODEG as number;
 const bj_DEGTORAD = jass.bj_DEGTORAD as number;
 const UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT as any;
 const UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL as any;
@@ -111,14 +112,10 @@ const Q连击3ID = stringToFourCC(配置.Q.连击3.技能ID);
 // 工具函数
 // ---------------------------------------------------------------------------
 
-function 计算两点角度(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  return Atan2(y2 - y1, x2 - x1) * bj_RADTODEG;
-}
-
 /** 目标是否位于施法者前方 180 度（源：左右各 90 度判定，含 0/360 跨界归一化）。 */
 function 在前方半圆(this: void, caster: any, target: any): boolean {
   const 面向 = GetUnitFacing(caster);
-  const 目标角 = 计算两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target));
+  const 目标角 = 两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target));
   let 差值 = (目标角 - 面向) % 360;
   if (差值 < 0) 差值 += 360;
   return 差值 <= 90 || 差值 >= 270;
@@ -195,7 +192,7 @@ function 应用Q目标命中表现(this: void, caster: any, target: any, 角度:
     主单位死亡时中断: false,
   });
   addDelayedCallback(
-    Math.round((击退配置.间隔秒 * 击退配置.次数 + 0.05) * 1000),
+    秒转毫秒(击退配置.间隔秒 * 击退配置.次数 + 0.05),
     恢复Q目标表现 as unknown as (this: void, variable?: any) => void,
     { target } as 目标表现上下文,
   );
@@ -312,7 +309,7 @@ function Q1命中后劈砍(this: void, variable?: any): void {
 
   // 连击窗口：0.5 秒后仍停留在连击 1 则复位按钮
   addDelayedCallback(
-    Math.round(配置.Q.初段.连击窗口秒 * 1000),
+    秒转毫秒(配置.Q.初段.连击窗口秒),
     Q初段窗口复位 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -364,7 +361,7 @@ function Q1冲锋结束(this: void, 移动单位: any, 原因: string, _位移ID
     SetUnitAnimationByIndex(移动单位, 配置.Q.初段.命中后.动作索引);
     SetUnitTimeScale(移动单位, 配置.Q.初段.命中后.时间流速);
     addDelayedCallback(
-      Math.round(配置.Q.初段.命中后.硬直延迟秒 * 1000),
+      秒转毫秒(配置.Q.初段.命中后.硬直延迟秒),
       Q1命中后劈砍 as unknown as (this: void, variable?: any) => void,
       record,
     );
@@ -382,7 +379,7 @@ function Q1启动冲锋(this: void, variable?: any): void {
     return;
   }
 
-  ctx.方向角度 = 计算两点角度(GetUnitX(caster), GetUnitY(caster), ctx.目标点X, ctx.目标点Y);
+  ctx.方向角度 = 两点角度(GetUnitX(caster), GetUnitY(caster), ctx.目标点X, ctx.目标点Y);
   const q1音效句柄播 = (jglobals as any)[配置.Q.初段.音效.全局音效键];
     if (q1音效句柄播 != null) PlaySoundOnUnitBJ(q1音效句柄播, 100, caster);
   SetUnitTimeScale(caster, 配置.Q.初段.时间流速);
@@ -416,7 +413,7 @@ function 释放Q初段(this: void, context: Q初段上下文, caster: any, 技�
   record.Q连击 = 1;
 
   addDelayedCallback(
-    Math.round(配置.Q.初段.起手延迟秒 * 1000),
+    秒转毫秒(配置.Q.初段.起手延迟秒),
     Q1启动冲锋 as unknown as (this: void, variable?: any) => void,
     context,
   );
@@ -476,7 +473,7 @@ function Q2第一段劈砍(this: void, variable?: any): void {
 
   // 过渡：时间流速恢复、动作索引 7、再向前 75
   addDelayedCallback(
-    Math.round(配置.Q.连击2.过渡.延迟秒 * 1000),
+    秒转毫秒(配置.Q.连击2.过渡.延迟秒),
     Q2过渡 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -491,7 +488,7 @@ function Q2过渡(this: void, variable?: any): void {
   SetUnitAnimationByIndex(caster, 配置.Q.连击2.过渡.动作索引);
   沿面向瞬步(caster, 配置.Q.连击2.过渡.前移距离);
   addDelayedCallback(
-    Math.round(配置.Q.连击2.第二段.延迟秒 * 1000),
+    秒转毫秒(配置.Q.连击2.第二段.延迟秒),
     Q2第二段劈砍 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -510,7 +507,7 @@ function Q2第二段劈砍(this: void, variable?: any): void {
   for (const target of 目标列表) {
     SaberQ命中去重添加(caster, target);
     // 源：目标前方 75 创建 e061 风王结界表现（物编缩放 1.5×运行时 1.5）
-    const 弧度 = 计算两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target)) * bj_DEGTORAD;
+    const 弧度 = 两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target)) * bj_DEGTORAD;
     创建点特效({
       模型路径: 配置.Q.连击2.第二段.表现特效.模型路径,
       X: GetUnitX(target) + 配置.Q.连击2.第二段.表现特效.目标前方偏移 * Cos(弧度),
@@ -546,7 +543,7 @@ function Q2第二段劈砍(this: void, variable?: any): void {
   移除单位暂停(caster, 配置.暂停来源.Q连击2);
 
   addDelayedCallback(
-    Math.round(配置.Q.连击2.连击窗口秒 * 1000),
+    秒转毫秒(配置.Q.连击2.连击窗口秒),
     Q连击2窗口复位 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -589,7 +586,7 @@ function 释放Q连击2(this: void, context: Q连击2上下文, caster: any, 技
   沿面向瞬步(caster, 配置.Q.连击2.前移距离);
 
   addDelayedCallback(
-    Math.round(配置.Q.连击2.第一段.延迟秒 * 1000),
+    秒转毫秒(配置.Q.连击2.第一段.延迟秒),
     Q2第一段劈砍 as unknown as (this: void, variable?: any) => void,
     context,
   );
@@ -686,7 +683,7 @@ function Q3第一段劈砍(this: void, variable?: any): void {
     技能实例ID: ctx.技能实例ID,
   });
   addDelayedCallback(
-    Math.round(配置.Q.连击3.过渡.延迟秒 * 1000),
+    秒转毫秒(配置.Q.连击3.过渡.延迟秒),
     Q3过渡 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -701,12 +698,12 @@ function Q3过渡(this: void, variable?: any): void {
   SetUnitAnimationByIndex(caster, 配置.Q.连击3.过渡.动作索引);
   ctx.下降次数 = 0;
   ctx.下降回调ID = addPeriodicCallback(
-    Math.round(配置.Q.连击3.下降.间隔秒 * 1000),
+    秒转毫秒(配置.Q.连击3.下降.间隔秒),
     推进Q3下降 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
   addDelayedCallback(
-    Math.round(配置.Q.连击3.第二段.延迟秒 * 1000),
+    秒转毫秒(配置.Q.连击3.第二段.延迟秒),
     Q3第二段劈砍 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -735,7 +732,7 @@ function Q3第二段劈砍(this: void, variable?: any): void {
   SetUnitFlyHeight(caster, 0, 0);
 
   addDelayedCallback(
-    Math.round(配置.Q.连击3.复位延迟秒 * 1000),
+    秒转毫秒(配置.Q.连击3.复位延迟秒),
     Q3复位 as unknown as (this: void, variable?: any) => void,
     ctx,
   );
@@ -785,12 +782,12 @@ function 释放Q连击3(this: void, context: Q连击3上下文, caster: any, 技
   沿面向瞬步(caster, 配置.Q.连击3.前移距离);
 
   context.上升回调ID = addPeriodicCallback(
-    Math.round(配置.Q.连击3.上升.间隔秒 * 1000),
+    秒转毫秒(配置.Q.连击3.上升.间隔秒),
     推进Q3上升 as unknown as (this: void, variable?: any) => void,
     context,
   );
   addDelayedCallback(
-    Math.round(配置.Q.连击3.第一段.延迟秒 * 1000),
+    秒转毫秒(配置.Q.连击3.第一段.延迟秒),
     Q3第一段劈砍 as unknown as (this: void, variable?: any) => void,
     context,
   );

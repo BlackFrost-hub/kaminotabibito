@@ -45,8 +45,12 @@ const { 开始击退 } = require("系统.03．技能系统.00．技能模板+函
 const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getEnemyUnitsInRange: (this: void, source: any, x: number, y: number, radius: number) => any[];
 };
-const { 读取单位攻击力 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 取单位ID, 单位存活, 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
+  取单位ID: (this: void, unit: any) => number;
+  单位存活: (this: void, unit: any) => boolean;
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
 };
 const {
   创建点特效,
@@ -59,8 +63,6 @@ const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
 };
 
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
-const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitState = jass.GetUnitState as (this: void, unit: any, state: any) => number;
@@ -107,9 +109,9 @@ function D环绕Tick(this: void, variable?: any): void {
     return;
   }
   if (state.特效 == null || state.特效 === 0) return;
-  const 弧度 = (jass.GetUnitFacing(hero) + 90) * Math.PI / 180;
-  const x = GetUnitX(hero) + Math.cos(弧度) * 配置.D.环绕距离;
-  const y = GetUnitY(hero) + Math.sin(弧度) * 配置.D.环绕距离;
+  const 环绕角度 = jass.GetUnitFacing(hero) + 90;
+  const x = 极坐标X(GetUnitX(hero), 环绕角度, 配置.D.环绕距离);
+  const y = 极坐标Y(GetUnitY(hero), 环绕角度, 配置.D.环绕距离);
   japi.DzSetEffectPos(state.特效, x, y, 配置.D.环绕高度);
 }
 
@@ -153,14 +155,6 @@ function 清理D表现(this: void, variable?: any): void {
   const id = 取单位ID(data.hero);
   if (id === 0 || D特效版本表[id] !== data.version) return;
   销毁D表现(data.hero);
-}
-
-function 取单位ID(this: void, unit: any): number {
-  return unit == null || unit === 0 ? 0 : GetHandleId(unit);
-}
-
-function 单位存活(this: void, unit: any): boolean {
-  return unit != null && unit !== 0 && GetUnitTypeId(unit) !== 0 && GetUnitState(unit, UNIT_STATE_LIFE) > 0.405;
 }
 
 function 是D合法目标(this: void, target: any): boolean {

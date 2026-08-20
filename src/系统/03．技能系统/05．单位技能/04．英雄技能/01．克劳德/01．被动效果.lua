@@ -2,7 +2,6 @@
 local ____exports = {}
 local ____require_result_0 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
 local _____8F6C_56DB_4F4DID = ____require_result_0["转四位ID"]
-local _____5355_4F4D_62E5_6709_539F_751FBuff = ____require_result_0["单位拥有原生Buff"]
 local _____83B7_53D6_8303_56F4_654C_519B = ____require_result_0["获取范围敌军"]
 local _____5728_5750_6807_64AD_653E_7279_6548 = ____require_result_0["在坐标播放特效"]
 local _____53D6_5355_4F4DX = ____require_result_0["取单位X"]
@@ -19,7 +18,6 @@ local _____5F00_59CB_786C_76F4 = ____require_result_3["开始硬直"]
 local ____require_result_4 = require("系统.03．技能系统.05．单位技能.04．英雄技能.01．克劳德.00．配置")
 local _____514B_52B3_5FB7_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_4["克劳德单位技能配置"]
 local _____514B_52B3_5FB7_5355_4F4D_7C7B_578BID = _____8F6C_56DB_4F4DID(_____514B_52B3_5FB7_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
-local _____514B_52B3_5FB7_89E6_53D1BuffID = _____8F6C_56DB_4F4DID(_____514B_52B3_5FB7_5355_4F4D_6280_80FD_914D_7F6E["触发BuffID"])
 local function _____51C6_5907_514B_52B3_5FB7_6E85_5C04_4F24_5BB3_76EE_6807(target, _index, variable)
     local _____53D8_91CF = variable
     if _____53D8_91CF == nil or target == _____53D8_91CF["主目标"] then
@@ -28,7 +26,11 @@ local function _____51C6_5907_514B_52B3_5FB7_6E85_5C04_4F24_5BB3_76EE_6807(targe
     return {}
 end
 local function _____514B_52B3_5FB7_66B4_51FB_540E_5904_7406(record, applied, _snapshot)
-    if not _____5355_4F4D_62E5_6709_539F_751FBuff(record.attacker, _____514B_52B3_5FB7_89E6_53D1BuffID) then
+    local ____opt_result_7
+    if record ~= nil then
+        ____opt_result_7 = record.isNormalAttack
+    end
+    if ____opt_result_7 ~= true or not (applied > 0) then
         return
     end
     _____5F00_59CB_786C_76F4(record.attacker, _____514B_52B3_5FB7_5355_4F4D_6280_80FD_914D_7F6E["硬直毫秒"] * 0.001)

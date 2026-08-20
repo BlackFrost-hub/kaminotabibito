@@ -9,6 +9,7 @@ import { 获取或创建黑崎一护状态, 获取黑崎一护状态, 设置黑�
 import { 黑崎一护BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/09．黑崎一护";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 注册玩家黑流牙突A键 } from "./08．黑流牙突";
+import { 秒转毫秒, 秒转Tick数 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
@@ -98,7 +99,8 @@ function 推进卍解倒计时(this: void, variable: any): void {
   const caster = ctx.施法者;
 
   ctx.Tick数 += 1;
-  if (caster == null || caster === 0 || !IsUnitAliveBJ(caster) || ctx.Tick数 >= Math.round(配置.R.持续秒 * 10)) {
+  // 倒计时回调固定 100ms（每秒 10 Tick）：持续秒 × 10 即 Tick 数，结束时点与原四舍五入语义完全一致
+  if (caster == null || caster === 0 || !IsUnitAliveBJ(caster) || ctx.Tick数 >= 秒转Tick数(配置.R.持续秒, 100)) {
     if (caster != null && caster !== 0) 结束卍解(caster);
     else if (ctx.倒计时回调ID !== 0) {
       removePeriodicCallback(ctx.倒计时回调ID);
@@ -153,7 +155,7 @@ function 释放解放(this: void, context: R上下文, caster: any, _技能实�
   获取或创建黑崎一护状态(caster).移速已突破 = true;
 
   addDelayedCallback(
-    Math.round(配置.R.卍解延迟秒 * 1000),
+    秒转毫秒(配置.R.卍解延迟秒),
     启动卍解 as unknown as (this: void, variable?: any) => void,
     context,
   );

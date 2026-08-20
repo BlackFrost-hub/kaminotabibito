@@ -29,6 +29,7 @@ local ____require_result_7 = require("系统.03．技能系统.00．技能模板
 local _____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
 local _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D = ____require_result_7["读取单位最大生命"]
+local _____53D6_5355_4F4DID = ____require_result_7["取单位ID"]
 local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.02．原地击飞系统")
 local _____5F00_59CB_539F_5730_51FB_98DE = ____require_result_8["开始原地击飞"]
 local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
@@ -64,7 +65,6 @@ local WEAPON_TYPE_METAL_HEAVY_BASH = jass.WEAPON_TYPE_METAL_HEAVY_BASH
 local UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 local UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
 local UNIT_TYPE_STRUCTURE = jass.UNIT_TYPE_STRUCTURE
-local GetHandleId = jass.GetHandleId
 local IsUnitType = jass.IsUnitType
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -76,11 +76,8 @@ local SetUnitAnimation = jass.SetUnitAnimation
 local GetUnitState = jass.GetUnitState
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local _____4E0A_4E0B_6587_8868 = {}
-local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    return (unit == nil or unit == 0) and 0 or (GetHandleId(unit) or 0)
-end
 local function _____83B7_53D6_6216_521B_5EFAR_4E0A_4E0B_6587(unit)
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local unitId = _____53D6_5355_4F4DID(unit)
     if unitId == 0 then
         return nil
     end
@@ -256,7 +253,7 @@ local function _____6E05_7406R_4E0A_4E0B_6587(context, _____7F29_77ED_51B7_5374)
         end
         context["已启动"] = false
     end
-    local unitId = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
+    local unitId = _____53D6_5355_4F4DID(context["施法者"])
     if unitId ~= 0 and _____4E0A_4E0B_6587_8868[unitId] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, unitId)
     end
@@ -301,7 +298,7 @@ local function _____857E_7C73_8389_4E9AR_786C_76F4_7ED3_675F(variable)
     end
 end
 local function _____857E_7C73_8389_4E9AR_5355_4F4D_6B7B_4EA1(dyingUnit, _killingUnit)
-    local context = _____4E0A_4E0B_6587_8868[_____53D6_5355_4F4D_53E5_67C4ID(dyingUnit)]
+    local context = _____4E0A_4E0B_6587_8868[_____53D6_5355_4F4DID(dyingUnit)]
     if context ~= nil then
         _____6E05_7406R_4E0A_4E0B_6587(context, false)
     end

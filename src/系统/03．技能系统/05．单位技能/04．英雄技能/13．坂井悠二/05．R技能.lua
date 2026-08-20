@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____53D6_5355_4F4D_53E5_67C4ID, _____6E05_7406R_4E0A_4E0B_6587, _____7ED3_7B97R_5355_6B21_4F24_5BB3, _____6E05_7406R_5230_671F, jass, _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3, _____83B7_53D6_8303_56F4_654C_519B, removeDelayedCallback, removePeriodicCallback, GetHandleId, GetOwningPlayer, RemoveUnit, stringToFourCC, UnitRemoveAbility, SetPlayerAbilityAvailable, _____914D_7F6E, ____R_6280_80FDID_5B57_7B26_4E32, ____R_65E5_5FD7_6A21_5757, _____4E0A_4E0B_6587_8868
+local _____6E05_7406R_4E0A_4E0B_6587, _____7ED3_7B97R_5355_6B21_4F24_5BB3, _____6E05_7406R_5230_671F, jass, _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3, _____83B7_53D6_8303_56F4_654C_519B, removeDelayedCallback, removePeriodicCallback, GetOwningPlayer, RemoveUnit, stringToFourCC, UnitRemoveAbility, SetPlayerAbilityAvailable, _____914D_7F6E, ____R_6280_80FDID_5B57_7B26_4E32, ____R_65E5_5FD7_6A21_5757, _____4E0A_4E0B_6587_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.13．坂井悠二.00．配置")
 local _____5742_4E95_60A0_4E8C_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["坂井悠二技能配置"]
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
@@ -9,14 +9,11 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
+local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local _____6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
+local _____6781_5750_6807Y = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标Y"]
 local ____04_FF0E_8C03_8BD5_8F93_51FA = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.04．调试输出")
 local _____6280_80FD_5F3A_5236_8C03_8BD5_8F93_51FA = ____04_FF0E_8C03_8BD5_8F93_51FA["技能强制调试输出"]
-function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    if unit == nil or unit == 0 then
-        return 0
-    end
-    return GetHandleId(unit) or 0
-end
 function _____6E05_7406R_4E0A_4E0B_6587(context)
     if context["周期回调ID"] ~= 0 then
         removePeriodicCallback(context["周期回调ID"])
@@ -41,7 +38,7 @@ function _____6E05_7406R_4E0A_4E0B_6587(context)
     end
     context["已切二段"] = false
     context["已启动"] = false
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(context["施法者"])
+    local id = _____53D6_5355_4F4DID(context["施法者"])
     if id ~= 0 and _____4E0A_4E0B_6587_8868[id] == context then
         __TS__Delete(_____4E0A_4E0B_6587_8868, id)
     end
@@ -132,7 +129,6 @@ local ____require_result_8 = require("系统.00．核心系统.01．事件中心
 local registerDeathListener = ____require_result_8.registerDeathListener
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
-GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 GetOwningPlayer = jass.GetOwningPlayer
@@ -180,14 +176,14 @@ ____R_65E5_5FD7_6A21_5757 = "坂井悠二R排查"
 _____4E0A_4E0B_6587_8868 = {}
 local _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
 local function _____83B7_53D6R_4E0A_4E0B_6587(unit)
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local id = _____53D6_5355_4F4DID(unit)
     if id == 0 then
         return nil
     end
     return _____4E0A_4E0B_6587_8868[id]
 end
 local function _____83B7_53D6_6216_521B_5EFAR_4E0A_4E0B_6587(unit)
-    local id = _____53D6_5355_4F4D_53E5_67C4ID(unit)
+    local id = _____53D6_5355_4F4DID(unit)
     if id == 0 then
         return nil
     end
@@ -229,10 +225,10 @@ local function _____63A8_8FDBR_5468_671F_4F24_5BB3(context)
     local _____4E2D_5FC3X = GetUnitX(_____795E_95E8)
     local _____4E2D_5FC3Y = GetUnitY(_____795E_95E8)
     local _____843D_70B9_534A_5F84 = _____914D_7F6E["周期"]["随机落点半径"]
-    local _____89D2_5EA6 = GetRandomReal(0, 360) * (3.14159265358979 / 180)
+    local _____968F_673A_89D2_5EA6 = GetRandomReal(0, 360)
     local _____534A_5F84 = GetRandomReal(0, _____843D_70B9_534A_5F84)
-    local _____843D_70B9X = _____4E2D_5FC3X + _____534A_5F84 * math.cos(_____89D2_5EA6)
-    local _____843D_70B9Y = _____4E2D_5FC3Y + _____534A_5F84 * math.sin(_____89D2_5EA6)
+    local _____843D_70B9X = _____6781_5750_6807X(_____4E2D_5FC3X, _____968F_673A_89D2_5EA6, _____534A_5F84)
+    local _____843D_70B9Y = _____6781_5750_6807Y(_____4E2D_5FC3Y, _____968F_673A_89D2_5EA6, _____534A_5F84)
     do
         local i = 0
         while i < #_____914D_7F6E["周期"]["制裁特效"] do

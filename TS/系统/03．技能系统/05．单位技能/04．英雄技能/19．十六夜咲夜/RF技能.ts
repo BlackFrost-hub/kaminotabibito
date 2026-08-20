@@ -55,7 +55,8 @@ function 标准化角差(this: void, value: number): number {
 
 function RF计算伤害倍率(this: void, knife: any, target: any): { 倍率: number; 正中心: boolean } {
   const knifeFacing = 两点角度(jass.GetUnitX(knife), jass.GetUnitY(knife), jass.GetUnitX(target), jass.GetUnitY(target));
-  const difference = Math.abs(标准化角差(jass.GetUnitFacing(target) - knifeFacing));
+  const 角差 = 标准化角差(jass.GetUnitFacing(target) - knifeFacing);
+  const difference = 角差 < 0 ? -角差 : 角差;
   if (difference > 配置.RF.背刺边界角度) return { 倍率: 配置.RF.中心伤害攻击力倍率, 正中心: false };
   const ratio = difference / 配置.RF.背刺边界角度;
   return {

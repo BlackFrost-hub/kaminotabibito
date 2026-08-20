@@ -40,10 +40,12 @@ const { 增加生命比例仇恨 } = require("系统.01．单位系统.06．仇�
 const { 施加嘲讽 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.index") as {
   施加嘲讽: (this: void, 来源单位: any, 目标单位: any, 参数: { 持续时间: number; 反伤倍率?: number }) => number;
 };
-const { 单位存活, 两点角度, 读取单位最大生命 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 单位存活, 两点角度, 读取单位最大生命, 极坐标X, 极坐标Y } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   单位存活: (this: void, unit: any) => boolean;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
   读取单位最大生命: (this: void, unit: any) => number;
+  极坐标X: (this: void, x: number, angleDeg: number, distance: number) => number;
+  极坐标Y: (this: void, y: number, angleDeg: number, distance: number) => number;
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: {
@@ -185,8 +187,7 @@ function 处理掩护伤害(this: void, context: any): number {
     ? 两点角度(GetUnitX(target), GetUnitY(target), GetUnitX(attacker), GetUnitY(attacker))
     : jass.GetUnitFacing(施法者);
   // 施法者瞬移到目标身后（朝伤害来源方向 125 码）
-  const 弧度 = 方向角 * Math.PI / 180;
-  SetUnitPosition(施法者, GetUnitX(target) + Math.cos(弧度) * cfg.掩护位移距离, GetUnitY(target) + Math.sin(弧度) * cfg.掩护位移距离);
+  SetUnitPosition(施法者, 极坐标X(GetUnitX(target), 方向角, cfg.掩护位移距离), 极坐标Y(GetUnitY(target), 方向角, cfg.掩护位移距离));
   // 施法者短暂免伤
   YDUserDataSetSafe("unit", 施法者, 免疫伤害属性名, "boolean", true);
   addDelayedCallback(cfg.掩护后免伤持续秒 * 1000, () => {

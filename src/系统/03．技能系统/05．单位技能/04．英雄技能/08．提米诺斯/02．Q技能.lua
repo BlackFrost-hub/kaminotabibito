@@ -17,12 +17,11 @@ local ____require_result_2 = require("系统.04．伤害系统.02．治疗系统
 local spellHeal = ____require_result_2.spellHeal
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
 local getUnitsInRange = ____require_result_3.getUnitsInRange
-local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDWETimerDestroyEffectSafe = ____require_result_4.YDWETimerDestroyEffectSafe
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_4.stringToFourCCSafe
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
+local createTimedUnitEffect = ____require_result_5.createTimedUnitEffect
 local ____Q_6280_80FDID = stringToFourCCSafe(_____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E["Q技能ID"])
 local _____63D0_7C73_8BFA_65AF_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local function _____53D6_6709_6548_9B54_8017(caster, level)
@@ -96,10 +95,7 @@ local function ____on_63D0_7C73_8BFA_65AFQ(caster, abilityId)
                     local j = 0
                     while j < #cfg["特效"] do
                         local effectCfg = cfg["特效"][j + 1]
-                        local effect = jass.AddSpecialEffectTarget(effectCfg["模型"], target, effectCfg["挂点"])
-                        if effect ~= nil then
-                            YDWETimerDestroyEffectSafe(cfg["特效持续秒"], effect)
-                        end
+                        createTimedUnitEffect(target, effectCfg["挂点"], effectCfg["模型"], cfg["特效持续秒"])
                         j = j + 1
                     end
                 end

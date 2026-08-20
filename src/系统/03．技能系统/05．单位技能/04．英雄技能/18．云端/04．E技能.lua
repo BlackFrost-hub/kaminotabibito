@@ -23,15 +23,18 @@ local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_3["临时调整攻
 local _____4E34_65F6_8C03_6574_62A4_7532 = ____require_result_3["临时调整护甲"]
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_654F_6377 = ____require_result_4["读取单位敏捷"]
-local ____require_result_5 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_5.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_5.YDUserDataSetSafe
-local ____require_result_6 = require("lib.扩展函数.BJ函数.14．音效函数")
-local PlaySoundOnUnitBJ = ____require_result_6.PlaySoundOnUnitBJ
-local ____require_result_7 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
-local CreateFloatTextOnUnit = ____require_result_7.CreateFloatTextOnUnit
-local ____require_result_8 = require("系统.03．技能系统.01．技能冷却.03．QWERD冷却显示")
-local _____767B_8BB0_88AB_52A8_6280_80FD_51B7_5374 = ____require_result_8["登记被动技能冷却"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____require_result_5["秒转毫秒"]
+local _____5411_4E0B_53D6_6574_6574_6570 = ____require_result_5["向下取整整数"]
+local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataGetSafe = ____require_result_6.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_6.YDUserDataSetSafe
+local ____require_result_7 = require("lib.扩展函数.BJ函数.14．音效函数")
+local PlaySoundOnUnitBJ = ____require_result_7.PlaySoundOnUnitBJ
+local ____require_result_8 = require("lib.扩展函数.封装函数.03．漂浮文字.03．创建漂浮文字")
+local CreateFloatTextOnUnit = ____require_result_8.CreateFloatTextOnUnit
+local ____require_result_9 = require("系统.03．技能系统.01．技能冷却.03．QWERD冷却显示")
+local _____767B_8BB0_88AB_52A8_6280_80FD_51B7_5374 = ____require_result_9["登记被动技能冷却"]
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
@@ -41,8 +44,8 @@ local IsUnitAlly = jass.IsUnitAlly
 local IsUnitOwnedByPlayer = jass.IsUnitOwnedByPlayer
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
-local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_9.stringToFourCCSafe
+local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_10.stringToFourCCSafe
 local _____914D_7F6E = _____4E91_7AEF_6280_80FD_914D_7F6E
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____914D_7F6E["单位类型ID"]
 local ____E_7C7B_578BID = stringToFourCCSafe(_____914D_7F6E.E["技能ID"])
@@ -120,7 +123,7 @@ local function _____5904_7406_65E0_53CC_5251_6CD5_89E6_53D1(unit, _damage, damag
             removeDelayedCallback(record["E冷却回调ID"])
         end
         record["E冷却回调ID"] = addDelayedCallback(
-            math.floor(_____914D_7F6E.E["触发冷却秒"] * 1000 + 0.5),
+            _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.E["触发冷却秒"]),
             _____7ED3_675FE_89E6_53D1_51B7_5374,
             source
         )
@@ -175,7 +178,7 @@ local function _____5904_7406_65E0_53CC_5251_6CD5_89E6_53D1(unit, _damage, damag
             speedY = _____914D_7F6E.E["漂浮字"]["上浮速度"],
             height = 40
         })
-        local _____589E_91CF = math.floor(_____8BFB_53D6_5355_4F4D_654F_6377(source) * (_____914D_7F6E.E["破势"]["每级敏捷系数"] * _____7B49_7EA7))
+        local _____589E_91CF = _____5411_4E0B_53D6_6574_6574_6570(_____8BFB_53D6_5355_4F4D_654F_6377(source) * (_____914D_7F6E.E["破势"]["每级敏捷系数"] * _____7B49_7EA7))
         _____4E34_65F6_8C03_6574_653B_51FB(source, _____589E_91CF)
         registerManualBuff(source, _____4E91_7AEFBuffID["无双破势"], _____914D_7F6E.E["增益持续秒"], _____589E_91CF)
         ctx = {["施法者"] = source, ["分支"] = "破势", ["增量"] = _____589E_91CF, ["已回收"] = false}
@@ -196,7 +199,7 @@ local function _____5904_7406_65E0_53CC_5251_6CD5_89E6_53D1(unit, _damage, damag
         ctx = {["施法者"] = source, ["分支"] = "御势", ["增量"] = _____589E_91CF, ["已回收"] = false}
     end
     addDelayedCallback(
-        math.floor(_____914D_7F6E.E["增益持续秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.E["增益持续秒"]),
         _____56DE_6536E_589E_76CA,
         ctx
     )

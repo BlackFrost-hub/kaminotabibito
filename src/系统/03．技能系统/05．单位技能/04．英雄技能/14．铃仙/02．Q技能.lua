@@ -8,6 +8,7 @@ local ____00A_FF0E_8868_73B0_5DE5_5177 = require("系统.03．技能系统.05．
 local _____64AD_653E_94C3_4ED9_5355_4F4D_7ED1_5B9A_97F3_6548 = ____00A_FF0E_8868_73B0_5DE5_5177["播放铃仙单位绑定音效"]
 local ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406 = require("系统.03．技能系统.05．单位技能.04．英雄技能.14．铃仙.00B．分身与状态管理")
 local _____662F_94C3_4ED9_672C_4F53 = ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406["是铃仙本体"]
+local _____662F_94C3_4ED9_5206_8EAB = ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406["是铃仙分身"]
 local _____94C3_4ED9_5206_8EAB_6570_91CF = ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406["铃仙分身数量"]
 local _____83B7_53D6_94C3_4ED9_5206_8EAB_7EC4 = ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406["获取铃仙分身组"]
 local _____79FB_9664_94C3_4ED9_5206_8EAB = ____00B_FF0E_5206_8EAB_4E0E_72B6_6001_7BA1_7406["移除铃仙分身"]
@@ -34,13 +35,16 @@ local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
 local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_9["读取单位攻击力"]
 local _____5355_4F4D_5B58_6D3B = ____require_result_9["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_9["两点角度"]
+local _____53D6_5355_4F4DID = ____require_result_9["取单位ID"]
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____require_result_10["秒转毫秒"]
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local UNIT_TYPE_HERO = jass.UNIT_TYPE_HERO
 local ____Q_6280_80FDID = stringToFourCCSafe(_____94C3_4ED9_5355_4F4D_6280_80FD_914D_7F6E["Q技能ID"])
 local ____Agho_9690_8EAB_80FD_529BID = stringToFourCCSafe("Agho")
-local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local SetUnitFacing = jass.SetUnitFacing
@@ -51,9 +55,33 @@ local GetSpellTargetY = jass.GetSpellTargetY
 local IsUnitType = jass.IsUnitType
 local UnitAddAbility = jass.UnitAddAbility
 local UnitRemoveAbility = jass.UnitRemoveAbility
-local _____89D2_5EA6_8F6C_5F27_5EA6 = math.pi / 180
-local function _____4E24_70B9_89D2_5EA6(x1, y1, x2, y2)
-    return math.atan(y2 - y1, x2 - x1) * 180 / math.pi
+--- Q 隐身代次表：重复命中/重复施法时旧回调不得移除新一轮仍有效的隐身能力
+local ____Q_9690_8EAB_4EE3_6B21_8868 = {}
+local function _____94C3_4ED9Q_5206_8EAB_6A21_4EFF_6062_590D(variable)
+    local _____53C2_6570 = variable
+    if _____53C2_6570 == nil then
+        return
+    end
+    local _____5206_8EAB = _____53C2_6570["分身"]
+    if _____5206_8EAB == nil or _____5206_8EAB == 0 or not _____5355_4F4D_5B58_6D3B(_____5206_8EAB) or not _____662F_94C3_4ED9_5206_8EAB(_____5206_8EAB) then
+        return
+    end
+    SetUnitAnimationByIndex(_____5206_8EAB, 2)
+    _____79FB_9664_5355_4F4D_6682_505C(_____5206_8EAB, "铃仙Q分身模仿")
+end
+local function _____94C3_4ED9Q_9690_8EAB_5230_671F(variable)
+    local _____53C2_6570 = variable
+    if _____53C2_6570 == nil then
+        return
+    end
+    local _____65BD_6CD5_8005 = _____53C2_6570["施法者"]
+    if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
+        return
+    end
+    if ____Q_9690_8EAB_4EE3_6B21_8868[_____53D6_5355_4F4DID(_____65BD_6CD5_8005)] ~= _____53C2_6570["代次"] then
+        return
+    end
+    UnitRemoveAbility(_____65BD_6CD5_8005, ____Agho_9690_8EAB_80FD_529BID)
 end
 local function _____94C3_4ED9Q_5206_8EAB_6A21_4EFF(_____65BD_6CD5_8005, _____5206_8EAB, _____65B9_5411_89D2)
     if _____5206_8EAB == nil or _____5206_8EAB == 0 then
@@ -76,16 +104,7 @@ local function _____94C3_4ED9Q_5206_8EAB_6A21_4EFF(_____65BD_6CD5_8005, _____520
         ["动画速度"] = 3,
         ["持续秒"] = cfg["分身特效时长"]
     })
-    addDelayedCallback(
-        350,
-        function()
-            if _____5206_8EAB == nil or _____5206_8EAB == 0 or not _____5355_4F4D_5B58_6D3B(_____5206_8EAB) then
-                return
-            end
-            SetUnitAnimationByIndex(_____5206_8EAB, 2)
-            _____79FB_9664_5355_4F4D_6682_505C(_____5206_8EAB, "铃仙Q分身模仿")
-        end
-    )
+    addDelayedCallback(350, _____94C3_4ED9Q_5206_8EAB_6A21_4EFF_6062_590D, {["分身"] = _____5206_8EAB})
     SetUnitTimeScale(_____5206_8EAB, 1)
 end
 local function ____on_94C3_4ED9Q(_____65BD_6CD5_8005, _____6280_80FDID_6570_503C)
@@ -176,15 +195,15 @@ local function ____on_94C3_4ED9Q(_____65BD_6CD5_8005, _____6280_80FDID_6570_503C
         end,
         ["on结束"] = function(_____539F_56E0)
             if _____547D_4E2D_82F1_96C4 then
+                local _____65BD_6CD5_8005ID = _____53D6_5355_4F4DID(_____65BD_6CD5_8005)
+                local _____4EE3_6B21 = (____Q_9690_8EAB_4EE3_6B21_8868[_____65BD_6CD5_8005ID] or 0) + 1
+                ____Q_9690_8EAB_4EE3_6B21_8868[_____65BD_6CD5_8005ID] = _____4EE3_6B21
                 UnitAddAbility(_____65BD_6CD5_8005, ____Agho_9690_8EAB_80FD_529BID)
                 registerManualBuff(_____65BD_6CD5_8005, _____94C3_4ED9BuffID["Q隐身"], cfg["隐身持续秒"], 0)
                 addDelayedCallback(
-                    math.floor(cfg["隐身持续秒"] * 1000 + 0.5),
-                    function()
-                        if _____65BD_6CD5_8005 ~= nil and _____65BD_6CD5_8005 ~= 0 and _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
-                            UnitRemoveAbility(_____65BD_6CD5_8005, ____Agho_9690_8EAB_80FD_529BID)
-                        end
-                    end
+                    _____79D2_8F6C_6BEB_79D2(cfg["隐身持续秒"]),
+                    _____94C3_4ED9Q_9690_8EAB_5230_671F,
+                    {["施法者"] = _____65BD_6CD5_8005, ["代次"] = _____4EE3_6B21}
                 )
             end
         end

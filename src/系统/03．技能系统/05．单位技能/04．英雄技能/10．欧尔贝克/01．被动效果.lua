@@ -6,6 +6,7 @@ local ____00B_FF0E_79EF_6512_72B6_6001 = require("系统.03．技能系统.05．
 local _____83B7_53D6_6B27_5C14_8D1D_514B_79EF_6512_8BA1_6570 = ____00B_FF0E_79EF_6512_72B6_6001["获取欧尔贝克积攒计数"]
 local _____6D88_8017_6B27_5C14_8D1D_514B_79EF_6512 = ____00B_FF0E_79EF_6512_72B6_6001["消耗欧尔贝克积攒"]
 local jass = require("jass.common")
+local GetRandomReal = jass.GetRandomReal
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
@@ -85,7 +86,7 @@ local function _____5C1D_8BD5_89E6_53D1_6B27_5C14_8D1D_514B_5251_6C14(caster)
     local cfg = _____6B27_5C14_8D1D_514B_5355_4F4D_6280_80FD_914D_7F6E.E
     local hasBuff = _____5355_4F4D_62E5_6709_539F_751FBuff(caster, _____79EF_6512Buff_7C7B_578BID)
     local probability = hasBuff and cfg["积攒触发概率"] or cfg["普攻触发概率"]
-    if math.random() >= probability then
+    if GetRandomReal(0, 1) >= probability then
         return
     end
     _____91CA_653E_6B27_5C14_8D1D_514B_5251_6C14(caster, level)

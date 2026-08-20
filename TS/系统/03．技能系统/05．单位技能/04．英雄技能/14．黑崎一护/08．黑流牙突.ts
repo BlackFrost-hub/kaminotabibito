@@ -29,6 +29,9 @@ const { 造成单体技能伤害 } = require("系统.04．伤害系统.08．技�
 const { 读取单位攻击力 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
 };
+const { 秒转毫秒 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  秒转毫秒: (this: void, seconds: number) => number;
+};
 const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, params: any) => any;
   销毁点特效: (this: void, effect: any) => void;
@@ -174,7 +177,7 @@ function 结算黑流牙突命中(this: void, ctx: 黑流牙突上下文): void 
   const 目标ID = GetHandleId(target);
   目标独立冷却表[目标ID] = true;
   const 冷却上下文: 目标冷却上下文 = { 目标: target, 目标ID };
-  addDelayedCallback(Math.round(配置.黑流牙突.标记持续秒 * 1000), 清除黑流牙突标记 as unknown as (this: void, variable?: any) => void, 冷却上下文);
+  addDelayedCallback(秒转毫秒(配置.黑流牙突.标记持续秒), 清除黑流牙突标记 as unknown as (this: void, variable?: any) => void, 冷却上下文);
 
   恢复施法者(ctx);
 }
@@ -255,7 +258,7 @@ function 发起黑流牙突(this: void, caster: any, target: any): void {
   };
   突进上下文表[GetHandleId(caster)] = ctx;
   ctx.回调ID = addPeriodicCallback(
-    Math.round(配置.黑流牙突.推进间隔秒 * 1000),
+    秒转毫秒(配置.黑流牙突.推进间隔秒),
     推进黑流牙突 as unknown as (this: void, variable?: any) => void,
     ctx,
   );

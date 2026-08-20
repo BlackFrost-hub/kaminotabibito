@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_539F_751FBuff_6280_80FDID, B015, B018, B019, B017, S005, S007, S006, S008
+local _____53D6_539F_751FBuff_6280_80FDID, B015, B018, B019, B017, S005, S007, S006, S008, UnitRemoveAbility, _____539F_751FBuff_5B9A_65F6_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.03．阿伦劳特.00．配置")
 local _____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["阿伦劳特单位技能配置"]
 function _____53D6_539F_751FBuff_6280_80FDID(buffId)
@@ -20,12 +20,26 @@ function _____53D6_539F_751FBuff_6280_80FDID(buffId)
 end
 local jass = require("jass.common")
 local Atan2 = jass.Atan2
+local SquareRoot = jass.SquareRoot
 local _____5F27_5EA6_8F6C_89D2_5EA6 = 57.29577951308232
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local removeDelayedCallback = ____require_result_1.removeDelayedCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____require_result_2["秒转毫秒"]
+local function _____539F_751FBuff_5230_671F_79FB_9664(variable)
+    local _____53C2_6570 = variable
+    if _____53C2_6570 == nil then
+        return
+    end
+    UnitRemoveAbility(_____53C2_6570["单位"], _____53C2_6570["技能ID"])
+    local map = _____539F_751FBuff_5B9A_65F6_8868[_____53C2_6570["单位ID"]]
+    if map ~= nil then
+        map[_____53C2_6570.BuffID] = nil
+    end
+end
 local _____5149_5F62_6001_5355_4F4DID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["光形态单位ID"])
 local _____6697_5F62_6001_5355_4F4DID = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["暗形态单位ID"])
 B015 = stringToFourCCSafe(_____963F_4F26_52B3_7279_5355_4F4D_6280_80FD_914D_7F6E["裁决审判强化BuffID"])
@@ -40,7 +54,7 @@ local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local UnitAddAbility = jass.UnitAddAbility
-local UnitRemoveAbility = jass.UnitRemoveAbility
+UnitRemoveAbility = jass.UnitRemoveAbility
 local IsUnitType = jass.IsUnitType
 local GetOwningPlayer = jass.GetOwningPlayer
 --- 是否为阿伦劳特（光/暗任一形态）
@@ -75,7 +89,7 @@ end
 ____exports["拥有天堂呼唤"] = function(unit)
     return ____exports["阿伦劳特拥有原生Buff"](unit, B018)
 end
-local _____539F_751FBuff_5B9A_65F6_8868 = {}
+_____539F_751FBuff_5B9A_65F6_8868 = {}
 --- 给单位添加原生 Buff，持续 duration 秒后自动移除；重复添加刷新时长
 ____exports["添加原生Buff持续"] = function(unit, buffId, duration)
     if unit == nil or unit == 0 or duration <= 0 then
@@ -100,14 +114,9 @@ ____exports["添加原生Buff持续"] = function(unit, buffId, duration)
         removeDelayedCallback(old["定时器ID"])
     end
     local timerId = addDelayedCallback(
-        math.floor(duration * 1000 + 0.5),
-        function()
-            UnitRemoveAbility(unit, abilityId)
-            local map = _____539F_751FBuff_5B9A_65F6_8868[unitId]
-            if map ~= nil then
-                map[buffId] = nil
-            end
-        end
+        _____79D2_8F6C_6BEB_79D2(duration),
+        _____539F_751FBuff_5230_671F_79FB_9664,
+        {["单位"] = unit, ["技能ID"] = abilityId, ["单位ID"] = unitId, BuffID = buffId}
     )
     unitMap[buffId] = {["定时器ID"] = timerId}
 end
@@ -159,6 +168,6 @@ end
 ____exports["两点距离"] = function(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
-    return math.sqrt(dx * dx + dy * dy)
+    return SquareRoot(dx * dx + dy * dy)
 end
 return ____exports

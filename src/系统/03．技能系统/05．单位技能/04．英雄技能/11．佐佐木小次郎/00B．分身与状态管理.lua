@@ -21,25 +21,30 @@ local removeDelayedCallback = ____require_result_3.removeDelayedCallback
 local ____require_result_4 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
 local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_4["添加单位暂停"]
 local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_4["移除单位暂停"]
-local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_5["造成技能伤害"]
-local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-local getUnitsInRange = ____require_result_6.getUnitsInRange
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_7["两点角度"]
-local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
-local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-local isUnitEnemy = ____require_result_9.isUnitEnemy
-local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.21．攻击效果.02．攻击效果监听")
-local _____6CE8_518C_666E_653B_653B_51FB_6548_679C_76D1_542C = ____require_result_10["注册普攻攻击效果监听"]
-local ____require_result_11 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_11.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_11["移除单位指定Buff"]
-local ____require_result_12 = require("系统.03．技能系统.01．技能冷却.03．QWERD冷却显示")
-local _____767B_8BB0_88AB_52A8_6280_80FD_51B7_5374 = ____require_result_12["登记被动技能冷却"]
+local ____require_result_5 = require("lib.扩展函数.Star扩展函数.Star扩展库.06A．X库函数安全版")
+local X_SetUnitMovableSafe = ____require_result_5.X_SetUnitMovableSafe
+local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_6["造成技能伤害"]
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+local getUnitsInRange = ____require_result_7.getUnitsInRange
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_8["两点角度"]
+local _____89D2_5EA6_5DEE_7EDD_5BF9_503C = ____require_result_8["角度差绝对值"]
+local _____6781_5750_6807X = ____require_result_8["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_8["极坐标Y"]
+local ____require_result_9 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_9["创建点特效"]
+local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+local isUnitEnemy = ____require_result_10.isUnitEnemy
+local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.21．攻击效果.02．攻击效果监听")
+local _____6CE8_518C_666E_653B_653B_51FB_6548_679C_76D1_542C = ____require_result_11["注册普攻攻击效果监听"]
+local ____require_result_12 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_12.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_12["移除单位指定Buff"]
+local ____require_result_13 = require("系统.03．技能系统.01．技能冷却.03．QWERD冷却显示")
+local _____767B_8BB0_88AB_52A8_6280_80FD_51B7_5374 = ____require_result_13["登记被动技能冷却"]
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -74,20 +79,6 @@ do
         playerId = playerId + 1
     end
 end
-local function _____5F52_4E00_5316_89D2_5EA6(angle)
-    local result = angle % 360
-    if result < 0 then
-        result = result + 360
-    end
-    return result
-end
-local function _____89D2_5EA6_5DEE(a, b)
-    local diff = math.abs(_____5F52_4E00_5316_89D2_5EA6(a) - _____5F52_4E00_5316_89D2_5EA6(b))
-    if diff > 180 then
-        diff = 360 - diff
-    end
-    return diff
-end
 local function _____662F_6709_6548_4F24_5BB3_76EE_6807(_____65BD_6CD5_8005, target)
     if target == nil or target == 0 or target == _____65BD_6CD5_8005 then
         return false
@@ -120,7 +111,7 @@ ____exports["佐佐木扇形伤害"] = function(_____65BD_6CD5_8005, _____4E2D_5
             do
                 local target = targets[i + 1]
                 if not _____662F_6709_6548_4F24_5BB3_76EE_6807(_____65BD_6CD5_8005, target) then
-                    goto __continue17
+                    goto __continue13
                 end
                 local _____6307_5411_76EE_6807_89D2_5EA6 = _____4E24_70B9_89D2_5EA6(
                     _____4E2D_5FC3X,
@@ -128,12 +119,12 @@ ____exports["佐佐木扇形伤害"] = function(_____65BD_6CD5_8005, _____4E2D_5
                     GetUnitX(target),
                     GetUnitY(target)
                 )
-                if _____89D2_5EA6_5DEE(_____6307_5411_76EE_6807_89D2_5EA6, _____9762_5411_89D2_5EA6) > _____534A_89D2 then
-                    goto __continue17
+                if _____89D2_5EA6_5DEE_7EDD_5BF9_503C(_____6307_5411_76EE_6807_89D2_5EA6, _____9762_5411_89D2_5EA6) > _____534A_89D2 then
+                    goto __continue13
                 end
                 if _____786C_76F4_79D2 > 0 then
-                    local ____require_result_13 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-                    local ____SFB__65BD_52A0_901A_7528Buff = ____require_result_13["SFB_施加通用Buff"]
+                    local ____require_result_14 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+                    local ____SFB__65BD_52A0_901A_7528Buff = ____require_result_14["SFB_施加通用Buff"]
                     ____SFB__65BD_52A0_901A_7528Buff(_____65BD_6CD5_8005, target, 21, _____786C_76F4_79D2)
                 end
                 if _____547D_4E2D_7279_6548_6A21_578B ~= "" then
@@ -161,7 +152,7 @@ ____exports["佐佐木扇形伤害"] = function(_____65BD_6CD5_8005, _____4E2D_5
                     ["参与技能伤害加成"] = true
                 })
             end
-            ::__continue17::
+            ::__continue13::
             i = i + 1
         end
     end
@@ -277,6 +268,7 @@ local _____5206_8EAB_5F85_843D_5730_8868 = {}
 --- 当前正在创建分身的佐佐木本体（SFB 幻象召唤事件的召唤单位是全局马甲，无法从召唤单位反推本体）
 local _____5F53_524D_521B_5EFA_5206_8EAB_7684_82F1_96C4 = nil
 local function _____5206_8EAB_5165_573A_5904_7406(_____5206_8EAB, _____8BB0_5F55)
+    X_SetUnitMovableSafe(_____5206_8EAB, false)
     if type(japi.EXSetUnitCollisionType) == "function" then
         japi.EXSetUnitCollisionType(false, _____5206_8EAB, 1)
     end
@@ -300,8 +292,8 @@ local function _____5206_8EAB_5165_573A_5904_7406(_____5206_8EAB, _____8BB0_5F55
             cfg["命中特效缩放"],
             0
         )
-        local ____require_result_14 = require("系统.03．技能系统.05．单位技能.04．英雄技能.11．佐佐木小次郎.00A．表现工具")
-        local _____64AD_653E_4F50_4F50_6728_5355_4F4D_97F3_6548 = ____require_result_14["播放佐佐木单位音效"]
+        local ____require_result_15 = require("系统.03．技能系统.05．单位技能.04．英雄技能.11．佐佐木小次郎.00A．表现工具")
+        local _____64AD_653E_4F50_4F50_6728_5355_4F4D_97F3_6548 = ____require_result_15["播放佐佐木单位音效"]
         _____64AD_653E_4F50_4F50_6728_5355_4F4D_97F3_6548(_____5206_8EAB, cfg["分身命中音效路径"], cfg["分身命中音效裁断"])
     end
     addDelayedCallback(
@@ -401,28 +393,28 @@ ____exports["是佐佐木分身"] = function(_____82F1_96C4, _____76EE_6807)
     if GetUnitTypeId(_____76EE_6807) ~= _____4F50_4F50_6728_5355_4F4D_7C7B_578BID then
         return false
     end
-    local ____require_result_15 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
-    local _____5355_4F4D_62E5_6709_539F_751FBuff = ____require_result_15["单位拥有原生Buff"]
+    local ____require_result_16 = require("系统.03．技能系统.05．单位技能.00．公共.03．暴击被动公共工具")
+    local _____5355_4F4D_62E5_6709_539F_751FBuff = ____require_result_16["单位拥有原生Buff"]
     return _____5355_4F4D_62E5_6709_539F_751FBuff(_____76EE_6807, _____5E7B_8C61BuffID)
 end
 local _____666E_653B_8BA1_6570_8868 = {}
 local function ____on_4F50_4F50_6728_666E_653B_547D_4E2D(ctx)
-    local ____opt_result_18
+    local ____opt_result_19
     if ctx ~= nil then
-        ____opt_result_18 = ctx.source
+        ____opt_result_19 = ctx.source
     end
-    local source = ____opt_result_18
+    local source = ____opt_result_19
     if not ____exports["是佐佐木本体"](source) then
         return
     end
     if not _____5355_4F4D_5B58_6D3B(source) then
         return
     end
-    local ____opt_result_21
+    local ____opt_result_22
     if ctx ~= nil then
-        ____opt_result_21 = ctx.target
+        ____opt_result_22 = ctx.target
     end
-    local target = ____opt_result_21
+    local target = ____opt_result_22
     if target == nil or target == 0 then
         return
     end
@@ -441,8 +433,16 @@ local function ____on_4F50_4F50_6728_666E_653B_547D_4E2D(ctx)
         GetUnitX(target),
         GetUnitY(target)
     )
-    local _____8EAB_540EX = GetUnitX(target) + math.cos(_____6307_5411_89D2_5EA6 * math.pi / 180) * cfg["普攻分身后方距离"]
-    local _____8EAB_540EY = GetUnitY(target) + math.sin(_____6307_5411_89D2_5EA6 * math.pi / 180) * cfg["普攻分身后方距离"]
+    local _____8EAB_540EX = _____6781_5750_6807X(
+        GetUnitX(target),
+        _____6307_5411_89D2_5EA6,
+        cfg["普攻分身后方距离"]
+    )
+    local _____8EAB_540EY = _____6781_5750_6807Y(
+        GetUnitY(target),
+        _____6307_5411_89D2_5EA6,
+        cfg["普攻分身后方距离"]
+    )
     ____exports["创建佐佐木分身"](
         source,
         _____8EAB_540EX,
@@ -455,12 +455,12 @@ end
 _____6CE8_518C_666E_653B_653B_51FB_6548_679C_76D1_542C({
     ["名称"] = "佐佐木小次郎-普攻计数",
     ["条件"] = function(ctx)
-        local ____exports__662F_4F50_4F50_6728_672C_4F53_25 = ____exports["是佐佐木本体"]
-        local ____opt_result_24
+        local ____exports__662F_4F50_4F50_6728_672C_4F53_26 = ____exports["是佐佐木本体"]
+        local ____opt_result_25
         if ctx ~= nil then
-            ____opt_result_24 = ctx.source
+            ____opt_result_25 = ctx.source
         end
-        return ____exports__662F_4F50_4F50_6728_672C_4F53_25(____opt_result_24)
+        return ____exports__662F_4F50_4F50_6728_672C_4F53_26(____opt_result_25)
     end,
     ["命中后"] = ____on_4F50_4F50_6728_666E_653B_547D_4E2D
 })

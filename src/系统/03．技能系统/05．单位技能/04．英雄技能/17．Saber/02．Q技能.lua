@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____8BA1_7B97_4E24_70B9_89D2_5EA6, _____5728_524D_65B9_534A_5706, _____8FC7_6EE4Q_5288_780D_76EE_6807, _____8BA1_7B97_5200_5149_70B9, _____64AD_653E_5200_5149, _____6062_590DQ_76EE_6807_8868_73B0, _____5E94_7528Q_76EE_6807_547D_4E2D_8868_73B0, _____7ED3_7B97Q_524D_65B9_5288_780D, ____Q_521D_6BB5_7A97_53E3_590D_4F4D, _____6CBF_9762_5411_77AC_6B65, ____Q2_8FC7_6E21, ____Q2_7B2C_4E8C_6BB5_5288_780D, ____Q_8FDE_51FB2_7A97_53E3_590D_4F4D, _____63A8_8FDBQ3_4E0B_964D, ____Q3_8FC7_6E21, ____Q3_7B2C_4E8C_6BB5_5288_780D, ____Q3_590D_4F4D, jass, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____5F00_59CB_51FB_9000, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____83B7_53D6_8303_56F4_654C_519B, _____65BD_52A0_7729_6655, registerManualBuff, _____79FB_9664_5355_4F4D_6682_505C, _____521B_5EFA_70B9_7279_6548, createTimedUnitEffect, GetUnitX, GetUnitY, GetUnitFacing, GetUnitFlyHeight, GetOwningPlayer, SetUnitTimeScale, SetUnitAnimationByIndex, SetUnitAnimation, SetUnitTurnSpeed, SetUnitFlyHeight, SetPlayerAbilityAvailable, UnitAddAbility, UnitRemoveAbility, IsUnitType, IsUnitVisible, Atan2, Cos, Sin, bj_RADTODEG, bj_DEGTORAD, UNIT_TYPE_ANCIENT, UNIT_TYPE_MECHANICAL, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_METAL_HEAVY_BASH, _____914D_7F6E, ____Q_521D_6BB5ID, ____Q_8FDE_51FB2ID, ____Q_8FDE_51FB3ID
+local _____5728_524D_65B9_534A_5706, _____8FC7_6EE4Q_5288_780D_76EE_6807, _____8BA1_7B97_5200_5149_70B9, _____64AD_653E_5200_5149, _____6062_590DQ_76EE_6807_8868_73B0, _____5E94_7528Q_76EE_6807_547D_4E2D_8868_73B0, _____7ED3_7B97Q_524D_65B9_5288_780D, ____Q_521D_6BB5_7A97_53E3_590D_4F4D, _____6CBF_9762_5411_77AC_6B65, ____Q2_8FC7_6E21, ____Q2_7B2C_4E8C_6BB5_5288_780D, ____Q_8FDE_51FB2_7A97_53E3_590D_4F4D, _____63A8_8FDBQ3_4E0B_964D, ____Q3_8FC7_6E21, ____Q3_7B2C_4E8C_6BB5_5288_780D, ____Q3_590D_4F4D, jass, addDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____5F00_59CB_51FB_9000, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____83B7_53D6_8303_56F4_654C_519B, _____65BD_52A0_7729_6655, registerManualBuff, _____79FB_9664_5355_4F4D_6682_505C, _____521B_5EFA_70B9_7279_6548, createTimedUnitEffect, GetUnitX, GetUnitY, GetUnitFacing, GetUnitFlyHeight, GetOwningPlayer, SetUnitTimeScale, SetUnitAnimationByIndex, SetUnitAnimation, SetUnitTurnSpeed, SetUnitFlyHeight, SetPlayerAbilityAvailable, UnitAddAbility, UnitRemoveAbility, IsUnitType, IsUnitVisible, Cos, Sin, bj_DEGTORAD, UNIT_TYPE_ANCIENT, UNIT_TYPE_MECHANICAL, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_METAL_HEAVY_BASH, _____914D_7F6E, ____Q_521D_6BB5ID, ____Q_8FDE_51FB2ID, ____Q_8FDE_51FB3ID
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.17．Saber.00．配置")
 local ____Saber_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["Saber技能配置"]
 local ____08_FF0ESaber = require("系统.05．Buff系统.03．Buff表.02．英雄.08．Saber")
@@ -16,12 +16,12 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
 local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
-function _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2)
-    return Atan2(y2 - y1, x2 - x1) * bj_RADTODEG
-end
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
 function _____5728_524D_65B9_534A_5706(caster, target)
     local _____9762_5411 = GetUnitFacing(caster)
-    local _____76EE_6807_89D2 = _____8BA1_7B97_4E24_70B9_89D2_5EA6(
+    local _____76EE_6807_89D2 = _____4E24_70B9_89D2_5EA6(
         GetUnitX(caster),
         GetUnitY(caster),
         GetUnitX(target),
@@ -39,29 +39,29 @@ function _____8FC7_6EE4Q_5288_780D_76EE_6807(caster, _____654C_519B_5217_8868)
     for ____, target in ipairs(_____654C_519B_5217_8868) do
         do
             if target == nil or target == 0 then
-                goto __continue6
+                goto __continue5
             end
             if not _____5355_4F4D_5B58_6D3B(target) then
-                goto __continue6
+                goto __continue5
             end
             if IsUnitType(target, UNIT_TYPE_ANCIENT) then
-                goto __continue6
+                goto __continue5
             end
             if IsUnitType(target, UNIT_TYPE_MECHANICAL) then
-                goto __continue6
+                goto __continue5
             end
             if not IsUnitVisible(target, owner) then
-                goto __continue6
+                goto __continue5
             end
             if ____SaberQ_547D_4E2D_53BB_91CD_5305_542B(caster, target) then
-                goto __continue6
+                goto __continue5
             end
             if not _____5728_524D_65B9_534A_5706(caster, target) then
-                goto __continue6
+                goto __continue5
             end
             _____7ED3_679C[#_____7ED3_679C + 1] = target
         end
-        ::__continue6::
+        ::__continue5::
     end
     return _____7ED3_679C
 end
@@ -114,7 +114,7 @@ function _____5E94_7528Q_76EE_6807_547D_4E2D_8868_73B0(caster, target, _____89D2
         ["主单位死亡时中断"] = false
     })
     addDelayedCallback(
-        math.floor((_____51FB_9000_914D_7F6E["间隔秒"] * _____51FB_9000_914D_7F6E["次数"] + 0.05) * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____51FB_9000_914D_7F6E["间隔秒"] * _____51FB_9000_914D_7F6E["次数"] + 0.05),
         _____6062_590DQ_76EE_6807_8868_73B0,
         {target = target}
     )
@@ -207,7 +207,7 @@ function ____Q2_8FC7_6E21(variable)
     SetUnitAnimationByIndex(caster, _____914D_7F6E.Q["连击2"]["过渡"]["动作索引"])
     _____6CBF_9762_5411_77AC_6B65(caster, _____914D_7F6E.Q["连击2"]["过渡"]["前移距离"])
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["连击2"]["第二段"]["延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["连击2"]["第二段"]["延迟秒"]),
         ____Q2_7B2C_4E8C_6BB5_5288_780D,
         ctx
     )
@@ -230,7 +230,7 @@ function ____Q2_7B2C_4E8C_6BB5_5288_780D(variable)
     local _____65B9_5411 = GetUnitFacing(caster)
     for ____, target in ipairs(_____76EE_6807_5217_8868) do
         ____SaberQ_547D_4E2D_53BB_91CD_6DFB_52A0(caster, target)
-        local _____5F27_5EA6 = _____8BA1_7B97_4E24_70B9_89D2_5EA6(
+        local _____5F27_5EA6 = _____4E24_70B9_89D2_5EA6(
             GetUnitX(caster),
             GetUnitY(caster),
             GetUnitX(target),
@@ -280,7 +280,7 @@ function ____Q2_7B2C_4E8C_6BB5_5288_780D(variable)
     UnitAddAbility(caster, ____Q_8FDE_51FB3ID)
     _____79FB_9664_5355_4F4D_6682_505C(caster, _____914D_7F6E["暂停来源"]["Q连击2"])
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["连击2"]["连击窗口秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["连击2"]["连击窗口秒"]),
         ____Q_8FDE_51FB2_7A97_53E3_590D_4F4D,
         ctx
     )
@@ -348,12 +348,12 @@ function ____Q3_8FC7_6E21(variable)
     SetUnitAnimationByIndex(caster, _____914D_7F6E.Q["连击3"]["过渡"]["动作索引"])
     ctx["下降次数"] = 0
     ctx["下降回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.Q["连击3"]["下降"]["间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["连击3"]["下降"]["间隔秒"]),
         _____63A8_8FDBQ3_4E0B_964D,
         ctx
     )
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["连击3"]["第二段"]["延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["连击3"]["第二段"]["延迟秒"]),
         ____Q3_7B2C_4E8C_6BB5_5288_780D,
         ctx
     )
@@ -381,7 +381,7 @@ function ____Q3_7B2C_4E8C_6BB5_5288_780D(variable)
     _____79FB_9664_5355_4F4D_6682_505C(caster, _____914D_7F6E["暂停来源"]["Q连击3"])
     SetUnitFlyHeight(caster, 0, 0)
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["连击3"]["复位延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["连击3"]["复位延迟秒"]),
         ____Q3_590D_4F4D,
         ctx
     )
@@ -462,10 +462,9 @@ UnitAddAbility = jass.UnitAddAbility
 UnitRemoveAbility = jass.UnitRemoveAbility
 IsUnitType = jass.IsUnitType
 IsUnitVisible = jass.IsUnitVisible
-Atan2 = jass.Atan2
+local Atan2 = jass.Atan2
 Cos = jass.Cos
 Sin = jass.Sin
-bj_RADTODEG = jass.bj_RADTODEG
 bj_DEGTORAD = jass.bj_DEGTORAD
 UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 UNIT_TYPE_MECHANICAL = jass.UNIT_TYPE_MECHANICAL
@@ -549,7 +548,7 @@ local function ____Q1_547D_4E2D_540E_5288_780D(variable)
     UnitAddAbility(caster, ____Q_8FDE_51FB2ID)
     SetUnitTimeScale(caster, 1)
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["初段"]["连击窗口秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["初段"]["连击窗口秒"]),
         ____Q_521D_6BB5_7A97_53E3_590D_4F4D,
         ctx
     )
@@ -592,7 +591,7 @@ local function ____Q1_51B2_950B_7ED3_675F(_____79FB_52A8_5355_4F4D, _____539F_56
         SetUnitAnimationByIndex(_____79FB_52A8_5355_4F4D, _____914D_7F6E.Q["初段"]["命中后"]["动作索引"])
         SetUnitTimeScale(_____79FB_52A8_5355_4F4D, _____914D_7F6E.Q["初段"]["命中后"]["时间流速"])
         addDelayedCallback(
-            math.floor(_____914D_7F6E.Q["初段"]["命中后"]["硬直延迟秒"] * 1000 + 0.5),
+            _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["初段"]["命中后"]["硬直延迟秒"]),
             ____Q1_547D_4E2D_540E_5288_780D,
             record
         )
@@ -610,7 +609,7 @@ local function ____Q1_542F_52A8_51B2_950B(variable)
         ctx["已启动"] = false
         return
     end
-    ctx["方向角度"] = _____8BA1_7B97_4E24_70B9_89D2_5EA6(
+    ctx["方向角度"] = _____4E24_70B9_89D2_5EA6(
         GetUnitX(caster),
         GetUnitY(caster),
         ctx["目标点X"],
@@ -649,7 +648,7 @@ local function _____91CA_653EQ_521D_6BB5(context, caster, _____6280_80FD_5B9E_4F
     local record = _____83B7_53D6_6216_521B_5EFASaber_72B6_6001(caster)
     record["Q连击"] = 1
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["初段"]["起手延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["初段"]["起手延迟秒"]),
         ____Q1_542F_52A8_51B2_950B,
         context
     )
@@ -688,7 +687,7 @@ local function ____Q2_7B2C_4E00_6BB5_5288_780D(variable)
         ["技能实例ID"] = ctx["技能实例ID"]
     })
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["连击2"]["过渡"]["延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["连击2"]["过渡"]["延迟秒"]),
         ____Q2_8FC7_6E21,
         ctx
     )
@@ -717,7 +716,7 @@ local function _____91CA_653EQ_8FDE_51FB2(context, caster, _____6280_80FD_5B9E_4
     SetUnitAnimationByIndex(caster, _____914D_7F6E.Q["连击2"]["动作索引"])
     _____6CBF_9762_5411_77AC_6B65(caster, _____914D_7F6E.Q["连击2"]["前移距离"])
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["连击2"]["第一段"]["延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["连击2"]["第一段"]["延迟秒"]),
         ____Q2_7B2C_4E00_6BB5_5288_780D,
         context
     )
@@ -790,7 +789,7 @@ local function ____Q3_7B2C_4E00_6BB5_5288_780D(variable)
         ["技能实例ID"] = ctx["技能实例ID"]
     })
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["连击3"]["过渡"]["延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["连击3"]["过渡"]["延迟秒"]),
         ____Q3_8FC7_6E21,
         ctx
     )
@@ -827,12 +826,12 @@ local function _____91CA_653EQ_8FDE_51FB3(context, caster, _____6280_80FD_5B9E_4
     SetUnitAnimationByIndex(caster, _____914D_7F6E.Q["连击3"]["动作索引"])
     _____6CBF_9762_5411_77AC_6B65(caster, _____914D_7F6E.Q["连击3"]["前移距离"])
     context["上升回调ID"] = addPeriodicCallback(
-        math.floor(_____914D_7F6E.Q["连击3"]["上升"]["间隔秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["连击3"]["上升"]["间隔秒"]),
         _____63A8_8FDBQ3_4E0A_5347,
         context
     )
     addDelayedCallback(
-        math.floor(_____914D_7F6E.Q["连击3"]["第一段"]["延迟秒"] * 1000 + 0.5),
+        _____79D2_8F6C_6BEB_79D2(_____914D_7F6E.Q["连击3"]["第一段"]["延迟秒"]),
         ____Q3_7B2C_4E00_6BB5_5288_780D,
         context
     )

@@ -80,6 +80,7 @@ function 结算命中伤害(this: void, 实例: 原生弹幕内部实例, 目标
     目标: 目标单位,
     伤害: 实例.当前伤害值,
     伤害类型: 实例.参数.伤害类型 ?? DAMAGE_TYPE_NORMAL,
+    attack: 实例.参数.attack === true,
     ranged: false,
     attackType: 实例.参数.攻击类型 ?? ATTACK_TYPE_NORMAL,
     weaponType: 实例.参数.武器类型 ?? WEAPON_TYPE_WHOKNOWS,

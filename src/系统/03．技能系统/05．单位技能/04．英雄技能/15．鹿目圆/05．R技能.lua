@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local _____64AD_653ER_5168_5C40_97F3_6548, _____79FB_9664_5355_4F4D_58F3, _____6E05_7406R, _____6E05_7406R_8109_51B2_7BAD, _____521B_5EFAR_8109_51B2_7BAD, _____662FR_57FA_7840_6709_6548_76EE_6807, _____662FR_654C_65B9_76EE_6807, _____662FR_53CB_65B9_76EE_6807, _____7ED3_7B97R_5355_6B21_8109_51B2, ____R_654C_65B9_6BCF_76EE_6807_5904_7406, ____R_7ED3_7B97Tick, ____R_521B_5EFA_53CC_7BAD, ____R_4E0B_964DTick, ____R_5F39_9053Tick, jass, jglobals, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____79FB_9664_5355_4F4D_8D1F_9762Buff, _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3, _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B, doHeal, _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168, getUnitsInRange, _____521B_5EFA_70B9_7279_6548, GetRandomDirectionDeg, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, IsUnitEnemy, IsUnitAlly, IsUnitOwnedByPlayer, IsUnitType, UnitRemoveBuffsEx, PauseUnit, SetUnitFacing, SetUnitX, SetUnitY, GetUnitFlyHeight, GetUnitDefaultFlyHeight, SetUnitFlyHeight, SetUnitScale, SetUnitAnimationByIndex, RemoveUnit, GetRandomReal, Cos, Sin, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_TYPE_MECHANICAL, UNIT_TYPE_ANCIENT, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, WEAPON_TYPE_WHOKNOWS, bj_DEGTORAD, GetUnitStateJapi, _____914D_7F6E
+local _____64AD_653ER_5168_5C40_97F3_6548, _____79FB_9664_5355_4F4D_58F3, _____6E05_7406R, _____6E05_7406R_8109_51B2_7BAD, _____521B_5EFAR_8109_51B2_7BAD, _____662FR_57FA_7840_6709_6548_76EE_6807, _____662FR_654C_65B9_76EE_6807, _____662FR_53CB_65B9_76EE_6807, _____7ED3_7B97R_5355_6B21_8109_51B2, ____R_654C_65B9_6BCF_76EE_6807_5904_7406, ____R_7ED3_7B97Tick, ____R_521B_5EFA_53CC_7BAD, ____R_4E0B_964DTick, ____R_5F39_9053Tick, jass, jglobals, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____79FB_9664_5355_4F4D_8D1F_9762Buff, _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3, _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B, doHeal, _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168, _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0, getUnitsInRange, _____521B_5EFA_70B9_7279_6548, GetRandomDirectionDeg, GetUnitTypeId, GetUnitX, GetUnitY, GetUnitState, IsUnitEnemy, IsUnitAlly, IsUnitOwnedByPlayer, IsUnitType, UnitRemoveBuffsEx, PauseUnit, SetUnitFacing, SetUnitX, SetUnitY, GetUnitFlyHeight, GetUnitDefaultFlyHeight, SetUnitFlyHeight, SetUnitScale, SetUnitAnimationByIndex, GetRandomReal, Cos, Sin, UNIT_STATE_LIFE, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_TYPE_MECHANICAL, UNIT_TYPE_ANCIENT, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_SHADOW_STRIKE, WEAPON_TYPE_WHOKNOWS, bj_DEGTORAD, GetUnitStateJapi, _____914D_7F6E
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.15．鹿目圆.00．配置")
 local _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["鹿目圆单位技能配置"]
 local ____01_FF0E_72B6_6001_4E0E_88AB_52A8 = require("系统.03．技能系统.05．单位技能.04．英雄技能.15．鹿目圆.01．状态与被动")
@@ -25,7 +25,7 @@ function _____64AD_653ER_5168_5C40_97F3_6548(soundKey)
 end
 function _____79FB_9664_5355_4F4D_58F3(unit)
     if unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 then
-        RemoveUnit(unit)
+        _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
     end
 end
 function _____6E05_7406R(context)
@@ -326,15 +326,17 @@ local ____require_result_9 = require("平台扩展API取值")
 local _____6280_80FD__83B7_53D6_6280_80FD_6700_5927_51B7_5374_65F6_95F4 = ____require_result_9["技能_获取技能最大冷却时间"]
 local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装")
 _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_10["创建单位并登记排泄安全"]
-local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
-getUnitsInRange = ____require_result_11.getUnitsInRange
-local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-_____521B_5EFA_70B9_7279_6548 = ____require_result_12["创建点特效"]
-local ____require_result_13 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_13["读取单位攻击力"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_13["两点角度"]
-local ____require_result_14 = require("lib.扩展函数.BJ函数.07．杂项")
-GetRandomDirectionDeg = ____require_result_14.GetRandomDirectionDeg
+local ____require_result_11 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+_____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_11["立即移除单位并取消排泄登记"]
+local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.01．选取中心范围")
+getUnitsInRange = ____require_result_12.getUnitsInRange
+local ____require_result_13 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+_____521B_5EFA_70B9_7279_6548 = ____require_result_13["创建点特效"]
+local ____require_result_14 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_14["读取单位攻击力"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_14["两点角度"]
+local ____require_result_15 = require("lib.扩展函数.BJ函数.07．杂项")
+GetRandomDirectionDeg = ____require_result_15.GetRandomDirectionDeg
 local GetHandleId = jass.GetHandleId
 GetUnitTypeId = jass.GetUnitTypeId
 GetUnitX = jass.GetUnitX
@@ -358,7 +360,6 @@ SetUnitFlyHeight = jass.SetUnitFlyHeight
 SetUnitScale = jass.SetUnitScale
 local SetUnitAnimation = jass.SetUnitAnimation
 SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
-RemoveUnit = jass.RemoveUnit
 GetRandomReal = jass.GetRandomReal
 local SquareRoot = jass.SquareRoot
 Cos = jass.Cos
@@ -371,11 +372,11 @@ UNIT_TYPE_ANCIENT = jass.UNIT_TYPE_ANCIENT
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____jass_bj_DEGTORAD_15 = jass.bj_DEGTORAD
-if ____jass_bj_DEGTORAD_15 == nil then
-    ____jass_bj_DEGTORAD_15 = 0.017453292519943295
+local ____jass_bj_DEGTORAD_16 = jass.bj_DEGTORAD
+if ____jass_bj_DEGTORAD_16 == nil then
+    ____jass_bj_DEGTORAD_16 = 0.017453292519943295
 end
-bj_DEGTORAD = ____jass_bj_DEGTORAD_15
+bj_DEGTORAD = ____jass_bj_DEGTORAD_16
 GetUnitStateJapi = japi.GetUnitState
 _____914D_7F6E = _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E
 local function _____4E24_70B9_8DDD_79BB(x1, y1, x2, y2)

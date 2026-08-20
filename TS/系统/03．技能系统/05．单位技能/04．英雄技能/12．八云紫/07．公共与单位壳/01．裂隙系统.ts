@@ -15,8 +15,14 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 };
+const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
+  立即移除单位并取消排泄登记: (this: void, unit: any) => void;
+};
 const { getEnemyUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getEnemyUnitsInRange: (this: void, source: any, x: number, y: number, radius: number) => any[];
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { 是否精英单位 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．便捷短函数集合.06．精英单位判断") as {
   是否精英单位: (this: void, unit: any) => boolean;
@@ -130,11 +136,6 @@ export function 是八云紫合法敌人(this: void, hero: any, target: any): bo
     && jass.IsUnitType(target, UNIT_TYPE_ANCIENT) !== true;
 }
 
-function 销毁点特效(this: void, variable?: any): void {
-  const effect = variable as any;
-  if (effect != null && effect !== 0) jass.DestroyEffect(effect);
-}
-
 export function 创建八云紫点特效(
   this: void,
   model: string,
@@ -144,12 +145,14 @@ export function 创建八云紫点特效(
   scale: number = 1,
   height: number = 0,
 ): any {
-  const effect = jass.AddSpecialEffect(model, x, y);
-  if (effect == null || effect === 0) return effect;
-  if (scale !== 1 && japi.EXSetEffectSize != null) japi.EXSetEffectSize(effect, scale);
-  if (height !== 0 && japi.EXSetEffectZ != null) japi.EXSetEffectZ(effect, height);
-  addDelayedCallback(durationSec * 1000, 销毁点特效, effect);
-  return effect;
+  return 创建点特效({
+    模型路径: model,
+    X: x,
+    Y: y,
+    Z: height,
+    缩放: scale,
+    持续秒: durationSec,
+  });
 }
 
 function 清理间隙命中层(this: void, variable?: any): void {
@@ -236,7 +239,7 @@ function 清理裂隙记录(this: void, record: 八云紫裂隙记录): void {
     if (next > 0) 英雄长期裂隙数[heroId] = next;
     else delete 英雄长期裂隙数[heroId];
   }
-  if (record.单位 != null && record.单位 !== 0 && jass.GetUnitTypeId(record.单位) !== 0) jass.RemoveUnit(record.单位);
+  if (record.单位 != null && record.单位 !== 0 && jass.GetUnitTypeId(record.单位) !== 0) 立即移除单位并取消排泄登记(record.单位);
 }
 
 function 裂隙到期(this: void, variable?: any): void {
@@ -287,16 +290,17 @@ export function 检查八云紫D裂隙放置(this: void, hero: any, x: number, y
 export function 计算裂隙可达终点(this: void, startX: number, startY: number, targetX: number, targetY: number): { x: number; y: number } {
   const dx = targetX - startX;
   const dy = targetY - startY;
-  const distance = Math.sqrt(dx * dx + dy * dy);
+  const distance = jass.SquareRoot(dx * dx + dy * dy);
   if (distance <= 0.01) return { x: startX, y: startY };
-  const maxDistance = Math.min(distance, 配置.裂隙.放置距离);
+  const maxDistance = distance < 配置.裂隙.放置距离 ? distance : 配置.裂隙.放置距离;
   const ux = dx / distance;
   const uy = dy / distance;
   let x = startX;
   let y = startY;
   let travelled = 0;
   while (travelled < maxDistance) {
-    const step = Math.min(配置.裂隙.移动步长, maxDistance - travelled);
+    const 剩余 = maxDistance - travelled;
+    const step = 配置.裂隙.移动步长 < 剩余 ? 配置.裂隙.移动步长 : 剩余;
     const nextX = x + ux * step;
     const nextY = y + uy * step;
     if (jass.IsTerrainPathable(nextX, nextY, PATHING_TYPE_WALKABILITY) === true) break;
@@ -364,7 +368,7 @@ export function 创建八云紫临时裂隙(this: void, hero: any, x: number, y:
 
 function 移除临时裂隙(this: void, variable?: any): void {
   const unit = variable as any;
-  if (unit != null && unit !== 0 && jass.GetUnitTypeId(unit) !== 0) jass.RemoveUnit(unit);
+  if (unit != null && unit !== 0 && jass.GetUnitTypeId(unit) !== 0) 立即移除单位并取消排泄登记(unit);
 }
 
 export function 获取八云紫裂隙记录(this: void, unit: any): 八云紫裂隙记录 | undefined {
@@ -443,7 +447,7 @@ function 监听八云紫裂隙自毁(this: void, castingUnit: any, spellAbilityI
     return;
   }
   if (unitTypeId === 配置.单位.临时裂隙类型ID && unitTypeId !== 0) {
-    jass.RemoveUnit(castingUnit);
+    立即移除单位并取消排泄登记(castingUnit);
   }
 }
 

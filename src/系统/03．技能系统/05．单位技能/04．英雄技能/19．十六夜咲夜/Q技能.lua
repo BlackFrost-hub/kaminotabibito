@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____Q_5355_5200_7ED3_675F, _____5207_6362Q_8FFD_8E2A_5200, _____767B_8BB0Q_98DE_5200, _____63A8_8FDBQ_98DE_5200, jass, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B, _____5355_4F4D_662F_5426_6682_505C, GetUnitX, GetUnitY, GetUnitFlyHeight, SetUnitX, SetUnitY, SetUnitFacing, SetUnitFlyHeight, SetUnitScale, IsUnitEnemy, GetOwningPlayer, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_METAL_HEAVY_SLICE
+local ____Q_5355_5200_7ED3_675F, _____5207_6362Q_8FFD_8E2A_5200, _____767B_8BB0Q_98DE_5200, _____63A8_8FDBQ_98DE_5200, jass, _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3, _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B, _____5411_4E0B_53D6_6574_6574_6570, _____5355_4F4D_662F_5426_6682_505C, GetUnitX, GetUnitY, GetUnitFlyHeight, SetUnitX, SetUnitY, SetUnitFacing, SetUnitFlyHeight, SetUnitScale, IsUnitEnemy, GetOwningPlayer, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_METAL_HEAVY_SLICE
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.00．配置")
 local _____914D_7F6E = ____00_FF0E_914D_7F6E["十六夜咲夜基础技能配置"]
 local ____01_FF0E_98DE_5200_4E0E_65F6_95F4_5DE5_5177 = require("系统.03．技能系统.05．单位技能.04．英雄技能.19．十六夜咲夜.01．飞刀与时间工具")
@@ -97,10 +97,8 @@ function _____767B_8BB0Q_98DE_5200(state)
             return _____914D_7F6E.Q["追踪步长"] * _____914D_7F6E.Q["追踪最大Tick"]
         end,
         ["设置最大距离"] = function(value)
-            state["追踪Tick"] = math.max(
-                0,
-                _____914D_7F6E.Q["追踪最大Tick"] - math.floor(value / _____914D_7F6E.Q["追踪步长"])
-            )
+            local _____5269_4F59Tick = _____914D_7F6E.Q["追踪最大Tick"] - _____5411_4E0B_53D6_6574_6574_6570(value / _____914D_7F6E.Q["追踪步长"])
+            state["追踪Tick"] = _____5269_4F59Tick > 0 and _____5269_4F59Tick or 0
         end,
         ["结束"] = function()
             ____Q_5355_5200_7ED3_675F(state)
@@ -213,8 +211,10 @@ _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3 = ____require_result_0["造成单�
 _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_0["结束独立技能伤害实例"]
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_1["读取单位攻击力"]
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-_____5355_4F4D_662F_5426_6682_505C = ____require_result_2["单位是否暂停"]
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
+_____5411_4E0B_53D6_6574_6574_6570 = ____require_result_2["向下取整整数"]
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+_____5355_4F4D_662F_5426_6682_505C = ____require_result_3["单位是否暂停"]
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY

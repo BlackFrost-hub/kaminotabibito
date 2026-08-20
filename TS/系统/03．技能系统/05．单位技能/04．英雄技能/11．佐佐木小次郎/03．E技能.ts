@@ -39,6 +39,9 @@ const { 读取单位攻击力, 读取单位最大生命, 单位存活 } = requir
   读取单位最大生命: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
 };
+const { 向下取整整数 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算") as {
+  向下取整整数: (this: void, value: number) => number;
+};
 const { getUnitsInRange } = require("lib.扩展函数.自定义扩展函数.01．选取中心范围") as {
   getUnitsInRange: (this: void, x: number, y: number, radius: number) => any[];
 };
@@ -113,11 +116,12 @@ function 结束止水(this: void, 英雄: any, 施法进度条: any, 是否完�
 
   const 当前生命 = GetUnitState(英雄, UNIT_STATE_LIFE);
   const 最大生命 = 读取单位最大生命(英雄);
-  const 新生命 = Math.min(最大生命, 当前生命 + 最大生命 * cfg.恢复生命比例);
+  const 恢复后生命 = 当前生命 + 最大生命 * cfg.恢复生命比例;
+  const 新生命 = 恢复后生命 > 最大生命 ? 最大生命 : 恢复后生命;
   SetUnitState(英雄, UNIT_STATE_LIFE, 新生命);
 
   // 12 秒内增加 14% 攻击（到期减回）
-  const 攻击加成 = Math.floor(读取单位攻击力(英雄) * cfg.增攻比例);
+  const 攻击加成 = 向下取整整数(读取单位攻击力(英雄) * cfg.增攻比例);
   if (攻击加成 > 0) {
     临时调整攻击(英雄, 攻击加成);
     registerManualBuff(英雄, 佐佐木小次郎BuffID.宗和的心得, cfg.增攻持续秒, 攻击加成, {

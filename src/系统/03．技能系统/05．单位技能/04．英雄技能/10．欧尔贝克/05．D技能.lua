@@ -28,6 +28,8 @@ local ____require_result_7 = require("系统.03．技能系统.00．技能模板
 local _____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
 local _____4E24_70B9_89D2_5EA6 = ____require_result_7["两点角度"]
 local _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D = ____require_result_7["读取单位最大生命"]
+local _____6781_5750_6807X = ____require_result_7["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_7["极坐标Y"]
 local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
 local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
@@ -172,11 +174,18 @@ local function _____5904_7406_63A9_62A4_4F24_5BB3(context)
         GetUnitX(attacker),
         GetUnitY(attacker)
     ) or jass.GetUnitFacing(_____65BD_6CD5_8005)
-    local _____5F27_5EA6 = _____65B9_5411_89D2 * math.pi / 180
     SetUnitPosition(
         _____65BD_6CD5_8005,
-        GetUnitX(target) + math.cos(_____5F27_5EA6) * cfg["掩护位移距离"],
-        GetUnitY(target) + math.sin(_____5F27_5EA6) * cfg["掩护位移距离"]
+        _____6781_5750_6807X(
+            GetUnitX(target),
+            _____65B9_5411_89D2,
+            cfg["掩护位移距离"]
+        ),
+        _____6781_5750_6807Y(
+            GetUnitY(target),
+            _____65B9_5411_89D2,
+            cfg["掩护位移距离"]
+        )
     )
     YDUserDataSetSafe(
         "unit",
