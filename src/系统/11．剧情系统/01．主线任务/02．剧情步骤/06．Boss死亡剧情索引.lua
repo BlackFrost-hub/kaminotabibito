@@ -16,6 +16,7 @@ local GetUnitTypeId = jass.GetUnitTypeId
 ____exports["Boss死亡剧情索引表"] = {
     {
         ["Boss单位名"] = "地精祭祀|cffff0000（BossLV12）|r",
+        ["Boss单位ID"] = "N00C",
         ["需要剧情进度"] = 3,
         ["设置剧情进度"] = 4,
         ["剧情片段ID"] = "jlc_goblin_boss_death",
@@ -82,8 +83,8 @@ ____exports["Boss死亡剧情索引表"] = {
     },
     {["Boss单位名"] = "沉睡英魂·亚伦柯斯", ["需要剧情进度"] = 47, ["设置剧情进度"] = 48, ["说明"] = "亚伦柯斯死亡后开启通往封印核心的内层墓门；传送门由 Boss 死亡监听按场景时机注册。"}
 }
-local function ____Boss_5355_4F4D_540D_5339_914D(unitTypeId, ____Boss_5355_4F4D_540D)
-    local rawId = _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID(____Boss_5355_4F4D_540D)
+local function ____Boss_5355_4F4D_540D_5339_914D(unitTypeId, ____Boss_5355_4F4D_540D, ____Boss_5355_4F4DID)
+    local rawId = ____Boss_5355_4F4DID or _____6309_540D_5B57_53CD_67E5Boss_5355_4F4DID(____Boss_5355_4F4D_540D)
     return stringToFourCCSafe(rawId) == unitTypeId
 end
 local function _____5267_60C5_8FDB_5EA6_5339_914D(_____914D_7F6E_8FDB_5EA6, _____5F53_524D_5267_60C5_8FDB_5EA6)
@@ -98,7 +99,7 @@ ____exports["查找Boss死亡剧情索引"] = function(____Boss_5355_4F4D_7C7B_5
         while i < #____exports["Boss死亡剧情索引表"] do
             do
                 local _____7D22_5F15_9879 = ____exports["Boss死亡剧情索引表"][i + 1]
-                if not ____Boss_5355_4F4D_540D_5339_914D(____Boss_5355_4F4D_7C7B_578BID, _____7D22_5F15_9879["Boss单位名"]) then
+                if not ____Boss_5355_4F4D_540D_5339_914D(____Boss_5355_4F4D_7C7B_578BID, _____7D22_5F15_9879["Boss单位名"], _____7D22_5F15_9879["Boss单位ID"]) then
                     goto __continue7
                 end
                 if not _____5267_60C5_8FDB_5EA6_5339_914D(_____7D22_5F15_9879["需要剧情进度"], _____5F53_524D_5267_60C5_8FDB_5EA6) then

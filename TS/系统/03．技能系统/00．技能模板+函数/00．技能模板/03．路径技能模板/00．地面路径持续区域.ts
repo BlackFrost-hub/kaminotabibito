@@ -33,6 +33,7 @@ import { 创建区域效果, 清理区域效果周期伤害去重组, type 区�
 import { 获取矩形区域单位 } from "../../01．技能函数/09．形状区域/矩形区域";
 import type { 技能提示圈配置 } from "../../02．通用函数/16．技能提示圈工厂";
 import type { 英雄技能距离修正上下文 } from "../../04．机制组件/11．技能属性修正";
+import type { 机制清理篮子 } from "../../04．机制组件/06．机制清理/01．机制清理篮子";
 
 const { isUnitEnemy, isUnitAlly } = require("lib.扩展函数.自定义扩展函数.02．条件判断函数") as {
   isUnitEnemy: (this: void, targetUnit: any, sourceUnit: any) => boolean;
@@ -46,6 +47,7 @@ const { 造成持续伤害 } = require("系统.04．伤害系统.07．持续伤�
 };
 
 export interface 地面路径持续区域参数 {
+  清理?: 机制清理篮子;
   起点X: number;
   起点Y: number;
   方向角: number;
@@ -421,6 +423,11 @@ export function 创建地面路径持续区域(参数: 地面路径持续区域�
     确保地面路径整体伤害系统已启动();
   }
   实例.启动();
+  if (参数.清理 != null) {
+    参数.清理.登记清理("地面路径持续区域-" + 实例ID, function 地面路径持续区域清理(this: void): void {
+      实例.销毁();
+    });
+  }
   return 实例;
 }
 

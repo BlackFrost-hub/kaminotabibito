@@ -39,6 +39,7 @@ local _____521D_59CB_5316_4E16_754C_5730_56FE_4E2D_7ACB_751F_7269 = ____require_
 local _____521D_59CB_5316_4E16_754C_5730_56FE_690D_7269 = ____require_result_1["初始化世界地图植物"]
 local _____521D_59CB_5316_4E16_754C_5730_56FE_5F02_754C_63CF_8FF0_77F3 = ____require_result_1["初始化世界地图异界描述石"]
 local _____5EF6_8FDF_521D_59CB_5316_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C = ____require_result_1["延迟初始化世界地图Boss初始注册"]
+local _____521D_59CB_5316_4E16_754C_5730_56FE_82F1_96C4_9009_62E9_573A_666F = ____require_result_1["初始化世界地图英雄选择场景"]
 local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_2.addPeriodicCallback
 local removePeriodicCallback = ____require_result_2.removePeriodicCallback
@@ -109,6 +110,9 @@ function ____exports.init(self)
         _____4E16_754C_5730_56FE_6742_9C7C_7CBE_82F1_521B_5EFA_5DF2_5B8C_6210 = true
     end
     _____521D_59CB_5316_5176_4ED6_4E16_754C_5730_56FE_914D_7F6E()
+    if type(_____521D_59CB_5316_4E16_754C_5730_56FE_82F1_96C4_9009_62E9_573A_666F) == "function" then
+        _____521D_59CB_5316_4E16_754C_5730_56FE_82F1_96C4_9009_62E9_573A_666F()
+    end
     if type(_____5EF6_8FDF_521D_59CB_5316_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C) == "function" then
         _____5EF6_8FDF_521D_59CB_5316_4E16_754C_5730_56FEBoss_521D_59CB_6CE8_518C()
     end

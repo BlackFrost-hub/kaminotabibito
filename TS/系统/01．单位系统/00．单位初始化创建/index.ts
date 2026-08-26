@@ -22,6 +22,7 @@ const {
   初始化世界地图植物,
   初始化世界地图异界描述石,
   延迟初始化世界地图Boss初始注册,
+  初始化世界地图英雄选择场景,
 } = require("系统.01．单位系统.00．单位初始化创建.02．世界地图单位初始化.index") as {
   启用世界地图单位TS初始化?: boolean;
   启动世界地图全部单位缓步创建?: (this: void, 选项?: { 完成回调?: (this: void) => void }) => void;
@@ -36,6 +37,7 @@ const {
   初始化世界地图植物?: (this: void) => number;
   初始化世界地图异界描述石?: (this: void) => number;
   延迟初始化世界地图Boss初始注册?: (this: void) => void;
+  初始化世界地图英雄选择场景?: (this: void) => void;
 };
 const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
@@ -103,6 +105,9 @@ export function init(): void {
     世界地图杂鱼精英创建已完成 = true;
   }
   初始化其他世界地图配置();
+  if (typeof 初始化世界地图英雄选择场景 === "function") {
+    初始化世界地图英雄选择场景();
+  }
   if (typeof 延迟初始化世界地图Boss初始注册 === "function") {
     延迟初始化世界地图Boss初始注册();
   }

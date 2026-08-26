@@ -2,6 +2,7 @@
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 塞拉公共 } from "./00．公共";
+import { 距离平方XY } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 创建持续危险区域, type 持续危险区域实例 } from "../../../../../00．技能模板+函数/04．机制组件/03．持续危险区/01．持续危险区域";
 const {  巴尔扎罗斯单位技能配置,
   巴尔扎罗斯技能数值配置,
@@ -18,7 +19,6 @@ const {  巴尔扎罗斯单位技能配置,
   GetUnitY,
   单位有效,
   取单位ID,
-  点在圆内,
   计算冰焰目标位置,
   零度领域减伤到期Ms表,
   绝对零度领域状态表,
@@ -71,7 +71,7 @@ function 创建绝对零度领域(this: void, context: 巴尔扎罗斯运行时�
   const heroes = 获取Boss技能敌对英雄列表(context.Boss单位);
   for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
-    if (单位有效(hero) && 点在圆内(GetUnitX(hero), GetUnitY(hero), x, y, config.半径)) {
+    if (单位有效(hero) && 距离平方XY(GetUnitX(hero), GetUnitY(hero), x, y) <= config.半径 * config.半径) {
       减少巴尔扎罗斯灼热层数(hero, config.生成清除灼热层数);
     }
   }

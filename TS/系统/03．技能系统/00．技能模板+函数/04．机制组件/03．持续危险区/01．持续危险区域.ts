@@ -2,8 +2,10 @@
 
 import { 创建区域效果, 区域效果实例, 区域效果参数 } from "../../01．技能函数/04．区域效果/区域效果";
 import type { 技能提示圈配置 } from "../../02．通用函数/16．技能提示圈工厂";
+import type { 机制清理篮子 } from "../06．机制清理/01．机制清理篮子";
 
 export interface 持续危险区域参数 {
+  清理?: 机制清理篮子;
   X: number;
   Y: number;
   锚点单位?: any;
@@ -63,7 +65,7 @@ function 转换为区域效果参数(this: void, 参数: 持续危险区域参�
 
 export function 创建持续危险区域(this: void, 参数: 持续危险区域参数): 持续危险区域实例 {
   const 区域效果 = 创建区域效果(转换为区域效果参数(参数));
-  return {
+  const 实例: 持续危险区域实例 = {
     区域效果,
     销毁(): void {
       区域效果.销毁();
@@ -78,4 +80,10 @@ export function 创建持续危险区域(this: void, 参数: 持续危险区域�
       区域效果.移动到(x, y);
     },
   };
+  if (参数.清理 != null) {
+    参数.清理.登记清理("持续危险区域-" + 参数.X + "-" + 参数.Y, function 持续危险区域清理(this: void): void {
+      实例.销毁();
+    });
+  }
+  return 实例;
 }

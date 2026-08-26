@@ -33,7 +33,8 @@ imports\Common\Effect\Form\Aura\BloodAura\BloodAura.mdx
 - MDX / MDL 内部的项目私有贴图路径必须去掉 `imports\` 前缀，并指向分类目录共享 `Texture`，例如 `Common\Effect\Form\Aura\Texture\Shockwave10.blp`。
 - Warcraft III 原生贴图必须保留源模型中的原生游戏路径，例如 `Textures\CloudSingle.blp`、`Textures\GenericGlow64.blp`；禁止改写到分类 `Texture`，也不要复制进 `imports`。
 - 导出工具可能把原生贴图一并导出到模型目录；源目录里存在同名 `.blp` 不能证明它是私有贴图。迁移前必须用 Warcraft MPQ/CASC 文件索引按完整游戏路径判定。
-- 只有模型名是 `file_000123`、`unnamed`、纯数字等无语义名字时，才按用途改成语义化名字；原本有明确语义的模型名不要无脑改名。
+- 只有模型名是 `file_000123`、`unnamed`、纯数字、`JNTX (编号)`、`[TX] (编号)`、哈希式导出名等无语义名字时，才按用途改成语义化名字；原本有明确语义的模型名不要无脑改名。
+- 对上述无语义模型，必须先在确认具体英雄、技能和阶段用途后登记原始文件名、来源、完整 SHA-256、贴图依赖和用途，再执行单项迁移。正式纳入项目资源库后可以改成正常项目名，但必须保留原始名称索引并追加“原始名称 -> 正式路径/名称”映射；不能用改名后的文件绕过重复检查。
 
 ## 整理已有资源时
 

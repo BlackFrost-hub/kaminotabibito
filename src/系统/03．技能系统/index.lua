@@ -76,6 +76,18 @@ local ____opt_6 = _____5FEB_6377_952E_6280_80FD_6A21_5757["init环境互动"]
 if ____opt_6 ~= nil then
     ____opt_6()
 end
+local ____opt_8 = _____5FEB_6377_952E_6280_80FD_6A21_5757["init点金术"]
+if ____opt_8 ~= nil then
+    ____opt_8()
+end
+local ____opt_10 = _____5FEB_6377_952E_6280_80FD_6A21_5757["init鱼竿"]
+if ____opt_10 ~= nil then
+    ____opt_10()
+end
+local ____opt_12 = _____5FEB_6377_952E_6280_80FD_6A21_5757["init召唤师技能"]
+if ____opt_12 ~= nil then
+    ____opt_12()
+end
 require("系统.03．技能系统.01．显示技能名字")
 local ____ai_6280_80FD_7CFB_7EDF = require("系统.03．技能系统.06．AI自动使用技能.index")
 ____ai_6280_80FD_7CFB_7EDF.init()

@@ -4,6 +4,8 @@ local ____exports = {}
 local _____79FB_9664_4E34_65F6_88C2_9699, jass, _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.12．八云紫.00．配置")
 local _____516B_4E91_7D2B_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["八云紫单位技能配置"]
+local ____02_FF0E_5355_4F4D_4E0E_8303_56F4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009 = ____02_FF0E_5355_4F4D_4E0E_8303_56F4["获取坐标范围单位按筛选"]
 function _____79FB_9664_4E34_65F6_88C2_9699(variable)
     local unit = variable
     if unit ~= nil and unit ~= 0 and jass.GetUnitTypeId(unit) ~= 0 then
@@ -53,24 +55,23 @@ local _____88C2_9699_521B_5EFA_76D1_542C_5668_5217_8868 = {}
 local function _____53E5_67C4ID(handle)
     return (handle == nil or handle == 0) and 0 or jass.GetHandleId(handle)
 end
+--- 范围内原生单位全量枚举（不筛选，含死亡/无敌/建筑/机械/古树）。
+-- 配置型筛选等价表达：要求有效单位=false + 允许死亡=true + 允许无敌=true + 全类型放行 + 无参照单位。
 local function _____83B7_53D6_8303_56F4_5185_539F_751F_5355_4F4D(x, y, radius)
-    local group = jass.CreateGroup()
-    local result = {}
-    jass.GroupEnumUnitsInRange(
-        group,
+    return _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009(
         x,
         y,
         radius,
-        nil
+        nil,
+        {
+            ["要求有效单位"] = false,
+            ["允许死亡"] = true,
+            ["允许无敌"] = true,
+            ["允许建筑"] = true,
+            ["允许机械"] = true,
+            ["允许古树"] = true
+        }
     )
-    local unit = jass.FirstOfGroup(group)
-    while unit ~= nil and unit ~= 0 do
-        result[#result + 1] = unit
-        jass.GroupRemoveUnit(group, unit)
-        unit = jass.FirstOfGroup(group)
-    end
-    jass.DestroyGroup(group)
-    return result
 end
 ____exports["八云紫单位存活"] = function(unit)
     return unit ~= nil and unit ~= 0 and jass.GetUnitTypeId(unit) ~= 0 and jass.GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
@@ -416,13 +417,13 @@ ____exports["查找八云紫裂隙"] = function(x, y, radius, owner)
             do
                 local record = ____exports["获取八云紫裂隙记录"](units[i + 1])
                 if record == nil then
-                    goto __continue75
+                    goto __continue74
                 end
                 if owner == nil or owner == 0 or jass.GetOwningPlayer(record["主人"]) == jass.GetOwningPlayer(owner) then
                     return record
                 end
             end
-            ::__continue75::
+            ::__continue74::
             i = i + 1
         end
     end
@@ -437,14 +438,14 @@ ____exports["获取范围内八云紫裂隙"] = function(x, y, radius, owner)
             do
                 local record = ____exports["获取八云紫裂隙记录"](units[i + 1])
                 if record == nil then
-                    goto __continue80
+                    goto __continue79
                 end
                 if owner ~= nil and owner ~= 0 and jass.GetOwningPlayer(record["主人"]) ~= jass.GetOwningPlayer(owner) then
-                    goto __continue80
+                    goto __continue79
                 end
                 result[#result + 1] = record
             end
-            ::__continue80::
+            ::__continue79::
             i = i + 1
         end
     end
@@ -486,21 +487,21 @@ ____exports["触发八云紫裂隙扩散"] = function(hero, centerGap)
             do
                 local gap = gaps[i + 1]
                 if gap["扩散冷却到"] > now then
-                    goto __continue92
+                    goto __continue91
                 end
                 local life = jass.GetUnitState(gap["单位"], UNIT_STATE_LIFE)
                 local maxLife = jass.GetUnitState(gap["单位"], UNIT_STATE_MAX_LIFE)
                 local cost = maxLife * _____914D_7F6E["裂隙"]["扩散生命消耗比例"]
                 if life <= cost + 0.405 then
                     _____6E05_7406_88C2_9699_8BB0_5F55(gap)
-                    goto __continue92
+                    goto __continue91
                 end
                 jass.SetUnitState(gap["单位"], UNIT_STATE_LIFE, life - cost)
                 gap["扩散冷却到"] = now + _____914D_7F6E["裂隙"]["扩散冷却秒"] * 1000
                 _____5DF2_6CE8_518C_88C2_9699_6269_6563_53D1_5C04_5668(hero, gap)
                 count = count + 1
             end
-            ::__continue92::
+            ::__continue91::
             i = i + 1
         end
     end

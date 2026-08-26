@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { 单位未标记死亡 as 单位有效, 取单位ID } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 单位未标记死亡 as 单位有效, 取单位ID, 距离XY } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 执行Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 const { 播放限时单位动画 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待") as {
   播放限时单位动画: (this: void, 参数: any) => any;
@@ -51,7 +51,6 @@ const EXSetEffectSize = japi.EXSetEffectSize as (effect: any, scale: number) => 
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, timeScale: number) => void;
-const SquareRoot = jass.SquareRoot as (value: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -169,7 +168,7 @@ function 发射熔岩护盾反弹弹幕(this: void, boss: any, attacker: any): v
   const targetY = GetUnitY(attacker);
   const dx = targetX - startX;
   const dy = targetY - startY;
-  const distance = SquareRoot(dx * dx + dy * dy);
+  const distance = 距离XY(startX, startY, targetX, targetY);
   let controlX = (startX + targetX) * 0.5 + config.近战反弹控制点侧偏;
   let controlY = (startY + targetY) * 0.5;
   if (distance > 0.01) {

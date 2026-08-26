@@ -44,6 +44,7 @@ interface 技能延迟阶段变量 {
   上下文: 技能阶段链上下文;
   控制器: 技能阶段控制器;
   执行?: (this: void, 上下文: 技能阶段链上下文, 控制器: 技能阶段控制器) => void;
+  自动完成: boolean;
   已结束: boolean;
 }
 
@@ -71,7 +72,7 @@ function on技能延迟阶段到期(this: void, variable?: any): void {
   if (data == null || data.已结束) return;
   data.已结束 = true;
   if (data.执行 != null) data.执行(data.上下文, data.控制器);
-  data.控制器.完成当前阶段();
+  if (data.自动完成) data.控制器.完成当前阶段();
 }
 
 function 取阶段延迟毫秒(this: void, 延迟毫秒: 技能阶段延迟毫秒, 上下文: 技能阶段链上下文): number {
@@ -183,6 +184,7 @@ export function 创建延迟执行阶段(
   延迟毫秒: 技能阶段延迟毫秒,
   执行: (this: void, 上下文: 技能阶段链上下文, 控制器: 技能阶段控制器) => void,
   名称?: string,
+  自动完成: boolean = true,
 ): 技能阶段定义 {
   return {
     名称,
@@ -190,11 +192,11 @@ export function 创建延迟执行阶段(
       const delayMs = 取阶段延迟毫秒(延迟毫秒, 上下文);
       if (delayMs <= 0) {
         执行(上下文, 控制器);
-        控制器.完成当前阶段();
+        if (自动完成) 控制器.完成当前阶段();
         return;
       }
 
-      const data: 技能延迟阶段变量 = { 上下文, 控制器, 执行, 已结束: false };
+      const data: 技能延迟阶段变量 = { 上下文, 控制器, 执行, 自动完成, 已结束: false };
       const callbackId = addDelayedCallback(delayMs, on技能延迟阶段到期, data);
       控制器.设置当前阶段停止函数(function 停止技能延迟执行阶段(this: void): void {
         if (data.已结束) return;

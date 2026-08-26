@@ -21,6 +21,7 @@ import {
   极坐标X,
   极坐标Y,
 } from "./19．公共工具";
+import { 两点角度 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import type { 菲尼克斯尔伤害上下文参数 } from "./19．公共工具";
 import { 创建二阶贝塞尔XYZ轨迹, 创建原生弹幕 } from "../../../../00．技能模板+函数/01．技能函数/01．弹幕/01．TS原生弹幕";
 import { 创建技能提示圈 } from "../../../../00．技能模板+函数/02．通用函数/16．技能提示圈工厂";
@@ -30,15 +31,9 @@ const jass = require("jass.common") as any;
 const GetHandleId = jass.GetHandleId as (unit: any) => number;
 const GetUnitFlyHeight = jass.GetUnitFlyHeight as (unit: any) => number;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
-const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const bj_RADTODEG = (jass.bj_RADTODEG ?? 57.29577951308232) as number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
-
-function 取坐标朝向角(this: void, fromX: number, fromY: number, toX: number, toY: number): number {
-  return (Atan2(toY - fromY, toX - fromX) as number) * bj_RADTODEG;
-}
 
 function 发射菲尼克斯尔骸骨弹幕波次(this: void, context: 菲尼克斯尔运行时上下文, 伤害上下文: 菲尼克斯尔伤害上下文参数): void {
   const boss = context.Boss;
@@ -48,7 +43,7 @@ function 发射菲尼克斯尔骸骨弹幕波次(this: void, context: 菲尼克�
   const bossY = 取单位Y(boss);
   const safeTarget = 取随机玩家英雄(boss);
   const safeAngle = 单位存活(safeTarget)
-    ? 取坐标朝向角(bossX, bossY, 取单位X(safeTarget), 取单位Y(safeTarget))
+    ? 两点角度(bossX, bossY, 取单位X(safeTarget), 取单位Y(safeTarget))
     : GetRandomReal(0, 360);
   const slotCount = config.每波数量 + 1;
   const angleStep = 360 / slotCount;

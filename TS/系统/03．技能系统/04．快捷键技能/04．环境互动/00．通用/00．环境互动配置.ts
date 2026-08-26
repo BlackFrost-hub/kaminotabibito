@@ -9,5 +9,9 @@ export interface 环境互动触发点 {
   X: number;
   Y: number;
   触发范围?: number;
+  一次性?: boolean;
+  提示文本?: string;
+  延迟提示文本?: string;
+  奖励物品ID?: string;
   触发回调: (this: void, 玩家ID: number, 施法单位: any, 触发点: 环境互动触发点) => boolean;
 }

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____9020_6210_4F24_5BB3, _____64AD_653E_70B9_540D_7279_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____6302Buff, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____64AD_653E_65BD_6CD5_6CD5_9635, _____7ED3_7B97_5468_671F_4F24_5BB3, ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548, addDelayedCallback, registerManualBuff, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_70B9_7279_6548, createTimedUnitEffect, _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4, Sound3DII_CooPlayReuse, jass, GetUnitStateJapi, GetRandomInt, GetUnitTypeId, GetSpellTargetUnit, GetUnitName, GetUnitState, GetUnitX, GetUnitY, SetUnitFacing, Atan2, R2I, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, BJ_RADTODEG, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7F6A_4E0E_7F5A_6280_80FDID
+local _____9020_6210_4F24_5BB3, _____64AD_653E_70B9_540D_7279_6548, _____8BA9_5355_4F4D_9762_5411_76EE_6807, _____6302Buff, _____53D6_8C61_9650_540D_79F0, _____53D6_8C61_9650_6CD5_9635_989C_8272, _____64AD_653E_65BD_6CD5_6CD5_9635, _____7ED3_7B97_5468_671F_4F24_5BB3, ____on_745F_5170_8FEA_5C14_7F6A_4E0E_7F5A_751F_6548, addDelayedCallback, registerManualBuff, _____5F00_59CB_786C_76F4, _____663E_793A_5E38_89C4_6280_80FD_541F_5531_6761, _____5173_95ED_541F_5531_6761, _____521B_5EFA_70B9_7279_6548, createTimedUnitEffect, _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B, _____83B7_53D6Boss_6280_80FD_5E94_653B_51FB_76EE_6807, _____83B7_53D6Boss_6280_80FD_6700_8FD1_654C_5BF9_82F1_96C4, Sound3DII_CooPlayReuse, jass, GetUnitStateJapi, GetRandomInt, GetUnitTypeId, GetSpellTargetUnit, GetUnitName, GetUnitState, GetUnitX, GetUnitY, SetUnitFacing, R2I, UNIT_STATE_MAX_LIFE, UNIT_STATE_MAX_MANA, UNIT_STATE_MANA, _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID, _____7F6A_4E0E_7F5A_6280_80FDID
 local ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.03．运行时上下文")
 local _____83B7_53D6_6216_521B_5EFA_745F_5170_8FEA_5C14_4E0A_4E0B_6587 = ____03_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["获取或创建瑟兰迪尔上下文"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.02．瑟兰迪尔.02．数值与表现配置")
@@ -14,6 +14,7 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local stringToFourCC = ____19_FF0E_6218_6597_516C_5171_5DE5_5177.stringToFourCC
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位存活"]
+local _____5355_4F4D_95F4_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位间角度"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
 local _____63D0_4EA4_9884_8BA1_7B97Boss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss单体技能伤害"]
 local ____01_FF0E_56FA_5B9A_7EC4_5408_6280_80FD_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.14．固定组合技能模板.01．固定组合技能执行器")
@@ -43,11 +44,10 @@ function _____8BA9_5355_4F4D_9762_5411_76EE_6807(caster, target)
     if not _____5355_4F4D_6709_6548(caster) or not _____5355_4F4D_6709_6548(target) then
         return
     end
-    local angle = Atan2(
-        GetUnitY(target) - GetUnitY(caster),
-        GetUnitX(target) - GetUnitX(caster)
-    ) * BJ_RADTODEG
-    SetUnitFacing(caster, angle)
+    SetUnitFacing(
+        caster,
+        _____5355_4F4D_95F4_89D2_5EA6(caster, target)
+    )
 end
 function _____6302Buff(boss, target, buffID, duration, value, icon, effect)
     registerManualBuff(
@@ -345,7 +345,6 @@ GetUnitY = jass.GetUnitY
 SetUnitFacing = jass.SetUnitFacing
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
-Atan2 = jass.Atan2
 local AddSpecialEffect = jass.AddSpecialEffect
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
 R2I = jass.R2I
@@ -354,7 +353,6 @@ local DzSetEffectVertexColor = japi.DzSetEffectVertexColor
 UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA
 UNIT_STATE_MANA = jass.UNIT_STATE_MANA
-BJ_RADTODEG = 57.29577951308232
 _____745F_5170_8FEA_5C14_5355_4F4D_7C7B_578BID = stringToFourCC(_____745F_5170_8FEA_5C14_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 _____7F6A_4E0E_7F5A_6280_80FDID = stringToFourCC(_____745F_5170_8FEA_5C14_6570_503C_4E0E_8868_73B0_914D_7F6E["罪与罚"]["技能槽位"])
 local _____7F6A_4E0E_7F5A_5DF2_6CE8_518C = false

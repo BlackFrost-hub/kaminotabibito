@@ -3,6 +3,7 @@ local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
 local ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8BFB_53D6_5267_60C5_8FDB_5EA6 = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["读取剧情进度"]
+local _____6CE8_518C_5267_60C5_8FDB_5EA6_53D8_66F4_76D1_542C = ____01_FF0E_5267_60C5_52A8_4F5C_4E0A_4E0B_6587["注册剧情进度变更监听"]
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -28,13 +29,39 @@ local IssueImmediateOrder = jass.IssueImmediateOrder
 local SetUnitFacingTimed = jass.SetUnitFacingTimed
 local _____5DF2_521D_59CB_5316_8FDB_5EA605_6838_5FC3 = false
 local _____53D6_6D88_8FDB_5EA605_8303_56F4_76D1_542C
+local _____8FDB_5EA605_8303_56F4_76D1_542C_5DF2_6CE8_518C = false
 local function ____on_51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_89E6_53D1(_____89E6_53D1_5355_4F4D)
     if _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= 4 then
         return false
     end
     local _____7247_6BB5ID = "jlc_goblin_defeated_return_elder"
     local _____5DF2_5F00_59CB_64AD_653E = _____64AD_653E_4E3B_7EBF_5267_60C5_7247_6BB5(_____7247_6BB5ID, {["片段ID"] = _____7247_6BB5ID, ["触发配置名"] = "击败地精返回长老核心", ["触发单位"] = _____89E6_53D1_5355_4F4D})
+    if _____5DF2_5F00_59CB_64AD_653E then
+        _____8FDB_5EA605_8303_56F4_76D1_542C_5DF2_6CE8_518C = false
+        _____53D6_6D88_8FDB_5EA605_8303_56F4_76D1_542C = nil
+    end
     return _____5DF2_5F00_59CB_64AD_653E
+end
+--- 进度 4 可能由 Boss 运行器在死亡事件之后延迟结算；长老单位也可能晚于
+-- 主线入口初始化完成。入口必须可重复确保注册，不能因为第一次读取为空而永久失效。
+____exports["确保注册击败地精返回长老入口"] = function()
+    if _____8FDB_5EA605_8303_56F4_76D1_542C_5DF2_6CE8_518C then
+        return
+    end
+    local _____957F_8001_5355_4F4D = YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit")
+    if _____957F_8001_5355_4F4D == nil or _____957F_8001_5355_4F4D == 0 then
+        return
+    end
+    if _____53D6_6D88_8FDB_5EA605_8303_56F4_76D1_542C ~= nil then
+        _____53D6_6D88_8FDB_5EA605_8303_56F4_76D1_542C()
+    end
+    _____53D6_6D88_8FDB_5EA605_8303_56F4_76D1_542C = registerOneShotUnitRangeListener(_____957F_8001_5355_4F4D, 800, ____on_51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_89E6_53D1, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D)
+    _____8FDB_5EA605_8303_56F4_76D1_542C_5DF2_6CE8_518C = true
+end
+local function ____on_4E3B_7EBF_8FDB_5EA6_53D8_66F4(_____65B0_8FDB_5EA6)
+    if _____65B0_8FDB_5EA6 == 4 then
+        ____exports["确保注册击败地精返回长老入口"]()
+    end
 end
 ____exports["执行击败地精回村前置"] = function(_____53C2_6570)
     local _____89E6_53D1_5355_4F4D = YDUserDataGetSafe("string", "主线剧情入口", "触发单位", "unit")
@@ -61,13 +88,7 @@ ____exports["初始化进度05_击败地精返回长老核心"] = function()
         return
     end
     _____5DF2_521D_59CB_5316_8FDB_5EA605_6838_5FC3 = true
-    local _____957F_8001_5355_4F4D = YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit")
-    if _____957F_8001_5355_4F4D == nil or _____957F_8001_5355_4F4D == 0 then
-        return
-    end
-    if _____53D6_6D88_8FDB_5EA605_8303_56F4_76D1_542C ~= nil then
-        _____53D6_6D88_8FDB_5EA605_8303_56F4_76D1_542C()
-    end
-    _____53D6_6D88_8FDB_5EA605_8303_56F4_76D1_542C = registerOneShotUnitRangeListener(_____957F_8001_5355_4F4D, 800, ____on_51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_89E6_53D1, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D)
+    _____6CE8_518C_5267_60C5_8FDB_5EA6_53D8_66F4_76D1_542C(____on_4E3B_7EBF_8FDB_5EA6_53D8_66F4)
+    ____exports["确保注册击败地精返回长老入口"]()
 end
 return ____exports

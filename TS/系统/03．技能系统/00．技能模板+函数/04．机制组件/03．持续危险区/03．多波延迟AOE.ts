@@ -59,14 +59,20 @@ class 多波延迟AOE实现 implements 多波延迟AOE实例 {
 
   推进(now: number): void {
     if (this.已停止) return;
-    let 全部触发 = true;
     for (let i = 0; i < this.运行波次列表.length; i++) {
       const 运行波次 = this.运行波次列表[i];
       if (运行波次.已触发) continue;
-      全部触发 = false;
       if (now >= 运行波次.到期Ms) {
         运行波次.已触发 = true;
         this.参数.on触发(运行波次.波次, i + 1);
+        if (this.已停止) return;
+      }
+    }
+    let 全部触发 = true;
+    for (let i = 0; i < this.运行波次列表.length; i++) {
+      if (!this.运行波次列表[i].已触发) {
+        全部触发 = false;
+        break;
       }
     }
     if (全部触发) this.停止();

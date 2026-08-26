@@ -31,10 +31,8 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
-const {
-  创建原生弹幕,
-} = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index") as {
-  创建原生弹幕: (this: void, 参数: any) => any;
+const { 发射弹道 } = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂") as {
+  发射弹道: (this: void, 参数: any) => any;
 };
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, callback: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
@@ -81,13 +79,15 @@ function 释放欧尔贝克剑气(this: void, caster: any, level: number): void 
     Z: 0,
     持续秒: 0.8,
   });
-  创建原生弹幕({
+  // H-03 试点：直线弹幕经弹道编排工厂发射（轨迹/表现/伤害字段与源原生弹幕逐项等价）
+  发射弹道({
+    名称: "欧尔贝克-千枝枪剑气",
     所有者: caster,
-    X: GetUnitX(caster),
-    Y: GetUnitY(caster),
-    方向角: angle,
+    发射X: GetUnitX(caster),
+    发射Y: GetUnitY(caster),
+    发射方向角: angle,
     速度: cfg.弹幕速度,
-    最大距离: cfg.弹幕速度 * cfg.弹幕生命秒,
+    轨迹: { 类型: "直线", 距离: cfg.弹幕速度 * cfg.弹幕生命秒 },
     生命周期: cfg.弹幕生命秒,
     命中半径: cfg.弹幕命中半径,
     影响目标: "敌方",

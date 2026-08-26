@@ -25,7 +25,7 @@ const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩�
 };
 
 import type { 剧情动作参数表, 剧情动作处理器 } from "../../00．剧情系统核心工具/00．剧情动作类型";
-import { 读取剧情进度 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
+import { 读取剧情进度, 注册剧情进度变更监听 } from "../../00．剧情系统核心工具/01．剧情动作上下文";
 
 type 播放主线剧情片段函数 = (this: void, 片段ID: string, 上下文?: any) => boolean;
 let 播放主线剧情片段实现: 播放主线剧情片段函数 | undefined;
@@ -45,13 +45,42 @@ const SetUnitFacingTimed = jass.SetUnitFacingTimed as (this: void, whichUnit: an
 
 let 已初始化进度05核心 = false;
 let 取消进度05范围监听: (() => void) | undefined;
+let 进度05范围监听已注册 = false;
 
 function on击败地精返回长老触发(this: void, 触发单位: any): boolean {
   if (读取剧情进度() !== 4) return false;
 
   const 片段ID = "jlc_goblin_defeated_return_elder";
   const 已开始播放 = 播放主线剧情片段(片段ID, { 片段ID, 触发配置名: "击败地精返回长老核心", 触发单位 });
+  if (已开始播放) {
+    进度05范围监听已注册 = false;
+    取消进度05范围监听 = undefined;
+  }
   return 已开始播放;
+}
+
+/**
+ * 进度 4 可能由 Boss 运行器在死亡事件之后延迟结算；长老单位也可能晚于
+ * 主线入口初始化完成。入口必须可重复确保注册，不能因为第一次读取为空而永久失效。
+ */
+export function 确保注册击败地精返回长老入口(this: void): void {
+  if (进度05范围监听已注册) return;
+
+  const 长老单位 = YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit");
+  if (长老单位 == null || 长老单位 === 0) return;
+
+  if (取消进度05范围监听 != null) 取消进度05范围监听();
+  取消进度05范围监听 = registerOneShotUnitRangeListener(
+    长老单位,
+    800,
+    on击败地精返回长老触发,
+    是玩家英雄组单位,
+  );
+  进度05范围监听已注册 = true;
+}
+
+function on主线进度变更(this: void, 新进度: number): void {
+  if (新进度 === 4) 确保注册击败地精返回长老入口();
 }
 
 export function 执行击败地精回村前置(this: void, 参数: 剧情动作参数表): void {
@@ -73,14 +102,6 @@ export const 击败地精返回长老剧情动作注册表: Record<string, 剧�
 export function 初始化进度05_击败地精返回长老核心(this: void): void {
   if (已初始化进度05核心) return;
   已初始化进度05核心 = true;
-
-  const 长老单位 = YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit");
-  if (长老单位 == null || 长老单位 === 0) return;
-  if (取消进度05范围监听 != null) 取消进度05范围监听();
-  取消进度05范围监听 = registerOneShotUnitRangeListener(
-    长老单位,
-    800,
-    on击败地精返回长老触发,
-    是玩家英雄组单位,
-  );
+  注册剧情进度变更监听(on主线进度变更);
+  确保注册击败地精返回长老入口();
 }

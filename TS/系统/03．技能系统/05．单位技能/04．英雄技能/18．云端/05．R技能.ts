@@ -8,7 +8,7 @@
 import { 云端技能配置 } from "./00．配置";
 import { 云端BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/18．云端";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 读取单位攻击力, 两点角度, 距离XY } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 
 const jass = require("jass.common") as any;
@@ -94,9 +94,6 @@ const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale:
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, name: string) => void;
 const UnitAddAbility = jass.UnitAddAbility as (this: void, unit: any, abilityId: number) => boolean;
 const UnitRemoveAbility = jass.UnitRemoveAbility as (this: void, unit: any, abilityId: number) => boolean;
-const SquareRoot = jass.SquareRoot as (this: void, x: number) => number;
-const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
-const bj_RADTODEG = jass.bj_RADTODEG as number;
 const bj_DEGTORAD = jass.bj_DEGTORAD as number;
 const CAMERA_FIELD_TARGET_DISTANCE = jass.CAMERA_FIELD_TARGET_DISTANCE as any;
 const CAMERA_FIELD_FARZ = jass.CAMERA_FIELD_FARZ as any;
@@ -386,10 +383,8 @@ function R第二段冲刺(this: void, variable: any): void {
   SetUnitInvulnerable(target, true);
 
   // 源第二段：朝目标方向,距离 = 200 + 实时两者距离
-  const dx = GetUnitX(target) - GetUnitX(caster);
-  const dy = GetUnitY(target) - GetUnitY(caster);
-  const 实时距离 = SquareRoot(dx * dx + dy * dy);
-  const 角度 = Atan2(dy, dx) * bj_RADTODEG;
+  const 实时距离 = 距离XY(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target));
+  const 角度 = 两点角度(GetUnitX(caster), GetUnitY(caster), GetUnitX(target), GetUnitY(target));
   开始冲锋并附带残影表现(caster, {
     角度,
     距离: 配置.R.冲刺.第二段.基础距离 + 实时距离,
@@ -423,7 +418,7 @@ function R第一段冲刺(this: void, variable: any): void {
   SetUnitInvulnerable(target, true);
 
   // 源第一段：朝目标反向退后 400（AngleBetweenPoints(b, a)）
-  const 角度 = Atan2(GetUnitY(caster) - GetUnitY(target), GetUnitX(caster) - GetUnitX(target)) * bj_RADTODEG;
+  const 角度 = 两点角度(GetUnitX(target), GetUnitY(target), GetUnitX(caster), GetUnitY(caster));
   开始冲锋并附带残影表现(caster, {
     角度,
     距离: 配置.R.冲刺.第一段.距离,

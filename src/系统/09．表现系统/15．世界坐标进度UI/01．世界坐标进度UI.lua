@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____5237_65B0_586B_5145, _____5237_65B0_6587_672C, _____5C1D_8BD5_505C_6B62_4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8, _____9A71_52A8_4E16_754C_5750_6807_8FDB_5EA6UI, offTick10ms, DzFrameSetSize, DzFrameSetText, DzFrameShow, _____9A71_52A8_95F4_9694_79D2, _____4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8_5DF2_542F_52A8, _____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868
+local _____5237_65B0_586B_5145, _____5237_65B0_6587_672C, _____4ECE_9A71_52A8_5217_8868_79FB_9664, _____5C1D_8BD5_505C_6B62_4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8, _____5237_65B0_4E16_754C_5750_6807_8FDB_5EA6UI_8DDF_968F, _____9A71_52A8_4E16_754C_5750_6807_8FDB_5EA6UI, offTick10ms, DzFrameSetSize, DzFrameSetText, DzFrameBindWorldPos, DzFrameUnBind, DzFrameShow, DzDestroyFrame, GetUnitX, GetUnitY, GetUnitFlyHeight, GetUnitTypeId, GetWidgetLife, _____9A71_52A8_95F4_9694_79D2, _____4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8_5DF2_542F_52A8, _____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868
 local ____04_FF0E_6570_5B57_683C_5F0F_5316 = require("系统.09．表现系统.08．吟唱条.04．数字格式化")
 local _____683C_5F0F_5316_4E00_4F4D_5C0F_6570 = ____04_FF0E_6570_5B57_683C_5F0F_5316["格式化一位小数"]
 function _____5237_65B0_586B_5145(ui)
@@ -15,12 +15,43 @@ function _____5237_65B0_6587_672C(ui)
         ((((((("|cffd8f4ee" .. ui["标题"]) .. "|r |cff") .. ui["数值颜色"]) .. _____683C_5F0F_5316_4E00_4F4D_5C0F_6570(ui["显示值"])) .. "|r|cff8fa7ad / ") .. _____683C_5F0F_5316_4E00_4F4D_5C0F_6570(ui["最大值"])) .. ui["数值后缀"]) .. "|r"
     )
 end
+function _____4ECE_9A71_52A8_5217_8868_79FB_9664(ui)
+    do
+        local i = #_____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868 - 1
+        while i >= 0 do
+            if _____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868[i + 1] == ui then
+                __TS__ArraySplice(_____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868, i, 1)
+                return
+            end
+            i = i - 1
+        end
+    end
+end
 function _____5C1D_8BD5_505C_6B62_4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8()
     if not _____4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8_5DF2_542F_52A8 or #_____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868 > 0 then
         return
     end
     _____4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8_5DF2_542F_52A8 = false
     offTick10ms(_____9A71_52A8_4E16_754C_5750_6807_8FDB_5EA6UI)
+end
+function _____5237_65B0_4E16_754C_5750_6807_8FDB_5EA6UI_8DDF_968F(ui)
+    if ui["跟随单位"] == nil or ui["跟随单位"] == 0 then
+        return true
+    end
+    if GetUnitTypeId(ui["跟随单位"]) == 0 or GetWidgetLife(ui["跟随单位"]) <= 0.405 then
+        ____exports["销毁世界坐标进度UI"](ui)
+        return false
+    end
+    DzFrameBindWorldPos(
+        ui["根帧"],
+        GetUnitX(ui["跟随单位"]) + ui["跟随X偏移"],
+        GetUnitY(ui["跟随单位"]) + ui["跟随Y偏移"],
+        GetUnitFlyHeight(ui["跟随单位"]) + ui["跟随Z偏移"],
+        0,
+        0,
+        false
+    )
+    return true
 end
 function _____9A71_52A8_4E16_754C_5750_6807_8FDB_5EA6UI()
     do
@@ -30,7 +61,10 @@ function _____9A71_52A8_4E16_754C_5750_6807_8FDB_5EA6UI()
                 local ui = _____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868[i + 1]
                 if ui == nil or ui["已销毁"] then
                     __TS__ArraySplice(_____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868, i, 1)
-                    goto __continue21
+                    goto __continue24
+                end
+                if not _____5237_65B0_4E16_754C_5750_6807_8FDB_5EA6UI_8DDF_968F(ui) then
+                    goto __continue24
                 end
                 if ui["显示值"] ~= ui["目标值"] then
                     ui["动画已经过秒"] = ui["动画已经过秒"] + _____9A71_52A8_95F4_9694_79D2
@@ -50,13 +84,26 @@ function _____9A71_52A8_4E16_754C_5750_6807_8FDB_5EA6UI()
                     _____5237_65B0_6587_672C(ui)
                 end
             end
-            ::__continue21::
+            ::__continue24::
             i = i - 1
         end
     end
     _____5C1D_8BD5_505C_6B62_4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8()
 end
+____exports["销毁世界坐标进度UI"] = function(ui)
+    if ui == nil or ui["已销毁"] then
+        return
+    end
+    ui["已销毁"] = true
+    ui["已显示"] = false
+    _____4ECE_9A71_52A8_5217_8868_79FB_9664(ui)
+    DzFrameShow(ui["根帧"], false)
+    DzFrameUnBind(ui["根帧"])
+    DzDestroyFrame(ui["根帧"])
+    _____5C1D_8BD5_505C_6B62_4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8()
+end
 local japi = require("jass.japi")
+local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local onTick10ms = ____require_result_0.onTick10ms
 offTick10ms = ____require_result_0.offTick10ms
@@ -72,10 +119,15 @@ local DzFrameSetTextColor = japi.DzFrameSetTextColor
 local DzFrameSetFont = japi.DzFrameSetFont
 local DzFrameSetPriority = japi.DzFrameSetPriority
 local DzFrameSetIgnoreTrackEvents = japi.DzFrameSetIgnoreTrackEvents
-local DzFrameBindWorldPos = japi.DzFrameBindWorldPos
-local DzFrameUnBind = japi.DzFrameUnBind
+DzFrameBindWorldPos = japi.DzFrameBindWorldPos
+DzFrameUnBind = japi.DzFrameUnBind
 DzFrameShow = japi.DzFrameShow
-local DzDestroyFrame = japi.DzDestroyFrame
+DzDestroyFrame = japi.DzDestroyFrame
+GetUnitX = jass.GetUnitX
+GetUnitY = jass.GetUnitY
+GetUnitFlyHeight = jass.GetUnitFlyHeight
+GetUnitTypeId = jass.GetUnitTypeId
+GetWidgetLife = jass.GetWidgetLife
 local _____70B9_5DE6_4E0A = 0
 local _____70B9_4E2D = 4
 local _____9ED8_8BA4_5BBD_5EA6 = 0.082
@@ -138,18 +190,6 @@ local function _____9650_5236_8FDB_5EA6_503C(value, maximum)
         return maximum
     end
     return value
-end
-local function _____4ECE_9A71_52A8_5217_8868_79FB_9664(ui)
-    do
-        local i = #_____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868 - 1
-        while i >= 0 do
-            if _____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868[i + 1] == ui then
-                __TS__ArraySplice(_____4E16_754C_5750_6807_8FDB_5EA6UI_5217_8868, i, 1)
-                return
-            end
-            i = i - 1
-        end
-    end
 end
 local function _____786E_4FDD_4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8()
     if _____4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8_5DF2_542F_52A8 then
@@ -226,33 +266,45 @@ ____exports["创建世界坐标进度UI"] = function(_____53C2_6570)
     local visible = ____53C2_6570__521D_59CB_663E_793A_1
     local current = _____9650_5236_8FDB_5EA6_503C(_____53C2_6570["当前值"] or 0, _____53C2_6570["最大值"])
     local smoothDuration = _____53C2_6570["平滑过渡秒"] ~= nil and _____53C2_6570["平滑过渡秒"] > 0 and _____53C2_6570["平滑过渡秒"] or _____9ED8_8BA4_5E73_6ED1_8FC7_6E21_79D2
+    local ____53C2_6570__6700_5927_503C_3 = _____53C2_6570["最大值"]
+    local ____temp_4 = _____53C2_6570["标题"] or "进度"
+    local ____temp_5 = _____53C2_6570["数值后缀"] or ""
+    local ____typeVisual__989C_8272_6 = typeVisual["颜色"]
+    local ____53C2_6570__8DDF_968F_5355_4F4D_2 = _____53C2_6570["跟随单位"]
+    if ____53C2_6570__8DDF_968F_5355_4F4D_2 == nil then
+        ____53C2_6570__8DDF_968F_5355_4F4D_2 = nil
+    end
     local ui = {
         ID = id,
         ["根帧"] = root,
         ["填充帧"] = fill,
         ["文本帧"] = text,
-        ["最大值"] = _____53C2_6570["最大值"],
+        ["最大值"] = ____53C2_6570__6700_5927_503C_3,
         ["目标值"] = current,
         ["显示值"] = current,
         ["动画起始值"] = current,
         ["动画已经过秒"] = smoothDuration,
         ["平滑过渡秒"] = smoothDuration,
-        ["标题"] = _____53C2_6570["标题"] or "进度",
-        ["数值后缀"] = _____53C2_6570["数值后缀"] or "",
+        ["标题"] = ____temp_4,
+        ["数值后缀"] = ____temp_5,
         ["类型"] = ____type,
-        ["数值颜色"] = typeVisual["颜色"],
+        ["数值颜色"] = ____typeVisual__989C_8272_6,
         ["内条宽度"] = innerWidth,
         ["内条高度"] = innerHeight,
         ["文本刷新Tick"] = 0,
         ["已显示"] = visible,
-        ["已销毁"] = false
+        ["已销毁"] = false,
+        ["跟随单位"] = ____53C2_6570__8DDF_968F_5355_4F4D_2,
+        ["跟随X偏移"] = _____53C2_6570["跟随X偏移"] or 0,
+        ["跟随Y偏移"] = _____53C2_6570["跟随Y偏移"] or 0,
+        ["跟随Z偏移"] = _____53C2_6570["跟随Z偏移"] or 0
     }
     local z = _____53C2_6570.Z or 180
-    local ____53C2_6570__96FE_4E2D_53EF_89C1_2 = _____53C2_6570["雾中可见"]
-    if ____53C2_6570__96FE_4E2D_53EF_89C1_2 == nil then
-        ____53C2_6570__96FE_4E2D_53EF_89C1_2 = false
+    local ____53C2_6570__96FE_4E2D_53EF_89C1_7 = _____53C2_6570["雾中可见"]
+    if ____53C2_6570__96FE_4E2D_53EF_89C1_7 == nil then
+        ____53C2_6570__96FE_4E2D_53EF_89C1_7 = false
     end
-    local fogVisible = ____53C2_6570__96FE_4E2D_53EF_89C1_2
+    local fogVisible = ____53C2_6570__96FE_4E2D_53EF_89C1_7
     DzFrameBindWorldPos(
         root,
         _____53C2_6570.X,
@@ -305,17 +357,5 @@ ____exports["设置世界坐标进度UI显示"] = function(ui, visible)
     end
     ui["已显示"] = visible
     DzFrameShow(ui["根帧"], visible)
-end
-____exports["销毁世界坐标进度UI"] = function(ui)
-    if ui == nil or ui["已销毁"] then
-        return
-    end
-    ui["已销毁"] = true
-    ui["已显示"] = false
-    _____4ECE_9A71_52A8_5217_8868_79FB_9664(ui)
-    DzFrameShow(ui["根帧"], false)
-    DzFrameUnBind(ui["根帧"])
-    DzDestroyFrame(ui["根帧"])
-    _____5C1D_8BD5_505C_6B62_4E16_754C_5750_6807_8FDB_5EA6UI_9A71_52A8()
 end
 return ____exports

@@ -3,6 +3,7 @@
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 立即设置单位朝向 } from "../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
 import { 执行BossAOE技能伤害 } from "../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import { 单位间角度, 角度差绝对值 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 格鲁姆公共 } from "./00．公共";
 const {  巴尔扎罗斯技能数值配置,
   播放格鲁姆台词,
@@ -21,8 +22,6 @@ const {  巴尔扎罗斯技能数值配置,
   快速控制_击晕,
   单位有效,
   点到单位距离平方,
-  取方向角,
-  角度差绝对值,
   造成格鲁姆Boss技能伤害,
   播放点特效,
 } = 格鲁姆公共;
@@ -31,7 +30,7 @@ function 目标在重锤扇形内(this: void, grum: any, target: any, facing: nu
   const config = 巴尔扎罗斯技能数值配置.熔岩重锤;
   if (!单位有效(grum) || !单位有效(target)) return false;
   if (点到单位距离平方(target, GetUnitX(grum), GetUnitY(grum)) > config.扇形半径 * config.扇形半径) return false;
-  const angle = 取方向角(grum, target);
+  const angle = 单位间角度(grum, target);
   return 角度差绝对值(angle, facing) <= config.扇形角度 * 0.5;
 }
 
@@ -85,7 +84,7 @@ export function 释放格鲁姆重锤(this: void, context: 巴尔扎罗斯运行
   const grum = context.格鲁姆;
   if (!单位有效(grum) || !单位有效(target)) return;
   const config = 巴尔扎罗斯技能数值配置.熔岩重锤;
-  const angle = 取方向角(grum, target);
+  const angle = 单位间角度(grum, target);
   // 预警、命中扇形和格鲁姆本体必须共享同一帧的朝向快照。
   立即设置单位朝向(grum, angle);
   创建重锤提示(grum, angle);

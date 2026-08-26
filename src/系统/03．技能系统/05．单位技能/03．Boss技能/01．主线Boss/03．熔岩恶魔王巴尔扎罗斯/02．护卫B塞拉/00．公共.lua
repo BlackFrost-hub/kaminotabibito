@@ -4,6 +4,7 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local _____70B9_8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离平方XY"]
+local _____8DDD_79BBXY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
 local _____63D0_4EA4_9884_8BA1_7B97Boss_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss技能伤害"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -56,25 +57,16 @@ local GetUnitFlyHeight = jass.GetUnitFlyHeight
 local IsUnitType = jass.IsUnitType
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
-local Atan2 = jass.Atan2
-local SquareRoot = jass.SquareRoot
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local BJ_RADTODEG = 57.29577951308232
 local _____585E_62C9_5F62_6001_8868 = {}
 local _____96F6_5EA6_9886_57DF_51CF_4F24_5230_671FMs_8868 = {}
 local _____7EDD_5BF9_96F6_5EA6_9886_57DF_72B6_6001_8868 = {}
 local _____5F31_8FFD_8E2A_5F39_4F53_72B6_6001_8868 = {}
-local function _____53D6_65B9_5411_89D2(fromX, fromY, toX, toY)
-    return Atan2(toY - fromY, toX - fromX) * BJ_RADTODEG
-end
-local function _____70B9_5728_5706_5185(x, y, cx, cy, radius)
-    return _____70B9_8DDD_79BB_5E73_65B9(x, y, cx, cy) <= radius * radius
-end
 local function _____53D6_585E_62C9_5F62_6001(context)
     if context["塞拉当前形态"] == "冰霜" then
         return "冰霜"
@@ -100,13 +92,12 @@ local function _____76EE_6807_5728_7EDD_5BF9_96F6_5EA6_9886_57DF_5185(sera, targ
     if _____72B6_6001 == nil or getServerTime() >= _____72B6_6001["结束Ms"] then
         return false
     end
-    return _____70B9_5728_5706_5185(
+    return _____70B9_8DDD_79BB_5E73_65B9(
         GetUnitX(target),
         GetUnitY(target),
         _____72B6_6001.X,
-        _____72B6_6001.Y,
-        _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["绝对零度领域"]["半径"]
-    )
+        _____72B6_6001.Y
+    ) <= _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["绝对零度领域"]["半径"] * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["绝对零度领域"]["半径"]
 end
 local function _____53D6_6700_9AD8_707C_70ED_82F1_96C4(context, _____53EA_53D6_9886_57DF_5185)
     local sera = context["塞拉"]
@@ -119,10 +110,10 @@ local function _____53D6_6700_9AD8_707C_70ED_82F1_96C4(context, _____53EA_53D6_9
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue14
+                    goto __continue12
                 end
                 if _____53EA_53D6_9886_57DF_5185 and not _____76EE_6807_5728_7EDD_5BF9_96F6_5EA6_9886_57DF_5185(sera, hero) then
-                    goto __continue14
+                    goto __continue12
                 end
                 local stack = _____83B7_53D6_5DF4_5C14_624E_7F57_65AF_707C_70ED_5C42_6570(hero)
                 if stack > bestStack then
@@ -130,7 +121,7 @@ local function _____53D6_6700_9AD8_707C_70ED_82F1_96C4(context, _____53EA_53D6_9
                     bestStack = stack
                 end
             end
-            ::__continue14::
+            ::__continue12::
             i = i + 1
         end
     end
@@ -160,7 +151,12 @@ local function _____8BA1_7B97_51B0_7130_76EE_6807_4F4D_7F6E(context, target)
     local targetY = GetUnitY(target)
     local dx = GetUnitX(sera) - targetX
     local dy = GetUnitY(sera) - targetY
-    local distance = SquareRoot(dx * dx + dy * dy)
+    local distance = _____8DDD_79BBXY(
+        targetX,
+        targetY,
+        GetUnitX(sera),
+        GetUnitY(sera)
+    )
     if distance <= 1 then
         return {X = targetX, Y = targetY}
     end
@@ -225,24 +221,19 @@ ____exports["塞拉公共"] = {
     IsUnitType = IsUnitType,
     SetUnitAnimationByIndex = SetUnitAnimationByIndex,
     SetUnitTimeScale = SetUnitTimeScale,
-    Atan2 = Atan2,
-    SquareRoot = SquareRoot,
     UNIT_STATE_MAX_LIFE = UNIT_STATE_MAX_LIFE,
     UNIT_TYPE_DEAD = UNIT_TYPE_DEAD,
     ATTACK_TYPE_NORMAL = ATTACK_TYPE_NORMAL,
     DAMAGE_TYPE_FIRE = DAMAGE_TYPE_FIRE,
     DAMAGE_TYPE_COLD = DAMAGE_TYPE_COLD,
     WEAPON_TYPE_WHOKNOWS = WEAPON_TYPE_WHOKNOWS,
-    BJ_RADTODEG = BJ_RADTODEG,
     ["塞拉形态表"] = _____585E_62C9_5F62_6001_8868,
     ["零度领域减伤到期Ms表"] = _____96F6_5EA6_9886_57DF_51CF_4F24_5230_671FMs_8868,
     ["绝对零度领域状态表"] = _____7EDD_5BF9_96F6_5EA6_9886_57DF_72B6_6001_8868,
     ["弱追踪弹体状态表"] = _____5F31_8FFD_8E2A_5F39_4F53_72B6_6001_8868,
     ["单位有效"] = _____5355_4F4D_6709_6548,
     ["取单位ID"] = _____53D6_5355_4F4DID,
-    ["取方向角"] = _____53D6_65B9_5411_89D2,
     ["点距离平方"] = _____70B9_8DDD_79BB_5E73_65B9,
-    ["点在圆内"] = _____70B9_5728_5706_5185,
     ["取塞拉形态"] = _____53D6_585E_62C9_5F62_6001,
     ["取形态技能倍率"] = _____53D6_5F62_6001_6280_80FD_500D_7387,
     ["目标在绝对零度领域内"] = _____76EE_6807_5728_7EDD_5BF9_96F6_5EA6_9886_57DF_5185,

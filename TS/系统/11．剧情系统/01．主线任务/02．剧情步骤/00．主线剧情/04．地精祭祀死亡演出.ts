@@ -283,14 +283,23 @@ export const 地精祭祀死亡演出剧情动作注册表: Record<string, 剧�
 
 function on地精祭祀死亡(this: void, dyingUnit: any, killingUnit: any): void {
   if (读取剧情进度() !== 3) return;
-  const bossUnit = YDUserDataGetSafe("string", "Boss", "地精巫师", "unit");
-  if (bossUnit == null || bossUnit === 0) return;
-  if (dyingUnit !== bossUnit) return;
+  const bossUnit = YDUserDataGetSafe("string", "Boss", "地精巫师", "unit")
+    ?? 读取剧情运行时单位("Boss.地精巫师");
+  const dyingUnitTypeId = dyingUnit == null || dyingUnit === 0 ? 0 : jass.GetUnitTypeId(dyingUnit);
+  const isConfiguredGoblinPriest = dyingUnitTypeId === stringToFourCCSafe("N00C");
+  // 句柄绑定优先；如果死亡结算先清掉了 Boss 表，按唯一的地精祭祀战斗类型兜底，
+  // 避免剧情进度卡在 3。这里不按显示名匹配，避免颜色码变化造成漏触发。
+  if (!isConfiguredGoblinPriest && (bossUnit == null || bossUnit === 0 || dyingUnit !== bossUnit)) return;
+  if (dyingUnit == null || dyingUnit === 0) return;
   if (killingUnit != null && killingUnit !== 0) {
     注册剧情运行时单位(地精死亡击杀玩家单位键, killingUnit);
   }
   清理剧情运行时单位("Boss.地精巫师");
   const 已启动剧情 = 尝试播放Boss死亡主线剧情(dyingUnit);
+  const { 确保注册击败地精返回长老入口 } = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.05．击败地精返回长老") as {
+    确保注册击败地精返回长老入口: (this: void) => void;
+  };
+  if (读取剧情进度() === 4) 确保注册击败地精返回长老入口();
   if (!已启动剧情) 清理剧情运行时单位(地精死亡击杀玩家单位键);
 }
 

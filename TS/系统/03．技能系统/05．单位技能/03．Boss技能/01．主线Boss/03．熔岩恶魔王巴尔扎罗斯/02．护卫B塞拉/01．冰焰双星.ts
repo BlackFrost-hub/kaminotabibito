@@ -3,6 +3,7 @@
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 塞拉公共 } from "./00．公共";
 import { 执行BossAOE技能伤害 } from "../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import { 两点角度, 距离XY } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 巴尔扎罗斯音效配置 } from "../02．数值与表现配置";
 import { 播放Boss坐标音效 } from "../../../00．公共/00．Boss音效播放";
 const {  巴尔扎罗斯技能数值配置,
@@ -19,13 +20,11 @@ const {  巴尔扎罗斯技能数值配置,
   GetUnitX,
   GetUnitY,
   GetUnitFlyHeight,
-  SquareRoot,
   DAMAGE_TYPE_FIRE,
   DAMAGE_TYPE_COLD,
   ATTACK_TYPE_NORMAL,
   WEAPON_TYPE_WHOKNOWS,
   单位有效,
-  取方向角,
   取形态技能倍率,
   创建塞拉点特效,
   造成塞拉Boss技能伤害,
@@ -114,17 +113,17 @@ function 创建冰焰弱追踪曲线轨迹(
       // 贝塞尔采样点按时间推进会绕过弹体速度；限制单 Tick 位移，确保弱追踪阶段也遵守配置速度。
       const dx = desiredX - 实例.当前X;
       const dy = desiredY - 实例.当前Y;
-      const distance = SquareRoot(dx * dx + dy * dy);
+      const distance = 距离XY(实例.当前X, 实例.当前Y, desiredX, desiredY);
       const maxStep = 实例.当前速度 * delta;
       const stepScale = distance > 0 && maxStep > 0 && distance > maxStep ? maxStep / distance : 1;
       const x = 实例.当前X + dx * stepScale;
       const y = 实例.当前Y + dy * stepScale;
-      return { X: x, Y: y, Z: startZ, 方向角: 取方向角(实例.当前X, 实例.当前Y, x, y), 完成: false };
+      return { X: x, Y: y, Z: startZ, 方向角: 两点角度(实例.当前X, 实例.当前Y, x, y), 完成: false };
     }
     if (!状态.锁定) {
       状态.锁定 = true;
       if (单位有效(target)) {
-        状态.锁定角 = 取方向角(实例.当前X, 实例.当前Y, GetUnitX(target), GetUnitY(target));
+        状态.锁定角 = 两点角度(实例.当前X, 实例.当前Y, GetUnitX(target), GetUnitY(target));
       }
     }
     return {
@@ -141,7 +140,7 @@ function 发射冰焰弹体(this: void, context: 巴尔扎罗斯运行时上下�
   const sera = context.塞拉;
   if (!单位有效(sera) || !单位有效(target)) return;
   const config = 巴尔扎罗斯技能数值配置.冰焰双星;
-  const angle = 取方向角(GetUnitX(sera), GetUnitY(sera), GetUnitX(target), GetUnitY(target));
+  const angle = 两点角度(GetUnitX(sera), GetUnitY(sera), GetUnitX(target), GetUnitY(target));
   const sideAngle = angle + 90 * side;
   const startX = GetUnitX(sera) + CosBJ(angle) * config.发射前向偏移 + CosBJ(sideAngle) * config.发射侧向偏移;
   const startY = GetUnitY(sera) + SinBJ(angle) * config.发射前向偏移 + SinBJ(sideAngle) * config.发射侧向偏移;

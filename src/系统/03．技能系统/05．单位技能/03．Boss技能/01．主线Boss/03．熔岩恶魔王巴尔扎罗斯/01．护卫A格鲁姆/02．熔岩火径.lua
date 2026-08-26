@@ -4,6 +4,8 @@ local ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85 = require("系统.03．技能系
 local _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411 = ____00_FF0E_5355_4F4D_52A8_753B_7B49_5F85["立即设置单位朝向"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
 local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_95F4_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位间角度"]
 local ____00_FF0E_516C_5171 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．护卫A格鲁姆.00．公共")
 local _____683C_9C81_59C6_516C_5171 = ____00_FF0E_516C_5171["格鲁姆公共"]
 local ____683C_9C81_59C6_516C_5171_0 = _____683C_9C81_59C6_516C_5171
@@ -20,7 +22,6 @@ local SinBJ = ____683C_9C81_59C6_516C_5171_0.SinBJ
 local GetUnitX = ____683C_9C81_59C6_516C_5171_0.GetUnitX
 local GetUnitY = ____683C_9C81_59C6_516C_5171_0.GetUnitY
 local _____5355_4F4D_6709_6548 = ____683C_9C81_59C6_516C_5171_0["单位有效"]
-local _____53D6_65B9_5411_89D2 = ____683C_9C81_59C6_516C_5171_0["取方向角"]
 local _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3 = ____683C_9C81_59C6_516C_5171_0["计算火径持续伤害"]
 local ATTACK_TYPE_NORMAL = ____683C_9C81_59C6_516C_5171_0.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_FIRE = ____683C_9C81_59C6_516C_5171_0.DAMAGE_TYPE_FIRE
@@ -29,7 +30,7 @@ local _____9020_6210_683C_9C81_59C6Boss_6280_80FD_4F24_5BB3 = ____683C_9C81_59C6
 local _____64AD_653E_70B9_7279_6548 = ____683C_9C81_59C6_516C_5171_0["播放点特效"]
 local function _____53D6_706B_5F84_53C2_6570(grum, target)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]
-    local normalAngle = _____53D6_65B9_5411_89D2(grum, target)
+    local normalAngle = _____5355_4F4D_95F4_89D2_5EA6(grum, target)
     local lineAngle = normalAngle + 90
     local center = {
         x = GetUnitX(grum) + CosBJ(normalAngle) * config["火线中心前移"],
@@ -129,7 +130,7 @@ ____exports["释放格鲁姆火径"] = function(context, target)
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]
     _____7ACB_5373_8BBE_7F6E_5355_4F4D_671D_5411(
         grum,
-        _____53D6_65B9_5411_89D2(grum, target)
+        _____5355_4F4D_95F4_89D2_5EA6(grum, target)
     )
     local fire = _____53D6_706B_5F84_53C2_6570(grum, target)
     _____521B_5EFA_6280_80FD_63D0_793A_5708({

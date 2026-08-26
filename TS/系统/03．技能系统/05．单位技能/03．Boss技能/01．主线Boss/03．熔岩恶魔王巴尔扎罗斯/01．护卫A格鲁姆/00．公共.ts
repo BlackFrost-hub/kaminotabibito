@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { 单位未标记死亡 as 单位有效, 取单位ID, 单位到点距离平方 as 点到单位距离平方 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 单位未标记死亡 as 单位有效, 取单位ID, 单位到点距离平方 as 点到单位距离平方, 单位间角度, 角度差绝对值 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 提交预计算Boss技能伤害 } from "../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
@@ -52,7 +52,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -61,25 +60,12 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
 const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
 
-const BJ_RADTODEG = 57.29577951308232;
 const 快速控制_击晕 = 0;
 
 function 取目标单位(this: void, context: 巴尔扎罗斯运行时上下文): any {
   const entry = 获取Boss技能最高仇恨目标(context.Boss单位);
   if (entry != null && 单位有效(entry.targetRef)) return entry.targetRef;
   return 获取Boss技能随机敌对英雄(context.Boss单位);
-}
-
-function 取方向角(this: void, from: any, to: any): number {
-  if (!单位有效(from) || !单位有效(to)) return 0;
-  return Atan2(GetUnitY(to) - GetUnitY(from), GetUnitX(to) - GetUnitX(from)) * BJ_RADTODEG;
-}
-
-function 角度差绝对值(this: void, a: number, b: number): number {
-  let diff = a - b;
-  while (diff > 180) diff -= 360;
-  while (diff < -180) diff += 360;
-  return diff >= 0 ? diff : -diff;
 }
 
 function 计算火径持续伤害(this: void, grum: any): number {
@@ -131,7 +117,6 @@ export const 格鲁姆公共 = {
   GetUnitState,
   IsUnitType,
   AddSpecialEffect,
-  Atan2,
   UNIT_STATE_MAX_LIFE,
   UNIT_TYPE_DEAD,
   ATTACK_TYPE_NORMAL,
@@ -139,12 +124,11 @@ export const 格鲁姆公共 = {
   WEAPON_TYPE_WHOKNOWS,
   EXSetEffectZ,
   EXSetEffectSize,
-  BJ_RADTODEG,
   快速控制_击晕,
   单位有效,
   取单位ID,
   取目标单位,
-  取方向角,
+  单位间角度,
   角度差绝对值,
   点到单位距离平方,
   计算火径持续伤害,

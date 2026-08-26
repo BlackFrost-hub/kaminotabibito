@@ -13,8 +13,8 @@ local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用�
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
 local ____require_result_2 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 local Sound3DII_UnitPlayReuse = ____require_result_2.Sound3DII_UnitPlayReuse
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
-local _____521B_5EFA_539F_751F_5F39_5E55 = ____require_result_3["创建原生弹幕"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
+local _____53D1_5C04_5F39_9053 = ____require_result_3["发射弹道"]
 local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
 local registerAppliedFinalDamageListener = ____require_result_4.registerAppliedFinalDamageListener
 local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
@@ -52,13 +52,14 @@ local function _____91CA_653E_6B27_5C14_8D1D_514B_5251_6C14(caster, level)
         Z = 0,
         ["持续秒"] = 0.8
     })
-    _____521B_5EFA_539F_751F_5F39_5E55({
+    _____53D1_5C04_5F39_9053({
+        ["名称"] = "欧尔贝克-千枝枪剑气",
         ["所有者"] = caster,
-        X = GetUnitX(caster),
-        Y = GetUnitY(caster),
-        ["方向角"] = angle,
+        ["发射X"] = GetUnitX(caster),
+        ["发射Y"] = GetUnitY(caster),
+        ["发射方向角"] = angle,
         ["速度"] = cfg["弹幕速度"],
-        ["最大距离"] = cfg["弹幕速度"] * cfg["弹幕生命秒"],
+        ["轨迹"] = {["类型"] = "直线", ["距离"] = cfg["弹幕速度"] * cfg["弹幕生命秒"]},
         ["生命周期"] = cfg["弹幕生命秒"],
         ["命中半径"] = cfg["弹幕命中半径"],
         ["影响目标"] = "敌方",

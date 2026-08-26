@@ -2,3 +2,4 @@
 
 dofile('HeroAbility/HeroComboAbilityTemplates.lua')
 dofile('HeroAbility/Cloud.lua')
+dofile('HeroAbility/Emilia.lua')

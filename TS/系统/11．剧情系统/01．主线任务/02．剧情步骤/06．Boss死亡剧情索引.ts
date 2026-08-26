@@ -15,6 +15,8 @@ const GetUnitTypeId = jass.GetUnitTypeId as (this: void, whichUnit: any) => numb
 
 export interface Boss死亡剧情索引项 {
   Boss单位名: string;
+  /** 显式战斗单位类型 ID；优先于显示名反查，避免颜色码/文本改动造成死亡剧情漏触发。 */
+  Boss单位ID?: string;
   需要剧情进度?: number;
   设置剧情进度?: number;
   阶段标记?: string;
@@ -25,6 +27,7 @@ export interface Boss死亡剧情索引项 {
 export const Boss死亡剧情索引表: Boss死亡剧情索引项[] = [
   {
     Boss单位名: "地精祭祀|cffff0000（BossLV12）|r",
+    Boss单位ID: "N00C",
     需要剧情进度: 3,
     设置剧情进度: 4,
     剧情片段ID: "jlc_goblin_boss_death",
@@ -97,8 +100,8 @@ export const Boss死亡剧情索引表: Boss死亡剧情索引项[] = [
   },
 ];
 
-function Boss单位名匹配(this: void, unitTypeId: number, Boss单位名: string): boolean {
-  const rawId = 按名字反查Boss单位ID(Boss单位名);
+function Boss单位名匹配(this: void, unitTypeId: number, Boss单位名: string, Boss单位ID?: string): boolean {
+  const rawId = Boss单位ID ?? 按名字反查Boss单位ID(Boss单位名);
   return stringToFourCCSafe(rawId) === unitTypeId;
 }
 
@@ -118,7 +121,7 @@ export function 查找Boss死亡剧情索引(
 ): Boss死亡剧情索引项 | undefined {
   for (let i = 0; i < Boss死亡剧情索引表.length; i++) {
     const 索引项 = Boss死亡剧情索引表[i];
-    if (!Boss单位名匹配(Boss单位类型ID, 索引项.Boss单位名)) continue;
+    if (!Boss单位名匹配(Boss单位类型ID, 索引项.Boss单位名, 索引项.Boss单位ID)) continue;
     if (!剧情进度匹配(索引项.需要剧情进度, 当前剧情进度)) continue;
     if (!阶段匹配(索引项.阶段标记, 阶段标记)) continue;
     return 索引项;

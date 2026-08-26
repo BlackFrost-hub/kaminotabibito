@@ -17,6 +17,7 @@ export * from "./12．Boss台词广播";
 export * from "./13．施法时间线";
 export * from "./14．持续施法发射";
 export * from "./15．单位技能壳提示";
+export * from "./16．动态技能数据";
 export * from "./16．技能提示圈工厂";
 export * from "./17．闪电效果代码";
 export * from "./18．单位动画守护";

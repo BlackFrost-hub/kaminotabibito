@@ -4,6 +4,7 @@ local ____exports = {}
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
+local _____8DDD_79BBXY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
 local _____6267_884CBoss_5355_4F53_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行Boss单体技能伤害"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
@@ -48,7 +49,6 @@ local EXSetEffectSize = japi.EXSetEffectSize
 local IsUnitType = jass.IsUnitType
 local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 local SetUnitTimeScale = jass.SetUnitTimeScale
-local SquareRoot = jass.SquareRoot
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -187,7 +187,7 @@ local function _____53D1_5C04_7194_5CA9_62A4_76FE_53CD_5F39_5F39_5E55(boss, atta
     local targetY = GetUnitY(attacker)
     local dx = targetX - startX
     local dy = targetY - startY
-    local distance = SquareRoot(dx * dx + dy * dy)
+    local distance = _____8DDD_79BBXY(startX, startY, targetX, targetY)
     local controlX = (startX + targetX) * 0.5 + config["近战反弹控制点侧偏"]
     local controlY = (startY + targetY) * 0.5
     if distance > 0.01 then

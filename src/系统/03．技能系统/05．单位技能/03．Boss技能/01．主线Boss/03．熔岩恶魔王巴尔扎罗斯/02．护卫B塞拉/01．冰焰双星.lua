@@ -5,6 +5,9 @@ local ____00_FF0E_516C_5171 = require("系统.03．技能系统.05．单位技�
 local _____585E_62C9_516C_5171 = ____00_FF0E_516C_5171["塞拉公共"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
 local _____6267_884CBossAOE_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["执行BossAOE技能伤害"]
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local _____8DDD_79BBXY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
 local _____5DF4_5C14_624E_7F57_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["巴尔扎罗斯音效配置"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
@@ -24,13 +27,11 @@ local SinBJ = ____585E_62C9_516C_5171_0.SinBJ
 local GetUnitX = ____585E_62C9_516C_5171_0.GetUnitX
 local GetUnitY = ____585E_62C9_516C_5171_0.GetUnitY
 local GetUnitFlyHeight = ____585E_62C9_516C_5171_0.GetUnitFlyHeight
-local SquareRoot = ____585E_62C9_516C_5171_0.SquareRoot
 local DAMAGE_TYPE_FIRE = ____585E_62C9_516C_5171_0.DAMAGE_TYPE_FIRE
 local DAMAGE_TYPE_COLD = ____585E_62C9_516C_5171_0.DAMAGE_TYPE_COLD
 local ATTACK_TYPE_NORMAL = ____585E_62C9_516C_5171_0.ATTACK_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = ____585E_62C9_516C_5171_0.WEAPON_TYPE_WHOKNOWS
 local _____5355_4F4D_6709_6548 = ____585E_62C9_516C_5171_0["单位有效"]
-local _____53D6_65B9_5411_89D2 = ____585E_62C9_516C_5171_0["取方向角"]
 local _____53D6_5F62_6001_6280_80FD_500D_7387 = ____585E_62C9_516C_5171_0["取形态技能倍率"]
 local _____521B_5EFA_585E_62C9_70B9_7279_6548 = ____585E_62C9_516C_5171_0["创建塞拉点特效"]
 local _____9020_6210_585E_62C9Boss_6280_80FD_4F24_5BB3 = ____585E_62C9_516C_5171_0["造成塞拉Boss技能伤害"]
@@ -138,7 +139,7 @@ local function _____521B_5EFA_51B0_7130_5F31_8FFD_8E2A_66F2_7EBF_8F68_8FF9(start
             local desiredY = y01 + (y12 - y01) * t
             local dx = desiredX - _____5B9E_4F8B["当前X"]
             local dy = desiredY - _____5B9E_4F8B["当前Y"]
-            local distance = SquareRoot(dx * dx + dy * dy)
+            local distance = _____8DDD_79BBXY(_____5B9E_4F8B["当前X"], _____5B9E_4F8B["当前Y"], desiredX, desiredY)
             local maxStep = _____5B9E_4F8B["当前速度"] * delta
             local stepScale = distance > 0 and maxStep > 0 and distance > maxStep and maxStep / distance or 1
             local x = _____5B9E_4F8B["当前X"] + dx * stepScale
@@ -147,14 +148,14 @@ local function _____521B_5EFA_51B0_7130_5F31_8FFD_8E2A_66F2_7EBF_8F68_8FF9(start
                 X = x,
                 Y = y,
                 Z = startZ,
-                ["方向角"] = _____53D6_65B9_5411_89D2(_____5B9E_4F8B["当前X"], _____5B9E_4F8B["当前Y"], x, y),
+                ["方向角"] = _____4E24_70B9_89D2_5EA6(_____5B9E_4F8B["当前X"], _____5B9E_4F8B["当前Y"], x, y),
                 ["完成"] = false
             }
         end
         if not _____72B6_6001["锁定"] then
             _____72B6_6001["锁定"] = true
             if _____5355_4F4D_6709_6548(target) then
-                _____72B6_6001["锁定角"] = _____53D6_65B9_5411_89D2(
+                _____72B6_6001["锁定角"] = _____4E24_70B9_89D2_5EA6(
                     _____5B9E_4F8B["当前X"],
                     _____5B9E_4F8B["当前Y"],
                     GetUnitX(target),
@@ -177,7 +178,7 @@ local function _____53D1_5C04_51B0_7130_5F39_4F53(context, target, _____7C7B_578
         return
     end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["冰焰双星"]
-    local angle = _____53D6_65B9_5411_89D2(
+    local angle = _____4E24_70B9_89D2_5EA6(
         GetUnitX(sera),
         GetUnitY(sera),
         GetUnitX(target),

@@ -4,6 +4,7 @@ import { 坂井悠二技能配置 } from "./00．配置";
 import { 坂井悠二BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/05．坂井悠二";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 单位存活, 取单位ID, 极坐标X, 极坐标Y } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 获取坐标范围单位按筛选 } from "../../../00．技能模板+函数/02．通用函数/02．单位与范围";
 import { 向下取整整数 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 import { 确保单位可设置飞行高度 } from "../../../00．技能模板+函数/01．技能函数/03．跳跃·击飞/01．跳跃系统/00．共享";
 import { 技能强制调试输出 } from "../../../00．技能模板+函数/02．通用函数/04．调试输出";
@@ -63,13 +64,6 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 };
 const stringToFourCC = stringToFourCCSafe;
 const GetRandomReal = jass.GetRandomReal as (this: void, low: number, high: number) => number;
-const ForGroup = jass.ForGroup as (this: void, group: any, callback: (this: void) => void) => void;
-const GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange as (this: void, group: any, x: number, y: number, radius: number, filter: any) => void;
-const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
-const CreateGroup = jass.CreateGroup as (this: void) => any;
-const DestroyGroup = jass.DestroyGroup as (this: void, group: any) => void;
-const FilterBoolExpr = (jass.Filter ?? ((_f: any) => true)) as (this: void, func: (this: void) => boolean) => any;
-const IsUnitAlly = jass.IsUnitAlly as (this: void, unit: any, player: any) => boolean;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: any) => boolean;
 const SetUnitX = jass.SetUnitX as (this: void, unit: any, x: number) => void;
 const SetUnitY = jass.SetUnitY as (this: void, unit: any, y: number) => void;
@@ -237,7 +231,6 @@ function 执行鼓舞(this: void, context?: any): void {
   }
 
   const 范围 = 配置.鼓舞.范围;
-  const owner = GetOwningPlayer(caster);
 
   for (const hidStr in ctx.已鼓舞友军) {
     const hid = Number(hidStr);
@@ -245,18 +238,23 @@ function 执行鼓舞(this: void, context?: any): void {
     if (record != null && !单位存活(record.单位)) 清除单个鼓舞(ctx, hid);
   }
 
-  const group = CreateGroup();
-  GroupEnumUnitsInRange(group, GetUnitX(caster), GetUnitY(caster), 范围, null);
-
-  ForGroup(group, function 遍历友军(this: void): void {
-    const u = GetEnumUnit();
-    if (u == null || u === 0) return;
-    if (u === caster) return;
-    if (!IsUnitAlly(u, owner)) return;
-    if (IsUnitType(u, UNIT_TYPE_DEAD) || IsUnitType(u, UNIT_TYPE_STRUCTURE)) return;
-    if (!单位存活(u)) return;
+  // 源 ForGroup 遍历友军：排除自身 + 友军 + 排除死亡/建筑（放行机械/古树/无敌），去重后鼓舞。
+  // 配置型筛选逐项等价：有效单位 + 仅友军 + 排除自身 + 排除建筑 + 放行机械/古树/无敌。
+  const 友军列表 = 获取坐标范围单位按筛选(GetUnitX(caster), GetUnitY(caster), 范围, caster, {
+    要求有效单位: true,
+    允许建筑: false,
+    允许机械: true,
+    允许古树: true,
+    允许无敌: true,
+    排除自身: true,
+    仅友军: true,
+  });
+  for (let i = 0; i < 友军列表.length; i++) {
+    const u = 友军列表[i];
+    if (u == null || u === 0) continue;
+    if (!单位存活(u)) continue;
     const hid = 取单位ID(u);
-    if (hid === 0 || ctx.已鼓舞友军[hid] != null) return;
+    if (hid === 0 || ctx.已鼓舞友军[hid] != null) continue;
 
     const 攻击加成 = 向下取整整数((Number(GetUnitStateJapi(u, UNIT_STATE_ATTACK1_BASE)) || 0) * 配置.鼓舞.攻击力基础倍率);
     临时调整攻击(u, 攻击加成);
@@ -267,8 +265,7 @@ function 执行鼓舞(this: void, context?: any): void {
       标签: "坂井悠二-D-鼓舞",
     });
     ctx.已鼓舞友军[hid] = { 单位: u, 攻击加成 };
-  });
-  DestroyGroup(group);
+  }
 }
 
 // 主更新周期（0.05s，源 Func024T/Func025Func013T）：

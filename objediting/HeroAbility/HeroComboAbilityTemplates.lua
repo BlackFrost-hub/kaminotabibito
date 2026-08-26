@@ -3,6 +3,64 @@
 
 HeroComboAbilityShell = HeroComboAbilityShell or {}
 
+-- Player hero skill shells use the same channel base as Boss skills, but remain
+-- hero abilities so they occupy the unit's Q/W/E/R hero slots.
+function createPlayerHeroChannelAbility(id, name, options)
+  options = options or {}
+
+  local ability = AbilityDefinitionIllidanChannel:new(id)
+  ability:setName(name)
+  ability:setEditorSuffix(options.editorSuffix or 'PlayerHeroChannelShell')
+  ability:setHeroAbility(options.heroAbility ~= false)
+  ability:setItemAbility(false)
+  local levels = options.levels or 1
+  ability:setLevels(levels)
+  for level = 1, levels do
+    ability:setCooldown(level, options.cooldown ~= nil and options.cooldown or 1)
+    ability:setManaCost(level, options.manaCost or 0)
+    ability:setCastRange(level, options.castRange or 900)
+    ability:setAreaofEffect(level, options.area or 0)
+    ability:setDurationNormal(level, options.durationNormal or 0)
+    ability:setDurationHero(level, options.durationHero or 0)
+    ability:setTargetsAllowed(level, options.targetsAllowed or 'ground,air,enemy,neutral,nonsapper')
+    ability:setFollowThroughTime(level, options.followThroughTime or 0)
+    ability:setTargetType(level, options.targetType ~= nil and options.targetType or 2)
+    ability:setOptions(level, options.channelOptions ~= nil and options.channelOptions or 1)
+    ability:setArtDuration(level, options.artDuration or 0)
+    ability:setDisableOtherAbilities(level, options.disableOtherAbilities or false)
+    ability:setTooltipNormal(level, options.tooltip or name)
+    ability:setTooltipNormalExtended(level, options.tooltipExtended or options.tooltip or name)
+  end
+  ability:setRequirements(options.requirements or '')
+  ability:setAnimationNames(options.animationNames or '')
+  ability:setArtEffect(options.artEffect or '')
+  ability:setArtTarget(options.artTarget or '')
+  ability:setTargetAttachments(options.targetAttachments or 0)
+  ability:setTargetAttachmentPoint(options.targetAttachmentPoint or '')
+  ability:setArtCaster(options.artCaster or '')
+  ability:setCasterAttachments(options.casterAttachments or 0)
+  ability:setCasterAttachmentPoint(options.casterAttachmentPoint or '')
+  ability:setBaseOrderID(1, options.orderId or 'channel')
+  ability:setButtonPositionNormalX(options.buttonX or 0)
+  ability:setButtonPositionNormalY(options.buttonY or 2)
+  ability:setIconNormal(options.icon or 'ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp')
+  if options.hotkey ~= nil then
+    ability:setHotkeyNormal(options.hotkey)
+  end
+  return ability
+end
+
+-- Active player-hero D skills use the normal ability bar. They share the same
+-- channel shell, but are explicitly non-hero abilities so they do not consume
+-- one of the four Q/W/E/R hero slots.
+function createPlayerHeroActiveDChannelAbility(id, name, options)
+  options = options or {}
+  options.heroAbility = false
+  options.buttonX = options.buttonX or 0
+  options.buttonY = options.buttonY or 1
+  return createPlayerHeroChannelAbility(id, name, options)
+end
+
 local COMBO_SHELL_DURATION = 0.001
 
 function HeroComboAbilityShell.createDivineShield(options)

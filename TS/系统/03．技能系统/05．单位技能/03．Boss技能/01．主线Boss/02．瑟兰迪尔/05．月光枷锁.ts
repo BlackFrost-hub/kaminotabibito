@@ -6,7 +6,7 @@ import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置"
 import { 瑟兰迪尔单位技能配置 } from "./00．配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC, 单位句柄存在, 单位存活 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { stringToFourCC, 单位句柄存在, 单位存活 as 单位有效, 单位间角度 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 执行Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 播放限时单位动画 } from "../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
 
@@ -59,7 +59,6 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (unit: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
-const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
@@ -69,7 +68,6 @@ const UnitRemoveAbility = jass.UnitRemoveAbility as (unit: any, abilityId: numbe
 const 瑟兰迪尔单位类型ID = stringToFourCC(瑟兰迪尔单位技能配置.单位ID);
 const 月光枷锁技能ID = stringToFourCC(瑟兰迪尔数值与表现配置.月光枷锁.技能槽位);
 let 月光枷锁已注册 = false;
-const BJ_RADTODEG = 57.29577951308232;
 const 月光枷锁根须BuffID = "C017";
 const 月光枷锁原生根须Buff = 1111844210; // 'BEer'
 
@@ -103,8 +101,7 @@ function 播放月光枷锁施法动作(this: void, caster: any): void {
 
 function 让单位面向目标(this: void, caster: any, target: any): void {
   if (!单位有效(caster) || !单位有效(target)) return;
-  const angle = Atan2(GetUnitY(target) - GetUnitY(caster), GetUnitX(target) - GetUnitX(caster)) * BJ_RADTODEG;
-  SetUnitFacing(caster, angle);
+  SetUnitFacing(caster, 单位间角度(caster, target));
 }
 
 function 发射月光枷锁弹幕(this: void, caster: any, target: any, context?: 瑟兰迪尔运行时上下文): void {

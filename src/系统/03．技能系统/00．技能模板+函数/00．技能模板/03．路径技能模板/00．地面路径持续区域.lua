@@ -363,6 +363,16 @@ ____exports["创建地面路径持续区域"] = function(_____53C2_6570)
         _____786E_4FDD_5730_9762_8DEF_5F84_6574_4F53_4F24_5BB3_7CFB_7EDF_5DF2_542F_52A8()
     end
     _____5B9E_4F8B["启动"](_____5B9E_4F8B)
+    if _____53C2_6570["清理"] ~= nil then
+        local ____self_16 = _____53C2_6570["清理"]
+        ____self_16["登记清理"](
+            ____self_16,
+            "地面路径持续区域-" .. tostring(_____5B9E_4F8BID),
+            function()
+                _____5B9E_4F8B["销毁"](_____5B9E_4F8B)
+            end
+        )
+    end
     return _____5B9E_4F8B
 end
 ____exports["创建火焰路径持续区域"] = function(_____53C2_6570)

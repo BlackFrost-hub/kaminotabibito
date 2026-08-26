@@ -39,6 +39,8 @@ local ____18_FF0E_4E91_7AEF = require("系统.05．Buff系统.03．Buff表.02．
 local _____4E91_7AEFBuff_8868 = ____18_FF0E_4E91_7AEF["云端Buff表"]
 local ____19_FF0E_5341_516D_591C_54B2_591C = require("系统.05．Buff系统.03．Buff表.02．英雄.19．十六夜咲夜")
 local _____5341_516D_591C_54B2_591CBuff_8868 = ____19_FF0E_5341_516D_591C_54B2_591C["十六夜咲夜Buff表"]
+local ____20_FF0E_7231_871C_8389_96C5 = require("系统.05．Buff系统.03．Buff表.02．英雄.20．爱蜜莉雅")
+local _____7231_871C_8389_96C5Buff_8868 = ____20_FF0E_7231_871C_8389_96C5["爱蜜莉雅Buff表"]
 ____exports["英雄Buff表"] = __TS__ObjectAssign(
     {},
     _____63D0_7C73_8BFA_65AFBuff_8868,
@@ -59,7 +61,8 @@ ____exports["英雄Buff表"] = __TS__ObjectAssign(
     _____5B89_65AF_827E_5C14Buff_8868,
     _____6B27_5C14_8D1D_514BBuff_8868,
     _____4E91_7AEFBuff_8868,
-    _____5341_516D_591C_54B2_591CBuff_8868
+    _____5341_516D_591C_54B2_591CBuff_8868,
+    _____7231_871C_8389_96C5Buff_8868
 )
 do
     local ____export = require("系统.05．Buff系统.03．Buff表.02．英雄.01．提米诺斯")
@@ -207,6 +210,14 @@ do
 end
 do
     local ____export = require("系统.05．Buff系统.03．Buff表.02．英雄.19．十六夜咲夜")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.05．Buff系统.03．Buff表.02．英雄.20．爱蜜莉雅")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

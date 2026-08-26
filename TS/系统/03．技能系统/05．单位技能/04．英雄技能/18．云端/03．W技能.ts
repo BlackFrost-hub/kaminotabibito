@@ -8,7 +8,7 @@ import { 云端技能配置 } from "./00．配置";
 import { 消耗云端W模式 } from "./01．状态表";
 import { 云端BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/18．云端";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 读取单位攻击力, 两点角度 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 秒转毫秒 } from "../../../00．技能模板+函数/02．通用函数/24．整数与时间换算";
 import { 获取坐标范围单位按筛选 } from "../../../00．技能模板+函数/02．通用函数/02．单位与范围";
 import { registerSpellEndcastListener } from "../../../../00．核心系统/01．事件中心/08．技能事件中心";
@@ -57,10 +57,8 @@ const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, p: any) => boole
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, unit: any, flag: boolean) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, name: string) => void;
-const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
 const Cos = jass.Cos as (this: void, radians: number) => number;
 const Sin = jass.Sin as (this: void, radians: number) => number;
-const bj_RADTODEG = jass.bj_RADTODEG as number;
 const bj_DEGTORAD = jass.bj_DEGTORAD as number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_DIVINE = jass.DAMAGE_TYPE_DIVINE as any;
@@ -242,7 +240,7 @@ function 释放W光暗魔剑(this: void, context: W上下文, caster: any, 技�
   const sy = GetUnitY(caster);
   const tx = GetSpellTargetX();
   const ty = GetSpellTargetY();
-  const 角度 = Atan2(ty - sy, tx - sx) * bj_RADTODEG;
+  const 角度 = 两点角度(sx, sy, tx, ty);
 
   // 施法入口锁存本次分支并切换下一发（禁止延迟回调读共享状态，计划 6.2.7）
   const 模式 = 消耗云端W模式(caster);

@@ -3,6 +3,7 @@
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 立即设置单位朝向 } from "../../../../../00．技能模板+函数/02．通用函数/00．单位动画等待";
 import { 执行BossAOE技能伤害 } from "../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
+import { 单位间角度 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 格鲁姆公共 } from "./00．公共";
 const {  巴尔扎罗斯技能数值配置,
   播放格鲁姆台词,
@@ -17,7 +18,6 @@ const {  巴尔扎罗斯技能数值配置,
   GetUnitX,
   GetUnitY,
   单位有效,
-  取方向角,
   计算火径持续伤害,
   ATTACK_TYPE_NORMAL,
   DAMAGE_TYPE_FIRE,
@@ -40,7 +40,7 @@ interface 火径参数 {
 
 function 取火径参数(this: void, grum: any, target: any): 火径参数 {
   const config = 巴尔扎罗斯技能数值配置.熔岩火径;
-  const normalAngle = 取方向角(grum, target);
+  const normalAngle = 单位间角度(grum, target);
   const lineAngle = normalAngle + 90;
   const center = {
     x: GetUnitX(grum) + CosBJ(normalAngle) * config.火线中心前移,
@@ -129,7 +129,7 @@ export function 释放格鲁姆火径(this: void, context: 巴尔扎罗斯运行
   const grum = context.格鲁姆;
   if (!单位有效(grum) || !单位有效(target)) return;
   const config = 巴尔扎罗斯技能数值配置.熔岩火径;
-  立即设置单位朝向(grum, 取方向角(grum, target));
+  立即设置单位朝向(grum, 单位间角度(grum, target));
   const fire = 取火径参数(grum, target);
   创建技能提示圈({
     类型: "矩形",

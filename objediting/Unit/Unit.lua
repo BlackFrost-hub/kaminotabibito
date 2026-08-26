@@ -1,6 +1,7 @@
 -- Unit object data entry, grouped to mirror imports/Unit.
 
 dofile('Unit/UnitTemplates.lua')
+dofile('Unit/PlayerHero/Emilia.lua')
 dofile('Unit/Elite/AncestralTide.lua')
 dofile('Unit/Elite/SealGuard.lua')
 dofile('Unit/Elite/Mia.lua')

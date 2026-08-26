@@ -7,7 +7,7 @@
 import { 云端技能配置 } from "./00．配置";
 import { 云端BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/18．云端";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { 读取单位攻击力 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 读取单位攻击力, 两点角度, 距离XY } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { registerSpellEndcastListener } from "../../../../00．核心系统/01．事件中心/08．技能事件中心";
 
 const jass = require("jass.common") as any;
@@ -69,9 +69,6 @@ const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const Player = jass.Player as (this: void, id: number) => any;
 const SetUnitInvulnerable = jass.SetUnitInvulnerable as (this: void, unit: any, flag: boolean) => void;
 const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, name: string) => void;
-const SquareRoot = jass.SquareRoot as (this: void, x: number) => number;
-const Atan2 = jass.Atan2 as (this: void, y: number, x: number) => number;
-const bj_RADTODEG = jass.bj_RADTODEG as number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
@@ -282,7 +279,7 @@ function 释放Q冰火魔剑(this: void, context: Q上下文, caster: any, 技�
   // 护场表现（源技能马甲换模型 finalfield，按物编壳参数转直接特效）
   const sx = GetUnitX(caster);
   const sy = GetUnitY(caster);
-  const 角度 = Atan2(GetUnitY(target) - sy, GetUnitX(target) - sx) * bj_RADTODEG;
+  const 角度 = 两点角度(sx, sy, GetUnitX(target), GetUnitY(target));
   const 颜色 = 分支 === "火" ? 配置.Q.火.颜色 : 配置.Q.冰.颜色;
   创建点特效({
     模型路径: 配置.Q.护场特效.模型,
@@ -299,9 +296,7 @@ function 释放Q冰火魔剑(this: void, context: Q上下文, caster: any, 技�
   });
 
   // 冲锋至目标 85 码内：源 0.02s × 40 码 = 2000 码/秒
-  const dx = GetUnitX(target) - sx;
-  const dy = GetUnitY(target) - sy;
-  const 距离 = SquareRoot(dx * dx + dy * dy) - 配置.Q.冲锋.命中距离码;
+  const 距离 = 距离XY(sx, sy, GetUnitX(target), GetUnitY(target)) - 配置.Q.冲锋.命中距离码;
   if (距离 <= 0) {
     结算Q命中(context);
     return;

@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { 单位未标记死亡 as 单位有效, 取单位ID, 距离平方XY as 点距离平方 } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 单位未标记死亡 as 单位有效, 取单位ID, 距离平方XY as 点距离平方, 两点角度, 距离XY } from "../../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 提交预计算Boss技能伤害 } from "../../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import type { 巴尔扎罗斯运行时上下文 } from "../03．运行时上下文";
 import { 巴尔扎罗斯单位技能配置 } from "../00．配置";
@@ -63,8 +63,6 @@ const GetUnitFlyHeight = jass.GetUnitFlyHeight as (unit: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, timeScale: number) => void;
-const Atan2 = jass.Atan2 as (y: number, x: number) => number;
-const SquareRoot = jass.SquareRoot as (value: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -72,19 +70,10 @@ const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const BJ_RADTODEG = 57.29577951308232;
 const 塞拉形态表: Record<number, "火焰" | "冰霜" | undefined> = {};
 const 零度领域减伤到期Ms表: Record<number, number | undefined> = {};
 const 绝对零度领域状态表: Record<number, { X: number; Y: number; 结束Ms: number } | undefined> = {};
 const 弱追踪弹体状态表: Record<number, { 锁定: boolean; 锁定角: number } | undefined> = {};
-
-function 取方向角(this: void, fromX: number, fromY: number, toX: number, toY: number): number {
-  return Atan2(toY - fromY, toX - fromX) * BJ_RADTODEG;
-}
-
-function 点在圆内(this: void, x: number, y: number, cx: number, cy: number, radius: number): boolean {
-  return 点距离平方(x, y, cx, cy) <= radius * radius;
-}
 
 function 取塞拉形态(this: void, context: 巴尔扎罗斯运行时上下文): "火焰" | "冰霜" {
   if (context.塞拉当前形态 === "冰霜") return "冰霜";
@@ -103,7 +92,7 @@ function 目标在绝对零度领域内(this: void, sera: any, target: any): boo
   if (!单位有效(target)) return false;
   const 状态 = 绝对零度领域状态表[取单位ID(sera)];
   if (状态 == null || getServerTime() >= 状态.结束Ms) return false;
-  return 点在圆内(GetUnitX(target), GetUnitY(target), 状态.X, 状态.Y, 巴尔扎罗斯技能数值配置.绝对零度领域.半径);
+  return 点距离平方(GetUnitX(target), GetUnitY(target), 状态.X, 状态.Y) <= 巴尔扎罗斯技能数值配置.绝对零度领域.半径 * 巴尔扎罗斯技能数值配置.绝对零度领域.半径;
 }
 
 function 取最高灼热英雄(this: void, context: 巴尔扎罗斯运行时上下文, 只取领域内: boolean): any {
@@ -142,7 +131,7 @@ function 计算冰焰目标位置(this: void, context: 巴尔扎罗斯运行时�
   const targetY = GetUnitY(target);
   const dx = GetUnitX(sera) - targetX;
   const dy = GetUnitY(sera) - targetY;
-  const distance = SquareRoot(dx * dx + dy * dy);
+  const distance = 距离XY(targetX, targetY, GetUnitX(sera), GetUnitY(sera));
   if (distance <= 1) return { X: targetX, Y: targetY };
   return {
     X: targetX + dx / distance * config.目标附近偏移,
@@ -210,24 +199,19 @@ export const 塞拉公共 = {
   IsUnitType,
   SetUnitAnimationByIndex,
   SetUnitTimeScale,
-  Atan2,
-  SquareRoot,
   UNIT_STATE_MAX_LIFE,
   UNIT_TYPE_DEAD,
   ATTACK_TYPE_NORMAL,
   DAMAGE_TYPE_FIRE,
   DAMAGE_TYPE_COLD,
   WEAPON_TYPE_WHOKNOWS,
-  BJ_RADTODEG,
   塞拉形态表,
   零度领域减伤到期Ms表,
   绝对零度领域状态表,
   弱追踪弹体状态表,
   单位有效,
   取单位ID,
-  取方向角,
   点距离平方,
-  点在圆内,
   取塞拉形态,
   取形态技能倍率,
   目标在绝对零度领域内,

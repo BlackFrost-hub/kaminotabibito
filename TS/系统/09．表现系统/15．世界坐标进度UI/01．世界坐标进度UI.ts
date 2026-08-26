@@ -4,6 +4,7 @@ import { 格式化一位小数 } from '../08．吟唱条/04．数字格式化';
 import type { 世界坐标进度UI, 世界坐标进度UI参数, 世界坐标进度UI类型 } from './00．类型';
 
 const japi = require('jass.japi') as any;
+const jass = require('jass.common') as any;
 const { onTick10ms, offTick10ms } = require('系统.00．核心系统.05．中心计时器') as {
   onTick10ms: (this: void, callback: (this: void) => void) => void;
   offTick10ms: (this: void, callback: (this: void) => void) => void;
@@ -25,6 +26,11 @@ const DzFrameBindWorldPos = japi.DzFrameBindWorldPos as (frame: number, x: numbe
 const DzFrameUnBind = japi.DzFrameUnBind as (frame: number) => void;
 const DzFrameShow = japi.DzFrameShow as (frame: number, visible: boolean) => void;
 const DzDestroyFrame = japi.DzDestroyFrame as (frame: number) => void;
+const GetUnitX = jass.GetUnitX as (unit: any) => number;
+const GetUnitY = jass.GetUnitY as (unit: any) => number;
+const GetUnitFlyHeight = jass.GetUnitFlyHeight as (unit: any) => number;
+const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const GetWidgetLife = jass.GetWidgetLife as (widget: any) => number;
 
 const 点左上 = 0;
 const 点中 = 4;
@@ -110,6 +116,24 @@ function 确保世界坐标进度UI驱动(this: void): void {
   onTick10ms(驱动世界坐标进度UI);
 }
 
+function 刷新世界坐标进度UI跟随(this: void, ui: 世界坐标进度UI): boolean {
+  if (ui.跟随单位 == null || ui.跟随单位 === 0) return true;
+  if (GetUnitTypeId(ui.跟随单位) === 0 || GetWidgetLife(ui.跟随单位) <= 0.405) {
+    销毁世界坐标进度UI(ui);
+    return false;
+  }
+  DzFrameBindWorldPos(
+    ui.根帧,
+    GetUnitX(ui.跟随单位) + ui.跟随X偏移,
+    GetUnitY(ui.跟随单位) + ui.跟随Y偏移,
+    GetUnitFlyHeight(ui.跟随单位) + ui.跟随Z偏移,
+    0,
+    0,
+    false,
+  );
+  return true;
+}
+
 function 驱动世界坐标进度UI(this: void): void {
   for (let i = 世界坐标进度UI列表.length - 1; i >= 0; i--) {
     const ui = 世界坐标进度UI列表[i];
@@ -117,6 +141,7 @@ function 驱动世界坐标进度UI(this: void): void {
       世界坐标进度UI列表.splice(i, 1);
       continue;
     }
+    if (!刷新世界坐标进度UI跟随(ui)) continue;
     if (ui.显示值 !== ui.目标值) {
       ui.动画已经过秒 += 驱动间隔秒;
       let ratio = ui.动画已经过秒 / ui.平滑过渡秒;
@@ -191,6 +216,10 @@ export function 创建世界坐标进度UI(this: void, 参数: 世界坐标进�
     文本刷新Tick: 0,
     已显示: visible,
     已销毁: false,
+    跟随单位: 参数.跟随单位 ?? null,
+    跟随X偏移: 参数.跟随X偏移 ?? 0,
+    跟随Y偏移: 参数.跟随Y偏移 ?? 0,
+    跟随Z偏移: 参数.跟随Z偏移 ?? 0,
   };
   const z = 参数.Z ?? 180;
   const fogVisible = 参数.雾中可见 ?? false;

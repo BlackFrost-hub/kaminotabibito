@@ -21,3 +21,6 @@ export * from "./22．限次周期执行器";
 export * from "./23．Boss施法时间线";
 export * from "./24．非死亡Boss收束时间线";
 export * from "./25．限时二段技能壳";
+export * from "./26．技能实例收束适配器";
+export * from "./27．战斗技能实例生命周期工厂";
+export * from "./28．薄Boss阶段编排工厂";

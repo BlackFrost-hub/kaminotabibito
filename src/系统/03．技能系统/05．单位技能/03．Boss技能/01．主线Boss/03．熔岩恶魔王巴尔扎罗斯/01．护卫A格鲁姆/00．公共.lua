@@ -4,6 +4,8 @@ local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local _____70B9_5230_5355_4F4D_8DDD_79BB_5E73_65B9 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位到点距离平方"]
+local _____5355_4F4D_95F4_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位间角度"]
+local _____89D2_5EA6_5DEE_7EDD_5BF9_503C = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["角度差绝对值"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
 local _____63D0_4EA4_9884_8BA1_7B97Boss_6280_80FD_4F24_5BB3 = ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668["提交预计算Boss技能伤害"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
@@ -44,7 +46,6 @@ local GetUnitY = jass.GetUnitY
 local GetUnitState = jass.GetUnitState
 local IsUnitType = jass.IsUnitType
 local AddSpecialEffect = jass.AddSpecialEffect
-local Atan2 = jass.Atan2
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -52,7 +53,6 @@ local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local EXSetEffectZ = japi.EXSetEffectZ
 local EXSetEffectSize = japi.EXSetEffectSize
-local BJ_RADTODEG = 57.29577951308232
 local _____5FEB_901F_63A7_5236__51FB_6655 = 0
 local function _____53D6_76EE_6807_5355_4F4D(context)
     local entry = _____83B7_53D6Boss_6280_80FD_6700_9AD8_4EC7_6068_76EE_6807(context["Boss单位"])
@@ -60,25 +60,6 @@ local function _____53D6_76EE_6807_5355_4F4D(context)
         return entry.targetRef
     end
     return _____83B7_53D6Boss_6280_80FD_968F_673A_654C_5BF9_82F1_96C4(context["Boss单位"])
-end
-local function _____53D6_65B9_5411_89D2(from, to)
-    if not _____5355_4F4D_6709_6548(from) or not _____5355_4F4D_6709_6548(to) then
-        return 0
-    end
-    return Atan2(
-        GetUnitY(to) - GetUnitY(from),
-        GetUnitX(to) - GetUnitX(from)
-    ) * BJ_RADTODEG
-end
-local function _____89D2_5EA6_5DEE_7EDD_5BF9_503C(a, b)
-    local diff = a - b
-    while diff > 180 do
-        diff = diff - 360
-    end
-    while diff < -180 do
-        diff = diff + 360
-    end
-    return diff >= 0 and diff or -diff
 end
 local function _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3(grum)
     return _____8BFB_53D6_5355_4F4D_653B_51FB_529B(grum) * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]["持续伤害攻击力比例"] * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["熔岩火径"]["伤害总倍率"]
@@ -133,7 +114,6 @@ ____exports["格鲁姆公共"] = {
     GetUnitState = GetUnitState,
     IsUnitType = IsUnitType,
     AddSpecialEffect = AddSpecialEffect,
-    Atan2 = Atan2,
     UNIT_STATE_MAX_LIFE = UNIT_STATE_MAX_LIFE,
     UNIT_TYPE_DEAD = UNIT_TYPE_DEAD,
     ATTACK_TYPE_NORMAL = ATTACK_TYPE_NORMAL,
@@ -141,12 +121,11 @@ ____exports["格鲁姆公共"] = {
     WEAPON_TYPE_WHOKNOWS = WEAPON_TYPE_WHOKNOWS,
     EXSetEffectZ = EXSetEffectZ,
     EXSetEffectSize = EXSetEffectSize,
-    BJ_RADTODEG = BJ_RADTODEG,
     ["快速控制_击晕"] = _____5FEB_901F_63A7_5236__51FB_6655,
     ["单位有效"] = _____5355_4F4D_6709_6548,
     ["取单位ID"] = _____53D6_5355_4F4DID,
     ["取目标单位"] = _____53D6_76EE_6807_5355_4F4D,
-    ["取方向角"] = _____53D6_65B9_5411_89D2,
+    ["单位间角度"] = _____5355_4F4D_95F4_89D2_5EA6,
     ["角度差绝对值"] = _____89D2_5EA6_5DEE_7EDD_5BF9_503C,
     ["点到单位距离平方"] = _____70B9_5230_5355_4F4D_8DDD_79BB_5E73_65B9,
     ["计算火径持续伤害"] = _____8BA1_7B97_706B_5F84_6301_7EED_4F24_5BB3,

@@ -2,7 +2,7 @@
 
 import { 增加玩家腐败值, 清除玩家腐败值, 取腐败值最高玩家, type 莫尔特斯运行时上下文 } from "./01．运行时上下文";
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
-import { 单位有效, 极坐标X, 极坐标Y } from "./16．公共工具";
+import { 单位有效, 极坐标X, 极坐标Y, 距离XY } from "./16．公共工具";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 执行Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import {
@@ -24,7 +24,6 @@ const 虫尸拾取调试模块 = "莫尔特斯-虫尸拾取";
 
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
-const SquareRoot = jass.SquareRoot as (value: number) => number;
 const RemoveUnit = jass.RemoveUnit as (unit: any) => void;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
@@ -112,12 +111,6 @@ interface 共生腐朽虫群测试击杀变量 {
   周期?: 限次周期执行器实例;
 }
 
-function 计算距离(this: void, x1: number, y1: number, x2: number, y2: number): number {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  return SquareRoot(dx * dx + dy * dy);
-}
-
 function 取甲虫目标(this: void, context: 莫尔特斯运行时上下文): any {
   const target = 取腐败值最高玩家(context);
   if (单位有效(target)) return target;
@@ -164,7 +157,7 @@ function 莫尔特斯虫尸可拾取单位(this: void, variable?: any): any[] {
             unitX,
             unitY,
             "距离=",
-            计算距离(data.X, data.Y, unitX, unitY),
+            距离XY(data.X, data.Y, unitX, unitY),
           );
         } else {
           debugLogForce(虫尸拾取调试模块, "额外候选", "索引=", i, "单位=", unit, "有效=", valid);
@@ -229,7 +222,7 @@ function 莫尔特斯虫尸拾取(this: void, picker: any, 实例: any, variable
     pickerY,
     "距离=",
     data.X != null && data.Y != null && pickerX != null && pickerY != null
-      ? 计算距离(data.X, data.Y, pickerX, pickerY)
+      ? 距离XY(data.X, data.Y, pickerX, pickerY)
       : "nil",
   );
   if (实例 != null && 实例.特效 != null && 实例.特效 !== 0) {

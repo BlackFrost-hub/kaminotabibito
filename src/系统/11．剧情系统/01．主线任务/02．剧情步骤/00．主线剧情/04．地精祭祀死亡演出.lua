@@ -295,11 +295,17 @@ local function ____on_5730_7CBE_796D_7940_6B7B_4EA1(dyingUnit, killingUnit)
     if _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= 3 then
         return
     end
-    local bossUnit = YDUserDataGetSafe("string", "Boss", "地精巫师", "unit")
-    if bossUnit == nil or bossUnit == 0 then
+    local ____YDUserDataGetSafe_result_15 = YDUserDataGetSafe("string", "Boss", "地精巫师", "unit")
+    if ____YDUserDataGetSafe_result_15 == nil then
+        ____YDUserDataGetSafe_result_15 = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D("Boss.地精巫师")
+    end
+    local bossUnit = ____YDUserDataGetSafe_result_15
+    local dyingUnitTypeId = (dyingUnit == nil or dyingUnit == 0) and 0 or jass.GetUnitTypeId(dyingUnit)
+    local isConfiguredGoblinPriest = dyingUnitTypeId == stringToFourCCSafe("N00C")
+    if not isConfiguredGoblinPriest and (bossUnit == nil or bossUnit == 0 or dyingUnit ~= bossUnit) then
         return
     end
-    if dyingUnit ~= bossUnit then
+    if dyingUnit == nil or dyingUnit == 0 then
         return
     end
     if killingUnit ~= nil and killingUnit ~= 0 then
@@ -307,6 +313,11 @@ local function ____on_5730_7CBE_796D_7940_6B7B_4EA1(dyingUnit, killingUnit)
     end
     _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D("Boss.地精巫师")
     local _____5DF2_542F_52A8_5267_60C5 = _____5C1D_8BD5_64AD_653EBoss_6B7B_4EA1_4E3B_7EBF_5267_60C5(dyingUnit)
+    local ____require_result_16 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.05．击败地精返回长老")
+    local _____786E_4FDD_6CE8_518C_51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_5165_53E3 = ____require_result_16["确保注册击败地精返回长老入口"]
+    if _____8BFB_53D6_5267_60C5_8FDB_5EA6() == 4 then
+        _____786E_4FDD_6CE8_518C_51FB_8D25_5730_7CBE_8FD4_56DE_957F_8001_5165_53E3()
+    end
     if not _____5DF2_542F_52A8_5267_60C5 then
         _____6E05_7406_5267_60C5_8FD0_884C_65F6_5355_4F4D(_____5730_7CBE_6B7B_4EA1_51FB_6740_73A9_5BB6_5355_4F4D_952E)
     end

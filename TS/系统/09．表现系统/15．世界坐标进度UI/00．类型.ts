@@ -20,6 +20,10 @@ export interface 世界坐标进度UI参数 {
   高度?: number;
   底框贴图?: string;
   填充贴图?: string;
+  跟随单位?: any;
+  跟随X偏移?: number;
+  跟随Y偏移?: number;
+  跟随Z偏移?: number;
 }
 
 export interface 世界坐标进度UI {
@@ -42,4 +46,8 @@ export interface 世界坐标进度UI {
   文本刷新Tick: number;
   已显示: boolean;
   已销毁: boolean;
+  跟随单位: any | null;
+  跟随X偏移: number;
+  跟随Y偏移: number;
+  跟随Z偏移: number;
 }

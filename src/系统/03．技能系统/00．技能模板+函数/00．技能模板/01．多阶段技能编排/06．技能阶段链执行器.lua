@@ -58,7 +58,9 @@ local function ____on_6280_80FD_5EF6_8FDF_9636_6BB5_5230_671F(variable)
     if data["执行"] ~= nil then
         data["执行"](data["上下文"], data["控制器"])
     end
-    data["控制器"]["完成当前阶段"]()
+    if data["自动完成"] then
+        data["控制器"]["完成当前阶段"]()
+    end
 end
 local function _____53D6_9636_6BB5_5EF6_8FDF_6BEB_79D2(_____5EF6_8FDF_6BEB_79D2, _____4E0A_4E0B_6587)
     return type(_____5EF6_8FDF_6BEB_79D2) == "number" and _____5EF6_8FDF_6BEB_79D2 or _____5EF6_8FDF_6BEB_79D2(_____4E0A_4E0B_6587)
@@ -128,17 +130,28 @@ ____exports["创建立即执行阶段"] = function(_____6267_884C, _____540D_79F
         end
     }
 end
-____exports["创建延迟执行阶段"] = function(_____5EF6_8FDF_6BEB_79D2, _____6267_884C, _____540D_79F0)
+____exports["创建延迟执行阶段"] = function(_____5EF6_8FDF_6BEB_79D2, _____6267_884C, _____540D_79F0, _____81EA_52A8_5B8C_6210)
+    if _____81EA_52A8_5B8C_6210 == nil then
+        _____81EA_52A8_5B8C_6210 = true
+    end
     return {
         ["名称"] = _____540D_79F0,
         ["开始"] = function(_____4E0A_4E0B_6587, _____63A7_5236_5668)
             local delayMs = _____53D6_9636_6BB5_5EF6_8FDF_6BEB_79D2(_____5EF6_8FDF_6BEB_79D2, _____4E0A_4E0B_6587)
             if delayMs <= 0 then
                 _____6267_884C(_____4E0A_4E0B_6587, _____63A7_5236_5668)
-                _____63A7_5236_5668["完成当前阶段"]()
+                if _____81EA_52A8_5B8C_6210 then
+                    _____63A7_5236_5668["完成当前阶段"]()
+                end
                 return
             end
-            local data = {["上下文"] = _____4E0A_4E0B_6587, ["控制器"] = _____63A7_5236_5668, ["执行"] = _____6267_884C, ["已结束"] = false}
+            local data = {
+                ["上下文"] = _____4E0A_4E0B_6587,
+                ["控制器"] = _____63A7_5236_5668,
+                ["执行"] = _____6267_884C,
+                ["自动完成"] = _____81EA_52A8_5B8C_6210,
+                ["已结束"] = false
+            }
             local callbackId = addDelayedCallback(delayMs, ____on_6280_80FD_5EF6_8FDF_9636_6BB5_5230_671F, data)
             _____63A7_5236_5668["设置当前阶段停止函数"](function()
                 if data["已结束"] then

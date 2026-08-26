@@ -6,7 +6,7 @@ import { 瑟兰迪尔数值与表现配置 } from "./02．数值与表现配置"
 import { 瑟兰迪尔单位技能配置 } from "./00．配置";
 import { 播放瑟兰迪尔台词 } from "./15．台词播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC, 单位存活 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { stringToFourCC, 单位存活 as 单位有效, 单位间角度 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 提交预计算Boss单体技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 import { 创建固定组合技能执行器 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/01．固定组合技能执行器";
 import { 创建固定时间轴阶段列表 } from "../../../../00．技能模板+函数/00．技能模板/14．固定组合技能模板/02．固定时间轴阶段工厂";
@@ -51,7 +51,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const SetUnitFacing = jass.SetUnitFacing as (unit: any, facing: number) => void;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (unit: any, scale: number) => void;
-const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
 const R2I = jass.R2I as (value: number) => number;
@@ -60,7 +59,6 @@ const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as ((effect: any, col
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as any;
 const UNIT_STATE_MANA = jass.UNIT_STATE_MANA as any;
-const BJ_RADTODEG = 57.29577951308232;
 const 瑟兰迪尔单位类型ID = stringToFourCC(瑟兰迪尔单位技能配置.单位ID);
 const 罪与罚技能ID = stringToFourCC(瑟兰迪尔数值与表现配置.罪与罚.技能槽位);
 let 罪与罚已注册 = false;
@@ -86,8 +84,7 @@ function 播放点名特效(this: void, target: any, duration: number): void {
 
 function 让单位面向目标(this: void, caster: any, target: any): void {
   if (!单位有效(caster) || !单位有效(target)) return;
-  const angle = Atan2(GetUnitY(target) - GetUnitY(caster), GetUnitX(target) - GetUnitX(caster)) * BJ_RADTODEG;
-  SetUnitFacing(caster, angle);
+  SetUnitFacing(caster, 单位间角度(caster, target));
 }
 
 function 挂Buff(this: void, boss: any, target: any, buffID: string, duration: number, value: number, icon: string, effect?: string): void {

@@ -11,6 +11,7 @@ local ____16_FF0E_516C_5171_5DE5_5177 = require("系统.03．技能系统.05．�
 local _____5355_4F4D_6709_6548 = ____16_FF0E_516C_5171_5DE5_5177["单位有效"]
 local _____6781_5750_6807X = ____16_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____16_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local _____8DDD_79BBXY = ____16_FF0E_516C_5171_5DE5_5177["距离XY"]
 local ____00_FF0EBoss_97F3_6548_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.00．公共.00．Boss音效播放")
 local _____64AD_653EBoss_5750_6807_97F3_6548 = ____00_FF0EBoss_97F3_6548_64AD_653E["播放Boss坐标音效"]
 local ____22_FF0EBoss_6280_80FD_4F24_5BB3_6267_884C_5668 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.22．Boss技能伤害执行器")
@@ -26,7 +27,6 @@ local debugLogForce = ____require_result_1.debugLogForce
 local _____866B_5C38_62FE_53D6_8C03_8BD5_6A21_5757 = "莫尔特斯-虫尸拾取"
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local SquareRoot = jass.SquareRoot
 local RemoveUnit = jass.RemoveUnit
 local GetOwningPlayer = jass.GetOwningPlayer
 local IssueTargetOrder = jass.IssueTargetOrder
@@ -55,11 +55,6 @@ local ____require_result_10 = require("系统.05．Buff系统.03．Buff表.01．
 local _____83AB_5C14_7279_65AFBuffID = ____require_result_10["莫尔特斯BuffID"]
 local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.17．物品技能工具兼容")
 local _____4E34_65F6_8C03_6574_653B_51FB = ____require_result_11["临时调整攻击"]
-local function _____8BA1_7B97_8DDD_79BB(x1, y1, x2, y2)
-    local dx = x2 - x1
-    local dy = y2 - y1
-    return SquareRoot(dx * dx + dy * dy)
-end
 local function _____53D6_7532_866B_76EE_6807(context)
     local target = _____53D6_8150_8D25_503C_6700_9AD8_73A9_5BB6(context)
     if _____5355_4F4D_6709_6548(target) then
@@ -111,7 +106,7 @@ local function _____83AB_5C14_7279_65AF_866B_5C38_53EF_62FE_53D6_5355_4F4D(varia
                             unitX,
                             unitY,
                             "距离=",
-                            _____8BA1_7B97_8DDD_79BB(data.X, data.Y, unitX, unitY)
+                            _____8DDD_79BBXY(data.X, data.Y, unitX, unitY)
                         )
                     else
                         debugLogForce(
@@ -143,7 +138,7 @@ local function _____83AB_5C14_7279_65AF_866B_5C38_53EF_62FE_53D6_5355_4F4D(varia
             do
                 local unit = extraUnits[i + 1]
                 if not _____5355_4F4D_6709_6548(unit) then
-                    goto __continue16
+                    goto __continue15
                 end
                 local exists = false
                 do
@@ -160,7 +155,7 @@ local function _____83AB_5C14_7279_65AF_866B_5C38_53EF_62FE_53D6_5355_4F4D(varia
                     result[#result + 1] = unit
                 end
             end
-            ::__continue16::
+            ::__continue15::
             i = i + 1
         end
     end
@@ -203,7 +198,7 @@ local function _____83AB_5C14_7279_65AF_866B_5C38_62FE_53D6(picker, _____5B9E_4F
         pickerX,
         pickerY,
         "距离=",
-        data.X ~= nil and data.Y ~= nil and pickerX ~= nil and pickerY ~= nil and _____8BA1_7B97_8DDD_79BB(data.X, data.Y, pickerX, pickerY) or "nil"
+        data.X ~= nil and data.Y ~= nil and pickerX ~= nil and pickerY ~= nil and _____8DDD_79BBXY(data.X, data.Y, pickerX, pickerY) or "nil"
     )
     if _____5B9E_4F8B ~= nil and _____5B9E_4F8B["特效"] ~= nil and _____5B9E_4F8B["特效"] ~= 0 then
         _____6269_5C55__8BBE_7279_6548_901F_5EA6(_____5B9E_4F8B["特效"], cfg["虫尸特效正常播放速度"])

@@ -8,8 +8,8 @@ const { registerSpellEffectListener } = require("系统.00．核心系统.01．�
 const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   是玩家英雄组单位: (this: void, 单位: any) => boolean;
 };
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
-  stringToFourCCSafe: (this: void, 原始ID: string | undefined | null) => number;
+const { 解析配置内部ID } = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具") as {
+  解析配置内部ID: (this: void, 配置值: string | undefined | null) => number;
 };
 const { 距离平方XY } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   距离平方XY: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
@@ -40,7 +40,7 @@ function 移除调查点(this: void, 调查点ID: string): boolean {
 
 function 处理环境互动技能(this: void, 施法单位: any, 技能ID: number): void {
   if (施法单位 == null || 施法单位 === 0 || !是玩家英雄组单位(施法单位)) return;
-  if (技能ID !== stringToFourCCSafe(环境互动技能ID)) return;
+  if (技能ID !== 解析配置内部ID(环境互动技能ID)) return;
 
   const 玩家 = GetOwningPlayer(施法单位);
   if (玩家 == null || 玩家 === 0) return;
@@ -56,9 +56,9 @@ function 处理环境互动技能(this: void, 施法单位: any, 技能ID: numbe
     if (距离平方XY(施法X, 施法Y, 调查点.X, 调查点.Y) > 触发范围 * 触发范围) continue;
 
     if (调查点.触发回调(玩家ID, 施法单位, 调查点)) {
-      移除调查点(调查点.ID);
+      if (调查点.一次性 !== false) 移除调查点(调查点.ID);
+      return;
     }
-    return;
   }
 }
 
@@ -86,6 +86,10 @@ export function 清理全部环境互动调查点(this: void): void {
 export function init环境互动(this: void): void {
   if (已初始化环境互动) return;
   已初始化环境互动 = true;
+  const 旧环境互动模块 = require("系统.03．技能系统.04．快捷键技能.04．环境互动.02．旧环境互动.01．旧环境互动核心") as {
+    注册旧环境互动调查点?: (this: void) => void;
+  };
+  旧环境互动模块.注册旧环境互动调查点?.();
   registerSpellEffectListener(处理环境互动技能);
 }
 

@@ -24,6 +24,8 @@ local _____663E_793A_5E38_89C4_8BFB_6761 = ____19_FF0E_516C_5171_5DE5_5177["显�
 local _____5F00_59CB_65BD_6CD5_786C_76F4 = ____19_FF0E_516C_5171_5DE5_5177["开始施法硬直"]
 local _____6781_5750_6807X = ____19_FF0E_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____19_FF0E_516C_5171_5DE5_5177["极坐标Y"]
+local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
 local ____01_FF0ETS_539F_751F_5F39_5E55 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.index")
 local _____521B_5EFA_4E8C_9636_8D1D_585E_5C14XYZ_8F68_8FF9 = ____01_FF0ETS_539F_751F_5F39_5E55["创建二阶贝塞尔XYZ轨迹"]
 local _____521B_5EFA_539F_751F_5F39_5E55 = ____01_FF0ETS_539F_751F_5F39_5E55["创建原生弹幕"]
@@ -35,18 +37,9 @@ local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
 local GetUnitFlyHeight = jass.GetUnitFlyHeight
 local GetRandomReal = jass.GetRandomReal
-local Atan2 = jass.Atan2
-local ____jass_bj_RADTODEG_0 = jass.bj_RADTODEG
-if ____jass_bj_RADTODEG_0 == nil then
-    ____jass_bj_RADTODEG_0 = 57.29577951308232
-end
-local bj_RADTODEG = ____jass_bj_RADTODEG_0
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_SHADOW_STRIKE = jass.DAMAGE_TYPE_SHADOW_STRIKE
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local function _____53D6_5750_6807_671D_5411_89D2(fromX, fromY, toX, toY)
-    return Atan2(toY - fromY, toX - fromX) * bj_RADTODEG
-end
 local function _____53D1_5C04_83F2_5C3C_514B_65AF_5C14_9AB8_9AA8_5F39_5E55_6CE2_6B21(context, _____4F24_5BB3_4E0A_4E0B_6587)
     local boss = context.Boss
     if not _____5355_4F4D_5B58_6D3B(boss) then
@@ -56,7 +49,7 @@ local function _____53D1_5C04_83F2_5C3C_514B_65AF_5C14_9AB8_9AA8_5F39_5E55_6CE2_
     local bossX = _____53D6_5355_4F4DX(boss)
     local bossY = _____53D6_5355_4F4DY(boss)
     local safeTarget = _____53D6_968F_673A_73A9_5BB6_82F1_96C4(boss)
-    local safeAngle = _____5355_4F4D_5B58_6D3B(safeTarget) and _____53D6_5750_6807_671D_5411_89D2(
+    local safeAngle = _____5355_4F4D_5B58_6D3B(safeTarget) and _____4E24_70B9_89D2_5EA6(
         bossX,
         bossY,
         _____53D6_5355_4F4DX(safeTarget),
@@ -225,8 +218,8 @@ ____exports["初始化菲尼克斯尔骸骨弹幕节点"] = function(context)
             ____exports["释放菲尼克斯尔骸骨弹幕"](context)
         end
     )
-    local ____self_7 = context["清理"]
-    ____self_7["登记周期回调"](____self_7, "菲尼克斯尔-骸骨弹幕", timerId)
+    local ____self_6 = context["清理"]
+    ____self_6["登记周期回调"](____self_6, "菲尼克斯尔-骸骨弹幕", timerId)
 end
 ____exports["注册菲尼克斯尔骸骨弹幕"] = function()
 end

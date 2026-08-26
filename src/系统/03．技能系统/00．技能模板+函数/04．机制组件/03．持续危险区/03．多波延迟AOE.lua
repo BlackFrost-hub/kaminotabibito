@@ -46,7 +46,6 @@ _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0.prototype["推进"] = function(self, now)
     if self["已停止"] then
         return
     end
-    local _____5168_90E8_89E6_53D1 = true
     do
         local i = 0
         while i < #self["运行波次列表"] do
@@ -55,13 +54,26 @@ _____591A_6CE2_5EF6_8FDFAOE_5B9E_73B0.prototype["推进"] = function(self, now)
                 if _____8FD0_884C_6CE2_6B21["已触发"] then
                     goto __continue9
                 end
-                _____5168_90E8_89E6_53D1 = false
                 if now >= _____8FD0_884C_6CE2_6B21["到期Ms"] then
                     _____8FD0_884C_6CE2_6B21["已触发"] = true
                     self["参数"]["on触发"](_____8FD0_884C_6CE2_6B21["波次"], i + 1)
+                    if self["已停止"] then
+                        return
+                    end
                 end
             end
             ::__continue9::
+            i = i + 1
+        end
+    end
+    local _____5168_90E8_89E6_53D1 = true
+    do
+        local i = 0
+        while i < #self["运行波次列表"] do
+            if not self["运行波次列表"][i + 1]["已触发"] then
+                _____5168_90E8_89E6_53D1 = false
+                break
+            end
             i = i + 1
         end
     end

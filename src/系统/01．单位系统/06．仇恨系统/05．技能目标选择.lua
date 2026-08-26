@@ -359,4 +359,33 @@ ____exports["获取Boss技能最远敌对英雄"] = function(boss)
     end
     return best
 end
+____exports["获取Boss技能最远敌对英雄Ex"] = function(boss, centerUnit, radius, excludeList, filter)
+    local ____centerUnit_3 = centerUnit
+    if ____centerUnit_3 == nil then
+        ____centerUnit_3 = boss
+    end
+    local center = ____centerUnit_3
+    local heroes = ____exports["获取Boss技能敌对英雄列表Ex"](
+        boss,
+        center,
+        radius,
+        excludeList,
+        filter
+    )
+    local priorityCount = _____83B7_53D6_6700_9AD8_4F18_5148_7EA7_76EE_6807_6570_91CF(heroes)
+    local best = nil
+    local bestDistance = -1
+    do
+        local i = 0
+        while i < priorityCount do
+            local distance = _____8DDD_79BB_5E73_65B9(center, heroes[i + 1])
+            if distance > bestDistance then
+                bestDistance = distance
+                best = heroes[i + 1]
+            end
+            i = i + 1
+        end
+    end
+    return best
+end
 return ____exports

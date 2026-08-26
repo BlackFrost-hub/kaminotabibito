@@ -7,7 +7,8 @@ import { 巴尔扎罗斯技能数值配置, 巴尔扎罗斯音效配置 } from "
 import { 播放巴尔扎罗斯台词 } from "./14．台词播放";
 import { 播放Boss坐标音效 } from "../../00．公共/00．Boss音效播放";
 import { 注册单位技能壳监听 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
-import { stringToFourCC, 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { stringToFourCC, 单位未标记死亡 as 单位有效, 单位间角度 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
+import { 统一选择目标 } from "../../../../00．技能模板+函数/00．技能模板/02．选目标模板/01．统一目标选择适配";
 import { 执行BossAOE技能伤害 } from "../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器";
 
 const { 启动基础施法时间线 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.13．施法时间线") as {
@@ -58,7 +59,6 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const IsUnitType = jass.IsUnitType as (unit: any, unitType: any) => boolean;
 const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number, y: number) => any;
-const Atan2 = jass.Atan2 as (y: number, x: number) => number;
 const UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE as any;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -66,21 +66,15 @@ const DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
 const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, size: number) => void) | undefined;
-const BJ_RADTODEG = 57.29577951308232;
 const 巴尔扎罗斯单位类型ID = stringToFourCC(巴尔扎罗斯单位技能配置.单位ID);
 const 恶魔咆哮波技能ID = stringToFourCC(巴尔扎罗斯技能数值配置.恶魔咆哮波.技能槽位);
 const 快速控制_击晕 = 0;
 let 恶魔咆哮波已注册 = false;
 
 function 取目标单位(this: void, boss: any): any {
-  const entry = 获取Boss技能最高仇恨目标(boss);
-  if (entry != null && 单位有效(entry.targetRef)) return entry.targetRef;
-  return 获取Boss技能随机敌对英雄(boss);
-}
-
-function 取方向角(this: void, boss: any, target: any): number {
-  if (!单位有效(boss) || !单位有效(target)) return 0;
-  return Atan2(GetUnitY(target) - GetUnitY(boss), GetUnitX(target) - GetUnitX(boss)) * BJ_RADTODEG;
+  const 仇恨单位 = 统一选择目标({ 模式: "Boss-最高仇恨", 来源单位: boss }).单位;
+  if (仇恨单位 != null && 单位有效(仇恨单位)) return 仇恨单位;
+  return 统一选择目标({ 模式: "Boss-随机", 来源单位: boss }).单位;
 }
 
 function 是巴尔扎罗斯护卫(this: void, context: 巴尔扎罗斯运行时上下文, unit: any): boolean {
@@ -257,7 +251,7 @@ function 释放巴尔扎罗斯恶魔咆哮波实例(
   if (!单位有效(targetUnit)) return;
 
   const config = 巴尔扎罗斯技能数值配置.恶魔咆哮波;
-  const angle = 取方向角(施法者, targetUnit);
+  const angle = 单位间角度(施法者, targetUnit);
   创建咆哮波预警(施法者, angle, 宽度倍率);
   播放恶魔咆哮波蓄力特效(施法者, angle, 嘴部高度);
   启动基础施法时间线({

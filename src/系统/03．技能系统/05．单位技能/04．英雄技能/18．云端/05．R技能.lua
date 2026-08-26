@@ -9,6 +9,8 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local _____8DDD_79BBXY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]
 local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
 local _____79D2_8F6C_6BEB_79D2 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["秒转毫秒"]
 function _____64A4_9500R_654F_6377(ctx)
@@ -85,9 +87,6 @@ local SetUnitTimeScale = jass.SetUnitTimeScale
 local SetUnitAnimation = jass.SetUnitAnimation
 local UnitAddAbility = jass.UnitAddAbility
 local UnitRemoveAbility = jass.UnitRemoveAbility
-local SquareRoot = jass.SquareRoot
-local Atan2 = jass.Atan2
-local bj_RADTODEG = jass.bj_RADTODEG
 local bj_DEGTORAD = jass.bj_DEGTORAD
 local CAMERA_FIELD_TARGET_DISTANCE = jass.CAMERA_FIELD_TARGET_DISTANCE
 local CAMERA_FIELD_FARZ = jass.CAMERA_FIELD_FARZ
@@ -373,10 +372,18 @@ local function ____R_7B2C_4E8C_6BB5_51B2_523A(variable)
     end
     PauseUnit(target, true)
     SetUnitInvulnerable(target, true)
-    local dx = GetUnitX(target) - GetUnitX(caster)
-    local dy = GetUnitY(target) - GetUnitY(caster)
-    local _____5B9E_65F6_8DDD_79BB = SquareRoot(dx * dx + dy * dy)
-    local _____89D2_5EA6 = Atan2(dy, dx) * bj_RADTODEG
+    local _____5B9E_65F6_8DDD_79BB = _____8DDD_79BBXY(
+        GetUnitX(caster),
+        GetUnitY(caster),
+        GetUnitX(target),
+        GetUnitY(target)
+    )
+    local _____89D2_5EA6 = _____4E24_70B9_89D2_5EA6(
+        GetUnitX(caster),
+        GetUnitY(caster),
+        GetUnitX(target),
+        GetUnitY(target)
+    )
     _____5F00_59CB_51B2_950B_5E76_9644_5E26_6B8B_5F71_8868_73B0(caster, {
         ["角度"] = _____89D2_5EA6,
         ["距离"] = _____914D_7F6E.R["冲刺"]["第二段"]["基础距离"] + _____5B9E_65F6_8DDD_79BB,
@@ -403,10 +410,12 @@ local function ____R_7B2C_4E00_6BB5_51B2_523A(variable)
     end
     PauseUnit(target, true)
     SetUnitInvulnerable(target, true)
-    local _____89D2_5EA6 = Atan2(
-        GetUnitY(caster) - GetUnitY(target),
-        GetUnitX(caster) - GetUnitX(target)
-    ) * bj_RADTODEG
+    local _____89D2_5EA6 = _____4E24_70B9_89D2_5EA6(
+        GetUnitX(target),
+        GetUnitY(target),
+        GetUnitX(caster),
+        GetUnitY(caster)
+    )
     _____5F00_59CB_51B2_950B_5E76_9644_5E26_6B8B_5F71_8868_73B0(caster, {
         ["角度"] = _____89D2_5EA6,
         ["距离"] = _____914D_7F6E.R["冲刺"]["第一段"]["距离"],

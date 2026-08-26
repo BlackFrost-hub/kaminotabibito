@@ -302,3 +302,26 @@ export function 获取Boss技能最远敌对英雄(this: void, boss: any): any {
   }
   return best;
 }
+
+export function 获取Boss技能最远敌对英雄Ex(
+  this: void,
+  boss: any,
+  centerUnit?: any,
+  radius?: number,
+  excludeList?: any[],
+  filter?: Boss技能英雄过滤器,
+): any {
+  const center = centerUnit ?? boss;
+  const heroes = 获取Boss技能敌对英雄列表Ex(boss, center, radius, excludeList, filter);
+  const priorityCount = 获取最高优先级目标数量(heroes);
+  let best: any = null;
+  let bestDistance = -1;
+  for (let i = 0; i < priorityCount; i++) {
+    const distance = 距离平方(center, heroes[i]);
+    if (distance > bestDistance) {
+      bestDistance = distance;
+      best = heroes[i];
+    }
+  }
+  return best;
+}

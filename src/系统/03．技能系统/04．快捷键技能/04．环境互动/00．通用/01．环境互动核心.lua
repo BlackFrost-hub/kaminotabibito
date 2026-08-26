@@ -8,8 +8,8 @@ local ____require_result_0 = require("系统.00．核心系统.01．事件中心
 local registerSpellEffectListener = ____require_result_0.registerSpellEffectListener
 local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_1["是玩家英雄组单位"]
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
+local ____require_result_2 = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具")
+local _____89E3_6790_914D_7F6E_5185_90E8ID = ____require_result_2["解析配置内部ID"]
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8DDD_79BB_5E73_65B9XY = ____require_result_3["距离平方XY"]
 local ____require_result_4 = require("系统.03．技能系统.04．快捷键技能.04．环境互动.00．通用.00．环境互动配置")
@@ -42,7 +42,7 @@ local function _____5904_7406_73AF_5883_4E92_52A8_6280_80FD(_____65BD_6CD5_5355_
     if _____65BD_6CD5_5355_4F4D == nil or _____65BD_6CD5_5355_4F4D == 0 or not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____65BD_6CD5_5355_4F4D) then
         return
     end
-    if _____6280_80FDID ~= stringToFourCCSafe(_____73AF_5883_4E92_52A8_6280_80FDID) then
+    if _____6280_80FDID ~= _____89E3_6790_914D_7F6E_5185_90E8ID(_____73AF_5883_4E92_52A8_6280_80FDID) then
         return
     end
     local _____73A9_5BB6 = GetOwningPlayer(_____65BD_6CD5_5355_4F4D)
@@ -62,9 +62,11 @@ local function _____5904_7406_73AF_5883_4E92_52A8_6280_80FD(_____65BD_6CD5_5355_
                     goto __continue11
                 end
                 if _____8C03_67E5_70B9["触发回调"](_____73A9_5BB6ID, _____65BD_6CD5_5355_4F4D, _____8C03_67E5_70B9) then
-                    _____79FB_9664_8C03_67E5_70B9(_____8C03_67E5_70B9.ID)
+                    if _____8C03_67E5_70B9["一次性"] ~= false then
+                        _____79FB_9664_8C03_67E5_70B9(_____8C03_67E5_70B9.ID)
+                    end
+                    return
                 end
-                return
             end
             ::__continue11::
             i = i + 1
@@ -102,6 +104,11 @@ ____exports["init环境互动"] = function()
         return
     end
     _____5DF2_521D_59CB_5316_73AF_5883_4E92_52A8 = true
+    local _____65E7_73AF_5883_4E92_52A8_6A21_5757 = require("系统.03．技能系统.04．快捷键技能.04．环境互动.02．旧环境互动.01．旧环境互动核心")
+    local ____opt_5 = _____65E7_73AF_5883_4E92_52A8_6A21_5757["注册旧环境互动调查点"]
+    if ____opt_5 ~= nil then
+        ____opt_5()
+    end
     registerSpellEffectListener(_____5904_7406_73AF_5883_4E92_52A8_6280_80FD)
 end
 return ____exports

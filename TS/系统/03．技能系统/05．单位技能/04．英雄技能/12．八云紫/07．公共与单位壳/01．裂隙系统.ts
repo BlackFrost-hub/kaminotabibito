@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import { 八云紫单位技能配置 } from "../00．配置";
+import { 获取坐标范围单位按筛选 } from "../../../../00．技能模板+函数/02．通用函数/02．单位与范围";
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
@@ -85,18 +86,19 @@ function 句柄ID(this: void, handle: any): number {
 }
 
 // 裂隙物编属于 Ancient，不能经过公共战斗单位筛选器。
+/**
+ * 范围内原生单位全量枚举（不筛选，含死亡/无敌/建筑/机械/古树）。
+ * 配置型筛选等价表达：要求有效单位=false + 允许死亡=true + 允许无敌=true + 全类型放行 + 无参照单位。
+ */
 function 获取范围内原生单位(this: void, x: number, y: number, radius: number): any[] {
-  const group = jass.CreateGroup();
-  const result: any[] = [];
-  jass.GroupEnumUnitsInRange(group, x, y, radius, null);
-  let unit = jass.FirstOfGroup(group);
-  while (unit != null && unit !== 0) {
-    result.push(unit);
-    jass.GroupRemoveUnit(group, unit);
-    unit = jass.FirstOfGroup(group);
-  }
-  jass.DestroyGroup(group);
-  return result;
+  return 获取坐标范围单位按筛选(x, y, radius, null, {
+    要求有效单位: false,
+    允许死亡: true,
+    允许无敌: true,
+    允许建筑: true,
+    允许机械: true,
+    允许古树: true,
+  });
 }
 
 export function 八云紫单位存活(this: void, unit: any): boolean {

@@ -9,6 +9,8 @@ local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("�
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["读取单位攻击力"]
+local _____4E24_70B9_89D2_5EA6 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["两点角度"]
+local _____8DDD_79BBXY = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["距离XY"]
 local ____08_FF0E_6280_80FD_4E8B_4EF6_4E2D_5FC3 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
 local registerSpellEndcastListener = ____08_FF0E_6280_80FD_4E8B_4EF6_4E2D_5FC3.registerSpellEndcastListener
 function CosDeg(_____89D2_5EA6)
@@ -74,9 +76,6 @@ local GetLocalPlayer = jass.GetLocalPlayer
 local Player = jass.Player
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitAnimation = jass.SetUnitAnimation
-local SquareRoot = jass.SquareRoot
-local Atan2 = jass.Atan2
-local bj_RADTODEG = jass.bj_RADTODEG
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_FIRE = jass.DAMAGE_TYPE_FIRE
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
@@ -302,10 +301,12 @@ local function _____91CA_653EQ_51B0_706B_9B54_5251(context, caster, _____6280_80
     SetUnitAnimation(caster, _____914D_7F6E.Q["动作名"])
     local sx = GetUnitX(caster)
     local sy = GetUnitY(caster)
-    local _____89D2_5EA6 = Atan2(
-        GetUnitY(target) - sy,
-        GetUnitX(target) - sx
-    ) * bj_RADTODEG
+    local _____89D2_5EA6 = _____4E24_70B9_89D2_5EA6(
+        sx,
+        sy,
+        GetUnitX(target),
+        GetUnitY(target)
+    )
     local _____989C_8272 = _____5206_652F == "火" and _____914D_7F6E.Q["火"]["颜色"] or _____914D_7F6E.Q["冰"]["颜色"]
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____914D_7F6E.Q["护场特效"]["模型"],
@@ -320,9 +321,12 @@ local function _____91CA_653EQ_51B0_706B_9B54_5251(context, caster, _____6280_80
         ["蓝"] = _____989C_8272["蓝"],
         ["透明度"] = _____989C_8272["透明度"]
     })
-    local dx = GetUnitX(target) - sx
-    local dy = GetUnitY(target) - sy
-    local _____8DDD_79BB = SquareRoot(dx * dx + dy * dy) - _____914D_7F6E.Q["冲锋"]["命中距离码"]
+    local _____8DDD_79BB = _____8DDD_79BBXY(
+        sx,
+        sy,
+        GetUnitX(target),
+        GetUnitY(target)
+    ) - _____914D_7F6E.Q["冲锋"]["命中距离码"]
     if _____8DDD_79BB <= 0 then
         _____7ED3_7B97Q_547D_4E2D(context)
         return

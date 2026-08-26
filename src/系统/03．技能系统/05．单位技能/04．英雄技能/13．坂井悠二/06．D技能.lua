@@ -14,6 +14,8 @@ local _____5355_4F4D_5B58_6D3B = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单�
 local _____53D6_5355_4F4DID = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["取单位ID"]
 local _____6781_5750_6807X = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标X"]
 local _____6781_5750_6807Y = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["极坐标Y"]
+local ____02_FF0E_5355_4F4D_4E0E_8303_56F4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009 = ____02_FF0E_5355_4F4D_4E0E_8303_56F4["获取坐标范围单位按筛选"]
 local ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.24．整数与时间换算")
 local _____5411_4E0B_53D6_6574_6574_6570 = ____24_FF0E_6574_6570_4E0E_65F6_95F4_6362_7B97["向下取整整数"]
 local ____00_FF0E_5171_4EAB = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.03．跳跃·击飞.01．跳跃系统.00．共享")
@@ -170,17 +172,6 @@ local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCCSafe = ____require_result_7.stringToFourCCSafe
 stringToFourCC = stringToFourCCSafe
 local GetRandomReal = jass.GetRandomReal
-local ForGroup = jass.ForGroup
-local GroupEnumUnitsInRange = jass.GroupEnumUnitsInRange
-local GetEnumUnit = jass.GetEnumUnit
-local CreateGroup = jass.CreateGroup
-local DestroyGroup = jass.DestroyGroup
-local ____jass_Filter_8 = jass.Filter
-if ____jass_Filter_8 == nil then
-    ____jass_Filter_8 = function(_f) return true end
-end
-local FilterBoolExpr = ____jass_Filter_8
-local IsUnitAlly = jass.IsUnitAlly
 local IsUnitType = jass.IsUnitType
 local SetUnitX = jass.SetUnitX
 local SetUnitY = jass.SetUnitY
@@ -246,7 +237,6 @@ local function _____6267_884C_9F13_821E(context)
         return
     end
     local _____8303_56F4 = _____914D_7F6E["鼓舞"]["范围"]
-    local owner = GetOwningPlayer(caster)
     for hidStr in pairs(ctx["已鼓舞友军"]) do
         local hid = __TS__Number(hidStr)
         local record = ctx["已鼓舞友军"][hid]
@@ -254,54 +244,55 @@ local function _____6267_884C_9F13_821E(context)
             _____6E05_9664_5355_4E2A_9F13_821E(ctx, hid)
         end
     end
-    local group = CreateGroup()
-    GroupEnumUnitsInRange(
-        group,
+    local _____53CB_519B_5217_8868 = _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009(
         GetUnitX(caster),
         GetUnitY(caster),
         _____8303_56F4,
-        nil
+        caster,
+        {
+            ["要求有效单位"] = true,
+            ["允许建筑"] = false,
+            ["允许机械"] = true,
+            ["允许古树"] = true,
+            ["允许无敌"] = true,
+            ["排除自身"] = true,
+            ["仅友军"] = true
+        }
     )
-    ForGroup(
-        group,
-        function()
-            local u = GetEnumUnit()
-            if u == nil or u == 0 then
-                return
+    do
+        local i = 0
+        while i < #_____53CB_519B_5217_8868 do
+            do
+                local u = _____53CB_519B_5217_8868[i + 1]
+                if u == nil or u == 0 then
+                    goto __continue37
+                end
+                if not _____5355_4F4D_5B58_6D3B(u) then
+                    goto __continue37
+                end
+                local hid = _____53D6_5355_4F4DID(u)
+                if hid == 0 or ctx["已鼓舞友军"][hid] ~= nil then
+                    goto __continue37
+                end
+                local _____653B_51FB_52A0_6210 = _____5411_4E0B_53D6_6574_6574_6570((__TS__Number(GetUnitStateJapi(u, UNIT_STATE_ATTACK1_BASE)) or 0) * _____914D_7F6E["鼓舞"]["攻击力基础倍率"])
+                _____4E34_65F6_8C03_6574_653B_51FB(u, _____653B_51FB_52A0_6210)
+                SetUnitMoveSpeed(
+                    u,
+                    GetUnitMoveSpeed(u) + _____914D_7F6E["鼓舞"]["移动速度加值"]
+                )
+                registerManualBuff(
+                    u,
+                    _____5742_4E95_60A0_4E8CBuffID["D鼓舞"],
+                    _____914D_7F6E["持续秒"],
+                    _____914D_7F6E["鼓舞"]["攻击力基础倍率"],
+                    {["来源"] = caster, ["来源类型"] = "技能", ["标签"] = "坂井悠二-D-鼓舞"}
+                )
+                ctx["已鼓舞友军"][hid] = {["单位"] = u, ["攻击加成"] = _____653B_51FB_52A0_6210}
             end
-            if u == caster then
-                return
-            end
-            if not IsUnitAlly(u, owner) then
-                return
-            end
-            if IsUnitType(u, UNIT_TYPE_DEAD) or IsUnitType(u, UNIT_TYPE_STRUCTURE) then
-                return
-            end
-            if not _____5355_4F4D_5B58_6D3B(u) then
-                return
-            end
-            local hid = _____53D6_5355_4F4DID(u)
-            if hid == 0 or ctx["已鼓舞友军"][hid] ~= nil then
-                return
-            end
-            local _____653B_51FB_52A0_6210 = _____5411_4E0B_53D6_6574_6574_6570((__TS__Number(GetUnitStateJapi(u, UNIT_STATE_ATTACK1_BASE)) or 0) * _____914D_7F6E["鼓舞"]["攻击力基础倍率"])
-            _____4E34_65F6_8C03_6574_653B_51FB(u, _____653B_51FB_52A0_6210)
-            SetUnitMoveSpeed(
-                u,
-                GetUnitMoveSpeed(u) + _____914D_7F6E["鼓舞"]["移动速度加值"]
-            )
-            registerManualBuff(
-                u,
-                _____5742_4E95_60A0_4E8CBuffID["D鼓舞"],
-                _____914D_7F6E["持续秒"],
-                _____914D_7F6E["鼓舞"]["攻击力基础倍率"],
-                {["来源"] = caster, ["来源类型"] = "技能", ["标签"] = "坂井悠二-D-鼓舞"}
-            )
-            ctx["已鼓舞友军"][hid] = {["单位"] = u, ["攻击加成"] = _____653B_51FB_52A0_6210}
+            ::__continue37::
+            i = i + 1
         end
-    )
-    DestroyGroup(group)
+    end
 end
 local function _____66F4_65B0D_9A6C_7532_7FA4(context)
     local ctx = context
@@ -340,7 +331,7 @@ local function _____66F4_65B0D_9A6C_7532_7FA4(context)
                 do
                     local _____53C2 = ctx["马甲二参数"][i + 1]
                     if _____53C2["马甲"] == nil or _____53C2["马甲"] == 0 then
-                        goto __continue50
+                        goto __continue47
                     end
                     local _____89D2_5EA63 = _____4E00_9762_5411 + 180 + _____53C2["角度符号"] * _____53C2["角度"]
                     SetUnitX(
@@ -353,7 +344,7 @@ local function _____66F4_65B0D_9A6C_7532_7FA4(context)
                     )
                     SetUnitFacing(_____53C2["马甲"], _____4E00_9762_5411 + _____53C2["面向角度"])
                 end
-                ::__continue50::
+                ::__continue47::
                 i = i + 1
             end
         end
@@ -412,7 +403,7 @@ local function _____5EF6_8FDF_9644_52A0D_9A6C_7532_7279_6548(context)
             do
                 local _____9A6C_7532 = ctx["马甲二参数"][i + 1]["马甲"]
                 if _____9A6C_7532 == nil or _____9A6C_7532 == 0 or not _____5355_4F4D_5B58_6D3B(_____9A6C_7532) then
-                    goto __continue61
+                    goto __continue58
                 end
                 do
                     local j = 0
@@ -439,7 +430,7 @@ local function _____5EF6_8FDF_9644_52A0D_9A6C_7532_7279_6548(context)
                 end
                 _____6210_529F_9A6C_7532_6570 = _____6210_529F_9A6C_7532_6570 + 1
             end
-            ::__continue61::
+            ::__continue58::
             i = i + 1
         end
     end
@@ -508,26 +499,26 @@ local function _____521B_5EFA_9A6C_7532(context)
             local _____9762_5411_89D2_5EA6
             if _____521D_59CB["距离"] ~= nil then
                 _____8DDD_79BB = _____521D_59CB["距离"]
-                local ____521D_59CB__89D2_5EA6_9 = _____521D_59CB["角度"]
-                if ____521D_59CB__89D2_5EA6_9 == nil then
-                    ____521D_59CB__89D2_5EA6_9 = 0
+                local ____521D_59CB__89D2_5EA6_8 = _____521D_59CB["角度"]
+                if ____521D_59CB__89D2_5EA6_8 == nil then
+                    ____521D_59CB__89D2_5EA6_8 = 0
                 end
-                _____89D2_5EA6 = ____521D_59CB__89D2_5EA6_9
-                local ____521D_59CB__9762_5411_89D2_5EA6_10 = _____521D_59CB["面向角度"]
-                if ____521D_59CB__9762_5411_89D2_5EA6_10 == nil then
-                    ____521D_59CB__9762_5411_89D2_5EA6_10 = 0
+                _____89D2_5EA6 = ____521D_59CB__89D2_5EA6_8
+                local ____521D_59CB__9762_5411_89D2_5EA6_9 = _____521D_59CB["面向角度"]
+                if ____521D_59CB__9762_5411_89D2_5EA6_9 == nil then
+                    ____521D_59CB__9762_5411_89D2_5EA6_9 = 0
                 end
-                _____9762_5411_89D2_5EA6 = ____521D_59CB__9762_5411_89D2_5EA6_10
+                _____9762_5411_89D2_5EA6 = ____521D_59CB__9762_5411_89D2_5EA6_9
             else
                 _____8DDD_79BB = 400 + GetRandomReal(200, 600)
                 _____89D2_5EA6 = GetRandomReal(1, 60)
-                local ____temp_11
+                local ____temp_10
                 if _____521D_59CB["面向角度"] ~= nil then
-                    ____temp_11 = _____521D_59CB["面向角度"]
+                    ____temp_10 = _____521D_59CB["面向角度"]
                 else
-                    ____temp_11 = GetRandomReal(-90, 90)
+                    ____temp_10 = GetRandomReal(-90, 90)
                 end
-                _____9762_5411_89D2_5EA6 = ____temp_11
+                _____9762_5411_89D2_5EA6 = ____temp_10
             end
             local _____89D2_5EA6_7B26_53F7 = _____89D2_5EA6 < 31 and 1 or -1
             local _____89D2_5EA63 = _____65BD_6CD5_8005_9762_5411 + 180 + _____89D2_5EA6_7B26_53F7 * _____89D2_5EA6
@@ -540,8 +531,8 @@ local function _____521B_5EFA_9A6C_7532(context)
                 _____521D_59CBY,
                 _____65BD_6CD5_8005_9762_5411 + _____9762_5411_89D2_5EA6
             )
-            local ____context__9A6C_7532_4E8C_53C2_6570_12 = context["马甲二参数"]
-            ____context__9A6C_7532_4E8C_53C2_6570_12[#____context__9A6C_7532_4E8C_53C2_6570_12 + 1] = {
+            local ____context__9A6C_7532_4E8C_53C2_6570_11 = context["马甲二参数"]
+            ____context__9A6C_7532_4E8C_53C2_6570_11[#____context__9A6C_7532_4E8C_53C2_6570_11 + 1] = {
                 ["马甲"] = _____9A6C_7532,
                 ["距离"] = _____8DDD_79BB,
                 ["角度"] = _____89D2_5EA6,
