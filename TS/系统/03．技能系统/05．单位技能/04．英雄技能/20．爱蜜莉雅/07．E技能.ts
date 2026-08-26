@@ -54,6 +54,14 @@ const { 读取单位攻击力, 单位存活, 两点角度 } = require("系统.03
   单位存活: (this: void, unit: any) => boolean;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
 };
+const { 创建限时二段技能壳, 确认限时二段技能壳, 清理限时二段技能壳 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.25．限时二段技能壳") as {
+  创建限时二段技能壳: (this: void, 参数: any) => any;
+  确认限时二段技能壳: (this: void, 控制器: any) => boolean;
+  清理限时二段技能壳: (this: void, 控制器: any) => boolean;
+};
+const { 消费爱蜜莉雅D强化 } = require("./02．公共状态与冰晶") as {
+  消费爱蜜莉雅D强化: (this: void, 英雄: any) => boolean;
+};
 const platformAbilityApi = require("平台扩展API取值") as {
   技能_获取技能最大冷却时间: (this: void, 单位: any, 技能代码: number) => number;
 };
@@ -73,6 +81,8 @@ interface E护盾数据 {
   修饰ID: number;
   位移ID: number;
   已结束: boolean;
+  /** 二段输入壳控制器（ASE2；护盾期间切换 E 按钮为提前结束） */
+  二段壳: any;
 }
 
 function 施加落点冰爆(this: void, 施法者: any, X: number, Y: number, 技能实例ID: number | undefined, 伤害值: number): void {
@@ -113,10 +123,12 @@ function 施加落点冰爆(this: void, 施法者: any, X: number, Y: number, �
 function 结束E护盾分支(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 分支: "自然" | "提前" | "破盾"): void {
   const 数据 = 控制器.数据 as E护盾数据;
   if (数据 == null || 数据.已结束) return;
+  // 先置 已结束 再停止位移：停止位移同步触发位移结束回调，此时必须已标记结束（否则落点冰爆/冰晶/D强化被重复执行）
+  数据.已结束 = true;
   // 提前结束：停止位移
   if (分支 === "提前" && 数据.位移ID !== 0) 停止位移(数据.位移ID, "中断");
   if (数据.修饰ID !== 0) unregisterDamageModifier(数据.修饰ID);
-  数据.已结束 = true;
+  if (数据.二段壳 != null) 清理限时二段技能壳(数据.二段壳);
   移除单位指定Buff(施法者, 爱蜜莉雅BuffID.冰晶护身);
   destroyUnitEffect(施法者, 护盾特效键);
   if (分支 === "破盾") {
@@ -145,19 +157,26 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
   }
 
   const 护盾值 = 读取单位攻击力(施法者) * 爱蜜莉雅E配置.护盾攻击力倍率;
-  const 数据: E护盾数据 = { 护盾剩余: 护盾值, 修饰ID: 0, 位移ID: 0, 已结束: false };
+  const 数据: E护盾数据 = { 护盾剩余: 护盾值, 修饰ID: 0, 位移ID: 0, 已结束: false, 二段壳: null };
   const 控制器 = 创建战斗技能实例({
     技能键: "E护盾",
     施法者,
     技能实例ID,
     数据,
     结束回调: function E结束(this: void, _原因: string, _c: any): void {
+      // 死亡/中断收束：补全清理（与 结束E护盾分支 幂等）
+      if (数据.已结束) return;
+      // 先置 已结束 再停止位移：停止位移同步触发 位移结束回调，此时必须已标记结束（否则会执行落点冰爆/生成冰晶/消费 D 强化）
+      数据.已结束 = true;
+      if (数据.位移ID !== 0) 停止位移(数据.位移ID, "中断");
       if (数据.修饰ID !== 0) unregisterDamageModifier(数据.修饰ID);
+      if (数据.二段壳 != null) 清理限时二段技能壳(数据.二段壳);
+      移除单位指定Buff(施法者, 爱蜜莉雅BuffID.冰晶护身);
       destroyUnitEffect(施法者, 护盾特效键);
     },
   });
 
-  // 护盾吸收伤害（破盾触发）
+  // 护盾吸收伤害（破盾触发）：只吸收 ≤ 剩余护盾的部分，超出部分继续结算
   数据.修饰ID = registerDamageModifier(function E护盾吸收(this: void, context: any): number {
     if (数据.已结束) return context.currentDamage;
     if (context.target !== 施法者) return context.currentDamage;
@@ -165,9 +184,13 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
     const 吸收 = context.currentDamage > 数据.护盾剩余 ? 数据.护盾剩余 : context.currentDamage;
     数据.护盾剩余 -= 吸收;
     if (数据.护盾剩余 <= 0) {
-      结束E护盾分支(施法者, 控制器, 技能实例ID, "破盾");
+      // 破盾收口延迟到本次伤害修正回调遍历结束后执行（回调内 unregisterDamageModifier 会 splice 当前项扰乱遍历）
+      addDelayedCallback(0, function E破盾延迟收口(this: void): void {
+        结束E护盾分支(施法者, 控制器, 技能实例ID, "破盾");
+      });
     }
-    return 0;
+    // 返回剩余伤害（例：护盾 100、伤害 300 → 吸收 100、返回 200）
+    return context.currentDamage - 吸收;
   }, 1000);
 
   registerManualBuff(施法者, 爱蜜莉雅BuffID.冰晶护身, 爱蜜莉雅E配置.护盾持续秒, 护盾值);
@@ -178,6 +201,15 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
     结束E护盾分支(施法者, 控制器, 技能实例ID, "自然");
   });
   控制器.登记延迟回调(自然结束延迟);
+
+  // 二段输入壳：护盾期间切换 E 按钮为提前结束（ASE2），护盾结束自动恢复
+  数据.二段壳 = 创建限时二段技能壳({
+    名称: "爱蜜莉雅-E二段",
+    单位: 施法者,
+    一段技能ID: E技能类型ID,
+    二段技能ID: jass.FourCC(爱蜜莉雅E配置.二段技能ID),
+    持续秒: 爱蜜莉雅E配置.护盾持续秒,
+  });
 
   // 位移：向目标点冲锋（检查地形；不可达 → 短惩罚冷却）
   const 目标X = GetSpellTargetX();
@@ -214,9 +246,53 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
       if (爱蜜莉雅E配置.落点生成冰晶) {
         创建爱蜜莉雅场上冰晶(施法者, "E", 落点X, 落点Y, 爱蜜莉雅E配置.落点冰晶持续秒);
       }
+      // D 强化：落点保护脉冲（为附近友军提供较弱护盾）
+      if (消费爱蜜莉雅D强化(施法者)) {
+        E施加保护脉冲(施法者, 落点X, 落点Y, 技能实例ID);
+      }
       数据.位移ID = 0;
     },
   });
+}
+
+/** D 强化保护脉冲：为落点附近友军施加短时较弱护盾（registerDamageModifier 吸收） */
+function E施加保护脉冲(this: void, 施法者: any, X: number, Y: number, 技能实例ID: number | undefined): void {
+  const 护盾值 = 读取单位攻击力(施法者) * 爱蜜莉雅E配置.保护脉冲护盾攻击力倍率;
+  const 持续秒 = 爱蜜莉雅E配置.保护脉冲持续秒;
+  const 组 = jass.CreateGroup() as any;
+  jass.GroupEnumUnitsInRange(组, X, Y, 260, null);
+  while (true) {
+    const u = jass.FirstOfGroup(组) as any;
+    if (u == null || u === 0) break;
+    jass.GroupRemoveUnit(组, u);
+    if (!单位存活(u)) continue;
+    if (!jass.IsUnitAlly(u, jass.GetOwningPlayer(施法者))) continue;
+    if (u === 施法者) continue;
+    // 每友军一个短时护盾修饰（吸收后注销）
+    let 剩余 = 护盾值;
+    const 修饰ID = registerDamageModifier(function 保护脉冲吸收(this: void, context: any): number {
+      if (context.target !== u) return context.currentDamage;
+      if (剩余 <= 0) return context.currentDamage;
+      const 吸收 = context.currentDamage > 剩余 ? 剩余 : context.currentDamage;
+      剩余 -= 吸收;
+      return context.currentDamage - 吸收;
+    }, 900);
+    registerManualBuff(u, 爱蜜莉雅BuffID.冰晶护身, 持续秒, 护盾值);
+    addDelayedCallback(持续秒 * 1000, function 保护脉冲结束(this: void): void {
+      unregisterDamageModifier(修饰ID);
+    });
+  }
+  jass.DestroyGroup(组);
+  void 技能实例ID;
+}
+
+function 释放E二段输入(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  if (施法者 == null || 施法者 === 0) return;
+  const 活跃列表 = 查询战斗技能实例(施法者, "E护盾");
+  for (let i = 0; i < 活跃列表.length; i++) {
+    结束E护盾分支(施法者, 活跃列表[i], 技能实例ID, "提前");
+    return;
+  }
 }
 
 export function 注册爱蜜莉雅E(this: void): void {
@@ -231,6 +307,16 @@ export function 注册爱蜜莉雅E(this: void): void {
     创建独立技能实例: true,
     独立技能来源类型: "单位技能",
     技能实例持续时间秒: 爱蜜莉雅E配置.护盾持续秒 + 2,
+  });
+  注册单位技能壳监听({
+    名称: "爱蜜莉雅-E二段输入（ASE2）",
+    单位类型ID: 英雄单位类型ID,
+    技能ID: 爱蜜莉雅E配置.二段技能ID,
+    获取或创建上下文: function E二段上下文(this: void, unit: any): any {
+      return { 英雄: unit };
+    },
+    释放技能: 释放E二段输入,
+    创建独立技能实例: false,
   });
 }
 

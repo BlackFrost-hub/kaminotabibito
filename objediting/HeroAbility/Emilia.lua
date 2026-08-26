@@ -18,6 +18,8 @@ createPlayerHeroChannelAbility('AEQ1', '爱蜜莉雅-冰之矢（Q）', {
   hotkey = 'Q',
   buttonX = 0,
   buttonY = 2,
+  cooldown = 5,
+  manaCost = 60,
 })
 
 createPlayerHeroChannelAbility('AEW1', '爱蜜莉雅-冰花绽放（W）', {
@@ -33,6 +35,8 @@ createPlayerHeroChannelAbility('AEW1', '爱蜜莉雅-冰花绽放（W）', {
   hotkey = 'W',
   buttonX = 1,
   buttonY = 2,
+  cooldown = 9,
+  manaCost = 80,
 })
 
 createPlayerHeroChannelAbility('AEE1', '爱蜜莉雅-冰晶护身（E）', {
@@ -48,6 +52,8 @@ createPlayerHeroChannelAbility('AEE1', '爱蜜莉雅-冰晶护身（E）', {
   hotkey = 'E',
   buttonX = 2,
   buttonY = 2,
+  cooldown = 10,
+  manaCost = 70,
 })
 
 createPlayerHeroChannelAbility('AER1', '爱蜜莉雅-永冻之庭（R）', {
@@ -63,6 +69,8 @@ createPlayerHeroChannelAbility('AER1', '爱蜜莉雅-永冻之庭（R）', {
   hotkey = 'R',
   buttonX = 3,
   buttonY = 2,
+  cooldown = 70,
+  manaCost = 140,
 })
 
 createPlayerHeroActiveDChannelAbility('AED1', '爱蜜莉雅-帕克显现（D）', {
@@ -78,5 +86,7 @@ createPlayerHeroActiveDChannelAbility('AED1', '爱蜜莉雅-帕克显现（D）'
   hotkey = 'D',
   buttonX = 0,
   buttonY = 1,
+  cooldown = 15,
+  manaCost = 40,
 })
 

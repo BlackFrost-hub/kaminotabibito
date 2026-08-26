@@ -64,6 +64,8 @@ export interface 区域效果参数 {
   持续时间: number;
   检测间隔?: number;
   防抖间隔?: number;
+  /** 首次扫描（创建时已在范围内的单位）也触发 on进入；引用计数用途配合 防抖间隔: 0 保证进出严格对称 */
+  首次扫描触发进入?: boolean;
   影响目标?: "敌方" | "友方" | "全部";
   所有者?: any;
   模型路径?: string;
@@ -270,7 +272,7 @@ class 区域效果实现 implements 区域效果实例 {
       const hid = GetHandleId(单位);
       if (!this.是否影响目标(单位)) continue;
       新集合[hid] = 单位;
-      if (!是首次 && !this.当前单位集合[hid]) {
+      if ((!是首次 || this.参数.首次扫描触发进入 === true) && !this.当前单位集合[hid]) {
         const 上次离开 = this.单位最后离开时间[hid];
         if (上次离开 == null || 当前时间 - 上次离开 >= 防抖毫秒) {
           this.参数.on进入?.(单位, this.参数.回调上下文ID);

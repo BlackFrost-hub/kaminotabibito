@@ -255,7 +255,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                 goto __continue32
             end
             _____65B0_96C6_5408[hid] = _____5355_4F4D
-            if not _____662F_9996_6B21 and not self["当前单位集合"][hid] then
+            if (not _____662F_9996_6B21 or self["参数"]["首次扫描触发进入"] == true) and not self["当前单位集合"][hid] then
                 local _____4E0A_6B21_79BB_5F00 = self["单位最后离开时间"][hid]
                 if _____4E0A_6B21_79BB_5F00 == nil or _____5F53_524D_65F6_95F4 - _____4E0A_6B21_79BB_5F00 >= _____9632_6296_6BEB_79D2 then
                     local ____opt_15 = self["参数"]["on进入"]

@@ -43,10 +43,22 @@ const { addDelayedCallback, removeDelayedCallback, getGameTime } = require("系�
 
 const 英雄单位类型ID = jass.FourCC(爱蜜莉雅技能配置.单位类型ID) as number;
 const 环绕特效键 = "爱蜜莉雅D环绕";
+/** 每英雄 D 到期回调 ID（重复开启时先取消旧回调，防止旧回调提前清掉新 D 状态） */
+const D到期回调表: Record<number, number | undefined> = {};
+
+const { 取单位ID } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+  取单位ID: (this: void, unit: any) => number;
+};
 
 /** 清理 D 表现与状态（到期/打断/死亡/R 收束共用；幂等） */
 export function 结束爱蜜莉雅D(this: void, 施法者: any): void {
   if (施法者 == null || 施法者 === 0) return;
+  // 取消挂起的到期回调（若仍存在）
+  const 旧ID = D到期回调表[取单位ID(施法者)];
+  if (旧ID != null && 旧ID !== 0) {
+    removeDelayedCallback(旧ID);
+    delete D到期回调表[取单位ID(施法者)];
+  }
   destroyUnitEffect(施法者, 环绕特效键);
   移除单位指定Buff(施法者, 爱蜜莉雅BuffID.帕克显现);
   清理爱蜜莉雅D强化(施法者);
@@ -54,8 +66,12 @@ export function 结束爱蜜莉雅D(this: void, 施法者: any): void {
 
 function 释放D帕克显现(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0) return;
+  const 英雄ID = 取单位ID(施法者);
   播放爱蜜莉雅动作(施法者, 爱蜜莉雅D配置.动作索引, 1.0);
-  // 重复 D：先清理旧环绕表现（状态由 设置爱蜜莉雅D强化 覆盖刷新）
+  // 重复 D：先取消旧到期回调（旧回调不得清掉新 D 状态）+ 清理旧环绕表现
+  const 旧到期ID = D到期回调表[英雄ID];
+  if (旧到期ID != null && 旧到期ID !== 0) removeDelayedCallback(旧到期ID);
+  delete D到期回调表[英雄ID];
   destroyUnitEffect(施法者, 环绕特效键);
   移除单位指定Buff(施法者, 爱蜜莉雅BuffID.帕克显现);
 
@@ -76,12 +92,18 @@ function 释放D帕克显现(this: void, _context: any, 施法者: any, _技能�
     持续秒: 0.5,
   });
 
-  // 到期清理（幂等：结束爱蜜莉雅D 已清理状态）
+  // 到期清理（幂等：结束爱蜜莉雅D 已清理状态）；重复 D 时旧回调先被取消
   const 到期ID = addDelayedCallback(持续毫秒, function D到期清理(this: void): void {
+    delete D到期回调表[英雄ID];
     结束爱蜜莉雅D(施法者);
   });
+  D到期回调表[英雄ID] = 到期ID;
   const 注销 = 登记爱蜜莉雅技能清理(施法者, "D到期", function D清理(this: void): void {
-    removeDelayedCallback(到期ID);
+    const 当前ID = D到期回调表[英雄ID];
+    if (当前ID != null && 当前ID === 到期ID) {
+      removeDelayedCallback(当前ID);
+      delete D到期回调表[英雄ID];
+    }
     结束爱蜜莉雅D(施法者);
   });
   void 注销;

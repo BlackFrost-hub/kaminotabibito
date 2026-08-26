@@ -1,18 +1,21 @@
 /** @noSelfInFile */
 /**
- * 爱蜜莉雅 - R：永冻之庭（A8）
+ * 爱蜜莉雅 - R：永冻之庭（A8，R002.2 修正）
  *
- * - 蓄力（世界坐标进度 UI，跟随施法者，登记 A1 进度 UI）后创建大范围冰结领域。
+ * - 蓄力使用通用"施法·蓄力·充能"模板（06．施法·蓄力·充能/充能系统）：
+ *   指令中断 / 硬控制中断 / 死亡中断 / 世界坐标进度 UI 倒计时与销毁均由充能系统处理，
+ *   蓄力被硬控或下达其他指令时真正中断，不再生成领域。
  * - 领域：真实持续区域（周期伤害/寒意/减速），视觉半径不作为判定依据。
  * - 冰晶读取：按创建顺序有限读取（配置上限），连接光用项目通用闪电 code（BLSB），
- *   每枚冰晶延迟爆发并移除节点；无前置冰晶时仍有基础效果。
- * - 最终冰爆：领域结束/打断/死亡时清理法阵、冰环、连接光、冰晶锁与计时器。
+ *   每枚冰晶延迟爆发并移除节点；爆发延迟回调登记到 R 实例（打断/死亡一并移除）。
+ * - 最终冰爆：领域结束/打断/死亡时清理法阵、冰环、连接光、冰晶锁与计时器；
+ *   结束结算使用结束时点的实时单位快照（刚进入结算、已离开不结算）。
  * - D 强化 R：消耗剩余强化资源并结束 D；领域半径与最终伤害提升。
  */
 
 import { 爱蜜莉雅技能配置, 爱蜜莉雅R配置, 爱蜜莉雅读条配置 } from "./00．配置";
 import { 创建战斗技能实例 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
-import { 登记爱蜜莉雅进度UI, 查询爱蜜莉雅冰晶, 移除爱蜜莉雅冰晶, 播放爱蜜莉雅动作 } from "./02．公共状态与冰晶";
+import { 播放爱蜜莉雅动作, 查询爱蜜莉雅冰晶, 移除爱蜜莉雅冰晶 } from "./02．公共状态与冰晶";
 import { 标记目标在爱蜜莉雅区域, 取消标记目标在爱蜜莉雅区域 } from "./04．普攻联动";
 import { 结束爱蜜莉雅D } from "./08．D技能";
 
@@ -37,8 +40,11 @@ const { 造成批量AOE技能伤害 } = require("系统.04．伤害系统.08．�
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
-const { 创建世界坐标进度UI } = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI") as {
-  创建世界坐标进度UI: (this: void, 参数: any) => any;
+const { 开始充能 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统") as {
+  开始充能: (this: void, 单位: any, 参数: any) => number;
+};
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
@@ -46,10 +52,6 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
 const { 读取单位攻击力, 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
-};
-const { addDelayedCallback, getGameTime } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
-  getGameTime: (this: void) => number;
 };
 const { 施加爱蜜莉雅寒意 } = require("./03．被动效果") as {
   施加爱蜜莉雅寒意: (this: void, 施法者: any, 目标: any, 来源键: string) => boolean;
@@ -66,8 +68,27 @@ interface R领域数据 {
   区域: any;
   连接光: any[];
   已结束: boolean;
+  /** 实例结束原因（H-01 收束时写入；null=区域自然到期 → 可结算最终冰爆；打断/死亡 → 只清理不结算） */
+  结束原因: string | null;
   半径: number;
   最终伤害: number;
+}
+
+/** 结束时点实时快照：按中心+半径枚举当前敌人（刚进入结算、已离开不结算） */
+function R取实时区域敌人(this: void, 施法者: any, X: number, Y: number, 半径: number): any[] {
+  const 结果: any[] = [];
+  const 组 = jass.CreateGroup() as any;
+  jass.GroupEnumUnitsInRange(组, X, Y, 半径, null);
+  while (true) {
+    const u = jass.FirstOfGroup(组) as any;
+    if (u == null || u === 0) break;
+    jass.GroupRemoveUnit(组, u);
+    if (u === 施法者 || !单位存活(u)) continue;
+    if (!jass.IsUnitEnemy(u, jass.GetOwningPlayer(施法者))) continue;
+    结果.push(u);
+  }
+  jass.DestroyGroup(组);
+  return 结果;
 }
 
 function R区域内结算(this: void, 施法者: any, 区域内单位: any[], 技能实例ID: number | undefined, 伤害值: number): void {
@@ -98,6 +119,150 @@ function R清理连接光(this: void, 数据: R领域数据): void {
   }
 }
 
+/** 蓄力完成：创建领域 + 冰晶读取 + D 强化结算（由充能系统 充能完成回调 调用） */
+function R创建领域(
+  this: void,
+  施法者: any,
+  技能实例ID: number | undefined,
+  中心X: number,
+  中心Y: number,
+  半径: number,
+  最终伤害: number,
+  有强化: boolean,
+  来源键: string,
+): void {
+  if (!单位存活(施法者)) return;
+  if (有强化) {
+    while (消费爱蜜莉雅D强化(施法者)) {
+      // 消耗全部剩余强化
+    }
+    结束爱蜜莉雅D(施法者);
+  }
+
+  const 数据: R领域数据 = { 区域: null, 连接光: [], 已结束: false, 结束原因: null, 半径, 最终伤害 };
+  const 控制器 = 创建战斗技能实例({
+    技能键: "R领域",
+    施法者,
+    技能实例ID,
+    数据,
+    结束回调: function R结束(this: void, 原因: string, _c: any): void {
+      // 记录结束原因（on销毁 据此区分自然结束 vs 打断/死亡）
+      数据.结束原因 = 原因;
+      R清理连接光(数据);
+      if (数据.区域 != null) {
+        数据.区域.销毁();
+        数据.区域 = null;
+      }
+    },
+  });
+
+  const 区域 = 创建持续危险区域({
+    X: 中心X,
+    Y: 中心Y,
+    半径,
+    持续时间: 爱蜜莉雅R配置.持续秒,
+    影响目标: "敌方",
+    所有者: 施法者,
+    首次扫描触发进入: true,
+    防抖间隔: 0,
+    on进入: function R目标进入(this: void, 单位: any): void {
+      标记目标在爱蜜莉雅区域(单位);
+      施加快速减速Buff(施法者, 单位, 0, 爱蜜莉雅R配置.减速百分比, 爱蜜莉雅R配置.周期秒, "爱蜜莉雅-R", "技能");
+    },
+    on离开: function R目标离开(this: void, 单位: any): void {
+      取消标记目标在爱蜜莉雅区域(单位);
+    },
+    on周期: function R周期(this: void, 区域内单位: any[]): void {
+      R区域内结算(施法者, 区域内单位, 技能实例ID, 读取单位攻击力(施法者) * 爱蜜莉雅R配置.周期伤害攻击力倍率);
+    },
+    on销毁: function R区域销毁(this: void): void {
+      // 先逐个取消区域标记：底层销毁只调 on销毁 后直接清空集合、不触发 on离开
+      const 残留单位 = 区域.区域效果.当前区域内单位;
+      for (let i = 0; i < 残留单位.length; i++) 取消标记目标在爱蜜莉雅区域(残留单位[i]);
+      R清理连接光(数据);
+      数据.区域 = null;
+      // 打断/死亡（H-01 收束触发销毁）：只清理不结算最终冰爆
+      if (数据.结束原因 != null) return;
+      if (数据.已结束) return;
+      数据.已结束 = true;
+      // 最终冰爆：结束时点实时快照（刚进入结算、已离开不结算）
+      const 区域内单位 = R取实时区域敌人(施法者, 中心X, 中心Y, 半径);
+      R区域内结算(施法者, 区域内单位, 技能实例ID, 数据.最终伤害);
+      创建点特效({
+        模型路径: 爱蜜莉雅R配置.最终冰爆模型,
+        X: 中心X,
+        Y: 中心Y,
+        Z: 30,
+        缩放: 半径 / 200,
+        持续秒: 1.6,
+      });
+      控制器.完成();
+    },
+  });
+  数据.区域 = 区域;
+
+  // 领域主体表现（常驻句柄，生命周期由实例清理统一管理：自然到期随收束销毁，打断/死亡提前销毁；不传持续秒避免 EC_CreateEffect 内置定时器与 DestroyEffect 双销毁）
+  const 领域主体特效 = 创建点特效({
+    模型路径: 爱蜜莉雅R配置.领域模型,
+    X: 中心X,
+    Y: 中心Y,
+    Z: 5,
+    缩放: 半径 / 200,
+  });
+  if (领域主体特效 != null && 领域主体特效 !== 0) {
+    控制器.登记自定义清理("R领域主体", function R领域主体清理(this: void): void {
+      jass.DestroyEffect(领域主体特效);
+    });
+  }
+
+  // 冰晶读取：按创建顺序有限读取（配置上限）；跳过失效引用并清除已读取节点
+  const 冰晶列表 = 查询爱蜜莉雅冰晶(施法者);
+  const 读取上限 = 爱蜜莉雅R配置.冰晶读取上限;
+  for (let i = 0; i < 冰晶列表.length && i < 读取上限; i++) {
+    const 节点 = 冰晶列表[i];
+    // 连接光（真实冰晶端点 → 领域中心）
+    const 光 = AddLightning(爱蜜莉雅R配置.闪电代码, false, 节点.X, 节点.Y, 中心X, 中心Y);
+    if (光 != null && 光 !== 0) 数据.连接光.push(光);
+    const 序号 = 节点.序号;
+    const 爆发延迟 = 0.25 + i * 0.2;
+    // 登记到 R 实例：R 被打断/死亡/提前清理时，延迟爆发回调一并移除（不再结算伤害与特效）
+    const 爆发ID = addDelayedCallback(爆发延迟 * 1000, function R冰晶爆发(this: void): void {
+      const 移除结果 = 移除爱蜜莉雅冰晶(施法者, 序号);
+      if (移除结果 != null) {
+        创建点特效({
+          模型路径: 爱蜜莉雅R配置.领域模型,
+          X: 移除结果.X,
+          Y: 移除结果.Y,
+          Z: 20,
+          缩放: 0.5,
+          持续秒: 0.6,
+        });
+        // 冰晶爆发伤害（冰晶点小范围实时快照）
+        const 目标列表 = R取实时区域敌人(施法者, 移除结果.X, 移除结果.Y, 180);
+        造成批量AOE技能伤害({
+          来源: 施法者,
+          目标列表,
+          伤害: 读取单位攻击力(施法者) * 爱蜜莉雅R配置.冰晶爆发伤害攻击力倍率,
+          伤害类型: DAMAGE_TYPE_COLD,
+          来源类型: "单位技能",
+          技能ID: R技能类型ID,
+          技能实例ID,
+          标签: "爱蜜莉雅-R冰晶爆发",
+          参与技能伤害加成: true,
+        });
+      }
+      // 销毁该连接光
+      if (数据.连接光.length > 0) {
+        const 光 = 数据.连接光[0];
+        数据.连接光.splice(0, 1);
+        if (光 != null && 光 !== 0) DestroyLightning(光);
+      }
+    });
+    控制器.登记延迟回调(爆发ID);
+  }
+  void 来源键;
+}
+
 function 释放R永冻之庭(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0) return;
   播放爱蜜莉雅动作(施法者, 爱蜜莉雅R配置.动作索引, 1.2);
@@ -105,7 +270,7 @@ function 释放R永冻之庭(this: void, _context: any, 施法者: any, 技能�
   const 中心Y = GetSpellTargetY();
   const 攻击力 = 读取单位攻击力(施法者);
 
-  // D 强化：消耗剩余强化资源并结束 D（蓄力完成后生效）
+  // D 强化：蓄力完成后生效（消耗剩余强化资源并结束 D）
   const D状态 = 获取爱蜜莉雅D强化(施法者);
   const 有强化 = D状态 != null && D状态.剩余次数 > 0;
   const 半径 = 有强化 ? 爱蜜莉雅R配置.半径 * 爱蜜莉雅R配置.强化半径倍率 : 爱蜜莉雅R配置.半径;
@@ -113,153 +278,39 @@ function 释放R永冻之庭(this: void, _context: any, 施法者: any, 技能�
     ? 攻击力 * 爱蜜莉雅R配置.强化最终冰爆伤害攻击力倍率
     : 攻击力 * 爱蜜莉雅R配置.最终冰爆伤害攻击力倍率;
   const 来源键 = "R:" + (技能实例ID ?? 0);
-  const 数据: R领域数据 = { 区域: null, 连接光: [], 已结束: false, 半径, 最终伤害 };
 
-  // 蓄力：世界坐标进度 UI（跟随施法者，登记 A1 统一销毁）
-  const 进度UI = 创建世界坐标进度UI({
-    X: GetUnitX(施法者),
-    Y: GetUnitY(施法者),
-    Z: 0,
-    跟随单位: 施法者,
-    跟随Z偏移: 爱蜜莉雅读条配置.跟随Z偏移,
-    最大值: 爱蜜莉雅R配置.蓄力秒,
-    当前值: 0,
-    标题: 爱蜜莉雅R配置.蓄力秒 > 0 ? "永冻之庭" : "",
-    类型: 爱蜜莉雅读条配置.UI类型,
-  });
-  if (进度UI != null) 登记爱蜜莉雅进度UI(施法者, 进度UI);
-
-  // 蓄力预警法阵
-  创建点特效({
-    模型路径: 爱蜜莉雅R配置.领域模型,
-    X: 中心X,
-    Y: 中心Y,
-    Z: 5,
-    缩放: 半径 / 200,
-    持续秒: 爱蜜莉雅R配置.蓄力秒 + 0.1,
-  });
-
-  addDelayedCallback(爱蜜莉雅R配置.蓄力秒 * 1000, function R蓄力完成(this: void): void {
-    if (!单位存活(施法者)) return;
-    if (有强化) {
-      while (消费爱蜜莉雅D强化(施法者)) {
-        // 消耗全部剩余强化
-      }
-      结束爱蜜莉雅D(施法者);
-    }
-
-    const 控制器 = 创建战斗技能实例({
-      技能键: "R领域",
-      施法者,
-      技能实例ID,
-      数据,
-      结束回调: function R结束(this: void, _原因: string, _c: any): void {
-        R清理连接光(数据);
-        if (数据.区域 != null) 数据.区域.销毁();
-      },
-    });
-
-    const 区域 = 创建持续危险区域({
-      X: 中心X,
-      Y: 中心Y,
-      半径,
-      持续时间: 爱蜜莉雅R配置.持续秒,
-      影响目标: "敌方",
-      on进入: function R目标进入(this: void, 单位: any): void {
-        标记目标在爱蜜莉雅区域(单位);
-        施加快速减速Buff(施法者, 单位, 0, 爱蜜莉雅R配置.减速百分比, 爱蜜莉雅R配置.周期秒, "爱蜜莉雅-R", "技能");
-      },
-      on离开: function R目标离开(this: void, 单位: any): void {
-        取消标记目标在爱蜜莉雅区域(单位);
-      },
-      on周期: function R周期(this: void, 区域内单位: any[]): void {
-        R区域内结算(施法者, 区域内单位, 技能实例ID, 攻击力 * 爱蜜莉雅R配置.周期伤害攻击力倍率);
-      },
-      on销毁: function R区域销毁(this: void): void {
-        if (数据.已结束) return;
-        // 最终冰爆：大范围冰封（范围与实际判定一致）
-        R清理连接光(数据);
-        const 区域内单位 = 区域.区域效果.当前区域内单位;
-        R区域内结算(施法者, 区域内单位, 技能实例ID, 数据.最终伤害);
-        for (let i = 0; i < 区域内单位.length; i++) 取消标记目标在爱蜜莉雅区域(区域内单位[i]);
-        创建点特效({
-          模型路径: 爱蜜莉雅R配置.最终冰爆模型,
-          X: 中心X,
-          Y: 中心Y,
-          Z: 30,
-          缩放: 半径 / 200,
-          持续秒: 1.6,
-        });
-        控制器.完成();
-      },
-    });
-    数据.区域 = 区域;
-    数据.已结束 = false;
-
-    // 领域主体表现（一套，持续秒自销毁）
-    创建点特效({
-      模型路径: 爱蜜莉雅R配置.领域模型,
-      X: 中心X,
-      Y: 中心Y,
-      Z: 5,
-      缩放: 半径 / 200,
-      持续秒: 爱蜜莉雅R配置.持续秒,
-    });
-
-    // 冰晶读取：按创建顺序有限读取（配置上限）；跳过失效引用并清除已读取节点
-    const 冰晶列表 = 查询爱蜜莉雅冰晶(施法者);
-    const 读取上限 = 爱蜜莉雅R配置.冰晶读取上限;
-    for (let i = 0; i < 冰晶列表.length && i < 读取上限; i++) {
-      const 节点 = 冰晶列表[i];
-      // 连接光（真实冰晶端点 → 领域中心）
-      const 光 = AddLightning(爱蜜莉雅R配置.闪电代码, false, 节点.X, 节点.Y, 中心X, 中心Y);
-      if (光 != null && 光 !== 0) 数据.连接光.push(光);
-      const 序号 = 节点.序号;
-      const 爆发延迟 = 0.25 + i * 0.2;
-      addDelayedCallback(爆发延迟 * 1000, function R冰晶爆发(this: void): void {
-        const 移除结果 = 移除爱蜜莉雅冰晶(施法者, 序号);
-        if (移除结果 != null) {
-          创建点特效({
-            模型路径: 爱蜜莉雅R配置.领域模型,
-            X: 移除结果.X,
-            Y: 移除结果.Y,
-            Z: 20,
-            缩放: 0.5,
-            持续秒: 0.6,
-          });
-          // 冰晶爆发伤害（冰晶点小范围）
-          const 目标组 = jass.CreateGroup() as any;
-          jass.GroupEnumUnitsInRange(目标组, 移除结果.X, 移除结果.Y, 180, null);
-          const 目标列表: any[] = [];
-          while (true) {
-            const u = jass.FirstOfGroup(目标组) as any;
-            if (u == null || u === 0) break;
-            jass.GroupRemoveUnit(目标组, u);
-            if (u !== 施法者 && 单位存活(u) && jass.IsUnitEnemy(u, jass.GetOwningPlayer(施法者))) 目标列表.push(u);
-          }
-          jass.DestroyGroup(目标组);
-          造成批量AOE技能伤害({
-            来源: 施法者,
-            目标列表,
-            伤害: 攻击力 * 爱蜜莉雅R配置.冰晶爆发伤害攻击力倍率,
-            伤害类型: DAMAGE_TYPE_COLD,
-            来源类型: "单位技能",
-            技能ID: R技能类型ID,
-            技能实例ID,
-            标签: "爱蜜莉雅-R冰晶爆发",
-            参与技能伤害加成: true,
-          });
-        }
-        // 销毁该连接光
-        if (数据.连接光.length > 0) {
-          const 光 = 数据.连接光[0];
-          数据.连接光.splice(0, 1);
-          if (光 != null && 光 !== 0) DestroyLightning(光);
-        }
-        void 来源键;
+  // 蓄力：通用充能系统（指令中断 / 硬控中断 / 死亡中断 / 世界坐标进度 UI 倒计时与销毁）
+  let 法阵特效: any = null;
+  开始充能(施法者, {
+    持续时间: 爱蜜莉雅R配置.蓄力秒,
+    指令中断: true,
+    世界坐标进度UI: true,
+    世界坐标进度UI类型: 爱蜜莉雅读条配置.UI类型,
+    世界坐标进度UI标题: "永冻之庭",
+    世界坐标进度UI数值后缀: "",
+    世界坐标进度UI高度偏移: 爱蜜莉雅读条配置.跟随Z偏移,
+    显示进度条特效: false,
+    // 蓄力预警法阵（一次）
+    开始回调: function R蓄力开始(this: void, _单位: any, _充能ID: number): void {
+      法阵特效 = 创建点特效({
+        模型路径: 爱蜜莉雅R配置.领域模型,
+        X: 中心X,
+        Y: 中心Y,
+        Z: 5,
+        缩放: 半径 / 200,
       });
-    }
-    void 来源键;
+    },
+    // 蓄力结束（完成/被打断/死亡统一销毁常驻法阵；充能系统结束回调对任意原因都会调用）
+    结束回调: function R蓄力结束(this: void, _单位: any, _原因: string, _充能ID: number): void {
+      if (法阵特效 != null && 法阵特效 !== 0) {
+        jass.DestroyEffect(法阵特效);
+        法阵特效 = null;
+      }
+    },
+    // 蓄力完成：创建领域（被打断/死亡不会走到这里）
+    充能完成回调: function R蓄力完成(this: void, _单位: any, _充能ID: number): void {
+      R创建领域(施法者, 技能实例ID, 中心X, 中心Y, 半径, 最终伤害, 有强化, 来源键);
+    },
   });
 }
 

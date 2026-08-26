@@ -76,16 +76,19 @@ function 发射分裂冰刃(this: void, 施法者: any, X: number, Y: number, �
   }
 }
 
-/** D 强化：向目标发射短距离追踪冰弹（不重复碎冰/不耗冰晶） */
-function 发射Q帕克冰弹(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined): void {
+/**
+ * D 强化：命中或穿晶后追加短距离追踪冰弹（不重复碎冰/不耗冰晶）。
+ * 先确认发射条件再消费资源：点地施法无目标时改向冰弹方向直线发射，不白扣强化次数。
+ */
+function 发射Q帕克冰弹(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 方向角: number): void {
+  const 有目标 = 目标 != null && 目标 !== 0;
   if (!消费爱蜜莉雅D强化(施法者)) return;
-  if (目标 == null || 目标 === 0) return;
-  发射弹道({
+  const 发射参数: any = {
     名称: "爱蜜莉雅-Q帕克冰弹",
     所有者: 施法者,
-    发射方向角: 两点角度(GetUnitX(施法者), GetUnitY(施法者), GetUnitX(目标), GetUnitY(目标)),
+    发射方向角: 有目标 ? 两点角度(GetUnitX(施法者), GetUnitY(施法者), GetUnitX(目标), GetUnitY(目标)) : 方向角,
     速度: 爱蜜莉雅Q配置.弹道速度 * 1.2,
-    轨迹: { 类型: "追踪", 目标, 追踪转向速度: 540 },
+    轨迹: 有目标 ? { 类型: "追踪", 目标, 追踪转向速度: 540 } : { 类型: "直线", 距离: 450 },
     命中半径: 90,
     影响目标: "敌方",
     碰撞消失: true,
@@ -100,7 +103,8 @@ function 发射Q帕克冰弹(this: void, 施法者: any, 目标: any, 技能实�
     参与技能伤害加成: false,
     模型: 爱蜜莉雅普攻配置.帕克追击模型,
     缩放: 爱蜜莉雅普攻配置.帕克追击缩放,
-  });
+  };
+  发射弹道(发射参数);
 }
 
 function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
@@ -131,7 +135,8 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
     影响目标: "敌方",
     碰撞消失: true,
     每单位最大命中次数: 1,
-    伤害值: 伤害,
+    // 主冰矢不传 伤害值：伤害由 on命中 统一结算（结算爱蜜莉雅技能命中 含碎冰/受控增伤/寒意），
+    // 避免弹道工厂自动结算与 on命中 造成双重扣血。
     伤害类型: DAMAGE_TYPE_COLD,
     来源类型: "单位技能",
     技能ID: Q技能类型ID,
@@ -148,7 +153,7 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
         标签: "爱蜜莉雅-Q冰之矢",
         伤害类型: DAMAGE_TYPE_COLD,
       });
-      发射Q帕克冰弹(施法者, 目标, 技能实例ID);
+      发射Q帕克冰弹(施法者, 目标, 技能实例ID, 基础方向);
     },
     onTick: function Q穿晶检测(this: void, 实例: any, _delta: number): void {
       if (已穿晶 || 实例 == null) return;
@@ -167,7 +172,7 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
         持续秒: 0.8,
       });
       发射分裂冰刃(施法者, 坐标.X, 坐标.Y, 实例.当前方向角 ?? 基础方向, 技能实例ID);
-      发射Q帕克冰弹(施法者, 目标单位, 技能实例ID);
+      发射Q帕克冰弹(施法者, 目标单位, 技能实例ID, 实例.当前方向角 ?? 基础方向);
     },
     on到达点: function Q终点(this: void, 弹幕ID: number, _原因: string): void {
       // 终点生成新冰晶节点（超上限按配置替换最旧）

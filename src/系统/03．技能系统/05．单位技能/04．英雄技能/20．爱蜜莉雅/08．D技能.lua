@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.00．配置")
 local _____7231_871C_8389_96C5_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["爱蜜莉雅技能配置"]
@@ -29,10 +30,22 @@ local removeDelayedCallback = ____require_result_3.removeDelayedCallback
 local getGameTime = ____require_result_3.getGameTime
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 local _____73AF_7ED5_7279_6548_952E = "爱蜜莉雅D环绕"
+--- 每英雄 D 到期回调 ID（重复开启时先取消旧回调，防止旧回调提前清掉新 D 状态）
+local ____D_5230_671F_56DE_8C03_8868 = {}
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____53D6_5355_4F4DID = ____require_result_4["取单位ID"]
 --- 清理 D 表现与状态（到期/打断/死亡/R 收束共用；幂等）
 ____exports["结束爱蜜莉雅D"] = function(_____65BD_6CD5_8005)
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
         return
+    end
+    local _____65E7ID = ____D_5230_671F_56DE_8C03_8868[_____53D6_5355_4F4DID(_____65BD_6CD5_8005)]
+    if _____65E7ID ~= nil and _____65E7ID ~= 0 then
+        removeDelayedCallback(_____65E7ID)
+        __TS__Delete(
+            ____D_5230_671F_56DE_8C03_8868,
+            _____53D6_5355_4F4DID(_____65BD_6CD5_8005)
+        )
     end
     destroyUnitEffect(_____65BD_6CD5_8005, _____73AF_7ED5_7279_6548_952E)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____65BD_6CD5_8005, _____7231_871C_8389_96C5BuffID["帕克显现"])
@@ -42,7 +55,13 @@ local function _____91CA_653ED_5E15_514B_663E_73B0(_context, _____65BD_6CD5_8005
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
         return
     end
+    local _____82F1_96C4ID = _____53D6_5355_4F4DID(_____65BD_6CD5_8005)
     _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C(_____65BD_6CD5_8005, _____7231_871C_8389_96C5D_914D_7F6E["动作索引"], 1)
+    local _____65E7_5230_671FID = ____D_5230_671F_56DE_8C03_8868[_____82F1_96C4ID]
+    if _____65E7_5230_671FID ~= nil and _____65E7_5230_671FID ~= 0 then
+        removeDelayedCallback(_____65E7_5230_671FID)
+    end
+    __TS__Delete(____D_5230_671F_56DE_8C03_8868, _____82F1_96C4ID)
     destroyUnitEffect(_____65BD_6CD5_8005, _____73AF_7ED5_7279_6548_952E)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____65BD_6CD5_8005, _____7231_871C_8389_96C5BuffID["帕克显现"])
     local _____6301_7EED_6BEB_79D2 = _____7231_871C_8389_96C5D_914D_7F6E["持续秒"] * 1000
@@ -72,14 +91,20 @@ local function _____91CA_653ED_5E15_514B_663E_73B0(_context, _____65BD_6CD5_8005
     local _____5230_671FID = addDelayedCallback(
         _____6301_7EED_6BEB_79D2,
         function()
+            __TS__Delete(____D_5230_671F_56DE_8C03_8868, _____82F1_96C4ID)
             ____exports["结束爱蜜莉雅D"](_____65BD_6CD5_8005)
         end
     )
+    ____D_5230_671F_56DE_8C03_8868[_____82F1_96C4ID] = _____5230_671FID
     local _____6CE8_9500 = _____767B_8BB0_7231_871C_8389_96C5_6280_80FD_6E05_7406(
         _____65BD_6CD5_8005,
         "D到期",
         function()
-            removeDelayedCallback(_____5230_671FID)
+            local _____5F53_524DID = ____D_5230_671F_56DE_8C03_8868[_____82F1_96C4ID]
+            if _____5F53_524DID ~= nil and _____5F53_524DID == _____5230_671FID then
+                removeDelayedCallback(_____5F53_524DID)
+                __TS__Delete(____D_5230_671F_56DE_8C03_8868, _____82F1_96C4ID)
+            end
             ____exports["结束爱蜜莉雅D"](_____65BD_6CD5_8005)
         end
     )

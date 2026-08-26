@@ -20,3 +20,4 @@ export * from "./17．Saber/index";
 export * from "./18．云端/index";
 export * from "./19．十六夜咲夜/index";
 export * from "./20．爱蜜莉雅/index";
+export * from "./21．朱雀院红叶/index";
