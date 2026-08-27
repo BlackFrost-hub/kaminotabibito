@@ -26,7 +26,7 @@ const { 取单位ID, 单位存活 } = require("系统.03．技能系统.00．技
   单位存活: (this: void, unit: any) => boolean;
 };
 const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; Z?: number; 面向角度?: number; 缩放?: number }) => any;
+  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; Z?: number; 面向角度?: number; 缩放?: number; 持续秒?: number }) => any;
   销毁点特效: (this: void, effect: any) => void;
 };
 const { 销毁世界坐标进度UI } = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI") as {
@@ -149,6 +149,7 @@ export function 创建爱蜜莉雅冰晶(
     Z,
     面向角度: 0,
     缩放: 爱蜜莉雅冰晶配置.缩放,
+    持续秒: 爱蜜莉雅冰晶配置.持续秒,
   });
   if (特效句柄 == null || 特效句柄 === 0) return null;
 
@@ -410,8 +411,10 @@ export {};
 // 动作表现辅助（A9：动作通过配置指定索引播放；映射待实机确认，见规划 8.1）
 //=============================================================================
 
-/** 播放爱蜜莉雅施法动作（按配置索引），持续后恢复 stand。 */
-export function 播放爱蜜莉雅动作(this: void, 英雄: any, 动作索引: number, 持续秒: number): void {
+/** 播放爱蜜莉雅施法动作（接收动作槽，索引/持续秒全部配置驱动），持续后恢复 stand。 */
+export function 播放爱蜜莉雅动作(this: void, 英雄: any, 槽: { 索引: number; 持续秒: number }): void {
+  const 动作索引 = 槽.索引;
+  const 持续秒 = 槽.持续秒;
   if (英雄 == null || 英雄 === 0 || 动作索引 <= 0) return;
   jass.SetUnitAnimationByIndex(英雄, 动作索引);
   if (持续秒 > 0) {

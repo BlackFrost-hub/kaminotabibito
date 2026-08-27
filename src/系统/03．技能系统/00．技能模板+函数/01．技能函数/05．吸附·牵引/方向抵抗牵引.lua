@@ -111,7 +111,7 @@ function _____65B9_5411_62B5_6297_7275_5F15_63A7_5236_5668_5B9E_73B0.prototype.T
                 end
                 local x = GetUnitX(_____5355_4F4D)
                 local y = GetUnitY(_____5355_4F4D)
-                local id = jass.GetHandleId(_____5355_4F4D) or 0
+                local id = jass:GetHandleId(_____5355_4F4D) or 0
                 local _____4E0A_6B21 = self["位置记录"][id]
                 local _____62C9_529B_500D_7387 = 1
                 if _____542F_7528_65B9_5411_62B5_6297 and _____4E0A_6B21 ~= nil then

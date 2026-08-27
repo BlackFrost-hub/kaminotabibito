@@ -8,6 +8,7 @@ createPlayerHeroUnit('E00C', '爱蜜莉雅', {
   tooltipExtended = '冰之精灵术士爱蜜莉雅。',
   description = '冰之精灵术士爱蜜莉雅。',
   modelFile = 'Unit\\Hero\\Emilia\\[Hero]-Emilia_2.mdx',
+  scale = 1.0,
   icon = 'ReplaceableTextures\\CommandButtons\\BTNHeroArchMage.blp',
   normalAbilities = 'A014,AInv,AED1',
   heroAbilities = 'AEQ1,AEW1,AEE1,AER1',

@@ -123,7 +123,7 @@ end
 ____exports["计算坐标距离"] = function(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
-    return jass.SquareRoot(dx * dx + dy * dy)
+    return jass:SquareRoot(dx * dx + dy * dy)
 end
 ____exports["计算每tick位移"] = function(_____8DDD_79BB, _____6301_7EED_65F6_95F4)
     if _____6301_7EED_65F6_95F4 <= 0 then

@@ -150,7 +150,7 @@ local _____5408_6CD5_51B3_6597_5357_4FA7_5355_4F4D = nil
 local _____5408_6CD5_51B3_6597_56DE_8C03ID = 0
 local _____5408_6CD5_51B3_6597_5DF2_7ED3_675F = false
 local function _____67E5_627E_6D3B_52A8_4EFB_52A1(_____73A9_5BB6ID, _____4EFB_52A1ID)
-    local _____4EFB_52A1_952E = tostring(_____4EFB_52A1ID)
+    local _____4EFB_52A1_952E = tostring(nil, _____4EFB_52A1ID)
     local _____6D3B_52A8_4EFB_52A1_5217_8868 = questDB.getPlayerActiveQuests(_____73A9_5BB6ID)
     do
         local i = 0
@@ -290,13 +290,13 @@ local function ____on_7194_706B_9152_9001_8FBE_626B_63CF()
         _____505C_6B62_7194_706B_9152_9001_8FBE_626B_63CF()
         return
     end
-    local _____73A9_5BB6 = jass.Player(_____7194_706B_9152_63A5_53D6_73A9_5BB6ID)
+    local _____73A9_5BB6 = jass:Player(_____7194_706B_9152_63A5_53D6_73A9_5BB6ID)
     local _____82F1_96C4 = getRegisteredPlayerHero(_____73A9_5BB6)
     if _____82F1_96C4 == nil or _____82F1_96C4 == 0 then
         return
     end
-    local ____X_5DEE = jass.GetUnitX(_____82F1_96C4) - _____57CE_5916_5B88_536BX
-    local ____Y_5DEE = jass.GetUnitY(_____82F1_96C4) - _____57CE_5916_5B88_536BY
+    local ____X_5DEE = jass:GetUnitX(_____82F1_96C4) - _____57CE_5916_5B88_536BX
+    local ____Y_5DEE = jass:GetUnitY(_____82F1_96C4) - _____57CE_5916_5B88_536BY
     if ____X_5DEE * ____X_5DEE + ____Y_5DEE * ____Y_5DEE > _____57CE_5916_5B88_536B_89E6_53D1_8303_56F4 * _____57CE_5916_5B88_536B_89E6_53D1_8303_56F4 then
         return
     end
@@ -316,12 +316,12 @@ local function ____on_6076_9B54_57CE_4EFB_52A1_5355_4F4D_6B7B_4EA1(_____6B7B_4EA
     if _____6B7B_4EA1_5355_4F4D == nil or _____6B7B_4EA1_5355_4F4D == 0 then
         return
     end
-    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass.GetHandleId(_____6B7B_4EA1_5355_4F4D) == jass.GetHandleId(_____9057_5931_89D2_9970_6076_9B54_72AC) then
+    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass:GetHandleId(_____6B7B_4EA1_5355_4F4D) == jass:GetHandleId(_____9057_5931_89D2_9970_6076_9B54_72AC) then
         local _____73A9_5BB6ID = _____9057_5931_89D2_9970_63A5_53D6_73A9_5BB6ID
         _____9057_5931_89D2_9970_6076_9B54_72AC = nil
         local ____temp_13
         if _____73A9_5BB6ID >= 0 then
-            ____temp_13 = getRegisteredPlayerHero(jass.Player(_____73A9_5BB6ID))
+            ____temp_13 = getRegisteredPlayerHero(jass:Player(_____73A9_5BB6ID))
         else
             ____temp_13 = nil
         end
@@ -331,7 +331,7 @@ local function ____on_6076_9B54_57CE_4EFB_52A1_5355_4F4D_6B7B_4EA1(_____6B7B_4EA
             _____5E7F_64AD_5355_4F4D_63D0_793A(_____82F1_96C4, "|cffffff00『任务进度』：|r从恶魔犬的项圈下找到了遗失的仪式角饰。把它带回给年轻恶魔。", 5000)
         end
     end
-    if jass.GetUnitTypeId(_____6B7B_4EA1_5355_4F4D) == stringToFourCCSafe("u004") then
+    if jass:GetUnitTypeId(_____6B7B_4EA1_5355_4F4D) == stringToFourCCSafe("u004") then
         do
             local _____73A9_5BB6ID = 0
             while _____73A9_5BB6ID < 4 do
@@ -503,22 +503,22 @@ ____exports["完成迷宫缺灯任务"] = function(______73A9_5BB6ID)
 end
 ____exports["接受遗失角饰任务"] = function(_____73A9_5BB6ID)
     _____9057_5931_89D2_9970_63A5_53D6_73A9_5BB6ID = _____73A9_5BB6ID
-    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass.GetUnitTypeId(_____9057_5931_89D2_9970_6076_9B54_72AC) ~= 0 then
-        jass.RemoveUnit(_____9057_5931_89D2_9970_6076_9B54_72AC)
+    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass:GetUnitTypeId(_____9057_5931_89D2_9970_6076_9B54_72AC) ~= 0 then
+        jass:RemoveUnit(_____9057_5931_89D2_9970_6076_9B54_72AC)
     end
     _____9057_5931_89D2_9970_6076_9B54_72AC = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
-        jass.Player(12),
+        jass:Player(12),
         stringToFourCCSafe("n037"),
         22448.7,
         -19816.9,
         180
     )
-    local _____82F1_96C4 = getRegisteredPlayerHero(jass.Player(_____73A9_5BB6ID))
+    local _____82F1_96C4 = getRegisteredPlayerHero(jass:Player(_____73A9_5BB6ID))
     _____5E7F_64AD_5355_4F4D_63D0_793A(_____82F1_96C4, "|cffffff00『任务提示』：|r恶魔犬最后出现的位置在城外熔痕地带。仪式角饰应该还挂在它身上。", 5000)
 end
 ____exports["完成遗失角饰任务"] = function(______73A9_5BB6ID)
-    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass.GetUnitTypeId(_____9057_5931_89D2_9970_6076_9B54_72AC) ~= 0 then
-        jass.RemoveUnit(_____9057_5931_89D2_9970_6076_9B54_72AC)
+    if _____9057_5931_89D2_9970_6076_9B54_72AC ~= nil and _____9057_5931_89D2_9970_6076_9B54_72AC ~= 0 and jass:GetUnitTypeId(_____9057_5931_89D2_9970_6076_9B54_72AC) ~= 0 then
+        jass:RemoveUnit(_____9057_5931_89D2_9970_6076_9B54_72AC)
     end
     _____9057_5931_89D2_9970_6076_9B54_72AC = nil
     _____9057_5931_89D2_9970_63A5_53D6_73A9_5BB6ID = -1

@@ -413,7 +413,7 @@ local function _____6267_884C_4E00_65B9_901A_884CW_4E8C_6BB5(context, caster)
     context["二段路径X"] = GetUnitX(caster)
     context["二段路径Y"] = GetUnitY(caster)
     context["已命中单位"] = {}
-    local maxMana = jass.GetUnitState(caster, jass.UNIT_STATE_MAX_MANA) or 0
+    local maxMana = jass:GetUnitState(caster, jass.UNIT_STATE_MAX_MANA) or 0
     local requestedMana = maxMana * ____W_914D_7F6E["二段追加魔耗比例"]
     _____51CF_5C11_9B54_6CD5_503C(caster, requestedMana, false, false)
     _____79FB_9664_5355_4F4D_6682_505C(caster, context["暂停来源"])

@@ -27,7 +27,7 @@ local function isAncientUnit(unit)
     if not unit then
         return false
     end
-    return jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT)
+    return jass:IsUnitType(unit, jass.UNIT_TYPE_ANCIENT)
 end
 --- 判断单位是否不是机械单位、不是古树单位、非建筑、非死亡
 -- 
@@ -37,16 +37,16 @@ function ____exports.isValidUnit(unit)
     if not unit then
         return false
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_DEAD) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_DEAD) then
         return false
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_STRUCTURE) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_STRUCTURE) then
         return false
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_MECHANICAL) then
         return false
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_ANCIENT) then
         return false
     end
     return true
@@ -60,11 +60,11 @@ function ____exports.isUnitEnemy(targetUnit, sourceUnit)
     if not targetUnit or not sourceUnit then
         return false
     end
-    local sourcePlayer = jass.GetOwningPlayer(sourceUnit)
+    local sourcePlayer = jass:GetOwningPlayer(sourceUnit)
     if not sourcePlayer then
         return false
     end
-    return jass.IsUnitEnemy(targetUnit, sourcePlayer)
+    return jass:IsUnitEnemy(targetUnit, sourcePlayer)
 end
 --- 判断单位是否有效且是敌对单位
 -- 
@@ -104,12 +104,12 @@ function ____exports.isUnitAlly(targetUnit, sourceUnit)
     if not targetUnit or not sourceUnit then
         return false
     end
-    local targetPlayer = jass.GetOwningPlayer(targetUnit)
-    local sourcePlayer = jass.GetOwningPlayer(sourceUnit)
+    local targetPlayer = jass:GetOwningPlayer(targetUnit)
+    local sourcePlayer = jass:GetOwningPlayer(sourceUnit)
     if not targetPlayer or not sourcePlayer then
         return false
     end
-    return jass.IsPlayerAlly(targetPlayer, sourcePlayer)
+    return jass:IsPlayerAlly(targetPlayer, sourcePlayer)
 end
 --- 判断单位是否有效且是友军单位
 -- 
@@ -138,7 +138,7 @@ function ____exports.isNotUsingInventoryItem(unit)
     if not unit then
         return true
     end
-    local orderId = jass.GetUnitCurrentOrder(unit)
+    local orderId = jass:GetUnitCurrentOrder(unit)
     local ITEM_USE_MIN = 852008
     local ITEM_USE_MAX = 852013
     return orderId < ITEM_USE_MIN or orderId > ITEM_USE_MAX
@@ -158,19 +158,19 @@ function ____exports.matchUnitFilter(targetUnit, sourceUnit, options)
         return false
     end
     if options["要求有效单位"] ~= false then
-        if jass.IsUnitType(targetUnit, jass.UNIT_TYPE_DEAD) then
+        if jass:IsUnitType(targetUnit, jass.UNIT_TYPE_DEAD) then
             return false
         end
-        if not options["允许建筑"] and jass.IsUnitType(targetUnit, jass.UNIT_TYPE_STRUCTURE) then
+        if not options["允许建筑"] and jass:IsUnitType(targetUnit, jass.UNIT_TYPE_STRUCTURE) then
             return false
         end
-        if not options["允许机械"] and jass.IsUnitType(targetUnit, jass.UNIT_TYPE_MECHANICAL) then
+        if not options["允许机械"] and jass:IsUnitType(targetUnit, jass.UNIT_TYPE_MECHANICAL) then
             return false
         end
         if not options["允许古树"] and isAncientUnit(targetUnit) then
             return false
         end
-    elseif not options["允许死亡"] and jass.IsUnitType(targetUnit, jass.UNIT_TYPE_DEAD) then
+    elseif not options["允许死亡"] and jass:IsUnitType(targetUnit, jass.UNIT_TYPE_DEAD) then
         return false
     end
     if not options["允许无敌"] and isInvincibleUnit(targetUnit) then

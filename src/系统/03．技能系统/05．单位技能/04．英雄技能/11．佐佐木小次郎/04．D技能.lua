@@ -67,13 +67,13 @@ local function _____662F_6709_6548_654C_4EBA(_____65BD_6CD5_8005, target)
     if not _____5355_4F4D_5B58_6D3B(target) then
         return false
     end
-    if jass.IsUnitType(target, jass.UNIT_TYPE_ANCIENT) then
+    if jass:IsUnitType(target, jass.UNIT_TYPE_ANCIENT) then
         return false
     end
-    if jass.IsUnitType(target, jass.UNIT_TYPE_MECHANICAL) then
+    if jass:IsUnitType(target, jass.UNIT_TYPE_MECHANICAL) then
         return false
     end
-    if jass.IsUnitType(target, jass.UNIT_TYPE_STRUCTURE) then
+    if jass:IsUnitType(target, jass.UNIT_TYPE_STRUCTURE) then
         return false
     end
     if not isUnitEnemy(target, _____65BD_6CD5_8005) then
@@ -191,7 +191,7 @@ local function _____6267_884C_4F50_4F50_6728_6362_4F4D(_____82F1_96C4, _____5206
     local _____89D2_5EA6 = _____4E24_70B9_89D2_5EA6(_____672C_4F53X, _____672C_4F53Y, _____5206_8EABX, _____5206_8EABY)
     local _____5FEB_901F_6A21_5F0F = _____8DDD_79BB >= cfg["快速模式距离"]
     local _____6BCFtick_8DDD_79BB = _____5FEB_901F_6A21_5F0F and cfg["快速每tick距离"] or cfg["冲刺每tick距离"]
-    local _____603B_6B65_6570 = jass.R2I((_____8DDD_79BB + _____6BCFtick_8DDD_79BB - 1) / _____6BCFtick_8DDD_79BB)
+    local _____603B_6B65_6570 = jass:R2I((_____8DDD_79BB + _____6BCFtick_8DDD_79BB - 1) / _____6BCFtick_8DDD_79BB)
     local _____6B8B_5F71 = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
         owner,
         _____6B8B_5F71_9A6C_7532ID,

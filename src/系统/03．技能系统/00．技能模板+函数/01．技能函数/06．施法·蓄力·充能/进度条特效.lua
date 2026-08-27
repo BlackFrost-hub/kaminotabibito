@@ -138,7 +138,7 @@ local function _____88C1_526A_5230_5B57_8282(value)
     if value >= 255 then
         return 255
     end
-    return jass.R2I(value)
+    return jass:R2I(value)
 end
 ____exports["创建进度条特效"] = function(_____5355_4F4D, _____9009_9879)
     if not _____5355_4F4D_5B58_6D3B(_____5355_4F4D) then

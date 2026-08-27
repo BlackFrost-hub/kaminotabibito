@@ -14,6 +14,7 @@ import { 爱蜜莉雅技能配置, 爱蜜莉雅E配置 } from "./00．配置";
 import { 爱蜜莉雅BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/20．爱蜜莉雅";
 import { 创建战斗技能实例, 查询战斗技能实例 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 import { 播放爱蜜莉雅动作 } from "./02．公共状态与冰晶";
+import { 爱蜜莉雅动作槽 } from "./00．配置";
 import { 创建爱蜜莉雅场上冰晶 } from "./03．被动效果";
 
 const jass = require("jass.common") as any;
@@ -41,10 +42,11 @@ const { 开始冲锋, 停止位移 } = require("系统.03．技能系统.00．�
   开始冲锋: (this: void, 单位: any, 参数: any) => number;
   停止位移: (this: void, 位移ID: number, 原因?: string) => boolean;
 };
-const { 创建点特效, createUnitEffect, destroyUnitEffect } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+const { 创建点特效, createUnitEffect, destroyUnitEffect, 设置特效缩放 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
   createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
   destroyUnitEffect: (this: void, unit: any, effectKey?: string) => void;
+  设置特效缩放: (this: void, effect: any, scale: number) => void;
 };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
@@ -90,9 +92,9 @@ function 施加落点冰爆(this: void, 施法者: any, X: number, Y: number, �
     模型路径: 爱蜜莉雅E配置.落点冰爆模型,
     X,
     Y,
-    Z: 10,
-    缩放: 1,
-    持续秒: 1,
+    Z: 爱蜜莉雅E配置.表现.落点冰爆.高度,
+    缩放: 爱蜜莉雅E配置.表现.落点冰爆.缩放,
+    持续秒: 爱蜜莉雅E配置.表现.落点冰爆.持续秒,
   });
   const 目标组 = jass.CreateGroup() as any;
   jass.GroupEnumUnitsInRange(目标组, X, Y, 180, null);
@@ -136,9 +138,9 @@ function 结束E护盾分支(this: void, 施法者: any, 控制器: any, 技能�
       模型路径: 爱蜜莉雅E配置.破盾裂纹模型,
       X: GetUnitX(施法者),
       Y: GetUnitY(施法者),
-      Z: 5,
-      缩放: 1,
-      持续秒: 0.8,
+      Z: 爱蜜莉雅E配置.表现.破盾裂纹.高度,
+      缩放: 爱蜜莉雅E配置.表现.破盾裂纹.缩放,
+      持续秒: 爱蜜莉雅E配置.表现.破盾裂纹.持续秒,
     });
   }
   // 冰爆结算（自然/提前/破盾均触发；数值按分支统一用配置）
@@ -148,7 +150,7 @@ function 结束E护盾分支(this: void, 施法者: any, 控制器: any, 技能�
 
 function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0) return;
-  播放爱蜜莉雅动作(施法者, 爱蜜莉雅E配置.动作索引, 1.0);
+  播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.E);
   // 已有护盾：提前结束
   const 活跃列表 = 查询战斗技能实例(施法者, "E护盾");
   for (let i = 0; i < 活跃列表.length; i++) {
@@ -194,7 +196,8 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
   }, 1000);
 
   registerManualBuff(施法者, 爱蜜莉雅BuffID.冰晶护身, 爱蜜莉雅E配置.护盾持续秒, 护盾值);
-  createUnitEffect(施法者, "origin", 爱蜜莉雅E配置.护盾模型, 爱蜜莉雅E配置.护盾持续秒, 护盾特效键);
+  const 护盾特效 = createUnitEffect(施法者, "origin", 爱蜜莉雅E配置.护盾模型, 爱蜜莉雅E配置.表现.护盾.持续秒, 护盾特效键);
+  设置特效缩放(护盾特效, 爱蜜莉雅E配置.表现.护盾.缩放);
 
   // 护盾自然结束
   const 自然结束延迟 = addDelayedCallback(爱蜜莉雅E配置.护盾持续秒 * 1000, function E护盾自然结束(this: void): void {
@@ -220,10 +223,10 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
     模型路径: 爱蜜莉雅E配置.冰面路径模型,
     X: GetUnitX(施法者),
     Y: GetUnitY(施法者),
-    Z: 5,
+    Z: 爱蜜莉雅E配置.表现.冰面路径.高度,
     面向角度: 方向,
-    缩放: 1,
-    持续秒: 0.8,
+    缩放: 爱蜜莉雅E配置.表现.冰面路径.缩放,
+    持续秒: 爱蜜莉雅E配置.表现.冰面路径.持续秒,
   });
   数据.位移ID = 开始冲锋(施法者, {
     距离: 爱蜜莉雅E配置.位移距离,

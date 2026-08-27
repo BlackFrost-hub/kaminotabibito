@@ -7,21 +7,21 @@ function ____exports.destroyFrame(self, frame)
     if not frame then
         return false
     end
-    japi.DzDestroyFrame(frame)
+    japi:DzDestroyFrame(frame)
     return true
 end
 function ____exports.hideFrame(self, frame)
     if not frame then
         return false
     end
-    japi.DzFrameShow(frame, false)
+    japi:DzFrameShow(frame, false)
     return true
 end
 function ____exports.showFrame(self, frame)
     if not frame then
         return false
     end
-    japi.DzFrameShow(frame, true)
+    japi:DzFrameShow(frame, true)
     return true
 end
 function ____exports.getGameUIFrame(self)

@@ -26,9 +26,9 @@ local function _____64AD_653EQ_914D_7F6E_8868_73B0(unit)
     if sound == nil or sound == 0 then
         return
     end
-    jass.AttachSoundToUnit(sound, unit)
-    jass.SetSoundVolume(sound, 127)
-    jass.StartSound(sound)
+    jass:AttachSoundToUnit(sound, unit)
+    jass:SetSoundVolume(sound, 127)
+    jass:StartSound(sound)
 end
 local function _____91CA_653E_5723_5149_9644_9B54(_context, unit)
     _____64AD_653EQ_914D_7F6E_8868_73B0(unit)

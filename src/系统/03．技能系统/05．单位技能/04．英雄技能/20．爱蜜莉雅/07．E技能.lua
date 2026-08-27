@@ -11,13 +11,15 @@ local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____27_FF0E_6218_6597_6280_
 local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____27_FF0E_6218_6597_6280_80FD_5B9E_4F8B_751F_547D_5468_671F_5DE5_5382["查询战斗技能实例"]
 local ____02_FF0E_516C_5171_72B6_6001_4E0E_51B0_6676 = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.02．公共状态与冰晶")
 local _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C = ____02_FF0E_516C_5171_72B6_6001_4E0E_51B0_6676["播放爱蜜莉雅动作"]
+local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.00．配置")
+local _____7231_871C_8389_96C5_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["爱蜜莉雅动作槽"]
 local ____03_FF0E_88AB_52A8_6548_679C = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.03．被动效果")
 local _____521B_5EFA_7231_871C_8389_96C5_573A_4E0A_51B0_6676 = ____03_FF0E_88AB_52A8_6548_679C["创建爱蜜莉雅场上冰晶"]
 function ____E_65BD_52A0_4FDD_62A4_8109_51B2(_____65BD_6CD5_8005, X, Y, _____6280_80FD_5B9E_4F8BID)
     local _____62A4_76FE_503C = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____7231_871C_8389_96C5E_914D_7F6E["保护脉冲护盾攻击力倍率"]
     local _____6301_7EED_79D2 = _____7231_871C_8389_96C5E_914D_7F6E["保护脉冲持续秒"]
-    local _____7EC4 = jass.CreateGroup()
-    jass.GroupEnumUnitsInRange(
+    local _____7EC4 = jass:CreateGroup()
+    jass:GroupEnumUnitsInRange(
         _____7EC4,
         X,
         Y,
@@ -26,17 +28,17 @@ function ____E_65BD_52A0_4FDD_62A4_8109_51B2(_____65BD_6CD5_8005, X, Y, _____628
     )
     while true do
         do
-            local u = jass.FirstOfGroup(_____7EC4)
+            local u = jass:FirstOfGroup(_____7EC4)
             if u == nil or u == 0 then
                 break
             end
-            jass.GroupRemoveUnit(_____7EC4, u)
+            jass:GroupRemoveUnit(_____7EC4, u)
             if not _____5355_4F4D_5B58_6D3B(u) then
                 goto __continue35
             end
-            if not jass.IsUnitAlly(
+            if not jass:IsUnitAlly(
                 u,
-                jass.GetOwningPlayer(_____65BD_6CD5_8005)
+                jass:GetOwningPlayer(_____65BD_6CD5_8005)
             ) then
                 goto __continue35
             end
@@ -68,7 +70,7 @@ function ____E_65BD_52A0_4FDD_62A4_8109_51B2(_____65BD_6CD5_8005, X, Y, _____628
         end
         ::__continue35::
     end
-    jass.DestroyGroup(_____7EC4)
+    jass:DestroyGroup(_____7EC4)
     local ____ = _____6280_80FD_5B9E_4F8BID
 end
 jass = require("jass.common")
@@ -95,6 +97,7 @@ local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用�
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
 local createUnitEffect = ____require_result_4.createUnitEffect
 local destroyUnitEffect = ____require_result_4.destroyUnitEffect
+local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_4["设置特效缩放"]
 local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_5["注册单位技能壳监听"]
 local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
@@ -111,20 +114,20 @@ local platformAbilityApi = require("平台扩展API取值")
 local platformAbilityAction = require("平台扩展API动作")
 local ____require_result_9 = require("系统.00．核心系统.05．中心计时器")
 addDelayedCallback = ____require_result_9.addDelayedCallback
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
-local ____E_6280_80FD_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.E["技能ID"])
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass:FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
+local ____E_6280_80FD_7C7B_578BID = jass:FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.E["技能ID"])
 local _____62A4_76FE_7279_6548_952E = "爱蜜莉雅E护盾"
 local function _____65BD_52A0_843D_70B9_51B0_7206(_____65BD_6CD5_8005, X, Y, _____6280_80FD_5B9E_4F8BID, _____4F24_5BB3_503C)
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____7231_871C_8389_96C5E_914D_7F6E["落点冰爆模型"],
         X = X,
         Y = Y,
-        Z = 10,
-        ["缩放"] = 1,
-        ["持续秒"] = 1
+        Z = _____7231_871C_8389_96C5E_914D_7F6E["表现"]["落点冰爆"]["高度"],
+        ["缩放"] = _____7231_871C_8389_96C5E_914D_7F6E["表现"]["落点冰爆"]["缩放"],
+        ["持续秒"] = _____7231_871C_8389_96C5E_914D_7F6E["表现"]["落点冰爆"]["持续秒"]
     })
-    local _____76EE_6807_7EC4 = jass.CreateGroup()
-    jass.GroupEnumUnitsInRange(
+    local _____76EE_6807_7EC4 = jass:CreateGroup()
+    jass:GroupEnumUnitsInRange(
         _____76EE_6807_7EC4,
         X,
         Y,
@@ -133,17 +136,17 @@ local function _____65BD_52A0_843D_70B9_51B0_7206(_____65BD_6CD5_8005, X, Y, ___
     )
     while true do
         do
-            local u = jass.FirstOfGroup(_____76EE_6807_7EC4)
+            local u = jass:FirstOfGroup(_____76EE_6807_7EC4)
             if u == nil or u == 0 then
                 break
             end
-            jass.GroupRemoveUnit(_____76EE_6807_7EC4, u)
+            jass:GroupRemoveUnit(_____76EE_6807_7EC4, u)
             if u == _____65BD_6CD5_8005 or not _____5355_4F4D_5B58_6D3B(u) then
                 goto __continue3
             end
-            if not jass.IsUnitEnemy(
+            if not jass:IsUnitEnemy(
                 u,
-                jass.GetOwningPlayer(_____65BD_6CD5_8005)
+                jass:GetOwningPlayer(_____65BD_6CD5_8005)
             ) then
                 goto __continue3
             end
@@ -164,7 +167,7 @@ local function _____65BD_52A0_843D_70B9_51B0_7206(_____65BD_6CD5_8005, X, Y, ___
         end
         ::__continue3::
     end
-    jass.DestroyGroup(_____76EE_6807_7EC4)
+    jass:DestroyGroup(_____76EE_6807_7EC4)
 end
 local function _____7ED3_675FE_62A4_76FE_5206_652F(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____5206_652F)
     local _____6570_636E = _____63A7_5236_5668["数据"]
@@ -188,9 +191,9 @@ local function _____7ED3_675FE_62A4_76FE_5206_652F(_____65BD_6CD5_8005, _____63A
             ["模型路径"] = _____7231_871C_8389_96C5E_914D_7F6E["破盾裂纹模型"],
             X = GetUnitX(_____65BD_6CD5_8005),
             Y = GetUnitY(_____65BD_6CD5_8005),
-            Z = 5,
-            ["缩放"] = 1,
-            ["持续秒"] = 0.8
+            Z = _____7231_871C_8389_96C5E_914D_7F6E["表现"]["破盾裂纹"]["高度"],
+            ["缩放"] = _____7231_871C_8389_96C5E_914D_7F6E["表现"]["破盾裂纹"]["缩放"],
+            ["持续秒"] = _____7231_871C_8389_96C5E_914D_7F6E["表现"]["破盾裂纹"]["持续秒"]
         })
     end
     _____65BD_52A0_843D_70B9_51B0_7206(
@@ -206,7 +209,7 @@ local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
         return
     end
-    _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C(_____65BD_6CD5_8005, _____7231_871C_8389_96C5E_914D_7F6E["动作索引"], 1)
+    _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C(_____65BD_6CD5_8005, _____7231_871C_8389_96C5_52A8_4F5C_69FD.E)
     local _____6D3B_8DC3_5217_8868 = _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "E护盾")
     do
         local i = 0
@@ -272,13 +275,14 @@ local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005
         1000
     )
     registerManualBuff(_____65BD_6CD5_8005, _____7231_871C_8389_96C5BuffID["冰晶护身"], _____7231_871C_8389_96C5E_914D_7F6E["护盾持续秒"], _____62A4_76FE_503C)
-    createUnitEffect(
+    local _____62A4_76FE_7279_6548 = createUnitEffect(
         _____65BD_6CD5_8005,
         "origin",
         _____7231_871C_8389_96C5E_914D_7F6E["护盾模型"],
-        _____7231_871C_8389_96C5E_914D_7F6E["护盾持续秒"],
+        _____7231_871C_8389_96C5E_914D_7F6E["表现"]["护盾"]["持续秒"],
         _____62A4_76FE_7279_6548_952E
     )
+    _____8BBE_7F6E_7279_6548_7F29_653E(_____62A4_76FE_7279_6548, _____7231_871C_8389_96C5E_914D_7F6E["表现"]["护盾"]["缩放"])
     local _____81EA_7136_7ED3_675F_5EF6_8FDF = addDelayedCallback(
         _____7231_871C_8389_96C5E_914D_7F6E["护盾持续秒"] * 1000,
         function()
@@ -290,7 +294,7 @@ local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005
         ["名称"] = "爱蜜莉雅-E二段",
         ["单位"] = _____65BD_6CD5_8005,
         ["一段技能ID"] = ____E_6280_80FD_7C7B_578BID,
-        ["二段技能ID"] = jass.FourCC(_____7231_871C_8389_96C5E_914D_7F6E["二段技能ID"]),
+        ["二段技能ID"] = jass:FourCC(_____7231_871C_8389_96C5E_914D_7F6E["二段技能ID"]),
         ["持续秒"] = _____7231_871C_8389_96C5E_914D_7F6E["护盾持续秒"]
     })
     local _____76EE_6807X = GetSpellTargetX()
@@ -305,10 +309,10 @@ local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005
         ["模型路径"] = _____7231_871C_8389_96C5E_914D_7F6E["冰面路径模型"],
         X = GetUnitX(_____65BD_6CD5_8005),
         Y = GetUnitY(_____65BD_6CD5_8005),
-        Z = 5,
+        Z = _____7231_871C_8389_96C5E_914D_7F6E["表现"]["冰面路径"]["高度"],
         ["面向角度"] = _____65B9_5411,
-        ["缩放"] = 1,
-        ["持续秒"] = 0.8
+        ["缩放"] = _____7231_871C_8389_96C5E_914D_7F6E["表现"]["冰面路径"]["缩放"],
+        ["持续秒"] = _____7231_871C_8389_96C5E_914D_7F6E["表现"]["冰面路径"]["持续秒"]
     })
     _____6570_636E["位移ID"] = _____5F00_59CB_51B2_950B(
         _____65BD_6CD5_8005,

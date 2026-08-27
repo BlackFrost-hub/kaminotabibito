@@ -124,36 +124,36 @@ local function initPickupTrigger()
     if pickupTrigger ~= nil then
         return
     end
-    pickupTrigger = jass.CreateTrigger()
+    pickupTrigger = jass:CreateTrigger()
     if pickupTrigger == nil or pickupTrigger == 0 then
         return
     end
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(pickupTrigger, ITEM_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_PICKUP_ITEM)
-    jass.TriggerAddAction(pickupTrigger, dispatchPickupEvent)
+    jass:TriggerAddAction(pickupTrigger, dispatchPickupEvent)
 end
 --- 初始化丢弃事件触发器
 local function initDropTrigger()
     if dropTrigger ~= nil then
         return
     end
-    dropTrigger = jass.CreateTrigger()
+    dropTrigger = jass:CreateTrigger()
     if dropTrigger == nil or dropTrigger == 0 then
         return
     end
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(dropTrigger, ITEM_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_DROP_ITEM)
-    jass.TriggerAddAction(dropTrigger, dispatchDropEvent)
+    jass:TriggerAddAction(dropTrigger, dispatchDropEvent)
 end
 --- 初始化使用事件触发器
 local function initUseTrigger()
     if useTrigger ~= nil then
         return
     end
-    useTrigger = jass.CreateTrigger()
+    useTrigger = jass:CreateTrigger()
     if useTrigger == nil or useTrigger == 0 then
         return
     end
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(useTrigger, ITEM_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_USE_ITEM)
-    jass.TriggerAddAction(useTrigger, dispatchUseEvent)
+    jass:TriggerAddAction(useTrigger, dispatchUseEvent)
 end
 --- 注册物品拾取事件监听。
 -- 监听器会复用统一的拾取总触发器，返回值是当前监听的内部 id。

@@ -185,7 +185,7 @@ function ____exports.SFB_setBuff(sourceUnit, u, id, time, effectSourceName, effe
     end
     local fac = getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(caster, fac)
-    jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
+    jass:SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     local abilityId
     local orderStr
     repeat
@@ -404,7 +404,7 @@ function ____exports.SFB_setSlow(sourceUnit, u, as, ms, time, effectSourceName, 
     end
     local fac = getAngleBetweenUnits(caster, u)
     EXSetUnitFacing(caster, fac)
-    jass.SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
+    jass:SetUnitFacing(caster, jglobals.bj_RADTODEG * fac)
     YDWESetUnitAbilityDataReal(
         caster,
         ABILITY.SLOW,

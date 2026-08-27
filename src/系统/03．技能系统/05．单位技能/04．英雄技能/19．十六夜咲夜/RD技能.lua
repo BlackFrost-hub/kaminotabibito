@@ -27,7 +27,7 @@ function ____RD_8BBE_7F6E_78B0_649E(unit, enabled)
         return
     end
     if japi ~= nil and type(japi.EXSetUnitCollisionType) == "function" then
-        japi.EXSetUnitCollisionType(enabled, unit, ____RD_78B0_649E_7C7B_578B)
+        japi:EXSetUnitCollisionType(enabled, unit, ____RD_78B0_649E_7C7B_578B)
     end
 end
 function ____RD_679A_4E3E_5207_5272_654C_519B(context)
@@ -44,12 +44,12 @@ function ____RD_679A_4E3E_5207_5272_654C_519B(context)
             ["允许古树"] = true,
             ["允许无敌"] = true,
             ["仅敌人"] = true,
-            ["自定义条件"] = function(____, u) return not jass.IsUnitType(u, jass.UNIT_TYPE_TAUREN) end
+            ["自定义条件"] = function(____, u) return not jass:IsUnitType(u, jass.UNIT_TYPE_TAUREN) end
         }
     )
 end
 function ____RD_8BB0_5F55_88AB_5207_5355_4F4D(context, unit)
-    local id = jass.GetHandleId(unit)
+    local id = jass:GetHandleId(unit)
     if context["记录单位索引"][id] then
         return
     end
@@ -69,8 +69,8 @@ function ____RD_6062_590D_88AB_5207_5355_4F4D(context)
                 end
                 ____RD_8BBE_7F6E_78B0_649E(unit, true)
                 _____79FB_9664_5355_4F4D_6682_505C(unit, source)
-                jass.SetUnitTimeScale(unit, 1)
-                jass.SetUnitPathing(unit, true)
+                jass:SetUnitTimeScale(unit, 1)
+                jass:SetUnitPathing(unit, true)
             end
             ::__continue13::
             i = i + 1
@@ -78,22 +78,22 @@ function ____RD_6062_590D_88AB_5207_5355_4F4D(context)
     end
 end
 function ____RD_5904_7406_5207_5272_76EE_6807(context, target)
-    jass.SetUnitPathing(target, false)
-    local moveAngle = jass.GetUnitFacing(target) + 180
-    jass.SetUnitPosition(
+    jass:SetUnitPathing(target, false)
+    local moveAngle = jass:GetUnitFacing(target) + 180
+    jass:SetUnitPosition(
         target,
         _____6781_5750_6807X(
-            jass.GetUnitX(target),
+            jass:GetUnitX(target),
             ____RD_914D_7F6E["目标位移距离"],
             moveAngle
         ),
         _____6781_5750_6807Y(
-            jass.GetUnitY(target),
+            jass:GetUnitY(target),
             ____RD_914D_7F6E["目标位移距离"],
             moveAngle
         )
     )
-    jass.SetUnitFacing(
+    jass:SetUnitFacing(
         target,
         GetRandomDirectionDeg()
     )
@@ -102,8 +102,8 @@ function ____RD_5904_7406_5207_5272_76EE_6807(context, target)
         _____53D6_5207_5272_6682_505C_6765_6E90(context)
     )
     ____RD_8BBE_7F6E_78B0_649E(target, false)
-    jass.SetUnitTimeScale(target, 20)
-    jass.SetUnitAnimation(target, "Death")
+    jass:SetUnitTimeScale(target, 20)
+    jass:SetUnitAnimation(target, "Death")
     ____RD_8BB0_5F55_88AB_5207_5355_4F4D(context, target)
 end
 function ____RD_51BB_7ED3_5200_5149(variable)
@@ -112,7 +112,7 @@ function ____RD_51BB_7ED3_5200_5149(variable)
         return
     end
     if _____5355_4F4D_5B58_6D3B(params["刀光"]) then
-        jass.SetUnitTimeScale(params["刀光"], 0)
+        jass:SetUnitTimeScale(params["刀光"], 0)
     end
 end
 function ____RD_4E0B_964D(variable)
@@ -130,9 +130,9 @@ function ____RD_4E0B_964D(variable)
         return
     end
     if context["下降计数"] >= ____RD_914D_7F6E["下降次数"] then
-        jass.SetUnitFlyHeight(
+        jass:SetUnitFlyHeight(
             context["施法者"],
-            jass.GetUnitDefaultFlyHeight(context["施法者"]),
+            jass:GetUnitDefaultFlyHeight(context["施法者"]),
             0
         )
         _____79FB_9664_54B2_591C_5468_671F_4EFB_52A1(context["下降周期ID"])
@@ -141,9 +141,9 @@ function ____RD_4E0B_964D(variable)
         _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(context["技能实例ID"])
         return
     end
-    jass.SetUnitFlyHeight(
+    jass:SetUnitFlyHeight(
         context["施法者"],
-        jass.GetUnitFlyHeight(context["施法者"]) - ____RD_914D_7F6E["下降每次高度"],
+        jass:GetUnitFlyHeight(context["施法者"]) - ____RD_914D_7F6E["下降每次高度"],
         0
     )
     context["下降计数"] = context["下降计数"] + 1
@@ -167,21 +167,21 @@ function ____RD_6B63_5E38_6536_5C3E(context)
     context["切割周期ID"] = 0
     ____RD_6062_590D_88AB_5207_5355_4F4D(context)
     if _____5355_4F4D_5B58_6D3B(context["目标"]) then
-        jass.SetUnitInvulnerable(context["目标"], false)
+        jass:SetUnitInvulnerable(context["目标"], false)
         _____79FB_9664_5355_4F4D_6682_505C(context["目标"], context["来源"])
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["目标"], _____5341_516D_591C_54B2_591CBuffID["收缩世界目标封印"])
     end
     if _____5355_4F4D_5B58_6D3B(context["施法者"]) then
-        jass.SetUnitInvulnerable(context["施法者"], false)
+        jass:SetUnitInvulnerable(context["施法者"], false)
         _____79FB_9664_5355_4F4D_6682_505C(context["施法者"], context["来源"])
-        jass.SetUnitTimeScale(context["施法者"], 1)
+        jass:SetUnitTimeScale(context["施法者"], 1)
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["施法者"], _____5341_516D_591C_54B2_591CBuffID["收缩世界吟唱"])
     end
     do
         local i = 0
         while i < #context["刀光"] do
             if _____5355_4F4D_5B58_6D3B(context["刀光"][i + 1]) then
-                jass.SetUnitTimeScale(context["刀光"][i + 1], 1)
+                jass:SetUnitTimeScale(context["刀光"][i + 1], 1)
             end
             i = i + 1
         end
@@ -230,8 +230,8 @@ function ____RD_6267_884C_5207_5272(variable)
             return {["伤害"] = context["攻击力快照"] * ____RD_914D_7F6E["伤害攻击力倍率"]}
         end,
         ["每目标结算后处理器"] = function(target)
-            if not jass.IsUnitType(target, jass.UNIT_TYPE_TAUREN) and jass.IsUnitType(target, jass.UNIT_TYPE_MECHANICAL) then
-                jass.KillUnit(target)
+            if not jass:IsUnitType(target, jass.UNIT_TYPE_TAUREN) and jass:IsUnitType(target, jass.UNIT_TYPE_MECHANICAL) then
+                jass:KillUnit(target)
             end
         end
     })
@@ -243,29 +243,29 @@ function ____RD_6267_884C_5207_5272(variable)
                 if #context["待切刀光"] <= 0 then
                     break
                 end
-                local index = jass.GetRandomInt(0, #context["待切刀光"] - 1)
+                local index = jass:GetRandomInt(0, #context["待切刀光"] - 1)
                 local slash = context["待切刀光"][index + 1]
                 __TS__ArraySplice(context["待切刀光"], index, 1)
                 if slash == nil or slash == 0 or not _____5355_4F4D_5B58_6D3B(slash) then
                     goto __continue57
                 end
-                jass.SetUnitTimeScale(slash, 0.4)
+                jass:SetUnitTimeScale(slash, 0.4)
                 local angle = GetRandomDirectionDeg()
-                local distance = jass.GetRandomReal(____RD_914D_7F6E["刀光移动最小距离"], ____RD_914D_7F6E["刀光移动最大距离"])
-                jass.SetUnitPosition(
+                local distance = jass:GetRandomReal(____RD_914D_7F6E["刀光移动最小距离"], ____RD_914D_7F6E["刀光移动最大距离"])
+                jass:SetUnitPosition(
                     slash,
                     _____6781_5750_6807X(
-                        jass.GetUnitX(slash),
+                        jass:GetUnitX(slash),
                         distance,
                         angle
                     ),
                     _____6781_5750_6807Y(
-                        jass.GetUnitY(slash),
+                        jass:GetUnitY(slash),
                         distance,
                         angle
                     )
                 )
-                jass.SetUnitFacing(
+                jass:SetUnitFacing(
                     slash,
                     GetRandomDirectionDeg()
                 )
@@ -303,7 +303,7 @@ function ____RD_521B_5EFA_5200_5149(variable)
         while i < ____RD_914D_7F6E["每批刀光数量"] do
             do
                 local angle = GetRandomDirectionDeg()
-                local distance = jass.GetRandomReal(0, 850)
+                local distance = jass:GetRandomReal(0, 850)
                 local slash = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
                     context["施法者"],
                     _____914D_7F6E["单位壳"]["收缩刀光"],
@@ -314,8 +314,8 @@ function ____RD_521B_5EFA_5200_5149(variable)
                 if slash == nil or slash == 0 then
                     goto __continue67
                 end
-                jass.SetUnitScale(slash, ____RD_914D_7F6E["刀光缩放"], ____RD_914D_7F6E["刀光缩放"], ____RD_914D_7F6E["刀光缩放"])
-                jass.SetUnitFacing(
+                jass:SetUnitScale(slash, ____RD_914D_7F6E["刀光缩放"], ____RD_914D_7F6E["刀光缩放"], ____RD_914D_7F6E["刀光缩放"])
+                jass:SetUnitFacing(
                     slash,
                     GetRandomDirectionDeg()
                 )
@@ -343,7 +343,7 @@ function ____RD_541F_5531_5B8C_6210(variable)
         _____79FB_9664_54B2_591C_5468_671F_4EFB_52A1(context["快照周期ID"])
     end
     context["快照周期ID"] = 0
-    jass.SetUnitInvulnerable(context["目标"], false)
+    jass:SetUnitInvulnerable(context["目标"], false)
     context["刀光周期ID"] = _____6CE8_518C_54B2_591C_5468_671F_4EFB_52A1(____RD_914D_7F6E["刀光准备间隔毫秒"], ____RD_521B_5EFA_5200_5149, context)
 end
 jass = require("jass.common")
@@ -412,14 +412,14 @@ local function ____RD_5F02_5E38_6E05_7406(context)
     _____5B89_5168_79FB_9664_5355_4F4D_58F3(context["法阵"])
     ____RD_6062_590D_88AB_5207_5355_4F4D(context)
     if context["目标"] ~= nil and context["目标"] ~= 0 then
-        jass.SetUnitInvulnerable(context["目标"], false)
+        jass:SetUnitInvulnerable(context["目标"], false)
         _____79FB_9664_5355_4F4D_6682_505C(context["目标"], context["来源"])
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["目标"], _____5341_516D_591C_54B2_591CBuffID["收缩世界目标封印"])
     end
     if context["施法者"] ~= nil and context["施法者"] ~= 0 then
-        jass.SetUnitInvulnerable(context["施法者"], false)
+        jass:SetUnitInvulnerable(context["施法者"], false)
         _____79FB_9664_5355_4F4D_6682_505C(context["施法者"], context["来源"])
-        jass.SetUnitTimeScale(context["施法者"], 1)
+        jass:SetUnitTimeScale(context["施法者"], 1)
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["施法者"], _____5341_516D_591C_54B2_591CBuffID["收缩世界吟唱"])
     end
     _____5173_95ED_541F_5531_6761("常规技能")
@@ -439,24 +439,24 @@ local function ____RD_7EF4_6301_5C01_5370(variable)
         return
     end
     context["吟唱计数"] = context["吟唱计数"] + 1
-    jass.SetUnitInvulnerable(context["目标"], true)
-    jass.SetUnitFacing(
+    jass:SetUnitInvulnerable(context["目标"], true)
+    jass:SetUnitFacing(
         context["目标"],
-        jass.Atan2(
-            jass.GetUnitY(context["施法者"]) - jass.GetUnitY(context["目标"]),
-            jass.GetUnitX(context["施法者"]) - jass.GetUnitX(context["目标"])
+        jass:Atan2(
+            jass:GetUnitY(context["施法者"]) - jass:GetUnitY(context["目标"]),
+            jass:GetUnitX(context["施法者"]) - jass:GetUnitX(context["目标"])
         ) / jass.bj_DEGTORAD
     )
-    jass.SetUnitState(context["目标"], jass.UNIT_STATE_LIFE, context["目标生命快照"])
-    jass.SetUnitState(context["目标"], jass.UNIT_STATE_MANA, context["目标魔法快照"])
-    jass.SetUnitFlyHeight(
+    jass:SetUnitState(context["目标"], jass.UNIT_STATE_LIFE, context["目标生命快照"])
+    jass:SetUnitState(context["目标"], jass.UNIT_STATE_MANA, context["目标魔法快照"])
+    jass:SetUnitFlyHeight(
         context["施法者"],
-        jass.GetUnitFlyHeight(context["施法者"]) + 5,
+        jass:GetUnitFlyHeight(context["施法者"]) + 5,
         0
     )
     if context["吟唱计数"] == ____RD_914D_7F6E["吟唱动作切换计数"] then
-        jass.SetUnitAnimationByIndex(context["施法者"], 3)
-        jass.SetUnitTimeScale(context["施法者"], 1.5)
+        jass:SetUnitAnimationByIndex(context["施法者"], 3)
+        jass:SetUnitTimeScale(context["施法者"], 1.5)
     end
     if context["吟唱计数"] == ____RD_914D_7F6E["吟唱音效计数"] then
         _____64AD_653E_54B2_591C_5355_4F4D_97F3_6548("gg_snd_IzayoiSakuya_RD2", context["施法者"])
@@ -464,7 +464,7 @@ local function ____RD_7EF4_6301_5C01_5370(variable)
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRD(_listener, caster, _____6280_80FD_5B9E_4F8BID)
     _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(caster, _____914D_7F6E["符卡间隔秒"].RD)
-    local target = jass.GetSpellTargetUnit()
+    local target = jass:GetSpellTargetUnit()
     if not _____5355_4F4D_5B58_6D3B(target) then
         _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(_____6280_80FD_5B9E_4F8BID)
         return
@@ -478,18 +478,18 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRD(_listener, caster, ____
         ["法阵"] = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
             caster,
             _____914D_7F6E["单位壳"]["收缩法阵"],
-            jass.GetUnitX(caster),
-            jass.GetUnitY(caster),
+            jass:GetUnitX(caster),
+            jass:GetUnitY(caster),
             GetRandomDirectionDeg()
         ),
         ["刀光"] = {},
         ["待切刀光"] = {},
         ["记录单位"] = {},
         ["记录单位索引"] = {},
-        ["目标生命快照"] = jass.GetUnitState(target, jass.UNIT_STATE_LIFE),
-        ["目标魔法快照"] = jass.GetUnitState(target, jass.UNIT_STATE_MANA),
-        ["目标中心X"] = jass.GetUnitX(target),
-        ["目标中心Y"] = jass.GetUnitY(target),
+        ["目标生命快照"] = jass:GetUnitState(target, jass.UNIT_STATE_LIFE),
+        ["目标魔法快照"] = jass:GetUnitState(target, jass.UNIT_STATE_MANA),
+        ["目标中心X"] = jass:GetUnitX(target),
+        ["目标中心Y"] = jass:GetUnitY(target),
         ["攻击力快照"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster),
         ["吟唱计数"] = 0,
         ["快照周期ID"] = 0,
@@ -504,15 +504,15 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRD(_listener, caster, ____
         ["已结束"] = false
     }
     if context["法阵"] ~= nil and context["法阵"] ~= 0 then
-        jass.SetUnitScale(context["法阵"], ____RD_914D_7F6E["法阵缩放"], ____RD_914D_7F6E["法阵缩放"], ____RD_914D_7F6E["法阵缩放"])
+        jass:SetUnitScale(context["法阵"], ____RD_914D_7F6E["法阵缩放"], ____RD_914D_7F6E["法阵缩放"], ____RD_914D_7F6E["法阵缩放"])
     end
-    jass.SetCameraField(jass.CAMERA_FIELD_TARGET_DISTANCE, 3000, 0)
+    jass:SetCameraField(jass.CAMERA_FIELD_TARGET_DISTANCE, 3000, 0)
     _____5355_4F4D_6269_5C55__8BBE_79FB_52A8_7C7B_578B(caster, 2)
     _____6DFB_52A0_5355_4F4D_6682_505C(caster, context["来源"])
     _____6DFB_52A0_5355_4F4D_6682_505C(target, context["来源"])
-    jass.SetUnitInvulnerable(caster, true)
-    jass.SetUnitInvulnerable(target, true)
-    jass.SetUnitAnimationByIndex(caster, 8)
+    jass:SetUnitInvulnerable(caster, true)
+    jass:SetUnitInvulnerable(target, true)
+    jass:SetUnitAnimationByIndex(caster, 8)
     registerManualBuff(
         caster,
         _____5341_516D_591C_54B2_591CBuffID["收缩世界吟唱"],

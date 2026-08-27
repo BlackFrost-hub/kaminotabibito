@@ -53,7 +53,7 @@ local function _____5904_7406_6B27_83F2_8389_4E9AD(caster, abilityId)
     local cfg = _____6B27_83F2_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.D
     _____64AD_653E_6B27_83F2_8389_4E9A_5355_4F4D_97F3_6548(caster, cfg["全局音效键"])
     _____8C03_6574_73A9_5BB6_5C5E_6027(target, "魔抗", cfg["魔抗增加"])
-    jass.UnitAddAbility(target, _____6B27_83F2_8389_4E9AD_539F_751F_72B6_6001_6280_80FDID)
+    jass:UnitAddAbility(target, _____6B27_83F2_8389_4E9AD_539F_751F_72B6_6001_6280_80FDID)
     registerManualBuff(
         target,
         cfg.BuffID,

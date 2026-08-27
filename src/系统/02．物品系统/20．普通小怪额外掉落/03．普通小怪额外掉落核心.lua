@@ -18,11 +18,11 @@ local function ____on_666E_901A_5C0F_602A_6B7B_4EA1_5C1D_8BD5_989D_5916_6389_843
     if _____6B7B_4EA1_5355_4F4D == nil or _____6B7B_4EA1_5355_4F4D == 0 then
         return
     end
-    local _____8D44_683C = _____83B7_53D6_666E_901A_5C0F_602A_989D_5916_6389_843D_8D44_683C(jass.GetUnitTypeId(_____6B7B_4EA1_5355_4F4D))
+    local _____8D44_683C = _____83B7_53D6_666E_901A_5C0F_602A_989D_5916_6389_843D_8D44_683C(jass:GetUnitTypeId(_____6B7B_4EA1_5355_4F4D))
     if _____8D44_683C == nil then
         return
     end
-    if jass.GetRandomInt(1, _____603B_6389_843D_5224_5B9A_5206_6BCD) > _____603B_6389_843D_547D_4E2D_503C then
+    if jass:GetRandomInt(1, _____603B_6389_843D_5224_5B9A_5206_6BCD) > _____603B_6389_843D_547D_4E2D_503C then
         return
     end
     local _____7AE0_8282_88C5_5907_6C60 = _____83B7_53D6_7AE0_8282_666E_901A_5C0F_602A_989D_5916_88C5_5907_6C60(_____8D44_683C["章节"])
@@ -40,15 +40,15 @@ local function ____on_666E_901A_5C0F_602A_6B7B_4EA1_5C1D_8BD5_989D_5916_6389_843
     if #_____53EF_6389_843D_88C5_5907 == 0 then
         return
     end
-    local _____968F_673A_4E0B_6807 = jass.GetRandomInt(1, #_____53EF_6389_843D_88C5_5907) - 1
+    local _____968F_673A_4E0B_6807 = jass:GetRandomInt(1, #_____53EF_6389_843D_88C5_5907) - 1
     local _____6389_843D_7269_54C1_7C7B_578BID = stringToFourCCSafe(_____53EF_6389_843D_88C5_5907[_____968F_673A_4E0B_6807 + 1]["物品ID"])
     if _____6389_843D_7269_54C1_7C7B_578BID == 0 then
         return
     end
     _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C(
         _____6389_843D_7269_54C1_7C7B_578BID,
-        jass.GetUnitX(_____6B7B_4EA1_5355_4F4D),
-        jass.GetUnitY(_____6B7B_4EA1_5355_4F4D)
+        jass:GetUnitX(_____6B7B_4EA1_5355_4F4D),
+        jass:GetUnitY(_____6B7B_4EA1_5355_4F4D)
     )
 end
 ____exports["初始化普通小怪额外掉落"] = function()

@@ -4,11 +4,11 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local dispatchUnitDeath, jass, playerUnitEvent, listeners, initialized
 function dispatchUnitDeath()
-    local dyingUnit = jass.GetTriggerUnit()
+    local dyingUnit = jass:GetTriggerUnit()
     if dyingUnit == nil then
         return
     end
-    local killingUnit = jass.GetKillingUnit()
+    local killingUnit = jass:GetKillingUnit()
     do
         local i = 0
         while i < #listeners do
@@ -27,9 +27,9 @@ function ____exports.initUnitDeathEventCenter()
         return
     end
     initialized = true
-    local trigger = jass.CreateTrigger()
+    local trigger = jass:CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(trigger, ____exports.DEATH_EVENT_PLAYER_IDS, jass.EVENT_PLAYER_UNIT_DEATH)
-    jass.TriggerAddAction(trigger, dispatchUnitDeath)
+    jass:TriggerAddAction(trigger, dispatchUnitDeath)
 end
 jass = require("jass.common")
 playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")

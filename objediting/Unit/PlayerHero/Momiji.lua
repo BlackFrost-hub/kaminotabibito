@@ -8,6 +8,7 @@ createPlayerHeroUnit('E00G', '朱雀院红叶', {
   tooltipExtended = '擅长制造破绽、招架反击与高速终式的近战剑士。',
   description = '朱雀院流近战技巧型剑士。',
   modelFile = 'Unit\\Hero\\Momiji\\Momiji.mdx',
+  scale = 1.0,
   icon = 'ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiQ.blp',
   normalAbilities = 'A014,AInv,AMD1',
   heroAbilities = 'AMQ1,AMW1,AME1,AMR1',

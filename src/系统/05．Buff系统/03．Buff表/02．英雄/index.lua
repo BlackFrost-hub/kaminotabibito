@@ -41,6 +41,16 @@ local ____19_FF0E_5341_516D_591C_54B2_591C = require("系统.05．Buff系统.03�
 local _____5341_516D_591C_54B2_591CBuff_8868 = ____19_FF0E_5341_516D_591C_54B2_591C["十六夜咲夜Buff表"]
 local ____20_FF0E_7231_871C_8389_96C5 = require("系统.05．Buff系统.03．Buff表.02．英雄.20．爱蜜莉雅")
 local _____7231_871C_8389_96C5Buff_8868 = ____20_FF0E_7231_871C_8389_96C5["爱蜜莉雅Buff表"]
+local ____21_FF0E_6731_96C0_9662_7EA2_53F6 = require("系统.05．Buff系统.03．Buff表.02．英雄.21．朱雀院红叶")
+local _____6731_96C0_9662_7EA2_53F6Buff_8868 = ____21_FF0E_6731_96C0_9662_7EA2_53F6["朱雀院红叶Buff表"]
+local ____22_FF0E_6731_96C0_9662_693F = require("系统.05．Buff系统.03．Buff表.02．英雄.22．朱雀院椿")
+local _____6731_96C0_9662_693FBuff_8868 = ____22_FF0E_6731_96C0_9662_693F["朱雀院椿Buff表"]
+local ____23_FF0E_4F0A_857E_5A1C = require("系统.05．Buff系统.03．Buff表.02．英雄.23．伊蕾娜")
+local _____4F0A_857E_5A1CBuff_8868 = ____23_FF0E_4F0A_857E_5A1C["伊蕾娜Buff表"]
+local ____24_FF0E_585E_8389_4E9A_B7_514B_83B1_5C14 = require("系统.05．Buff系统.03．Buff表.02．英雄.24．塞莉亚·克莱尔")
+local _____585E_8389_4E9ABuff_8868 = ____24_FF0E_585E_8389_4E9A_B7_514B_83B1_5C14["塞莉亚Buff表"]
+local ____25_FF0E_8299_8389_83B2 = require("系统.05．Buff系统.03．Buff表.02．英雄.25．芙莉莲")
+local _____8299_8389_83B2Buff_8868 = ____25_FF0E_8299_8389_83B2["芙莉莲Buff表"]
 ____exports["英雄Buff表"] = __TS__ObjectAssign(
     {},
     _____63D0_7C73_8BFA_65AFBuff_8868,
@@ -62,7 +72,12 @@ ____exports["英雄Buff表"] = __TS__ObjectAssign(
     _____6B27_5C14_8D1D_514BBuff_8868,
     _____4E91_7AEFBuff_8868,
     _____5341_516D_591C_54B2_591CBuff_8868,
-    _____7231_871C_8389_96C5Buff_8868
+    _____7231_871C_8389_96C5Buff_8868,
+    _____6731_96C0_9662_7EA2_53F6Buff_8868,
+    _____6731_96C0_9662_693FBuff_8868,
+    _____4F0A_857E_5A1CBuff_8868,
+    _____585E_8389_4E9ABuff_8868,
+    _____8299_8389_83B2Buff_8868
 )
 do
     local ____export = require("系统.05．Buff系统.03．Buff表.02．英雄.01．提米诺斯")
@@ -218,6 +233,46 @@ do
 end
 do
     local ____export = require("系统.05．Buff系统.03．Buff表.02．英雄.20．爱蜜莉雅")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.05．Buff系统.03．Buff表.02．英雄.21．朱雀院红叶")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.05．Buff系统.03．Buff表.02．英雄.22．朱雀院椿")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.05．Buff系统.03．Buff表.02．英雄.23．伊蕾娜")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.05．Buff系统.03．Buff表.02．英雄.24．塞莉亚·克莱尔")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.05．Buff系统.03．Buff表.02．英雄.25．芙莉莲")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

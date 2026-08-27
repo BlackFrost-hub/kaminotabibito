@@ -38,7 +38,7 @@ local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用�
 local createTimedUnitEffect = ____require_result_5.createTimedUnitEffect
 local ____require_result_6 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
 local registerDeathListener = ____require_result_6.registerDeathListener
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass:FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 local _____51BB_7ED3_6682_505C_6765_6E90 = "爱蜜莉雅-冻结"
 local _____88AB_52A8_76EE_6807_8868 = {}
 --- 冻结去重：目标句柄 → 来源键 → true（同技能实例不重复冻结）

@@ -31,9 +31,9 @@ function ____exports.leakKey(self, leakType, handle)
         return leakType .. ":nil"
     end
     if type(handle) == "table" and handle ~= nil then
-        return (leakType .. ":obj:") .. tostring(handle)
+        return (leakType .. ":obj:") .. tostring(nil, handle)
     end
-    return (leakType .. ":") .. tostring(jass.GetHandleId(handle))
+    return (leakType .. ":") .. tostring(jass:GetHandleId(handle))
 end
 function ____exports.track(self, ____type, handle, tag)
     if not handle then
@@ -45,7 +45,7 @@ function ____exports.track(self, ____type, handle, tag)
         type = ____type,
         tag = tag,
         createdIndex = s.created,
-        handleText = tostring(handle)
+        handleText = tostring(nil, handle)
     }
 end
 function ____exports.untrack(self, ____type, handle)

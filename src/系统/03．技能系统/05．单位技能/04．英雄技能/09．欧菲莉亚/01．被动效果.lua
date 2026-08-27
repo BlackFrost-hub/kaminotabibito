@@ -24,7 +24,7 @@ local function _____8BBE_7F6E_6B27_83F2_8389_4E9A_88AB_52A8_590D_6D3B_751F_547D(
     if not (maxLife > 0) then
         return
     end
-    jass.SetUnitState(hero, jass.UNIT_STATE_LIFE, maxLife * _____6B27_83F2_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.R["被动复活生命百分比"] * 0.01)
+    jass:SetUnitState(hero, jass.UNIT_STATE_LIFE, maxLife * _____6B27_83F2_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.R["被动复活生命百分比"] * 0.01)
 end
 local function _____5904_7406_6B27_83F2_8389_4E9A_6B7B_4EA1_88AB_52A8(dyingUnit, _killingUnit)
     if dyingUnit == nil or dyingUnit == 0 or GetUnitTypeId(dyingUnit) ~= _____6B27_83F2_8389_4E9A_5355_4F4D_7C7B_578BID then

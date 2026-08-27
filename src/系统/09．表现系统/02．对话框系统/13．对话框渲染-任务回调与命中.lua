@@ -349,7 +349,7 @@ local function startSkipKeyCooldown(self, pid)
     until true
 end
 local function skipDialogLocal(self)
-    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
+    local triggerPlayer = japi:DzGetTriggerKeyPlayer()
     if not triggerPlayer then
         return
     end
@@ -419,9 +419,9 @@ function ____exports.initSkipKeyListener(self)
         return
     end
     g_skipKeyInitialized = true
-    local rawDebugTrigger = jass.CreateTrigger()
+    local rawDebugTrigger = jass:CreateTrigger()
     DzTriggerRegisterKeyEventTrg(rawDebugTrigger, KEY_STATE.DOWN, KEY_SKIP_DIALOG)
-    jass.TriggerAddAction(rawDebugTrigger, onRawSkipKeyEntry)
+    jass:TriggerAddAction(rawDebugTrigger, onRawSkipKeyEntry)
 end
 function ____exports.bindQuestSyncHandlersImpl(self, state)
     if state.questSyncHandlersBound or not state.frames or #state.frames == 0 then

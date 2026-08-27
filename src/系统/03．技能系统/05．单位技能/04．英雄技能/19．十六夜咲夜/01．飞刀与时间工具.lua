@@ -47,10 +47,10 @@ local _____98DE_5200_78B0_649E_679A_4E3E_7EC4 = nil
 local function _____679A_4E3E_98DE_5200_78B0_649E_654C_4EBA(source, x, y, radius)
     local result = {}
     if _____98DE_5200_78B0_649E_679A_4E3E_7EC4 == nil or _____98DE_5200_78B0_649E_679A_4E3E_7EC4 == 0 then
-        _____98DE_5200_78B0_649E_679A_4E3E_7EC4 = jass.CreateGroup()
+        _____98DE_5200_78B0_649E_679A_4E3E_7EC4 = jass:CreateGroup()
     end
-    jass.GroupClear(_____98DE_5200_78B0_649E_679A_4E3E_7EC4)
-    jass.GroupEnumUnitsInRange(
+    jass:GroupClear(_____98DE_5200_78B0_649E_679A_4E3E_7EC4)
+    jass:GroupEnumUnitsInRange(
         _____98DE_5200_78B0_649E_679A_4E3E_7EC4,
         x,
         y,
@@ -59,24 +59,24 @@ local function _____679A_4E3E_98DE_5200_78B0_649E_654C_4EBA(source, x, y, radius
     )
     while true do
         do
-            local unit = jass.FirstOfGroup(_____98DE_5200_78B0_649E_679A_4E3E_7EC4)
+            local unit = jass:FirstOfGroup(_____98DE_5200_78B0_649E_679A_4E3E_7EC4)
             if unit == nil or unit == 0 then
                 break
             end
-            jass.GroupRemoveUnit(_____98DE_5200_78B0_649E_679A_4E3E_7EC4, unit)
+            jass:GroupRemoveUnit(_____98DE_5200_78B0_649E_679A_4E3E_7EC4, unit)
             if not ____exports["单位存活"](unit) then
                 goto __continue4
             end
-            if jass.IsUnitType(unit, UNIT_TYPE_STRUCTURE) then
+            if jass:IsUnitType(unit, UNIT_TYPE_STRUCTURE) then
                 goto __continue4
             end
-            if jass.IsUnitType(unit, UNIT_TYPE_MECHANICAL) then
+            if jass:IsUnitType(unit, UNIT_TYPE_MECHANICAL) then
                 goto __continue4
             end
-            if jass.IsUnitType(unit, UNIT_TYPE_ANCIENT) then
+            if jass:IsUnitType(unit, UNIT_TYPE_ANCIENT) then
                 goto __continue4
             end
-            if not jass.IsUnitEnemy(
+            if not jass:IsUnitEnemy(
                 unit,
                 GetOwningPlayer(source)
             ) then
@@ -151,7 +151,7 @@ ____exports["移除咲夜周期任务"] = function(id)
     end
 end
 ____exports["两点角度"] = function(x1, y1, x2, y2)
-    return jass.Atan2(y2 - y1, x2 - x1) / bj_DEGTORAD
+    return jass:Atan2(y2 - y1, x2 - x1) / bj_DEGTORAD
 end
 ____exports["极坐标X"] = function(x, distance, angle)
     return x + distance * Cos(angle * bj_DEGTORAD)
@@ -215,7 +215,7 @@ end
 ____exports["施加短硬直并播放动作"] = function(unit, source, seconds, animation)
     _____6DFB_52A0_5355_4F4D_6682_505C(unit, source)
     if animation ~= nil and animation ~= "" then
-        jass.SetUnitAnimation(unit, animation)
+        jass:SetUnitAnimation(unit, animation)
     end
     addDelayedCallback(
         _____79D2_8F6C_6B63_6BEB_79D2(seconds, 1),
@@ -228,7 +228,7 @@ ____exports["登记咲夜飞刀"] = function(controller)
     if controller["单位"] == nil or controller["单位"] == 0 or controller["主人"] == nil or controller["主人"] == 0 then
         return
     end
-    _____54B2_591C_98DE_5200_767B_8BB0_8868[jass.GetHandleId(controller["单位"])] = controller
+    _____54B2_591C_98DE_5200_767B_8BB0_8868[jass:GetHandleId(controller["单位"])] = controller
 end
 ____exports["注销咲夜飞刀"] = function(unit)
     if unit == nil or unit == 0 then
@@ -236,7 +236,7 @@ ____exports["注销咲夜飞刀"] = function(unit)
     end
     __TS__Delete(
         _____54B2_591C_98DE_5200_767B_8BB0_8868,
-        jass.GetHandleId(unit)
+        jass:GetHandleId(unit)
     )
 end
 ____exports["获取咲夜现存飞刀"] = function(owner, centerX, centerY, radius)
@@ -312,7 +312,7 @@ local function _____63A8_8FDB_76F4_7EBF_98DE_5200(variable)
         while i < #targets do
             do
                 local target = targets[i + 1]
-                local targetId = jass.GetHandleId(target)
+                local targetId = jass:GetHandleId(target)
                 if state["参数"]["命中去重"] == true and state["已命中"][targetId] then
                     goto __continue60
                 end

@@ -117,7 +117,7 @@ local ____require_result_4 = require("系统.09．表现系统.15．世界坐标
 _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_4["销毁世界坐标进度UI"]
 local jass = require("jass.common")
 local GetUnitTypeId = jass.GetUnitTypeId
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass:FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 _____7231_871C_8389_96C5_72B6_6001_8868 = {}
 local _____4E0B_4E00_5168_5C40_51B0_6676_5E8F_53F7 = 1
 local _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
@@ -174,7 +174,8 @@ ____exports["创建爱蜜莉雅冰晶"] = function(_____82F1_96C4, _____6765_6E9
         Y = Y,
         Z = Z,
         ["面向角度"] = 0,
-        ["缩放"] = _____7231_871C_8389_96C5_51B0_6676_914D_7F6E["缩放"]
+        ["缩放"] = _____7231_871C_8389_96C5_51B0_6676_914D_7F6E["缩放"],
+        ["持续秒"] = _____7231_871C_8389_96C5_51B0_6676_914D_7F6E["持续秒"]
     })
     if _____7279_6548_53E5_67C4 == nil or _____7279_6548_53E5_67C4 == 0 then
         return nil
@@ -374,18 +375,20 @@ ____exports["获取爱蜜莉雅状态统计"] = function()
     return {["英雄数"] = _____82F1_96C4_6570, ["冰晶总数"] = _____51B0_6676_603B_6570}
 end
 _____786E_4FDD_6B7B_4EA1_76D1_542C()
---- 播放爱蜜莉雅施法动作（按配置索引），持续后恢复 stand。
-____exports["播放爱蜜莉雅动作"] = function(_____82F1_96C4, _____52A8_4F5C_7D22_5F15, _____6301_7EED_79D2)
+--- 播放爱蜜莉雅施法动作（接收动作槽，索引/持续秒全部配置驱动），持续后恢复 stand。
+____exports["播放爱蜜莉雅动作"] = function(_____82F1_96C4, _____69FD)
+    local _____52A8_4F5C_7D22_5F15 = _____69FD["索引"]
+    local _____6301_7EED_79D2 = _____69FD["持续秒"]
     if _____82F1_96C4 == nil or _____82F1_96C4 == 0 or _____52A8_4F5C_7D22_5F15 <= 0 then
         return
     end
-    jass.SetUnitAnimationByIndex(_____82F1_96C4, _____52A8_4F5C_7D22_5F15)
+    jass:SetUnitAnimationByIndex(_____82F1_96C4, _____52A8_4F5C_7D22_5F15)
     if _____6301_7EED_79D2 > 0 then
         local _____6062_590DID = addDelayedCallback(
             _____6301_7EED_79D2 * 1000,
             function()
                 if _____5355_4F4D_5B58_6D3B(_____82F1_96C4) then
-                    jass.SetUnitAnimation(_____82F1_96C4, "stand")
+                    jass:SetUnitAnimation(_____82F1_96C4, "stand")
                 end
             end
         )

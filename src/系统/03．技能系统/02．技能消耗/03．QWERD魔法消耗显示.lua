@@ -142,13 +142,13 @@ local function formatManaCost(value)
     if not (value > 0.05) then
         return ""
     end
-    local tenth = jass.R2I(value * 10 + 0.5)
-    local sec = jass.R2I(tenth / 10)
+    local tenth = jass:R2I(value * 10 + 0.5)
+    local sec = jass:R2I(tenth / 10)
     local decimal = tenth - sec * 10
     if decimal == 0 then
-        return jass.I2S(sec)
+        return jass:I2S(sec)
     end
-    return (tostring(jass.I2S(sec)) .. ".") .. tostring(jass.I2S(decimal))
+    return (tostring(jass:I2S(sec)) .. ".") .. tostring(jass:I2S(decimal))
 end
 local function calcDisplayManaCost(unit, abilityId, level)
     return _____8BA1_7B97_6700_7EC8_9B54_6CD5_6D88_8017(unit, abilityId, level)
@@ -217,7 +217,7 @@ local function _____5237_65B0_5355_4E2A_6280_80FD(whichHero, hotkey, ui)
         _____9690_85CF_5355_5143(ui)
         return
     end
-    local level = jass.GetUnitAbilityLevel(whichHero, abilityId)
+    local level = jass:GetUnitAbilityLevel(whichHero, abilityId)
     if level <= 0 then
         _____9690_85CF_5355_5143(ui)
         return

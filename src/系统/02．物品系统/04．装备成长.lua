@@ -309,37 +309,37 @@ local function applyPermanentBaseStats(unit, statEffects)
                 elseif effect.key == "armor" then
                     GS_Unit_Pry_change(unit, 3, value)
                 elseif effect.key == "str" then
-                    jass.SetHeroStr(
+                    jass:SetHeroStr(
                         unit,
-                        jass.GetHeroStr(unit, false) + value,
+                        jass:GetHeroStr(unit, false) + value,
                         true
                     )
                 elseif effect.key == "agi" then
-                    jass.SetHeroAgi(
+                    jass:SetHeroAgi(
                         unit,
-                        jass.GetHeroAgi(unit, false) + value,
+                        jass:GetHeroAgi(unit, false) + value,
                         true
                     )
                 elseif effect.key == "int" then
-                    jass.SetHeroInt(
+                    jass:SetHeroInt(
                         unit,
-                        jass.GetHeroInt(unit, false) + value,
+                        jass:GetHeroInt(unit, false) + value,
                         true
                     )
                 elseif effect.key == "all" then
-                    jass.SetHeroStr(
+                    jass:SetHeroStr(
                         unit,
-                        jass.GetHeroStr(unit, false) + value,
+                        jass:GetHeroStr(unit, false) + value,
                         true
                     )
-                    jass.SetHeroAgi(
+                    jass:SetHeroAgi(
                         unit,
-                        jass.GetHeroAgi(unit, false) + value,
+                        jass:GetHeroAgi(unit, false) + value,
                         true
                     )
-                    jass.SetHeroInt(
+                    jass:SetHeroInt(
                         unit,
-                        jass.GetHeroInt(unit, false) + value,
+                        jass:GetHeroInt(unit, false) + value,
                         true
                     )
                 else
@@ -356,57 +356,57 @@ local function addHeroXP(unit, amount)
     if amount <= 0 then
         return
     end
-    local chunk = jass.R2I(amount / 10)
+    local chunk = jass:R2I(amount / 10)
     do
         local i = 0
         while i < 10 do
-            jass.AddHeroXP(unit, chunk, true)
+            jass:AddHeroXP(unit, chunk, true)
             i = i + 1
         end
     end
     local remainder = amount - chunk * 10
     if remainder > 0 then
-        jass.AddHeroXP(unit, remainder, true)
+        jass:AddHeroXP(unit, remainder, true)
     end
 end
 local function getHeroLevel(unit)
-    return jass.GetHeroLevel(unit)
+    return jass:GetHeroLevel(unit)
 end
 --- 获取单位当前属性的绝对值，用于百分比计算。
 -- str/agi/int 用 GetHeroStr/Agi/Int；hp/mp 用 GetUnitState+ConvertUnitState；
 -- dmg=ConvertUnitState(0x15)，armor=ConvertUnitState(0x20)（需要 japi）
 local function getPctStatValue(unit, key)
     if key == "int" then
-        return jass.GetHeroInt(unit, true)
+        return jass:GetHeroInt(unit, true)
     end
     if key == "str" then
-        return jass.GetHeroStr(unit, true)
+        return jass:GetHeroStr(unit, true)
     end
     if key == "agi" then
-        return jass.GetHeroAgi(unit, true)
+        return jass:GetHeroAgi(unit, true)
     end
     if key == "hp" then
         return GetUnitStateJapi(
             unit,
-            jass.ConvertUnitState(1)
+            jass:ConvertUnitState(1)
         )
     end
     if key == "mp" then
         return GetUnitStateJapi(
             unit,
-            jass.ConvertUnitState(3)
+            jass:ConvertUnitState(3)
         )
     end
     if key == "dmg" then
         return GetUnitStateJapi(
             unit,
-            jass.ConvertUnitState(21)
+            jass:ConvertUnitState(21)
         )
     end
     if key == "armor" then
         return GetUnitStateJapi(
             unit,
-            jass.ConvertUnitState(32)
+            jass:ConvertUnitState(32)
         )
     end
     return 0
@@ -415,28 +415,28 @@ local function _____589E_52A0_91D1_5E01_5E76_663E_793A_53CD_9988(unit, delta)
     if delta == 0 then
         return
     end
-    local player = jass.GetOwningPlayer(unit)
+    local player = jass:GetOwningPlayer(unit)
     if player == nil or player == 0 then
         return
     end
-    local stateGold = jass.ConvertPlayerState(1)
-    local current = jass.GetPlayerState(player, stateGold)
+    local stateGold = jass:ConvertPlayerState(1)
+    local current = jass:GetPlayerState(player, stateGold)
     local next = current + delta < 0 and 0 or current + delta
     local actualDelta = next - current
     if actualDelta == 0 then
         return
     end
-    jass.SetPlayerState(player, stateGold, next)
+    jass:SetPlayerState(player, stateGold, next)
     _____663E_793A_91D1_5E01_83B7_5F97_53CD_9988(unit, player, actualDelta)
 end
 --- 对 unit 所属玩家的金币做一次百分比加减（pct 可负）
 local function applyGoldPct(unit, pct)
-    local player = jass.GetOwningPlayer(unit)
+    local player = jass:GetOwningPlayer(unit)
     if not player then
         return
     end
-    local stateGold = jass.ConvertPlayerState(1)
-    local current = jass.GetPlayerState(player, stateGold)
+    local stateGold = jass:ConvertPlayerState(1)
+    local current = jass:GetPlayerState(player, stateGold)
     _____589E_52A0_91D1_5E01_5E76_663E_793A_53CD_9988(
         unit,
         round(current * pct)
@@ -489,9 +489,9 @@ local function executeSegment(unit, seg, nativeGoldAbility)
             elseif eff.type == "exp" then
                 local ____eff_isLevelMult_10
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_10 = jass.R2I(getHeroLevel(unit) * eff.value)
+                    ____eff_isLevelMult_10 = jass:R2I(getHeroLevel(unit) * eff.value)
                 else
-                    ____eff_isLevelMult_10 = jass.R2I(eff.value)
+                    ____eff_isLevelMult_10 = jass:R2I(eff.value)
                 end
                 local amount = ____eff_isLevelMult_10
                 addHeroXP(unit, amount)
@@ -499,13 +499,13 @@ local function executeSegment(unit, seg, nativeGoldAbility)
                 local cur = getHeroLevel(unit)
                 local ____eff_isLevelMult_11
                 if eff.isLevelMult then
-                    ____eff_isLevelMult_11 = jass.R2I(cur * eff.value)
+                    ____eff_isLevelMult_11 = jass:R2I(cur * eff.value)
                 else
-                    ____eff_isLevelMult_11 = jass.R2I(eff.value)
+                    ____eff_isLevelMult_11 = jass:R2I(eff.value)
                 end
                 local add = ____eff_isLevelMult_11
                 if add > 0 then
-                    jass.SetHeroLevel(unit, cur + add, true)
+                    jass:SetHeroLevel(unit, cur + add, true)
                 end
             elseif eff.type == "stat" and eff.key ~= nil and eff.key ~= "" then
                 local name = itemRelatedFns.KEY_TO_NAME[eff.key]
@@ -531,10 +531,10 @@ local function executeSegment(unit, seg, nativeGoldAbility)
         else
             local capturedUnit = unit
             local capturedPct = goldPct
-            local remaining = jass.R2I(seg.timeSec)
+            local remaining = jass:R2I(seg.timeSec)
             local cb
             cb = function()
-                if capturedUnit and jass.IsUnitType(capturedUnit, jass.UNIT_TYPE_DEAD) then
+                if capturedUnit and jass:IsUnitType(capturedUnit, jass.UNIT_TYPE_DEAD) then
                     offSecond(cb)
                     return
                 end
@@ -551,8 +551,8 @@ local function executeSegment(unit, seg, nativeGoldAbility)
         do
             local i = 0
             while i < #goldFixed do
-                local mn = jass.R2I(goldFixed[i + 1].min)
-                local mx = jass.R2I(goldFixed[i + 1].max)
+                local mn = jass:R2I(goldFixed[i + 1].min)
+                local mx = jass:R2I(goldFixed[i + 1].max)
                 local delta = mn
                 if mx ~= mn then
                     local ____temp_12
@@ -569,13 +569,13 @@ local function executeSegment(unit, seg, nativeGoldAbility)
                         ____temp_13 = mn
                     end
                     local b = ____temp_13
-                    delta = jass.GetRandomInt(a, b)
+                    delta = jass:GetRandomInt(a, b)
                 end
                 if delta ~= 0 then
                     if nativeGoldAbility then
                         _____663E_793A_91D1_5E01_83B7_5F97_53CD_9988(
                             unit,
-                            jass.GetOwningPlayer(unit),
+                            jass:GetOwningPlayer(unit),
                             delta
                         )
                     else
@@ -601,7 +601,7 @@ local function onUseItem(unit, item)
     if not unit or not item then
         return
     end
-    if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
+    if jass:IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return
     end
     if IsUnitIllusionBJ(nil, unit) then
@@ -613,7 +613,7 @@ local function onUseItem(unit, item)
     end
     local glob = _G
     local idStr = fourCCToString(GetItemTypeId(item))
-    local key = (("__EquipPowerUP_" .. tostring(unit)) .. "_") .. idStr
+    local key = (("__EquipPowerUP_" .. tostring(nil, unit)) .. "_") .. idStr
     if glob[key] then
         return
     end

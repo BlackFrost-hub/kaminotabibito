@@ -136,7 +136,7 @@ function toHid(u)
         local n = __TS__ParseInt(u, 10)
         return __TS__NumberIsNaN(__TS__Number(n)) and 0 or n
     end
-    return jass.GetHandleId(u)
+    return jass:GetHandleId(u)
 end
 function notifyDotBuffExpiredFromPool(buffID, hid)
     __pcallExpiredBuffId = buffID

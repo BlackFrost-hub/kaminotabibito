@@ -8,7 +8,7 @@ local registerPlayerHeroListener = ____require_result_0.registerPlayerHeroListen
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据")
 local _____52A8_6001_4FEE_6539_5355_4F4D_6280_80FD_6570_636E = ____require_result_1["动态修改单位技能数据"]
 local GetUnitTypeId = jass.GetUnitTypeId
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC("E00C")
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass:FourCC("E00C")
 local _____663E_793A_914D_7F6E = {
     {
         ["技能ID"] = _____7231_871C_8389_96C5_6280_80FD_914D_7F6E.Q["技能ID"],

@@ -14,11 +14,11 @@ function ____exports.EC_GetPointZ(self, x, y)
         py = x
     end
     if starLocation == nil then
-        starLocation = jass.Location(px, py)
+        starLocation = jass:Location(px, py)
     else
-        jass.MoveLocation(starLocation, px, py)
+        jass:MoveLocation(starLocation, px, py)
     end
-    return jass.GetLocationZ(starLocation) or 0
+    return jass:GetLocationZ(starLocation) or 0
 end
 --- 创建特效（对齐 EC_CreateEffect）
 -- time:
@@ -69,22 +69,22 @@ function ____exports.EC_CreateEffect(self, pathOrX, xOrY, yOrZ, zOrFac, facOrSiz
         time = -1
     end
     local g = _G
-    local eff = jass.AddSpecialEffect(path, x, y)
+    local eff = jass:AddSpecialEffect(path, x, y)
     g.bj_lastCreatedEffect = eff
     if not eff then
         return nil
     end
-    japi.EXSetEffectSize(eff, size)
-    japi.EXSetEffectZ(
+    japi:EXSetEffectSize(eff, size)
+    japi:EXSetEffectZ(
         eff,
         ____exports.EC_GetPointZ(nil, x, y) + z
     )
-    japi.EXEffectMatRotateZ(eff, fac)
-    japi.EXSetEffectSpeed(eff, s)
+    japi:EXEffectMatRotateZ(eff, fac)
+    japi:EXSetEffectSpeed(eff, s)
     if time >= 0 then
         YDWETimerDestroyEffect(nil, time, eff)
     elseif time ~= -1 then
-        jass.DestroyEffect(eff)
+        jass:DestroyEffect(eff)
     end
     return eff
 end

@@ -58,7 +58,7 @@ local function ____on_63D0_7C73_8BFA_65AFD_6700_7EC8_4F24_5BB3(_target, attacker
     if ____temp_17 or skillInstanceId == nil then
         return
     end
-    if _____63D0_7C73_8BFA_65AFD_6280_80FD_5B9E_4F8B_8868[skillInstanceId] ~= true or jass.GetUnitTypeId(attacker) ~= _____63D0_7C73_8BFA_65AF_5355_4F4DID then
+    if _____63D0_7C73_8BFA_65AFD_6280_80FD_5B9E_4F8B_8868[skillInstanceId] ~= true or jass:GetUnitTypeId(attacker) ~= _____63D0_7C73_8BFA_65AF_5355_4F4DID then
         return
     end
     applyManaSteal(attacker, applied * _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.D["实际伤害回魔比例"], true)
@@ -73,8 +73,8 @@ local function _____63D0_7C73_8BFA_65AFD_64AD_653E_52A8_4F5C(variable)
     if record == nil or not _____5355_4F4D_5B58_6D3B(record.caster) then
         return
     end
-    jass.SetUnitFacing(record.caster, record.facing)
-    japi.EXSetUnitFacing(record.caster, record.facing)
+    jass:SetUnitFacing(record.caster, record.facing)
+    japi:EXSetUnitFacing(record.caster, record.facing)
     _____64AD_653E_63D0_7C73_8BFA_65AF_914D_7F6E_52A8_4F5C(record.caster, _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.D["动作编号"], _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.D["动作速度"])
 end
 local function _____63D0_7C73_8BFA_65AFD_7ED3_7B97(variable)
@@ -85,16 +85,16 @@ local function _____63D0_7C73_8BFA_65AFD_7ED3_7B97(variable)
     local cfg = _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.D
     local ____temp_18
     if record.target ~= nil and record.target ~= 0 then
-        ____temp_18 = jass.GetUnitX(record.target)
+        ____temp_18 = jass:GetUnitX(record.target)
     else
-        ____temp_18 = jass.GetUnitX(record.caster)
+        ____temp_18 = jass:GetUnitX(record.caster)
     end
     local centerX = ____temp_18
     local ____temp_19
     if record.target ~= nil and record.target ~= 0 then
-        ____temp_19 = jass.GetUnitY(record.target)
+        ____temp_19 = jass:GetUnitY(record.target)
     else
-        ____temp_19 = jass.GetUnitY(record.caster)
+        ____temp_19 = jass:GetUnitY(record.caster)
     end
     local centerY = ____temp_19
     local targets = getEnemyUnitsInRange(record.caster, centerX, centerY, cfg["伤害范围"])
@@ -116,34 +116,34 @@ local function _____63D0_7C73_8BFA_65AFD_7ED3_7B97(variable)
     _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(record.caster, record.originX, record.originY)
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = cfg["返回特效模型"],
-        X = jass.GetUnitX(record.caster),
-        Y = jass.GetUnitY(record.caster),
+        X = jass:GetUnitX(record.caster),
+        Y = jass:GetUnitY(record.caster),
         Z = cfg["返回特效Z"],
         ["Z轴角度"] = cfg["返回特效Z轴角度"],
         ["缩放"] = cfg["返回特效缩放"],
         ["持续秒"] = cfg["返回特效持续秒"]
     })
     EXSetUnitMoveType(record.caster, 2)
-    jass.SetUnitTimeScale(record.caster, 1)
+    jass:SetUnitTimeScale(record.caster, 1)
 end
 local function ____on_63D0_7C73_8BFA_65AFD(caster, abilityId)
-    if abilityId ~= ____D_6280_80FDID or jass.GetUnitTypeId(caster) ~= _____63D0_7C73_8BFA_65AF_5355_4F4DID then
+    if abilityId ~= ____D_6280_80FDID or jass:GetUnitTypeId(caster) ~= _____63D0_7C73_8BFA_65AF_5355_4F4DID then
         return
     end
-    local target = jass.GetSpellTargetUnit()
+    local target = jass:GetSpellTargetUnit()
     if not _____5355_4F4D_5B58_6D3B(target) then
         return
     end
     local cfg = _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.D
-    local targetFacing = jass.GetUnitFacing(target)
+    local targetFacing = jass:GetUnitFacing(target)
     local skillInstanceId = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["技能ID"] = ____D_6280_80FDID, ["来源类型"] = "单位技能", ["标签"] = "提米诺斯-吸魔权杖", ["持续时间秒"] = 1})
     _____63D0_7C73_8BFA_65AFD_6280_80FD_5B9E_4F8B_8868[skillInstanceId] = true
     _____7ED1_5B9A_5355_4F4D_5F53_524D_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(caster, skillInstanceId)
     local record = {
         caster = caster,
         target = target,
-        originX = jass.GetUnitX(caster),
-        originY = jass.GetUnitY(caster),
+        originX = jass:GetUnitX(caster),
+        originY = jass:GetUnitY(caster),
         facing = targetFacing + 180,
         damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * cfg["攻击力倍率"],
         skillInstanceId = skillInstanceId
@@ -151,16 +151,16 @@ local function ____on_63D0_7C73_8BFA_65AFD(caster, abilityId)
     _____5F00_59CB_786C_76F4(caster, cfg["硬直秒"])
     EXSetUnitMoveType(caster, 4)
     SetUnitAnimation(caster, "stand")
-    jass.SetUnitTimeScale(caster, cfg["动作速度"])
+    jass:SetUnitTimeScale(caster, cfg["动作速度"])
     _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(
         caster,
         _____6781_5750_6807X(
-            jass.GetUnitX(target),
+            jass:GetUnitX(target),
             targetFacing,
             cfg["目标偏移距离"]
         ),
         _____6781_5750_6807Y(
-            jass.GetUnitY(target),
+            jass:GetUnitY(target),
             targetFacing,
             cfg["目标偏移距离"]
         )

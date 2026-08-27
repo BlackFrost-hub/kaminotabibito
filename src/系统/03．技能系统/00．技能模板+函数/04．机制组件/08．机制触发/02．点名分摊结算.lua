@@ -22,11 +22,11 @@ local function _____4E24_70B9_8DDD_79BB_5E73_65B9(x1, y1, x2, y2)
 end
 local function _____53D6_5EF6_8FDF_6BEB_79D2(_____53C2_6570)
     if _____53C2_6570["延迟毫秒"] ~= nil then
-        local _____5EF6_8FDF = math.floor(_____53C2_6570["延迟毫秒"])
+        local _____5EF6_8FDF = math:floor(_____53C2_6570["延迟毫秒"])
         return _____5EF6_8FDF > 0 and _____5EF6_8FDF or 0
     end
     if _____53C2_6570["延迟秒"] ~= nil then
-        local _____5EF6_8FDF = math.floor(_____53C2_6570["延迟秒"] * 1000)
+        local _____5EF6_8FDF = math:floor(_____53C2_6570["延迟秒"] * 1000)
         return _____5EF6_8FDF > 0 and _____5EF6_8FDF or 0
     end
     return 0

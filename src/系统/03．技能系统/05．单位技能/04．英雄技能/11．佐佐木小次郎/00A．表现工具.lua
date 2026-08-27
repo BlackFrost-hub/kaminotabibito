@@ -28,8 +28,8 @@ ____exports["播放佐佐木单位音效"] = function(unit, path, cutoff)
     end
     Sound3DII_CooPlayReuse(
         path,
-        jass.GetUnitX(unit),
-        jass.GetUnitY(unit),
+        jass:GetUnitX(unit),
+        jass:GetUnitY(unit),
         0,
         cutoff
     )
@@ -43,7 +43,7 @@ ____exports["播放佐佐木全局音效"] = function(soundKey)
     if sound == nil or sound == 0 then
         return
     end
-    jass.StartSound(sound)
+    jass:StartSound(sound)
 end
 --- 按序号播放动作并设置时间缩放（-1 表示不换动作）
 ____exports["播放佐佐木配置动作"] = function(unit, animationIndex, timeScale)
@@ -51,10 +51,10 @@ ____exports["播放佐佐木配置动作"] = function(unit, animationIndex, time
         return
     end
     if animationIndex >= 0 then
-        jass.SetUnitAnimationByIndex(unit, animationIndex)
+        jass:SetUnitAnimationByIndex(unit, animationIndex)
     end
     if timeScale > 0 then
-        jass.SetUnitTimeScale(unit, timeScale)
+        jass:SetUnitTimeScale(unit, timeScale)
     end
 end
 return ____exports

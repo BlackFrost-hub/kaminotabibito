@@ -68,9 +68,9 @@ local function _____64AD_653E_5168_5C40_97F3_6548(unit, soundKey)
     if unit == nil or unit == 0 or soundHandle == nil or soundHandle == 0 then
         return
     end
-    jass.AttachSoundToUnit(soundHandle, unit)
-    jass.SetSoundVolume(soundHandle, 127)
-    jass.StartSound(soundHandle)
+    jass:AttachSoundToUnit(soundHandle, unit)
+    jass:SetSoundVolume(soundHandle, 127)
+    jass:StartSound(soundHandle)
 end
 local _____914D_7F6E = _____585E_62C9_65AF_6280_80FD_914D_7F6E
 local _____5143_7D20_914D_7F6E = _____914D_7F6E["元素魔法"]

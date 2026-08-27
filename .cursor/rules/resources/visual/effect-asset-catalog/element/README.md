@@ -8,7 +8,8 @@
 | `Blood` | [`blood.md`](blood.md) | 血液、血能、血族爆发。 |
 | `Fantasy` | `fantasy.md`（有条目时创建） | 幻想、星界、难以归入单一元素的魔法。 |
 | `Fire` | [`fire.md`](fire.md) | 火焰、熔岩、灼烧。 |
-| `Ice` | `ice.md`（有条目时创建） | 冰霜、冻结、寒气。 |
+| `Fantasy` | [`fantasy.md`](fantasy.md) | 花瓣、星点、幻想环境粒子。 |
+| `Ice` | [`ice.md`](ice.md) | 冰霜、冻结、寒气。 |
 | `Light` | `light.md`（有条目时创建） | 圣光、白金光、净化。 |
 | `magic` | `magic.md`（有条目时创建） | 通用奥术和复合魔法。 |
 | `Nature` | [`nature.md`](nature.md) | 自然、植物、生命。 |

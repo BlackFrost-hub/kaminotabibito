@@ -45,7 +45,7 @@ local function ____RZ_5173_95ED_8F93_5165(variable)
         return
     end
     context["输入开放"] = false
-    local playerId = jass.GetPlayerId(jass.GetOwningPlayer(context["施法者"]))
+    local playerId = jass:GetPlayerId(jass:GetOwningPlayer(context["施法者"]))
     if ____RZ_6D3B_52A8_8868[playerId] == context then
         __TS__Delete(____RZ_6D3B_52A8_8868, playerId)
     end
@@ -55,14 +55,14 @@ local function ____RZ_7B2C_4E00_9636_6BB5(variable)
     if context == nil or context["已结束"] or not _____5355_4F4D_5B58_6D3B(context["施法者"]) or not _____5355_4F4D_5B58_6D3B(context["目标"]) then
         return
     end
-    local targetFacing = jass.GetUnitFacing(context["目标"])
+    local targetFacing = jass:GetUnitFacing(context["目标"])
     local landingX = _____6781_5750_6807X(
-        jass.GetUnitX(context["目标"]),
+        jass:GetUnitX(context["目标"]),
         _____914D_7F6E.RZ["目标偏移"],
         targetFacing + 75
     )
     local landingY = _____6781_5750_6807Y(
-        jass.GetUnitY(context["目标"]),
+        jass:GetUnitY(context["目标"]),
         _____914D_7F6E.RZ["目标偏移"],
         targetFacing + 75
     )
@@ -70,11 +70,11 @@ local function ____RZ_7B2C_4E00_9636_6BB5(variable)
     local facing = _____4E24_70B9_89D2_5EA6(
         landingX,
         landingY,
-        jass.GetUnitX(context["目标"]),
-        jass.GetUnitY(context["目标"])
+        jass:GetUnitX(context["目标"]),
+        jass:GetUnitY(context["目标"])
     )
-    jass.SetUnitFacing(context["施法者"], context["保持原位"] and facing or targetFacing)
-    jass.SetUnitAnimation(context["施法者"], context["保持原位"] and "attack" or "spell")
+    jass:SetUnitFacing(context["施法者"], context["保持原位"] and facing or targetFacing)
+    jass:SetUnitAnimation(context["施法者"], context["保持原位"] and "attack" or "spell")
 end
 local function ____RZ_4EA4_6362_7ED3_7B97(variable)
     local context = variable
@@ -84,27 +84,27 @@ local function ____RZ_4EA4_6362_7ED3_7B97(variable)
     context["已结束"] = true
     ____RZ_89E3_9664_51BB_7ED3(context)
     if _____5355_4F4D_5B58_6D3B(context["目标"]) then
-        jass.SetUnitX(context["目标"], context["原X"])
-        jass.SetUnitY(context["目标"], context["原Y"])
+        jass:SetUnitX(context["目标"], context["原X"])
+        jass:SetUnitY(context["目标"], context["原Y"])
     end
     if not context["保持原位"] and _____5355_4F4D_5B58_6D3B(context["施法者"]) then
         _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(context["施法者"], context["原X"], context["原Y"])
     end
     _____79FB_9664_5355_4F4D_6682_505C(context["施法者"], context["来源"])
-    jass.SetUnitTimeScale(context["施法者"], 1)
-    jass.SetUnitAnimation(context["施法者"], "stand")
+    jass:SetUnitTimeScale(context["施法者"], 1)
+    jass:SetUnitAnimation(context["施法者"], "stand")
 end
 local function ____onRZ_540C_6B65Z_952E(event)
     if event.player == nil or event.player == 0 then
         return
     end
-    local context = ____RZ_6D3B_52A8_8868[jass.GetPlayerId(event.player)]
-    if context ~= nil and context["输入开放"] and not context["已结束"] and jass.GetOwningPlayer(context["施法者"]) == event.player then
+    local context = ____RZ_6D3B_52A8_8868[jass:GetPlayerId(event.player)]
+    if context ~= nil and context["输入开放"] and not context["已结束"] and jass:GetOwningPlayer(context["施法者"]) == event.player then
         context["保持原位"] = true
     end
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRZ(_listener, caster)
-    local target = jass.GetSpellTargetUnit()
+    local target = jass:GetSpellTargetUnit()
     if not _____5355_4F4D_5B58_6D3B(target) then
         return
     end
@@ -114,29 +114,29 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRZ(_listener, caster)
         ["目标"] = target,
         ["序号"] = ____RZ_5E8F_53F7,
         ["来源"] = "十六夜咲夜-RZ:" .. tostring(____RZ_5E8F_53F7),
-        ["原X"] = jass.GetUnitX(caster),
-        ["原Y"] = jass.GetUnitY(caster),
+        ["原X"] = jass:GetUnitX(caster),
+        ["原Y"] = jass:GetUnitY(caster),
         ["保持原位"] = false,
         ["输入开放"] = true,
         ["已结束"] = false,
         ["冻结单位"] = {}
     }
-    local group = jass.CreateGroup()
-    jass.GroupEnumUnitsInRange(
+    local group = jass:CreateGroup()
+    jass:GroupEnumUnitsInRange(
         group,
-        jass.GetUnitX(target),
-        jass.GetUnitY(target),
+        jass:GetUnitX(target),
+        jass:GetUnitY(target),
         _____914D_7F6E.RZ["时停半径"],
         nil
     )
     while true do
         do
-            local unit = jass.FirstOfGroup(group)
+            local unit = jass:FirstOfGroup(group)
             if unit == nil or unit == 0 then
                 break
             end
-            jass.GroupRemoveUnit(group, unit)
-            if unit == caster or not _____5355_4F4D_5B58_6D3B(unit) or jass.IsUnitType(unit, jass.UNIT_TYPE_TAUREN) then
+            jass:GroupRemoveUnit(group, unit)
+            if unit == caster or not _____5355_4F4D_5B58_6D3B(unit) or jass:IsUnitType(unit, jass.UNIT_TYPE_TAUREN) then
                 goto __continue20
             end
             _____6DFB_52A0_5355_4F4D_6682_505C(unit, context["来源"])
@@ -145,10 +145,10 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRZ(_listener, caster)
         end
         ::__continue20::
     end
-    jass.DestroyGroup(group)
+    jass:DestroyGroup(group)
     _____6DFB_52A0_5355_4F4D_6682_505C(caster, context["来源"])
-    jass.SetUnitAnimation(caster, "spell")
-    ____RZ_6D3B_52A8_8868[jass.GetPlayerId(jass.GetOwningPlayer(caster))] = context
+    jass:SetUnitAnimation(caster, "spell")
+    ____RZ_6D3B_52A8_8868[jass:GetPlayerId(jass:GetOwningPlayer(caster))] = context
     _____64AD_653E_54B2_591C_5355_4F4D_97F3_6548("gg_snd_ManaShieldCaster1", caster)
     _____64AD_653E_54B2_591C_5355_4F4D_97F3_6548("gg_snd_IzayoiSakuya_RZ", caster)
     addDelayedCallback(_____914D_7F6E.RZ["第一阶段秒"] * 1000, ____RZ_7B2C_4E00_9636_6BB5, context)

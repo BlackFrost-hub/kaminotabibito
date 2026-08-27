@@ -12,15 +12,15 @@ ____exports["播放提米诺斯单位音效"] = function(unit, soundKey)
     if sound == nil or sound == 0 then
         return
     end
-    jass.AttachSoundToUnit(sound, unit)
-    jass.SetSoundVolume(sound, 127)
-    jass.StartSound(sound)
+    jass:AttachSoundToUnit(sound, unit)
+    jass:SetSoundVolume(sound, 127)
+    jass:StartSound(sound)
 end
 ____exports["播放提米诺斯配置动作"] = function(unit, animationIndex, timeScale)
     if unit == nil or unit == 0 or animationIndex < 0 then
         return
     end
-    jass.SetUnitTimeScale(unit, timeScale)
-    jass.SetUnitAnimationByIndex(unit, animationIndex)
+    jass:SetUnitTimeScale(unit, timeScale)
+    jass:SetUnitAnimationByIndex(unit, animationIndex)
 end
 return ____exports

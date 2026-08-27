@@ -1,6 +1,6 @@
 # 特效资产分类目录
 
-本目录是 `effect-asset-catalog.md` 的详细条目区，目录结构与 `imports\Common\Effect` 对齐。
+本目录是 `effect-asset-catalog.md` 的详细条目区，目录结构与 `imports\Common\Effect` 对齐。`Common\Decoration` 动态装饰物不在本目录统计，统一登记到上级的 [`decoration-asset-catalog.md`](../decoration-asset-catalog.md)。
 
 ## 分类入口
 

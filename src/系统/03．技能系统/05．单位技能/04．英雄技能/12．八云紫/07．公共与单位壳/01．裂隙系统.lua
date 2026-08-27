@@ -8,7 +8,7 @@ local ____02_FF0E_5355_4F4D_4E0E_8303_56F4 = require("系统.03．技能系统.0
 local _____83B7_53D6_5750_6807_8303_56F4_5355_4F4D_6309_7B5B_9009 = ____02_FF0E_5355_4F4D_4E0E_8303_56F4["获取坐标范围单位按筛选"]
 function _____79FB_9664_4E34_65F6_88C2_9699(variable)
     local unit = variable
-    if unit ~= nil and unit ~= 0 and jass.GetUnitTypeId(unit) ~= 0 then
+    if unit ~= nil and unit ~= 0 and jass:GetUnitTypeId(unit) ~= 0 then
         _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(unit)
     end
 end
@@ -53,7 +53,7 @@ local _____95F4_9699_547D_4E2D_6B21_6570 = {}
 local _____5DF2_6CE8_518C_88C2_9699_6269_6563_53D1_5C04_5668
 local _____88C2_9699_521B_5EFA_76D1_542C_5668_5217_8868 = {}
 local function _____53E5_67C4ID(handle)
-    return (handle == nil or handle == 0) and 0 or jass.GetHandleId(handle)
+    return (handle == nil or handle == 0) and 0 or jass:GetHandleId(handle)
 end
 --- 范围内原生单位全量枚举（不筛选，含死亡/无敌/建筑/机械/古树）。
 -- 配置型筛选等价表达：要求有效单位=false + 允许死亡=true + 允许无敌=true + 全类型放行 + 无参照单位。
@@ -74,10 +74,10 @@ local function _____83B7_53D6_8303_56F4_5185_539F_751F_5355_4F4D(x, y, radius)
     )
 end
 ____exports["八云紫单位存活"] = function(unit)
-    return unit ~= nil and unit ~= 0 and jass.GetUnitTypeId(unit) ~= 0 and jass.GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
+    return unit ~= nil and unit ~= 0 and jass:GetUnitTypeId(unit) ~= 0 and jass:GetUnitState(unit, UNIT_STATE_LIFE) > 0.405
 end
 ____exports["是八云紫"] = function(unit)
-    return ____exports["八云紫单位存活"](unit) and jass.GetUnitTypeId(unit) == _____914D_7F6E["单位"]["英雄类型ID"]
+    return ____exports["八云紫单位存活"](unit) and jass:GetUnitTypeId(unit) == _____914D_7F6E["单位"]["英雄类型ID"]
 end
 ____exports["设置八云紫R期间D排斥豁免"] = function(hero, enabled)
     local heroId = _____53E5_67C4ID(hero)
@@ -106,10 +106,10 @@ ____exports["八云紫R期间D排斥已豁免"] = function(hero)
     return _____82F1_96C4R_671F_95F4D_6392_65A5_8C41_514D[heroId] == true or _____82F1_96C4E_671F_95F4D_6392_65A5_8C41_514D[heroId] == true
 end
 ____exports["是八云紫合法敌人"] = function(hero, target)
-    return ____exports["八云紫单位存活"](target) and jass.IsUnitEnemy(
+    return ____exports["八云紫单位存活"](target) and jass:IsUnitEnemy(
         target,
-        jass.GetOwningPlayer(hero)
-    ) == true and jass.IsUnitType(target, UNIT_TYPE_STRUCTURE) ~= true and jass.IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and jass.IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true
+        jass:GetOwningPlayer(hero)
+    ) == true and jass:IsUnitType(target, UNIT_TYPE_STRUCTURE) ~= true and jass:IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and jass:IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true
 end
 ____exports["创建八云紫点特效"] = function(model, x, y, durationSec, scale, height)
     if scale == nil then
@@ -181,8 +181,8 @@ local function _____7ED3_7B97_88C2_9699_547D_4E2D(hero, target, skillId, skillIn
             while i < #_____914D_7F6E["裂隙"]["二次特效"] do
                 ____exports["创建八云紫点特效"](
                     _____914D_7F6E["裂隙"]["二次特效"][i + 1],
-                    jass.GetUnitX(target),
-                    jass.GetUnitY(target),
+                    jass:GetUnitX(target),
+                    jass:GetUnitY(target),
                     1.25
                 )
                 i = i + 1
@@ -234,7 +234,7 @@ local function _____6E05_7406_88C2_9699_8BB0_5F55(record)
             __TS__Delete(_____82F1_96C4_957F_671F_88C2_9699_6570, heroId)
         end
     end
-    if record["单位"] ~= nil and record["单位"] ~= 0 and jass.GetUnitTypeId(record["单位"]) ~= 0 then
+    if record["单位"] ~= nil and record["单位"] ~= 0 and jass:GetUnitTypeId(record["单位"]) ~= 0 then
         _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(record["单位"])
     end
 end
@@ -303,7 +303,7 @@ end
 ____exports["计算裂隙可达终点"] = function(startX, startY, targetX, targetY)
     local dx = targetX - startX
     local dy = targetY - startY
-    local distance = jass.SquareRoot(dx * dx + dy * dy)
+    local distance = jass:SquareRoot(dx * dx + dy * dy)
     if distance <= 0.01 then
         return {x = startX, y = startY}
     end
@@ -324,7 +324,7 @@ ____exports["计算裂隙可达终点"] = function(startX, startY, targetX, targ
         local step = _____914D_7F6E["裂隙"]["移动步长"] < _____5269_4F59 and _____914D_7F6E["裂隙"]["移动步长"] or _____5269_4F59
         local nextX = x + ux * step
         local nextY = y + uy * step
-        if jass.IsTerrainPathable(nextX, nextY, PATHING_TYPE_WALKABILITY) == true then
+        if jass:IsTerrainPathable(nextX, nextY, PATHING_TYPE_WALKABILITY) == true then
             break
         end
         x = nextX
@@ -349,7 +349,7 @@ ____exports["创建八云紫裂隙"] = function(hero, x, y, skillId, skillInstan
         lifetime = {duration = placement["持续秒"], long = placement["长期"]}
     end
     local gap = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
-        jass.GetOwningPlayer(hero),
+        jass:GetOwningPlayer(hero),
         _____914D_7F6E["单位"]["裂隙类型ID"],
         x,
         y,
@@ -371,8 +371,8 @@ ____exports["创建八云紫裂隙"] = function(hero, x, y, skillId, skillInstan
         local heroId = _____53E5_67C4ID(hero)
         _____82F1_96C4_957F_671F_88C2_9699_6570[heroId] = (_____82F1_96C4_957F_671F_88C2_9699_6570[heroId] or 0) + 1
     end
-    jass.SetUnitState(gap, UNIT_STATE_MAX_LIFE, lifetime.duration)
-    jass.SetUnitState(gap, UNIT_STATE_LIFE, lifetime.duration)
+    jass:SetUnitState(gap, UNIT_STATE_MAX_LIFE, lifetime.duration)
+    jass:SetUnitState(gap, UNIT_STATE_LIFE, lifetime.duration)
     addDelayedCallback(lifetime.duration * 1000, _____88C2_9699_5230_671F, record)
     ____exports["结算八云紫裂隙展开"](
         hero,
@@ -392,7 +392,7 @@ ____exports["创建八云紫裂隙"] = function(hero, x, y, skillId, skillInstan
 end
 ____exports["创建八云紫临时裂隙"] = function(hero, x, y, durationSec)
     local unit = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
-        jass.GetOwningPlayer(hero),
+        jass:GetOwningPlayer(hero),
         _____914D_7F6E["单位"]["临时裂隙类型ID"],
         x,
         y,
@@ -419,7 +419,7 @@ ____exports["查找八云紫裂隙"] = function(x, y, radius, owner)
                 if record == nil then
                     goto __continue74
                 end
-                if owner == nil or owner == 0 or jass.GetOwningPlayer(record["主人"]) == jass.GetOwningPlayer(owner) then
+                if owner == nil or owner == 0 or jass:GetOwningPlayer(record["主人"]) == jass:GetOwningPlayer(owner) then
                     return record
                 end
             end
@@ -440,7 +440,7 @@ ____exports["获取范围内八云紫裂隙"] = function(x, y, radius, owner)
                 if record == nil then
                     goto __continue79
                 end
-                if owner ~= nil and owner ~= 0 and jass.GetOwningPlayer(record["主人"]) ~= jass.GetOwningPlayer(owner) then
+                if owner ~= nil and owner ~= 0 and jass:GetOwningPlayer(record["主人"]) ~= jass:GetOwningPlayer(owner) then
                     goto __continue79
                 end
                 result[#result + 1] = record
@@ -474,8 +474,8 @@ ____exports["触发八云紫裂隙扩散"] = function(hero, centerGap)
         return 0
     end
     local gaps = ____exports["获取范围内八云紫裂隙"](
-        jass.GetUnitX(centerGap["单位"]),
-        jass.GetUnitY(centerGap["单位"]),
+        jass:GetUnitX(centerGap["单位"]),
+        jass:GetUnitY(centerGap["单位"]),
         _____914D_7F6E["裂隙"]["附近检测范围"],
         hero
     )
@@ -489,14 +489,14 @@ ____exports["触发八云紫裂隙扩散"] = function(hero, centerGap)
                 if gap["扩散冷却到"] > now then
                     goto __continue91
                 end
-                local life = jass.GetUnitState(gap["单位"], UNIT_STATE_LIFE)
-                local maxLife = jass.GetUnitState(gap["单位"], UNIT_STATE_MAX_LIFE)
+                local life = jass:GetUnitState(gap["单位"], UNIT_STATE_LIFE)
+                local maxLife = jass:GetUnitState(gap["单位"], UNIT_STATE_MAX_LIFE)
                 local cost = maxLife * _____914D_7F6E["裂隙"]["扩散生命消耗比例"]
                 if life <= cost + 0.405 then
                     _____6E05_7406_88C2_9699_8BB0_5F55(gap)
                     goto __continue91
                 end
-                jass.SetUnitState(gap["单位"], UNIT_STATE_LIFE, life - cost)
+                jass:SetUnitState(gap["单位"], UNIT_STATE_LIFE, life - cost)
                 gap["扩散冷却到"] = now + _____914D_7F6E["裂隙"]["扩散冷却秒"] * 1000
                 _____5DF2_6CE8_518C_88C2_9699_6269_6563_53D1_5C04_5668(hero, gap)
                 count = count + 1
@@ -511,7 +511,7 @@ local function _____76D1_542C_516B_4E91_7D2B_88C2_9699_81EA_6BC1(castingUnit, sp
     if spellAbilityId ~= _____914D_7F6E["技能"].Afzy["类型ID"] or castingUnit == nil or castingUnit == 0 then
         return
     end
-    local unitTypeId = jass.GetUnitTypeId(castingUnit)
+    local unitTypeId = jass:GetUnitTypeId(castingUnit)
     if unitTypeId == _____914D_7F6E["单位"]["裂隙类型ID"] then
         local record = ____exports["获取八云紫裂隙记录"](castingUnit)
         if record ~= nil then

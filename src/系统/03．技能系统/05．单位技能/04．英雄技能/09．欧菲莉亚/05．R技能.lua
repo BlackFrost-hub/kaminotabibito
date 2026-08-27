@@ -60,10 +60,10 @@ local function _____8BBE_7F6E_590D_6D3B_751F_547D_9B54_6CD5(hero, lifePercent, m
     local maxLife = GetUnitStateJapi(hero, jass.UNIT_STATE_MAX_LIFE)
     local maxMana = GetUnitStateJapi(hero, jass.UNIT_STATE_MAX_MANA)
     if maxLife > 0 then
-        jass.SetUnitState(hero, jass.UNIT_STATE_LIFE, maxLife * lifePercent * 0.01)
+        jass:SetUnitState(hero, jass.UNIT_STATE_LIFE, maxLife * lifePercent * 0.01)
     end
     if maxMana > 0 then
-        jass.SetUnitState(hero, jass.UNIT_STATE_MANA, maxMana * manaPercent * 0.01)
+        jass:SetUnitState(hero, jass.UNIT_STATE_MANA, maxMana * manaPercent * 0.01)
     end
 end
 local function _____7ED3_675F_6B27_83F2_8389_4E9AR_79FB_52A8(record)
@@ -75,7 +75,7 @@ local function _____7ED3_675F_6B27_83F2_8389_4E9AR_79FB_52A8(record)
         return
     end
     StarOther_PanCameraToTimedForPlayer(
-        jass.GetOwningPlayer(record["单位"]),
+        jass:GetOwningPlayer(record["单位"]),
         GetUnitX(record["单位"]),
         GetUnitY(record["单位"]),
         0.1
@@ -103,8 +103,8 @@ local function _____6B27_83F2_8389_4E9AR_79FB_52A8Tick(variable)
     })
     local x = _____6781_5750_6807X(result["最终X"], record["方向"], 0)
     local y = _____6781_5750_6807Y(result["最终Y"], record["方向"], 0)
-    jass.SetUnitX(record["单位"], x)
-    jass.SetUnitY(record["单位"], y)
+    jass:SetUnitX(record["单位"], x)
+    jass:SetUnitY(record["单位"], y)
     record["步数"] = record["步数"] + 1
     if record["步数"] >= _____6B27_83F2_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.R["复活移动步数"] or result["是否提前停止"] then
         _____7ED3_675F_6B27_83F2_8389_4E9AR_79FB_52A8(record)
@@ -113,14 +113,14 @@ end
 local function _____5F00_59CB_6B27_83F2_8389_4E9AR_79FB_52A8(hero)
     local record = {
         ["单位"] = hero,
-        ["方向"] = jass.GetRandomReal(0, 360),
+        ["方向"] = jass:GetRandomReal(0, 360),
         ["步数"] = 0,
         ["回调ID"] = 0
     }
     record["回调ID"] = addPeriodicCallback(_____6B27_83F2_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.R["复活移动间隔毫秒"], _____6B27_83F2_8389_4E9AR_79FB_52A8Tick, record)
 end
 local function _____590D_6D3B_6B27_83F2_8389_4E9AR_76EE_6807(caster, target, level, bossBattle, battleBoss)
-    if target == nil or target == 0 or not jass.IsUnitType(target, jass.UNIT_TYPE_DEAD) then
+    if target == nil or target == 0 or not jass:IsUnitType(target, jass.UNIT_TYPE_DEAD) then
         return
     end
     local deadX = GetUnitX(target)
@@ -137,32 +137,32 @@ local function _____590D_6D3B_6B27_83F2_8389_4E9AR_76EE_6807(caster, target, lev
     end
     local respawnBoss = ____bossBattle_10
     if respawnBoss ~= nil and respawnBoss ~= 0 then
-        jass.SetUnitX(
+        jass:SetUnitX(
             target,
             GetUnitX(respawnBoss)
         )
-        jass.SetUnitY(
+        jass:SetUnitY(
             target,
             GetUnitY(respawnBoss)
         )
     elseif not bossBattle then
-        jass.SetUnitX(
+        jass:SetUnitX(
             target,
             GetUnitX(caster)
         )
-        jass.SetUnitY(
+        jass:SetUnitY(
             target,
             GetUnitY(caster)
         )
     end
-    jass.SetUnitFlyHeight(
+    jass:SetUnitFlyHeight(
         target,
-        jass.GetUnitDefaultFlyHeight(target),
+        jass:GetUnitDefaultFlyHeight(target),
         0
     )
-    jass.SetUnitTimeScale(target, 1)
-    jass.ShowUnit(target, true)
-    jass.CameraClearNoiseForPlayer(jass.GetOwningPlayer(target))
+    jass:SetUnitTimeScale(target, 1)
+    jass:ShowUnit(target, true)
+    jass:CameraClearNoiseForPlayer(jass:GetOwningPlayer(target))
     _____8BBE_7F6E_590D_6D3B_751F_547D_9B54_6CD5(target, _____6B27_83F2_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.R["主动生命基础百分比"] + _____6B27_83F2_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.R["主动生命每级百分比"] * level, _____6B27_83F2_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.R["主动魔法基础百分比"] + _____6B27_83F2_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.R["主动魔法每级百分比"] * level)
     _____5F00_59CB_6B27_83F2_8389_4E9AR_79FB_52A8(target)
 end
@@ -178,7 +178,7 @@ local function _____5904_7406_6B27_83F2_8389_4E9AR(caster, abilityId)
         local i = 0
         while i < 16 do
             do
-                local hero = getRegisteredPlayerHero(jass.Player(i))
+                local hero = getRegisteredPlayerHero(jass:Player(i))
                 if hero == nil or hero == 0 then
                     goto __continue27
                 end

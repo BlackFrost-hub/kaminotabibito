@@ -73,8 +73,8 @@ local function ____RQ_6E05_7406(context)
     context["分身"] = {}
     if context["目标"] ~= nil and context["目标"] ~= 0 then
         _____79FB_9664_5355_4F4D_6682_505C(context["目标"], context["来源"])
-        jass.SetUnitTimeScale(context["目标"], 1)
-        jass.SetUnitVertexColor(
+        jass:SetUnitTimeScale(context["目标"], 1)
+        jass:SetUnitVertexColor(
             context["目标"],
             255,
             255,
@@ -85,10 +85,10 @@ local function ____RQ_6E05_7406(context)
     end
     if context["施法者"] ~= nil and context["施法者"] ~= 0 then
         _____79FB_9664_5355_4F4D_6682_505C(context["施法者"], context["来源"])
-        jass.SetUnitInvulnerable(context["施法者"], false)
-        jass.SetUnitTimeScale(context["施法者"], 1)
-        jass.ShowUnit(context["施法者"], true)
-        jass.SetUnitAnimation(context["施法者"], "stand")
+        jass:SetUnitInvulnerable(context["施法者"], false)
+        jass:SetUnitTimeScale(context["施法者"], 1)
+        jass:ShowUnit(context["施法者"], true)
+        jass:SetUnitAnimation(context["施法者"], "stand")
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["施法者"], _____5341_516D_591C_54B2_591CBuffID["夜雾幻影无敌免控"])
     end
     _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(context["技能实例ID"])
@@ -117,7 +117,7 @@ local function ____RQ_521B_5EFA_98DE_5200_6392(context, centerX, centerY, facing
             )
             if knife ~= nil and knife ~= 0 then
                 if fixedHeight ~= nil then
-                    jass.SetUnitFlyHeight(knife, fixedHeight, 0)
+                    jass:SetUnitFlyHeight(knife, fixedHeight, 0)
                 end
                 local ____context__98DE_5200_7 = context["飞刀"]
                 ____context__98DE_5200_7[#____context__98DE_5200_7 + 1] = knife
@@ -132,15 +132,15 @@ local function ____RQ_7B2C_4E00_8F6E(variable)
         return
     end
     local facing = _____4E24_70B9_89D2_5EA6(
-        jass.GetUnitX(context["施法者"]),
-        jass.GetUnitY(context["施法者"]),
-        jass.GetUnitX(context["目标"]),
-        jass.GetUnitY(context["目标"])
+        jass:GetUnitX(context["施法者"]),
+        jass:GetUnitY(context["施法者"]),
+        jass:GetUnitX(context["目标"]),
+        jass:GetUnitY(context["目标"])
     )
     ____RQ_521B_5EFA_98DE_5200_6392(
         context,
-        jass.GetUnitX(context["施法者"]),
-        jass.GetUnitY(context["施法者"]),
+        jass:GetUnitX(context["施法者"]),
+        jass:GetUnitY(context["施法者"]),
         facing,
         _____914D_7F6E.RQ["第一轮数量"],
         _____914D_7F6E["单位壳"]["蓝刀"]
@@ -153,8 +153,8 @@ local function ____RQ_5C01_9501_76EE_6807(variable)
         return
     end
     _____6DFB_52A0_5355_4F4D_6682_505C(context["目标"], context["来源"])
-    jass.SetUnitTimeScale(context["目标"], 0)
-    jass.SetUnitVertexColor(
+    jass:SetUnitTimeScale(context["目标"], 0)
+    jass:SetUnitVertexColor(
         context["目标"],
         255,
         255,
@@ -178,8 +178,8 @@ local function ____RQ_521B_5EFA_56DB_5411_5206_8EAB(variable)
     local angles = {315, 45, 135, 235}
     local facings = {135, 225, 315, 45}
     local angle = angles[params["序号"] + 1] or 315
-    local targetX = jass.GetUnitX(context["目标"])
-    local targetY = jass.GetUnitY(context["目标"])
+    local targetX = jass:GetUnitX(context["目标"])
+    local targetY = jass:GetUnitY(context["目标"])
     local x = _____6781_5750_6807X(targetX, _____914D_7F6E.RQ["分身距离"], angle)
     local y = _____6781_5750_6807Y(targetY, _____914D_7F6E.RQ["分身距离"], angle)
     local facing = facings[params["序号"] + 1] or 135
@@ -190,16 +190,16 @@ local function ____RQ_521B_5EFA_56DB_5411_5206_8EAB(variable)
         y,
         facing
     )
-    local cloneHeight = jass.GetUnitFlyHeight(context["目标"])
+    local cloneHeight = jass:GetUnitFlyHeight(context["目标"])
     if clone ~= nil and clone ~= 0 then
-        jass.SetUnitFlyHeight(
+        jass:SetUnitFlyHeight(
             clone,
-            jass.GetUnitDefaultFlyHeight(clone) + jass.GetUnitFlyHeight(context["目标"]),
+            jass:GetUnitDefaultFlyHeight(clone) + jass:GetUnitFlyHeight(context["目标"]),
             0
         )
-        cloneHeight = jass.GetUnitFlyHeight(clone)
-        jass.SetUnitTimeScale(clone, 2)
-        jass.SetUnitAnimation(clone, "attack")
+        cloneHeight = jass:GetUnitFlyHeight(clone)
+        jass:SetUnitTimeScale(clone, 2)
+        jass:SetUnitAnimation(clone, "attack")
         local ____context__5206_8EAB_8 = context["分身"]
         ____context__5206_8EAB_8[#____context__5206_8EAB_8 + 1] = clone
     end
@@ -218,23 +218,23 @@ local function ____RQ_521B_5EFA_4E0A_7A7A_5206_8EAB(variable)
     if context == nil or context["已结束"] or not _____5355_4F4D_5B58_6D3B(context["目标"]) then
         return
     end
-    local targetX = jass.GetUnitX(context["目标"])
-    local targetY = jass.GetUnitY(context["目标"])
+    local targetX = jass:GetUnitX(context["目标"])
+    local targetY = jass:GetUnitY(context["目标"])
     local highClone = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
         context["施法者"],
         _____914D_7F6E["单位壳"]["仰视分身"],
         targetX,
         targetY,
-        jass.GetRandomReal(0, 360)
+        jass:GetRandomReal(0, 360)
     )
     if highClone ~= nil and highClone ~= 0 then
-        jass.SetUnitFlyHeight(
+        jass:SetUnitFlyHeight(
             highClone,
-            jass.GetUnitDefaultFlyHeight(highClone) + jass.GetUnitFlyHeight(context["目标"]),
+            jass:GetUnitDefaultFlyHeight(highClone) + jass:GetUnitFlyHeight(context["目标"]),
             0
         )
-        jass.SetUnitTimeScale(highClone, 0.5)
-        jass.SetUnitAnimation(highClone, "morph")
+        jass:SetUnitTimeScale(highClone, 0.5)
+        jass:SetUnitAnimation(highClone, "morph")
         local ____context__5206_8EAB_9 = context["分身"]
         ____context__5206_8EAB_9[#____context__5206_8EAB_9 + 1] = highClone
     end
@@ -250,9 +250,9 @@ local function ____RQ_521B_5EFA_4E0A_7A7A_5206_8EAB(variable)
                 angle + 180
             )
             if knife ~= nil and knife ~= 0 then
-                jass.SetUnitFlyHeight(
+                jass:SetUnitFlyHeight(
                     knife,
-                    jass.GetUnitDefaultFlyHeight(knife) + jass.GetUnitFlyHeight(context["目标"]),
+                    jass:GetUnitDefaultFlyHeight(knife) + jass:GetUnitFlyHeight(context["目标"]),
                     0
                 )
                 local ____context__6536_5C3E_98DE_5200_10 = context["收尾飞刀"]
@@ -267,21 +267,21 @@ local function ____RQ_672C_4F53_79FB_4F4D(variable)
     if context == nil or context["已结束"] or not _____5355_4F4D_5B58_6D3B(context["施法者"]) or not _____5355_4F4D_5B58_6D3B(context["目标"]) then
         return
     end
-    local angle = jass.GetUnitFacing(context["目标"]) + 180
+    local angle = jass:GetUnitFacing(context["目标"]) + 180
     local x = _____6781_5750_6807X(
-        jass.GetUnitX(context["目标"]),
+        jass:GetUnitX(context["目标"]),
         _____914D_7F6E.RQ["分身距离"],
         angle
     )
     local y = _____6781_5750_6807Y(
-        jass.GetUnitY(context["目标"]),
+        jass:GetUnitY(context["目标"]),
         _____914D_7F6E.RQ["分身距离"],
         angle
     )
-    jass.ShowUnit(context["施法者"], true)
+    jass:ShowUnit(context["施法者"], true)
     _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(context["施法者"], x, y)
-    jass.SetUnitFacing(context["施法者"], angle)
-    jass.SetUnitAnimation(context["施法者"], "throw")
+    jass:SetUnitFacing(context["施法者"], angle)
+    jass:SetUnitAnimation(context["施法者"], "throw")
 end
 local function ____RQ_6062_590D_672C_4F53(variable)
     local context = variable
@@ -289,8 +289,8 @@ local function ____RQ_6062_590D_672C_4F53(variable)
         return
     end
     _____79FB_9664_5355_4F4D_6682_505C(context["施法者"], context["来源"])
-    jass.SetUnitTimeScale(context["施法者"], 1)
-    jass.SetUnitAnimation(context["施法者"], "stand")
+    jass:SetUnitTimeScale(context["施法者"], 1)
+    jass:SetUnitAnimation(context["施法者"], "stand")
 end
 local function ____RQ_63A8_8FDB_98DE_5200(variable)
     local context = variable
@@ -306,10 +306,10 @@ local function ____RQ_63A8_8FDB_98DE_5200(variable)
                     __TS__ArraySplice(context["飞刀"], i, 1)
                     goto __continue39
                 end
-                local x = jass.GetUnitX(knife)
-                local y = jass.GetUnitY(knife)
-                local tx = jass.GetUnitX(context["目标"])
-                local ty = jass.GetUnitY(context["目标"])
+                local x = jass:GetUnitX(knife)
+                local y = jass:GetUnitY(knife)
+                local tx = jass:GetUnitX(context["目标"])
+                local ty = jass:GetUnitY(context["目标"])
                 local dx = tx - x
                 local dy = ty - y
                 if dx * dx + dy * dy <= _____914D_7F6E.RQ["飞刀追踪步长"] * _____914D_7F6E.RQ["飞刀追踪步长"] then
@@ -318,18 +318,18 @@ local function ____RQ_63A8_8FDB_98DE_5200(variable)
                     goto __continue39
                 end
                 local angle = _____4E24_70B9_89D2_5EA6(x, y, tx, ty)
-                jass.SetUnitX(
+                jass:SetUnitX(
                     knife,
                     _____6781_5750_6807X(x, _____914D_7F6E.RQ["飞刀追踪步长"], angle)
                 )
-                jass.SetUnitY(
+                jass:SetUnitY(
                     knife,
                     _____6781_5750_6807Y(y, _____914D_7F6E.RQ["飞刀追踪步长"], angle)
                 )
-                jass.SetUnitFacing(knife, angle)
-                if jass.GetUnitFlyHeight(knife) > jass.GetUnitFlyHeight(context["目标"]) then
-                    local _____76EE_6807_9AD8_5EA6 = jass.GetUnitFlyHeight(context["目标"])
-                    local _____4E0B_964D_9AD8_5EA6 = jass.GetUnitFlyHeight(knife) - 18
+                jass:SetUnitFacing(knife, angle)
+                if jass:GetUnitFlyHeight(knife) > jass:GetUnitFlyHeight(context["目标"]) then
+                    local _____76EE_6807_9AD8_5EA6 = jass:GetUnitFlyHeight(context["目标"])
+                    local _____4E0B_964D_9AD8_5EA6 = jass:GetUnitFlyHeight(knife) - 18
                     local ____jass_SetUnitFlyHeight_12 = jass.SetUnitFlyHeight
                     local ____temp_11
                     if _____76EE_6807_9AD8_5EA6 > _____4E0B_964D_9AD8_5EA6 then
@@ -376,13 +376,13 @@ local function ____RQ_6700_7EC8_7ED3_7B97(variable)
         return
     end
     if _____5355_4F4D_5B58_6D3B(context["施法者"]) and _____5355_4F4D_5B58_6D3B(context["目标"]) then
-        local hitEffect = jass.AddSpecialEffect(
+        local hitEffect = jass:AddSpecialEffect(
             "war3mapImported\\bloodex.mdx",
-            jass.GetUnitX(context["目标"]),
-            jass.GetUnitY(context["目标"])
+            jass:GetUnitX(context["目标"]),
+            jass:GetUnitY(context["目标"])
         )
         if hitEffect ~= nil and hitEffect ~= 0 then
-            jass.DestroyEffect(hitEffect)
+            jass:DestroyEffect(hitEffect)
         end
         _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
             ["来源"] = context["施法者"],
@@ -403,7 +403,7 @@ local function ____RQ_6700_7EC8_7ED3_7B97(variable)
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRQ(_listener, caster, _____6280_80FD_5B9E_4F8BID)
     _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(caster, _____914D_7F6E["符卡间隔秒"].RQ)
-    local target = jass.GetSpellTargetUnit()
+    local target = jass:GetSpellTargetUnit()
     if not _____5355_4F4D_5B58_6D3B(target) then
         _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(_____6280_80FD_5B9E_4F8BID)
         return
@@ -423,9 +423,9 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRQ(_listener, caster, ____
         ["已结束"] = false
     }
     _____6DFB_52A0_5355_4F4D_6682_505C(caster, context["来源"])
-    jass.SetUnitInvulnerable(caster, true)
-    jass.SetUnitAnimationByIndex(caster, 2)
-    jass.SetUnitTimeScale(caster, 2.5)
+    jass:SetUnitInvulnerable(caster, true)
+    jass:SetUnitAnimationByIndex(caster, 2)
+    jass:SetUnitTimeScale(caster, 2.5)
     registerManualBuff(
         caster,
         _____5341_516D_591C_54B2_591CBuffID["夜雾幻影无敌免控"],

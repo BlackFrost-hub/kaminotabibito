@@ -17,14 +17,14 @@ ____exports.bj_STOCK_DEFAULT_MAX = 1
 -- 对应JASS: UnitItemInSlotBJ
 -- 将0-based转换为1-based索引
 function ____exports.UnitItemInSlotBJ(whichUnit, itemSlot)
-    return jass.UnitItemInSlot(whichUnit, itemSlot - 1)
+    return jass:UnitItemInSlot(whichUnit, itemSlot - 1)
 end
 function ____exports.GetInventoryIndexOfItemTypeBJ(whichUnit, itemId)
     do
         local index = 0
         while index < ____exports.bj_MAX_INVENTORY do
-            local indexItem = jass.UnitItemInSlot(whichUnit, index)
-            if indexItem ~= nil and jass.GetItemTypeId(indexItem) == itemId then
+            local indexItem = jass:UnitItemInSlot(whichUnit, index)
+            if indexItem ~= nil and jass:GetItemTypeId(indexItem) == itemId then
                 return index
             end
             index = index + 1
@@ -37,16 +37,16 @@ function ____exports.GetItemOfTypeFromUnitBJ(whichUnit, itemId)
     if index < 0 then
         return nil
     end
-    return jass.UnitItemInSlot(whichUnit, index)
+    return jass:UnitItemInSlot(whichUnit, index)
 end
 function ____exports.GetItemTypeCountInUnitBJ(whichUnit, itemId)
     local totalCount = 0
     do
         local index = 0
         while index < ____exports.bj_MAX_INVENTORY do
-            local indexItem = jass.UnitItemInSlot(whichUnit, index)
-            if indexItem ~= nil and jass.GetItemTypeId(indexItem) == itemId then
-                local charges = jass.GetItemCharges(indexItem)
+            local indexItem = jass:UnitItemInSlot(whichUnit, index)
+            if indexItem ~= nil and jass:GetItemTypeId(indexItem) == itemId then
+                local charges = jass:GetItemCharges(indexItem)
                 local ____temp_1
                 if charges > 0 then
                     ____temp_1 = charges
@@ -67,20 +67,20 @@ function ____exports.RemoveItemTypeFromUnitBJ(whichUnit, itemId, count)
         if item == nil then
             break
         end
-        local charges = jass.GetItemCharges(item)
+        local charges = jass:GetItemCharges(item)
         if charges > 1 then
             local needRemove = count - removedCount
             if charges > needRemove then
-                jass.SetItemCharges(item, charges - needRemove)
+                jass:SetItemCharges(item, charges - needRemove)
                 removedCount = removedCount + needRemove
                 break
             else
                 removedCount = removedCount + charges
-                jass.RemoveItem(item)
+                jass:RemoveItem(item)
             end
         else
             removedCount = removedCount + 1
-            jass.RemoveItem(item)
+            jass:RemoveItem(item)
         end
     end
     return removedCount
@@ -90,28 +90,28 @@ end
 --     call RemoveItemFromStock(whichUnit, itemId)
 -- endfunction
 function ____exports.RemoveItemFromStockBJ(itemId, whichUnit)
-    jass.RemoveItemFromStock(whichUnit, itemId)
+    jass:RemoveItemFromStock(whichUnit, itemId)
 end
 --- 对齐 Blizzard.j：
 -- function AddItemToStockBJ takes integer itemId, unit whichUnit, integer currentStock, integer stockMax returns nothing
 --     call AddItemToStock(whichUnit, itemId, currentStock, stockMax)
 -- endfunction
 function ____exports.AddItemToStockBJ(itemId, whichUnit, currentStock, stockMax)
-    jass.AddItemToStock(whichUnit, itemId, currentStock, stockMax)
+    jass:AddItemToStock(whichUnit, itemId, currentStock, stockMax)
 end
 --- 对齐 Blizzard.j：
 -- function AddUnitToStockBJ takes integer unitId, unit whichUnit, integer currentStock, integer stockMax returns nothing
 --     call AddUnitToStock(whichUnit, unitId, currentStock, stockMax)
 -- endfunction
 function ____exports.AddUnitToStockBJ(unitId, whichUnit, currentStock, stockMax)
-    jass.AddUnitToStock(whichUnit, unitId, currentStock, stockMax)
+    jass:AddUnitToStock(whichUnit, unitId, currentStock, stockMax)
 end
 --- 对齐 Blizzard.j：
 -- function RemoveUnitFromStockBJ takes integer unitId, unit whichUnit returns nothing
 --     call RemoveUnitFromStock(whichUnit, unitId)
 -- endfunction
 function ____exports.RemoveUnitFromStockBJ(unitId, whichUnit)
-    jass.RemoveUnitFromStock(whichUnit, unitId)
+    jass:RemoveUnitFromStock(whichUnit, unitId)
 end
 --- 获取物品位置（坐标）
 -- 对应JASS: GetItemLoc
@@ -119,9 +119,9 @@ function ____exports.GetItemLoc(whichItem)
     if whichItem == nil or whichItem == 0 then
         return nil
     end
-    local x = jass.GetItemX(whichItem)
-    local y = jass.GetItemY(whichItem)
-    return jass.Location(x, y)
+    local x = jass:GetItemX(whichItem)
+    local y = jass:GetItemY(whichItem)
+    return jass:Location(x, y)
 end
 --- 在指定位置创建物品
 -- 对应JASS: CreateItemLoc
@@ -129,9 +129,9 @@ function ____exports.CreateItemLoc(itemId, loc)
     if loc == nil or loc == 0 then
         return nil
     end
-    local x = jass.GetLocationX(loc)
-    local y = jass.GetLocationY(loc)
-    return jass.CreateItem(itemId, x, y)
+    local x = jass:GetLocationX(loc)
+    local y = jass:GetLocationY(loc)
+    return jass:CreateItem(itemId, x, y)
 end
 --- 设置物品位置
 -- 对应JASS: SetItemPositionLoc
@@ -142,9 +142,9 @@ function ____exports.SetItemPositionLoc(whichItem, loc)
     if loc == nil or loc == 0 then
         return
     end
-    local x = jass.GetLocationX(loc)
-    local y = jass.GetLocationY(loc)
-    jass.SetItemPosition(whichItem, x, y)
+    local x = jass:GetLocationX(loc)
+    local y = jass:GetLocationY(loc)
+    jass:SetItemPosition(whichItem, x, y)
 end
 --- 单位在指定坐标丢弃物品
 -- 对应JASS: UnitDropItemPointLoc
@@ -158,9 +158,9 @@ function ____exports.UnitDropItemPointLoc(whichUnit, whichItem, loc)
     if loc == nil or loc == 0 then
         return false
     end
-    local x = jass.GetLocationX(loc)
-    local y = jass.GetLocationY(loc)
-    return jass.UnitDropItemPoint(whichUnit, whichItem, x, y)
+    local x = jass:GetLocationX(loc)
+    local y = jass:GetLocationY(loc)
+    return jass:UnitDropItemPoint(whichUnit, whichItem, x, y)
 end
 --- 单位在指定坐标使用物品
 -- 对应JASS: UnitUseItemPointLoc
@@ -174,9 +174,9 @@ function ____exports.UnitUseItemPointLoc(whichUnit, whichItem, loc)
     if loc == nil or loc == 0 then
         return false
     end
-    local x = jass.GetLocationX(loc)
-    local y = jass.GetLocationY(loc)
-    jass.UnitUseItemPoint(whichUnit, whichItem, x, y)
+    local x = jass:GetLocationX(loc)
+    local y = jass:GetLocationY(loc)
+    jass:UnitUseItemPoint(whichUnit, whichItem, x, y)
     return true
 end
 return ____exports

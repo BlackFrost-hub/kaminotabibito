@@ -45,31 +45,31 @@ ____exports["注册技能显示名称覆盖"] = function(unitRawId, abilityRawId
 end
 local function getAbilityName(unit, abilityId, level)
     if type(japi.DzGetUnitAbilityTip) == "function" then
-        return japi.DzGetUnitAbilityTip(unit, abilityId) or ""
+        return japi:DzGetUnitAbilityTip(unit, abilityId) or ""
     end
-    local abil = japi.EXGetUnitAbility(unit, abilityId)
+    local abil = japi:EXGetUnitAbility(unit, abilityId)
     if not abil then
         return ""
     end
-    return japi.EXGetAbilityDataString(abil, level, 215) or ""
+    return japi:EXGetAbilityDataString(abil, level, 215) or ""
 end
 local function onSpellChannel(castingUnit, spellAbilityId)
     if type(CreateFloatTextOnUnit) ~= "function" then
         return
     end
-    if jass.IsUnitType(castingUnit, jass.UNIT_TYPE_MECHANICAL) then
+    if jass:IsUnitType(castingUnit, jass.UNIT_TYPE_MECHANICAL) then
         return
     end
-    if jass.IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT) then
+    if jass:IsUnitType(castingUnit, jass.UNIT_TYPE_ANCIENT) then
         return
     end
-    local orderId = jass.GetUnitCurrentOrder(castingUnit)
+    local orderId = jass:GetUnitCurrentOrder(castingUnit)
     if ITEM_USE_ORDER_IDS:has(orderId) then
         return
     end
-    local level = jass.GetUnitAbilityLevel(castingUnit, spellAbilityId)
+    local level = jass:GetUnitAbilityLevel(castingUnit, spellAbilityId)
     local skillName = _____6280_80FD_663E_793A_540D_79F0_8986_76D6_8868[_____6280_80FD_663E_793A_540D_79F0_8986_76D6_952E(
-        jass.GetUnitTypeId(castingUnit),
+        jass:GetUnitTypeId(castingUnit),
         spellAbilityId
     )] or getAbilityName(castingUnit, spellAbilityId, level)
     if not skillName then

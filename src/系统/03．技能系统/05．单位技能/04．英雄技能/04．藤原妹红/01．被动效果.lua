@@ -50,7 +50,7 @@ local _____88AB_52A8_6280_80FDID = stringToFourCCSafe(_____85E4_539F_59B9_7EA2_5
 local GetUnitStateJapi = japi.GetUnitState
 local _____88AB_52A8_72B6_6001_8868 = {}
 local function _____53D6_5355_4F4D_53E5_67C4ID(unit)
-    return (unit == nil or unit == 0) and 0 or (jass.GetHandleId(unit) or 0)
+    return (unit == nil or unit == 0) and 0 or (jass:GetHandleId(unit) or 0)
 end
 local function _____53D6_88AB_52A8_72B6_6001(unit)
     return _____88AB_52A8_72B6_6001_8868[_____53D6_5355_4F4D_53E5_67C4ID(unit)]
@@ -90,9 +90,9 @@ local function _____88AB_52A8_514D_75AB_4F24_5BB3_8FC7_6EE4(context)
     return (____opt_17 and ____opt_17["重生中"]) == true
 end
 local function _____88AB_52A8_91CD_751F_76EE_6807_5141_8BB8_547D_4E2D(source, target)
-    return _____5355_4F4D_5B58_6D3B(target) and not IsUnitType(target, UNIT_TYPE_ANCIENT) and not IsUnitType(target, UNIT_TYPE_MECHANICAL) and not IsUnitType(target, UNIT_TYPE_STRUCTURE) and jass.IsUnitEnemy(
+    return _____5355_4F4D_5B58_6D3B(target) and not IsUnitType(target, UNIT_TYPE_ANCIENT) and not IsUnitType(target, UNIT_TYPE_MECHANICAL) and not IsUnitType(target, UNIT_TYPE_STRUCTURE) and jass:IsUnitEnemy(
         target,
-        jass.GetOwningPlayer(source)
+        jass:GetOwningPlayer(source)
     )
 end
 local function _____51C6_5907_88AB_52A8_91CD_751F_4F24_5BB3(target, _index, variable)
@@ -243,7 +243,7 @@ local function _____521D_59CB_5316_5DF2_6CE8_518C_85E4_539F_59B9_7EA2()
     do
         local i = 0
         while i < 16 do
-            _____521B_5EFA_85E4_539F_59B9_7EA2_88AB_52A8_72B6_6001(getRegisteredPlayerHero(jass.Player(i)))
+            _____521B_5EFA_85E4_539F_59B9_7EA2_88AB_52A8_72B6_6001(getRegisteredPlayerHero(jass:Player(i)))
             i = i + 1
         end
     end

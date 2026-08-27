@@ -21,7 +21,7 @@ function _____64AD_653ER_5168_5C40_97F3_6548(soundKey)
     if sound == nil or sound == 0 then
         return
     end
-    jass.StartSound(sound)
+    jass:StartSound(sound)
 end
 function _____79FB_9664_5355_4F4D_58F3(unit)
     if unit ~= nil and unit ~= 0 and GetUnitTypeId(unit) ~= 0 then
@@ -447,7 +447,7 @@ end
 local function _____91CA_653ER(entry, caster, _____6280_80FD_5B9E_4F8BID)
     if entry["距离"] < _____914D_7F6E.R["最低施法距离"] then
         SetUnitAnimation(caster, "stand")
-        jass.DisplayTimedTextToPlayer(
+        jass:DisplayTimedTextToPlayer(
             GetOwningPlayer(caster),
             0,
             0,

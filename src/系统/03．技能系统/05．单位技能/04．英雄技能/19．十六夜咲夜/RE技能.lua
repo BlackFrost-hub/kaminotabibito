@@ -41,7 +41,7 @@ local function ____RE_89E3_9664_77ED_6682_505C(variable)
     end
     _____79FB_9664_5355_4F4D_6682_505C(data["单位"], data["来源"])
     if _____5355_4F4D_5B58_6D3B(data["单位"]) then
-        jass.SetUnitVertexColor(
+        jass:SetUnitVertexColor(
             data["单位"],
             255,
             255,
@@ -68,7 +68,7 @@ local function ____RE_679A_4E3E_76EE_6807(state, x, y, radius)
             ["允许古树"] = true,
             ["允许无敌"] = true,
             ["仅敌人"] = true,
-            ["自定义条件"] = function(____, u) return not jass.IsUnitType(u, jass.UNIT_TYPE_ANCIENT) and state["已命中"][jass.GetHandleId(u)] ~= true end
+            ["自定义条件"] = function(____, u) return not jass:IsUnitType(u, jass.UNIT_TYPE_ANCIENT) and state["已命中"][jass:GetHandleId(u)] ~= true end
         }
     )
 end
@@ -85,7 +85,7 @@ local function _____7ED3_675FRE(state)
     _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(state["技能实例ID"])
 end
 local function ____RE_547D_4E2D(state, target)
-    state["已命中"][jass.GetHandleId(target)] = true
+    state["已命中"][jass:GetHandleId(target)] = true
     state["命中次数"] = state["命中次数"] + 1
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = state["施法者"],
@@ -101,9 +101,9 @@ local function ____RE_547D_4E2D(state, target)
         ["技能ID"] = _____914D_7F6E["技能"].RE["类型ID"],
         ["技能实例ID"] = state["技能实例ID"]
     })
-    local source = (("十六夜咲夜-RE:" .. tostring(state["技能实例ID"] or jass.GetHandleId(state["飞刀"]))) .. ":") .. tostring(state["命中次数"])
+    local source = (("十六夜咲夜-RE:" .. tostring(state["技能实例ID"] or jass:GetHandleId(state["飞刀"]))) .. ":") .. tostring(state["命中次数"])
     _____6DFB_52A0_5355_4F4D_6682_505C(target, source)
-    jass.SetUnitVertexColor(
+    jass:SetUnitVertexColor(
         target,
         255,
         255,
@@ -117,23 +117,23 @@ local function ____RE_547D_4E2D(state, target)
     end
     local candidates = ____RE_679A_4E3E_76EE_6807(
         state,
-        jass.GetUnitX(target),
-        jass.GetUnitY(target),
+        jass:GetUnitX(target),
+        jass:GetUnitY(target),
         _____914D_7F6E.RE["搜索半径"]
     )
     if #candidates <= 0 then
         _____7ED3_675FRE(state)
         return
     end
-    state["当前目标"] = candidates[jass.GetRandomInt(0, #candidates - 1) + 1]
+    state["当前目标"] = candidates[jass:GetRandomInt(0, #candidates - 1) + 1]
     state["角度"] = _____4E24_70B9_89D2_5EA6(
-        jass.GetUnitX(state["飞刀"]),
-        jass.GetUnitY(state["飞刀"]),
-        jass.GetUnitX(state["当前目标"]),
-        jass.GetUnitY(state["当前目标"])
+        jass:GetUnitX(state["飞刀"]),
+        jass:GetUnitY(state["飞刀"]),
+        jass:GetUnitX(state["当前目标"]),
+        jass:GetUnitY(state["当前目标"])
     )
     state["每Tick位移"] = _____914D_7F6E.RE["锁定后步长"]
-    jass.SetUnitFacing(state["飞刀"], state["角度"])
+    jass:SetUnitFacing(state["飞刀"], state["角度"])
 end
 local function _____63A8_8FDBRE(variable)
     local state = variable
@@ -146,25 +146,25 @@ local function _____63A8_8FDBRE(variable)
     end
     if state["当前目标"] ~= nil and state["当前目标"] ~= 0 and _____5355_4F4D_5B58_6D3B(state["当前目标"]) then
         state["角度"] = _____4E24_70B9_89D2_5EA6(
-            jass.GetUnitX(state["飞刀"]),
-            jass.GetUnitY(state["飞刀"]),
-            jass.GetUnitX(state["当前目标"]),
-            jass.GetUnitY(state["当前目标"])
+            jass:GetUnitX(state["飞刀"]),
+            jass:GetUnitY(state["飞刀"]),
+            jass:GetUnitX(state["当前目标"]),
+            jass:GetUnitY(state["当前目标"])
         )
-        jass.SetUnitFacing(state["飞刀"], state["角度"])
+        jass:SetUnitFacing(state["飞刀"], state["角度"])
     end
     local x = _____6781_5750_6807X(
-        jass.GetUnitX(state["飞刀"]),
+        jass:GetUnitX(state["飞刀"]),
         state["每Tick位移"],
         state["角度"]
     )
     local y = _____6781_5750_6807Y(
-        jass.GetUnitY(state["飞刀"]),
+        jass:GetUnitY(state["飞刀"]),
         state["每Tick位移"],
         state["角度"]
     )
-    jass.SetUnitX(state["飞刀"], x)
-    jass.SetUnitY(state["飞刀"], y)
+    jass:SetUnitX(state["飞刀"], x)
+    jass:SetUnitY(state["飞刀"], y)
     state["已飞行距离"] = state["已飞行距离"] + state["每Tick位移"]
     local targets = ____RE_679A_4E3E_76EE_6807(state, x, y, _____914D_7F6E.RE["命中半径"])
     if #targets > 0 then
@@ -173,13 +173,13 @@ local function _____63A8_8FDBRE(variable)
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRE(_listener, caster, _____6280_80FD_5B9E_4F8BID)
     _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(caster, _____914D_7F6E["符卡间隔秒"].RE)
-    local x = jass.GetUnitX(caster)
-    local y = jass.GetUnitY(caster)
+    local x = jass:GetUnitX(caster)
+    local y = jass:GetUnitY(caster)
     local angle = _____4E24_70B9_89D2_5EA6(
         x,
         y,
-        jass.GetSpellTargetX(),
-        jass.GetSpellTargetY()
+        jass:GetSpellTargetX(),
+        jass:GetSpellTargetY()
     )
     local knife = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
         caster,
@@ -215,7 +215,7 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRE(_listener, caster, ____
         end,
         ["设置角度"] = function(value)
             state["角度"] = value
-            jass.SetUnitFacing(knife, value)
+            jass:SetUnitFacing(knife, value)
         end,
         ["取每Tick位移"] = function()
             return state["每Tick位移"]

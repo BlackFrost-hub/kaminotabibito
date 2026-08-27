@@ -5,6 +5,8 @@
 > 游戏内路径统一从 `Common\Effect\...` 开始，不带 `imports\` 前缀。
 >
 > 详细条目按导入目录拆分在 [`effect-asset-catalog/`](effect-asset-catalog/README.md)，本文件只保留总入口和通用规则。
+>
+> 边界：`imports\Common\Decoration` 的动态装饰物不属于 `Common\Effect`，不计入本目录模型统计；装饰物统一登记在 [`decoration-asset-catalog.md`](decoration-asset-catalog.md)。
 
 ## 用途
 
@@ -26,22 +28,23 @@
 | 元素特效 | [`effect-asset-catalog/element/README.md`](effect-asset-catalog/element/README.md) | `imports\Common\Effect\Element` |
 | 弹道特效 | [`effect-asset-catalog/projectile/README.md`](effect-asset-catalog/projectile/README.md) | `imports\Common\Effect\Projectile` |
 | 闪电定义与贴图 | [`effect-asset-catalog/lightning/README.md`](effect-asset-catalog/lightning/README.md) | `imports\Splats` + `imports\Common\Effect\Lightning` |
+| 动态装饰物（独立目录） | [`decoration-asset-catalog.md`](decoration-asset-catalog.md) | `imports\Common\Decoration`，不计入本特效库统计 |
 | 去重与维护 | [`effect-asset-catalog/maintenance.md`](effect-asset-catalog/maintenance.md) | 跨分类维护规则 |
 
 新增详细条目时必须写入对应分类文件；禁止再把条目表追加到本入口文件。
 
 ## 当前覆盖
 
-截至 2026-07-29，本轮已记录候选迁移并按 `.mdx` 实际文件重新统计：
+截至 2026-08-27，按 `.mdx` 实际文件重新统计：
 
 | 一级分类 | 模型数量 |
 | --- | ---: |
-| `Element` | 86 |
-| `Form` | 170 |
-| `Projectile` | 8 |
-| 合计 | 263 |
+| `Element` | 119 |
+| `Form` | 266 |
+| `Projectile` | 30 |
+| 合计 | 415 |
 
-本表只统计 `.mdx`，不把 366 张 `.blp` 贴图计作模型。其余未确认资源在实际预览或使用时逐步补入，不凭文件名一次性猜测外观。
+本表只统计 `Common\Effect` 下的 `.mdx`，不把贴图或 `Common\Decoration` 装饰物计作特效模型。其余未确认资源在实际预览或使用时逐步补入，不凭文件名一次性猜测外观。
 
 ## 使用方法
 

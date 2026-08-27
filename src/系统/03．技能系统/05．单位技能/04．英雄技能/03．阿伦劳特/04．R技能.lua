@@ -320,7 +320,7 @@ local function _____5149_7948_7977_5B8C_6210(_____65BD_6CD5_8005, rctx)
         if fx ~= nil and fx ~= 0 then
             do
                 pcall(function()
-                    japi.EXSetEffectSpeed(fx, 0.5)
+                    japi:EXSetEffectSpeed(fx, 0.5)
                 end)
             end
         end

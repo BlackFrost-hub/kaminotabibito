@@ -21,6 +21,11 @@ import { 欧尔贝克Buff表 } from "./17．欧尔贝克";
 import { 云端Buff表 } from "./18．云端";
 import { 十六夜咲夜Buff表 } from "./19．十六夜咲夜";
 import { 爱蜜莉雅Buff表 } from "./20．爱蜜莉雅";
+import { 朱雀院红叶Buff表 } from "./21．朱雀院红叶";
+import { 朱雀院椿Buff表 } from "./22．朱雀院椿";
+import { 伊蕾娜Buff表 } from "./23．伊蕾娜";
+import { 塞莉亚Buff表 } from "./24．塞莉亚·克莱尔";
+import { 芙莉莲Buff表 } from "./25．芙莉莲";
 
 // 英雄专属 Buff。后续按单英雄拆文件，并在这里聚合。
 export const 英雄Buff表: Record<string, BuffData> = {
@@ -44,6 +49,11 @@ export const 英雄Buff表: Record<string, BuffData> = {
   ...云端Buff表,
   ...十六夜咲夜Buff表,
   ...爱蜜莉雅Buff表,
+  ...朱雀院红叶Buff表,
+  ...朱雀院椿Buff表,
+  ...伊蕾娜Buff表,
+  ...塞莉亚Buff表,
+  ...芙莉莲Buff表,
 };
 
 export * from "./01．提米诺斯";
@@ -66,5 +76,10 @@ export * from "./17．欧尔贝克";
 export * from "./18．云端";
 export * from "./19．十六夜咲夜";
 export * from "./20．爱蜜莉雅";
+export * from "./21．朱雀院红叶";
+export * from "./22．朱雀院椿";
+export * from "./23．伊蕾娜";
+export * from "./24．塞莉亚·克莱尔";
+export * from "./25．芙莉莲";
 
 export default 英雄Buff表;

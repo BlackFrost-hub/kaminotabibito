@@ -85,7 +85,7 @@ local function _____83B7_53D6_6216_521B_5EFAA0KR_4E0A_4E0B_6587(unit)
 end
 local function ____A0KR_76EE_6807_5141_8BB8(caster, target, context)
     local targetId = _____53D6_5355_4F4DID(target)
-    return targetId ~= 0 and context["已命中"][targetId] ~= true and _____5355_4F4D_5B58_6D3B(target) and not IsUnitType(target, UNIT_TYPE_ANCIENT) and not IsUnitType(target, UNIT_TYPE_MECHANICAL) and not IsUnitType(target, UNIT_TYPE_STRUCTURE) and jass.IsUnitEnemy(
+    return targetId ~= 0 and context["已命中"][targetId] ~= true and _____5355_4F4D_5B58_6D3B(target) and not IsUnitType(target, UNIT_TYPE_ANCIENT) and not IsUnitType(target, UNIT_TYPE_MECHANICAL) and not IsUnitType(target, UNIT_TYPE_STRUCTURE) and jass:IsUnitEnemy(
         target,
         GetOwningPlayer(caster)
     ) == true

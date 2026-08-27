@@ -5,9 +5,14 @@ import type { 英雄技能距离修正上下文 } from "../../../04．机制组�
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha as ((effect: any, alpha: number) => void) | undefined;
+const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, scale: number) => void) | undefined;
+const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+};
+const { EC_GetPointZ } = require("lib.扩展函数.Star扩展函数.04．EC扩展库") as {
+  EC_GetPointZ: (this: void, x: number, y: number) => number;
 };
 const jglobals = require("jass.globals") as any;
 const { X_GAFC, X_IsTerrainWalkable, X_IsUnitTerrainWalkable, X_GetAbleX, X_GetAbleY } = require("lib.扩展函数.Star扩展函数.Star扩展库.06．X库函数") as {
@@ -84,6 +89,12 @@ export interface 通用位移参数 {
   禁用碰撞?: boolean;
   位移特效?: string;
   附加位移特效?: string;
+  位移特效缩放?: number;
+  位移特效高度?: number;
+  位移特效持续秒?: number;
+  附加位移特效缩放?: number;
+  附加位移特效高度?: number;
+  附加位移特效持续秒?: number;
 
   命中半径?: number;
   只命中敌人?: boolean;
@@ -138,6 +149,12 @@ export interface 位移实例 {
   禁用碰撞: boolean;
   位移特效: string;
   附加位移特效: string;
+  位移特效缩放: number;
+  位移特效高度: number;
+  位移特效持续秒: number;
+  附加位移特效缩放: number;
+  附加位移特效高度: number;
+  附加位移特效持续秒: number;
   命中半径: number;
   只命中敌人: boolean;
   允许命中自己: boolean;
@@ -237,15 +254,19 @@ export function 单位已被暂停(单位: any): boolean {
 }
 
 export function 播放位移特效(实例: 位移实例): void {
-  播放单个位移特效(实例.位移特效, 实例);
-  播放单个位移特效(实例.附加位移特效, 实例);
+  播放单个位移特效(实例.位移特效, 实例, 实例.位移特效缩放, 实例.位移特效高度, 实例.位移特效持续秒);
+  播放单个位移特效(实例.附加位移特效, 实例, 实例.附加位移特效缩放, 实例.附加位移特效高度, 实例.附加位移特效持续秒);
 }
 
-function 播放单个位移特效(模型: string, 实例: 位移实例): void {
+function 播放单个位移特效(模型: string, 实例: 位移实例, 缩放: number, 高度: number, 持续秒: number): void {
   if (模型 == null || 模型 === "") return;
-  const 特效 = jass.AddSpecialEffect(模型, jass.GetUnitX(实例.单位) as number, jass.GetUnitY(实例.单位) as number);
+  const x = jass.GetUnitX(实例.单位) as number;
+  const y = jass.GetUnitY(实例.单位) as number;
+  const 特效 = jass.AddSpecialEffect(模型, x, y);
   if (特效 != null && 特效 !== 0) {
-    addDelayedCallback(300, 冲锋位移特效到期, 特效);
+    if (typeof EXSetEffectSize === "function") EXSetEffectSize(特效, 缩放);
+    if (typeof EXSetEffectZ === "function") EXSetEffectZ(特效, EC_GetPointZ(x, y) + 高度);
+    addDelayedCallback((持续秒 > 0 ? 持续秒 : 0.3) * 1000, 冲锋位移特效到期, 特效);
   }
 }
 

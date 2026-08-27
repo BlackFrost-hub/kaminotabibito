@@ -26,7 +26,7 @@ function _____53CB_65B9_5171_540C_6D88_5931(variable)
         return
     end
     context["友方已隐藏"] = true
-    jass.ShowUnit(context["目标"], false)
+    jass:ShowUnit(context["目标"], false)
     local _____5269_4F59_79D2 = (context["到期时间"] - getGameTime()) / 1000
     registerManualBuff(
         context["目标"],
@@ -83,12 +83,12 @@ local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local PATHING_TYPE_WALKABILITY = jass.PATHING_TYPE_WALKABILITY
 local _____795E_9690_4E0A_4E0B_6587_8868 = {}
 local function _____5355_4F4D_6709_6548(unit)
-    return unit ~= nil and unit ~= 0 and jass.GetUnitTypeId(unit) ~= 0
+    return unit ~= nil and unit ~= 0 and jass:GetUnitTypeId(unit) ~= 0
 end
 local function _____53E5_67C4ID(unit)
     local _____5355_4F4D_6709_6548_result_13
     if _____5355_4F4D_6709_6548(unit) then
-        _____5355_4F4D_6709_6548_result_13 = jass.GetHandleId(unit)
+        _____5355_4F4D_6709_6548_result_13 = jass:GetHandleId(unit)
     else
         _____5355_4F4D_6709_6548_result_13 = 0
     end
@@ -144,7 +144,7 @@ local function _____8C03_6574E_51B7_5374(variable)
 end
 local function _____9690_85CF_516B_4E91_7D2B(context)
     local hero = context["英雄"]
-    jass.SetUnitVertexColor(
+    jass:SetUnitVertexColor(
         hero,
         255,
         255,
@@ -152,13 +152,13 @@ local function _____9690_85CF_516B_4E91_7D2B(context)
         0
     )
     _____5355_4F4D_6269_5C55__8BBE_79FB_52A8_7C7B_578B(hero, 1)
-    jass.SetUnitScale(hero, _____914D_7F6E.E["隐藏缩放"], _____914D_7F6E.E["隐藏缩放"], _____914D_7F6E.E["隐藏缩放"])
-    jass.SetUnitAcquireRange(hero, 0)
-    jass.SetUnitInvulnerable(hero, true)
+    jass:SetUnitScale(hero, _____914D_7F6E.E["隐藏缩放"], _____914D_7F6E.E["隐藏缩放"], _____914D_7F6E.E["隐藏缩放"])
+    jass:SetUnitAcquireRange(hero, 0)
+    jass:SetUnitInvulnerable(hero, true)
     _____521B_5EFA_516B_4E91_7D2B_70B9_7279_6548(
         _____914D_7F6E.E["消失特效"],
-        jass.GetUnitX(hero),
-        jass.GetUnitY(hero),
+        jass:GetUnitX(hero),
+        jass:GetUnitY(hero),
         1.5,
         _____914D_7F6E.E["消失特效缩放"],
         _____914D_7F6E.E["消失特效高度"]
@@ -169,8 +169,8 @@ local function _____6062_590D_516B_4E91_7D2B(context)
     if not _____5355_4F4D_6709_6548(hero) then
         return
     end
-    jass.ShowUnit(hero, true)
-    jass.SetUnitVertexColor(
+    jass:ShowUnit(hero, true)
+    jass:SetUnitVertexColor(
         hero,
         255,
         255,
@@ -178,33 +178,33 @@ local function _____6062_590D_516B_4E91_7D2B(context)
         255
     )
     _____5355_4F4D_6269_5C55__8BBE_79FB_52A8_7C7B_578B(hero, 2)
-    jass.SetUnitScale(hero, _____914D_7F6E.E["恢复缩放"], _____914D_7F6E.E["恢复缩放"], _____914D_7F6E.E["恢复缩放"])
-    jass.SetUnitAcquireRange(hero, _____914D_7F6E.E["恢复索敌范围"])
-    jass.SetUnitInvulnerable(hero, context["原始无敌"])
+    jass:SetUnitScale(hero, _____914D_7F6E.E["恢复缩放"], _____914D_7F6E.E["恢复缩放"], _____914D_7F6E.E["恢复缩放"])
+    jass:SetUnitAcquireRange(hero, _____914D_7F6E.E["恢复索敌范围"])
+    jass:SetUnitInvulnerable(hero, context["原始无敌"])
     _____79FB_9664_5355_4F4D_6682_505C(hero, ____E_6682_505C_6765_6E90)
 end
 local function _____83B7_53D6_654C_65B9_80CC_540E_70B9(target)
-    local _____80CC_540E_89D2_5EA6 = jass.GetUnitFacing(target) + 180
+    local _____80CC_540E_89D2_5EA6 = jass:GetUnitFacing(target) + 180
     local distance = _____914D_7F6E.E["敌方背后距离"]
     local x = _____6781_5750_6807X(
-        jass.GetUnitX(target),
+        jass:GetUnitX(target),
         _____80CC_540E_89D2_5EA6,
         distance
     )
     local y = _____6781_5750_6807Y(
-        jass.GetUnitY(target),
+        jass:GetUnitY(target),
         _____80CC_540E_89D2_5EA6,
         distance
     )
-    if jass.IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY) == true then
+    if jass:IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY) == true then
         distance = _____914D_7F6E.E["敌方阻挡回退距离"]
         x = _____6781_5750_6807X(
-            jass.GetUnitX(target),
+            jass:GetUnitX(target),
             _____80CC_540E_89D2_5EA6,
             distance
         )
         y = _____6781_5750_6807Y(
-            jass.GetUnitY(target),
+            jass:GetUnitY(target),
             _____80CC_540E_89D2_5EA6,
             distance
         )
@@ -219,7 +219,7 @@ local function _____7ED3_7B97_654C_65B9_5206_652F(context)
     local point = _____83B7_53D6_654C_65B9_80CC_540E_70B9(target)
     context["出现X"] = point.x
     context["出现Y"] = point.y
-    jass.SetUnitPosition(context["英雄"], point.x, point.y)
+    jass:SetUnitPosition(context["英雄"], point.x, point.y)
     _____64AD_653E_516B_4E91_7D2B_5355_4F4D_97F3_6548(context["英雄"], _____914D_7F6E.E["敌方出现语音键"])
     _____521B_5EFAE_88C2_9699(context["英雄"], point.x, point.y, context["技能实例ID"])
     _____65BD_52A0_7729_6655(
@@ -231,15 +231,15 @@ local function _____7ED3_7B97_654C_65B9_5206_652F(context)
     )
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____914D_7F6E.E["敌方结算特效"],
-        X = jass.GetUnitX(target),
-        Y = jass.GetUnitY(target),
+        X = jass:GetUnitX(target),
+        Y = jass:GetUnitY(target),
         Z = _____914D_7F6E.E["敌方结算特效高度"],
         ["缩放"] = _____914D_7F6E.E["敌方结算特效缩放"],
         ["动画速度"] = _____914D_7F6E.E["敌方结算特效速度"],
         ["持续秒"] = _____914D_7F6E.E["敌方结算特效持续秒"]
     })
     local attack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(context["英雄"])
-    local _____7F3A_5931_751F_547D = jass.GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass.GetUnitState(target, UNIT_STATE_LIFE)
+    local _____7F3A_5931_751F_547D = jass:GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass:GetUnitState(target, UNIT_STATE_LIFE)
     local missingLife = _____7F3A_5931_751F_547D > 0 and _____7F3A_5931_751F_547D or 0
     _____9020_6210E_4F24_5BB3(context, target, attack * _____914D_7F6E.E["敌方额外伤害攻击力比例"] + missingLife * _____914D_7F6E.E["敌方已损失生命比例"], "八云紫-E-敌方神隐突袭")
 end
@@ -247,8 +247,8 @@ local function _____7ED3_7B97_6700_7EC8_5C55_5F00(context)
     if not _____516B_4E91_7D2B_5355_4F4D_5B58_6D3B(context["英雄"]) then
         return
     end
-    local heroX = jass.GetUnitX(context["英雄"])
-    local heroY = jass.GetUnitY(context["英雄"])
+    local heroX = jass:GetUnitX(context["英雄"])
+    local heroY = jass:GetUnitY(context["英雄"])
     _____521B_5EFA_516B_4E91_7D2B_70B9_7279_6548(_____914D_7F6E.E["出现特效"], heroX, heroY, 1.5)
     local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(context["英雄"]) * _____914D_7F6E.E["最终伤害攻击力比例"]
     local enemies = getEnemyUnitsInRange(context["英雄"], heroX, heroY, _____914D_7F6E.E["最终范围"])
@@ -273,29 +273,29 @@ local function _____7ED3_675F_795E_9690(context, _____7ED3_7B97_4F24_5BB3)
         __TS__Delete(_____795E_9690_4E0A_4E0B_6587_8868, heroId)
     end
     _____8BBE_7F6E_516B_4E91_7D2BE_671F_95F4D_6392_65A5_8C41_514D(context["英雄"], false)
-    jass.SetPlayerAbilityAvailable(
-        jass.GetOwningPlayer(context["英雄"]),
+    jass:SetPlayerAbilityAvailable(
+        jass:GetOwningPlayer(context["英雄"]),
         _____914D_7F6E["技能"].E["类型ID"],
         true
     )
-    jass.UnitRemoveAbility(context["英雄"], _____914D_7F6E["技能"]["E出现"]["类型ID"])
+    jass:UnitRemoveAbility(context["英雄"], _____914D_7F6E["技能"]["E出现"]["类型ID"])
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["英雄"], _____516B_4E91_7D2BBuffID["神隐"])
     if context["友方已隐藏"] and _____5355_4F4D_6709_6548(context["目标"]) then
-        jass.ShowUnit(context["目标"], true)
+        jass:ShowUnit(context["目标"], true)
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["目标"], _____516B_4E91_7D2BBuffID["神隐"])
     end
     if _____7ED3_7B97_4F24_5BB3 and context["方式"] == "敌方" then
         _____7ED3_7B97_654C_65B9_5206_652F(context)
     elseif context["方式"] == "裂隙" then
-        jass.SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
+        jass:SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
     elseif context["方式"] == "友方" and _____5355_4F4D_6709_6548(context["目标"]) then
-        context["出现X"] = jass.GetUnitX(context["目标"])
-        context["出现Y"] = jass.GetUnitY(context["目标"])
-        jass.SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
-        jass.SetUnitPosition(context["目标"], context["出现X"], context["出现Y"])
+        context["出现X"] = jass:GetUnitX(context["目标"])
+        context["出现Y"] = jass:GetUnitY(context["目标"])
+        jass:SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
+        jass:SetUnitPosition(context["目标"], context["出现X"], context["出现Y"])
         _____79FB_9664_5355_4F4D_8D1F_9762Buff(context["目标"], false)
     elseif context["方式"] ~= "自身" then
-        jass.SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
+        jass:SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
     end
     _____6062_590D_516B_4E91_7D2B(context)
     if _____7ED3_7B97_4F24_5BB3 then
@@ -320,10 +320,10 @@ local function _____53CB_65B9_795E_9690_5230_8FBE(variable)
     if context == nil or context["已结束"] or not _____516B_4E91_7D2B_5355_4F4D_5B58_6D3B(context["目标"]) then
         return
     end
-    context["出现X"] = jass.GetUnitX(context["目标"])
-    context["出现Y"] = jass.GetUnitY(context["目标"])
+    context["出现X"] = jass:GetUnitX(context["目标"])
+    context["出现Y"] = jass:GetUnitY(context["目标"])
     _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(context["英雄"], _____914D_7F6E.E["友方出现语音键"])
-    jass.SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
+    jass:SetUnitPosition(context["英雄"], context["出现X"], context["出现Y"])
     _____521B_5EFA_516B_4E91_7D2B_70B9_7279_6548(_____914D_7F6E.E["出现特效"], context["出现X"], context["出现Y"], 1.5)
     _____521B_5EFAE_88C2_9699(context["英雄"], context["出现X"], context["出现Y"], context["技能实例ID"])
     addDelayedCallback(_____914D_7F6E.E["友方消失延迟秒"] * 1000, _____53CB_65B9_5171_540C_6D88_5931, context)
@@ -337,12 +337,12 @@ local function _____8FDB_5165_795E_9690(context, _____51CF_5C11_51B7_5374_6BD4_4
     _____795E_9690_4E0A_4E0B_6587_8868[heroId] = context
     _____8BBE_7F6E_516B_4E91_7D2BE_671F_95F4D_6392_65A5_8C41_514D(context["英雄"], true)
     _____9690_85CF_516B_4E91_7D2B(context)
-    jass.SetPlayerAbilityAvailable(
-        jass.GetOwningPlayer(context["英雄"]),
+    jass:SetPlayerAbilityAvailable(
+        jass:GetOwningPlayer(context["英雄"]),
         _____914D_7F6E["技能"].E["类型ID"],
         false
     )
-    jass.UnitAddAbility(context["英雄"], _____914D_7F6E["技能"]["E出现"]["类型ID"])
+    jass:UnitAddAbility(context["英雄"], _____914D_7F6E["技能"]["E出现"]["类型ID"])
     registerManualBuff(
         context["英雄"],
         _____516B_4E91_7D2BBuffID["神隐"],
@@ -363,43 +363,43 @@ local function _____83B7_53D6E_76D1_542C_4E0A_4E0B_6587(hero)
     return _____662F_516B_4E91_7D2B(hero) and ({["英雄"] = hero}) or nil
 end
 local function _____91CA_653EE(_entry, hero, skillInstanceId)
-    local target = jass.GetSpellTargetUnit()
-    local targetX = jass.GetSpellTargetX()
-    local targetY = jass.GetSpellTargetY()
+    local target = jass:GetSpellTargetUnit()
+    local targetX = jass:GetSpellTargetX()
+    local targetY = jass:GetSpellTargetY()
     local now = getGameTime()
     local mode
     local gap
     local cooldownReduction = 0
-    local appearX = jass.GetUnitX(hero)
-    local appearY = jass.GetUnitY(hero)
+    local appearX = jass:GetUnitX(hero)
+    local appearY = jass:GetUnitY(hero)
     _____521B_5EFAE_88C2_9699(hero, appearX, appearY, skillInstanceId)
     if target == hero then
         mode = "自身"
         cooldownReduction = _____914D_7F6E.E["自身额外减冷却比例"]
-    elseif target ~= nil and target ~= 0 and jass.IsUnitEnemy(
+    elseif target ~= nil and target ~= 0 and jass:IsUnitEnemy(
         target,
-        jass.GetOwningPlayer(hero)
+        jass:GetOwningPlayer(hero)
     ) == true then
         if not _____662F_516B_4E91_7D2B_5408_6CD5_654C_4EBA(hero, target) then
             return
         end
         mode = "敌方"
-    elseif target ~= nil and target ~= 0 and jass.IsUnitAlly(
+    elseif target ~= nil and target ~= 0 and jass:IsUnitAlly(
         target,
-        jass.GetOwningPlayer(hero)
+        jass:GetOwningPlayer(hero)
     ) == true then
         if not _____516B_4E91_7D2B_5355_4F4D_5B58_6D3B(target) then
             return
         end
         mode = "友方"
         cooldownReduction = _____914D_7F6E.E["友方额外减冷却比例"]
-        appearX = jass.GetUnitX(target)
-        appearY = jass.GetUnitY(target)
+        appearX = jass:GetUnitX(target)
+        appearY = jass:GetUnitY(target)
     else
         gap = _____67E5_627E_516B_4E91_7D2B_88C2_9699(targetX, targetY, _____914D_7F6E.E["裂隙搜索范围"], hero)
         if gap == nil then
-            jass.DisplayTimedTextToPlayer(
-                jass.GetOwningPlayer(hero),
+            jass:DisplayTimedTextToPlayer(
+                jass:GetOwningPlayer(hero),
                 0,
                 0,
                 3,
@@ -410,8 +410,8 @@ local function _____91CA_653EE(_entry, hero, skillInstanceId)
         end
         mode = "裂隙"
         cooldownReduction = _____914D_7F6E.E["裂隙额外减冷却比例"]
-        appearX = jass.GetUnitX(gap["单位"])
-        appearY = jass.GetUnitY(gap["单位"])
+        appearX = jass:GetUnitX(gap["单位"])
+        appearY = jass:GetUnitY(gap["单位"])
     end
     _____8FDB_5165_795E_9690(
         {
@@ -449,9 +449,9 @@ local function _____76D1_542C_81EA_8EAB_795E_9690D_95F4_9699(hero, gap, skillId)
     if context == nil or context["已结束"] or context["方式"] ~= "自身" then
         return
     end
-    context["出现X"] = jass.GetUnitX(gap["单位"])
-    context["出现Y"] = jass.GetUnitY(gap["单位"])
-    jass.SetUnitPosition(hero, context["出现X"], context["出现Y"])
+    context["出现X"] = jass:GetUnitX(gap["单位"])
+    context["出现Y"] = jass:GetUnitY(gap["单位"])
+    jass:SetUnitPosition(hero, context["出现X"], context["出现Y"])
     _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(hero, _____914D_7F6E.E["主动出现语音键"])
     _____7ED3_675F_795E_9690(context, true)
 end

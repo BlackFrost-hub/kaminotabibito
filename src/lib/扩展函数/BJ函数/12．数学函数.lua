@@ -15,32 +15,32 @@ local BJ_RADTODEG = DEFAULT_BJ_RADTODEG
 local BJ_DEGTORAD = DEFAULT_BJ_DEGTORAD
 --- 余弦（角度）
 function ____exports.CosBJ(degrees)
-    return jass.Cos(degrees * BJ_DEGTORAD)
+    return jass:Cos(degrees * BJ_DEGTORAD)
 end
 --- 正弦（角度）
 function ____exports.SinBJ(degrees)
-    return jass.Sin(degrees * BJ_DEGTORAD)
+    return jass:Sin(degrees * BJ_DEGTORAD)
 end
 --- 正切（角度）
 function ____exports.TanBJ(degrees)
     local rad = degrees * BJ_DEGTORAD
-    return jass.Sin(rad) / jass.Cos(rad)
+    return jass:Sin(rad) / jass:Cos(rad)
 end
 --- 反余弦（返回角度）
 function ____exports.AcosBJ(value)
-    return jass.Acos(value) * BJ_RADTODEG
+    return jass:Acos(value) * BJ_RADTODEG
 end
 --- 反正弦（返回角度）
 function ____exports.AsinBJ(value)
-    return jass.Asin(value) * BJ_RADTODEG
+    return jass:Asin(value) * BJ_RADTODEG
 end
 --- 反正切（返回角度）
 function ____exports.AtanBJ(value)
-    return jass.Atan(value) * BJ_RADTODEG
+    return jass:Atan(value) * BJ_RADTODEG
 end
 --- 反正切2（返回角度）
 function ____exports.Atan2BJ(y, x)
-    return jass.Atan2(y, x) * BJ_RADTODEG
+    return jass:Atan2(y, x) * BJ_RADTODEG
 end
 --- 实数绝对值 - RAbsBJ
 function ____exports.RAbsBJ(a)
@@ -52,25 +52,25 @@ function ____exports.RSignBJ(a)
 end
 --- 整数绝对值 - IAbsBJ
 function ____exports.IAbsBJ(a)
-    local ia = jass.R2I(a)
+    local ia = jass:R2I(a)
     return ia < 0 and __TS__Number(-ia) or ia
 end
 --- 整数符号 - ISignBJ（返回 ±1）
 function ____exports.ISignBJ(a)
-    local ia = jass.R2I(a)
+    local ia = jass:R2I(a)
     return ia < 0 and -1 or (ia > 0 and 1 or 0)
 end
 --- 随机百分比 (0-100) - GetRandomPercentageBJ
 function ____exports.GetRandomPercentageBJ()
-    return jass.GetRandomReal(0, 100)
+    return jass:GetRandomReal(0, 100)
 end
 --- 整数取模 - ModuloInteger
 function ____exports.ModuloInteger(dividend, divisor)
-    local d = jass.R2I(divisor)
+    local d = jass:R2I(divisor)
     if d == 0 then
         return 0
     end
-    return jass.R2I(dividend) % d
+    return jass:R2I(dividend) % d
 end
 --- 实数取模 - ModuloReal
 function ____exports.ModuloReal(dividend, divisor)
@@ -85,9 +85,9 @@ function ____exports.AngleBetweenPoints(locA, locB)
     if locA == nil or locB == nil then
         return 0
     end
-    local dx = jass.GetLocationX(locB) - jass.GetLocationX(locA)
-    local dy = jass.GetLocationY(locB) - jass.GetLocationY(locA)
-    return jass.Atan2(dy, dx) * BJ_RADTODEG
+    local dx = jass:GetLocationX(locB) - jass:GetLocationX(locA)
+    local dy = jass:GetLocationY(locB) - jass:GetLocationY(locA)
+    return jass:Atan2(dy, dx) * BJ_RADTODEG
 end
 --- 两点之间距离 - DistanceBetweenPoints
 -- 对应 Blizzard.j: DistanceBetweenPoints
@@ -95,9 +95,9 @@ function ____exports.DistanceBetweenPoints(locA, locB)
     if locA == nil or locB == nil then
         return 0
     end
-    local dx = jass.GetLocationX(locB) - jass.GetLocationX(locA)
-    local dy = jass.GetLocationY(locB) - jass.GetLocationY(locA)
-    return jass.SquareRoot(dx * dx + dy * dy)
+    local dx = jass:GetLocationX(locB) - jass:GetLocationX(locA)
+    local dy = jass:GetLocationY(locB) - jass:GetLocationY(locA)
+    return jass:SquareRoot(dx * dx + dy * dy)
 end
 --- 整数最大值 - IMaxBJ
 function ____exports.IMaxBJ(a, b)
@@ -117,7 +117,7 @@ function ____exports.RMinBJ(a, b)
 end
 --- 百分比转整数 - PercentToInt
 function ____exports.PercentToInt(percentage, max)
-    return jass.R2I(percentage * 0.01 * max)
+    return jass:R2I(percentage * 0.01 * max)
 end
 --- 百分比转255 - PercentTo255
 function ____exports.PercentTo255(percentage)

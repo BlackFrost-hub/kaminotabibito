@@ -35,13 +35,13 @@ local function toMessagePart(value)
     if value == nil then
         return "nil"
     end
-    return tostring(value)
+    return tostring(nil, value)
 end
 local function normalizeModuleName(module)
     if module == nil or module == "" then
         return "未标记模块"
     end
-    return tostring(module)
+    return tostring(nil, module)
 end
 local function joinMessageParts(args)
     local parts = {}

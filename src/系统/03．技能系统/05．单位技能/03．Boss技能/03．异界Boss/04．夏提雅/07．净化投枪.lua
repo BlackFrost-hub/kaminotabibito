@@ -114,7 +114,7 @@ local function _____53D1_5C04_590F_63D0_96C5P3_51C0_5316_6295_67AA(context, x, y
     local controlY = (startY + y) * 0.5 + SinBJ(_____63A7_5236_89D2_5EA6) * _____66F2_7EBF_504F_79FB
     local controlDX = controlX - startX
     local controlDY = controlY - startY
-    local _____63A7_5236_6C34_5E73_8DDD_79BB = jass.SquareRoot(controlDX * controlDX + controlDY * controlDY)
+    local _____63A7_5236_6C34_5E73_8DDD_79BB = jass:SquareRoot(controlDX * controlDX + controlDY * controlDY)
     local _____4E0B_4FEF_89D2 = GetRandomReal(cfg["P3投枪下俯角最小"], cfg["P3投枪下俯角最大"])
     local startZ = TanBJ(_____4E0B_4FEF_89D2) * _____63A7_5236_6C34_5E73_8DDD_79BB * 2
     local controlZ = startZ * 0.5

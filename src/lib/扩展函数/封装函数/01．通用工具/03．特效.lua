@@ -84,7 +84,7 @@ function _____9650_5236_5230_989C_8272_5B57_8282(value)
     if value > 255 then
         return 255
     end
-    return jass.R2I(value)
+    return jass:R2I(value)
 end
 function _____53D6_7279_6548_9876_70B9_989C_8272(_____53C2_6570)
     if _____53C2_6570["顶点颜色"] ~= nil then
@@ -202,7 +202,7 @@ function destroyBoundEffect(effect)
     if not effect then
         return
     end
-    jass.DestroyEffect(effect)
+    jass:DestroyEffect(effect)
 end
 function _____505C_6B62_7279_6548_9500_6BC1_68C0_67E5()
     if _____7279_6548_9500_6BC1_68C0_67E5_56DE_8C03ID <= 0 then
@@ -230,7 +230,7 @@ function _____5904_7406_5B9A_65F6_7279_6548_9500_6BC1(now)
             local effect = _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868[i + 1]
             if now >= _____5B9A_65F6_9500_6BC1_7279_6548_5230_671F_6BEB_79D2_5217_8868[i + 1] then
                 if effect then
-                    jass.DestroyEffect(effect)
+                    jass:DestroyEffect(effect)
                 end
             else
                 _____5B9A_65F6_9500_6BC1_7279_6548_5217_8868[writeIndex + 1] = effect
@@ -530,7 +530,7 @@ local function getUnitEffectHandleId(unit)
     if not unit then
         return 0
     end
-    return jass.GetHandleId(unit)
+    return jass:GetHandleId(unit)
 end
 local function getUnitEffectKey(unit, effectKey)
     local handleId = getUnitEffectHandleId(unit)
@@ -567,7 +567,7 @@ function ____exports.createUnitEffect(unit, attachPoint, modelPath, duration, ef
     if existingEffect then
         destroyBoundEffect(existingEffect)
     end
-    local effect = jass.AddSpecialEffectTarget(
+    local effect = jass:AddSpecialEffectTarget(
         _____89C4_8303_5316_7279_6548_6A21_578B_8DEF_5F84(modelPath),
         unit,
         attachPoint

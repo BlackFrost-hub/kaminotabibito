@@ -102,7 +102,7 @@ local function _____64AD_653ED_5168_5C40_97F3_6548(soundKey)
     if sound == nil or sound == 0 then
         return
     end
-    jass.StartSound(sound)
+    jass:StartSound(sound)
 end
 ____D_8868_73B0_8868 = {}
 ____D_7279_6548_7248_672C_8868 = {}
@@ -120,7 +120,7 @@ local function ____D_73AF_7ED5Tick(variable)
     if state["特效"] == nil or state["特效"] == 0 then
         return
     end
-    local _____73AF_7ED5_89D2_5EA6 = jass.GetUnitFacing(hero) + 90
+    local _____73AF_7ED5_89D2_5EA6 = jass:GetUnitFacing(hero) + 90
     local x = _____6781_5750_6807X(
         GetUnitX(hero),
         _____73AF_7ED5_89D2_5EA6,
@@ -131,7 +131,7 @@ local function ____D_73AF_7ED5Tick(variable)
         _____73AF_7ED5_89D2_5EA6,
         _____914D_7F6E.D["环绕距离"]
     )
-    japi.DzSetEffectPos(state["特效"], x, y, _____914D_7F6E.D["环绕高度"])
+    japi:DzSetEffectPos(state["特效"], x, y, _____914D_7F6E.D["环绕高度"])
 end
 local function _____64AD_653ED_8868_73B0(hero)
     local id = _____53D6_5355_4F4DID(hero)

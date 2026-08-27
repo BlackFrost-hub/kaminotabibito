@@ -6,7 +6,7 @@ local _____857E_7C73_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_
 local ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_6280_80FD_58F3_76D1_542C_6CE8_518C_5668["注册单位技能壳监听"]
 function IsUnitEnemy(unit, player)
-    return jass.IsUnitEnemy(unit, player) == true
+    return jass:IsUnitEnemy(unit, player) == true
 end
 jass = require("jass.common")
 local ____require_result_0 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.01．弹幕.01．TS原生弹幕.07．上下文弹幕")
@@ -79,7 +79,7 @@ local function ____Q_76EE_6807_5141_8BB8(caster, target)
     return target ~= nil and target ~= 0 and target ~= caster and _____5355_4F4D_5B58_6D3B(target) and IsUnitEnemy(
         target,
         GetOwningPlayer(caster)
-    ) and jass.IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true and jass.IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and jass.IsUnitType(target, UNIT_TYPE_STRUCTURE) ~= true
+    ) and jass:IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true and jass:IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and jass:IsUnitType(target, UNIT_TYPE_STRUCTURE) ~= true
 end
 local function ____Q_547D_4E2D(event)
     local context = event["上下文"]

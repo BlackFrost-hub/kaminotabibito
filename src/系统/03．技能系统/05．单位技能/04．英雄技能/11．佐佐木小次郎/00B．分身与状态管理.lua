@@ -67,12 +67,12 @@ do
     local playerId = 0
     while playerId <= 15 do
         SetPlayerAbilityAvailable(
-            jass.Player(playerId),
+            jass:Player(playerId),
             ____Q_4E8C_6BB5_6280_80FDID,
             false
         )
         SetPlayerAbilityAvailable(
-            jass.Player(playerId),
+            jass:Player(playerId),
             ____W_4E8C_6BB5_6280_80FDID,
             false
         )
@@ -86,13 +86,13 @@ local function _____662F_6709_6548_4F24_5BB3_76EE_6807(_____65BD_6CD5_8005, targ
     if not _____5355_4F4D_5B58_6D3B(target) then
         return false
     end
-    if jass.IsUnitType(target, jass.UNIT_TYPE_ANCIENT) then
+    if jass:IsUnitType(target, jass.UNIT_TYPE_ANCIENT) then
         return false
     end
-    if jass.IsUnitType(target, jass.UNIT_TYPE_MECHANICAL) then
+    if jass:IsUnitType(target, jass.UNIT_TYPE_MECHANICAL) then
         return false
     end
-    if jass.IsUnitType(target, jass.UNIT_TYPE_STRUCTURE) then
+    if jass:IsUnitType(target, jass.UNIT_TYPE_STRUCTURE) then
         return false
     end
     if not isUnitEnemy(target, _____65BD_6CD5_8005) then
@@ -270,7 +270,7 @@ local _____5F53_524D_521B_5EFA_5206_8EAB_7684_82F1_96C4 = nil
 local function _____5206_8EAB_5165_573A_5904_7406(_____5206_8EAB, _____8BB0_5F55)
     X_SetUnitMovableSafe(_____5206_8EAB, false)
     if type(japi.EXSetUnitCollisionType) == "function" then
-        japi.EXSetUnitCollisionType(false, _____5206_8EAB, 1)
+        japi:EXSetUnitCollisionType(false, _____5206_8EAB, 1)
     end
     _____6DFB_52A0_5355_4F4D_6682_505C(_____5206_8EAB, _____5206_8EAB_5165_573A_6682_505C_6765_6E90)
     SetUnitX(_____5206_8EAB, _____8BB0_5F55["落点X"])
@@ -302,7 +302,7 @@ local function _____5206_8EAB_5165_573A_5904_7406(_____5206_8EAB, _____8BB0_5F55
             if _____5206_8EAB == nil or _____5206_8EAB == 0 then
                 return
             end
-            jass.SetUnitTimeScale(_____5206_8EAB, 1)
+            jass:SetUnitTimeScale(_____5206_8EAB, 1)
             _____79FB_9664_5355_4F4D_6682_505C(_____5206_8EAB, _____5206_8EAB_5165_573A_6682_505C_6765_6E90)
         end
     )

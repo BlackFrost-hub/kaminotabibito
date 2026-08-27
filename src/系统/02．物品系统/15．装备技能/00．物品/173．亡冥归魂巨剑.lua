@@ -20,8 +20,8 @@ _____6CE8_518C_6700_7EC8_4F24_5BB3_89E6_53D1_6A21_677F({
     ["冷却秒数"] = 8,
     ["on触发"] = function(event)
         local source = event["持有者"]
-        local x = jass.GetUnitX(event["目标"])
-        local y = jass.GetUnitY(event["目标"])
+        local x = jass:GetUnitX(event["目标"])
+        local y = jass:GetUnitY(event["目标"])
         addDelayedCallback(
             600,
             function()

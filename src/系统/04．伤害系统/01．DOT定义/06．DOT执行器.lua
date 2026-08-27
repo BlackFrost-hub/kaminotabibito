@@ -53,7 +53,7 @@ function ____exports.createDotExecutor(self, deps)
         if not unit or not model or model == "" then
             return
         end
-        local eff = jass.AddSpecialEffectTarget(model, unit, "origin")
+        local eff = jass:AddSpecialEffectTarget(model, unit, "origin")
         if eff == nil then
             return
         end

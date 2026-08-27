@@ -2,6 +2,7 @@
 
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
+| `Common\Effect\Form\MagicCircle\feastaura.mdx` | 低矮圆形暗紫符文环配双层冲击纹，中心留空，适合作为不遮挡英雄的状态提示。 | 循环 `Stand 333-1600`；贴地跟随英雄或按状态位置显示。 | 伊蕾娜被动旅途见闻记录提示与 D 当前魔法变式提示。 | 只表达当前记录/变式状态，不代替 Buff、见闻队列、选择或消费逻辑；只有 Stand，状态结束、技能消费、死亡或场景清理时必须主动销毁。 | 2840 | `2D8DE2B664C10734` |
 | `Common\Effect\Form\MagicCircle\AinzFallingSkyMagicCircle.mdx` | 多层蓝白环、符文和中心星形组成高层级法阵。 | 适合高空低亮度展示；迁移版补齐安全 `Death`。 | 安兹·天空坠落高空法阵备选。 | 五芒星语义偏强；不能与落线和结算层同帧堆满。 | 4720 | `82358DD55A6C8876` |
 | `Common\Effect\Form\MagicCircle\fate.mdx` | 干净的暗金圆形法阵，轮廓清楚、装饰克制。 | 贴地或低空法阵；迁移版补齐安全 `Death`。 | 生命锚、安兹常规施法阵。 | 不是超位法术主体，需与实体锚点组合。 | 3608 | `D9AA0CF723456BB5` |
 | `Common\Effect\Form\MagicCircle\SpiritGuardSoulSeal.mdx` | 边界清楚、中心留黑的冷蓝符文环。 | 贴地镇魂印；迁移版补齐安全 `Death`。 | 苍影灵卫镇魂印、冷蓝封印阵。 | 不与向内收束的月纹缚魂层同点同时堆放。 | 7948 | `F4B96B345E4AB21A` |
@@ -22,3 +23,15 @@
 | `Common\Effect\Form\MagicCircle\GrandUndeadAura.mdx` | 候选截图观察：大型多重法阵有高阶召令的层级，绿色亡灵气息也能成立；缺点是容易与自然系法术混淆。 | 迁移后序列：`Stand / Death`；保留源动画结构。 | 安兹·高阶亡灵召唤；源候选 `GrandUndeadAura.mdx`。 | 若采用，需与黑金或骨白召唤主体共同出现。 | 8136 | `F40EC0678F15DDE5` |
 | `Common\Effect\Form\MagicCircle\ElvenGateDefenseCircle.mdx` | 明亮的蓝色铭文法阵，轮廓清楚，适合作为必须守住的城门目标。 | 贴地持续显示。 | 克林姆德王城攻城战的城门防御核心。 | 作为可攻击单位模型使用；运行时必须锁定站位，死亡直接触发攻城失败。 | 9000 | `E1EB5FAEB5169010` |
 | `Common\Effect\Form\MagicCircle\JNTX (34).mdx` | 红色符文环、星点和尘雾组成的地面法阵。 | `Birth / Stand / Death`；由术士施法预警阶段创建并按持续时间销毁。 | 菲利斯第二军团术士的法阵预警。 | 13 张贴图均为 Warcraft 原生路径；法阵范围和缩放由技能配置控制。 | 18752 | `2FA5AE27E72BB669` |
+| `Common\Effect\Form\MagicCircle\IrenaCorridorOpen.mdx` | 蓝白椭圆法阵、星光和中心能量从地面迅速展开。 | 非循环 `Birth 0-667`；在 R 领域中心播放一次。 | 伊蕾娜 R 万法回廊展开层。 | 不代替持续领域；蓄力中断或英雄死亡时立即清理。 | 21240 | `E272F46F62AB3116` |
+| `Common\Effect\Form\MagicCircle\IrenaBlueStarCircle.mdx` | 干净的蓝色星形地面阵，中心和边界清楚。 | `Stand 333-1600`；贴地显示并按领域尺寸缩放。 | 伊蕾娜 R 星阵辅助层。 | 与持续领域低亮度叠加，不承担范围和伤害。 | 2572 | `63C6E310CCD9EEFD` |
+| `Common\Effect\Form\MagicCircle\IrenaCorridorField.mdx` | 八个蓝色星节点围绕双层回廊环持续旋转，阵心留空。 | `Birth 0-400 / Stand 500-2200 / Death 2300-2700`；贴地持续。 | 伊蕾娜 R 万法回廊主体。 | 缩放 1 时外半径约 328、节点中心半径 245；范围判定不能使用 BoundsRadius 400。 | 37224 | `3CD2FA15FC168902` |
+| `Common\Effect\Form\MagicCircle\CeliaFormulaNode.mdx` | 中性白蓝晶核外有公式轮、刻度和细小节点，适合运行时染色。 | `Birth 0-450 / Stand 600-2200 / Stand Alternate 2400-4000 / Stand Upgrade 4200-5800 / Death 6000-6400`；节点坐标由 TS 更新。 | 塞莉亚被动/Q/W/E 共用公式节点主体。 | 本次优化版已正式替换；只保留一份通用模型，Q/W/E 用运行时颜色和序列区分，最终尺寸、亮度和朝向仍需 War3 实机验收。 | 151308 | `82F4D92100175DE3` |
+| `Common\Effect\Form\MagicCircle\CeliaAnchorCircle.mdx` | 蓝色地面公式阵带星点和清晰边界，阵心较小。 | `Stand / Death / Birth`；在 E 目标点按真实持续时间显示。 | 塞莉亚 E 锚定魔法阵主版本。 | 不扩大真实控制范围；源代号 `file_000831.mdx`。 | 9194 | `3B5F8EE6FD79C4D9` |
+| `Common\Effect\Form\MagicCircle\CeliaAnchorCircleBackup.mdx` | 多层蓝色圆环、星纹和外扩波纹组成较复杂的锚定阵。 | `Birth / Stand / Death`；贴地创建。 | 塞莉亚 E 锚定阵备份。 | 与主版本二选一；源代号 `JNTX (44).mdx`。 | 18752 | `F8AE1E87A0078AE6` |
+| `Common\Effect\Form\MagicCircle\CeliaHighFormulaCircle.mdx` | 大型蓝白公式圆环围绕明亮阵心，线条规整。 | `stand 0-4600`；在 R 中心限时显示。 | 塞莉亚 R 高阶术式展开主版本。 | 只有 Stand，必须由 R 实例主动销毁；真实范围不随模型外圈扩大。 | 4476 | `9BD8FCCA52F5BAC1` |
+| `Common\Effect\Form\MagicCircle\CeliaHighFormulaCircleBackup.mdx` | 蓝紫多层法阵、闪电纹和外圈符号快速爆发。 | 非循环 `Birth Death 0-1500`。 | 塞莉亚 R 高阶术式展开备份。 | 适合一次性展开，不可冒充持续领域；源代号 `file_001130.mdx`。 | 9307 | `A8628F383D72A196` |
+| `Common\Effect\Form\MagicCircle\CeliaFormulaLockCore.mdx` | 紫色公式环、符号节点和中心核心持续旋转。 | `Stand 0-3333`；在闭锁阵心限时显示。 | 塞莉亚 R 闭锁核心；芙莉莲解析完成反馈复用同一资源。 | 与外部 `DeathMark.MDX` 完全同哈希，不得重复导入；只有 Stand，调用方必须主动销毁。 | 6071 | `10860BF826244BD6` |
+| `Common\Effect\Form\MagicCircle\CeliaFormulaLockCoreBackup.mdx` | 蓝色公式阵和星点形成较轻的闭锁核心。 | `Stand / Death / Birth`；贴地限时显示。 | 塞莉亚 R 闭锁核心备份。 | 与主版本二选一；两张私有贴图已复用 `CeliaAnchorCircle` 同哈希副本，重复贴图已删除。 | 9386 | `856981E9D8D92B76` |
+| `Common\Effect\Form\MagicCircle\FrierenAnalysisMark.mdx` | 低亮白紫解析环围绕小型中心符号，轮廓紧凑。 | `Birth 0-360 / Stand 500-2100 / Death 2300-2620`；随解析目标位置更新。 | 芙莉莲攻击/防御/位置三类解析的共享标记。 | 本次优化版已正式替换；三类状态只运行时染色，不复制三份模型，最终尺寸、亮度和目标跟随仍需 War3 实机验收。 | 43628 | `5B6AA07712F3CBA6` |
+| `Common\Effect\Form\MagicCircle\FrierenBarrierFormula.mdx` | 蓝色公式圆阵由细环、符号和中心星点构成。 | `Stand 0-3333`；叠在 W 正面护壁中心并限时销毁。 | 芙莉莲 W 魔力护壁公式层。 | 不能单独替代弧形盾面；只有 Stand，必须随 W 收口清理。 | 6071 | `413A5F812DCFE008` |

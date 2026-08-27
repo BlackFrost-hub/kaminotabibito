@@ -21,3 +21,7 @@ export * from "./18．云端/index";
 export * from "./19．十六夜咲夜/index";
 export * from "./20．爱蜜莉雅/index";
 export * from "./21．朱雀院红叶/index";
+export * from "./22．朱雀院椿/index";
+export * from "./23．伊蕾娜/index";
+export * from "./24．塞莉亚·克莱尔/index";
+export * from "./25．芙莉莲/index";

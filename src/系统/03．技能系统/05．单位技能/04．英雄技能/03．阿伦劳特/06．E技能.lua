@@ -528,7 +528,7 @@ WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local WEAPON_TYPE_METAL_HEAVY_SLICE = jass.WEAPON_TYPE_METAL_HEAVY_SLICE
 YDWE_OBJECT_TYPE_UNIT = 2
 UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-local UNIT_STATE_ATTACK = jass.ConvertUnitState(21)
+local UNIT_STATE_ATTACK = jass:ConvertUnitState(21)
 Cos = jass.Cos
 Sin = jass.Sin
 R2I = jass.R2I
@@ -642,7 +642,7 @@ ____exports["on阿伦劳特E"] = function(_____65BD_6CD5_5355_4F4D, abilityId)
     if not _____662F_963F_4F26_52B3_7279_82F1_96C4(_____65BD_6CD5_5355_4F4D) then
         return
     end
-    local _____76EE_6807_5355_4F4D = jass.GetSpellTargetUnit()
+    local _____76EE_6807_5355_4F4D = jass:GetSpellTargetUnit()
     if _____76EE_6807_5355_4F4D == nil or _____76EE_6807_5355_4F4D == 0 or not _____5355_4F4D_5B58_6D3B(_____76EE_6807_5355_4F4D) then
         return
     end

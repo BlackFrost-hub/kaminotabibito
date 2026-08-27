@@ -12,6 +12,8 @@ local _____6E05_7406_7231_871C_8389_96C5D_5F3A_5316 = ____02_FF0E_516C_5171_72B6
 local _____767B_8BB0_7231_871C_8389_96C5_6280_80FD_6E05_7406 = ____02_FF0E_516C_5171_72B6_6001_4E0E_51B0_6676["登记爱蜜莉雅技能清理"]
 local ____02_FF0E_516C_5171_72B6_6001_4E0E_51B0_6676 = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.02．公共状态与冰晶")
 local _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C = ____02_FF0E_516C_5171_72B6_6001_4E0E_51B0_6676["播放爱蜜莉雅动作"]
+local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.00．配置")
+local _____7231_871C_8389_96C5_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["爱蜜莉雅动作槽"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -22,13 +24,14 @@ local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用�
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_1["创建点特效"]
 local createUnitEffect = ____require_result_1.createUnitEffect
 local destroyUnitEffect = ____require_result_1.destroyUnitEffect
+local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_1["设置特效缩放"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
 local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_3.addDelayedCallback
 local removeDelayedCallback = ____require_result_3.removeDelayedCallback
 local getGameTime = ____require_result_3.getGameTime
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass:FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 local _____73AF_7ED5_7279_6548_952E = "爱蜜莉雅D环绕"
 --- 每英雄 D 到期回调 ID（重复开启时先取消旧回调，防止旧回调提前清掉新 D 状态）
 local ____D_5230_671F_56DE_8C03_8868 = {}
@@ -56,7 +59,7 @@ local function _____91CA_653ED_5E15_514B_663E_73B0(_context, _____65BD_6CD5_8005
         return
     end
     local _____82F1_96C4ID = _____53D6_5355_4F4DID(_____65BD_6CD5_8005)
-    _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C(_____65BD_6CD5_8005, _____7231_871C_8389_96C5D_914D_7F6E["动作索引"], 1)
+    _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C(_____65BD_6CD5_8005, _____7231_871C_8389_96C5_52A8_4F5C_69FD.D)
     local _____65E7_5230_671FID = ____D_5230_671F_56DE_8C03_8868[_____82F1_96C4ID]
     if _____65E7_5230_671FID ~= nil and _____65E7_5230_671FID ~= 0 then
         removeDelayedCallback(_____65E7_5230_671FID)
@@ -73,20 +76,21 @@ local function _____91CA_653ED_5E15_514B_663E_73B0(_context, _____65BD_6CD5_8005
         _____7231_871C_8389_96C5D_914D_7F6E["强化次数"],
         {stack = _____7231_871C_8389_96C5D_914D_7F6E["强化次数"]}
     )
-    createUnitEffect(
+    local _____73AF_7ED5_7279_6548 = createUnitEffect(
         _____65BD_6CD5_8005,
         "origin",
         _____7231_871C_8389_96C5D_914D_7F6E["环绕模型"],
-        _____7231_871C_8389_96C5D_914D_7F6E["持续秒"],
+        _____7231_871C_8389_96C5D_914D_7F6E["表现"]["环绕"]["持续秒"],
         _____73AF_7ED5_7279_6548_952E
     )
+    _____8BBE_7F6E_7279_6548_7F29_653E(_____73AF_7ED5_7279_6548, _____7231_871C_8389_96C5D_914D_7F6E["表现"]["环绕"]["缩放"])
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____7231_871C_8389_96C5D_914D_7F6E["扩散模型"],
         X = GetUnitX(_____65BD_6CD5_8005),
         Y = GetUnitY(_____65BD_6CD5_8005),
-        Z = 30,
-        ["缩放"] = 1,
-        ["持续秒"] = 0.5
+        Z = _____7231_871C_8389_96C5D_914D_7F6E["表现"]["扩散"]["高度"],
+        ["缩放"] = _____7231_871C_8389_96C5D_914D_7F6E["表现"]["扩散"]["缩放"],
+        ["持续秒"] = _____7231_871C_8389_96C5D_914D_7F6E["表现"]["扩散"]["持续秒"]
     })
     local _____5230_671FID = addDelayedCallback(
         _____6301_7EED_6BEB_79D2,

@@ -36,7 +36,7 @@ local function _____662F_5426_4E3A_7834_8840_4E4B_6212(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
     end
-    return jass.GetItemTypeId(_____7269_54C1) == _____7834_8840_4E4B_6212_7269_54C1ID
+    return jass:GetItemTypeId(_____7269_54C1) == _____7834_8840_4E4B_6212_7269_54C1ID
 end
 local function _____6E05_7406_7834_8840_4E4B_6212_4E0A_4E0B_6587(_____5355_4F4D)
     _____7834_8840_4E4B_6212_4E0A_4E0B_6587_6258_7BA1_5668["清空"](_____5355_4F4D)

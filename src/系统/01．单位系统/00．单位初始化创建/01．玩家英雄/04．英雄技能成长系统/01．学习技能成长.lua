@@ -62,7 +62,7 @@ local function ____on_82F1_96C4_5B66_4E60_6280_80FD(unit, abilityId)
     if unit == nil or unit == 0 then
         return
     end
-    local heroId = jass.GetUnitTypeId(unit)
+    local heroId = jass:GetUnitTypeId(unit)
     do
         local i = 0
         while i < #_____82F1_96C4_6280_80FD_6210_957F_914D_7F6E_8868 do

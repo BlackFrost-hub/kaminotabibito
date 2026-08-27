@@ -30,9 +30,9 @@ local function _____6E05_7406_795D_798F(target)
     end
     __TS__Delete(
         _____795D_798F_8868,
-        jass.GetHandleId(target)
+        jass:GetHandleId(target)
     )
-    jass.UnitRemoveAbility(target, _____539F_751F_72B6_6001_6280_80FDID)
+    jass:UnitRemoveAbility(target, _____539F_751F_72B6_6001_6280_80FDID)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(target, _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.R.BuffID)
 end
 local function ____on_795D_798F_79FB_9664(target)
@@ -41,18 +41,18 @@ local function ____on_795D_798F_79FB_9664(target)
     end
     __TS__Delete(
         _____795D_798F_8868,
-        jass.GetHandleId(target)
+        jass:GetHandleId(target)
     )
-    jass.UnitRemoveAbility(target, _____539F_751F_72B6_6001_6280_80FDID)
+    jass:UnitRemoveAbility(target, _____539F_751F_72B6_6001_6280_80FDID)
 end
 local function _____65BD_52A0_63D0_7C73_8BFA_65AF_795D_798F(caster, target)
     local cfg = _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.R
-    local hid = jass.GetHandleId(target)
+    local hid = jass:GetHandleId(target)
     if _____795D_798F_8868[hid] ~= nil or getBuffRuntime(target, cfg.BuffID) ~= nil then
         _____6E05_7406_795D_798F(target)
     end
     _____795D_798F_8868[hid] = {["剩余次数"] = cfg["刷新次数"]}
-    jass.UnitAddAbility(target, _____539F_751F_72B6_6001_6280_80FDID)
+    jass:UnitAddAbility(target, _____539F_751F_72B6_6001_6280_80FDID)
     registerManualBuff(
         target,
         cfg.BuffID,
@@ -72,8 +72,8 @@ local function _____65BD_52A0_63D0_7C73_8BFA_65AF_795D_798F(caster, target)
             local effect = cfg["特效"][i + 1]
             _____521B_5EFA_70B9_7279_6548({
                 ["模型路径"] = effect["模型"],
-                X = jass.GetUnitX(target),
-                Y = jass.GetUnitY(target),
+                X = jass:GetUnitX(target),
+                Y = jass:GetUnitY(target),
                 Z = effect.Z,
                 ["Z轴角度"] = 270,
                 ["缩放"] = effect["缩放"],
@@ -84,8 +84,8 @@ local function _____65BD_52A0_63D0_7C73_8BFA_65AF_795D_798F(caster, target)
     end
 end
 local function ____on_63D0_7C73_8BFA_65AFR_4E0E_795D_798F_6280_80FD(caster, abilityId)
-    if abilityId == ____R_6280_80FDID and jass.GetUnitTypeId(caster) == _____63D0_7C73_8BFA_65AF_5355_4F4DID then
-        local target = jass.GetSpellTargetUnit()
+    if abilityId == ____R_6280_80FDID and jass:GetUnitTypeId(caster) == _____63D0_7C73_8BFA_65AF_5355_4F4DID then
+        local target = jass:GetSpellTargetUnit()
         if target == nil or target == 0 then
             return
         end
@@ -93,13 +93,13 @@ local function ____on_63D0_7C73_8BFA_65AFR_4E0E_795D_798F_6280_80FD(caster, abil
         _____65BD_52A0_63D0_7C73_8BFA_65AF_795D_798F(caster, target)
         return
     end
-    local hid = jass.GetHandleId(caster)
+    local hid = jass:GetHandleId(caster)
     local record = _____795D_798F_8868[hid]
     local buff = getBuffRuntime(caster, _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.R.BuffID)
     if record == nil or buff == nil then
         return
     end
-    local level = jass.GetUnitAbilityLevel(caster, abilityId)
+    local level = jass:GetUnitAbilityLevel(caster, abilityId)
     if not (level > 0) or getAbilityManaCost(caster, abilityId, level) > _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.R["最大基础魔耗"] then
         return
     end

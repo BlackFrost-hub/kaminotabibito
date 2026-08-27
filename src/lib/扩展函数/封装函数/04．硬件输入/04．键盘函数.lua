@@ -52,23 +52,23 @@ function onSyncKeyUpData()
     end
 end
 function isChatInputActive()
-    if japi.DzIsChatBoxOpen() then
+    if japi:DzIsChatBoxOpen() then
         return true
     end
-    local chatEditBar = japi.DzFrameGetChatEditBar()
-    if chatEditBar ~= nil and chatEditBar ~= 0 and japi.DzFrameIsFocus(chatEditBar) then
+    local chatEditBar = japi:DzFrameGetChatEditBar()
+    if chatEditBar ~= nil and chatEditBar ~= 0 and japi:DzFrameIsFocus(chatEditBar) then
         return true
     end
     return false
 end
 function getLocalDispatchKey(keyCode, status)
-    return (tostring(keyCode) .. ":") .. tostring(status)
+    return (tostring(nil, keyCode) .. ":") .. tostring(nil, status)
 end
 function dispatchLocalKeyEvent(status)
     if isChatInputActive() then
         return
     end
-    local key = japi.DzGetTriggerKey()
+    local key = japi:DzGetTriggerKey()
     local callbacks = localKeyCallbacksByKeyAndStatus[getLocalDispatchKey(key, status)]
     if callbacks == nil then
         return
@@ -117,7 +117,7 @@ localKeyCallbacksByKeyAndStatus = {}
 syncKeyUpPrefix = "KEYUP"
 syncKeyUpDataTrigger = nil
 function ____exports.isKeyDown(self, keyCode)
-    return not not japi.DzIsKeyDown(keyCode)
+    return not not japi:DzIsKeyDown(keyCode)
 end
 local function keyCodeToTrgChar(self, keyCode)
     if string and type(string.char) == "function" and keyCode >= 1 and keyCode <= 255 then
@@ -126,7 +126,7 @@ local function keyCodeToTrgChar(self, keyCode)
                 return true, ""
             end
             local ____try, ____hasReturned, ____returnValue = pcall(function()
-                return true, string.char(keyCode)
+                return true, string:char(keyCode)
             end)
             if not ____try then
                 ____hasReturned, ____returnValue = ____catch(____hasReturned)
@@ -179,7 +179,7 @@ local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action
     runFalseLocalRegistration(
         nil,
         function()
-            japi.DzTriggerRegisterKeyEventByCode(
+            japi:DzTriggerRegisterKeyEventByCode(
                 trig,
                 keyCode,
                 status,
@@ -191,11 +191,11 @@ local function registerKeyBindToTriggerLocal(self, trig, status, keyCode, action
     )
 end
 local function getTriggerKeyPlayerOrLocal(self)
-    local player = japi.DzGetTriggerKeyPlayer()
+    local player = japi:DzGetTriggerKeyPlayer()
     if player ~= nil and player ~= 0 then
         return player
     end
-    return jass.GetLocalPlayer()
+    return jass:GetLocalPlayer()
 end
 function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action, playerId)
     local trig = createTriggerOrNull(nil)
@@ -204,7 +204,7 @@ function ____exports.registerKeyEventByCode(self, keyCode, status, sync, action,
     end
     if sync then
         registerKeyBindToTrigger(nil, trig, status, keyCode)
-        jass.TriggerAddAction(trig, action)
+        jass:TriggerAddAction(trig, action)
     else
         registerKeyBindToTriggerLocal(
             nil,
@@ -227,7 +227,7 @@ function ____exports.registerKeyDown(self, keyCode, callback, playerId)
             callback(
                 nil,
                 getTriggerKeyPlayerOrLocal(nil),
-                japi.DzGetTriggerKey()
+                japi:DzGetTriggerKey()
             )
         end,
         playerId
@@ -246,7 +246,7 @@ function ____exports.registerKeyUp(self, keyCode, callback, playerId)
             callback(
                 nil,
                 getTriggerKeyPlayerOrLocal(nil),
-                japi.DzGetTriggerKey()
+                japi:DzGetTriggerKey()
             )
         end,
         playerId
@@ -292,9 +292,9 @@ function ____exports.registerKeyEventRawStatus(self, keyCode, status, sync, acti
     )
 end
 function ____exports.getTriggerKeyPlayer(self)
-    return japi.DzGetTriggerKeyPlayer()
+    return japi:DzGetTriggerKeyPlayer()
 end
 function ____exports.getTriggerKey(self)
-    return japi.DzGetTriggerKey()
+    return japi:DzGetTriggerKey()
 end
 return ____exports

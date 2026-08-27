@@ -35,10 +35,10 @@ local function isValidHandle(handle)
     return handle ~= nil and handle ~= 0
 end
 local function _____5F53_524D_6BEB_79D2()
-    return os.clock() * 1000
+    return os:clock() * 1000
 end
 local function _____88AB_52A8_51B7_5374_952E(whichHero, abilityId)
-    return (tostring(jass.GetHandleId(whichHero)) .. "_") .. tostring(abilityId)
+    return (tostring(jass:GetHandleId(whichHero)) .. "_") .. tostring(abilityId)
 end
 --- 登记被动/内部冷却到 QWERD 冷却显示（仅本地表现，外部传秒数）。
 -- 
@@ -77,7 +77,7 @@ local function _____88AB_52A8_51B7_5374_6B7B_4EA1_6E05_7406(dyingUnit, _killingU
     if not isValidHandle(dyingUnit) then
         return
     end
-    local prefix = tostring(jass.GetHandleId(dyingUnit)) .. "_"
+    local prefix = tostring(jass:GetHandleId(dyingUnit)) .. "_"
     for key in pairs(_____88AB_52A8_51B7_5374_8868) do
         if (string.find(key, prefix, nil, true) or 0) - 1 == 0 then
             _____88AB_52A8_51B7_5374_8868[key] = nil
@@ -136,10 +136,10 @@ local function formatCooldown(cooldown)
     if not (cooldown > 0.05) then
         return ""
     end
-    local tenth = jass.R2I(cooldown * 10 + 0.5)
-    local sec = jass.R2I(tenth / 10)
+    local tenth = jass:R2I(cooldown * 10 + 0.5)
+    local sec = jass:R2I(tenth / 10)
     local decimal = tenth - sec * 10
-    return (tostring(jass.I2S(sec)) .. ".") .. tostring(jass.I2S(decimal))
+    return (tostring(jass:I2S(sec)) .. ".") .. tostring(jass:I2S(decimal))
 end
 local function _____6784_5EFA_663E_793A_6587_672C(hotkey, abilityId, cooldown)
     local cdText = formatCooldown(cooldown)

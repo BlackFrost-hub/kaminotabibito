@@ -48,14 +48,14 @@ end
 function ____exports.round(value)
     local _____5B89_5168_503C = value or 0
     if _____5B89_5168_503C >= 0 then
-        return jass.R2I(_____5B89_5168_503C + 0.5)
+        return jass:R2I(_____5B89_5168_503C + 0.5)
     end
-    return __TS__Number(-jass.R2I(-_____5B89_5168_503C + 0.5))
+    return __TS__Number(-jass:R2I(-_____5B89_5168_503C + 0.5))
 end
 --- 向上取整到整数。
 function ____exports.ceil(value)
     local _____5B89_5168_503C = value or 0
-    local truncated = jass.R2I(_____5B89_5168_503C)
+    local truncated = jass:R2I(_____5B89_5168_503C)
     if _____5B89_5168_503C > 0 and truncated < _____5B89_5168_503C then
         return truncated + 1
     end

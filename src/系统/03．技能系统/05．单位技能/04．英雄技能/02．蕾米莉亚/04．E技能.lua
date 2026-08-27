@@ -218,7 +218,7 @@ local function _____6E05_7406E_4E0A_4E0B_6587(context)
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(buffTarget, _____857E_7C73_8389_4E9ABuffID["血雾形态"])
         ShowUnit(context["施法者"], true)
         local maxLife = _____8BFB_53D6_5355_4F4D_6700_5927_751F_547D(context["施法者"])
-        local life = jass.GetUnitState(context["施法者"], jass.UNIT_STATE_LIFE) or 0
+        local life = jass:GetUnitState(context["施法者"], jass.UNIT_STATE_LIFE) or 0
         local endVoice = ____E_914D_7F6E["结束语音"]
         local ____temp_28 = maxLife > 0
         if ____temp_28 then

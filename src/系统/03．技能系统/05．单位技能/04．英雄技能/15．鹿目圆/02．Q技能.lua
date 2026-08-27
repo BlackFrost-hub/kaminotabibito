@@ -100,7 +100,7 @@ local function _____64AD_653EQ_5168_5C40_97F3_6548(soundKey)
     if sound == nil or sound == 0 then
         return
     end
-    jass.StartSound(sound)
+    jass:StartSound(sound)
 end
 _____914D_7F6E = _____9E7F_76EE_5706_5355_4F4D_6280_80FD_914D_7F6E
 local ____Q_4F24_5BB3_6807_7B7E = "鹿目圆-Q-区域"
@@ -108,7 +108,7 @@ local ____Q_795E_5723_4F24_5BB3_6807_7B7E = "鹿目圆-Q-锁定神圣"
 local ____Q_4E0A_4E0B_6587_8868 = {}
 local ____Q_7BAD_5F39_5E55_72B6_6001_8868 = {}
 local function _____662FQ_6709_6548_654C_4EBA(source, target)
-    return _____5355_4F4D_5B58_6D3B(target) and IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true and jass.IsUnitEnemy(
+    return _____5355_4F4D_5B58_6D3B(target) and IsUnitType(target, UNIT_TYPE_MECHANICAL) ~= true and IsUnitType(target, UNIT_TYPE_ANCIENT) ~= true and jass:IsUnitEnemy(
         target,
         GetOwningPlayer(source)
     ) == true
