@@ -10,9 +10,13 @@
  * - 不制作魔法书、翻页模型或角色语音：切换提示仅一个短寿命 feastaura 符文。
  */
 
-import { 伊蕾娜技能配置, 伊蕾娜变式配置, 伊蕾娜表现配置, 伊蕾娜模型动作配置 } from "./00．配置";
+import { 伊蕾娜技能配置, 伊蕾娜变式配置, 伊蕾娜表现配置, 伊蕾娜模型动作配置, 伊蕾娜音效配置 } from "./00．配置";
 import { 播放伊蕾娜阶段动作 } from "./01A．动作表现";
 import { 设置伊蕾娜变式, 获取伊蕾娜变式 } from "./02．被动效果";
+
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string, 伊蕾娜变式?: string) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -26,6 +30,9 @@ const { 单位存活 } = require("系统.03．技能系统.00．技能模板+函
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
+};
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
 
 const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
@@ -50,12 +57,16 @@ function 释放D旅途魔法变式(this: void, _context: any, 施法者: any, _�
     // R 蓄力期间被拒：不刷新任何提示
     return;
   }
+  播放英雄技能喊话(施法者, "伊蕾娜", 伊蕾娜技能配置.D.技能ID, 下一个);
+  // 变式切换成功音（单位=施法者；R 锁定拒绝分支已在上方 return，不会播放，参数配置驱动）
+  Sound3DII_UnitPlayReuse(伊蕾娜音效配置.D切换.路径, 施法者, 伊蕾娜音效配置.D切换.裁断距离);
   播放伊蕾娜阶段动作(施法者, 伊蕾娜模型动作配置.技能动作.D切换);
 
   // 切换提示：短暂符文（角色身边），不创建书本/翻页表现
   const 提示 = 创建点特效({
     模型路径: 伊蕾娜表现配置.D变式提示.模型路径,
-    X: GetUnitX(施法者),
+   RGB: 伊蕾娜表现配置.D变式提示.RGB,
+       X: GetUnitX(施法者),
     Y: GetUnitY(施法者),
     Z: 伊蕾娜表现配置.D变式提示.高度,
     缩放: 伊蕾娜表现配置.D变式提示.缩放,

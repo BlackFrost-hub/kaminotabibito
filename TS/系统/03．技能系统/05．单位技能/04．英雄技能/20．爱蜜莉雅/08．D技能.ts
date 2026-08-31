@@ -9,7 +9,7 @@
  * - 不创建可选取独立帕克单位。
  */
 
-import { 爱蜜莉雅技能配置, 爱蜜莉雅D配置 } from "./00．配置";
+import { 爱蜜莉雅技能配置, 爱蜜莉雅D配置, 爱蜜莉雅表现配置, 爱蜜莉雅音效配置 } from "./00．配置";
 import { 爱蜜莉雅BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/20．爱蜜莉雅";
 import {
   获取爱蜜莉雅D强化,
@@ -19,6 +19,10 @@ import {
 } from "./02．公共状态与冰晶";
 import { 播放爱蜜莉雅动作 } from "./02．公共状态与冰晶";
 import { 爱蜜莉雅动作槽 } from "./00．配置";
+
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string, 伊蕾娜变式?: string) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -33,6 +37,9 @@ const { 创建点特效, createUnitEffect, destroyUnitEffect, 设置特效缩放
   createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
   destroyUnitEffect: (this: void, unit: any, effectKey?: string) => void;
   设置特效缩放: (this: void, effect: any, scale: number) => void;
+};
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
@@ -69,6 +76,7 @@ export function 结束爱蜜莉雅D(this: void, 施法者: any): void {
 function 释放D帕克显现(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0) return;
   const 英雄ID = 取单位ID(施法者);
+  播放英雄技能喊话(施法者, "爱蜜莉雅", 爱蜜莉雅技能配置.D.技能ID);
   播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.D);
   // 重复 D：先取消旧到期回调（旧回调不得清掉新 D 状态）+ 清理旧环绕表现
   const 旧到期ID = D到期回调表[英雄ID];
@@ -84,16 +92,19 @@ function 释放D帕克显现(this: void, _context: any, 施法者: any, _技能�
   });
 
   // 帕克环绕（常驻，到期/结束销毁）+ 360° 显现扩散（一次性）
-  const 环绕特效 = createUnitEffect(施法者, "origin", 爱蜜莉雅D配置.环绕模型, 爱蜜莉雅D配置.表现.环绕.持续秒, 环绕特效键);
-  设置特效缩放(环绕特效, 爱蜜莉雅D配置.表现.环绕.缩放);
+  const 环绕特效 = createUnitEffect(施法者, "origin", 爱蜜莉雅表现配置.帕克环绕.模型路径, 爱蜜莉雅表现配置.帕克环绕.持续秒, 环绕特效键);
+  设置特效缩放(环绕特效, 爱蜜莉雅表现配置.帕克环绕.缩放);
   创建点特效({
-    模型路径: 爱蜜莉雅D配置.扩散模型,
-    X: GetUnitX(施法者),
+    模型路径: 爱蜜莉雅表现配置.扩散.模型路径,
+   RGB: 爱蜜莉雅表现配置.扩散.RGB,
+       X: GetUnitX(施法者),
     Y: GetUnitY(施法者),
-    Z: 爱蜜莉雅D配置.表现.扩散.高度,
-    缩放: 爱蜜莉雅D配置.表现.扩散.缩放,
-    持续秒: 爱蜜莉雅D配置.表现.扩散.持续秒,
+    Z: 爱蜜莉雅表现配置.扩散.高度,
+    缩放: 爱蜜莉雅表现配置.扩散.缩放,
+    持续秒: 爱蜜莉雅表现配置.扩散.持续秒,
   });
+  // 帕克显现扩散音：360° 显现扩散表现处一次（重复 D 覆盖旧表现后随新施法播放；单位=施法者，参数配置驱动）
+  Sound3DII_UnitPlayReuse(爱蜜莉雅音效配置.D显现.路径, 施法者, 爱蜜莉雅音效配置.D显现.裁断距离);
 
   // 到期清理（幂等：结束爱蜜莉雅D 已清理状态）；重复 D 时旧回调先被取消
   const 到期ID = addDelayedCallback(持续毫秒, function D到期清理(this: void): void {

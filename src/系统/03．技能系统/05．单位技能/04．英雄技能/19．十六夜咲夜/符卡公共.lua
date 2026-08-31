@@ -19,7 +19,7 @@ ____exports["取消十六夜咲夜符卡界面"] = function(caster)
     if caster == nil or caster == 0 then
         return
     end
-    local player = jass:GetOwningPlayer(caster)
+    local player = jass.GetOwningPlayer(caster)
     if player == nil or player == 0 then
         return
     end

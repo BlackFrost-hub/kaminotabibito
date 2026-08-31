@@ -35,18 +35,18 @@ local function _____89E3_9664D_786C_76F4(variable)
     end
 end
 local function _____91CA_653ED(_context, hero, skillInstanceId)
-    local startX = jass:GetUnitX(hero)
-    local startY = jass:GetUnitY(hero)
+    local startX = jass.GetUnitX(hero)
+    local startY = jass.GetUnitY(hero)
     local ____end = _____8BA1_7B97_88C2_9699_53EF_8FBE_7EC8_70B9(
         startX,
         startY,
-        jass:GetSpellTargetX(),
-        jass:GetSpellTargetY()
+        jass.GetSpellTargetX(),
+        jass.GetSpellTargetY()
     )
     local placement = _____68C0_67E5_516B_4E91_7D2BD_88C2_9699_653E_7F6E(hero, ____end.x, ____end.y)
     if not placement["可创建"] then
-        jass:DisplayTimedTextToPlayer(
-            jass:GetOwningPlayer(hero),
+        jass.DisplayTimedTextToPlayer(
+            jass.GetOwningPlayer(hero),
             0,
             0,
             3,
@@ -63,7 +63,7 @@ local function _____91CA_653ED(_context, hero, skillInstanceId)
         end
     end
     _____6DFB_52A0_5355_4F4D_6682_505C(hero, ____D_6682_505C_6765_6E90)
-    jass:SetUnitAnimation(hero, _____914D_7F6E.D["施法动作"])
+    jass.SetUnitAnimation(hero, _____914D_7F6E.D["施法动作"])
     _____521B_5EFA_516B_4E91_7D2B_88C2_9699(
         hero,
         ____end.x,

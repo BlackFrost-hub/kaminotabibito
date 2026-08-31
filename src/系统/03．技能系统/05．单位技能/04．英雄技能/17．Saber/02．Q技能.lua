@@ -188,7 +188,7 @@ function ____Q_521D_6BB5_7A97_53E3_590D_4F4D(variable)
 end
 function _____6CBF_9762_5411_77AC_6B65(caster, _____8DDD_79BB)
     local _____5F27_5EA6 = GetUnitFacing(caster) * bj_DEGTORAD
-    jass:SetUnitPosition(
+    jass.SetUnitPosition(
         caster,
         GetUnitX(caster) + _____8DDD_79BB * Cos(_____5F27_5EA6),
         GetUnitY(caster) + _____8DDD_79BB * Sin(_____5F27_5EA6)
@@ -841,7 +841,7 @@ local function ____Q_5355_4F4D_6B7B_4EA1_6E05_7406(dyingUnit, _killingUnit)
     if dyingUnit == nil or dyingUnit == 0 then
         return
     end
-    if jass:GetUnitTypeId(dyingUnit) ~= _____82F1_96C4_5355_4F4D_7C7B_578BID then
+    if jass.GetUnitTypeId(dyingUnit) ~= _____82F1_96C4_5355_4F4D_7C7B_578BID then
         return
     end
     local record = _____83B7_53D6Saber_72B6_6001(dyingUnit)

@@ -97,7 +97,7 @@ local function _____6267_884C_7FFB_6EDA(_____94C3_4ED9, _____65B9_5411_89D2, ___
                 removePeriodicCallback(_____56DE_8C03ID)
                 return
             end
-            if jass:IsUnitPaused(_____94C3_4ED9) == true then
+            if jass.IsUnitPaused(_____94C3_4ED9) == true then
                 return
             end
             if _____5269_4F59_6B21_6570 <= 0 or not _____5355_4F4D_5B58_6D3B(_____94C3_4ED9) then

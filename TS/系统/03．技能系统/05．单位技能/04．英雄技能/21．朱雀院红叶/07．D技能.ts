@@ -3,6 +3,7 @@
 import {
   朱雀院红叶技能配置,
   朱雀院红叶表现配置,
+  朱雀院红叶音效配置,
   朱雀院红叶Buff配置,
   朱雀院红叶动作配置,
   朱雀院红叶动作槽,
@@ -25,10 +26,15 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
 };
-const { createUnitEffect, destroyUnitEffect, 设置特效缩放 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
-  destroyUnitEffect: (this: void, unit: any, effectKey?: string) => void;
-  设置特效缩放: (this: void, effect: any, scale: number) => void;
+const { 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }) => any;
+  销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
+};
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+};
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
 };
 const {
   是朱雀院红叶,
@@ -45,6 +51,7 @@ const {
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院红叶技能配置.单位类型ID);
 const 秘传BuffID = 朱雀院红叶Buff配置.秘传三式;
 const D配置 = 朱雀院红叶待平衡数值.D;
+const D秘传三式音效 = 朱雀院红叶音效配置.D秘传三式;
 const 刀环特效键 = "朱雀院红叶D刀环";
 
 //=============================================================================
@@ -78,7 +85,7 @@ function 移除D状态(this: void, 英雄: any): void {
     removeDelayedCallback(状态.到期回调ID);
     状态.到期回调ID = 0;
   }
-  destroyUnitEffect(英雄, 刀环特效键);
+  销毁单位坐标跟随特效(英雄, 刀环特效键);
   移除单位指定Buff(英雄, 秘传BuffID);
   delete D状态表[id];
 }
@@ -86,6 +93,8 @@ function 移除D状态(this: void, 英雄: any): void {
 function 开启D秘传三式(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
   if (!是朱雀院红叶(施法者)) return;
   播放红叶动作(施法者, 朱雀院红叶动作槽.D启动);
+  // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动；重复 D 刷新同样视为成功施法）
+  播放英雄技能喊话(施法者, "朱雀院红叶", 朱雀院红叶技能配置.D.技能ID);
   const id = jass.GetHandleId(施法者);
   const 已有 = D状态表[id];
   if (已有 != null) {
@@ -109,11 +118,22 @@ function 开启D秘传三式(this: void, _context: any, 施法者: any, _技能�
   });
   D状态表[id] = 状态;
   刷新D显示(施法者, 状态);
-  // 秘传刀环表现（候选未迁入则留空不播）
-  if (D配置.刀环特效 != null && D配置.刀环特效 !== "") {
-    const 刀环特效 = createUnitEffect(施法者, "origin", D配置.刀环特效, 朱雀院红叶表现配置.参数.D刀环.持续秒, 刀环特效键);
-    设置特效缩放(刀环特效, 朱雀院红叶表现配置.参数.D刀环.缩放);
+  // 秘传刀环表现（模型/缩放/高度/RGB 全由表现配置驱动；秘传结束 移除D状态 统一销毁）
+  if ((朱雀院红叶表现配置.D刀环.模型路径 as string) !== "") {
+    创建单位坐标跟随特效(
+      施法者,
+      朱雀院红叶表现配置.D刀环.模型路径,
+      刀环特效键,
+      朱雀院红叶表现配置.D刀环.缩放,
+      朱雀院红叶表现配置.D刀环.高度,
+      1,
+      undefined,
+      0,
+      朱雀院红叶表现配置.D刀环.RGB,
+    );
   }
+  // 秘传三式启动音（单次激活成功时一次；单位绑定，参数配置驱动；重复 D 刷新不重播，强化消费不单独响）
+  Sound3DII_UnitPlayReuse(D秘传三式音效.路径, 施法者, D秘传三式音效.裁断距离);
   登记朱雀院清理(施法者, "红叶D", function D清理(this: void): void {
     移除D状态(施法者);
   });

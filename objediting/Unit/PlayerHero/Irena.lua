@@ -11,7 +11,7 @@ createPlayerHeroUnit('E00I', '伊蕾娜', {
   scale = 1.0,
   icon = 'ReplaceableTextures\\CommandButtons\\BTNHeroArchMage.blp',
   normalAbilities = 'A014,AInv,AID1',
-  heroAbilities = 'AIQ1,AIW1,AIE1,AIR1',
+  heroAbilities = '',
   upgradesUsed = '',
 
   strength = 20,

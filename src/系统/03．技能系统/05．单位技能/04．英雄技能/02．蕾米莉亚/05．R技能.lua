@@ -100,9 +100,9 @@ local function _____83B7_53D6_6216_521B_5EFAR_4E0A_4E0B_6587(unit)
     return created
 end
 local function ____R_76EE_6807_5141_8BB8(caster, target)
-    return _____5355_4F4D_5B58_6D3B(target) and not IsUnitType(target, UNIT_TYPE_ANCIENT) and not IsUnitType(target, UNIT_TYPE_MECHANICAL) and not IsUnitType(target, UNIT_TYPE_STRUCTURE) and jass:IsUnitEnemy(
+    return _____5355_4F4D_5B58_6D3B(target) and not IsUnitType(target, UNIT_TYPE_ANCIENT) and not IsUnitType(target, UNIT_TYPE_MECHANICAL) and not IsUnitType(target, UNIT_TYPE_STRUCTURE) and jass.IsUnitEnemy(
         target,
-        jass:GetOwningPlayer(caster)
+        jass.GetOwningPlayer(caster)
     ) == true
 end
 local function ____R_64AD_653E_5468_671F_8868_73B0(caster)

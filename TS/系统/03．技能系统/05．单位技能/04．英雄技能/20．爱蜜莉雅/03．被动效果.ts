@@ -11,7 +11,7 @@
  * - 统一命中结算入口：各技能命中调用 结算爱蜜莉雅技能命中 —— 碎冰优先、受控目标增伤、施加寒意。
  */
 
-import { 爱蜜莉雅技能配置, 爱蜜莉雅被动配置, 爱蜜莉雅冰晶配置 } from "./00．配置";
+import { 爱蜜莉雅技能配置, 爱蜜莉雅被动配置, 爱蜜莉雅冰晶配置, 爱蜜莉雅音效配置 } from "./00．配置";
 import { 爱蜜莉雅BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/20．爱蜜莉雅";
 import {
   创建爱蜜莉雅冰晶,
@@ -23,9 +23,16 @@ import {
 
 const jass = require("jass.common") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
+const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
+const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
+
+const { Sound3DII_UnitPlayReuse, Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+};
 
 const { registerManualBuff, 移除单位指定Buff, 获取单位Buff层数 } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -165,6 +172,8 @@ function 冻结结束(this: void, 目标: any, 状态: 被动目标状态): void
     return;
   }
   解冻目标(目标, 状态);
+  // 冻结解除碎裂音：复用 Q命中 槽（冻结自然到期解除、冰壳碎裂时一次；上方存活校验保证目标有效；死亡解除不播，参数配置驱动）
+  Sound3DII_CooPlayReuse(爱蜜莉雅音效配置.Q命中.路径, GetUnitX(目标), GetUnitY(目标), 爱蜜莉雅音效配置.Q命中.高度, 爱蜜莉雅音效配置.Q命中.裁断距离);
   施加霜裂(目标);
 }
 
@@ -190,6 +199,8 @@ export function 冻结爱蜜莉雅目标(this: void, 施法者: any, 目标: any
   状态.冻结施法者 = 施法者;
   registerManualBuff(目标, 爱蜜莉雅BuffID.冻结, 爱蜜莉雅被动配置.冻结秒, 0);
   createTimedUnitEffect(目标, "origin", "Common\\Effect\\Element\\Ice\\sem_shen_du_dong_jie.mdx", 爱蜜莉雅被动配置.冻结秒);
+  // 冻结包裹音：目标被冻结的状态建立时一次（冻结中/抗性/同实例去重均已在上方拦截，状态转移单次触发；单位=目标，参数配置驱动）
+  Sound3DII_UnitPlayReuse(爱蜜莉雅音效配置.冻结包裹.路径, 目标, 爱蜜莉雅音效配置.冻结包裹.裁断距离);
   状态.冻结回调ID = addDelayedCallback(爱蜜莉雅被动配置.冻结秒 * 1000, function 冻结到期(this: void): void {
     冻结结束(目标, 状态);
   });

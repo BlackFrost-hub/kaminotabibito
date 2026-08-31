@@ -26,8 +26,9 @@ const { YDUserDataSet } = require("lib.扩展函数.YDWE函数.01．YDUserData�
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
 };
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, getGameDifficulty } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+  getGameDifficulty: (this: void) => number;
 };
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
   stringToFourCC: (this: void, s: string) => number;
@@ -89,6 +90,11 @@ function 读取小怪生命倍率(this: void): number {
   const hp2 = (jglobals as any).udg_HP2;
   if (typeof hp2 === "number" && hp2 > 0) return hp2;
   return 1;
+}
+
+function 读取难度生命倍率(this: void): number {
+  const difficulty = getGameDifficulty();
+  return difficulty > 0 ? 1 + difficulty * 0.2 : 1;
 }
 
 function 赋予飞行高度能力(this: void, unit: any): void {
@@ -163,7 +169,9 @@ function 应用召唤物属性(this: void, unit: any, 参数: 规范化召唤物
   }
 
   if (参数.生命值 != null && 参数.生命值 > 0) {
-    const scaledHp = 参数.生命值 * (参数.生命值受小怪倍率 === false ? 1 : 读取小怪生命倍率());
+    const 小怪生命倍率 = 参数.生命值受小怪倍率 === false ? 1 : 读取小怪生命倍率();
+    const 难度生命倍率 = 参数.生命值受难度倍率 === true ? 读取难度生命倍率() : 1;
+    const scaledHp = 参数.生命值 * 小怪生命倍率 * 难度生命倍率;
     SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, scaledHp);
     SetUnitState(unit, UNIT_STATE_LIFE, scaledHp);
   }

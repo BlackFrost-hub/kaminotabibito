@@ -15,7 +15,7 @@ function getHandleIdSafe(handle)
     if not handle then
         return 0
     end
-    return jass:GetHandleId(handle) or 0
+    return jass.GetHandleId(handle) or 0
 end
 function _____53D6_7269_54C1_52A0_5DE5_884C_53F7(item)
     local itemId = getHandleIdSafe(item)
@@ -71,7 +71,7 @@ function _____5904_7406_70E4_7126_5230_671F(item, campfire)
     end
     local name = getItemNameSafe(item)
     floatBurnText(campfire, name)
-    jass:RemoveItem(item)
+    jass.RemoveItem(item)
     untrackItem(item)
 end
 function _____5904_7406_52A0_5DE5_5230_671F(item, campfire, timeoutSec, results)
@@ -84,7 +84,7 @@ function _____5904_7406_52A0_5DE5_5230_671F(item, campfire, timeoutSec, results)
     playFinishEffect(campfire)
     local chosen = pickResult(results)
     local inputCharges = getItemChargesSafe(item)
-    jass:RemoveItem(item)
+    jass.RemoveItem(item)
     untrackItem(item)
     local timeout = timeoutSec > 0 and timeoutSec or 0
     local remaining = chosen.qty * inputCharges
@@ -96,9 +96,9 @@ function _____5904_7406_52A0_5DE5_5230_671F(item, campfire, timeoutSec, results)
         setItemChargesSafe(it, remaining)
         local ok = tryGiveItemToCampfire(campfire, it)
         if not ok then
-            local roll = jass:GetRandomInt(1, 100)
+            local roll = jass.GetRandomInt(1, 100)
             if roll > 20 then
-                jass:RemoveItem(it)
+                jass.RemoveItem(it)
             end
         else
             local itemId = getHandleIdSafe(it)
@@ -120,10 +120,10 @@ function _____5904_7406_52A0_5DE5_5230_671F(item, campfire, timeoutSec, results)
     end
 end
 function getItemNameSafe(item)
-    return jass:GetItemName(item)
+    return jass.GetItemName(item)
 end
 function getItemChargesSafe(item)
-    local n = jass:GetItemCharges(item)
+    local n = jass.GetItemCharges(item)
     local ____TS__Number_result_12 = __TS__Number(n)
     if ____TS__Number_result_12 == nil then
         ____TS__Number_result_12 = 0
@@ -136,11 +136,11 @@ function setItemChargesSafe(item, n)
         return
     end
     local v = R2I(n) or 1
-    jass:SetItemCharges(item, v > 0 and v or 1)
+    jass.SetItemCharges(item, v > 0 and v or 1)
 end
 function getUnitXY(u)
-    local x = jass:GetUnitX(u)
-    local y = jass:GetUnitY(u)
+    local x = jass.GetUnitX(u)
+    local y = jass.GetUnitY(u)
     return {x = x, y = y}
 end
 function floatBurnText(campfire, itemName)
@@ -201,10 +201,10 @@ function pickResult(results)
         end
     end
     if total <= 0 then
-        local idx = jass:GetRandomInt(1, #results)
+        local idx = jass.GetRandomInt(1, #results)
         return results[idx]
     end
-    local roll = jass:GetRandomReal(0, 1) * total
+    local roll = jass.GetRandomReal(0, 1) * total
     do
         local i = 0
         while i < #results do
@@ -228,7 +228,7 @@ function tryGiveItemToCampfire(campfire, item)
         return false
     end
     _____6B63_5728_5C06_52A0_5DE5_4EA7_7269_653E_56DE_7BDD_706B = true
-    local success = not not jass:UnitAddItem(campfire, item)
+    local success = not not jass.UnitAddItem(campfire, item)
     _____6B63_5728_5C06_52A0_5DE5_4EA7_7269_653E_56DE_7BDD_706B = false
     return success
 end
@@ -459,7 +459,7 @@ local function _____5206_914D_7269_54C1_52A0_5DE5_884C_53F7(campfireId)
     end
 end
 local function isCampfire(u)
-    return jass:GetUnitTypeId(u) == CAMPFIRE_ID
+    return jass.GetUnitTypeId(u) == CAMPFIRE_ID
 end
 --- 使用 01．封装函数.ts 中的 stringToFourCC
 local function fourCCToInt(id)

@@ -56,6 +56,7 @@ local _____83F2_5C3C_514B_65AF_5C14Boss_540D = "双重凤凰·菲尼克斯尔"
 local _____83F2_5C3C_514B_65AF_5C14_8FDB_5165_8303_56F4 = 1400
 local _____83F2_5C3C_514B_65AF_5C14_89E6_53D1_533A_57DF = {X = 15429.9, Y = -4014.9, ["朝向"] = 0}
 local _____5F53_524D_83F2_5C3C_514B_65AF_5C14_73B0_8EAB_72B6_6001
+local _____5DF2_6B63_5F0F_51FB_8D25_83F2_5C3C_514B_65AF_5C14 = false
 local function _____5355_4F4D_5B58_6D3B(unit)
     return unit ~= nil and unit ~= 0 and IsUnitAliveBJ(unit)
 end
@@ -136,6 +137,7 @@ local function ____on_83F2_5C3C_514B_65AF_5C14_6B7B_4EA1(dyingUnit, _killingUnit
     if _____72B6_6001 == nil or _____72B6_6001["Boss单位"] ~= dyingUnit then
         return
     end
+    _____5DF2_6B63_5F0F_51FB_8D25_83F2_5C3C_514B_65AF_5C14 = true
     local _____6218_540E_73A9_5BB6 = _____8BFB_53D6_5267_60C5_8FD0_884C_65F6_5355_4F4D("剧情运行时.菲尼克斯尔玩家")
     if _____6218_540E_73A9_5BB6 ~= nil and _____6218_540E_73A9_5BB6 ~= 0 then
         _____6CE8_518C_5267_60C5_8FD0_884C_65F6_5355_4F4D("剧情运行时.菲尼克斯尔战后玩家", _____6218_540E_73A9_5BB6)
@@ -166,6 +168,9 @@ ____exports["获取菲尼克斯尔Boss"] = function()
         ____temp_14_15 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528(____exports["菲尼克斯尔Boss键"])
     end
     return ____temp_14_15
+end
+____exports["是否已正式击败菲尼克斯尔"] = function()
+    return _____5DF2_6B63_5F0F_51FB_8D25_83F2_5C3C_514B_65AF_5C14
 end
 ____exports["执行准备菲尼克斯尔现身"] = function()
     if _____8BFB_53D6_5267_60C5_8FDB_5EA6() ~= 43 then

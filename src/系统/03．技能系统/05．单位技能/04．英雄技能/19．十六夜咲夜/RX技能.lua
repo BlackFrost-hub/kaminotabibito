@@ -48,7 +48,7 @@ local function _____6E05_7406RX(context, _____7ED3_675F_4F24_5BB3_5B9E_4F8B)
         return
     end
     context["已结束"] = true
-    local casterId = jass:GetHandleId(context["施法者"])
+    local casterId = jass.GetHandleId(context["施法者"])
     if ____RX_6D3B_52A8_8868[casterId] == context then
         __TS__Delete(____RX_6D3B_52A8_8868, casterId)
     end
@@ -62,7 +62,7 @@ local function _____6E05_7406RX(context, _____7ED3_675F_4F24_5BB3_5B9E_4F8B)
     context["预备飞刀"] = {}
     if context["目标"] ~= nil and context["目标"] ~= 0 then
         _____79FB_9664_5355_4F4D_6682_505C(context["目标"], context["暂停来源"])
-        jass:SetUnitVertexColor(
+        jass.SetUnitVertexColor(
             context["目标"],
             255,
             255,
@@ -71,7 +71,7 @@ local function _____6E05_7406RX(context, _____7ED3_675F_4F24_5BB3_5B9E_4F8B)
         )
     end
     if context["反击特效"] ~= nil and context["反击特效"] ~= 0 then
-        jass:DestroyEffect(context["反击特效"])
+        jass.DestroyEffect(context["反击特效"])
     end
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["施法者"], _____5341_516D_591C_54B2_591CBuffID["完美女仆反击窗口"])
     if _____7ED3_675F_4F24_5BB3_5B9E_4F8B then
@@ -122,8 +122,8 @@ local function ____RX_91CA_653E_4E09_5708_98DE_5200(variable)
                 ["角度"] = _____4E24_70B9_89D2_5EA6(
                     record.X,
                     record.Y,
-                    jass:GetUnitX(context["目标"]),
-                    jass:GetUnitY(context["目标"])
+                    jass.GetUnitX(context["目标"]),
+                    jass.GetUnitY(context["目标"])
                 ),
                 ["周期毫秒"] = _____914D_7F6E.RX["飞刀周期毫秒"],
                 ["每Tick位移"] = _____914D_7F6E.RX["飞刀每Tick位移"],
@@ -147,7 +147,7 @@ local function ____RX_91CA_653E_4E09_5708_98DE_5200(variable)
         end
     end
     _____79FB_9664_5355_4F4D_6682_505C(context["目标"], context["暂停来源"])
-    jass:SetUnitVertexColor(
+    jass.SetUnitVertexColor(
         context["目标"],
         255,
         255,
@@ -155,13 +155,13 @@ local function ____RX_91CA_653E_4E09_5708_98DE_5200(variable)
         255
     )
     context["目标"] = nil
-    local casterId = jass:GetHandleId(context["施法者"])
+    local casterId = jass.GetHandleId(context["施法者"])
     if ____RX_6D3B_52A8_8868[casterId] == context then
         __TS__Delete(____RX_6D3B_52A8_8868, casterId)
     end
     context["已结束"] = true
     if context["反击特效"] ~= nil and context["反击特效"] ~= 0 then
-        jass:DestroyEffect(context["反击特效"])
+        jass.DestroyEffect(context["反击特效"])
     end
     if remaining <= 0 then
         _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(context["技能实例ID"])
@@ -173,8 +173,8 @@ local function ____RX_521B_5EFA_4E00_5708(variable)
         return
     end
     local context = params["上下文"]
-    local centerX = jass:GetUnitX(context["目标"])
-    local centerY = jass:GetUnitY(context["目标"])
+    local centerX = jass.GetUnitX(context["目标"])
+    local centerY = jass.GetUnitY(context["目标"])
     local radius = _____914D_7F6E.RX["第一圈半径"] + params["圈序号"] * _____914D_7F6E.RX["圈半径增量"]
     do
         local i = 0
@@ -193,7 +193,7 @@ local function ____RX_521B_5EFA_4E00_5708(variable)
                 if shell == nil or shell == 0 then
                     goto __continue27
                 end
-                jass:SetUnitVertexColor(
+                jass.SetUnitVertexColor(
                     shell,
                     255,
                     255,
@@ -224,22 +224,22 @@ local function ____RX_6267_884C_53CD_51FB(variable)
         return
     end
     local attacker = context["目标"]
-    local facing = jass:GetUnitFacing(attacker)
+    local facing = jass.GetUnitFacing(attacker)
     _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(
         context["施法者"],
         _____6781_5750_6807X(
-            jass:GetUnitX(attacker),
+            jass.GetUnitX(attacker),
             _____914D_7F6E.RX["瞬移偏移"],
             facing + 180
         ),
         _____6781_5750_6807Y(
-            jass:GetUnitY(attacker),
+            jass.GetUnitY(attacker),
             _____914D_7F6E.RX["瞬移偏移"],
             facing + 180
         )
     )
     _____6DFB_52A0_5355_4F4D_6682_505C(attacker, context["暂停来源"])
-    jass:SetUnitVertexColor(
+    jass.SetUnitVertexColor(
         attacker,
         255,
         255,
@@ -274,12 +274,12 @@ local function ____RX_4F24_5BB3_4FEE_6B63(damage)
         end
         return ____temp_10
     end
-    local context = ____RX_6D3B_52A8_8868[jass:GetHandleId(target)]
+    local context = ____RX_6D3B_52A8_8868[jass.GetHandleId(target)]
     if context == nil or context["已结束"] or context["已触发"] or damage.attacker == nil or damage.attacker == 0 then
         return damage.currentDamage
     end
-    local dx = jass:GetUnitX(target) - jass:GetUnitX(damage.attacker)
-    local dy = jass:GetUnitY(target) - jass:GetUnitY(damage.attacker)
+    local dx = jass.GetUnitX(target) - jass.GetUnitX(damage.attacker)
+    local dy = jass.GetUnitY(target) - jass.GetUnitY(damage.attacker)
     if dx * dx + dy * dy < _____914D_7F6E.RX["最小触发距离"] * _____914D_7F6E.RX["最小触发距离"] then
         return damage.currentDamage
     end
@@ -300,7 +300,7 @@ end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRX(_listener, caster, _____6280_80FD_5B9E_4F8BID)
     _____53D6_6D88_5341_516D_591C_54B2_591C_7B26_5361_754C_9762(caster)
     ____RX_5E8F_53F7 = ____RX_5E8F_53F7 + 1
-    local old = ____RX_6D3B_52A8_8868[jass:GetHandleId(caster)]
+    local old = ____RX_6D3B_52A8_8868[jass.GetHandleId(caster)]
     if old ~= nil then
         _____6E05_7406RX(old, true)
     end
@@ -313,9 +313,9 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRX(_listener, caster, ____
         ["预备飞刀"] = {},
         ["目标"] = nil,
         ["暂停来源"] = "十六夜咲夜-RX:" .. tostring(____RX_5E8F_53F7),
-        ["反击特效"] = jass:AddSpecialEffectTarget("war3mapImported\\Time Rune.mdx", caster, "origin")
+        ["反击特效"] = jass.AddSpecialEffectTarget("war3mapImported\\Time Rune.mdx", caster, "origin")
     }
-    ____RX_6D3B_52A8_8868[jass:GetHandleId(caster)] = context
+    ____RX_6D3B_52A8_8868[jass.GetHandleId(caster)] = context
     registerManualBuff(
         caster,
         _____5341_516D_591C_54B2_591CBuffID["完美女仆反击窗口"],

@@ -27,7 +27,7 @@ local function onDeath(dying, killer)
     if dying == nil then
         return
     end
-    local typeId = jass:GetUnitTypeId(dying)
+    local typeId = jass.GetUnitTypeId(dying)
     local unitId = typeIdToUnitId(typeId)
     local entry = unitId and idData[unitId] or nil
     local spawnRaw = entry and entry.berserkUnit or entry and entry.berserk
@@ -39,17 +39,17 @@ local function onDeath(dying, killer)
         return
     end
     local BERSERK_PROC = 0.0625
-    if jass:GetRandomInt(1, 10000) > BERSERK_PROC * 10000 then
+    if jass.GetRandomInt(1, 10000) > BERSERK_PROC * 10000 then
         return
     end
     local x = 0
     local y = 0
     local facingDeg = 270
-    x = jass:GetUnitX(dying)
-    y = jass:GetUnitY(dying)
-    facingDeg = jass:GetUnitFacing(dying) * (180 / 3.14159265359)
+    x = jass.GetUnitX(dying)
+    y = jass.GetUnitY(dying)
+    facingDeg = jass.GetUnitFacing(dying) * (180 / 3.14159265359)
     local four = stringToFourCC(__TS__StringSubstring(spawnUnitId, 0, 4))
-    local owner = jass:GetOwningPlayer(dying)
+    local owner = jass.GetOwningPlayer(dying)
     local created = nil
     created = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
         owner,
@@ -60,7 +60,7 @@ local function onDeath(dying, killer)
     )
     local ____killer_9
     if killer then
-        ____killer_9 = jass:GetOwningPlayer(killer)
+        ____killer_9 = jass.GetOwningPlayer(killer)
     else
         ____killer_9 = nil
     end

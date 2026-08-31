@@ -71,6 +71,7 @@ interface 菲尼克斯尔现身状态 {
 }
 
 let 当前菲尼克斯尔现身状态: 菲尼克斯尔现身状态 | undefined;
+let 已正式击败菲尼克斯尔 = false;
 
 function 单位存活(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitAliveBJ(unit);
@@ -146,6 +147,7 @@ function 注册菲尼克斯尔范围监听(this: void, 状态: 菲尼克斯尔�
 function on菲尼克斯尔死亡(this: void, dyingUnit: any, _killingUnit: any): void {
   const 状态 = 当前菲尼克斯尔现身状态;
   if (状态 == null || 状态.Boss单位 !== dyingUnit) return;
+  已正式击败菲尼克斯尔 = true;
 
   const 战后玩家 = 读取剧情运行时单位("剧情运行时.菲尼克斯尔玩家");
   if (战后玩家 != null && 战后玩家 !== 0) {
@@ -171,6 +173,10 @@ function on菲尼克斯尔死亡(this: void, dyingUnit: any, _killingUnit: any):
 
 export function 获取菲尼克斯尔Boss(this: void): any {
   return 当前菲尼克斯尔现身状态?.Boss单位 ?? 读取剧情运行时单位("剧情运行时.菲尼克斯尔") ?? 读取语义单位引用(菲尼克斯尔Boss键);
+}
+
+export function 是否已正式击败菲尼克斯尔(this: void): boolean {
+  return 已正式击败菲尼克斯尔;
 }
 
 export function 执行准备菲尼克斯尔现身(this: void): void {

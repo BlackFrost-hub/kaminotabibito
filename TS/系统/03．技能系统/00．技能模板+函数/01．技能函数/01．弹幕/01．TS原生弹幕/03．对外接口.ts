@@ -15,6 +15,7 @@ import {
   DzSetEffectPos,
   EXEffectMatScale,
   DzSetUnitModel,
+  DzSetUnitVertexColor,
   EC_CreateEffect,
   GetOwningPlayer,
   GetUnitFacing,
@@ -185,6 +186,16 @@ function 初始化弹幕表现(this: void, 参数: 原生弹幕参数, 弹幕单
 
     if (参数.模型 != null && 参数.模型 !== "" && DzSetUnitModel != null) {
       DzSetUnitModel(弹幕单位, 参数.模型);
+    }
+    // 主弹幕模型着色（RGB 配置驱动）
+    if (参数.RGB != null && 参数.RGB.红 != null && 参数.RGB.绿 != null && 参数.RGB.蓝 != null) {
+      DzSetUnitVertexColor(
+        弹幕单位,
+        限制弹幕特效颜色字节(参数.RGB.红),
+        限制弹幕特效颜色字节(参数.RGB.绿),
+        限制弹幕特效颜色字节(参数.RGB.蓝),
+        限制弹幕特效颜色字节(参数.RGB.透明度 ?? 255),
+      );
     }
 
     const 缩放 = 参数.缩放 ?? 1;

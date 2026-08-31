@@ -5,6 +5,7 @@ import {
   朱雀院椿表现配置,
   朱雀院椿Buff配置,
   朱雀院椿被动配置,
+  朱雀院椿音效配置,
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
@@ -37,6 +38,9 @@ const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤�
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
+};
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院椿技能配置.单位类型ID);
@@ -144,6 +148,8 @@ export function 获取VF(this: void, 英雄: any): number {
 
 function 刷新VF表现(this: void, 英雄: any, 状态: 椿英雄状态): void {
   const 残缺 = 状态.VF当前 <= 0 || 状态.VF当前 < 被动配置.VF上限 * 被动配置.VF残缺阈值;
+  // 跳变判定：上一次刷新的 VF残缺 标记覆盖"无（VF归零）/残缺"两种旧状态，本次回到完整即为跳变
+  const 之前残缺 = 状态.VF残缺;
   状态.VF残缺 = 残缺;
   移除单位指定Buff(英雄, VF场BuffID);
   移除单位指定Buff(英雄, VF残缺BuffID);
@@ -153,6 +159,10 @@ function 刷新VF表现(this: void, 英雄: any, 状态: 椿英雄状态): void 
       registerManualBuff(英雄, VF残缺BuffID, 9999, 1, { stack: 1 });
     } else {
       registerManualBuff(英雄, VF场BuffID, 9999, 状态.VF当前, { stack: 1 });
+      // VF 场展开音：仅"无/残缺→完整"跳变时播一次（常规刷新/初始化满 VF 不播；单位=施法者，参数配置驱动）
+      if (之前残缺) {
+        Sound3DII_UnitPlayReuse(朱雀院椿音效配置.VF展开.路径, 英雄, 朱雀院椿音效配置.VF展开.裁断距离);
+      }
     }
   }
 }

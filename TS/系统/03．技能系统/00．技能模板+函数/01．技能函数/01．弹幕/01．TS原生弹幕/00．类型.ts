@@ -129,7 +129,10 @@ export interface 原生弹幕参数 {
   弹射次数上限?: number;
   弹射衰减?: number;
 
+  /** 主弹幕模型；不填则使用弹幕单位默认模型（DzSetUnitModel 替换）。 */
   模型?: string;
+  /** 主弹幕模型着色（DzSetUnitVertexColor）；不填保持默认。 */
+  RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number };
   /** 附加特效槽位最多两个；贝塞尔等自定义轨迹同样复用这组参数。 */
   附加特效1?: 原生弹幕附加特效参数;
   附加特效2?: 原生弹幕附加特效参数;

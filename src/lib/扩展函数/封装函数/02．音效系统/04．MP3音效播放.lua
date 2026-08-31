@@ -26,7 +26,7 @@ function onSoundDestroyFallbackCheck()
         while i < #soundDestroyFallbackSounds do
             local sound = soundDestroyFallbackSounds[i + 1]
             if now >= soundDestroyFallbackDueMs[i + 1] then
-                jass:DestroySound(sound)
+                jass.DestroySound(sound)
             else
                 soundDestroyFallbackSounds[writeIndex + 1] = sound
                 soundDestroyFallbackDueMs[writeIndex + 1] = soundDestroyFallbackDueMs[i + 1]
@@ -89,12 +89,12 @@ function ____exports.Sound3DII_Mp3Play(path, player, model)
     if model == nil then
         model = getDefaultSoundModel()
     end
-    local pathHash = jass:StringHash(path)
-    local count = jass:LoadInteger(hash, pathHash, KEY_COUNT) or 0
+    local pathHash = jass.StringHash(path)
+    local count = jass.LoadInteger(hash, pathHash, KEY_COUNT) or 0
     if count > POOL_MAX then
         count = POOL_MAX
     end
-    local index = jass:LoadInteger(hash, pathHash, KEY_INDEX) or 0
+    local index = jass.LoadInteger(hash, pathHash, KEY_INDEX) or 0
     local slot = index % POOL_MAX
     local sound = nil
     if slot >= count then
@@ -109,8 +109,8 @@ function ____exports.Sound3DII_Mp3Play(path, player, model)
             model
         )
         if sound then
-            jass:SaveInteger(hash, pathHash, KEY_COUNT, count + 1)
-            jass:SaveInteger(hash, pathHash, KEY_INDEX, index + 1)
+            jass.SaveInteger(hash, pathHash, KEY_COUNT, count + 1)
+            jass.SaveInteger(hash, pathHash, KEY_INDEX, index + 1)
         end
     else
         sound = getSoundInternal(
@@ -123,17 +123,17 @@ function ____exports.Sound3DII_Mp3Play(path, player, model)
             model
         )
         if sound then
-            jass:SaveInteger(hash, pathHash, KEY_INDEX, index + 1)
-            jass:StopSound(sound, false, false)
+            jass.SaveInteger(hash, pathHash, KEY_INDEX, index + 1)
+            jass.StopSound(sound, false, false)
         end
     end
     if sound then
-        jass:SetSoundChannel(sound, model.channel)
-        jass:SetSoundVolume(sound, model.volume)
-        jass:SetSoundPitch(sound, model.pitch)
-        local shouldPlay = not player or jass:GetLocalPlayer() == player
+        jass.SetSoundChannel(sound, model.channel)
+        jass.SetSoundVolume(sound, model.volume)
+        jass.SetSoundPitch(sound, model.pitch)
+        local shouldPlay = not player or jass.GetLocalPlayer() == player
         if shouldPlay then
-            jass:StartSound(sound)
+            jass.StartSound(sound)
         end
         lastPlayedSound = sound
         debugLog(

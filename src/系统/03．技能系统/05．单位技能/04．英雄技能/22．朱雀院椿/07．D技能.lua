@@ -5,6 +5,7 @@ local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技�
 local _____6731_96C0_9662_693F_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿技能配置"]
 local _____6731_96C0_9662_693F_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["朱雀院椿动作槽"]
 local _____6731_96C0_9662_693FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿D配置"]
+local _____6731_96C0_9662_693F_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿音效配置"]
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
@@ -15,15 +16,19 @@ local addPeriodicCallback = ____require_result_1.addPeriodicCallback
 local removePeriodicCallback = ____require_result_1.removePeriodicCallback
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
-local ____require_result_3 = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.02．被动效果")
-local _____662F_6731_96C0_9662_693F = ____require_result_3["是朱雀院椿"]
-local _____83B7_53D6_59FF_6001 = ____require_result_3["获取姿态"]
-local _____8BBE_7F6E_59FF_6001 = ____require_result_3["设置姿态"]
-local _____59FF_6001_662F_5426_9501_5B9A = ____require_result_3["姿态是否锁定"]
-local _____6263_9664VF = ____require_result_3["扣除VF"]
-local _____6062_590DVF = ____require_result_3["恢复VF"]
-local _____767B_8BB0_693F_6E05_7406 = ____require_result_3["登记椿清理"]
-local _____64AD_653E_693F_52A8_4F5C = ____require_result_3["播放椿动作"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_3.Sound3DII_UnitPlayReuse
+local ____require_result_4 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_4["播放英雄技能喊话"]
+local ____require_result_5 = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.02．被动效果")
+local _____662F_6731_96C0_9662_693F = ____require_result_5["是朱雀院椿"]
+local _____83B7_53D6_59FF_6001 = ____require_result_5["获取姿态"]
+local _____8BBE_7F6E_59FF_6001 = ____require_result_5["设置姿态"]
+local _____59FF_6001_662F_5426_9501_5B9A = ____require_result_5["姿态是否锁定"]
+local _____6263_9664VF = ____require_result_5["扣除VF"]
+local _____6062_590DVF = ____require_result_5["恢复VF"]
+local _____767B_8BB0_693F_6E05_7406 = ____require_result_5["登记椿清理"]
+local _____64AD_653E_693F_52A8_4F5C = ____require_result_5["播放椿动作"]
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 local ____D_914D_7F6E = _____6731_96C0_9662_693FD_914D_7F6E
 local _____4E8C_5200_72B6_6001_8868 = {}
@@ -91,6 +96,8 @@ local function _____91CA_653ED_59FF_6001_5207_6362(_context, _____65BD_6CD5_8005
         _____8BBE_7F6E_59FF_6001(_____65BD_6CD5_8005, "一刀")
         _____6062_590DVF(_____65BD_6CD5_8005, ____D_914D_7F6E["切回一刀恢复VF"])
     end
+    Sound3DII_UnitPlayReuse(_____6731_96C0_9662_693F_97F3_6548_914D_7F6E["D切换"]["路径"], _____65BD_6CD5_8005, _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["D切换"]["裁断距离"])
+    _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院椿", _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.D["技能ID"])
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册朱雀院椿D"] = function()

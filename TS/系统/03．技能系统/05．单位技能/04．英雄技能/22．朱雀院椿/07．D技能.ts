@@ -5,6 +5,7 @@ import {
   朱雀院椿动作配置,
   朱雀院椿动作槽,
   朱雀院椿D配置,
+  朱雀院椿音效配置,
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
@@ -19,6 +20,12 @@ const { addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePe
 };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
+};
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+};
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
 };
 const {
   是朱雀院椿,
@@ -104,6 +111,10 @@ function 释放D姿态切换(this: void, _context: any, 施法者: any, _技能�
     设置姿态(施法者, "一刀");
     恢复VF(施法者, D配置.切回一刀恢复VF);
   }
+  // 姿态切换音（切换实际成功后播；8s CD 反复切换均播；单位=施法者，参数配置驱动）
+  Sound3DII_UnitPlayReuse(朱雀院椿音效配置.D切换.路径, 施法者, 朱雀院椿音效配置.D切换.裁断距离);
+  // 技能喊话：姿态切换成功起点（全局 3D；随机二选一由喊话系统驱动）
+  播放英雄技能喊话(施法者, "朱雀院椿", 朱雀院椿技能配置.D.技能ID);
 }
 
 //=============================================================================

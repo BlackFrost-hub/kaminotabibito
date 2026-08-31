@@ -4,7 +4,7 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
 local dispatchHeroLevelEvent, jass, playerUnitEvent, heroLevelListeners, heroLevelTrigger, _initialized
 function dispatchHeroLevelEvent()
-    local heroUnit = jass:GetTriggerUnit()
+    local heroUnit = jass.GetTriggerUnit()
     if heroUnit == nil then
         return
     end
@@ -26,14 +26,14 @@ function ____exports.initHeroLevelEventCenter()
         return
     end
     _initialized = true
-    heroLevelTrigger = jass:CreateTrigger()
+    heroLevelTrigger = jass.CreateTrigger()
     local ____jass_EVENT_PLAYER_HERO_LEVEL_0 = jass.EVENT_PLAYER_HERO_LEVEL
     if ____jass_EVENT_PLAYER_HERO_LEVEL_0 == nil then
         ____jass_EVENT_PLAYER_HERO_LEVEL_0 = 46
     end
     local levelEventId = ____jass_EVENT_PLAYER_HERO_LEVEL_0
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(heroLevelTrigger, ____exports.HERO_LEVEL_EVENT_PLAYER_IDS, levelEventId)
-    jass:TriggerAddAction(heroLevelTrigger, dispatchHeroLevelEvent)
+    jass.TriggerAddAction(heroLevelTrigger, dispatchHeroLevelEvent)
 end
 jass = require("jass.common")
 playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")

@@ -92,6 +92,7 @@ interface 亚伦柯斯战后传送状态 {
 let 当前亚伦柯斯前导状态: 亚伦柯斯前导状态 | undefined;
 let 当前亚伦柯斯战后传送状态: 亚伦柯斯战后传送状态 | undefined;
 let 已播放封印核心抵达对白 = false;
+let 已正式击败亚伦柯斯 = false;
 
 function 单位存活(this: void, unit: any): boolean {
   return unit != null && unit !== 0 && IsUnitAliveBJ(unit);
@@ -193,11 +194,16 @@ function 创建亚伦柯斯战后传送门(this: void): void {
 function on亚伦柯斯死亡(this: void, dyingUnit: any, _killingUnit: any): void {
   const 状态 = 当前亚伦柯斯前导状态;
   if (状态 == null || 状态.Boss单位 !== dyingUnit) return;
+  已正式击败亚伦柯斯 = true;
   清理亚伦柯斯前导状态(状态);
   清理菲尼克斯尔战后地形装饰();
   进入主线节点(48);
   创建亚伦柯斯战后传送门();
   创建安兹隐藏挑战();
+}
+
+export function 是否已正式击败亚伦柯斯(this: void): boolean {
+  return 已正式击败亚伦柯斯;
 }
 
 function 播放亚伦柯斯前导(this: void, 触发单位: any): void {

@@ -42,6 +42,7 @@ local _____5F71_9AA8_62AB_98CE = require("系统.02．物品系统.15．装备�
 local _____9634_5F71_9677_9631_88C5_7F6E = require("系统.02．物品系统.15．装备技能.00．物品.134．阴影陷阱装置")
 local _____8D85_4F4D_9B54_6CD5_6B8B_7AE0_5929_7A7A_5760_843D = require("系统.02．物品系统.15．装备技能.00．物品.186．超位魔法残章天空坠落")
 local _____9ED1_7FFC_5B88_62A4_91CD_76FE = require("系统.02．物品系统.15．装备技能.00．物品.188．黑翼守护重盾")
+local _____6DF1_4E95_6D3B_6C34_56CA = require("系统.02．物品系统.15．装备技能.00．物品.192．深井活水囊")
 local _____5DF2_521D_59CB_5316 = false
 local function _____7269_54C1_4F7F_7528_5355_4F4D_662F_82F1_96C4(ctx)
     local unit = ctx["施法单位"]
@@ -195,6 +196,11 @@ local function ____on_7269_54C1_4F7F_7528_94FE_8DEF(ctx)
         ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["黑翼守护重盾"]
         if ____cond6 then
             _____9ED1_7FFC_5B88_62A4_91CD_76FE["处理黑翼守护重盾使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["深井活水囊"]
+        if ____cond6 then
+            _____6DF1_4E95_6D3B_6C34_56CA["处理深井活水囊使用"](ctx)
             break
         end
     until true

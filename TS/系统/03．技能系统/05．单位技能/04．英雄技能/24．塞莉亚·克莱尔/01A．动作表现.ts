@@ -12,11 +12,12 @@
  *   Q/W/E/D 的分阶段槽与收势为已知缺口（见执行计划 A8），不得用 Stand 冒充。
  */
 
-import { 塞莉亚克莱尔动作槽配置 } from "./00．配置";
+import { 塞莉亚克莱尔模型动作配置, 塞莉亚克莱尔动作槽配置 } from "./00．配置";
 
 const jass = require("jass.common") as any;
 /** 本封装内部恢复速度专用；对外仍只暴露具名接口。 */
 const SetUnitTimeScale = jass.SetUnitTimeScale as ((u: any, scale: number) => void) | undefined;
+const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as ((u: any, index: number) => void) | undefined;
 
 const { 播放限时单位动画 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.00．单位动画等待") as {
   播放限时单位动画: (this: void, 参数: any) => any;
@@ -30,8 +31,8 @@ const {
 };
 
 export interface 塞莉亚动作槽 {
-  /** 模型序列的显示索引（0-based） */
-  索引: number;
+  /** 模型序列的显示索引（0-based）；null = 待映射槽，业务不得播放 */
+  索引: number | null;
   名称: string;
   原始时长秒: number;
   播放速度: number;
@@ -52,12 +53,14 @@ export function 播放塞莉亚限时动作(
 ): any {
   if (英雄 == null || 英雄 === 0) return null;
   const 槽 = 取槽配置(槽名);
+  if (槽.索引 == null) return null; // 待映射槽：不播放
   const 实际持续 = 持续秒 != null && 持续秒 > 0 ? 持续秒 : 槽.原始时长秒 / 槽.播放速度;
   return 播放限时单位动画({
     单位: 英雄,
     动画编号: 槽.索引,
     动画速度: 槽.播放速度,
     持续秒: 实际持续,
+    恢复动画编号: 塞莉亚克莱尔模型动作配置.待机索引,
   });
 }
 
@@ -65,6 +68,7 @@ export function 播放塞莉亚限时动作(
 export function 开始塞莉亚循环动作(this: void, 英雄: any, 槽名: keyof typeof 塞莉亚克莱尔动作槽配置): any {
   if (英雄 == null || 英雄 === 0) return null;
   const 槽 = 取槽配置(槽名);
+  if (槽.索引 == null) return null; // 待映射槽：不播放
   return 创建单位动画守护({
     单位: 英雄,
     动画编号: 槽.索引,
@@ -78,7 +82,10 @@ export function 开始塞莉亚循环动作(this: void, 英雄: any, 槽名: key
 /** 停止循环守护并恢复 1.0 动画速度（所有结束路径必须调用）。 */
 export function 停止塞莉亚循环动作(this: void, 英雄: any, 守护句柄: any): void {
   if (守护句柄 != null) 停止单位动画守护(守护句柄);
-  if (英雄 != null && 英雄 !== 0 && SetUnitTimeScale != null) SetUnitTimeScale(英雄, 1);
+  if (英雄 != null && 英雄 !== 0) {
+    if (SetUnitTimeScale != null) SetUnitTimeScale(英雄, 1);
+    if (SetUnitAnimationByIndex != null) SetUnitAnimationByIndex(英雄, 塞莉亚克莱尔模型动作配置.待机索引);
+  }
 }
 
 /** 仅恢复动画速度（无守护句柄时的兜底恢复路径）。 */

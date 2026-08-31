@@ -10,12 +10,16 @@
  * - 目标失效不跳过自身位移收尾（位移不依赖目标存在）。
  */
 
-import { 爱蜜莉雅技能配置, 爱蜜莉雅E配置 } from "./00．配置";
+import { 爱蜜莉雅技能配置, 爱蜜莉雅E配置, 爱蜜莉雅表现配置, 爱蜜莉雅音效配置 } from "./00．配置";
 import { 爱蜜莉雅BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/20．爱蜜莉雅";
 import { 创建战斗技能实例, 查询战斗技能实例 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 import { 播放爱蜜莉雅动作 } from "./02．公共状态与冰晶";
 import { 爱蜜莉雅动作槽 } from "./00．配置";
 import { 创建爱蜜莉雅场上冰晶 } from "./03．被动效果";
+
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string, 伊蕾娜变式?: string) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -47,6 +51,9 @@ const { 创建点特效, createUnitEffect, destroyUnitEffect, 设置特效缩放
   createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
   destroyUnitEffect: (this: void, unit: any, effectKey?: string) => void;
   设置特效缩放: (this: void, effect: any, scale: number) => void;
+};
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
@@ -89,12 +96,13 @@ interface E护盾数据 {
 
 function 施加落点冰爆(this: void, 施法者: any, X: number, Y: number, 技能实例ID: number | undefined, 伤害值: number): void {
   创建点特效({
-    模型路径: 爱蜜莉雅E配置.落点冰爆模型,
-    X,
+    模型路径: 爱蜜莉雅表现配置.落点冰爆.模型路径,
+   RGB: 爱蜜莉雅表现配置.落点冰爆.RGB,
+       X,
     Y,
-    Z: 爱蜜莉雅E配置.表现.落点冰爆.高度,
-    缩放: 爱蜜莉雅E配置.表现.落点冰爆.缩放,
-    持续秒: 爱蜜莉雅E配置.表现.落点冰爆.持续秒,
+    Z: 爱蜜莉雅表现配置.落点冰爆.高度,
+    缩放: 爱蜜莉雅表现配置.落点冰爆.缩放,
+    持续秒: 爱蜜莉雅表现配置.落点冰爆.持续秒,
   });
   const 目标组 = jass.CreateGroup() as any;
   jass.GroupEnumUnitsInRange(目标组, X, Y, 180, null);
@@ -135,13 +143,16 @@ function 结束E护盾分支(this: void, 施法者: any, 控制器: any, 技能�
   destroyUnitEffect(施法者, 护盾特效键);
   if (分支 === "破盾") {
     创建点特效({
-      模型路径: 爱蜜莉雅E配置.破盾裂纹模型,
-      X: GetUnitX(施法者),
+      模型路径: 爱蜜莉雅表现配置.破盾裂纹.模型路径,
+     RGB: 爱蜜莉雅表现配置.破盾裂纹.RGB,
+         X: GetUnitX(施法者),
       Y: GetUnitY(施法者),
-      Z: 爱蜜莉雅E配置.表现.破盾裂纹.高度,
-      缩放: 爱蜜莉雅E配置.表现.破盾裂纹.缩放,
-      持续秒: 爱蜜莉雅E配置.表现.破盾裂纹.持续秒,
+      Z: 爱蜜莉雅表现配置.破盾裂纹.高度,
+      缩放: 爱蜜莉雅表现配置.破盾裂纹.缩放,
+      持续秒: 爱蜜莉雅表现配置.破盾裂纹.持续秒,
     });
+    // 破盾提示音：仅真实破盾分支一次（自然结束/提前结束不播；单位=施法者，参数配置驱动）
+    Sound3DII_UnitPlayReuse(爱蜜莉雅音效配置.E破盾.路径, 施法者, 爱蜜莉雅音效配置.E破盾.裁断距离);
   }
   // 冰爆结算（自然/提前/破盾均触发；数值按分支统一用配置）
   施加落点冰爆(施法者, GetUnitX(施法者), GetUnitY(施法者), 技能实例ID, 读取单位攻击力(施法者) * 爱蜜莉雅E配置.破盾伤害攻击力倍率);
@@ -158,6 +169,7 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
     return;
   }
 
+  播放英雄技能喊话(施法者, "爱蜜莉雅", 爱蜜莉雅技能配置.E.技能ID);
   const 护盾值 = 读取单位攻击力(施法者) * 爱蜜莉雅E配置.护盾攻击力倍率;
   const 数据: E护盾数据 = { 护盾剩余: 护盾值, 修饰ID: 0, 位移ID: 0, 已结束: false, 二段壳: null };
   const 控制器 = 创建战斗技能实例({
@@ -196,8 +208,10 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
   }, 1000);
 
   registerManualBuff(施法者, 爱蜜莉雅BuffID.冰晶护身, 爱蜜莉雅E配置.护盾持续秒, 护盾值);
-  const 护盾特效 = createUnitEffect(施法者, "origin", 爱蜜莉雅E配置.护盾模型, 爱蜜莉雅E配置.表现.护盾.持续秒, 护盾特效键);
-  设置特效缩放(护盾特效, 爱蜜莉雅E配置.表现.护盾.缩放);
+  const 护盾特效 = createUnitEffect(施法者, "origin", 爱蜜莉雅表现配置.护盾.模型路径, 爱蜜莉雅表现配置.护盾.持续秒, 护盾特效键);
+  设置特效缩放(护盾特效, 爱蜜莉雅表现配置.护盾.缩放);
+  // 护盾展开音：护盾 Buff/吸收修饰/护盾特效建立后一次（单位=施法者，参数配置驱动）
+  Sound3DII_UnitPlayReuse(爱蜜莉雅音效配置.E护盾展开.路径, 施法者, 爱蜜莉雅音效配置.E护盾展开.裁断距离);
 
   // 护盾自然结束
   const 自然结束延迟 = addDelayedCallback(爱蜜莉雅E配置.护盾持续秒 * 1000, function E护盾自然结束(this: void): void {
@@ -220,13 +234,14 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
   const 方向 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), 目标X, 目标Y);
   // 起点冰面路径单元（位移路径分段表现，位移结束时由落点层替换/自然消失）
   创建点特效({
-    模型路径: 爱蜜莉雅E配置.冰面路径模型,
-    X: GetUnitX(施法者),
+    模型路径: 爱蜜莉雅表现配置.冰面路径.模型路径,
+   RGB: 爱蜜莉雅表现配置.冰面路径.RGB,
+       X: GetUnitX(施法者),
     Y: GetUnitY(施法者),
-    Z: 爱蜜莉雅E配置.表现.冰面路径.高度,
+    Z: 爱蜜莉雅表现配置.冰面路径.高度,
     面向角度: 方向,
-    缩放: 爱蜜莉雅E配置.表现.冰面路径.缩放,
-    持续秒: 爱蜜莉雅E配置.表现.冰面路径.持续秒,
+    缩放: 爱蜜莉雅表现配置.冰面路径.缩放,
+    持续秒: 爱蜜莉雅表现配置.冰面路径.持续秒,
   });
   数据.位移ID = 开始冲锋(施法者, {
     距离: 爱蜜莉雅E配置.位移距离,
@@ -256,6 +271,8 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
       数据.位移ID = 0;
     },
   });
+  // 冰面位移启动音：冲锋真实启动后一次（提前结束/重复施法收旧分支在上方已返回；单位=施法者，参数配置驱动）
+  Sound3DII_UnitPlayReuse(爱蜜莉雅音效配置.E位移.路径, 施法者, 爱蜜莉雅音效配置.E位移.裁断距离);
 }
 
 /** D 强化保护脉冲：为落点附近友军施加短时较弱护盾（registerDamageModifier 吸收） */

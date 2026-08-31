@@ -25,9 +25,9 @@ ____exports["初始化召唤事件中心"] = function()
         return
     end
     _____5DF2_521D_59CB_5316 = true
-    local _____89E6_53D1_5668 = jass:CreateTrigger()
+    local _____89E6_53D1_5668 = jass.CreateTrigger()
     playerUnitEvent.registerPlayerUnitEventForPlayerIds(_____89E6_53D1_5668, ____exports["召唤事件玩家ID列表"], jass.EVENT_PLAYER_UNIT_SUMMON)
-    jass:TriggerAddAction(_____89E6_53D1_5668, _____6D3E_53D1_5355_4F4D_53EC_5524_4E8B_4EF6)
+    jass.TriggerAddAction(_____89E6_53D1_5668, _____6D3E_53D1_5355_4F4D_53EC_5524_4E8B_4EF6)
 end
 jass = require("jass.common")
 playerUnitEvent = require("系统.00．核心系统.01．事件中心.01．玩家单位事件")

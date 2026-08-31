@@ -108,6 +108,7 @@ export interface 点特效参数 extends 特效XYZ轴旋转参数 {
   动画速度?: number;
   动画索引?: number;
   顶点颜色?: number;
+  RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number };
   红?: number;
   绿?: number;
   蓝?: number;
@@ -297,6 +298,7 @@ export interface 循环点特效参数 extends 特效XYZ轴旋转参数 {
   缩放?: number;
   动画速度?: number;
   顶点颜色?: number;
+  RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number };
   红?: number;
   绿?: number;
   蓝?: number;
@@ -334,6 +336,14 @@ function 限制到颜色字节(this: void, value: number): number {
 
 function 取特效顶点颜色(this: void, 参数: 循环点特效参数): number | undefined {
   if (参数.顶点颜色 != null) return 参数.顶点颜色;
+  if (参数.RGB != null) {
+    return DzGetColor(
+      限制到颜色字节(参数.RGB.透明度 ?? 255),
+      限制到颜色字节(参数.RGB.红),
+      限制到颜色字节(参数.RGB.绿),
+      限制到颜色字节(参数.RGB.蓝),
+    );
+  }
   if (参数.红 == null || 参数.绿 == null || 参数.蓝 == null) return undefined;
   const alpha = 限制到颜色字节(参数.透明度 ?? 255);
   const red = 限制到颜色字节(参数.红);
@@ -679,7 +689,7 @@ function 确保单位坐标跟随特效Tick(this: void): void {
   单位坐标跟随特效回调ID = addPeriodicCallback(单位坐标跟随特效间隔毫秒, on单位坐标跟随特效Tick);
 }
 
-export function 创建单位坐标跟随特效(unit: any, modelPath: string, effectKey: string = "default", scale: number = 1, height: number = 单位坐标跟随特效默认高度, animSpeed?: number, 动画索引?: number, 面向弧度: number = 0): any {
+export function 创建单位坐标跟随特效(unit: any, modelPath: string, effectKey: string = "default", scale: number = 1, height: number = 单位坐标跟随特效默认高度, animSpeed?: number, 动画索引?: number, 面向弧度: number = 0, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }): any {
   if (!单位可坐标跟随(unit) || modelPath === "") return null;
   const key = getUnitEffectKey(unit, effectKey);
   if (key === "") return null;
@@ -697,6 +707,9 @@ export function 创建单位坐标跟随特效(unit: any, modelPath: string, eff
   EXSetEffectZ(effect, EC_GetPointZ(x, y) + height);
   if (动画索引 != null && DzSetEffectAnimation != null) {
     DzSetEffectAnimation(effect, 动画索引, 0);
+  }
+  if (RGB != null) {
+    DzSetEffectVertexColor(effect, DzGetColor(RGB.透明度 ?? 255, RGB.红, RGB.绿, RGB.蓝));
   }
   单位坐标跟随特效表[key] = { unit, effect, scale, height, animSpeed };
   单位坐标跟随特效数量 += 1;

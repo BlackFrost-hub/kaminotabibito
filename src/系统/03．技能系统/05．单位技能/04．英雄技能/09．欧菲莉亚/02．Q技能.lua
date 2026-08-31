@@ -32,7 +32,7 @@ local function _____6B27_83F2_8389_4E9AQ_76EE_6807_5408_6CD5(caster, target, own
     if target == nil or target == 0 or not _____5355_4F4D_5B58_6D3B(target) then
         return false
     end
-    if target ~= caster and jass:IsUnitAlly(target, owner) ~= true then
+    if target ~= caster and jass.IsUnitAlly(target, owner) ~= true then
         return false
     end
     if IsUnitType(target, jass.UNIT_TYPE_ANCIENT) == true then
@@ -65,7 +65,7 @@ local function _____5904_7406_6B27_83F2_8389_4E9AQ(caster, abilityId)
     })
     local lifeAmount = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * (cfg["基础治疗攻击力倍率"] + cfg["每级治疗攻击力倍率"] * level)
     local manaAmount = cfg["每级额外魔法恢复"] * level
-    local owner = jass:GetOwningPlayer(caster)
+    local owner = jass.GetOwningPlayer(caster)
     local targets = getUnitsInRange(
         GetUnitX(caster),
         GetUnitY(caster),

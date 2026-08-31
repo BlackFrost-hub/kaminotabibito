@@ -4,3 +4,4 @@
 
 | 正式资源 | 大概声音 | 来源 |
 | --- | --- | --- |
+| `imports/Sound/Hero/Celia/SFX/celia_r_core.mp3` | 公式环收紧聚能 accent（收束咬合裁剪） | 20-25英雄音效规划.md |

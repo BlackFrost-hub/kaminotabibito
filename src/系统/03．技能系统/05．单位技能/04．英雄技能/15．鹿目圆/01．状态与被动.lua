@@ -166,7 +166,7 @@ function _____8BBE_7F6E_5706_795E_653B_51FB_529B(hero)
     if hero == nil or hero == 0 then
         return
     end
-    local _____76EE_6807_653B_51FB_529B = _____914D_7F6E["圆神"]["攻击基础值"] + jass:GetHeroInt(hero, false) * _____914D_7F6E["圆神"]["攻击智力系数"]
+    local _____76EE_6807_653B_51FB_529B = _____914D_7F6E["圆神"]["攻击基础值"] + jass.GetHeroInt(hero, false) * _____914D_7F6E["圆神"]["攻击智力系数"]
     SetUnitStateJapi(hero, UNIT_STATE_ATTACK1_BASE, _____76EE_6807_653B_51FB_529B)
 end
 function _____5706_795E_72B6_6001_5230_671F(variable)

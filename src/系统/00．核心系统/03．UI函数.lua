@@ -57,7 +57,7 @@ function ____exports.openNpcDialog(self, p, data)
         end
         setDialogNpcUnit(nil, p, data.npcUnit)
         local removedOverheadMarker = removeQuestMarkerAfterNpcTriggered(nil, data.npcUnit)
-        local pid = jass:GetPlayerId(p)
+        local pid = jass.GetPlayerId(p)
         _____8BA9_5BF9_8BDDNPC_9762_5411_73A9_5BB6_5355_4F4D(pid, data.npcUnit, data["对话目标单位"], data["NPC配置朝向"])
         --- 必须用配置位而非「本地是否拆掉过叹号」：各客户端本地头顶表可能不一致，会导致 qipao 分支不同 → desync
         local waitQipaoAfterOverheadClear = data.removeOverheadMarkerOnOpen == true
@@ -68,7 +68,7 @@ function ____exports.openNpcDialog(self, p, data)
             nil,
             p,
             function()
-                local pid = jass:GetPlayerId(p)
+                local pid = jass.GetPlayerId(p)
                 _____6062_590D_5BF9_8BDDNPC_914D_7F6E_671D_5411(pid)
                 releaseNpcOccupation(nil, pid)
                 destroyBubbleEffect(nil, pid)
@@ -122,16 +122,16 @@ ____exports.DEFAULT_UI_FONT_SCALE = 0.016
 local __pcallDzFrameA = 0
 local __pcallDzFrameB = 0
 local function __pcallDzFrameClearAllPoints(self)
-    japi:DzFrameClearAllPoints(__pcallDzFrameA)
+    japi.DzFrameClearAllPoints(__pcallDzFrameA)
 end
 local function __pcallDzFrameSetAllPoints(self)
-    japi:DzFrameSetAllPoints(__pcallDzFrameA, __pcallDzFrameB)
+    japi.DzFrameSetAllPoints(__pcallDzFrameA, __pcallDzFrameB)
 end
 local function __pcallDzFrameSetParent(self)
-    japi:DzFrameSetParent(__pcallDzFrameA, __pcallDzFrameB)
+    japi.DzFrameSetParent(__pcallDzFrameA, __pcallDzFrameB)
 end
 local function __pcallDzFrameSetAlpha(self)
-    japi:DzFrameSetAlpha(__pcallDzFrameA, __pcallDzFrameB)
+    japi.DzFrameSetAlpha(__pcallDzFrameA, __pcallDzFrameB)
 end
 local function pcallDzFrameClearAllPoints(frame)
     __pcallDzFrameA = frame
@@ -164,9 +164,9 @@ function ____exports.applyDzTextFontAndAlignment(self, frame, textAlignment, fon
         return
     end
     local scale = fontScale ~= nil and fontScale ~= nil and fontScale or ____exports.DEFAULT_UI_FONT_SCALE
-    japi:DzFrameSetFont(frame, fontFile, scale, fontFlag)
-    japi:DzFrameSetTextAlignment(frame, ____exports.DZ_TEXT_ALIGN_RESET)
-    japi:DzFrameSetTextAlignment(frame, textAlignment)
+    japi.DzFrameSetFont(frame, fontFile, scale, fontFlag)
+    japi.DzFrameSetTextAlignment(frame, ____exports.DZ_TEXT_ALIGN_RESET)
+    japi.DzFrameSetTextAlignment(frame, textAlignment)
 end
 function ____exports.applyDzTextFontAndCenterAlignment(self, frame, fontScale, fontFile, fontFlag)
     if fontFile == nil then
@@ -201,7 +201,7 @@ function ____exports.createTextFrameFillBackdrop(self, backdrop, name, text)
     end
     pcallDzFrameClearAllPoints(tf)
     pcallDzFrameSetAllPoints(tf, backdrop)
-    japi:DzFrameSetText(tf, text)
+    japi.DzFrameSetText(tf, text)
     return tf
 end
 --- Tab 标签：`TEXT` 铺满背景 + 居中 + 指定 Tab 字号。

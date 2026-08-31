@@ -5,41 +5,46 @@ local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技�
 local _____8299_8389_83B2_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲技能配置"]
 local _____8299_8389_83B2D_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲D配置"]
 local _____8299_8389_83B2_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲表现配置"]
-local ____require_result_0 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.01A．动作表现")
-local _____64AD_653E_9650_65F6_52A8_4F5C = ____require_result_0["播放限时动作"]
-local _____8299_8389_83B2_52A8_4F5C_69FD = ____require_result_0["芙莉莲动作槽"]
+local _____8299_8389_83B2_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲音效配置"]
+local ____require_result_0 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_0.Sound3DII_CooPlayReuse
+local ____require_result_1 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_1["播放英雄技能喊话"]
+local ____require_result_2 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.01A．动作表现")
+local _____64AD_653E_9650_65F6_52A8_4F5C = ____require_result_2["播放限时动作"]
+local _____8299_8389_83B2_52A8_4F5C_69FD = ____require_result_2["芙莉莲动作槽"]
 local jass = require("jass.common")
-local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local getGameTime = ____require_result_2.getGameTime
-local addDelayedCallback = ____require_result_2.addDelayedCallback
-local removeDelayedCallback = ____require_result_2.removeDelayedCallback
-local addPeriodicCallback = ____require_result_2.addPeriodicCallback
-local removePeriodicCallback = ____require_result_2.removePeriodicCallback
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_3["注册单位技能壳监听"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
-local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_4["创建战斗技能实例"]
-local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_4["查询战斗技能实例"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.04．区域效果.区域效果")
-local _____521B_5EFA_533A_57DF_6548_679C = ____require_result_5["创建区域效果"]
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_6.createUnitEffect
-local destroyUnitEffect = ____require_result_6.destroyUnitEffect
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
-local ____require_result_7 = require("lib.扩展函数.KK扩展API.00．装饰物函数")
-local DzDoodadCreate = ____require_result_7.DzDoodadCreate
-local DzDoodadSetModel = ____require_result_7.DzDoodadSetModel
-local DzDoodadRemove = ____require_result_7.DzDoodadRemove
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
-local ____require_result_9 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.02．被动效果")
-local _____662F_8299_8389_83B2 = ____require_result_9["是芙莉莲"]
-local _____8BB0_5F55_8299_8389_83B2_6D3B_52A8 = ____require_result_9["记录芙莉莲活动"]
-local _____767B_8BB0_8299_8389_83B2_6E05_7406 = ____require_result_9["登记芙莉莲清理"]
-local _____82B1_7530_5224_5B9A_63A5_53E3 = ____require_result_9["花田判定接口"]
-local _____91CD_65B0_5B89_6392_9690_533F_8BA1_65F6 = ____require_result_9["重新安排隐匿计时"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local getGameTime = ____require_result_4.getGameTime
+local addDelayedCallback = ____require_result_4.addDelayedCallback
+local removeDelayedCallback = ____require_result_4.removeDelayedCallback
+local addPeriodicCallback = ____require_result_4.addPeriodicCallback
+local removePeriodicCallback = ____require_result_4.removePeriodicCallback
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_5["注册单位技能壳监听"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
+local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_6["创建战斗技能实例"]
+local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_6["查询战斗技能实例"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.04．区域效果.区域效果")
+local _____521B_5EFA_533A_57DF_6548_679C = ____require_result_7["创建区域效果"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createUnitEffect = ____require_result_8.createUnitEffect
+local destroyUnitEffect = ____require_result_8.destroyUnitEffect
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local ____require_result_9 = require("lib.扩展函数.KK扩展API.00．装饰物函数")
+local DzDoodadCreate = ____require_result_9.DzDoodadCreate
+local DzDoodadSetModel = ____require_result_9.DzDoodadSetModel
+local DzDoodadRemove = ____require_result_9.DzDoodadRemove
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_5B58_6D3B = ____require_result_10["单位存活"]
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.02．被动效果")
+local _____662F_8299_8389_83B2 = ____require_result_11["是芙莉莲"]
+local _____8BB0_5F55_8299_8389_83B2_6D3B_52A8 = ____require_result_11["记录芙莉莲活动"]
+local _____767B_8BB0_8299_8389_83B2_6E05_7406 = ____require_result_11["登记芙莉莲清理"]
+local _____82B1_7530_5224_5B9A_63A5_53E3 = ____require_result_11["花田判定接口"]
+local _____91CD_65B0_5B89_6392_9690_533F_8BA1_65F6 = ____require_result_11["重新安排隐匿计时"]
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
 local ____D_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.D["技能ID"])
 local ____D_914D_7F6E = _____8299_8389_83B2D_914D_7F6E
@@ -92,10 +97,10 @@ end
 ____exports["在花田内"] = function(_____8299_8389_83B2)
     return _____82B1_7530_5224_5B9A_63A5_53E3["在花田内"](_____8299_8389_83B2)
 end
---- 花田内静止检测（0.5s 采样：连续 2 次位移 < 阈值 → 静止；状态变化时重排隐匿计时）
+--- 花田内静止检测：采样间隔、移动阈值和连续次数均由 D 配置驱动。
 local function _____542F_52A8_9759_6B62_68C0_6D4B(_____82B1_7530)
     _____82B1_7530["静止检测ID"] = addPeriodicCallback(
-        500,
+        ____D_914D_7F6E["静止检测间隔毫秒"],
         function()
             if _____82B1_7530["已结束"] then
                 return
@@ -122,9 +127,9 @@ local function _____542F_52A8_9759_6B62_68C0_6D4B(_____82B1_7530)
                 _____82B1_7530["静止上次Y"]
             )
             local _____539F_9759_6B62 = _____82B1_7530["静止标记"]
-            if _____79FB_52A8_5E73_65B9 <= 20 * 20 then
+            if _____79FB_52A8_5E73_65B9 <= ____D_914D_7F6E["静止移动阈值"] * ____D_914D_7F6E["静止移动阈值"] then
                 _____82B1_7530["静止采样计数"] = _____82B1_7530["静止采样计数"] + 1
-                if _____82B1_7530["静止采样计数"] >= 2 then
+                if _____82B1_7530["静止采样计数"] >= ____D_914D_7F6E["静止连续采样次数"] then
                     _____82B1_7530["静止标记"] = true
                 end
             else
@@ -168,14 +173,15 @@ ____exports["尝试消费花田盛开"] = function(_____8299_8389_83B2)
     end
     _____82B1_7530["盛开已消费"] = true
     _____521B_5EFA_70B9_7279_6548({
-        ["模型路径"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣主体"],
+        ["模型路径"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["模型路径"],
         X = _____82B1_7530["中心X"],
         Y = _____82B1_7530["中心Y"],
-        Z = _____8299_8389_83B2_8868_73B0_914D_7F6E["特效参数"]["D盛开"]["高度"],
-        ["面向角度"] = 0,
-        ["动画索引"] = 0,
-        ["缩放"] = _____82B1_7530["半径"] / _____8299_8389_83B2_8868_73B0_914D_7F6E["特效参数"]["D花瓣"]["基准半径"] * _____8299_8389_83B2_8868_73B0_914D_7F6E["特效参数"]["D花瓣"]["基准缩放"] * _____8299_8389_83B2_8868_73B0_914D_7F6E["特效参数"]["D盛开"]["缩放倍率"],
-        ["持续秒"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["特效参数"]["D盛开"]["持续秒"]
+        Z = _____8299_8389_83B2_8868_73B0_914D_7F6E["D盛开"]["高度"],
+        ["面向角度"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D盛开"]["面向角度"],
+        ["动画索引"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D盛开"]["动画索引"],
+        ["缩放"] = _____82B1_7530["半径"] / _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["基准半径"] * _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["基准缩放"] * _____8299_8389_83B2_8868_73B0_914D_7F6E["D盛开"]["缩放倍率"],
+        ["持续秒"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D盛开"]["持续秒"],
+        RGB = _____8299_8389_83B2_8868_73B0_914D_7F6E["D盛开"].RGB
     })
     return true
 end
@@ -191,8 +197,8 @@ local function _____9500_6BC1_82B1_7530(_____82B1_7530, _____81EA_7136_7ED3_675F
         removePeriodicCallback(_____82B1_7530["静止检测ID"])
     end
     if _____82B1_7530["区域"] ~= nil then
-        local ____self_10 = _____82B1_7530["区域"]
-        ____self_10["销毁"](____self_10)
+        local ____self_12 = _____82B1_7530["区域"]
+        ____self_12["销毁"](____self_12)
         _____82B1_7530["区域"] = nil
     end
     if _____82B1_7530["视野句柄"] ~= nil and _____82B1_7530["视野句柄"] ~= 0 then
@@ -204,7 +210,7 @@ local function _____9500_6BC1_82B1_7530(_____82B1_7530, _____81EA_7136_7ED3_675F
             local _____53E5_67C4 = _____82B1_7530["花瓣句柄"]
             _____82B1_7530["花瓣句柄"] = nil
             addDelayedCallback(
-                400,
+                ____D_914D_7F6E["自然淡出延迟毫秒"],
                 function()
                     jass.DestroyEffect(_____53E5_67C4)
                 end
@@ -232,14 +238,14 @@ local function _____9500_6BC1_82B1_7530(_____82B1_7530, _____81EA_7136_7ED3_675F
 end
 --- 在花田半径内按交错网格创建有限花簇，避免规则方格的拼接感和无限实例。
 local function _____521B_5EFA_82B1_6D77(_____82B1_7530)
-    local _____914D_7F6E = _____8299_8389_83B2_8868_73B0_914D_7F6E["特效参数"]["D花海"]
+    local _____914D_7F6E = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花海"]
     local _____6709_6548_534A_5F84 = math.max(0, _____82B1_7530["半径"] - _____914D_7F6E["边缘内缩"])
     local _____6709_6548_534A_5F84_5E73_65B9 = _____6709_6548_534A_5F84 * _____6709_6548_534A_5F84
     local _____6570_91CF = 0
     do
         local _____884C = -_____914D_7F6E["网格半径"]
         while _____884C <= _____914D_7F6E["网格半径"] do
-            local _____884C_504F_79FB = math.abs(_____884C) % 2 == 1 and _____914D_7F6E["间距X"] * 0.5 or 0
+            local _____884C_504F_79FB = math.abs(_____884C) % _____914D_7F6E["交错行周期"] == _____914D_7F6E["交错行余数"] and _____914D_7F6E["间距X"] * _____914D_7F6E["交错行偏移比例"] or 0
             do
                 local _____5217 = -_____914D_7F6E["网格半径"]
                 while _____5217 <= _____914D_7F6E["网格半径"] do
@@ -252,13 +258,13 @@ local function _____521B_5EFA_82B1_6D77(_____82B1_7530)
                         if _____8DDD_79BB_5E73_65B9(x, y, _____82B1_7530["中心X"], _____82B1_7530["中心Y"]) > _____6709_6548_534A_5F84_5E73_65B9 then
                             goto __continue43
                         end
-                        local _____56FE_6848_7D22_5F15 = math.abs(_____884C * 7 + _____5217 * 11) % 3
+                        local _____56FE_6848_7D22_5F15 = math.abs(_____884C * _____914D_7F6E["图案行步进"] + _____5217 * _____914D_7F6E["图案列步进"]) % _____914D_7F6E["图案数量"]
                         local _____7F29_653E_500D_7387 = _____914D_7F6E["基准缩放"] * (1 + (_____56FE_6848_7D22_5F15 - 1) * _____914D_7F6E["缩放扰动"])
                         local _____7F51_683C_5E8F_53F7 = (_____884C + _____914D_7F6E["网格半径"]) * (_____914D_7F6E["网格半径"] * 2 + 1) + _____5217 + _____914D_7F6E["网格半径"]
-                        local _____671D_5411 = _____7F51_683C_5E8F_53F7 * _____914D_7F6E["旋转步进"] % 360
+                        local _____671D_5411 = _____7F51_683C_5E8F_53F7 * _____914D_7F6E["旋转步进"] % _____914D_7F6E["旋转角度周期"]
                         local _____82B1_7C07 = DzDoodadCreate(
                             _____82B1_6D77_88C5_9970_7269ID,
-                            0,
+                            _____914D_7F6E["装饰物变体ID"],
                             x,
                             y,
                             _____914D_7F6E["高度"],
@@ -267,8 +273,8 @@ local function _____521B_5EFA_82B1_6D77(_____82B1_7530)
                         )
                         if _____82B1_7C07 ~= nil and _____82B1_7C07 ~= 0 then
                             DzDoodadSetModel(_____82B1_7C07, _____914D_7F6E["模型路径"])
-                            local ____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_11 = _____82B1_7530["花簇句柄列表"]
-                            ____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_11[#____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_11 + 1] = _____82B1_7C07
+                            local ____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_13 = _____82B1_7530["花簇句柄列表"]
+                            ____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_13[#____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_13 + 1] = _____82B1_7C07
                             _____6570_91CF = _____6570_91CF + 1
                         end
                     end
@@ -296,8 +302,8 @@ local function _____91CA_653ED(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         do
             local i = 0
             while i < #_____65E7_5B9E_4F8B_5217_8868 do
-                local ____self_12 = _____65E7_5B9E_4F8B_5217_8868[i + 1]
-                ____self_12["完成"](____self_12)
+                local ____self_14 = _____65E7_5B9E_4F8B_5217_8868[i + 1]
+                ____self_14["完成"](____self_14)
                 i = i + 1
             end
         end
@@ -358,19 +364,28 @@ local function _____91CA_653ED(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         jass.EnableFogModifier(_____82B1_7530["视野句柄"])
     end
     _____82B1_7530["花瓣句柄"] = _____521B_5EFA_70B9_7279_6548({
-        ["模型路径"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣主体"],
+        ["模型路径"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["模型路径"],
         X = _____76EE_6807X,
         Y = _____76EE_6807Y,
-        Z = _____8299_8389_83B2_8868_73B0_914D_7F6E["特效参数"]["D花瓣"]["高度"],
-        ["面向角度"] = 0,
-        ["动画索引"] = 0,
-        ["缩放"] = ____D_914D_7F6E["半径"] / _____8299_8389_83B2_8868_73B0_914D_7F6E["特效参数"]["D花瓣"]["基准半径"] * _____8299_8389_83B2_8868_73B0_914D_7F6E["特效参数"]["D花瓣"]["基准缩放"],
-        ["持续秒"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["特效参数"]["D花瓣"]["持续秒"]
+        Z = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["高度"],
+        ["面向角度"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["面向角度"],
+        ["动画索引"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["动画索引"],
+        ["缩放"] = ____D_914D_7F6E["半径"] / _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["基准半径"] * _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["基准缩放"],
+        ["持续秒"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["持续秒"],
+        RGB = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"].RGB
     })
     _____521B_5EFA_82B1_6D77(_____82B1_7530)
+    Sound3DII_CooPlayReuse(
+        _____8299_8389_83B2_97F3_6548_914D_7F6E["D花田"]["路径"],
+        _____76EE_6807X,
+        _____76EE_6807Y,
+        _____8299_8389_83B2_97F3_6548_914D_7F6E["D花田"]["高度"],
+        _____8299_8389_83B2_97F3_6548_914D_7F6E["D花田"]["裁断距离"]
+    )
+    _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "芙莉莲", _____8299_8389_83B2_6280_80FD_914D_7F6E.D["技能ID"])
     _____542F_52A8_9759_6B62_68C0_6D4B(_____82B1_7530)
     _____82B1_7530["到期回调ID"] = addDelayedCallback(
-        ____D_914D_7F6E["持续秒"] * 1000 + 100,
+        ____D_914D_7F6E["持续秒"] * 1000 + ____D_914D_7F6E["到期兜底延迟毫秒"],
         function()
             if _____82B1_7530["已结束"] then
                 return
@@ -397,7 +412,7 @@ ____exports["注册芙莉莲D"] = function()
         ["释放技能"] = _____91CA_653ED,
         ["创建独立技能实例"] = true,
         ["独立技能来源类型"] = "单位技能",
-        ["技能实例持续时间秒"] = ____D_914D_7F6E["持续秒"] + 2
+        ["技能实例持续时间秒"] = ____D_914D_7F6E["持续秒"] + ____D_914D_7F6E["实例收尾缓冲秒"]
     })
 end
 return ____exports

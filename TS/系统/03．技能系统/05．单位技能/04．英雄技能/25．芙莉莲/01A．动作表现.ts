@@ -5,7 +5,7 @@
  * 最终人物模型 051_Frieren 的限时动画与循环动作守护统一封装。
  * Q/W/E/R/D 文件不得散落 SetUnitAnimation/SetUnitAnimationByIndex/SetUnitTimeScale，
  * 一律通过本模块接口播放；恢复动画速度 1.0，向 02 技能清理器提供句柄。
- * 索引 0 表示"未确认槽"跳过（待截图映射）；候选依据见 00．配置 芙莉莲技能动作槽。
+ * 技能动作索引 0 表示"未确认槽"跳过；待机恢复使用模型配置的真实 Stand 索引。
  */
 
 import { 芙莉莲模型动作配置, 芙莉莲技能动作槽 } from "./00．配置";
@@ -24,7 +24,6 @@ const { 登记芙莉莲清理 } = require("./02．被动效果") as {
 
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
-const SetUnitAnimation = jass.SetUnitAnimation as (this: void, unit: any, whichAnimation: string) => void;
 
 export interface 动作槽 {
   /** 模型序列显示索引（0 = 未确认槽，跳过） */
@@ -45,7 +44,7 @@ function 取序列定义(this: void, 索引: number): { 原始时长秒: number;
 }
 
 /**
- * 播放限时动作：按索引播放指定时长，结束后恢复 stand 与动画速度 1.0。
+ * 播放限时动作：按索引播放指定时长，结束后恢复模型配置的待机序列与动画速度 1.0。
  * 登记 02 技能清理器（技能结束/死亡统一移除恢复回调）。
  */
 export function 播放限时动作(this: void, 英雄: any, 槽: 动作槽, 登记名: string): void {
@@ -57,14 +56,14 @@ export function 播放限时动作(this: void, 英雄: any, 槽: 动作槽, 登�
     const 恢复ID = addDelayedCallback(持续毫秒, function 恢复站立(this: void): void {
       if (单位存活(英雄)) {
         SetUnitTimeScale(英雄, 1);
-        SetUnitAnimation(英雄, "stand");
+        SetUnitAnimationByIndex(英雄, 芙莉莲模型动作配置.待机索引);
       }
     });
     登记芙莉莲清理(英雄, 登记名, function 动作恢复清理(this: void): void {
       removeDelayedCallback(恢复ID);
       if (单位存活(英雄)) {
         SetUnitTimeScale(英雄, 1);
-        SetUnitAnimation(英雄, "stand");
+        SetUnitAnimationByIndex(英雄, 芙莉莲模型动作配置.待机索引);
       }
     });
   }
@@ -72,7 +71,7 @@ export function 播放限时动作(this: void, 英雄: any, 槽: 动作槽, 登�
 
 /**
  * 开始循环动作守护（保持段，如 W 防御保持 / R 蓄力保持）。
- * 返回句柄；调用 停止循环守护 恢复 stand 与速度 1.0。
+ * 返回句柄；调用 停止循环守护 恢复模型配置的待机序列与速度 1.0。
  */
 export interface 循环守护句柄 {
   英雄: any;
@@ -90,7 +89,7 @@ export function 开始循环守护(this: void, 英雄: any, 槽: 动作槽, 登�
     恢复ID = addDelayedCallback(槽.持续秒 * 1000, function 守护到期(this: void): void {
       if (单位存活(英雄)) {
         SetUnitTimeScale(英雄, 1);
-        SetUnitAnimation(英雄, "stand");
+        SetUnitAnimationByIndex(英雄, 芙莉莲模型动作配置.待机索引);
       }
     });
   }
@@ -107,7 +106,7 @@ export function 停止循环守护(this: void, 句柄: 循环守护句柄 | null
   句柄.恢复ID = 0;
   if (句柄.英雄 != null && 句柄.英雄 !== 0 && 单位存活(句柄.英雄)) {
     SetUnitTimeScale(句柄.英雄, 1);
-    SetUnitAnimation(句柄.英雄, "stand");
+    SetUnitAnimationByIndex(句柄.英雄, 芙莉莲模型动作配置.待机索引);
   }
 }
 

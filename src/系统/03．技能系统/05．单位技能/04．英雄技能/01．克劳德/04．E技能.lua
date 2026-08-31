@@ -607,7 +607,7 @@ local function ____E_51B2_950B_542F_52A8(state)
     end
     local dx = state["目标X"] - _____83B7_53D6_5355_4F4DX(state["施法者"])
     local dy = state["目标Y"] - _____83B7_53D6_5355_4F4DY(state["施法者"])
-    local _____76EE_6807_8DDD_79BB = jass:SquareRoot(dx * dx + dy * dy)
+    local _____76EE_6807_8DDD_79BB = jass.SquareRoot(dx * dx + dy * dy)
     local _____51B2_950B_8DDD_79BB = _____76EE_6807_8DDD_79BB > 0 and _____76EE_6807_8DDD_79BB < _____914D_7F6E["冲锋距离"] and _____76EE_6807_8DDD_79BB or _____914D_7F6E["冲锋距离"]
     state["位移ID"] = _____5F00_59CB_51B2_950B(state["施法者"], {
         ["角度"] = state["方向角"],

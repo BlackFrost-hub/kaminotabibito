@@ -59,7 +59,7 @@ local function ____RC_53D6_547D_4E2D_76EE_6807(state, x, y)
             ["允许古树"] = true,
             ["允许无敌"] = true,
             ["仅敌人"] = true,
-            ["自定义条件"] = function(____, u) return u ~= state["上次命中单位"] and not jass:IsUnitType(u, jass.UNIT_TYPE_ANCIENT) end
+            ["自定义条件"] = function(____, u) return u ~= state["上次命中单位"] and not jass.IsUnitType(u, jass.UNIT_TYPE_ANCIENT) end
         }
     )
     local ____temp_2
@@ -75,7 +75,7 @@ local function ____RC_6267_884C_53CD_5F39(state, nextAngle)
     state["角度"] = nextAngle
     state["每Tick位移"] = state["每Tick位移"] * (1 - _____914D_7F6E.RC["每次衰减"])
     state["伤害"] = state["伤害"] * (1 - _____914D_7F6E.RC["每次衰减"])
-    jass:SetUnitFacing(state["飞刀"], state["角度"])
+    jass.SetUnitFacing(state["飞刀"], state["角度"])
 end
 local function _____63A8_8FDBRC(variable)
     local state = variable
@@ -86,17 +86,17 @@ local function _____63A8_8FDBRC(variable)
         _____7ED3_675FRC(state)
         return
     end
-    local currentX = jass:GetUnitX(state["飞刀"])
-    local currentY = jass:GetUnitY(state["飞刀"])
+    local currentX = jass.GetUnitX(state["飞刀"])
+    local currentY = jass.GetUnitY(state["飞刀"])
     local x = _____6781_5750_6807X(currentX, state["每Tick位移"], state["角度"])
     local y = _____6781_5750_6807Y(currentY, state["每Tick位移"], state["角度"])
-    if jass:IsTerrainPathable(x, y, jass.PATHING_TYPE_WALKABILITY) then
+    if jass.IsTerrainPathable(x, y, jass.PATHING_TYPE_WALKABILITY) then
         state["上次命中单位"] = nil
         ____RC_6267_884C_53CD_5F39(state, state["角度"] + 180)
         return
     end
-    jass:SetUnitX(state["飞刀"], x)
-    jass:SetUnitY(state["飞刀"], y)
+    jass.SetUnitX(state["飞刀"], x)
+    jass.SetUnitY(state["飞刀"], y)
     state["已飞行距离"] = state["已飞行距离"] + state["每Tick位移"]
     local target = ____RC_53D6_547D_4E2D_76EE_6807(state, x, y)
     if target == nil or target == 0 then
@@ -122,13 +122,13 @@ local function _____63A8_8FDBRC(variable)
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRC(_listener, caster, _____6280_80FD_5B9E_4F8BID)
     _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(caster, _____914D_7F6E["符卡间隔秒"].RC)
-    local x = jass:GetUnitX(caster)
-    local y = jass:GetUnitY(caster)
+    local x = jass.GetUnitX(caster)
+    local y = jass.GetUnitY(caster)
     local angle = _____4E24_70B9_89D2_5EA6(
         x,
         y,
-        jass:GetSpellTargetX(),
-        jass:GetSpellTargetY()
+        jass.GetSpellTargetX(),
+        jass.GetSpellTargetY()
     )
     local knife = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
         caster,
@@ -141,7 +141,7 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRC(_listener, caster, ____
         _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(_____6280_80FD_5B9E_4F8BID)
         return
     end
-    jass:SetUnitScale(knife, _____914D_7F6E.RC["缩放"], _____914D_7F6E.RC["缩放"], _____914D_7F6E.RC["缩放"])
+    jass.SetUnitScale(knife, _____914D_7F6E.RC["缩放"], _____914D_7F6E.RC["缩放"], _____914D_7F6E.RC["缩放"])
     local state = {
         ["施法者"] = caster,
         ["飞刀"] = knife,
@@ -164,7 +164,7 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRC(_listener, caster, ____
         end,
         ["设置角度"] = function(value)
             state["角度"] = value
-            jass:SetUnitFacing(knife, value)
+            jass.SetUnitFacing(knife, value)
         end,
         ["取每Tick位移"] = function()
             return state["每Tick位移"]

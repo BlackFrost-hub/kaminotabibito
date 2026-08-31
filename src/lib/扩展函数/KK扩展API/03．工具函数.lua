@@ -17,12 +17,12 @@ end
 -- @param url QQ群链接
 -- @returns 是否成功打开
 function ____exports.DzOpenQQGroupUrl(self, url)
-    return japi:DzOpenQQGroupUrl(url) or false
+    return japi.DzOpenQQGroupUrl(url) or false
 end
 --- 异步执行全局函数
 -- 
 -- @param funcName 全局函数名
 function ____exports.DzExecuteFunc(self, funcName)
-    japi:DzExecuteFunc(funcName)
+    japi.DzExecuteFunc(funcName)
 end
 return ____exports

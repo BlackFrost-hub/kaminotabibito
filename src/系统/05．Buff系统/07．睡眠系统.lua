@@ -152,7 +152,7 @@ local function _____901A_77E5_7761_7720_76D1_542C(list, event)
     end
 end
 local function _____53D6_6682_505C_6765_6E90(_____76EE_6807_5355_4F4DID)
-    return "SleepBuff:" .. tostring(nil, _____76EE_6807_5355_4F4DID)
+    return "SleepBuff:" .. tostring(_____76EE_6807_5355_4F4DID)
 end
 local function _____64AD_653E_7761_7720_9ED8_8BA4_97F3_6548(unit)
     Sound3DII_UnitPlay(____exports["睡眠默认音效路径"], unit, ____exports["睡眠默认音效裁断距离"])

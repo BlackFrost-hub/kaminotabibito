@@ -173,7 +173,7 @@ local function _____5904_7406_63A9_62A4_4F24_5BB3(context)
         GetUnitY(target),
         GetUnitX(attacker),
         GetUnitY(attacker)
-    ) or jass:GetUnitFacing(_____65BD_6CD5_8005)
+    ) or jass.GetUnitFacing(_____65BD_6CD5_8005)
     SetUnitPosition(
         _____65BD_6CD5_8005,
         _____6781_5750_6807X(

@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-const 物品测试最大序号 = 192;
+const 物品测试最大序号 = 193;
 
 export const 精灵药水测试装备列表 = [
   "星露生命精华",
@@ -205,6 +205,7 @@ export const 物品测试序号装备名表: Record<number, string> = {
   190: "真祖女武神血铠",
   191: "英灵战乙女蔷薇镜",
   192: "星露生命精华",
+  193: "深井活水囊",
 };
 
 function 取序号装备名(this: void, 序号: number): string {

@@ -7,6 +7,7 @@ local _____4F0A_857E_5A1CW_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜W配置"]
 local _____4F0A_857E_5A1C_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜表现配置"]
 local _____4F0A_857E_5A1C_6A21_578B_52A8_4F5C_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜模型动作配置"]
 local _____4F0A_857E_5A1C_53D8_5F0F_6548_679C_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜变式效果配置"]
+local _____4F0A_857E_5A1C_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜音效配置"]
 local ____01A_FF0E_52A8_4F5C_8868_73B0 = require("系统.03．技能系统.05．单位技能.04．英雄技能.23．伊蕾娜.01A．动作表现")
 local _____64AD_653E_4F0A_857E_5A1C_9636_6BB5_52A8_4F5C = ____01A_FF0E_52A8_4F5C_8868_73B0["播放伊蕾娜阶段动作"]
 local _____5F00_59CB_4F0A_857E_5A1C_5FAA_73AF_52A8_4F5C = ____01A_FF0E_52A8_4F5C_8868_73B0["开始伊蕾娜循环动作"]
@@ -82,44 +83,50 @@ function _____5B9E_4F8B_5316W_6536_5C3E_5B88_62A4(_____65BD_6CD5_8005, _____6570
         end
     )
 end
+local ____require_result_0 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播放英雄技能喊话"]
 local jass = require("jass.common")
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local GetOwningPlayer = jass.GetOwningPlayer
 local IsUnitEnemy = jass.IsUnitEnemy
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local getGameTime = ____require_result_1.getGameTime
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
-local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_3.registerDamageModifier
-unregisterDamageModifier = ____require_result_3.unregisterDamageModifier
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
-local _____5F00_59CB_62A4_76FE = ____require_result_4["开始护盾"]
-_____79FB_9664_62A4_76FE = ____require_result_4["移除护盾"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
-_____5355_4F4D_5B58_6D3B = ____require_result_5["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_5["两点角度"]
-local _____6781_5750_6807X = ____require_result_5["极坐标X"]
-local _____6781_5750_6807Y = ____require_result_5["极坐标Y"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-_____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_6["获取坐标范围敌人"]
-local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_7["添加单位暂停"]
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_7["移除单位暂停"]
-local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-SFB_setSlow = ____require_result_8.SFB_setSlow
-local ____require_result_9 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_9.registerManualBuff
-_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_9["移除单位指定Buff"]
-local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_10["创建单位坐标跟随特效"]
-_____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_10["销毁单位坐标跟随特效"]
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
-local _____9500_6BC1_70B9_7279_6548 = ____require_result_10["销毁点特效"]
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local getGameTime = ____require_result_2.getGameTime
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_3["注册单位技能壳监听"]
+local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+local registerDamageModifier = ____require_result_4.registerDamageModifier
+unregisterDamageModifier = ____require_result_4.unregisterDamageModifier
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
+local _____5F00_59CB_62A4_76FE = ____require_result_5["开始护盾"]
+_____79FB_9664_62A4_76FE = ____require_result_5["移除护盾"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
+_____5355_4F4D_5B58_6D3B = ____require_result_6["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_6["两点角度"]
+local _____6781_5750_6807X = ____require_result_6["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_6["极坐标Y"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+_____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_7["获取坐标范围敌人"]
+local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_8["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_8["移除单位暂停"]
+local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+SFB_setSlow = ____require_result_9.SFB_setSlow
+local ____require_result_10 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_10.registerManualBuff
+_____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_10["移除单位指定Buff"]
+local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_11["创建单位坐标跟随特效"]
+_____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_11["销毁单位坐标跟随特效"]
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
+local _____9500_6BC1_70B9_7279_6548 = ____require_result_11["销毁点特效"]
+local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_12.Sound3DII_UnitPlayReuse
+local ____require_result_13 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_13.Sound3DII_CooPlayReuse
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____4F0A_857E_5A1C_6280_80FD_914D_7F6E["单位类型ID"]
 ____W_955C_754C_7279_6548_952E = "伊蕾娜-W镜界"
 local ____W_786C_76F4_6765_6E90 = "伊蕾娜-W硬直"
@@ -153,6 +160,7 @@ local function _____91CA_653EW_955C_754C_62A4_7B26(_context, _____65BD_6CD5_8005
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
+    _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "伊蕾娜", _____4F0A_857E_5A1C_6280_80FD_914D_7F6E.W["技能ID"])
     local _____65E7_6570_636E = _____53D6_4F0A_857E_5A1CW_7ED3_754C(_____65BD_6CD5_8005)
     if _____65E7_6570_636E ~= nil and not _____65E7_6570_636E["已关闭"] then
         _____5173_95EDW_955C_754C(_____65E7_6570_636E, false)
@@ -196,8 +204,13 @@ local function _____91CA_653EW_955C_754C_62A4_7B26(_context, _____65BD_6CD5_8005
         _____955C_754C_8868_73B0["模型路径"],
         ____W_955C_754C_7279_6548_952E,
         _____955C_754C_7F29_653E,
-        _____955C_754C_8868_73B0["高度"]
+        _____955C_754C_8868_73B0["高度"],
+        1,
+        nil,
+        0,
+        _____955C_754C_8868_73B0.RGB
     )
+    Sound3DII_UnitPlayReuse(_____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W展开"]["路径"], _____65BD_6CD5_8005, _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W展开"]["裁断距离"])
     _____6570_636E["护盾ID"] = _____5F00_59CB_62A4_76FE(
         _____65BD_6CD5_8005,
         {
@@ -252,6 +265,7 @@ local function _____91CA_653EW_955C_754C_62A4_7B26(_context, _____65BD_6CD5_8005
             )
             local _____53CD_9988_7279_6548 = _____521B_5EFA_70B9_7279_6548({
                 ["模型路径"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["模型路径"],
+                RGB = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"].RGB,
                 X = _____63A5_89E6X,
                 Y = _____63A5_89E6Y,
                 Z = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["高度"],
@@ -260,6 +274,13 @@ local function _____91CA_653EW_955C_754C_62A4_7B26(_context, _____65BD_6CD5_8005
                 ["持续秒"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["持续秒"]
             })
             local ____ = _____53CD_9988_7279_6548
+            Sound3DII_CooPlayReuse(
+                _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W偏折"]["路径"],
+                _____63A5_89E6X,
+                _____63A5_89E6Y,
+                _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W偏折"]["高度"],
+                _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W偏折"]["裁断距离"]
+            )
             addDelayedCallback(
                 10,
                 function()

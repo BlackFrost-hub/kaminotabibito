@@ -92,7 +92,7 @@ local function cancelCameraShakeTask(taskId)
 end
 function ____exports.CameraShakeForPlayer(whichPlayer, magnitude, duration)
     CameraSetEQNoiseForPlayer(whichPlayer, magnitude)
-    local playerId = jass:GetPlayerId(whichPlayer)
+    local playerId = jass.GetPlayerId(whichPlayer)
     local existing = cameraTimers:get(playerId)
     if existing then
         cancelCameraShakeTask(existing)

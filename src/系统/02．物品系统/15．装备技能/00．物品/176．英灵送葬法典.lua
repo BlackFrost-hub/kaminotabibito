@@ -57,8 +57,8 @@ end
 local function ____on_82F1_7075_9001_846C_89E6_53D1(e)
     local s = e["持有者"]
     local t = e["目标"]
-    local x = jass:GetUnitX(t)
-    local y = jass:GetUnitY(t)
+    local x = jass.GetUnitX(t)
+    local y = jass.GetUnitY(t)
     _____64AD_653E_70B9_7279_6548(
         _____56DBBoss_88C5_5907_7279_6548["英灵陨星预警"],
         x,

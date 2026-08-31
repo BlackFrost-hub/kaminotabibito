@@ -225,9 +225,9 @@ local function _____64AD_653EW_5168_5C40_97F3_6548(unit, soundKey)
     if unit == nil or unit == 0 or soundHandle == nil or soundHandle == 0 then
         return
     end
-    jass:AttachSoundToUnit(soundHandle, unit)
-    jass:SetSoundVolume(soundHandle, 127)
-    jass:StartSound(soundHandle)
+    jass.AttachSoundToUnit(soundHandle, unit)
+    jass.SetSoundVolume(soundHandle, 127)
+    jass.StartSound(soundHandle)
 end
 local function _____521B_5EFAW_8868_73B0_5355_4F4D(owner, typeId, x, y, facing)
     local _____8868_73B0_5355_4F4D = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(

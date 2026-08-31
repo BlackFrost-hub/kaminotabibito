@@ -15,7 +15,8 @@
 import {
   塞莉亚克莱尔技能配置,
   塞莉亚克莱尔D配置,
-  塞莉亚克莱尔表现子配置,
+  塞莉亚克莱尔表现配置,
+  塞莉亚音效配置,
 } from "./00．配置";
 import {
   查询塞莉亚节点,
@@ -46,6 +47,12 @@ const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Sta
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
+};
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+};
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
 };
 
 const 英雄单位类型ID = 塞莉亚克莱尔技能配置.单位类型ID;
@@ -78,6 +85,9 @@ function 选择最近合法节点(
 function 释放D术式转写(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
+  // 技能喊话：施法成功起点（前置检查通过；全局 3D；随机二选一由喊话系统驱动）
+  播放英雄技能喊话(施法者, "塞莉亚·克莱尔", 塞莉亚克莱尔技能配置.D.技能ID);
+
   const 目标X = GetSpellTargetX();
   const 目标Y = GetSpellTargetY();
   const 硬直来源 = D硬直来源;
@@ -101,14 +111,17 @@ function 释放D术式转写(this: void, _context: any, 施法者: any, 技能�
       // R 锁定或并发冲突：安全回滚（什么都不改）
       return;
     }
+    // 转写音（转写事务真正成功时一次；坐标=新落点，内含落点短闪延迟层，参数配置驱动）
+    Sound3DII_CooPlayReuse(塞莉亚音效配置.D转写.路径, 目标X, 目标Y, 塞莉亚音效配置.D转写.高度, 塞莉亚音效配置.D转写.裁断距离);
     // 新位置短闪表现
     const 落点闪现 = 创建点特效({
-      模型路径: 塞莉亚克莱尔表现子配置.D重连落点闪现.模型路径,
+      模型路径: 塞莉亚克莱尔表现配置.D重连落点闪现.模型路径,
+      RGB: 塞莉亚克莱尔表现配置.D重连落点闪现.RGB,
       X: 目标X,
       Y: 目标Y,
-      Z: 塞莉亚克莱尔表现子配置.D重连落点闪现.高度,
-      缩放: 塞莉亚克莱尔表现子配置.D重连落点闪现.缩放,
-      持续秒: 塞莉亚克莱尔表现子配置.D重连落点闪现.持续秒,
+      Z: 塞莉亚克莱尔表现配置.D重连落点闪现.高度,
+      缩放: 塞莉亚克莱尔表现配置.D重连落点闪现.缩放,
+      持续秒: 塞莉亚克莱尔表现配置.D重连落点闪现.持续秒,
     });
     void 落点闪现;
   });

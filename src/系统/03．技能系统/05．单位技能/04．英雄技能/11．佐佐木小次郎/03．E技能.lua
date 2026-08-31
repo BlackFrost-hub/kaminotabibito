@@ -65,7 +65,7 @@ local function _____7ED3_675F_6B62_6C34(_____82F1_96C4, _____65BD_6CD5_8FDB_5EA6
     local cfg = _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.E
     _____8C03_6574_73A9_5BB6_5C5E_6027(_____82F1_96C4, "伤害减少", -cfg["减伤比例"])
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____82F1_96C4, _____4F50_4F50_6728_5C0F_6B21_90CEBuffID["止水"])
-    jass:SetUnitAnimation(_____82F1_96C4, "stand")
+    jass.SetUnitAnimation(_____82F1_96C4, "stand")
     if _____65BD_6CD5_8FDB_5EA6_6761 ~= nil and _____65BD_6CD5_8FDB_5EA6_6761 ~= 0 then
         RemoveUnit(_____65BD_6CD5_8FDB_5EA6_6761)
     end
@@ -159,9 +159,9 @@ local function ____on_4F50_4F50_6728E_5F00_59CB(_____65BD_6CD5_5355_4F4D, _____6
             if not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_5355_4F4D) then
                 return
             end
-            jass:SetUnitAnimationByIndex(_____65BD_6CD5_5355_4F4D, 14)
+            jass.SetUnitAnimationByIndex(_____65BD_6CD5_5355_4F4D, 14)
             local _____65BD_6CD5_8FDB_5EA6_6761 = CreateUnit(
-                jass:Player(4),
+                jass.Player(4),
                 _____65BD_6CD5_8FDB_5EA6_6761ID,
                 GetUnitX(_____65BD_6CD5_5355_4F4D),
                 GetUnitY(_____65BD_6CD5_5355_4F4D),

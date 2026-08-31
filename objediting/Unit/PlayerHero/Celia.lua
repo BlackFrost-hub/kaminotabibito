@@ -11,7 +11,7 @@ createPlayerHeroUnit('E00J', '塞莉亚·克莱尔', {
   scale = 1.0,
   icon = 'ReplaceableTextures\\CommandButtons\\BTNHeroBloodElfPrince.blp',
   normalAbilities = 'A014,AInv,AKD1',
-  heroAbilities = 'AKQ1,AKW1,AKE1,AKR1',
+  heroAbilities = '',
   upgradesUsed = '',
 
   strength = 20,

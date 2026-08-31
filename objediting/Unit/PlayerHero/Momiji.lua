@@ -11,7 +11,7 @@ createPlayerHeroUnit('E00G', '朱雀院红叶', {
   scale = 1.0,
   icon = 'ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiQ.blp',
   normalAbilities = 'A014,AInv,AMD1',
-  heroAbilities = 'AMQ1,AMW1,AME1,AMR1',
+  heroAbilities = '',
   upgradesUsed = '',
 
   strength = 25,

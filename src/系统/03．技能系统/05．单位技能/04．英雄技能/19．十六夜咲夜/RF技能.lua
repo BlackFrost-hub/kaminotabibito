@@ -51,12 +51,12 @@ local function _____6807_51C6_5316_89D2_5DEE(value)
 end
 local function ____RF_8BA1_7B97_4F24_5BB3_500D_7387(knife, target)
     local knifeFacing = _____4E24_70B9_89D2_5EA6(
-        jass:GetUnitX(knife),
-        jass:GetUnitY(knife),
-        jass:GetUnitX(target),
-        jass:GetUnitY(target)
+        jass.GetUnitX(knife),
+        jass.GetUnitY(knife),
+        jass.GetUnitX(target),
+        jass.GetUnitY(target)
     )
-    local _____89D2_5DEE = _____6807_51C6_5316_89D2_5DEE(jass:GetUnitFacing(target) - knifeFacing)
+    local _____89D2_5DEE = _____6807_51C6_5316_89D2_5DEE(jass.GetUnitFacing(target) - knifeFacing)
     local difference = _____89D2_5DEE < 0 and -_____89D2_5DEE or _____89D2_5DEE
     if difference > _____914D_7F6E.RF["背刺边界角度"] then
         return {["倍率"] = _____914D_7F6E.RF["中心伤害攻击力倍率"], ["正中心"] = false}
@@ -87,7 +87,7 @@ local function _____7ED3_675FRF_4E0A_4E0B_6587(context)
         return
     end
     context["已结束"] = true
-    local ownerId = jass:GetPlayerId(jass:GetOwningPlayer(context["施法者"]))
+    local ownerId = jass.GetPlayerId(jass.GetOwningPlayer(context["施法者"]))
     if ____RF_6D3B_52A8_8868[ownerId] == context then
         __TS__Delete(____RF_6D3B_52A8_8868, ownerId)
     end
@@ -110,13 +110,13 @@ local function ____RF_6267_884C_8D2F_7A7F(variable)
         return
     end
     local knife = orbitNode["句柄"]
-    local startX = jass:GetUnitX(knife)
-    local startY = jass:GetUnitY(knife)
+    local startX = jass.GetUnitX(knife)
+    local startY = jass.GetUnitY(knife)
     local angle = _____4E24_70B9_89D2_5EA6(
         startX,
         startY,
-        jass:GetUnitX(context["目标"]),
-        jass:GetUnitY(context["目标"])
+        jass.GetUnitX(context["目标"]),
+        jass.GetUnitY(context["目标"])
     )
     local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(context["施法者"]) * ____RF_8BA1_7B97_4F24_5BB3_500D_7387(knife, context["目标"])["倍率"]
     _____7ED3_675FRF_4E0A_4E0B_6587(context)
@@ -162,8 +162,8 @@ local function ____RF_521D_59CB_547D_4E2D(target, state)
     local shell = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
         context["施法者"],
         _____914D_7F6E["单位壳"]["光速红刀"],
-        jass:GetUnitX(target) + _____914D_7F6E.RF["环绕半径"],
-        jass:GetUnitY(target),
+        jass.GetUnitX(target) + _____914D_7F6E.RF["环绕半径"],
+        jass.GetUnitY(target),
         90
     )
     if shell == nil or shell == 0 then
@@ -189,7 +189,7 @@ local function ____RF_521D_59CB_547D_4E2D(target, state)
         _____7ED3_675F_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(context["技能实例ID"])
         return "结束"
     end
-    ____RF_6D3B_52A8_8868[jass:GetPlayerId(jass:GetOwningPlayer(context["施法者"]))] = context
+    ____RF_6D3B_52A8_8868[jass.GetPlayerId(jass.GetOwningPlayer(context["施法者"]))] = context
     registerManualBuff(
         target,
         _____5341_516D_591C_54B2_591CBuffID["光速跃迁锁定"],
@@ -206,20 +206,20 @@ local function ____onRF_540C_6B65F_952E(event)
     if event.player == nil or event.player == 0 then
         return
     end
-    local context = ____RF_6D3B_52A8_8868[jass:GetPlayerId(event.player)]
-    if context ~= nil and context["可提前贯穿"] and jass:GetOwningPlayer(context["施法者"]) == event.player then
+    local context = ____RF_6D3B_52A8_8868[jass.GetPlayerId(event.player)]
+    if context ~= nil and context["可提前贯穿"] and jass.GetOwningPlayer(context["施法者"]) == event.player then
         ____RF_6267_884C_8D2F_7A7F(context)
     end
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRF(_listener, caster, _____6280_80FD_5B9E_4F8BID)
     _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(caster, _____914D_7F6E["符卡间隔秒"].RF)
-    local x = jass:GetUnitX(caster)
-    local y = jass:GetUnitY(caster)
+    local x = jass.GetUnitX(caster)
+    local y = jass.GetUnitY(caster)
     local angle = _____4E24_70B9_89D2_5EA6(
         x,
         y,
-        jass:GetSpellTargetX(),
-        jass:GetSpellTargetY()
+        jass.GetSpellTargetX(),
+        jass.GetSpellTargetY()
     )
     local state = _____521B_5EFA_76F4_7EBF_98DE_5200({
         ["施法者"] = caster,

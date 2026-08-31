@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_5E8F_5217_540D_79F0, removeDelayedCallback, _____5355_4F4D_5B58_6D3B, SetUnitTimeScale, SetUnitAnimation
+local _____53D6_5E8F_5217_540D_79F0, removeDelayedCallback, _____5355_4F4D_5B58_6D3B, SetUnitAnimationByIndex, SetUnitTimeScale
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
 local _____8299_8389_83B2_6A21_578B_52A8_4F5C_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲模型动作配置"]
 local _____8299_8389_83B2_6280_80FD_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["芙莉莲技能动作槽"]
@@ -14,7 +14,7 @@ ____exports["停止循环守护"] = function(_____53E5_67C4)
     _____53E5_67C4["恢复ID"] = 0
     if _____53E5_67C4["英雄"] ~= nil and _____53E5_67C4["英雄"] ~= 0 and _____5355_4F4D_5B58_6D3B(_____53E5_67C4["英雄"]) then
         SetUnitTimeScale(_____53E5_67C4["英雄"], 1)
-        SetUnitAnimation(_____53E5_67C4["英雄"], "stand")
+        SetUnitAnimationByIndex(_____53E5_67C4["英雄"], _____8299_8389_83B2_6A21_578B_52A8_4F5C_914D_7F6E["待机索引"])
     end
 end
 function _____53D6_5E8F_5217_540D_79F0(_____7D22_5F15)
@@ -37,9 +37,8 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 _____5355_4F4D_5B58_6D3B = ____require_result_1["单位存活"]
 local ____require_result_2 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.02．被动效果")
 local _____767B_8BB0_8299_8389_83B2_6E05_7406 = ____require_result_2["登记芙莉莲清理"]
-local SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
+SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 SetUnitTimeScale = jass.SetUnitTimeScale
-SetUnitAnimation = jass.SetUnitAnimation
 local function _____53D6_5E8F_5217_5B9A_4E49(_____7D22_5F15)
     do
         local i = 0
@@ -53,7 +52,7 @@ local function _____53D6_5E8F_5217_5B9A_4E49(_____7D22_5F15)
     end
     return nil
 end
---- 播放限时动作：按索引播放指定时长，结束后恢复 stand 与动画速度 1.0。
+--- 播放限时动作：按索引播放指定时长，结束后恢复模型配置的待机序列与动画速度 1.0。
 -- 登记 02 技能清理器（技能结束/死亡统一移除恢复回调）。
 ____exports["播放限时动作"] = function(_____82F1_96C4, _____69FD, _____767B_8BB0_540D)
     if _____82F1_96C4 == nil or _____82F1_96C4 == 0 or _____69FD["索引"] <= 0 then
@@ -70,7 +69,7 @@ ____exports["播放限时动作"] = function(_____82F1_96C4, _____69FD, _____767
             function()
                 if _____5355_4F4D_5B58_6D3B(_____82F1_96C4) then
                     SetUnitTimeScale(_____82F1_96C4, 1)
-                    SetUnitAnimation(_____82F1_96C4, "stand")
+                    SetUnitAnimationByIndex(_____82F1_96C4, _____8299_8389_83B2_6A21_578B_52A8_4F5C_914D_7F6E["待机索引"])
                 end
             end
         )
@@ -81,7 +80,7 @@ ____exports["播放限时动作"] = function(_____82F1_96C4, _____69FD, _____767
                 removeDelayedCallback(_____6062_590DID)
                 if _____5355_4F4D_5B58_6D3B(_____82F1_96C4) then
                     SetUnitTimeScale(_____82F1_96C4, 1)
-                    SetUnitAnimation(_____82F1_96C4, "stand")
+                    SetUnitAnimationByIndex(_____82F1_96C4, _____8299_8389_83B2_6A21_578B_52A8_4F5C_914D_7F6E["待机索引"])
                 end
             end
         )
@@ -102,7 +101,7 @@ ____exports["开始循环守护"] = function(_____82F1_96C4, _____69FD, _____767
             function()
                 if _____5355_4F4D_5B58_6D3B(_____82F1_96C4) then
                     SetUnitTimeScale(_____82F1_96C4, 1)
-                    SetUnitAnimation(_____82F1_96C4, "stand")
+                    SetUnitAnimationByIndex(_____82F1_96C4, _____8299_8389_83B2_6A21_578B_52A8_4F5C_914D_7F6E["待机索引"])
                 end
             end
         )

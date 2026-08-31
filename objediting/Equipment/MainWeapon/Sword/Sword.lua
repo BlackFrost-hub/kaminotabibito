@@ -47,3 +47,16 @@ createEquipmentItem('I0K5', '赤契噬魂刃', {
   tooltipExtended = '|cffff8080[主武器/剑]-持续汲血输出|r|n|cffffcc99等级：B++|n评分：9200|r|n|cffffffcc[基础属性]|r|n攻击力+185|n力量+40|n生命值+1200|n伤害吸血+8%|n|cFF808080剑锋上的赤色契文从不回应迟疑者，只有迅速结束战斗的人才能压住它对灵魂的饥渴。|r',
   description = '|cffff8080[主武器/剑]-持续汲血输出|r|n|cffffcc99等级：B++|n评分：9200|r|n|cffffffcc[基础属性]|r|n攻击力+185|n力量+40|n生命值+1200|n伤害吸血+8%|n|cFF808080剑锋上的赤色契文从不回应迟疑者，只有迅速结束战斗的人才能压住它对灵魂的饥渴。|r',
 })
+
+
+createEquipmentItem('I0KB', '王庭礼剑', {
+  baseId = 'ratc',
+  icon = 'Equipment\Icon\MainWeapon\Sword\royal_court_ceremonial_sword.blp',
+  model = 'war3mapImported\ysj.mdx',
+  abilities = ' ',
+  classification = 'Campaign',
+  level = 6,
+  score = 6500,
+  tooltipExtended = '|cffccffff[主武器/礼剑]-王庭仪典|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n攻击力+120|n敏捷+20|n暴击率+25%|n攻击速度+25%|n|cFF808080王庭武备堂的陈列礼剑，铭牌写着仿制品，剑格内侧的守夜人戳记却骗不了人——被调包的是赝品，真品一直立在原地。|r',
+  description = '|cffccffff[主武器/礼剑]-王庭仪典|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n攻击力+120|n敏捷+20|n暴击率+25%|n攻击速度+25%|n|cFF808080王庭武备堂的陈列礼剑，铭牌写着仿制品，剑格内侧的守夜人戳记却骗不了人——被调包的是赝品，真品一直立在原地。|r',
+})

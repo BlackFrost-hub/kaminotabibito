@@ -3,6 +3,7 @@
 import {
   朱雀院红叶技能配置,
   朱雀院红叶表现配置,
+  朱雀院红叶音效配置,
   朱雀院红叶动作配置,
   朱雀院红叶动作槽,
   朱雀院红叶待平衡数值,
@@ -37,6 +38,12 @@ const { 获取扇形区域单位 } = require("系统.03．技能系统.00．技�
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+};
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
+};
 const {
   施加朱雀院破绽,
   尝试消费一层刀势,
@@ -57,6 +64,8 @@ const 联动D = require("./07．D技能") as {
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院红叶技能配置.单位类型ID);
 const E技能ID = stringToFourCCSafe(朱雀院红叶技能配置.E.技能ID);
 const E配置 = 朱雀院红叶待平衡数值.E;
+const E轻斩音效 = 朱雀院红叶音效配置.E轻斩;
+const E终结音效 = 朱雀院红叶音效配置.E终结;
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
@@ -66,6 +75,7 @@ const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
+const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
 
 //=============================================================================
 // 剑痕（固定世界坐标，不阻挡路径，不可选取；供 Q/W/R 读取，先锁再消费）
@@ -129,14 +139,15 @@ function 创建剑痕(this: void, 来源英雄: any, X: number, Y: number, 方�
   }
   列表.push(序号);
   // 地面表现（候选未迁入则留空不播）
-  if (E配置.剑痕特效 != null && E配置.剑痕特效 !== "") {
+  if (朱雀院红叶表现配置.E剑痕.模型路径 != null && 朱雀院红叶表现配置.E剑痕.模型路径 !== "") {
     剑痕.特效句柄 = 创建点特效({
-      模型路径: E配置.剑痕特效,
+      模型路径: 朱雀院红叶表现配置.E剑痕.模型路径,
+      RGB: 朱雀院红叶表现配置.E剑痕.RGB,
       X,
       Y,
-      Z: 朱雀院红叶表现配置.参数.E剑痕.高度,
-      缩放: 朱雀院红叶表现配置.参数.E剑痕.缩放,
-      持续秒: 朱雀院红叶表现配置.参数.E剑痕.持续秒,
+      Z: 朱雀院红叶表现配置.E剑痕.高度,
+      缩放: 朱雀院红叶表现配置.E剑痕.缩放,
+      持续秒: 朱雀院红叶表现配置.E剑痕.持续秒,
     });
   }
   return 剑痕;
@@ -220,6 +231,8 @@ function 取段扇形敌人(this: void, 施法者: any, 数据: E数据, 半径:
 
 function 执行E一段(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: E数据): void {
   数据.已斩段数 = 1;
+  // 第一斩轻斩音（段回调结算点一次；坐标=斩击点，参数配置驱动）
+  Sound3DII_CooPlayReuse(E轻斩音效.路径, 数据.目标X, 数据.目标Y, E轻斩音效.高度, E轻斩音效.裁断距离);
   const 敌人 = 取段扇形敌人(施法者, 数据, E配置.第一斩半径, E配置.第一斩扇形角度);
   for (let i = 0; i < 敌人.length; i++) {
     const id = jass.GetHandleId(敌人[i]);
@@ -232,6 +245,8 @@ function 执行E一段(this: void, 施法者: any, 控制器: any, 技能实例I
 
 function 执行E二段(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: E数据): void {
   数据.已斩段数 = 2;
+  // 第二斩轻斩音（段回调结算点一次；坐标=斩击点，参数配置驱动）
+  Sound3DII_CooPlayReuse(E轻斩音效.路径, 数据.目标X, 数据.目标Y, E轻斩音效.高度, E轻斩音效.裁断距离);
   const 敌人 = 取段扇形敌人(施法者, 数据, E配置.第二斩半径, E配置.第二斩扇形角度);
   for (let i = 0; i < 敌人.length; i++) {
     const id = jass.GetHandleId(敌人[i]);
@@ -244,6 +259,10 @@ function 执行E二段(this: void, 施法者: any, 控制器: any, 技能实例I
 
 function 执行E三段(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: E数据): void {
   数据.已斩段数 = 3;
+  // 第三斩终结音（确认的二选一随机槽：运行时从 槽.候选路径 随机取一；坐标=第三斩结算点，参数配置驱动）
+  const 候选 = E终结音效.候选路径;
+  const 终结路径 = 候选 != null && 候选.length > 0 ? 候选[GetRandomInt(1, 候选.length) - 1] : E终结音效.路径;
+  Sound3DII_CooPlayReuse(终结路径, 数据.目标X, 数据.目标Y, E终结音效.高度, E终结音效.裁断距离);
   const 敌人 = 取段扇形敌人(施法者, 数据, E配置.第三斩半径, E配置.第三斩扇形角度);
   for (let i = 0; i < 敌人.length; i++) {
     const id = jass.GetHandleId(敌人[i]);
@@ -269,6 +288,8 @@ function 释放E三叶散华(this: void, _context: any, 施法者: any, 技能�
   播放红叶动作(施法者, 朱雀院红叶动作槽.E连续三斩);
   // 重复 E：已有活跃 E 实例时忽略（三段未完成不叠加）
   if (查询战斗技能实例(施法者, "红叶E").length > 0) return;
+  // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
+  播放英雄技能喊话(施法者, "朱雀院红叶", 朱雀院红叶技能配置.E.技能ID);
   const 目标X = GetSpellTargetX();
   const 目标Y = GetSpellTargetY();
   const 方向角 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), 目标X, 目标Y);

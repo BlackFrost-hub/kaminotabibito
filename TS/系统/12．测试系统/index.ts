@@ -46,6 +46,7 @@ const ENABLE_HERO_LEVEL_LOOP_TEST = true;
 const ENABLE_ITEM_SCORE_TEST = true;
 const ENABLE_HERO_COOLDOWN_RESET_TEST = true;
 const ENABLE_SAKAI_D_SNAKE_EFFECT_TEST = true;
+const ENABLE_CREATE_PLAYER_HERO_BY_NAME_TEST = true;
 
 function loadTests(): void {
   // 主线进度指令作为独立调试入口保留，避免打开总开关时连带启动其他测试。
@@ -213,6 +214,10 @@ function loadTests(): void {
 
   if (ENABLE_SAKAI_D_SNAKE_EFFECT_TEST) {
     require("系统.12．测试系统.29．坂井悠二D蛇特效测试");
+  }
+
+  if (ENABLE_CREATE_PLAYER_HERO_BY_NAME_TEST) {
+    require("系统.12．测试系统.30．按名称创建玩家英雄测试");
   }
 
 }

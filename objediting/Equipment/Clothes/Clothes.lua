@@ -121,3 +121,15 @@ createEquipmentItem('I0H1', '沉淤守卫胸甲', {
   tooltipExtended = '|cffccffff[衣服/胸甲]-防御/水抗|r|n|cffffcc99等级：C+|n评分：5100|r|n|cffffffcc[基础属性]|r|n生命值+2200|n护甲+32|n魔法抗性+15%|n水属性抗性+18%|n|cFF808080胸甲由沉积在旧水道底部的矿片锻成，厚重表面仍残留洗不去的紫色水痕。|r',
   description = '|cffccffff[衣服/胸甲]-防御/水抗|r|n|cffffcc99等级：C+|n评分：5100|r|n|cffffffcc[基础属性]|r|n生命值+2200|n护甲+32|n魔法抗性+15%|n水属性抗性+18%|n|cFF808080胸甲由沉积在旧水道底部的矿片锻成，厚重表面仍残留洗不去的紫色水痕。|r',
 })
+
+createEquipmentItem('I0KF', '守誓圣铠', {
+  baseId = 'rde1',
+  icon = 'Equipment\\Icon\\Clothes\\oath_vigil_plate_armor.blp',
+  model = 'war3mapImported\\Item Jerkin.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 6,
+  score = 6500,
+  tooltipExtended = '|cffccffff[衣服/重甲]-守誓/防御|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n生命值+2200|n护甲+30|n力量+22|n生命恢复+35|n眩晕抗性+15%|n|cFF808080以月纹熊革衬里、古树韧藤束边的圣地重铠，胸口的誓文只有守誓者读得完整。|r',
+  description = '|cffccffff[衣服/重甲]-守誓/防御|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n生命值+2200|n护甲+30|n力量+22|n生命恢复+35|n眩晕抗性+15%|n|cFF808080以月纹熊革衬里、古树韧藤束边的圣地重铠，胸口的誓文只有守誓者读得完整。|r',
+})

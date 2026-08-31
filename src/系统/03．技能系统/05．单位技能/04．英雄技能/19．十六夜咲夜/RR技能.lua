@@ -28,7 +28,7 @@ local _____54B2_591C_4E16_754C_8BA1_6570 = {}
 local ____RR_5355_4F4D_5168_5C40_72B6_6001_8868 = {}
 local ____RR_98DE_5200_5168_5C40_72B6_6001_8868 = {}
 local ____RR_5019_9009_81EA_589E_5E8F_53F7 = 0
-local _____653B_51FB_95F4_9694_72B6_6001 = jass:ConvertUnitState(37)
+local _____653B_51FB_95F4_9694_72B6_6001 = jass.ConvertUnitState(37)
 local GetUnitStateJapi = japi.GetUnitState
 local SetUnitStateJapi = japi.SetUnitState
 local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
@@ -37,7 +37,7 @@ local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_3["移除单�
 local ____require_result_4 = require("系统.05．Buff系统.03．Buff表.02．英雄.19．十六夜咲夜")
 local _____5341_516D_591C_54B2_591CBuffID = ____require_result_4["十六夜咲夜BuffID"]
 ____exports["十六夜咲夜处于咲夜世界"] = function(caster)
-    return caster ~= nil and caster ~= 0 and (_____54B2_591C_4E16_754C_8BA1_6570[jass:GetHandleId(caster)] or 0) > 0
+    return caster ~= nil and caster ~= 0 and (_____54B2_591C_4E16_754C_8BA1_6570[jass.GetHandleId(caster)] or 0) > 0
 end
 local function _____83B7_53D6RR_4E00_6BB5_4E0A_4E0B_6587(_caster)
     return {["二段"] = false}
@@ -46,31 +46,31 @@ local function _____83B7_53D6RR_4E8C_6BB5_4E0A_4E0B_6587(_caster)
     return {["二段"] = true}
 end
 local function ____RR_5355_4F4D_5728_533A_57DF(context, unit)
-    local dx = jass:GetUnitX(unit) - context.X
-    local dy = jass:GetUnitY(unit) - context.Y
+    local dx = jass.GetUnitX(unit) - context.X
+    local dy = jass.GetUnitY(unit) - context.Y
     return dx * dx + dy * dy <= 800 * 800
 end
 local function ____RR_5237_65B0_5355_4F4D_5168_5C40_72B6_6001(state)
     if state["完美计数"] > 0 then
-        jass:SetUnitTimeScale(state["单位"], 0)
+        jass.SetUnitTimeScale(state["单位"], 0)
         return
     end
     if state["缓速计数"] > 0 then
-        jass:SetUnitMoveSpeed(state["单位"], state["原移动速度"] * 0.5)
+        jass.SetUnitMoveSpeed(state["单位"], state["原移动速度"] * 0.5)
         if state["原攻击间隔"] > 0 then
             SetUnitStateJapi(state["单位"], _____653B_51FB_95F4_9694_72B6_6001, state["原攻击间隔"] * 2)
         end
-        jass:SetUnitTimeScale(state["单位"], 0.5)
+        jass.SetUnitTimeScale(state["单位"], 0.5)
         return
     end
-    jass:SetUnitMoveSpeed(state["单位"], state["原移动速度"])
+    jass.SetUnitMoveSpeed(state["单位"], state["原移动速度"])
     if state["原攻击间隔"] > 0 then
         SetUnitStateJapi(state["单位"], _____653B_51FB_95F4_9694_72B6_6001, state["原攻击间隔"])
     end
-    jass:SetUnitTimeScale(state["单位"], 1)
+    jass.SetUnitTimeScale(state["单位"], 1)
 end
 local function ____RR_8FDB_5165_5355_4F4D(context, unit)
-    local id = jass:GetHandleId(unit)
+    local id = jass.GetHandleId(unit)
     if context["单位记录"][id] ~= nil then
         return
     end
@@ -80,7 +80,7 @@ local function ____RR_8FDB_5165_5355_4F4D(context, unit)
     if global == nil then
         global = {
             ["单位"] = unit,
-            ["原移动速度"] = jass:GetUnitMoveSpeed(unit),
+            ["原移动速度"] = jass.GetUnitMoveSpeed(unit),
             ["原攻击间隔"] = GetUnitStateJapi(unit, _____653B_51FB_95F4_9694_72B6_6001),
             ["缓速计数"] = 0,
             ["完美计数"] = 0
@@ -110,7 +110,7 @@ local function ____RR_8FDB_5165_5355_4F4D(context, unit)
     ____RR_5237_65B0_5355_4F4D_5168_5C40_72B6_6001(global)
 end
 local function ____RR_79BB_5F00_5355_4F4D(context, record)
-    local id = jass:GetHandleId(record["单位"])
+    local id = jass.GetHandleId(record["单位"])
     local global = ____RR_5355_4F4D_5168_5C40_72B6_6001_8868[id]
     if context["完美空间"] then
         _____79FB_9664_5355_4F4D_6682_505C(record["单位"], context["来源"])
@@ -137,7 +137,7 @@ local function ____RR_79BB_5F00_5355_4F4D(context, record)
     __TS__Delete(context["单位记录"], id)
 end
 local function ____RR_8FDB_5165_98DE_5200(context, knife)
-    local id = jass:GetHandleId(knife["单位"])
+    local id = jass.GetHandleId(knife["单位"])
     if context["飞刀记录"][id] ~= nil then
         return
     end
@@ -162,7 +162,7 @@ local function ____RR_8FDB_5165_98DE_5200(context, knife)
     end
 end
 local function ____RR_79BB_5F00_98DE_5200(context, record)
-    local id = jass:GetHandleId(record["控制器"]["单位"])
+    local id = jass.GetHandleId(record["控制器"]["单位"])
     local global = ____RR_98DE_5200_5168_5C40_72B6_6001_8868[id]
     if context["完美空间"] then
         _____79FB_9664_5355_4F4D_6682_505C(record["控制器"]["单位"], context["来源"])
@@ -207,7 +207,7 @@ local function _____7ED3_675FRR_533A_57DF(context)
         end
     end
     if context["完美空间"] then
-        local id = jass:GetHandleId(context["施法者"])
+        local id = jass.GetHandleId(context["施法者"])
         local count = _____54B2_591C_4E16_754C_8BA1_6570[id] or 0
         if count <= 1 then
             __TS__Delete(_____54B2_591C_4E16_754C_8BA1_6570, id)
@@ -219,7 +219,7 @@ local function _____7ED3_675FRR_533A_57DF(context)
         end
     end
     if context["枚举组"] ~= nil and context["枚举组"] ~= 0 then
-        jass:DestroyGroup(context["枚举组"])
+        jass.DestroyGroup(context["枚举组"])
     end
     _____5B89_5168_79FB_9664_5355_4F4D_58F3(context["世界单位"])
     _____64AD_653E_54B2_591C_5750_6807_97F3_6548("gg_snd_BlinkBirth1", context.X, context.Y)
@@ -235,8 +235,8 @@ local function _____63A8_8FDBRR_533A_57DF(variable)
         return
     end
     local inside = {}
-    jass:GroupClear(context["枚举组"])
-    jass:GroupEnumUnitsInRange(
+    jass.GroupClear(context["枚举组"])
+    jass.GroupEnumUnitsInRange(
         context["枚举组"],
         context.X,
         context.Y,
@@ -245,22 +245,22 @@ local function _____63A8_8FDBRR_533A_57DF(variable)
     )
     while true do
         do
-            local unit = jass:FirstOfGroup(context["枚举组"])
+            local unit = jass.FirstOfGroup(context["枚举组"])
             if unit == nil or unit == 0 then
                 break
             end
-            jass:GroupRemoveUnit(context["枚举组"], unit)
-            if unit == context["施法者"] or unit == context["世界单位"] or not _____5355_4F4D_5B58_6D3B(unit) or jass:IsUnitType(unit, jass.UNIT_TYPE_TAUREN) then
+            jass.GroupRemoveUnit(context["枚举组"], unit)
+            if unit == context["施法者"] or unit == context["世界单位"] or not _____5355_4F4D_5B58_6D3B(unit) or jass.IsUnitType(unit, jass.UNIT_TYPE_TAUREN) then
                 goto __continue54
             end
-            inside[jass:GetHandleId(unit)] = true
+            inside[jass.GetHandleId(unit)] = true
             ____RR_8FDB_5165_5355_4F4D(context, unit)
         end
         ::__continue54::
     end
     for key in pairs(context["单位记录"]) do
         local record = context["单位记录"][key]
-        if record ~= nil and inside[jass:GetHandleId(record["单位"])] ~= true then
+        if record ~= nil and inside[jass.GetHandleId(record["单位"])] ~= true then
             ____RR_79BB_5F00_5355_4F4D(context, record)
         end
     end
@@ -269,21 +269,21 @@ local function _____63A8_8FDBRR_533A_57DF(variable)
     do
         local i = 0
         while i < #knives do
-            knifeInside[jass:GetHandleId(knives[i + 1]["单位"])] = true
+            knifeInside[jass.GetHandleId(knives[i + 1]["单位"])] = true
             ____RR_8FDB_5165_98DE_5200(context, knives[i + 1])
             i = i + 1
         end
     end
     for key in pairs(context["飞刀记录"]) do
         local record = context["飞刀记录"][key]
-        if record ~= nil and knifeInside[jass:GetHandleId(record["控制器"]["单位"])] ~= true then
+        if record ~= nil and knifeInside[jass.GetHandleId(record["控制器"]["单位"])] ~= true then
             ____RR_79BB_5F00_98DE_5200(context, record)
         end
     end
 end
 local function _____542F_52A8RR_533A_57DF(caster, perfect, sequence)
-    local x = jass:GetUnitX(caster)
-    local y = jass:GetUnitY(caster)
+    local x = jass.GetUnitX(caster)
+    local y = jass.GetUnitY(caster)
     local world = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
         caster,
         _____914D_7F6E["单位壳"]["咲夜的世界"],
@@ -295,7 +295,7 @@ local function _____542F_52A8RR_533A_57DF(caster, perfect, sequence)
         return
     end
     if not perfect then
-        jass:SetUnitVertexColor(
+        jass.SetUnitVertexColor(
             world,
             255,
             255,
@@ -303,7 +303,7 @@ local function _____542F_52A8RR_533A_57DF(caster, perfect, sequence)
             255
         )
     else
-        local id = jass:GetHandleId(caster)
+        local id = jass.GetHandleId(caster)
         _____54B2_591C_4E16_754C_8BA1_6570[id] = (_____54B2_591C_4E16_754C_8BA1_6570[id] or 0) + 1
         registerManualBuff(
             caster,
@@ -324,7 +324,7 @@ local function _____542F_52A8RR_533A_57DF(caster, perfect, sequence)
         ["周期ID"] = 0,
         ["单位记录"] = {},
         ["飞刀记录"] = {},
-        ["枚举组"] = jass:CreateGroup(),
+        ["枚举组"] = jass.CreateGroup(),
         ["已结束"] = false
     }
     _____64AD_653E_54B2_591C_5355_4F4D_97F3_6548("gg_snd_IzayoiSakuya_RR", caster)
@@ -337,29 +337,29 @@ local function _____7ED3_7B97RR_5019_9009(variable)
     if candidate == nil then
         return
     end
-    local id = jass:GetHandleId(candidate["施法者"])
+    local id = jass.GetHandleId(candidate["施法者"])
     if ____RR_5019_9009_8868[id] ~= candidate then
         return
     end
     __TS__Delete(____RR_5019_9009_8868, id)
-    local owner = jass:GetOwningPlayer(candidate["施法者"])
-    jass:UnitRemoveAbility(candidate["施法者"], _____914D_7F6E["技能"].RR["二段容器类型ID"])
-    jass:SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["二段容器类型ID"], false)
+    local owner = jass.GetOwningPlayer(candidate["施法者"])
+    jass.UnitRemoveAbility(candidate["施法者"], _____914D_7F6E["技能"].RR["二段容器类型ID"])
+    jass.SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["二段容器类型ID"], false)
     if not candidate["完美空间"] then
-        jass:SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["类型ID"], true)
+        jass.SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["类型ID"], true)
     end
     if _____5355_4F4D_5B58_6D3B(candidate["施法者"]) then
         _____542F_52A8RR_533A_57DF(candidate["施法者"], candidate["完美空间"], candidate["序号"])
     end
 end
 local function _____91CA_653ERR(listener, caster)
-    local id = jass:GetHandleId(caster)
+    local id = jass.GetHandleId(caster)
     if listener["二段"] then
         local candidate = ____RR_5019_9009_8868[id]
         if candidate ~= nil then
             candidate["完美空间"] = true
-            jass:SetPlayerAbilityAvailable(
-                jass:GetOwningPlayer(caster),
+            jass.SetPlayerAbilityAvailable(
+                jass.GetOwningPlayer(caster),
                 _____914D_7F6E["技能"].RR["二段容器类型ID"],
                 false
             )
@@ -367,10 +367,10 @@ local function _____91CA_653ERR(listener, caster)
         end
         return
     end
-    local owner = jass:GetOwningPlayer(caster)
-    jass:UnitAddAbility(caster, _____914D_7F6E["技能"].RR["二段容器类型ID"])
-    jass:SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["类型ID"], false)
-    jass:SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["二段容器类型ID"], true)
+    local owner = jass.GetOwningPlayer(caster)
+    jass.UnitAddAbility(caster, _____914D_7F6E["技能"].RR["二段容器类型ID"])
+    jass.SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["类型ID"], false)
+    jass.SetPlayerAbilityAvailable(owner, _____914D_7F6E["技能"].RR["二段容器类型ID"], true)
     ____RR_5019_9009_81EA_589E_5E8F_53F7 = ____RR_5019_9009_81EA_589E_5E8F_53F7 + 1
     local candidate = {["施法者"] = caster, ["序号"] = ____RR_5019_9009_81EA_589E_5E8F_53F7, ["完美空间"] = false}
     ____RR_5019_9009_8868[id] = candidate

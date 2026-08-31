@@ -17,7 +17,7 @@ local function _____662F_5426_4E3A_5730_72F1_706B_5361_724C(_____7269_54C1)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
     end
-    return jass:GetItemTypeId(_____7269_54C1) == _____5730_72F1_706B_5361_724C_7269_54C1ID
+    return jass.GetItemTypeId(_____7269_54C1) == _____5730_72F1_706B_5361_724C_7269_54C1ID
 end
 local function _____8BA1_7B97_6BCF_8DF3_751F_547D_6062_590D(_____5355_4F4D)
     return GetUnitStateJapi(_____5355_4F4D, UNIT_STATE_MAX_LIFE) * _____5730_72F1_706B_5361_724C_914D_7F6E["生命恢复百分比"] + _____5730_72F1_706B_5361_724C_914D_7F6E["固定生命恢复"]

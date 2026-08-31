@@ -42,6 +42,7 @@ local ENABLE_HERO_LEVEL_LOOP_TEST = true
 local ENABLE_ITEM_SCORE_TEST = true
 local ENABLE_HERO_COOLDOWN_RESET_TEST = true
 local ENABLE_SAKAI_D_SNAKE_EFFECT_TEST = true
+local ENABLE_CREATE_PLAYER_HERO_BY_NAME_TEST = true
 local function loadTests(self)
     if ENABLE_MAIN_PROGRESS_TEST then
         require("系统.12．测试系统.20．主线进度测试")
@@ -169,6 +170,9 @@ local function loadTests(self)
     end
     if ENABLE_SAKAI_D_SNAKE_EFFECT_TEST then
         require("系统.12．测试系统.29．坂井悠二D蛇特效测试")
+    end
+    if ENABLE_CREATE_PLAYER_HERO_BY_NAME_TEST then
+        require("系统.12．测试系统.30．按名称创建玩家英雄测试")
     end
 end
 loadTests(nil)

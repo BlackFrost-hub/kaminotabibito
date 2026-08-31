@@ -15,9 +15,9 @@ local function _____64AD_653E_5168_5C40_97F3_6548(unit, soundKey)
     if unit == nil or unit == 0 or soundHandle == nil or soundHandle == 0 then
         return
     end
-    jass:AttachSoundToUnit(soundHandle, unit)
-    jass:SetSoundVolume(soundHandle, 127)
-    jass:StartSound(soundHandle)
+    jass.AttachSoundToUnit(soundHandle, unit)
+    jass.SetSoundVolume(soundHandle, 127)
+    jass.StartSound(soundHandle)
 end
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local GetOwningPlayer = jass.GetOwningPlayer

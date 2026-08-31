@@ -35,7 +35,7 @@ local function _____63D0_7C73_8BFA_65AF_5149_5F31_70B9_4F24_5BB3_4FEE_6B63(conte
     if not (damage > 0) or attacker == nil or target == nil then
         return damage
     end
-    local ____temp_16 = jass:GetUnitTypeId(attacker) ~= _____63D0_7C73_8BFA_65AF_5355_4F4D_7C7B_578BID
+    local ____temp_16 = jass.GetUnitTypeId(attacker) ~= _____63D0_7C73_8BFA_65AF_5355_4F4D_7C7B_578BID
     if not ____temp_16 then
         local ____opt_result_15
         if context ~= nil then
@@ -49,7 +49,7 @@ local function _____63D0_7C73_8BFA_65AF_5149_5F31_70B9_4F24_5BB3_4FEE_6B63(conte
     if getRealAttr(target, "光属性抗性", 0) >= 0 then
         return damage
     end
-    local level = jass:GetUnitAbilityLevel(attacker, ____E_6280_80FD_7C7B_578BID)
+    local level = jass.GetUnitAbilityLevel(attacker, ____E_6280_80FD_7C7B_578BID)
     if not (level > 0) then
         return damage
     end

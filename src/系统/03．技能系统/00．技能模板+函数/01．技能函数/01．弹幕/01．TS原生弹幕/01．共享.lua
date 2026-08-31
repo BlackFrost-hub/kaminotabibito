@@ -43,6 +43,7 @@ ____exports.DzSetEffectAnimation = japi.DzSetEffectAnimation
 ____exports.DzPlayEffectAnimation = japi.DzPlayEffectAnimation
 ____exports.DzGetColor = japi.DzGetColor
 ____exports.DzSetEffectVertexColor = japi.DzSetEffectVertexColor
+____exports.DzSetUnitVertexColor = japi.DzSetUnitVertexColor
 ____exports.EXEffectMatReset = japi.EXEffectMatReset
 ____exports.EXEffectMatRotateY = japi.EXEffectMatRotateY
 ____exports.EXEffectMatRotateZ = japi.EXEffectMatRotateZ

@@ -2,17 +2,21 @@
 
 export const 朱雀院红叶技能配置 = {
   单位类型ID: "E00G",
-  Q: { 技能ID: "AMQ1", 名称: "飞燕·穿（Q）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiQ.blp", 快捷键: "Q" },
-  W: { 技能ID: "AMW1", 名称: "水镜·返刃（W）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiW.blp", 快捷键: "W" },
-  E: { 技能ID: "AME1", 名称: "三叶·散华（E）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiE.blp", 快捷键: "E" },
-  R: { 技能ID: "AMR1", 名称: "奥义·红叶一闪（R）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiR.blp", 快捷键: "R" },
-  D: { 技能ID: "AMD1", 名称: "朱雀流·秘传三式（D）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiD.blp", 快捷键: "D" },
+  Q: { 技能ID: "AMQ1", 名称: "飞燕·穿（Q）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiQ.blp", 快捷键: "Q", 冷却秒: 6, 魔耗百分比: 0.045, 说明: "技能说明：向目标方向突进并完成拔刀斩，命中后可在短时间内追加回身斩。|n伤害：拔刀斩造成攻击力100%的物理伤害；回身斩造成攻击力80%的物理伤害。|n施法距离：突进300距离|n伤害范围：命中半径100|n二段时间：命中后0.7秒内|n冷却时间：6秒|n魔法消耗：最大魔法值的4.5%" },
+  W: { 技能ID: "AMW1", 名称: "水镜·返刃（W）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiW.blp", 快捷键: "W", 冷却秒: 10, 魔耗百分比: 0.055, 说明: "技能说明：在面前展开水镜招架攻击；成功招架后立即反击攻击来源，未招架到攻击则以收刀斩结束。|n伤害：反击造成攻击力100%的物理伤害；未招架时释放前方收刀斩。|n防御范围：正面90度|n招架持续时间：0.6秒|n收刀斩范围：前方220|n冷却时间：10秒|n魔法消耗：最大魔法值的5.5%" },
+  E: { 技能ID: "AME1", 名称: "三叶·散华（E）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiE.blp", 快捷键: "E", 冷却秒: 9, 魔耗百分比: 0.065, 说明: "技能说明：向前方连续施展三段斩击，并在斩击路径上留下剑痕。|n伤害：第一段造成攻击力50%的物理伤害，第二段造成70%，第三段造成120%。|n施法方向：前方直线|n伤害范围：三段斩击路径|n剑痕持续时间：2.5秒|n冷却时间：9秒|n魔法消耗：最大魔法值的6.5%" },
+  R: { 技能ID: "AMR1", 名称: "奥义·红叶一闪（R）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiR.blp", 快捷键: "R", 冷却秒: 65, 魔耗百分比: 0.13, 说明: "技能说明：蓄力后沿目标方向释放高速直线终式，破绽、刀势和剑痕会强化后续斩击。|n伤害：主斩造成攻击力200%的物理伤害，并根据已有状态追加斩击。|n施法距离：700|n伤害范围：窄直线|n蓄力时间：0.7秒|n冷却时间：65秒|n魔法消耗：最大魔法值的13%" },
+  D: { 技能ID: "AMD1", 名称: "朱雀流·秘传三式（D）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiD.blp", 快捷键: "D", 冷却秒: 18, 魔耗百分比: 0.05, 说明: "技能说明：进入秘传状态，强化接下来的斩击、招架或终式。|n伤害：本技能不直接造成伤害，强化效果由后续技能触发。|n技能类型：天赋技能，初始获得|n强化次数：最多3次|n状态持续时间：8秒|n冷却时间：18秒|n魔法消耗：最大魔法值的5%" },
   Q2技能ID: "ASQ2",
 } as const;
 
 export const 朱雀院红叶物编配置 = {
   模型: "Unit\\Hero\\Momiji\\Momiji.mdx",
   模型缩放: 1,
+  来源原名: "hongye_hj.mdx",
+  来源模型哈希前16位: "77975D0798FD164F",
+  /** imports 规范化模型 SHA-256 前16位（2026-08-27 重算；源文件对照见返工报告） */
+  规范化模型哈希前16位: "F2376A51DB7CC9DB",
   主属性: "AGI",
   初始属性: { 力量: 25, 敏捷: 30, 智力: 15 },
   属性成长: { 力量: 2.0, 敏捷: 3.5, 智力: 1.5 },
@@ -58,28 +62,49 @@ export const 朱雀院红叶动作配置 = {
 } as const;
 
 export const 朱雀院红叶表现配置 = {
-  破绽标记: "Common\\Effect\\Form\\Marker\\MomijiWeakPointBlade3D.mdx",
-  刀势层数: [
-    "Common\\Effect\\Form\\Rotate\\MomijiVigorOrbit1.mdx",
-    "Common\\Effect\\Form\\Rotate\\MomijiVigorOrbit2.mdx",
-    "Common\\Effect\\Form\\Rotate\\MomijiVigorOrbit3.mdx",
-  ],
-  水镜主体: "Common\\Effect\\Form\\Shield\\MomijiWaterMirrorV5.mdx",
-  /** 瞬时破绽斩反馈已有迁入备份；尚未按正确朝向/时点接入，留空不播 */
-  破绽斩特效: "",
-  /** 满 3 层额外提示尚无正式主版本；现有 3 层常驻提示不复用为爆发层 */
-  满刀势提示特效: "",
-  参数: {
-    破绽标记: { 缩放: 1, 高度: 0, 持续秒: 4 },
-    刀势层数: { 缩放: 1, 高度: 0, 持续秒: -1 },
-    水镜主体: { 缩放: 1, 高度: 0, 持续秒: 0.6 },
-    破绽斩: { 缩放: 1, 高度: 30, 持续秒: 0.8 },
-    满刀势提示: { 缩放: 1, 高度: 30, 持续秒: 0.5 },
-    E剑痕: { 缩放: 1, 高度: 8, 持续秒: 2.5 },
-    R主斩: { 缩放: 1, 高度: 30, 持续秒: 0.6 },
-    R蓄力提示: { 缩放: 1, 高度: 8, 持续秒: -1 },
-    D刀环: { 缩放: 1, 高度: 0, 持续秒: 8 },
+  破绽标记: { 模型路径: "Common\\Effect\\Form\\Marker\\MomijiWeakPointBlade3D.mdx", 缩放: 1, 高度: 0, 持续秒: 4, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  刀势层数: { 模型路径: ["Common\\Effect\\Form\\Rotate\\MomijiVigorOrbit1.mdx", "Common\\Effect\\Form\\Rotate\\MomijiVigorOrbit2.mdx", "Common\\Effect\\Form\\Rotate\\MomijiVigorOrbit3.mdx"], 缩放: 1, 高度: 0, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  水镜主体: { 模型路径: "Common\\Effect\\Form\\Shield\\MomijiWaterMirrorV5.mdx", 缩放: 1, 高度: 0, 持续秒: 0.6, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  破绽斩: { 模型路径: "", 缩放: 1, 高度: 30, 持续秒: 0.8, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  满刀势提示: { 模型路径: "", 缩放: 1, 高度: 30, 持续秒: 0.5, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  E剑痕: { 模型路径: "", 缩放: 1, 高度: 8, 持续秒: 2.5, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  R主斩: { 模型路径: "Common\\Effect\\Form\\Line\\MomijiFinalSlash.mdx", 缩放: 1, 高度: 30, 持续秒: 0.6, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  R蓄力提示: { 模型路径: "", 缩放: 1, 高度: 8, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  D刀环: { 模型路径: "Common\\Effect\\Form\\Rotate\\MomijiVigorOrbit3.mdx", 缩放: 1, 高度: 0, 持续秒: 8, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+} as const;
+
+export const 朱雀院红叶音效配置 = {
+  /** 破绽标记：目标首次获得破绽（坐标；刷新已有破绽不播） */
+  破绽标记: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_weakpoint_mark.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 0.6 },
+  /** 刀势满层：从 2 层进入 3 层时一次（单位；1→2 层不播） */
+  刀势满层: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_vigor_full.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.0 },
+  /** Q 冲锋：飞燕·穿突进真实启动（单位） */
+  Q冲锋: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_q_dash.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.5 },
+  /** Q 回身斩：Q2 结算点（坐标） */
+  Q回身斩: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_q_finish.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 1.0 },
+  /** W 水镜展开：招架窗口真正建立（单位） */
+  W水镜展开: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_w_mirror_open.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.2 },
+  /** W 招架成功：化解一次攻击（单位） */
+  W招架成功: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_w_parry.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.2 },
+  /** W 返刃反击：招架后反击结算（坐标=反击/目标位置） */
+  W返刃反击: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_w_counter.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 1.0 },
+  /** E 轻斩：第一/第二斩回调各播一次（坐标=斩击点） */
+  E轻斩: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_e_slash_light.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 0.9 },
+  /** E 第三斩终结：确认的二选一随机槽（运行时从 候选路径 随机取一） */
+  E终结: {
+    路径: "Sound\\Hero\\Momiji\\SFX\\momiji_e_finish_01.mp3",
+    候选路径: ["Sound\\Hero\\Momiji\\SFX\\momiji_e_finish_01.mp3", "Sound\\Hero\\Momiji\\SFX\\momiji_e_finish_02.mp3"],
+    裁断距离: 1250,
+    音量: 1,
+    高度: 75,
+    持续秒: 1.0,
   },
+  /** R 蓄势：充能真正建立（单位） */
+  R蓄势: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_r_charge.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.5 },
+  /** R 红叶一闪：充能完成释放（坐标=施法者/直线起点） */
+  R红叶一闪: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_r_fire.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 2.0 },
+  /** D 秘传三式：单次激活成功（单位；重复 D 刷新不重播） */
+  D秘传三式: { 路径: "Sound\\Hero\\Momiji\\SFX\\momiji_d_three_forms.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.5 },
 } as const;
 
 export const 朱雀院红叶Buff配置 = {
@@ -115,7 +140,7 @@ export const 朱雀院红叶读条配置 = {
 
 export const 朱雀院红叶待平衡数值 = {
   Q: {
-    冷却秒: 6, 魔耗: 45, Q2窗口秒: 0.7,
+    冷却秒: 6, 魔耗百分比: 0.045, Q2窗口秒: 0.7,
     突进距离: 300, 突进速度: 900, 命中半径: 100,
     伤害攻击力倍率: 1.0, Q2伤害攻击力倍率: 0.8,
     刀势剑气攻击力倍率: 0.5, 剑痕回响攻击力倍率: 0.6, D刀光攻击力倍率: 0.5,
@@ -123,14 +148,14 @@ export const 朱雀院红叶待平衡数值 = {
     短惩罚冷却秒: 2,
   },
   W: {
-    冷却秒: 10, 魔耗: 55, 招架窗口秒: 0.6, 正面角度: 90,
+    冷却秒: 10, 魔耗百分比: 0.055, 招架窗口秒: 0.6, 正面角度: 90,
     Q2延长秒: 0.3,
     反击攻击力倍率: 1.0, 回刃剑气攻击力倍率: 0.5,
     前斩攻击力倍率: 0.8, 前斩半径: 220, 前斩扇形角度: 90,
     D强化拉回距离: 150,
   },
   E: {
-    冷却秒: 9, 魔耗: 65, 剑痕持续秒: 2.5,
+    冷却秒: 9, 魔耗百分比: 0.065, 剑痕持续秒: 2.5,
     第一斩攻击力倍率: 0.5, 第二斩攻击力倍率: 0.7, 第三斩攻击力倍率: 1.2,
     第一斩半径: 180, 第一斩扇形角度: 60,
     第二斩半径: 240, 第二斩扇形角度: 80,
@@ -139,25 +164,17 @@ export const 朱雀院红叶待平衡数值 = {
     同目标最大次数: 2,
     刀势强化第二剑痕: true,
     D强化第二剑痕: true,
-    /** 持续地面剑痕尚无正式模型；已迁入的 E 模型是第三斩刀光，不能填入此槽 */
-    剑痕特效: "",
   },
   R: {
-    冷却秒: 65, 魔耗: 130, 蓄力秒: 0.7,
+    冷却秒: 65, 魔耗百分比: 0.13, 蓄力秒: 0.7,
     距离: 700, 窄线角度: 10,
     主斩攻击力倍率: 2.0, 破绽终式攻击力倍率: 1.5,
     刀势回响攻击力倍率: 0.8, 剑痕回响攻击力倍率: 1.0,
     D强化每次加成: 0.3,
-    /** 窄线蓄力提示尚无正式模型；Q 冲锋风压不能挪作 R 预警 */
-    蓄力提示特效: "",
-    /** 主斩已迁入；当前创建逻辑未传快照方向，完成正确接入前留空 */
-    主斩特效: "",
   },
   D: {
-    冷却秒: 18, 魔耗: 50, 持续秒: 8, 强化次数: 3,
+    冷却秒: 18, 魔耗百分比: 0.05, 持续秒: 8, 强化次数: 3,
     延长秒: 2, 最大延长次数: 2,
-    /** 已迁入资源是短时刀势/收尾；当前槽会挂接 8 秒，生命周期不符，留空 */
-    刀环特效: "",
   },
 } as const;
 

@@ -40,7 +40,7 @@ local DzSetUnitID = japi.DzSetUnitID
 local DzSetUnitAbilityArt = japi.DzSetUnitAbilityArt
 local UNIT_STATE_MAX_LIFE = jass.UNIT_STATE_MAX_LIFE
 local UNIT_STATE_LIFE = jass.UNIT_STATE_LIFE
-local UNIT_STATE_ATTACK = jass:ConvertUnitState(21)
+local UNIT_STATE_ATTACK = jass.ConvertUnitState(21)
 local R2I = jass.R2I
 local function _____53D6_56DB_820D_4E94_5165_6574_6570(value)
     return R2I(value + 0.5)

@@ -2,16 +2,20 @@
 
 export const 朱雀院椿技能配置 = {
   单位类型ID: "E00H",
-  Q: { 技能ID: "ATQ1", 名称: "居合·返（Q）", 快捷键: "Q", 冷却秒: 5, 魔耗: 40 },
-  W: { 技能ID: "ATW1", 名称: "VF场·后之先（W）", 快捷键: "W", 冷却秒: 10, 魔耗: 55 },
-  E: { 技能ID: "ATE1", 名称: "刃道·间合（E）", 快捷键: "E", 冷却秒: 9, 魔耗: 65 },
-  R: { 技能ID: "ATR1", 名称: "炎姬·黄泉凤凰（R）", 快捷键: "R", 冷却秒: 70, 魔耗: 140 },
-  D: { 技能ID: "ATD1", 名称: "浴火鸟·二刀解放（D）", 快捷键: "D", 冷却秒: 8, 魔耗: 25 },
+  Q: { 技能ID: "ATQ1", 名称: "居合·返（Q）", 快捷键: "Q", 冷却秒: 5, 魔耗百分比: 0.04, 说明: "技能说明：向目标方向施展居合斩；拥有回锋或反击准备时会改为返刃，二刀姿态还会追加交叉斩。|n伤害：基础斩造成攻击力90%的物理伤害。|n伤害范围：半径260、扇形60度|n冷却时间：5秒|n魔法消耗：最大魔法值的4%" },
+  W: { 技能ID: "ATW1", 名称: "VF场·后之先（W）", 快捷键: "W", 冷却秒: 10, 魔耗百分比: 0.055, 说明: "技能说明：展开正面VF招架场，成功招架时化解一次主要攻击并反击，未受击则以收刀斩结束。|n伤害：反击造成攻击力100%的物理伤害；未受击时释放收刀斩。|n防御范围：正面90度|n招架持续时间：0.6秒|n冷却时间：10秒|n魔法消耗：最大魔法值的5.5%" },
+  E: { 技能ID: "ATE1", 名称: "刃道·间合（E）", 快捷键: "E", 冷却秒: 9, 魔耗百分比: 0.065, 说明: "技能说明：向目标方向位移，在终点施展横斩；二刀姿态会追加横斩，并建立决斗距离。|n伤害：横斩造成攻击力90%的物理伤害。|n施法距离：位移300距离|n伤害范围：半径240、扇形90度|n决斗距离持续时间：2.5秒|n冷却时间：9秒|n魔法消耗：最大魔法值的6.5%" },
+  R: { 技能ID: "ATR1", 名称: "炎姬·黄泉凤凰（R）", 快捷键: "R", 冷却秒: 70, 魔耗百分比: 0.14, 说明: "技能说明：蓄力后沿目标方向释放决斗终式，一刀姿态追加反击斩，二刀姿态追加交错斩。|n伤害：主斩造成攻击力200%的物理伤害。|n施法距离：700|n伤害范围：目标方向直线|n蓄力时间：0.7秒|n冷却时间：70秒|n魔法消耗：最大魔法值的14%" },
+  D: { 技能ID: "ATD1", 名称: "浴火鸟·二刀解放（D）", 快捷键: "D", 冷却秒: 8, 魔耗百分比: 0.025, 说明: "技能说明：切换一刀守势与二刀攻势，二刀状态会消耗VF，VF归零后自动回到一刀守势。|n伤害：本技能不直接造成伤害。|n技能类型：天赋技能，初始获得|n状态持续时间：12秒|nVF消耗：每秒4点|n冷却时间：8秒|n魔法消耗：最大魔法值的2.5%" },
 } as const;
 
 export const 朱雀院椿物编配置 = {
   模型: "Unit\\Hero\\Tsubaki\\Tsubaki.mdx",
   模型缩放: 1,
+  来源原名: "chun.mdx",
+  来源模型哈希前16位: "A8B7ECA7C2800F4A",
+  /** imports 规范化模型 SHA-256 前16位（2026-08-27 重算；用户源文件 chun.mdx 对照见返工报告） */
+  规范化模型哈希前16位: "99BD8447EA7589D5",
   主属性: "AGI",
   初始属性: { 力量: 25, 敏捷: 30, 智力: 15 },
   属性成长: { 力量: 2.0, 敏捷: 3.5, 智力: 1.5 },
@@ -20,37 +24,24 @@ export const 朱雀院椿物编配置 = {
 } as const;
 
 export const 朱雀院椿表现配置 = {
-  VF完整: "Common\\Effect\\Form\\Shield\\TsubakiVFBarrier.mdx",
-  VF残缺: "Common\\Effect\\Form\\Shield\\TsubakiVFCracked.mdx",
-  Q主斩: "Common\\Effect\\Form\\Line\\TsubakiIaidoSlash.mdx",
-  Q备份: "Common\\Effect\\Form\\Line\\TsubakiIaidoSlashBackup.mdx",
-  W普通招架: "Common\\Effect\\Form\\Shield\\TsubakiParryFlash.mdx",
-  W完美招架: "Common\\Effect\\Form\\Shield\\TsubakiPerfectParry.mdx",
-  E冲锋主层: ["Common\\Effect\\Form\\Charge\\t3_effect_k4.mdx", "Common\\Effect\\Form\\Charge\\az_yin_q1.mdx"],
-  E冲锋备份: "Common\\Effect\\Form\\Charge\\DashSlashWindBackup.mdx",
-  E终点主斩: "Common\\Effect\\Form\\Line\\TsubakiDashFinishSlash.mdx",
-  E终点备份: "Common\\Effect\\Form\\Line\\TsubakiDashFinishSlashBackup.mdx",
-  R主斩: "Common\\Effect\\Form\\Line\\TsubakiPhoenixFinalSlash.mdx",
-  R主斩备份: "Common\\Effect\\Form\\Line\\TsubakiPhoenixFinalSlashBackup.mdx",
-  R交错斩: "Common\\Effect\\Form\\Line\\TsubakiCrossSlash.mdx",
-  R交错斩备份: "Common\\Effect\\Form\\Line\\TsubakiCrossSlashBackup.mdx",
-  D一刀守势: "Common\\Effect\\Form\\Rotate\\TsubakiIchiGuard.mdx",
-  D二刀攻势: "Common\\Effect\\Form\\Rotate\\TsubakiNitoAssault.mdx",
-  参数: {
-    VF完整: { 缩放: 1, 高度: 0, 持续秒: -1 },
-    VF残缺: { 缩放: 1, 高度: 0, 持续秒: -1 },
-    Q主斩: { 缩放: 1, 高度: 30, 持续秒: 0.9 },
-    W普通招架: { 缩放: 1, 高度: 30, 持续秒: 0.5 },
-    W完美招架: { 缩放: 1, 高度: 30, 持续秒: 0.6 },
-    W招架窗口: { 缩放: 1, 高度: 0, 持续秒: 0.6 },
-    E冲锋主层: { 缩放: 1, 高度: 0, 持续秒: 0.3 },
-    E终点主斩: { 缩放: 1, 高度: 30, 持续秒: 0.8 },
-    R主斩: { 缩放: 1, 高度: 30, 持续秒: 2.2 },
-    R交错斩: { 缩放: 1, 高度: 30, 持续秒: 0.5 },
-    R蓄力提示: { 缩放: 1, 高度: 8, 持续秒: -1 },
-    D一刀守势: { 缩放: 1, 高度: 0, 持续秒: -1 },
-    D二刀攻势: { 缩放: 1, 高度: 0, 持续秒: -1 },
-  },
+  VF完整: { 模型路径: "Common\\Effect\\Form\\Shield\\TsubakiVFBarrier.mdx", 缩放: 1, 高度: 0, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  VF残缺: { 模型路径: "Common\\Effect\\Form\\Shield\\TsubakiVFCracked.mdx", 缩放: 1, 高度: 0, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  Q主斩: { 模型路径: "Common\\Effect\\Form\\Line\\TsubakiIaidoSlash.mdx", 缩放: 1, 高度: 30, 持续秒: 0.9, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  Q备份: { 模型路径: "Common\\Effect\\Form\\Line\\TsubakiIaidoSlashBackup.mdx", 缩放: 1, 高度: 30, 持续秒: 0.9, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  W普通招架: { 模型路径: "Common\\Effect\\Form\\Shield\\TsubakiParryFlash.mdx", 缩放: 1, 高度: 30, 持续秒: 0.5, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  W完美招架: { 模型路径: "Common\\Effect\\Form\\Shield\\TsubakiPerfectParry.mdx", 缩放: 1, 高度: 30, 持续秒: 0.6, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  W招架窗口: { 模型路径: "Common\\Effect\\Form\\Shield\\TsubakiParryFlash.mdx", 缩放: 1, 高度: 0, 持续秒: 0.6, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  E冲锋主层: { 模型路径: ["Common\\Effect\\Form\\Charge\\t3_effect_k4.mdx", "Common\\Effect\\Form\\Charge\\az_yin_q1.mdx"], 缩放: 1, 高度: 0, 持续秒: 0.3, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  E冲锋备份: { 模型路径: "Common\\Effect\\Form\\Charge\\DashSlashWindBackup.mdx", 缩放: 1, 高度: 0, 持续秒: 0.3, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  E终点主斩: { 模型路径: "Common\\Effect\\Form\\Line\\TsubakiDashFinishSlash.mdx", 缩放: 1, 高度: 30, 持续秒: 0.8, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  E终点备份: { 模型路径: "Common\\Effect\\Form\\Line\\TsubakiDashFinishSlashBackup.mdx", 缩放: 1, 高度: 30, 持续秒: 0.8, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  R主斩: { 模型路径: "Common\\Effect\\Form\\Line\\TsubakiPhoenixFinalSlash.mdx", 缩放: 1, 高度: 30, 持续秒: 2.2, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  R主斩备份: { 模型路径: "Common\\Effect\\Form\\Line\\TsubakiPhoenixFinalSlashBackup.mdx", 缩放: 1, 高度: 30, 持续秒: 2.2, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  R交错斩: { 模型路径: "Common\\Effect\\Form\\Line\\TsubakiCrossSlash.mdx", 缩放: 1, 高度: 30, 持续秒: 0.5, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  R交错斩备份: { 模型路径: "Common\\Effect\\Form\\Line\\TsubakiCrossSlashBackup.mdx", 缩放: 1, 高度: 30, 持续秒: 0.5, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  R蓄力提示: { 模型路径: "", 缩放: 1, 高度: 8, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  D一刀守势: { 模型路径: "Common\\Effect\\Form\\Rotate\\TsubakiIchiGuard.mdx", 缩放: 1, 高度: 0, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  D二刀攻势: { 模型路径: "Common\\Effect\\Form\\Rotate\\TsubakiNitoAssault.mdx", 缩放: 1, 高度: 0, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
 } as const;
 
 export const 朱雀院椿读条配置 = {
@@ -58,6 +49,33 @@ export const 朱雀院椿读条配置 = {
   跟随Z偏移: 220,
   显示模型进度条: false,
   死亡或打断同步销毁: true,
+} as const;
+
+export const 朱雀院椿音效配置 = {
+  /** Q 居合斩（坐标；基础居合结算点一次） */
+  Q居合: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_q_iaido.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 0.9 },
+  /** Q 返刃回身斩（坐标；返刃二段结算点一次） */
+  Q返刃: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_q_return.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 1.0 },
+  /** VF 场展开（单位；仅"无/残缺→完整"跳变时一次，常规刷新不播） */
+  VF展开: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_vf_open.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.3 },
+  /** W 普通招架（单位；普通招架分支一次） */
+  W普通招架: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_parry_normal.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 0.8 },
+  /** W 完美招架（单位；完美招架分支一次） */
+  W完美招架: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_parry_perfect.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.3 },
+  /** W 收刀斩（坐标；未受击收刀分支结算点一次） */
+  W收刀斩: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_sheath_slash.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 1.0 },
+  /** E 间合冲锋（单位；冲锋启动一次） */
+  E冲锋: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_e_dash.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.0 },
+  /** E 终点横斩（坐标；落点结算一次，二刀追加横斩复用） */
+  E终点横斩: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_e_slash.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 0.9 },
+  /** R 炎姬蓄力（单位；充能真正建立时一次） */
+  R蓄力: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_r_charge.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.8 },
+  /** R 黄泉凤凰终式（坐标；充能完成结算点一次） */
+  R终式: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_r_phoenix.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 3.6 },
+  /** 二刀交错斩（坐标；Q/R 二刀交叉分支成立时一次） */
+  二刀交错: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_r_cross.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 1.2 },
+  /** D 姿态切换（单位；切换成功一次） */
+  D切换: { 路径: "Sound\\Hero\\Tsubaki\\SFX\\tsubaki_d_switch.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.2 },
 } as const;
 
 export const 朱雀院椿Buff配置 = {
@@ -187,12 +205,6 @@ export const 朱雀院椿R配置 = {
   二刀VF代价: 30,
   /** 一刀受击分支恢复 VF */
   一刀受击恢复VF: 20,
-  /** 蓄力预警（候选未迁入留空） */
-  蓄力提示特效: "",
-  /** 主斩/交错斩表现（正式主版本；备份版本按候选规则切换）；决胜线候选未迁入留空 */
-  主斩特效: "Common\\Effect\\Form\\Line\\TsubakiPhoenixFinalSlash.mdx",
-  交错斩特效: "Common\\Effect\\Form\\Line\\TsubakiCrossSlash.mdx",
-  决胜线特效: "",
 } as const;
 
 /**

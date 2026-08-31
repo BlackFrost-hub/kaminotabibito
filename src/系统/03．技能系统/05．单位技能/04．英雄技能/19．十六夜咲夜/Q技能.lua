@@ -38,8 +38,8 @@ function ____Q_5355_5200_7ED3_675F(state)
 end
 function _____5207_6362Q_8FFD_8E2A_5200(state)
     local old = state["单位"]
-    local x = jass:GetUnitX(old)
-    local y = jass:GetUnitY(old)
+    local x = jass.GetUnitX(old)
+    local y = jass.GetUnitY(old)
     local target = state["上下文"]["目标"]
     local angle = target ~= nil and target ~= 0 and _____4E24_70B9_89D2_5EA6(
         x,
@@ -246,7 +246,7 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CQ(_context, caster, _____6
         ["剩余飞刀"] = _____914D_7F6E.Q["数量"],
         ["已结束"] = false
     }
-    local source = "十六夜咲夜-Q:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass:GetHandleId(caster))
+    local source = "十六夜咲夜-Q:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass.GetHandleId(caster))
     _____65BD_52A0_77ED_786C_76F4_5E76_64AD_653E_52A8_4F5C(caster, source, _____914D_7F6E.Q["硬直秒"], "spell")
     _____64AD_653E_54B2_591C_5355_4F4D_97F3_6548("gg_snd_IzayoiSakuya_RQ3", caster)
     local x = GetUnitX(caster)

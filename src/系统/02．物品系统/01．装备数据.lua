@@ -4481,6 +4481,61 @@ ____exports.items.I0HF = {
     armor = 12,
     hp = 900
 }
+____exports.items.I0G8 = {
+    type = "道具/戒指/饰品",
+    name = "祭血之皿",
+    goldPrice = 1080,
+    score = 5400,
+    level = "C+",
+    dmg = 75,
+    hp = 1000,
+    hpRegen = 70
+}
+____exports.items.I0H7 = {
+    type = "道具/戒指/饰品",
+    name = "祖地纹章徽记",
+    goldPrice = 1140,
+    score = 5700,
+    level = "C+",
+    all = 22,
+    armor = 12,
+    hp = 1100
+}
+____exports.items.I0K6 = {
+    type = "道具/戒指/饰品",
+    name = "封印旧档书签",
+    goldPrice = 1120,
+    score = 5600,
+    level = "C+",
+    int = 45,
+    mp = 1200,
+    mpRegen = 16,
+    magicDmg = 0.15,
+    cdReduction = 0.1
+}
+____exports.items.I0K7 = {
+    type = "道具/戒指/饰品",
+    name = "王庭旧誓徽章",
+    goldPrice = 1160,
+    score = 5800,
+    level = "C+",
+    str = 30,
+    hp = 1800,
+    armor = 28,
+    stunResist = 0.2
+}
+____exports.items.I0K8 = {
+    type = "道具/戒指/饰品",
+    name = "影旗追猎徽记",
+    goldPrice = 1400,
+    score = 7000,
+    level = "B",
+    dmg = 110,
+    agi = 40,
+    critRate = 0.12,
+    atkSpeed = 0.25,
+    movespeed2 = 0.08
+}
 ____exports.items.I0HG = {
     type = "道具/戒指/饰品",
     name = "王城先行者徽印",
@@ -4908,6 +4963,102 @@ ____exports.items.I0K4 = {
     darkDmg = 0.18,
     cdReduction = 0.1,
     mpRegen = 18
+}
+____exports.items.I0K9 = {
+    type = "道具/戒指/饰品",
+    name = "夜行教团坠饰",
+    goldPrice = 1380,
+    score = 6900,
+    level = "B",
+    agi = 30,
+    hp = 1000,
+    armor = 22,
+    dodge = 0.15,
+    movespeed2 = 0.1,
+    hpRegen = 45
+}
+____exports.items.I0KA = {
+    type = "道具/戒指/饰品",
+    name = "深井活水囊",
+    goldPrice = 1380,
+    score = 7000,
+    level = "B",
+    abilList = "IN02"
+}
+____exports.items.I0KB = {
+    type = "主武器",
+    name = "王庭礼剑",
+    goldPrice = 1300,
+    score = 6500,
+    level = "B",
+    dmg = 120,
+    agi = 20,
+    critRate = 0.25,
+    atkSpeed = 0.25,
+    weaponType = "剑"
+}
+____exports.items.I0KE = {type = "图纸", name = "守誓圣铠合成书", goldPrice = 0}
+____exports.items.I0KF = {
+    type = "衣服",
+    name = "守誓圣铠",
+    goldPrice = 1300,
+    score = 6500,
+    level = "B",
+    hp = 2200,
+    armor = 30,
+    str = 22,
+    hpRegen = 35,
+    stunResist = 0.15
+}
+____exports.items.I0KG = {type = "图纸", name = "熔渊坠饰合成书", goldPrice = 0}
+____exports.items.I0KH = {
+    type = "道具/戒指/饰品",
+    name = "熔渊坠饰",
+    goldPrice = 1660,
+    score = 8300,
+    level = "B+",
+    dodge = 0.2,
+    agi = 35,
+    hp = 1800,
+    armor = 25,
+    movespeed2 = 0.12,
+    hpRegen = 50
+}
+____exports.items.I0KB = {
+    type = "道具/戒指/饰品",
+    name = "焚羽余烬晶核",
+    goldPrice = 1780,
+    score = 8900,
+    level = "B++",
+    int = 55,
+    magicDmg = 0.18,
+    fireDmg = 0.18,
+    waterDmg = 0.18,
+    hpRegen = 24
+}
+____exports.items.I0KC = {
+    type = "道具/戒指/饰品",
+    name = "七晶封印棱章",
+    goldPrice = 1960,
+    score = 9800,
+    level = "B++",
+    all = 34,
+    hp = 2500,
+    armor = 28,
+    magicResist = 0.18,
+    cdReduction = 0.06
+}
+____exports.items.I0KD = {
+    type = "道具/戒指/饰品",
+    name = "英魂归寂长灯",
+    goldPrice = 2020,
+    score = 10100,
+    level = "B++",
+    cdReduction = 0.14,
+    skillHeal = 0.25,
+    mpRegen = 32,
+    hp = 2200,
+    stunResist = 0.22
 }
 ____exports.items.I0K5 = {
     type = "主武器",

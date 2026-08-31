@@ -34,7 +34,7 @@ local function _____89E3_9664RS_76EE_6807_6682_505C(variable)
     end
     _____79FB_9664_5355_4F4D_6682_505C(data["目标"], data["来源"])
     if _____5355_4F4D_5B58_6D3B(data["目标"]) then
-        jass:SetUnitVertexColor(
+        jass.SetUnitVertexColor(
             data["目标"],
             255,
             255,
@@ -68,17 +68,17 @@ local function _____63A8_8FDBRS_56DE_6536(variable)
                 if not _____5355_4F4D_5B58_6D3B(knife["单位"]) then
                     goto __continue12
                 end
-                local dx = jass:GetUnitX(knife["单位"]) - jass:GetUnitX(context["施法者"])
-                local dy = jass:GetUnitY(knife["单位"]) - jass:GetUnitY(context["施法者"])
+                local dx = jass.GetUnitX(knife["单位"]) - jass.GetUnitX(context["施法者"])
+                local dy = jass.GetUnitY(knife["单位"]) - jass.GetUnitY(context["施法者"])
                 if dx * dx + dy * dy <= _____914D_7F6E.RS["回收距离"] * _____914D_7F6E.RS["回收距离"] then
                     knife["结束"]()
                     goto __continue12
                 end
                 knife["设置角度"](_____4E24_70B9_89D2_5EA6(
-                    jass:GetUnitX(knife["单位"]),
-                    jass:GetUnitY(knife["单位"]),
-                    jass:GetUnitX(context["施法者"]),
-                    jass:GetUnitY(context["施法者"])
+                    jass.GetUnitX(knife["单位"]),
+                    jass.GetUnitY(knife["单位"]),
+                    jass.GetUnitX(context["施法者"]),
+                    jass.GetUnitY(context["施法者"])
                 ))
                 remaining = remaining + 1
             end
@@ -92,13 +92,13 @@ local function _____63A8_8FDBRS_56DE_6536(variable)
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRS(_listener, caster, _____6280_80FD_5B9E_4F8BID)
     _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(caster, _____914D_7F6E["符卡间隔秒"].RS)
-    local target = jass:GetSpellTargetUnit()
+    local target = jass.GetSpellTargetUnit()
     if not _____5355_4F4D_5B58_6D3B(target) then
         return
     end
-    local targetSource = "十六夜咲夜-RS目标:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass:GetHandleId(caster))
+    local targetSource = "十六夜咲夜-RS目标:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass.GetHandleId(caster))
     _____6DFB_52A0_5355_4F4D_6682_505C(target, targetSource)
-    jass:SetUnitVertexColor(
+    jass.SetUnitVertexColor(
         target,
         255,
         255,
@@ -106,33 +106,33 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRS(_listener, caster, ____
         120
     )
     addDelayedCallback(_____914D_7F6E.RS["目标暂停秒"] * 1000, _____89E3_9664RS_76EE_6807_6682_505C, {["目标"] = target, ["来源"] = targetSource})
-    local targetFacing = jass:GetUnitFacing(target)
+    local targetFacing = jass.GetUnitFacing(target)
     local landingX = _____6781_5750_6807X(
-        jass:GetUnitX(target),
+        jass.GetUnitX(target),
         _____914D_7F6E.RS["瞬移偏移"],
         targetFacing + 180
     )
     local landingY = _____6781_5750_6807Y(
-        jass:GetUnitY(target),
+        jass.GetUnitY(target),
         _____914D_7F6E.RS["瞬移偏移"],
         targetFacing + 180
     )
     _____65BD_52A0_77ED_786C_76F4_5E76_64AD_653E_52A8_4F5C(
         caster,
-        "十六夜咲夜-RS:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass:GetHandleId(caster)),
+        "十六夜咲夜-RS:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass.GetHandleId(caster)),
         _____914D_7F6E.RS["硬直秒"],
         "spell,slam"
     )
     if not _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(caster, landingX, landingY) then
         return
     end
-    jass:SetUnitFacing(
+    jass.SetUnitFacing(
         caster,
         _____4E24_70B9_89D2_5EA6(
             landingX,
             landingY,
-            jass:GetUnitX(target),
-            jass:GetUnitY(target)
+            jass.GetUnitX(target),
+            jass.GetUnitY(target)
         )
     )
     _____64AD_653E_54B2_591C_5355_4F4D_97F3_6548("gg_snd_IzayoiSakuya_RS", caster)
@@ -142,8 +142,8 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRS(_listener, caster, ____
         while i < #knives do
             local knife = knives[i + 1]
             knife["设置角度"](_____4E24_70B9_89D2_5EA6(
-                jass:GetUnitX(knife["单位"]),
-                jass:GetUnitY(knife["单位"]),
+                jass.GetUnitX(knife["单位"]),
+                jass.GetUnitY(knife["单位"]),
                 landingX,
                 landingY
             ))

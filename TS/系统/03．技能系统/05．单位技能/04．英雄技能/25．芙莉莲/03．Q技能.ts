@@ -12,6 +12,7 @@ import {
   芙莉莲Q配置,
   芙莉莲被动配置,
   芙莉莲表现配置,
+  芙莉莲音效配置,
 } from "./00．配置";
 const { 播放限时动作, 芙莉莲动作槽 } = require("./01A．动作表现") as {
   播放限时动作: (this: void, 英雄: any, 槽: any, 登记名: string) => void;
@@ -48,6 +49,15 @@ const { 读取单位攻击力, 单位存活, 两点角度 } = require("系统.03
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
 };
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+};
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+};
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
+};
 const {
   是芙莉莲,
   记录芙莉莲活动,
@@ -75,6 +85,7 @@ const 花田联动 = require("./07．D技能") as {
 const 英雄单位类型ID = stringToFourCCSafe(芙莉莲技能配置.单位类型ID);
 const Q技能ID = stringToFourCCSafe(芙莉莲技能配置.Q.技能ID);
 const Q配置 = 芙莉莲Q配置;
+const Q音效 = 芙莉莲音效配置.Q发射;
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
@@ -102,15 +113,18 @@ function 结算Q命中(this: void, 施法者: any, 目标: any, 技能实例ID: 
       标签 = "芙莉莲-Q破防";
       // 破防表现：目标防护表面短裂纹后消散（复用解析完成模型短播；参数配置驱动）
       创建点特效({
-        模型路径: 芙莉莲表现配置.解析完成,
-        X: GetUnitX(目标),
+        模型路径: 芙莉莲表现配置.解析完成.模型路径,
+            X: GetUnitX(目标),
         Y: GetUnitY(目标),
-        Z: 芙莉莲表现配置.特效参数.解析完成.高度,
-        面向角度: 0,
-        动画索引: 0,
-        缩放: 芙莉莲表现配置.特效参数.解析完成.缩放,
-        持续秒: 芙莉莲表现配置.特效参数.解析完成.持续秒,
+        Z: 芙莉莲表现配置.解析完成.高度,
+        面向角度: 芙莉莲表现配置.解析完成.面向角度,
+        动画索引: 芙莉莲表现配置.解析完成.动画索引,
+        缩放: 芙莉莲表现配置.解析完成.缩放,
+        持续秒: 芙莉莲表现配置.解析完成.持续秒,
+        RGB: 芙莉莲表现配置.解析完成.RGB,
       });
+      // 破防命中反馈（R/Q 解析完成破防共用；坐标=目标位置，参数配置驱动）
+      Sound3DII_CooPlayReuse(芙莉莲音效配置.R破防.路径, GetUnitX(目标), GetUnitY(目标), 芙莉莲音效配置.R破防.高度, 芙莉莲音效配置.R破防.裁断距离);
     }
   } else if (有解析(施法者, 目标, "防御")) {
     // 穿透分支：目标已有防御解析 → 魔法护盾/结界穿透强化
@@ -135,15 +149,18 @@ function 结算Q命中(this: void, 施法者: any, 目标: any, 技能实例ID: 
 
   // 命中反馈：小型穿透闪光（不使用大爆炸；参数配置驱动）
   创建点特效({
-    模型路径: 芙莉莲表现配置.R命中反馈,
-    X: GetUnitX(目标),
+    模型路径: 芙莉莲表现配置.Q命中反馈.模型路径,
+        X: GetUnitX(目标),
     Y: GetUnitY(目标),
-    Z: 芙莉莲表现配置.特效参数.Q命中反馈.高度,
-    面向角度: 0,
-    动画索引: 0,
-    缩放: 芙莉莲表现配置.特效参数.Q命中反馈.缩放,
-    持续秒: 芙莉莲表现配置.特效参数.Q命中反馈.持续秒,
+    Z: 芙莉莲表现配置.Q命中反馈.高度,
+    面向角度: 芙莉莲表现配置.Q命中反馈.面向角度,
+    动画索引: 芙莉莲表现配置.Q命中反馈.动画索引,
+    缩放: 芙莉莲表现配置.Q命中反馈.缩放,
+    持续秒: 芙莉莲表现配置.Q命中反馈.持续秒,
+    RGB: 芙莉莲表现配置.Q命中反馈.RGB,
   });
+  // 命中音（坐标=目标位置，参数配置驱动）
+  Sound3DII_CooPlayReuse(芙莉莲音效配置.Q命中.路径, GetUnitX(目标), GetUnitY(目标), 芙莉莲音效配置.Q命中.高度, 芙莉莲音效配置.Q命中.裁断距离);
 
   // 主要命中目标施加攻击解析
   施加解析(施法者, 目标, "攻击");
@@ -161,8 +178,12 @@ function 释放Q(this: void, _context: any, 施法者: any, 技能实例ID: numb
   // 施法时点：先快照隐匿（消费判定用），再记录活动（解除隐匿并重置静默计时）
   const 隐匿强化 = 快照隐匿(施法者);
   记录芙莉莲活动(施法者);
+  // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
+  播放英雄技能喊话(施法者, "芙莉莲", 芙莉莲技能配置.Q.技能ID);
   // 施法动作（Q 发射候选）
   播放限时动作(施法者, 芙莉莲动作槽.Q发射, "芙莉莲Q动作");
+  // 分层音效在施法时点启动；内层发射声与 Q 的 150ms 发射延迟对齐，且全局按单位位置播放。
+  Sound3DII_UnitPlayReuse(Q音效.路径, 施法者, Q音效.裁断距离);
   // 方向快照（施法时点）
   const 方向角 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), GetSpellTargetX(), GetSpellTargetY());
 
@@ -200,9 +221,21 @@ function 释放Q(this: void, _context: any, 施法者: any, 技能实例ID: numb
       技能ID: Q技能ID,
       技能实例ID,
       技能标签: "芙莉莲-QZoltraak",
-      模型: 芙莉莲表现配置.Q弹道,
-      缩放: 芙莉莲表现配置.特效参数.Q弹道.缩放,
-      飞行高度: 芙莉莲表现配置.特效参数.Q弹道.高度,
+      模型: 芙莉莲表现配置.Q弹道.模型路径,
+      RGB: 芙莉莲表现配置.Q弹道.RGB,
+      缩放: 芙莉莲表现配置.Q弹道.缩放,
+      飞行高度: 芙莉莲表现配置.Q弹道.高度,
+      附加特效1: {
+        模型: 芙莉莲表现配置.Q弹道附加特效.模型路径,
+        跟随主弹幕参数: 芙莉莲表现配置.Q弹道附加特效.跟随主弹幕参数,
+        跟随轨迹俯仰: 芙莉莲表现配置.Q弹道附加特效.跟随轨迹俯仰,
+        动画索引: 芙莉莲表现配置.Q弹道附加特效.动画索引,
+        缩放: 芙莉莲表现配置.Q弹道附加特效.缩放,
+        红: 芙莉莲表现配置.Q弹道附加特效.RGB.红,
+        绿: 芙莉莲表现配置.Q弹道附加特效.RGB.绿,
+        蓝: 芙莉莲表现配置.Q弹道附加特效.RGB.蓝,
+        透明度: 芙莉莲表现配置.Q弹道附加特效.RGB.透明度,
+      },
       on命中: function Q命中(this: void, 目标: any, _弹道: any): void {
         结算Q命中(施法者, 目标, 技能实例ID, 隐匿强化);
       },

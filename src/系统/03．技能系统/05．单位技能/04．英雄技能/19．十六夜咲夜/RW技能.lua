@@ -73,10 +73,10 @@ local function _____53D1_5C04RW_98DE_5200(variable)
         _____5C1D_8BD5_7ED3_675FRW(cast)
         return
     end
-    local x = jass:GetUnitX(cast["施法者"])
-    local y = jass:GetUnitY(cast["施法者"])
+    local x = jass.GetUnitX(cast["施法者"])
+    local y = jass.GetUnitY(cast["施法者"])
     local baseAngle = _____4E24_70B9_89D2_5EA6(x, y, cast["目标X"], cast["目标Y"])
-    local angle = baseAngle + jass:GetRandomReal(-_____914D_7F6E.RW["随机角度"], _____914D_7F6E.RW["随机角度"])
+    local angle = baseAngle + jass.GetRandomReal(-_____914D_7F6E.RW["随机角度"], _____914D_7F6E.RW["随机角度"])
     local state = _____521B_5EFA_76F4_7EBF_98DE_5200({
         ["施法者"] = cast["施法者"],
         ["单位类型ID"] = _____914D_7F6E["单位壳"]["蓝刀"],
@@ -101,8 +101,8 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRW(_listener, caster, ____
     local cast = {
         ["施法者"] = caster,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
-        ["目标X"] = jass:GetSpellTargetX(),
-        ["目标Y"] = jass:GetSpellTargetY(),
+        ["目标X"] = jass.GetSpellTargetX(),
+        ["目标Y"] = jass.GetSpellTargetY(),
         ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * _____914D_7F6E.RW["伤害攻击力倍率"],
         ["已发射"] = 0,
         ["活动飞刀"] = 0,
@@ -110,8 +110,8 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRW(_listener, caster, ____
         ["分身"] = nil,
         ["已结束"] = false
     }
-    local x = jass:GetUnitX(caster)
-    local y = jass:GetUnitY(caster)
+    local x = jass.GetUnitX(caster)
+    local y = jass.GetUnitY(caster)
     local angle = _____4E24_70B9_89D2_5EA6(x, y, cast["目标X"], cast["目标Y"])
     if _____5341_516D_591C_54B2_591C_5904_4E8E_54B2_591C_4E16_754C(caster) then
         cast["分身"] = _____521B_5EFA_54B2_591C_5355_4F4D_58F3(
@@ -122,18 +122,18 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRW(_listener, caster, ____
             angle
         )
         if cast["分身"] ~= nil and cast["分身"] ~= 0 then
-            jass:SetUnitFlyHeight(
+            jass.SetUnitFlyHeight(
                 cast["分身"],
-                jass:GetUnitDefaultFlyHeight(cast["分身"]),
+                jass.GetUnitDefaultFlyHeight(cast["分身"]),
                 0
             )
-            jass:SetUnitAnimation(cast["分身"], "channel")
+            jass.SetUnitAnimation(cast["分身"], "channel")
         end
     end
     if not _____5341_516D_591C_54B2_591C_5904_4E8E_54B2_591C_4E16_754C(caster) then
         _____65BD_52A0_77ED_786C_76F4_5E76_64AD_653E_52A8_4F5C(
             caster,
-            "十六夜咲夜-RW:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass:GetHandleId(caster)),
+            "十六夜咲夜-RW:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass.GetHandleId(caster)),
             _____914D_7F6E.RW["硬直秒"],
             "channel"
         )

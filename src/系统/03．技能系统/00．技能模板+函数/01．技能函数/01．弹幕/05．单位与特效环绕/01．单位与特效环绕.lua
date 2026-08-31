@@ -80,8 +80,8 @@ local function _____521B_5EFA_8FD0_884C_8282_70B9(params, nodeParams)
     local center = params["中心单位"]
     local initialAngle = (params["初始角度"] or 0) + (nodeParams["初始角度偏移"] or 0)
     local radius = nodeParams["半径"] or params["半径"]
-    local x = GetUnitX(center) + radius * jass:Cos(initialAngle * DEG_TO_RAD)
-    local y = GetUnitY(center) + radius * jass:Sin(initialAngle * DEG_TO_RAD)
+    local x = GetUnitX(center) + radius * jass.Cos(initialAngle * DEG_TO_RAD)
+    local y = GetUnitY(center) + radius * jass.Sin(initialAngle * DEG_TO_RAD)
     local facing = _____53D6_8282_70B9_671D_5411(nodeParams["朝向模式"] or "保持", initialAngle, nodeParams["朝向修正角度"] or 0) or 0
     local ____temp_2
     if nodeParams["类型"] == "单位" then
@@ -107,7 +107,7 @@ local function _____521B_5EFA_8FD0_884C_8282_70B9(params, nodeParams)
             if nodeParams["模型路径"] == nil or nodeParams["模型路径"] == "" then
                 return nil
             end
-            handle = jass:AddSpecialEffect(nodeParams["模型路径"], x, y)
+            handle = jass.AddSpecialEffect(nodeParams["模型路径"], x, y)
         end
         created = true
     end
@@ -158,8 +158,8 @@ local function _____66F4_65B0_73AF_7ED5_8282_70B9(instance, node)
     end
     local center = instance["参数"]["中心单位"]
     local angle = instance["当前角度"] + node["角度偏移"]
-    local x = GetUnitX(center) + node["半径"] * jass:Cos(angle * DEG_TO_RAD)
-    local y = GetUnitY(center) + node["半径"] * jass:Sin(angle * DEG_TO_RAD)
+    local x = GetUnitX(center) + node["半径"] * jass.Cos(angle * DEG_TO_RAD)
+    local y = GetUnitY(center) + node["半径"] * jass.Sin(angle * DEG_TO_RAD)
     local z = node["高度"] + (node["跟随中心飞行高度"] and GetUnitFlyHeight(center) or 0)
     local facing = _____53D6_8282_70B9_671D_5411(node["朝向模式"], angle, node["朝向修正角度"])
     if node["类型"] == "单位" then

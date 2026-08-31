@@ -51,14 +51,14 @@ local function _____5730_5F62_53EF_901A_884C(x, y)
     if type(jass.IsTerrainPathable) ~= "function" then
         return true
     end
-    return not jass:IsTerrainPathable(x, y, jass.PATHING_TYPE_WALKABILITY)
+    return not jass.IsTerrainPathable(x, y, jass.PATHING_TYPE_WALKABILITY)
 end
 --- 沿施法方向做 40 码步长地形检查，返回最终落点（阻挡时停在最后一个可通行点）。
 -- 源 JASS：Trig_zzm_QFunc001Func018Func007Func009Func005T 的循环判定。
 local function _____8BA1_7B97_77AC_79FB_843D_70B9(_____8D77_70B9X, _____8D77_70B9Y, _____89D2_5EA6, _____8DDD_79BB)
     local _____843D_70B9X = _____8D77_70B9X
     local _____843D_70B9Y = _____8D77_70B9Y
-    local _____6B65_6570 = jass:R2I(_____8DDD_79BB / 40)
+    local _____6B65_6570 = jass.R2I(_____8DDD_79BB / 40)
     do
         local i = 1
         while i <= _____6B65_6570 do
@@ -141,8 +141,8 @@ local function ____on_4F50_4F50_6728Q_751F_6548(_____65BD_6CD5_5355_4F4D, _____6
     local cfg = _____4F50_4F50_6728_5355_4F4D_6280_80FD_914D_7F6E.Q
     local _____8D77_70B9X = GetUnitX(_____65BD_6CD5_5355_4F4D)
     local _____8D77_70B9Y = GetUnitY(_____65BD_6CD5_5355_4F4D)
-    local _____76EE_6807X = jass:GetSpellTargetX()
-    local _____76EE_6807Y = jass:GetSpellTargetY()
+    local _____76EE_6807X = jass.GetSpellTargetX()
+    local _____76EE_6807Y = jass.GetSpellTargetY()
     local _____89D2_5EA6 = _____4E24_70B9_89D2_5EA6(_____8D77_70B9X, _____8D77_70B9Y, _____76EE_6807X, _____76EE_6807Y)
     local _____8DDD_79BB = _____8DDD_79BBXY(_____8D77_70B9X, _____8D77_70B9Y, _____76EE_6807X, _____76EE_6807Y)
     _____5237_65B0_77AC_79FB_5C31_7EEA(_____65BD_6CD5_5355_4F4D)

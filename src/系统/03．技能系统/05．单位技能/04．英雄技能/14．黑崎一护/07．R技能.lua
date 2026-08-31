@@ -161,7 +161,7 @@ local function ____R_5355_4F4D_6B7B_4EA1_6E05_7406(dyingUnit, _killingUnit)
     if dyingUnit == nil or dyingUnit == 0 then
         return
     end
-    if jass:GetUnitTypeId(dyingUnit) ~= _____82F1_96C4_5355_4F4D_7C7B_578BID then
+    if jass.GetUnitTypeId(dyingUnit) ~= _____82F1_96C4_5355_4F4D_7C7B_578BID then
         return
     end
     ____exports["结束卍解"](dyingUnit)

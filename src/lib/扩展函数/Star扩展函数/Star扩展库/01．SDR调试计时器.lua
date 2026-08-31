@@ -42,13 +42,13 @@ function ____exports.SDR_DebugTimer(t, time, isloop, Target, trig)
     if not ht then
         return
     end
-    local id = jass:GetHandleId(t)
-    jass:SaveTimerHandle(ht, SDR_Index, 0, t)
-    jass:SaveInteger(ht, id, 0, SDR_Index)
-    jass:SaveReal(ht, id, 1, time)
-    jass:SaveBoolean(ht, id, 2, isloop)
-    jass:SaveStr(ht, id, 3, Target)
-    jass:SaveStr(ht, id, 4, trig)
+    local id = jass.GetHandleId(t)
+    jass.SaveTimerHandle(ht, SDR_Index, 0, t)
+    jass.SaveInteger(ht, id, 0, SDR_Index)
+    jass.SaveReal(ht, id, 1, time)
+    jass.SaveBoolean(ht, id, 2, isloop)
+    jass.SaveStr(ht, id, 3, Target)
+    jass.SaveStr(ht, id, 4, trig)
     SDR_Index = SDR_Index + 1
 end
 return ____exports

@@ -28,7 +28,7 @@ local function _____66F4_65B0_5341_516D_591C_88AB_52A8_5C5E_6027(player, hero)
     if player == nil or player == 0 then
         return
     end
-    local playerId = jass:GetPlayerId(player)
+    local playerId = jass.GetPlayerId(player)
     local shouldApply = _____662F_9006_56DE_5341_516D_591C(hero)
     local applied = _____5DF2_7ED1_5B9A_73A9_5BB6[playerId] == true
     if shouldApply == applied then

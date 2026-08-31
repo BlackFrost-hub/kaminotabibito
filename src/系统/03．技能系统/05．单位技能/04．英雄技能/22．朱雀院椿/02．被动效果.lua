@@ -1,13 +1,15 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____5237_65B0VF_8868_73B0, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, ____VF_573ABuffID, ____VF_6B8B_7F3ABuffID, _____88AB_52A8_914D_7F6E
+local _____5237_65B0VF_8868_73B0, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, Sound3DII_UnitPlayReuse, ____VF_573ABuffID, ____VF_6B8B_7F3ABuffID, _____88AB_52A8_914D_7F6E
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.00．配置")
 local _____6731_96C0_9662_693F_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿技能配置"]
 local _____6731_96C0_9662_693FBuff_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿Buff配置"]
 local _____6731_96C0_9662_693F_88AB_52A8_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿被动配置"]
+local _____6731_96C0_9662_693F_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿音效配置"]
 function _____5237_65B0VF_8868_73B0(_____82F1_96C4, _____72B6_6001)
     local _____6B8B_7F3A = _____72B6_6001["VF当前"] <= 0 or _____72B6_6001["VF当前"] < _____88AB_52A8_914D_7F6E["VF上限"] * _____88AB_52A8_914D_7F6E["VF残缺阈值"]
+    local _____4E4B_524D_6B8B_7F3A = _____72B6_6001["VF残缺"]
     _____72B6_6001["VF残缺"] = _____6B8B_7F3A
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____82F1_96C4, ____VF_573ABuffID)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____82F1_96C4, ____VF_6B8B_7F3ABuffID)
@@ -28,6 +30,9 @@ function _____5237_65B0VF_8868_73B0(_____82F1_96C4, _____72B6_6001)
                 _____72B6_6001["VF当前"],
                 {stack = 1}
             )
+            if _____4E4B_524D_6B8B_7F3A then
+                Sound3DII_UnitPlayReuse(_____6731_96C0_9662_693F_97F3_6548_914D_7F6E["VF展开"]["路径"], _____82F1_96C4, _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["VF展开"]["裁断距离"])
+            end
         end
     end
 end
@@ -53,6 +58,8 @@ local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_7["造成技能伤
 local ____require_result_8 = require("系统.05．Buff系统.00．Buff系统")
 registerManualBuff = ____require_result_8.registerManualBuff
 _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_8["移除单位指定Buff"]
+local ____require_result_9 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+Sound3DII_UnitPlayReuse = ____require_result_9.Sound3DII_UnitPlayReuse
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 ____VF_573ABuffID = _____6731_96C0_9662_693FBuff_914D_7F6E["VF场"]
 ____VF_6B8B_7F3ABuffID = _____6731_96C0_9662_693FBuff_914D_7F6E["VF残缺"]
@@ -182,13 +189,13 @@ local function _____6CE8_518CVF_5438_6536()
     end
     ____VF_4FEE_6539_5668ID = registerDamageModifier(
         function(context)
-            local ____temp_9
+            local ____temp_10
             if context ~= nil then
-                ____temp_9 = context.target
+                ____temp_10 = context.target
             else
-                ____temp_9 = nil
+                ____temp_10 = nil
             end
-            local _____5355_4F4D = ____temp_9
+            local _____5355_4F4D = ____temp_10
             if not ____exports["是朱雀院椿"](_____5355_4F4D) then
                 return context.currentDamage
             end
@@ -222,13 +229,13 @@ ____exports["创建反击准备"] = function(_____82F1_96C4, _____65B9_5411, ___
     local _____72B6_6001 = _____53D6_82F1_96C4_72B6_6001(_____82F1_96C4)
     _____72B6_6001["反击准备到期"] = getGameTime() + _____88AB_52A8_914D_7F6E["反击准备持续秒"]
     _____72B6_6001["反击准备方向"] = _____65B9_5411
-    local ____temp_10
+    local ____temp_11
     if _____6765_6E90 ~= nil and _____6765_6E90 ~= 0 then
-        ____temp_10 = _____6765_6E90
+        ____temp_11 = _____6765_6E90
     else
-        ____temp_10 = nil
+        ____temp_11 = nil
     end
-    _____72B6_6001["反击准备来源"] = ____temp_10
+    _____72B6_6001["反击准备来源"] = ____temp_11
     registerManualBuff(
         _____82F1_96C4,
         _____53CD_51FB_51C6_5907BuffID,

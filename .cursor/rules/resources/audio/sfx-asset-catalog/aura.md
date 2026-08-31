@@ -5,3 +5,4 @@
 | 正式资源 | 大概声音 | 来源 |
 | --- | --- | --- |
 | `imports/Sound/Boss/Felice/SFX/felice_aberration_transform_start_01.mp3` | 声音描述：暗能急速聚合、低频暗柱爆起、身体 / 统帅形态异化，以及恶魔气场展开 | `TS/系统/03．技能系统/05．单位技能/03．Boss技能/01．主线Boss/06．菲利斯/16．音频需求预算清单.md:108` |
+| `imports/Sound/Hero/Emilia/SFX/emilia_r_field.mp3` | 永冻领域持续寒气低频层+冰晶脉冲 | 20-25英雄音效规划.md |

@@ -38,9 +38,9 @@ local function _____5904_7406_6B27_83F2_8389_4E9AW(caster, abilityId)
         return
     end
     local cfg = _____6B27_83F2_8389_4E9A_5355_4F4D_6280_80FD_914D_7F6E.W
-    local soundIndex = jass:GetRandomInt(0, #cfg["全局音效键"] - 1)
+    local soundIndex = jass.GetRandomInt(0, #cfg["全局音效键"] - 1)
     _____64AD_653E_6B27_83F2_8389_4E9A_5355_4F4D_97F3_6548(caster, cfg["全局音效键"][soundIndex + 1])
-    local target = jass:GetSpellTargetUnit()
+    local target = jass.GetSpellTargetUnit()
     if not _____6B27_83F2_8389_4E9AW_76EE_6807_53EF_53D7_4F24(target) then
         return
     end

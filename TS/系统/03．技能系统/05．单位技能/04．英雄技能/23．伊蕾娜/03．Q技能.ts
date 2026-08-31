@@ -11,8 +11,12 @@
  * - 弹道命中、超程、死亡、打断与场景清理统一由战斗技能实例收束并销毁模型。
  */
 
-import { 伊蕾娜技能配置, 伊蕾娜Q配置, 伊蕾娜变式效果配置, 伊蕾娜表现配置, 伊蕾娜模型动作配置 } from "./00．配置";
+import { 伊蕾娜技能配置, 伊蕾娜Q配置, 伊蕾娜变式效果配置, 伊蕾娜表现配置, 伊蕾娜模型动作配置, 伊蕾娜音效配置 } from "./00．配置";
 import { 播放伊蕾娜阶段动作 } from "./01A．动作表现";
+
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string, 伊蕾娜变式?: string) => boolean;
+};
 import {
   记录伊蕾娜见闻,
   获取伊蕾娜变式,
@@ -65,6 +69,9 @@ const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Sta
 const { SFB_setSlow } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
   SFB_setSlow: (this: void, sourceUnit: any, u: any, attackSlow: number, moveSlow: number, time: number, effectSourceName?: string, effectSourceType?: string) => void;
 };
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+};
 
 const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
 const Q技能类型ID = jass.FourCC(伊蕾娜技能配置.Q.技能ID) as number;
@@ -112,6 +119,8 @@ function 处理Q命中(this: void, 施法者: any, 目标: any, 数据: any): vo
     "伊蕾娜-追迹标记",
     "技能",
   );
+  // Q 命中音（坐标=目标位置；主弹命中结算一次，参数配置驱动）
+  Sound3DII_CooPlayReuse(伊蕾娜音效配置.Q命中.路径, GetUnitX(目标), GetUnitY(目标), 伊蕾娜音效配置.Q命中.高度, 伊蕾娜音效配置.Q命中.裁断距离);
   // 见闻在真实命中后记录（A3）
   记录伊蕾娜见闻(施法者, "风行", 数据.技能实例ID);
 
@@ -159,7 +168,8 @@ function 尝试W折射联动(this: void, 施法者: any, 数据: any): void {
     伤害形态: "单体",
     参与技能伤害加成: false,
     模型: 伊蕾娜表现配置.Q联动弹道.模型路径,
-    缩放: 伊蕾娜表现配置.Q联动弹道.缩放,
+   RGB: 伊蕾娜表现配置.Q联动弹道.RGB,
+       缩放: 伊蕾娜表现配置.Q联动弹道.缩放,
     飞行高度: 伊蕾娜表现配置.Q联动弹道.高度,
     生命周期: 伊蕾娜Q配置.最大距离 / 伊蕾娜Q配置.折射弹速度 + 0.5,
   });
@@ -210,7 +220,8 @@ function 尝试E路线追加(this: void, 施法者: any, 数据: any, 当前X: n
     伤害形态: "单体",
     参与技能伤害加成: false,
     模型: 伊蕾娜表现配置.Q联动弹道.模型路径,
-    缩放: 伊蕾娜表现配置.Q联动弹道.缩放,
+   RGB: 伊蕾娜表现配置.Q联动弹道.RGB,
+       缩放: 伊蕾娜表现配置.Q联动弹道.缩放,
     飞行高度: 伊蕾娜表现配置.Q联动弹道.高度,
     生命周期: 伊蕾娜Q配置.最大距离 / 伊蕾娜Q配置.弹道速度 + 0.5,
   });
@@ -222,6 +233,7 @@ function 尝试E路线追加(this: void, 施法者: any, 数据: any, 当前X: n
 
 function 释放Q旅风追迹(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
+  播放英雄技能喊话(施法者, "伊蕾娜", 伊蕾娜技能配置.Q.技能ID);
 
   // t0 快照：合法目标与目标点同时保存，后续异步只使用快照
   const 目标单位 = GetSpellTargetUnit();
@@ -286,6 +298,8 @@ function 释放Q旅风追迹(this: void, _context: any, 施法者: any, 技能�
 
     const 发射时目标有效 = 有目标 && 单位存活(目标单位);
     const 追踪保持秒 = 用迅行 ? 伊蕾娜Q配置.追踪保持秒 + 0.5 : 伊蕾娜Q配置.追踪保持秒;
+    // Q 发射音（坐标=施法者位置；到达发射时点且实例仍有效才播一次，参数配置驱动）
+    Sound3DII_CooPlayReuse(伊蕾娜音效配置.Q发射.路径, GetUnitX(施法者), GetUnitY(施法者), 伊蕾娜音效配置.Q发射.高度, 伊蕾娜音效配置.Q发射.裁断距离);
     const 弹道 = 发射弹道({
       名称: "伊蕾娜-旅风·追迹",
       所有者: 施法者,
@@ -314,7 +328,8 @@ function 释放Q旅风追迹(this: void, _context: any, 施法者: any, 技能�
       伤害形态: "单体",
       参与技能伤害加成: true,
       模型: 伊蕾娜表现配置.Q主弹道.模型路径,
-      缩放: 伊蕾娜表现配置.Q主弹道.缩放,
+     RGB: 伊蕾娜表现配置.Q主弹道.RGB,
+         缩放: 伊蕾娜表现配置.Q主弹道.缩放,
       飞行高度: 伊蕾娜表现配置.Q主弹道.高度,
       生命周期: 最终距离 / 伊蕾娜Q配置.弹道速度 + 1,
       实例控制器: 实例,

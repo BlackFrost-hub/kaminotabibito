@@ -11,6 +11,7 @@ local ____require_result_1 = require("系统.00．核心系统.01．事件中心
 local registerDeathListener = ____require_result_1.registerDeathListener
 local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_2.addDelayedCallback
+local getGameDifficulty = ____require_result_2.getGameDifficulty
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
 local stringToFourCC = ____require_result_3.stringToFourCC
 local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
@@ -63,6 +64,10 @@ local function _____8BFB_53D6_5C0F_602A_751F_547D_500D_7387()
         return hp2
     end
     return 1
+end
+local function _____8BFB_53D6_96BE_5EA6_751F_547D_500D_7387()
+    local difficulty = getGameDifficulty()
+    return difficulty > 0 and 1 + difficulty * 0.2 or 1
 end
 local function _____8D4B_4E88_98DE_884C_9AD8_5EA6_80FD_529B(unit)
     UnitAddAbility(unit, AMRF)
@@ -149,7 +154,9 @@ local function _____5E94_7528_53EC_5524_7269_5C5E_6027(unit, _____53C2_6570)
         )
     end
     if _____53C2_6570["生命值"] ~= nil and _____53C2_6570["生命值"] > 0 then
-        local scaledHp = _____53C2_6570["生命值"] * (_____53C2_6570["生命值受小怪倍率"] == false and 1 or _____8BFB_53D6_5C0F_602A_751F_547D_500D_7387())
+        local _____5C0F_602A_751F_547D_500D_7387 = _____53C2_6570["生命值受小怪倍率"] == false and 1 or _____8BFB_53D6_5C0F_602A_751F_547D_500D_7387()
+        local _____96BE_5EA6_751F_547D_500D_7387 = _____53C2_6570["生命值受难度倍率"] == true and _____8BFB_53D6_96BE_5EA6_751F_547D_500D_7387() or 1
+        local scaledHp = _____53C2_6570["生命值"] * _____5C0F_602A_751F_547D_500D_7387 * _____96BE_5EA6_751F_547D_500D_7387
         SetUnitStateJapi(unit, UNIT_STATE_MAX_LIFE, scaledHp)
         SetUnitState(unit, UNIT_STATE_LIFE, scaledHp)
     end

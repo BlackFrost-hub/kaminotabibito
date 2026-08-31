@@ -13,10 +13,10 @@ local enterRegionMasters = {}
 local enterRegionMasterActions = {}
 local enterRegionKeyByMasterHid = {}
 local function handleKey(handle)
-    return tostring(nil, handle)
+    return tostring(handle)
 end
 local function filterKey(filter)
-    return filter == nil and "null" or tostring(nil, filter)
+    return filter == nil and "null" or tostring(filter)
 end
 local function normalizeFilter(filter)
     local ____temp_1
@@ -52,9 +52,9 @@ local function dispatchListeners(list)
                 if not listener or not listener.active or not listener.trigger then
                     goto __continue12
                 end
-                local passed = jass:TriggerEvaluate(listener.trigger)
+                local passed = jass.TriggerEvaluate(listener.trigger)
                 if passed then
-                    jass:TriggerExecute(listener.trigger)
+                    jass.TriggerExecute(listener.trigger)
                 end
                 if listener.once then
                     listener.active = false
@@ -107,13 +107,11 @@ local function cleanupEnterRegionMaster(key)
     if master then
         local action = enterRegionMasterActions[key]
         if action then
-            jass:TriggerRemoveAction(master, action)
+            jass.TriggerRemoveAction(master, action)
         end
-        jass:DestroyTrigger(master)
+        jass.DestroyTrigger(master)
     end
-    local hid = master and tostring(
-        nil,
-        jass:GetHandleId(master)
+    local hid = master and tostring(jass.GetHandleId(master)
     ) or ""
     if hid ~= "" then
         __TS__Delete(enterRegionKeyByMasterHid, hid)
@@ -124,13 +122,11 @@ local function cleanupEnterRegionMaster(key)
     __TS__Delete(enterRegionListeners, key)
 end
 local function dispatchEnterRegionMaster()
-    local trig = jass:GetTriggeringTrigger()
+    local trig = jass.GetTriggeringTrigger()
     if not trig then
         return
     end
-    local key = enterRegionKeyByMasterHid[tostring(
-        nil,
-        jass:GetHandleId(trig)
+    local key = enterRegionKeyByMasterHid[tostring(jass.GetHandleId(trig)
     )]
     if not key then
         return
@@ -173,16 +169,14 @@ function ____exports.registerEnterRegionTrigger(trigger, region, filter)
     local key = regionKey(region, filter)
     if not enterRegionRegistered[key] then
         local normalizedFilter = normalizeFilter(filter)
-        local master = jass:CreateTrigger()
+        local master = jass.CreateTrigger()
         enterRegionMasters[key] = master
         enterRegionRegistered[key] = true
         enterRegionListeners[key] = enterRegionListeners[key] or ({})
-        enterRegionKeyByMasterHid[tostring(
-            nil,
-            jass:GetHandleId(master)
+        enterRegionKeyByMasterHid[tostring(jass.GetHandleId(master)
         )] = key
-        jass:TriggerRegisterEnterRegion(master, region, normalizedFilter)
-        enterRegionMasterActions[key] = jass:TriggerAddAction(master, dispatchEnterRegionMaster)
+        jass.TriggerRegisterEnterRegion(master, region, normalizedFilter)
+        enterRegionMasterActions[key] = jass.TriggerAddAction(master, dispatchEnterRegionMaster)
     end
     return addListener(enterRegionListeners, key, trigger, false)
 end
@@ -191,21 +185,21 @@ ____exports["创建矩形进入监听"] = function(_____77E9_5F62, _____56DE_8C0
     if _____77E9_5F62 == nil or _____77E9_5F62 == 0 then
         return nil
     end
-    local _____533A_57DF = jass:CreateRegion()
-    local _____89E6_53D1_5668 = jass:CreateTrigger()
+    local _____533A_57DF = jass.CreateRegion()
+    local _____89E6_53D1_5668 = jass.CreateTrigger()
     if _____533A_57DF == nil or _____533A_57DF == 0 or _____89E6_53D1_5668 == nil or _____89E6_53D1_5668 == 0 then
         if _____89E6_53D1_5668 ~= nil and _____89E6_53D1_5668 ~= 0 then
             safeDestroyTrigger(_____89E6_53D1_5668)
         end
         if _____533A_57DF ~= nil and _____533A_57DF ~= 0 then
-            jass:RemoveRegion(_____533A_57DF)
+            jass.RemoveRegion(_____533A_57DF)
         end
         return nil
     end
-    jass:RegionAddRect(_____533A_57DF, _____77E9_5F62)
+    jass.RegionAddRect(_____533A_57DF, _____77E9_5F62)
     if safeTriggerAddAction(_____89E6_53D1_5668, _____56DE_8C03) == nil then
         safeDestroyTrigger(_____89E6_53D1_5668)
-        jass:RemoveRegion(_____533A_57DF)
+        jass.RemoveRegion(_____533A_57DF)
         return nil
     end
     local _____53D6_6D88_76D1_542C = ____exports.registerEnterRegionTrigger(_____89E6_53D1_5668, _____533A_57DF, _____8FC7_6EE4_5668)
@@ -217,7 +211,7 @@ ____exports["创建矩形进入监听"] = function(_____77E9_5F62, _____56DE_8C0
         _____5DF2_53D6_6D88 = true
         _____53D6_6D88_76D1_542C()
         safeDestroyTrigger(_____89E6_53D1_5668)
-        jass:RemoveRegion(_____533A_57DF)
+        jass.RemoveRegion(_____533A_57DF)
     end
     return {["区域"] = _____533A_57DF, ["触发器"] = _____89E6_53D1_5668, ["取消"] = _____53D6_6D88}
 end

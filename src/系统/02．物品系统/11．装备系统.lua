@@ -200,7 +200,7 @@ local function handleItemEvent(self, unit, item, isPickup)
     if isSpecialUnit(nil, unit) then
         return
     end
-    local player = jass:GetOwningPlayer(unit)
+    local player = jass.GetOwningPlayer(unit)
     local isDrop = not isPickup
     local skipFlag = equipShared.skipNextDrop
     if isDrop and skipFlag then
@@ -225,7 +225,7 @@ local function handleItemEvent(self, unit, item, isPickup)
             local displayName = ____temp_13 or idStr
             local border = "|cff606060────────────────────────|r"
             local msg = (((((((border .. "\n|cffffff00『系统消息』：|r") .. "检测到|cFF87CEEB【装备】|r") .. "|cFFFFD700") .. "『") .. displayName) .. "』") .. "|r不在装备数据内，可以的话请加作者|cFF00D7FFQ2376886288|r反馈bug和问题，多谢。\n") .. border
-            jass:DisplayTimedTextToPlayer(
+            jass.DisplayTimedTextToPlayer(
                 player,
                 0,
                 0.01,
@@ -242,7 +242,7 @@ local function handleItemEvent(self, unit, item, isPickup)
     if isPickup and type(equipLimit.equipLimitWouldAllowPickup) == "function" and not equipLimit.equipLimitWouldAllowPickup(unit, item) then
         return
     end
-    local charges = jass:GetItemCharges(item)
+    local charges = jass.GetItemCharges(item)
     local itemNamePlain = _____53BB_9664_989C_8272_4EE3_7801(tostring(itemData.name or ""))
     local _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0_result_15
     if _____662F_5426_5141_8BB8_88C5_5907_6B21_6570_53E0_52A0(itemNamePlain) then
@@ -294,8 +294,8 @@ local function handleItemEvent(self, unit, item, isPickup)
     for ____, e in ipairs(itemRelatedFns.STAT_CONFIG) do
         addStat(nil, merged[e.key], e.name)
     end
-    local owner = jass:GetOwningPlayer(unit)
-    local playerName = jass:GetPlayerName(owner) or ""
+    local owner = jass.GetOwningPlayer(unit)
+    local playerName = jass.GetPlayerName(owner) or ""
     local actionText = isAdd and "获得" or "丢弃"
     local levelText = __TS__StringTrim(tostring(itemData.level or ""))
     local _____88C5_5907_539F_540D = itemData.name or "未知"
@@ -309,10 +309,10 @@ local function handleItemEvent(self, unit, item, isPickup)
             local isPct = itemRelatedFns["是否百分比装备属性名"](stat.name)
             local v = isPct and stat.value * 100 or stat.value
             local nearZero = v > -0.000001 and v < 0.000001
-            local vStr = nearZero and "0" or tostring(nil, v)
+            local vStr = nearZero and "0" or tostring(v)
             msg = msg .. (((" " .. stat.name) .. sign) .. vStr) .. (isPct and "%" or "")
         end
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             player,
             0,
             0.01,
@@ -342,10 +342,8 @@ local function handleItemEvent(self, unit, item, isPickup)
                 local num = __TS__Number(val)
                 local isPct = itemRelatedFns["是否百分比装备属性名"](statName)
                 local nearZero = num > -0.000001 and num < 0.000001
-                local valStr = isPct and (nearZero and "0%" or tostring(
-                    nil,
-                    jass:R2I(num * 1000 + 0.5) / 10
-                ) .. "%") or (nearZero and "0" or tostring(nil, num))
+                local valStr = isPct and (nearZero and "0%" or tostring(jass.R2I(num * 1000 + 0.5) / 10
+                ) .. "%") or (nearZero and "0" or tostring(num))
                 test5Parts[#test5Parts + 1] = (statName .. "为：") .. valStr
             end
             ::__continue57::
@@ -364,10 +362,10 @@ local function handleItemEvent(self, unit, item, isPickup)
         end
         local ms = ____equipMovespeed_getMaxMovespeed2Info_21(equipMovespeed, ____unit_20, ____isDrop_19)
         if ms.value > 0 then
-            test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(nil, ms.value)
+            test5Parts[#test5Parts + 1] = "移动速度为：" .. tostring(ms.value)
         end
         if ms.value > 0 and ms.name ~= "" and ms.count >= 2 and not isEquipItemMessageSilenced() then
-            jass:DisplayTimedTextToPlayer(
+            jass.DisplayTimedTextToPlayer(
                 owner,
                 0,
                 0.02,
@@ -377,7 +375,7 @@ local function handleItemEvent(self, unit, item, isPickup)
         end
     end
     if #test5Parts > 0 and not isEquipItemMessageSilenced() then
-        jass:DisplayTimedTextToPlayer(
+        jass.DisplayTimedTextToPlayer(
             owner,
             0,
             0.02,

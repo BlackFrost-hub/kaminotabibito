@@ -26,8 +26,8 @@ _____6CE8_518C_4E0D_540C_6280_80FD_4F24_5BB3_5E8F_5217_89E6_53D1_6A21_677F({
     ["on触发"] = function(e)
         local target = e["目标"]
         local attacker = e["攻击者"]
-        local x = jass:GetUnitX(target)
-        local y = jass:GetUnitY(target)
+        local x = jass.GetUnitX(target)
+        local y = jass.GetUnitY(target)
         local damage = e["本次伤害"] * 0.45
         local aoe = _____662FAOE_6280_80FD_4F24_5BB3(e["伤害快照"])
         _____64AD_653E_70B9_7279_6548(

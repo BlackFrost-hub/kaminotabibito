@@ -39,10 +39,7 @@ const { SFB_setBuff } = require("lib.扩展函数.Star扩展函数.Star扩展库
 import {
   旧环境互动Boss单位ID,
   旧环境互动配置表,
-  旧环境互动果子物品ID,
   旧环境互动隐藏木桩奖励物品ID列表,
-  旧环境互动水触手单位ID,
-  旧环境互动水触手特效路径,
   type 旧环境互动配置,
 } from "./00．旧环境互动配置";
 
@@ -64,11 +61,6 @@ interface Boss入口延迟参数 {
   触发单位: any;
 }
 
-interface 水触手延迟参数 {
-  施法单位: any;
-  配置: 旧环境互动配置;
-}
-
 function 创建并给予物品(this: void, 施法单位: any, 物品ID: string): void {
   const 物品 = 创建物品并注册排泄监听(
     解析配置内部ID(物品ID),
@@ -76,54 +68,6 @@ function 创建并给予物品(this: void, 施法单位: any, 物品ID: string):
     GetUnitY(施法单位),
   );
   if (物品 != null && 物品 !== 0) UnitAddItem(施法单位, 物品);
-}
-
-function 处理水触手(this: void, _玩家ID: number, 施法单位: any, 调查点: 旧环境互动配置): boolean {
-  createTimedEffect(旧环境互动水触手特效路径, 调查点.X, 调查点.Y, 0, 1);
-  addDelayedCallback(3000, 创建水触手, { 施法单位, 配置: 调查点 });
-  广播单位提示(施法单位, 调查点.提示文本, 1500);
-  return true;
-}
-
-function 创建水触手(this: void, 参数: 水触手延迟参数): void {
-  if (参数 == null || 参数.施法单位 == null || 参数.施法单位 === 0) return;
-  const X = 参数.配置.X;
-  const Y = 参数.配置.Y;
-  createTimedEffect(旧环境互动水触手特效路径, X, Y, 0, 1);
-  创建单位并登记排泄安全(Player(PLAYER_NEUTRAL_PASSIVE), 解析配置内部ID(旧环境互动水触手单位ID), X, Y, 0);
-  if (参数.配置.延迟提示文本 != null && 参数.配置.延迟提示文本 !== "") {
-    广播单位提示(参数.施法单位, 参数.配置.延迟提示文本, 1500);
-  }
-}
-
-function 处理书架(this: void, _玩家ID: number, 施法单位: any, 调查点: 旧环境互动配置): boolean {
-  const 当前恢复 = Number(YDUserDataGetSafe("unit", 施法单位, "魔法恢复", "real")) || 0;
-  YDUserDataSetSafe("unit", 施法单位, "魔法恢复", "real", 当前恢复 + 1);
-  const 玩家 = jass.GetOwningPlayer(施法单位);
-  const 当前魔法伤害 = Number(YDUserDataGetSafe("player", 玩家, "魔法伤害", "real")) || 0;
-  YDUserDataSetSafe("player", 玩家, "魔法伤害", "real", 当前魔法伤害 + 0.01);
-  广播单位提示(施法单位, 调查点.提示文本, 3000);
-  return true;
-}
-
-function 处理精灵小屋(this: void, _玩家ID: number, 施法单位: any, 调查点: 旧环境互动配置): boolean {
-  const 玩家 = jass.GetOwningPlayer(施法单位);
-  const 当前命中 = Number(YDUserDataGetSafe("player", 玩家, "命中率", "real")) || 0;
-  YDUserDataSetSafe("player", 玩家, "命中率", "real", 当前命中 + 0.01);
-  广播单位提示(施法单位, 调查点.提示文本, 3000);
-  return true;
-}
-
-function 处理空木桩(this: void, _玩家ID: number, 施法单位: any, 调查点: 旧环境互动配置): boolean {
-  创建并给予物品(施法单位, 旧环境互动果子物品ID);
-  广播单位提示(施法单位, 调查点.提示文本, 3000);
-  return true;
-}
-
-function 处理树上物品(this: void, _玩家ID: number, 施法单位: any, 调查点: 旧环境互动配置): boolean {
-  创建并给予物品(施法单位, 旧环境互动果子物品ID);
-  广播单位提示(施法单位, 调查点.提示文本, 3000);
-  return true;
 }
 
 function 处理隐藏木桩(this: void, _玩家ID: number, 施法单位: any, 调查点: 旧环境互动配置): boolean {
@@ -178,11 +122,6 @@ function 处理物品奖励(this: void, _玩家ID: number, 施法单位: any, �
 }
 
 function 取旧环境互动回调(this: void, 类型: 旧环境互动配置["类型"]): (this: void, 玩家ID: number, 施法单位: any, 调查点: any) => boolean {
-  if (类型 === "水触手") return 处理水触手;
-  if (类型 === "书架") return 处理书架;
-  if (类型 === "精灵小屋") return 处理精灵小屋;
-  if (类型 === "空木桩") return 处理空木桩;
-  if (类型 === "树上物品") return 处理树上物品;
   if (类型 === "隐藏木桩") return 处理隐藏木桩;
   if (类型 === "普通提示") return 处理普通提示;
   if (类型 === "Boss入口") return 处理Boss入口;

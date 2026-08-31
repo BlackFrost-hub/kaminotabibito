@@ -49,7 +49,7 @@ local function _____53E5_67C4_6709_6548(handle)
     return handle ~= nil and handle ~= 0
 end
 local function _____5F53_524D_6BEB_79D2()
-    return os:clock() * 1000
+    return os.clock() * 1000
 end
 local function _____5355_4F4D_6709_6548(unit)
     return _____53E5_67C4_6709_6548(unit) and IsUnitType(unit, UNIT_TYPE_DEAD) ~= true
@@ -83,10 +83,10 @@ local function _____683C_5F0F_5316_5269_4F59_79D2(_____5269_4F59_6BEB_79D2)
     if _____5269_4F59_6BEB_79D2 <= 0 then
         return ""
     end
-    local _____5341_5206_79D2 = math:floor(_____5269_4F59_6BEB_79D2 / 100 + 0.999)
-    local _____79D2 = math:floor(_____5341_5206_79D2 / 10)
+    local _____5341_5206_79D2 = math.floor(_____5269_4F59_6BEB_79D2 / 100 + 0.999)
+    local _____79D2 = math.floor(_____5341_5206_79D2 / 10)
     local _____5C0F_6570 = _____5341_5206_79D2 - _____79D2 * 10
-    return (tostring(nil, _____79D2) .. ".") .. tostring(nil, _____5C0F_6570)
+    return (tostring(_____79D2) .. ".") .. tostring(_____5C0F_6570)
 end
 local function _____8BA1_7B97_51B7_5374_8F6C_5708_8FDB_5EA6(_____5269_4F59_6BEB_79D2, _____603B_6BEB_79D2)
     if _____603B_6BEB_79D2 <= 0 then

@@ -162,7 +162,7 @@ function ____exports.EG_GetRandomOfGroup(self, id)
     if max < 0 then
         return nil
     end
-    local idx = jass:GetRandomInt(0, max)
+    local idx = jass.GetRandomInt(0, max)
     return g[idx]
 end
 --- 特效是否在指定特效组中

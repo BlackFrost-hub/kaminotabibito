@@ -11,7 +11,14 @@ import {
   芙莉莲技能配置,
   芙莉莲W配置,
   芙莉莲表现配置,
+  芙莉莲音效配置,
 } from "./00．配置";
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+};
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
+};
 const { 开始循环守护, 停止循环守护, 芙莉莲动作槽 } = require("./01A．动作表现") as {
   开始循环守护: (this: void, 英雄: any, 槽: any, 登记名: string) => any;
   停止循环守护: (this: void, 句柄: any) => void;
@@ -46,7 +53,7 @@ const { 角度差绝对值 } = require("系统.03．技能系统.00．技能模�
 const { 创建点特效, 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
   /** 挂载特效（scale + height 驱动；替代 createUnitEffect 无高度入口的短板） */
-  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number) => any;
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: any) => any;
   销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
 };
 const { 读取单位攻击力, 单位存活, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
@@ -138,6 +145,8 @@ function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: numb
   // 不叠加窗口：已有活跃 W 实例时忽略
   if (查询战斗技能实例(施法者, "芙莉莲W").length > 0) return;
   记录芙莉莲活动(施法者);
+  // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
+  播放英雄技能喊话(施法者, "芙莉莲", 芙莉莲技能配置.W.技能ID);
   // 快照正面方向
   const 方向角 = GetUnitFacing(施法者);
   // 窗口时长：花田修正只小幅延长（单次消费锁），不增加保护次数
@@ -161,10 +170,12 @@ function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: numb
   });
 
   // 护壁主体 + 防御公式层（常驻句柄，随实例/窗口统一销毁；不叠加定时自毁；缩放/高度 经 创建单位坐标跟随特效 配置驱动）
-  const 护壁句柄 = 创建单位坐标跟随特效(施法者, 芙莉莲表现配置.W护壁, 护壁特效键, 芙莉莲表现配置.特效参数.W护壁.缩放, 芙莉莲表现配置.特效参数.W护壁.高度);
+  const 护壁句柄 = 创建单位坐标跟随特效(施法者, 芙莉莲表现配置.W护壁.模型路径, 护壁特效键, 芙莉莲表现配置.W护壁.缩放, 芙莉莲表现配置.W护壁.高度, undefined, 芙莉莲表现配置.W护壁.动画索引, 芙莉莲表现配置.W护壁.面向角度, 芙莉莲表现配置.W护壁.RGB);
   void 护壁句柄;
-  const 公式层句柄 = 创建单位坐标跟随特效(施法者, 芙莉莲表现配置.W公式层, 公式层特效键, 芙莉莲表现配置.特效参数.W公式层.缩放, 芙莉莲表现配置.特效参数.W公式层.高度);
+  const 公式层句柄 = 创建单位坐标跟随特效(施法者, 芙莉莲表现配置.W公式层.模型路径, 公式层特效键, 芙莉莲表现配置.W公式层.缩放, 芙莉莲表现配置.W公式层.高度, undefined, 芙莉莲表现配置.W公式层.动画索引, 芙莉莲表现配置.W公式层.面向角度, 芙莉莲表现配置.W公式层.RGB);
   void 公式层句柄;
+  // 护壁展开音（护壁与公式层实际建立后；单位绑定，参数配置驱动）
+  Sound3DII_UnitPlayReuse(芙莉莲音效配置.W展开.路径, 施法者, 芙莉莲音效配置.W展开.裁断距离);
 
   // 一次主要攻击防御：来源在快照正面扇区内 → 化解一次（非 360° 无敌）
   数据.修饰ID = registerDamageModifier(function W防御修正(this: void, context: any): number {
@@ -182,15 +193,18 @@ function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: numb
     addDelayedCallback(0, function W防御成功收尾(this: void): void {
       // 受击反馈（参数配置驱动）
       创建点特效({
-        模型路径: 芙莉莲表现配置.R命中反馈,
-        X: GetUnitX(施法者),
+        模型路径: 芙莉莲表现配置.W受击反馈.模型路径,
+            X: GetUnitX(施法者),
         Y: GetUnitY(施法者),
-        Z: 芙莉莲表现配置.特效参数.W受击反馈.高度,
-        面向角度: 0,
-        动画索引: 0,
-        缩放: 芙莉莲表现配置.特效参数.W受击反馈.缩放,
-        持续秒: 芙莉莲表现配置.特效参数.W受击反馈.持续秒,
+        Z: 芙莉莲表现配置.W受击反馈.高度,
+        面向角度: 芙莉莲表现配置.W受击反馈.面向角度,
+        动画索引: 芙莉莲表现配置.W受击反馈.动画索引,
+        缩放: 芙莉莲表现配置.W受击反馈.缩放,
+        持续秒: 芙莉莲表现配置.W受击反馈.持续秒,
+        RGB: 芙莉莲表现配置.W受击反馈.RGB,
       });
+      // 成功抵挡音（单位绑定；一次性防御成功分支内，参数配置驱动）
+      Sound3DII_UnitPlayReuse(芙莉莲音效配置.W抵挡.路径, 施法者, 芙莉莲音效配置.W抵挡.裁断距离);
       // 对攻击来源记录防御解析
       施加解析(施法者, 来源, "防御");
       // 成功防御 → 提供一次演算普攻

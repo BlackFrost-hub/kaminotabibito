@@ -15,7 +15,8 @@
 import {
   塞莉亚克莱尔技能配置,
   塞莉亚克莱尔W配置,
-  塞莉亚克莱尔表现子配置,
+  塞莉亚克莱尔表现配置,
+  塞莉亚音效配置,
 } from "./00．配置";
 import { 塞莉亚BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/24．塞莉亚·克莱尔";
 import {
@@ -69,8 +70,14 @@ const { 添加单位暂停, 移除单位暂停 } = require("lib.扩展函数.Sta
   移除单位暂停: (this: void, u: any, 来源: string) => boolean;
 };
 const { 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number) => any;
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }) => any;
   销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
+};
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+};
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
 };
 
 const 英雄单位类型ID = 塞莉亚克莱尔技能配置.单位类型ID;
@@ -132,6 +139,9 @@ function 关闭W结界(this: void, 数据: 塞莉亚W结界数据, 收口类型:
 function 释放W解析结界(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
+  // 技能喊话：施法成功起点（前置检查通过；全局 3D；随机二选一由喊话系统驱动）
+  播放英雄技能喊话(施法者, "塞莉亚·克莱尔", 塞莉亚克莱尔技能配置.W.技能ID);
+
   // 时序：先暂停 → 硬直结束恢复（动作分槽未确认：缺口，见报告，不冒充已确认槽位）
   添加单位暂停(施法者, W硬直来源);
   addDelayedCallback(塞莉亚克莱尔W配置.硬直秒 * 1000, function W硬直结束(this: void): void {
@@ -152,10 +162,14 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
   // 跟随特效：高度走子配置（无内置到期，随窗口收口销毁）
   创建单位坐标跟随特效(
     施法者,
-    塞莉亚克莱尔表现子配置.W结界主体.模型路径,
+    塞莉亚克莱尔表现配置.W结界主体.模型路径,
     W结界特效键,
-    塞莉亚克莱尔表现子配置.W结界主体.缩放,
-    塞莉亚克莱尔表现子配置.W结界主体.高度,
+    塞莉亚克莱尔表现配置.W结界主体.缩放,
+    塞莉亚克莱尔表现配置.W结界主体.高度,
+    1,
+    undefined,
+    0,
+    塞莉亚克莱尔表现配置.W结界主体.RGB,
   );
   registerManualBuff(施法者, 塞莉亚BuffID.解析结界, 塞莉亚克莱尔W配置.保护窗口秒, 0);
   // 施法真正成功（节点与保护已建立）：授予一次演算普攻窗口
@@ -172,6 +186,9 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
     显示护盾条: true,
   });
 
+  // 结界展开音（保护窗口与结界实际建立后；单位绑定，参数配置驱动）
+  Sound3DII_UnitPlayReuse(塞莉亚音效配置.W展开.路径, 施法者, 塞莉亚音效配置.W展开.裁断距离);
+
   // 主要攻击解析：注销推迟到遍历之外
   数据.修改器ID = registerDamageModifier(function W解析修改器(this: void, context: any): number {
     if (数据.已关闭 || 数据.主要攻击已解析) return context.currentDamage;
@@ -183,6 +200,9 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
     if (getGameTime() >= 数据.窗口结束时间) return context.currentDamage;
 
     数据.主要攻击已解析 = true;
+
+    // 结界共鸣音（主要攻击被解析吸收的成功防御分支内一次；单位绑定，参数配置驱动）
+    Sound3DII_UnitPlayReuse(塞莉亚音效配置.W共鸣.路径, 施法者, 塞莉亚音效配置.W共鸣.裁断距离);
 
     addDelayedCallback(10, function W解析结算(this: void): void {
       if (数据.已关闭) return;

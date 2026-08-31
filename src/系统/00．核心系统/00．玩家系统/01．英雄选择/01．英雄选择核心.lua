@@ -44,7 +44,7 @@ local function _____83B7_53D6_53E5_67C4ID(_____53E5_67C4)
     if _____53E5_67C4 == nil or _____53E5_67C4 == 0 or type(jass.GetHandleId) ~= "function" then
         return 0
     end
-    return jass:GetHandleId(_____53E5_67C4)
+    return jass.GetHandleId(_____53E5_67C4)
 end
 local _____5F53_524D_72B6_6001 = {["是否已初始化"] = false, ["是否已关闭"] = false, ["已确认玩家数"] = 0, ["正在等待二击确认玩家数"] = 0}
 local _____70B9_51FB_6B21_6570_8FC7_671F_65F6_95F4_8868 = {}
@@ -94,7 +94,7 @@ ____exports["注册英雄选择旧单位事件"] = function(_____5DF2_786E_8BA4_
                 if _____539F_751F_4E8B_4EF6 == nil then
                     goto __continue12
                 end
-                jass:TriggerRegisterUnitEvent(_____65E7_89E6_53D1, _____76EE_6807_5355_4F4D, _____539F_751F_4E8B_4EF6)
+                jass.TriggerRegisterUnitEvent(_____65E7_89E6_53D1, _____76EE_6807_5355_4F4D, _____539F_751F_4E8B_4EF6)
                 _____5DF2_6CE8_518C_6570_91CF = _____5DF2_6CE8_518C_6570_91CF + 1
             end
             ::__continue12::
@@ -169,7 +169,7 @@ local function _____8F6E_8BE2_70B9_51FB_6B21_6570_8870_51CF()
                 while #_____8FC7_671F_5217_8868 > 0 and _____8FC7_671F_5217_8868[1] <= _____73B0_5728_6BEB_79D2 do
                     local _____8FC7_671F_65F6_95F4 = _____8FC7_671F_5217_8868[1]
                     table.remove(_____8FC7_671F_5217_8868, 1)
-                    local _____8870_51CF_540E_6B21_6570 = _____51CF_5C11_70B9_51FB_6B21_6570(jass:Player(_____73A9_5BB6ID))
+                    local _____8870_51CF_540E_6B21_6570 = _____51CF_5C11_70B9_51FB_6B21_6570(jass.Player(_____73A9_5BB6ID))
                 end
                 if #_____8FC7_671F_5217_8868 > 0 then
                     _____4ECD_6709_5F85_5904_7406_4EFB_52A1 = true
@@ -191,7 +191,7 @@ local function _____786E_4FDD_70B9_51FB_6B21_6570_8F6E_8BE2_5DF2_542F_52A8()
     _____70B9_51FB_6B21_6570_8F6E_8BE2ID = centerTimer.addPeriodicCallback(_____82F1_96C4_9009_62E9_8F6E_8BE2_95F4_9694_6BEB_79D2, _____8F6E_8BE2_70B9_51FB_6B21_6570_8870_51CF)
 end
 local function _____8BB0_5F55_4E00_6B21_70B9_51FB_786E_8BA4_7A97_53E3(_____73A9_5BB6)
-    local _____73A9_5BB6ID = jass:GetPlayerId(_____73A9_5BB6)
+    local _____73A9_5BB6ID = jass.GetPlayerId(_____73A9_5BB6)
     local _____8FC7_671F_65F6_95F4 = _____5F53_524D_6E38_620F_6BEB_79D2() + _____82F1_96C4_9009_62E9_914D_7F6E_8868["双击确认窗口秒数"] * 1000
     local _____5217_8868 = _____70B9_51FB_6B21_6570_8FC7_671F_65F6_95F4_8868[_____73A9_5BB6ID]
     if _____5217_8868 == nil then
@@ -253,11 +253,11 @@ local function _____5199_5165_73A9_5BB6_82F1_96C4_540D_5B57_7B26_4E32(_____73A9_
     if _____5B57_7B26_4E32_6570_7EC4 == nil then
         return
     end
-    local _____7D22_5F15 = jass:GetPlayerId(_____73A9_5BB6) + _____82F1_96C4_9009_62E9_914D_7F6E_8868["玩家英雄名写入字符串数组偏移"]
-    _____5B57_7B26_4E32_6570_7EC4[_____7D22_5F15] = jass:GetUnitName(_____82F1_96C4)
+    local _____7D22_5F15 = jass.GetPlayerId(_____73A9_5BB6) + _____82F1_96C4_9009_62E9_914D_7F6E_8868["玩家英雄名写入字符串数组偏移"]
+    _____5B57_7B26_4E32_6570_7EC4[_____7D22_5F15] = jass.GetUnitName(_____82F1_96C4)
 end
 local function _____83B7_53D6_82F1_96C4_5355_51FB_4ECB_7ECD_6587_672C(_____82F1_96C4)
-    local _____5355_4F4D_540D = jass:GetUnitName(_____82F1_96C4)
+    local _____5355_4F4D_540D = jass.GetUnitName(_____82F1_96C4)
     return _____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄单击介绍表"][_____5355_4F4D_540D]
 end
 local function _____663E_793A_82F1_96C4_5355_51FB_4ECB_7ECD(_____73A9_5BB6, _____82F1_96C4)
@@ -283,11 +283,11 @@ local function _____6267_884C_9009_62E9_786E_8BA4_516C_5171_89E6_53D1()
         return
     end
     if type(jass.TriggerExecute) == "function" then
-        jass:TriggerExecute(_____89E6_53D1_5668)
+        jass.TriggerExecute(_____89E6_53D1_5668)
     end
 end
 local function _____53D1_9001_82F1_96C4_786E_8BA4_516C_544A(_____73A9_5BB6, _____82F1_96C4)
-    local _____6587_672C = ((((_____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄确认公告前缀"] .. "|cffffcc99『") .. tostring(jass:GetPlayerName(_____73A9_5BB6))) .. "』|r使用角色『") .. tostring(jass:GetUnitName(_____82F1_96C4))) .. "』开始了旅途！"
+    local _____6587_672C = ((((_____82F1_96C4_9009_62E9_914D_7F6E_8868["英雄确认公告前缀"] .. "|cffffcc99『") .. tostring(jass.GetPlayerName(_____73A9_5BB6))) .. "』|r使用角色『") .. tostring(jass.GetUnitName(_____82F1_96C4))) .. "』开始了旅途！"
     QuestMessageBJ(
         GetPlayersAll(),
         jglobals.bj_QUESTMESSAGE_UPDATED,
@@ -316,7 +316,7 @@ local function _____786E_8BA4_82F1_96C4_9009_62E9(_____73A9_5BB6, _____82F1_96C4
     end
     _____53D1_9001_82F1_96C4_786E_8BA4_516C_544A(_____73A9_5BB6, _____82F1_96C4)
     if _____7981_7528_6280_80FDID ~= 0 then
-        jass:UnitRemoveAbility(_____82F1_96C4, _____7981_7528_6280_80FDID)
+        jass.UnitRemoveAbility(_____82F1_96C4, _____7981_7528_6280_80FDID)
     end
     ydSafe.YDUserDataSetSafe(
         "player",
@@ -335,7 +335,7 @@ local function _____786E_8BA4_82F1_96C4_9009_62E9(_____73A9_5BB6, _____82F1_96C4
         "unit",
         _____82F1_96C4
     )
-    jass:SetUnitOwner(_____82F1_96C4, _____73A9_5BB6, true)
+    jass.SetUnitOwner(_____82F1_96C4, _____73A9_5BB6, true)
     local BB = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
         _____73A9_5BB6,
         ____BB_5355_4F4D_7C7B_578BID,
@@ -350,7 +350,7 @@ local function _____786E_8BA4_82F1_96C4_9009_62E9(_____73A9_5BB6, _____82F1_96C4
         "unit",
         BB
     )
-    jass:SetUnitPosition(_____82F1_96C4, _____51FA_751F_70B9.X, _____51FA_751F_70B9.Y)
+    jass.SetUnitPosition(_____82F1_96C4, _____51FA_751F_70B9.X, _____51FA_751F_70B9.Y)
     StarOther_PanCameraToTimedForPlayer(_____73A9_5BB6, _____51FA_751F_70B9.X, _____51FA_751F_70B9.Y, 0.5)
     _____5199_5165_73A9_5BB6_82F1_96C4_540D_5B57_7B26_4E32(_____73A9_5BB6, _____82F1_96C4)
     ____exports["注册英雄选择旧单位事件"]({["英雄"] = _____82F1_96C4, BB = BB})
@@ -383,11 +383,11 @@ local function _____5E94_5FFD_7565_672C_6B21_9009_62E9(_____73A9_5BB6, _____73A9
     if not _____662F_82F1_96C4_9009_62E9_533A_57DF_5185_5355_4F4D(_____5355_4F4D) then
         return true
     end
-    if jass:IsUnitType(_____5355_4F4D, jass.UNIT_TYPE_HERO) ~= true then
+    if jass.IsUnitType(_____5355_4F4D, jass.UNIT_TYPE_HERO) ~= true then
         return true
     end
-    local _____5355_4F4D_6240_6709_8005 = jass:GetOwningPlayer(_____5355_4F4D)
-    local _____4E2D_7ACB_88AB_52A8_73A9_5BB6 = jass:Player(jass.PLAYER_NEUTRAL_PASSIVE)
+    local _____5355_4F4D_6240_6709_8005 = jass.GetOwningPlayer(_____5355_4F4D)
+    local _____4E2D_7ACB_88AB_52A8_73A9_5BB6 = jass.Player(jass.PLAYER_NEUTRAL_PASSIVE)
     if _____5355_4F4D_6240_6709_8005 ~= _____4E2D_7ACB_88AB_52A8_73A9_5BB6 then
         return true
     end
@@ -417,7 +417,7 @@ local function _____5173_95ED_82F1_96C4_9009_62E9_7CFB_7EDF()
         local i = 0
         while i < #_____82F1_96C4_9009_62E9_914D_7F6E_8868["可选玩家ID列表"] do
             local _____73A9_5BB6ID = _____82F1_96C4_9009_62E9_914D_7F6E_8868["可选玩家ID列表"][i + 1]
-            local _____73A9_5BB6 = jass:Player(_____73A9_5BB6ID)
+            local _____73A9_5BB6 = jass.Player(_____73A9_5BB6ID)
             _____6E05_7A7A_70B9_51FB_6B21_6570(_____73A9_5BB6)
             __TS__Delete(_____70B9_51FB_6B21_6570_8FC7_671F_65F6_95F4_8868, _____73A9_5BB6ID)
             i = i + 1
@@ -436,7 +436,7 @@ local function _____521D_59CB_5316_9009_4E2D_4E8B_4EF6_4E2D_5FC3()
         local i = 0
         while i < #_____82F1_96C4_9009_62E9_914D_7F6E_8868["可选玩家ID列表"] do
             local _____73A9_5BB6ID = _____82F1_96C4_9009_62E9_914D_7F6E_8868["可选玩家ID列表"][i + 1]
-            local _____73A9_5BB6 = jass:Player(_____73A9_5BB6ID)
+            local _____73A9_5BB6 = jass.Player(_____73A9_5BB6ID)
             selectionCenter.initPlayerSelectionCenter(_____73A9_5BB6)
             i = i + 1
         end

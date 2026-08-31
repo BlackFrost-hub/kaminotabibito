@@ -29,7 +29,7 @@ ____exports["十六夜咲夜处于RA强化"] = function(caster)
     if caster == nil or caster == 0 then
         return false
     end
-    return ____RA_5F3A_5316_4EE4_724C_8868[jass:GetHandleId(caster)] ~= nil
+    return ____RA_5F3A_5316_4EE4_724C_8868[jass.GetHandleId(caster)] ~= nil
 end
 local function _____83B7_53D6RA_76D1_542C_4E0A_4E0B_6587(_caster)
     return {["占位"] = true}
@@ -48,7 +48,7 @@ local function _____679A_4E3E_8303_56F4_5355_4F4D(caster, x, y, radius)
             ["允许古树"] = true,
             ["允许无敌"] = true,
             ["排除自身"] = true,
-            ["自定义条件"] = function(____, u) return not jass:IsUnitType(u, jass.UNIT_TYPE_TAUREN) end
+            ["自定义条件"] = function(____, u) return not jass.IsUnitType(u, jass.UNIT_TYPE_TAUREN) end
         }
     )
 end
@@ -58,7 +58,7 @@ local function _____7ED3_675FRA(variable)
         return
     end
     context["已结束"] = true
-    local casterId = jass:GetHandleId(context["施法者"])
+    local casterId = jass.GetHandleId(context["施法者"])
     if ____RA_5F3A_5316_4EE4_724C_8868[casterId] == context["强化令牌"] then
         __TS__Delete(____RA_5F3A_5316_4EE4_724C_8868, casterId)
     end
@@ -71,21 +71,21 @@ local function _____7ED3_675FRA(variable)
     end
     _____64AD_653E_54B2_591C_5750_6807_97F3_6548(
         "gg_snd_IzayoiSakuya_RA",
-        jass:GetUnitX(context["施法者"]),
-        jass:GetUnitY(context["施法者"])
+        jass.GetUnitX(context["施法者"]),
+        jass.GetUnitY(context["施法者"])
     )
 end
 local function _____91CA_653E_5341_516D_591C_54B2_591CRA(_listener, caster, _____6280_80FD_5B9E_4F8BID)
     _____8BBE_7F6E_5341_516D_591C_54B2_591C_7B26_5361_4E66_51B7_5374(caster, _____914D_7F6E["符卡间隔秒"].RA)
-    local startX = jass:GetUnitX(caster)
-    local startY = jass:GetUnitY(caster)
-    local targetX = jass:GetSpellTargetX()
-    local targetY = jass:GetSpellTargetY()
+    local startX = jass.GetUnitX(caster)
+    local startY = jass.GetUnitY(caster)
+    local targetX = jass.GetSpellTargetX()
+    local targetY = jass.GetSpellTargetY()
     local angle = _____4E24_70B9_89D2_5EA6(startX, startY, targetX, targetY)
     local dx = targetX - startX
     local dy = targetY - startY
-    local targetDistance = jass:SquareRoot(dx * dx + dy * dy)
-    local _____654F_6377_4F4D_79FB = _____914D_7F6E.RA["基础位移"] + jass:GetHeroAgi(caster, true) * _____914D_7F6E.RA["敏捷位移倍率"]
+    local targetDistance = jass.SquareRoot(dx * dx + dy * dy)
+    local _____654F_6377_4F4D_79FB = _____914D_7F6E.RA["基础位移"] + jass.GetHeroAgi(caster, true) * _____914D_7F6E.RA["敏捷位移倍率"]
     local _____4F4D_79FB_4E0A_9650 = _____654F_6377_4F4D_79FB < _____914D_7F6E.RA["最大位移"] and _____654F_6377_4F4D_79FB or _____914D_7F6E.RA["最大位移"]
     local moveDistance = targetDistance < _____4F4D_79FB_4E0A_9650 and targetDistance or _____4F4D_79FB_4E0A_9650
     _____6267_884C_6218_6597_81EA_8EAB_4F20_9001_5230_5750_6807(
@@ -93,7 +93,7 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRA(_listener, caster, ____
         _____6781_5750_6807X(startX, moveDistance, angle),
         _____6781_5750_6807Y(startY, moveDistance, angle)
     )
-    local source = "十六夜咲夜-RA:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass:GetHandleId(caster))
+    local source = "十六夜咲夜-RA:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass.GetHandleId(caster))
     local frozen = _____679A_4E3E_8303_56F4_5355_4F4D(caster, startX, startY, _____914D_7F6E.RA["单位冻结半径"])
     local records = {}
     do
@@ -110,8 +110,8 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRA(_listener, caster, ____
         while i < #knives do
             local knife = knives[i + 1]
             knife["设置角度"](_____4E24_70B9_89D2_5EA6(
-                jass:GetUnitX(knife["单位"]),
-                jass:GetUnitY(knife["单位"]),
+                jass.GetUnitX(knife["单位"]),
+                jass.GetUnitY(knife["单位"]),
                 targetX,
                 targetY
             ))
@@ -121,7 +121,7 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CRA(_listener, caster, ____
         end
     end
     ____RA_5F3A_5316_4EE4_724C_81EA_589E = ____RA_5F3A_5316_4EE4_724C_81EA_589E + 1
-    ____RA_5F3A_5316_4EE4_724C_8868[jass:GetHandleId(caster)] = ____RA_5F3A_5316_4EE4_724C_81EA_589E
+    ____RA_5F3A_5316_4EE4_724C_8868[jass.GetHandleId(caster)] = ____RA_5F3A_5316_4EE4_724C_81EA_589E
     _____64AD_653E_54B2_591C_5750_6807_97F3_6548("gg_snd_IzayoiSakuya_RA2", startX, startY)
     _____64AD_653E_54B2_591C_5750_6807_97F3_6548("gg_snd_BlinkBirth1", startX, startY)
     addDelayedCallback(_____914D_7F6E.RA["持续秒"] * 1000, _____7ED3_675FRA, {

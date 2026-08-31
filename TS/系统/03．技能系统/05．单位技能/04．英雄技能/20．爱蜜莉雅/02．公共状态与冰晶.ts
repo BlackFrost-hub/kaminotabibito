@@ -11,7 +11,7 @@
  * - 冰晶只用直接特效，不创建单位壳、不使用蝗虫单位、不进入选取与碰撞。
  */
 
-import { 爱蜜莉雅冰晶配置, 爱蜜莉雅技能配置 } from "./00．配置";
+import { 爱蜜莉雅冰晶配置, 爱蜜莉雅技能配置, 爱蜜莉雅表现配置 } from "./00．配置";
 
 const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
   registerDeathListener: (this: void, callback: (this: void, dyingUnit: any, killingUnit: any) => void) => void;
@@ -26,7 +26,7 @@ const { 取单位ID, 单位存活 } = require("系统.03．技能系统.00．技
   单位存活: (this: void, unit: any) => boolean;
 };
 const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; Z?: number; 面向角度?: number; 缩放?: number; 持续秒?: number }) => any;
+  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; Z?: number; 面向角度?: number; 缩放?: number; 持续秒?: number; RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number } }) => any;
   销毁点特效: (this: void, effect: any) => void;
 };
 const { 销毁世界坐标进度UI } = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI") as {
@@ -131,7 +131,7 @@ export function 创建爱蜜莉雅冰晶(
   来源技能: 爱蜜莉雅冰晶来源,
   X: number,
   Y: number,
-  Z: number = 爱蜜莉雅冰晶配置.高度,
+  Z: number = 爱蜜莉雅表现配置.冰晶节点.高度,
 ): 爱蜜莉雅冰晶 | null {
   if (英雄 == null || 英雄 === 0 || !单位存活(英雄)) return null;
   const 状态 = 取或建状态(英雄);
@@ -143,13 +143,14 @@ export function 创建爱蜜莉雅冰晶(
   }
 
   const 特效句柄 = 创建点特效({
-    模型路径: 爱蜜莉雅冰晶配置.模型,
+    模型路径: 爱蜜莉雅表现配置.冰晶节点.模型路径,
+    RGB: 爱蜜莉雅表现配置.冰晶节点.RGB,
     X,
     Y,
     Z,
     面向角度: 0,
-    缩放: 爱蜜莉雅冰晶配置.缩放,
-    持续秒: 爱蜜莉雅冰晶配置.持续秒,
+    缩放: 爱蜜莉雅表现配置.冰晶节点.缩放,
+    持续秒: 爱蜜莉雅表现配置.冰晶节点.持续秒,
   });
   if (特效句柄 == null || 特效句柄 === 0) return null;
 

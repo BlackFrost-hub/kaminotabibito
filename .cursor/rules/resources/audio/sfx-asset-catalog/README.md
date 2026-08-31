@@ -12,7 +12,7 @@
 | 点名与诅咒 | [`mark-curse.md`](mark-curse.md) | 2 | 点名、诅咒、拘束和封锁感。 |
 | 瞬时爆发 | [`instant-burst.md`](instant-burst.md) | 7 | 瞬时爆发、破碎、炸裂和重击。 |
 | 镜像与残影 | [`illusion-echo.md`](illusion-echo.md) | 3 | 镜像、残影、投影和回响。 |
-| 直线与贯穿 | [`line-pierce.md`](line-pierce.md) | 2 | 直线波、切面、丝带、贯穿和回流。 |
+| 直线与贯穿 | [`line-pierce.md`](line-pierce.md) | 3 | 直线波、切面、丝带、贯穿和回流。 |
 | 法阵与符文 | [`magic-ritual.md`](magic-ritual.md) | 0 | 法阵、符文、仪式和规则感脉冲。 |
 | 标记与锚点 | [`marker-anchor.md`](marker-anchor.md) | 0 | 核心、节点、血印和锚点。 |
 | 升降与回填 | [`rise-return.md`](rise-return.md) | 3 | 升起、坠落、回填和空中主体感。 |
@@ -30,7 +30,7 @@
 
 ## 收录概况
 
-- 已收录：40 条。
+- 已收录：41 条。
 - 未收录：139 个正式文件。详见 [`unrecorded.md`](unrecorded.md)。
 - 精确重复组：0 组（SHA-256）。
 - 本目录不根据文件名或主观试听补写声音说明。

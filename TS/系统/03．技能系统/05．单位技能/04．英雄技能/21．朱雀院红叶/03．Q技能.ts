@@ -2,6 +2,7 @@
 
 import {
   朱雀院红叶技能配置,
+  朱雀院红叶音效配置,
   朱雀院红叶动作配置,
   朱雀院红叶动作槽,
   朱雀院红叶待平衡数值,
@@ -47,6 +48,13 @@ const { 读取单位攻击力, 两点角度, 单位存活 } = require("系统.03
 const { 获取扇形区域单位 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域") as {
   获取扇形区域单位: (this: void, 参数: any) => any[];
 };
+const { Sound3DII_UnitPlayReuse, Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+};
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
+};
 const {
   施加朱雀院破绽,
   尝试消费一层刀势,
@@ -72,6 +80,8 @@ const 英雄单位类型ID = stringToFourCCSafe(朱雀院红叶技能配置.单�
 const Q技能ID = stringToFourCCSafe(朱雀院红叶技能配置.Q.技能ID);
 const Q2技能ID = stringToFourCCSafe(朱雀院红叶技能配置.Q2技能ID);
 const Q配置 = 朱雀院红叶待平衡数值.Q;
+const Q冲锋音效 = 朱雀院红叶音效配置.Q冲锋;
+const Q回身斩音效 = 朱雀院红叶音效配置.Q回身斩;
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
@@ -155,6 +165,8 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
   播放红叶动作(施法者, 朱雀院红叶动作槽.Q冲刺);
   // 重复 Q：已有活跃 Q 实例时忽略本次释放（Q1 位移/Q2 窗口期间不叠加）
   if (查询战斗技能实例(施法者, "红叶Q").length > 0) return;
+  // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
+  播放英雄技能喊话(施法者, "朱雀院红叶", 朱雀院红叶技能配置.Q.技能ID);
   const 起点X = GetUnitX(施法者);
   const 起点Y = GetUnitY(施法者);
   const 方向 = 两点角度(起点X, 起点Y, GetSpellTargetX(), GetSpellTargetY());
@@ -211,6 +223,8 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
     },
   });
   数据.位移ID = 位移ID;
+  // 冲锋启动音（突进真实启动后；单位绑定，参数配置驱动；启动失败不播）
+  if (位移ID !== 0) Sound3DII_UnitPlayReuse(Q冲锋音效.路径, 施法者, Q冲锋音效.裁断距离);
   if (位移ID === 0) 控制器.中断();
 }
 
@@ -223,6 +237,8 @@ function 执行Q2回身斩(this: void, 施法者: any, 控制器: any, 技能实
   const 方向 = GetUnitFacing(施法者); // 角度制（与扇形区域方向角一致）
   const X = GetUnitX(施法者);
   const Y = GetUnitY(施法者);
+  // 回身斩音（Q2 结算点；坐标=施法者位置，参数配置驱动）
+  Sound3DII_CooPlayReuse(Q回身斩音效.路径, X, Y, Q回身斩音效.高度, Q回身斩音效.裁断距离);
   const 扇形敌人 = 获取扇形区域单位({
     X,
     Y,

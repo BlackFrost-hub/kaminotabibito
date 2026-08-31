@@ -76,10 +76,10 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CE(_context, caster, _____6
         ["剩余飞刀"] = _____914D_7F6E.E["数量"],
         ["已结束"] = false
     }
-    local source = "十六夜咲夜-E:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass:GetHandleId(caster))
+    local source = "十六夜咲夜-E:" .. tostring(_____6280_80FD_5B9E_4F8BID or jass.GetHandleId(caster))
     _____65BD_52A0_77ED_786C_76F4_5E76_64AD_653E_52A8_4F5C(caster, source, _____914D_7F6E.E["硬直秒"], "spell")
     _____64AD_653E_54B2_591C_5355_4F4D_97F3_6548(
-        "gg_snd_IzayoiSakuya_attack" .. tostring(jass:GetRandomInt(4, 8)),
+        "gg_snd_IzayoiSakuya_attack" .. tostring(jass.GetRandomInt(4, 8)),
         caster
     )
     _____64AD_653E_54B2_591C_5355_4F4D_97F3_6548("gg_snd_OrbOfCorruptionMissile", caster)

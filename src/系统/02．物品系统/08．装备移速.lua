@@ -26,7 +26,7 @@ function getMaxMovespeed2Info(unit, ignoreItem)
         local slot = 0
         while slot <= 5 do
             do
-                local item = jass:UnitItemInSlot(unit, slot)
+                local item = jass.UnitItemInSlot(unit, slot)
                 if not item then
                     goto __continue15
                 end
@@ -88,7 +88,7 @@ local EQUIP_SPEED_EVENT_PLAYER_IDS = {
 }
 local _____5F15_64CE_79FB_901F_4E0A_9650 = 522
 local function getUnitKey(unit)
-    return tostring(nil, unit)
+    return tostring(unit)
 end
 local function getMaxMovespeed2(unit, ignoreItem)
     local info = getMaxMovespeed2Info(unit, ignoreItem)
@@ -130,7 +130,7 @@ local function onItemChange(unit, item, isPickup)
     if unit == nil or unit == 0 then
         return
     end
-    if jass:IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
+    if jass.IsUnitType(unit, jass.UNIT_TYPE_SUMMONED) then
         return
     end
     if IsUnitIllusionBJ(nil, unit) then

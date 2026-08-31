@@ -132,7 +132,7 @@ ____exports["触发格鲁姆炙热奉献"] = function(context)
         return 0
     end
     local config = _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["炙热奉献"]
-    local life = jass:GetUnitState(grum, jass.UNIT_STATE_LIFE)
+    local life = jass.GetUnitState(grum, jass.UNIT_STATE_LIFE)
     local maxLife = _____53D6_6700_5927_751F_547D(grum)
     if maxLife <= 0 or life > maxLife * config["触发生命比例"] then
         return 0

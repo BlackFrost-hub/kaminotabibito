@@ -7,6 +7,7 @@ local _____4F0A_857E_5A1CR_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜R配置"]
 local _____4F0A_857E_5A1C_8BFB_6761_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜读条配置"]
 local _____4F0A_857E_5A1C_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜表现配置"]
 local _____4F0A_857E_5A1C_6A21_578B_52A8_4F5C_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜模型动作配置"]
+local _____4F0A_857E_5A1C_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜音效配置"]
 local ____01A_FF0E_52A8_4F5C_8868_73B0 = require("系统.03．技能系统.05．单位技能.04．英雄技能.23．伊蕾娜.01A．动作表现")
 local _____64AD_653E_4F0A_857E_5A1C_9636_6BB5_52A8_4F5C = ____01A_FF0E_52A8_4F5C_8868_73B0["播放伊蕾娜阶段动作"]
 local ____02_FF0E_88AB_52A8_6548_679C = require("系统.03．技能系统.05．单位技能.04．英雄技能.23．伊蕾娜.02．被动效果")
@@ -15,6 +16,8 @@ local _____9501_5B9A_4F0A_857E_5A1CR_53D8_5F0F = ____02_FF0E_88AB_52A8_6548_679C
 local _____6D88_8D39_4F0A_857E_5A1CR_9501_5B9A_53D8_5F0F = ____02_FF0E_88AB_52A8_6548_679C["消费伊蕾娜R锁定变式"]
 local _____8FD8_539F_4F0A_857E_5A1CR_9501_5B9A_53D8_5F0F = ____02_FF0E_88AB_52A8_6548_679C["还原伊蕾娜R锁定变式"]
 local _____767B_8BB0_4F0A_857E_5A1C_6280_80FD_6E05_7406 = ____02_FF0E_88AB_52A8_6548_679C["登记伊蕾娜技能清理"]
+local ____require_result_0 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播放英雄技能喊话"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -25,36 +28,38 @@ local DestroyEffect = jass.DestroyEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_1["注册单位技能壳监听"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
-local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_2["创建战斗技能实例"]
-local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_2["查询战斗技能实例"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
-local _____5F00_59CB_5145_80FD = ____require_result_3["开始充能"]
-local _____505C_6B62_5145_80FD = ____require_result_3["停止充能"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
-local _____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_4["创建持续危险区域"]
-local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_5["造成技能伤害"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_6["两点角度"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_6["单位存活"]
-local _____6781_5750_6807X = ____require_result_6["极坐标X"]
-local _____6781_5750_6807Y = ____require_result_6["极坐标Y"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_7["获取坐标范围敌人"]
-local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-local SFB_setSlow = ____require_result_8.SFB_setSlow
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
-local _____5F00_59CB_62A4_76FE = ____require_result_9["开始护盾"]
-local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
-local _____53D1_5C04_5F39_9053 = ____require_result_10["发射弹道"]
-local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
+local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["创建战斗技能实例"]
+local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["查询战斗技能实例"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
+local _____5F00_59CB_5145_80FD = ____require_result_4["开始充能"]
+local _____505C_6B62_5145_80FD = ____require_result_4["停止充能"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
+local _____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_5["创建持续危险区域"]
+local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_6["造成技能伤害"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_7["两点角度"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
+local _____6781_5750_6807X = ____require_result_7["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_7["极坐标Y"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_8["获取坐标范围敌人"]
+local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+local SFB_setSlow = ____require_result_9.SFB_setSlow
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
+local _____5F00_59CB_62A4_76FE = ____require_result_10["开始护盾"]
+local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
+local _____53D1_5C04_5F39_9053 = ____require_result_11["发射弹道"]
+local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_12["创建点特效"]
+local ____require_result_13 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_13.Sound3DII_CooPlayReuse
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____4F0A_857E_5A1C_6280_80FD_914D_7F6E["单位类型ID"]
 local ____R_6280_80FD_7C7B_578BID = jass.FourCC(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.R["技能ID"])
 local ____R_6280_80FD_952E = "R万法回廊"
@@ -113,6 +118,13 @@ local function _____6267_884C_89C1_95FB_8FFD_52A0(_____65BD_6CD5_8005, _____5B9E
                 end
                 _____5DF2_7528_7C7B_578B[_____8BB0_5F55["类型"]] = true
                 if _____8BB0_5F55["类型"] == "风行" then
+                    Sound3DII_CooPlayReuse(
+                        _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["R追加弹"]["路径"],
+                        _____6570_636E["中心X"],
+                        _____6570_636E["中心Y"],
+                        _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["R追加弹"]["高度"],
+                        _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["R追加弹"]["裁断距离"]
+                    )
                     _____53D1_5C04_5F39_9053({
                         ["名称"] = "伊蕾娜-万法回廊·追迹",
                         ["所有者"] = _____65BD_6CD5_8005,
@@ -137,6 +149,7 @@ local function _____6267_884C_89C1_95FB_8FFD_52A0(_____65BD_6CD5_8005, _____5B9E
                         ["伤害形态"] = "AOE",
                         ["参与技能伤害加成"] = false,
                         ["模型"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["R追加魔弹"]["模型路径"],
+                        RGB = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["R追加魔弹"].RGB,
                         ["缩放"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["R追加魔弹"]["缩放"],
                         ["飞行高度"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["R追加魔弹"]["高度"],
                         ["生命周期"] = _____4F0A_857E_5A1CR_914D_7F6E["追加魔弹穿透距离"] / _____4F0A_857E_5A1CR_914D_7F6E["追加魔弹速度"] + 0.5,
@@ -169,6 +182,7 @@ local function _____6267_884C_89C1_95FB_8FFD_52A0(_____65BD_6CD5_8005, _____5B9E
                     local _____9884_793A_8868_73B0 = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["R远行预示"]
                     local _____9884_793A = _____521B_5EFA_70B9_7279_6548({
                         ["模型路径"] = _____9884_793A_8868_73B0["模型路径"],
+                        RGB = _____9884_793A_8868_73B0.RGB,
                         X = _____8FB9_7F18X,
                         Y = _____8FB9_7F18Y,
                         Z = _____9884_793A_8868_73B0["高度"],
@@ -194,6 +208,7 @@ local function _____6267_884C_89C1_95FB_8FFD_52A0(_____65BD_6CD5_8005, _____5B9E
                             local _____7206_53D1_8868_73B0 = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["R远行爆发"]
                             local _____661F_7206 = _____521B_5EFA_70B9_7279_6548({
                                 ["模型路径"] = _____7206_53D1_8868_73B0["模型路径"],
+                                RGB = _____7206_53D1_8868_73B0.RGB,
                                 X = _____8FB9_7F18X,
                                 Y = _____8FB9_7F18Y,
                                 Z = _____7206_53D1_8868_73B0["高度"],
@@ -246,6 +261,7 @@ local function _____6267_884CR_5B8C_6210_7ED3_7B97(_____65BD_6CD5_8005, _____5B9
     local _____9635_5FC3_8868_73B0 = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["R阵心爆发"]
     local _____9635_5FC3 = _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____9635_5FC3_8868_73B0["模型路径"],
+        RGB = _____9635_5FC3_8868_73B0.RGB,
         X = _____6570_636E["中心X"],
         Y = _____6570_636E["中心Y"],
         Z = _____9635_5FC3_8868_73B0["高度"],
@@ -253,6 +269,13 @@ local function _____6267_884CR_5B8C_6210_7ED3_7B97(_____65BD_6CD5_8005, _____5B9
         ["持续秒"] = _____9635_5FC3_8868_73B0["持续秒"]
     })
     local ____ = _____9635_5FC3
+    Sound3DII_CooPlayReuse(
+        _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["R爆发"]["路径"],
+        _____6570_636E["中心X"],
+        _____6570_636E["中心Y"],
+        _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["R爆发"]["高度"],
+        _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["R爆发"]["裁断距离"]
+    )
     if _____6570_636E["变式快照"] == "灰烬" then
         _____8303_56F4_7206_53D1(
             _____65BD_6CD5_8005,
@@ -321,6 +344,7 @@ local function _____6267_884CR_5B8C_6210_7ED3_7B97(_____65BD_6CD5_8005, _____5B9
             local _____6536_675F_8868_73B0 = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["R收束"]
             local _____6536_675F = _____521B_5EFA_70B9_7279_6548({
                 ["模型路径"] = _____6536_675F_8868_73B0["模型路径"],
+                RGB = _____6536_675F_8868_73B0.RGB,
                 X = _____6570_636E["中心X"],
                 Y = _____6570_636E["中心Y"],
                 Z = _____6536_675F_8868_73B0["高度"],
@@ -423,6 +447,7 @@ local function _____91CA_653ER_4E07_6CD5_56DE_5ECA(_context, _____65BD_6CD5_8005
     local _____661F_9635_8868_73B0 = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["R星阵"]
     _____5C55_5F00_7279_6548 = _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____5C55_5F00_8868_73B0["模型路径"],
+        RGB = _____5C55_5F00_8868_73B0.RGB,
         X = _____4E2D_5FC3X,
         Y = _____4E2D_5FC3Y,
         Z = _____5C55_5F00_8868_73B0["高度"],
@@ -431,6 +456,7 @@ local function _____91CA_653ER_4E07_6CD5_56DE_5ECA(_context, _____65BD_6CD5_8005
     })
     _____661F_9635_7279_6548 = _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____661F_9635_8868_73B0["模型路径"],
+        RGB = _____661F_9635_8868_73B0.RGB,
         X = _____4E2D_5FC3X,
         Y = _____4E2D_5FC3Y,
         Z = _____661F_9635_8868_73B0["高度"],
@@ -473,6 +499,16 @@ local function _____91CA_653ER_4E07_6CD5_56DE_5ECA(_context, _____65BD_6CD5_8005
             end
         }
     )
+    if _____5145_80FDID > 0 then
+        _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "伊蕾娜", _____4F0A_857E_5A1C_6280_80FD_914D_7F6E.R["技能ID"])
+        Sound3DII_CooPlayReuse(
+            _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["R展开"]["路径"],
+            _____4E2D_5FC3X,
+            _____4E2D_5FC3Y,
+            _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["R展开"]["高度"],
+            _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["R展开"]["裁断距离"]
+        )
+    end
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册伊蕾娜R"] = function()

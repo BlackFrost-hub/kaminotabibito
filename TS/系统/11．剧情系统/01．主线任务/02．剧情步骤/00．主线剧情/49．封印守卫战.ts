@@ -278,6 +278,7 @@ let 当前封印守卫战使用波次配置表: readonly 封印守卫战波次�
 let 当前封印守卫战人数模式: "单人" | "多人" = "多人";
 let 当前封印守卫战运行中 = false;
 let 已注册封印守卫战死亡监听 = false;
+let 封印守卫战已成功完成 = false;
 
 function on启动封印守卫战镜头震荡(this: void): void {
   const 玩家 = jass.GetEnumPlayer();
@@ -704,6 +705,7 @@ function 处理封印守卫战守护时限(this: void): void {
     设置全体玩家游戏失败();
     return;
   }
+  封印守卫战已成功完成 = true;
   进入主线节点(50);
   addDelayedCallback(10000, () => {
     设置全体玩家游戏胜利();
@@ -943,6 +945,10 @@ export function 创建封印能量核心与守护倒计时(this: void): any {
 
 export function 读取封印守卫战能量核心(this: void): any {
   return 当前封印能量核心;
+}
+
+export function 是否已成功完成封印守卫战(this: void): boolean {
+  return 封印守卫战已成功完成;
 }
 
 export function 启动封印守卫战(this: void): boolean {

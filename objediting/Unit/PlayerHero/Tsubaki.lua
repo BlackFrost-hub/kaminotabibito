@@ -11,7 +11,7 @@ createPlayerHeroUnit('E00H', '朱雀院椿', {
   scale = 1.0,
   icon = 'ReplaceableTextures\\CommandButtons\\BTNHeroBlademaster.blp',
   normalAbilities = 'A014,AInv,ATD1',
-  heroAbilities = 'ATQ1,ATW1,ATE1,ATR1',
+  heroAbilities = '',
   upgradesUsed = '',
 
   strength = 25,

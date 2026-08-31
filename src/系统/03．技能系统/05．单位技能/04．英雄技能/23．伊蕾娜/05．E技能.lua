@@ -6,6 +6,7 @@ local _____4F0A_857E_5A1CE_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜E配置"]
 local _____4F0A_857E_5A1C_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜表现配置"]
 local _____4F0A_857E_5A1C_53D8_5F0F_6548_679C_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜变式效果配置"]
 local _____4F0A_857E_5A1C_6A21_578B_52A8_4F5C_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜模型动作配置"]
+local _____4F0A_857E_5A1C_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜音效配置"]
 local ____01A_FF0E_52A8_4F5C_8868_73B0 = require("系统.03．技能系统.05．单位技能.04．英雄技能.23．伊蕾娜.01A．动作表现")
 local _____64AD_653E_4F0A_857E_5A1C_9636_6BB5_52A8_4F5C = ____01A_FF0E_52A8_4F5C_8868_73B0["播放伊蕾娜阶段动作"]
 local _____5F00_59CB_4F0A_857E_5A1C_5FAA_73AF_52A8_4F5C = ____01A_FF0E_52A8_4F5C_8868_73B0["开始伊蕾娜循环动作"]
@@ -16,6 +17,8 @@ local _____8BB0_5F55_4F0A_857E_5A1C_626B_5E1A_8DEF_7EBF = ____02_FF0E_88AB_52A8_
 local _____83B7_53D6_4F0A_857E_5A1C_53D8_5F0F = ____02_FF0E_88AB_52A8_6548_679C["获取伊蕾娜变式"]
 local _____6D88_8D39_4F0A_857E_5A1C_53D8_5F0F_7528_4E8E = ____02_FF0E_88AB_52A8_6548_679C["消费伊蕾娜变式用于"]
 local _____767B_8BB0_4F0A_857E_5A1C_6280_80FD_6E05_7406 = ____02_FF0E_88AB_52A8_6548_679C["登记伊蕾娜技能清理"]
+local ____require_result_0 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播放英雄技能喊话"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -27,38 +30,42 @@ local SetUnitFlyHeight = jass.SetUnitFlyHeight
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_1.addPeriodicCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
-local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["创建战斗技能实例"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
-local _____5F00_59CB_51B2_950B = ____require_result_4["开始冲锋"]
-local _____505C_6B62_4F4D_79FB = ____require_result_4["停止位移"]
-local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_5["造成技能伤害"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_6["两点角度"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_6["单位存活"]
-local _____8DDD_79BBXY = ____require_result_6["距离XY"]
-local _____6781_5750_6807X = ____require_result_6["极坐标X"]
-local _____6781_5750_6807Y = ____require_result_6["极坐标Y"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_7["获取坐标范围敌人"]
-local ____require_result_8 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_8["添加单位暂停"]
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_8["移除单位暂停"]
-local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-local SFB_setSlow = ____require_result_9.SFB_setSlow
-local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
-local _____5F00_59CB_62A4_76FE = ____require_result_10["开始护盾"]
-local _____79FB_9664_62A4_76FE = ____require_result_10["移除护盾"]
-local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_2.addPeriodicCallback
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_3["注册单位技能壳监听"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
+local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_4["创建战斗技能实例"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
+local _____5F00_59CB_51B2_950B = ____require_result_5["开始冲锋"]
+local _____505C_6B62_4F4D_79FB = ____require_result_5["停止位移"]
+local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_6["造成技能伤害"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_7["两点角度"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
+local _____8DDD_79BBXY = ____require_result_7["距离XY"]
+local _____6781_5750_6807X = ____require_result_7["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_7["极坐标Y"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_8["获取坐标范围敌人"]
+local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_9["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_9["移除单位暂停"]
+local ____require_result_10 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+local SFB_setSlow = ____require_result_10.SFB_setSlow
+local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
+local _____5F00_59CB_62A4_76FE = ____require_result_11["开始护盾"]
+local _____79FB_9664_62A4_76FE = ____require_result_11["移除护盾"]
+local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_12["创建点特效"]
+local ____require_result_13 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_13.Sound3DII_UnitPlayReuse
+local ____require_result_14 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_14.Sound3DII_CooPlayReuse
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____4F0A_857E_5A1C_6280_80FD_914D_7F6E["单位类型ID"]
 local ____E_6280_80FD_7C7B_578BID = jass.FourCC(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.E["技能ID"])
 local ____E_786C_76F4_6765_6E90 = "伊蕾娜-E硬直"
@@ -138,6 +145,7 @@ local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, 
     end
     local _____6CE2_7EB9 = _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地波纹"]["模型路径"],
+        RGB = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地波纹"].RGB,
         X = X,
         Y = Y,
         Z = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地波纹"]["高度"],
@@ -145,6 +153,13 @@ local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, 
         ["持续秒"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地波纹"]["持续秒"]
     })
     local ____ = _____6CE2_7EB9
+    Sound3DII_CooPlayReuse(
+        _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["E落地"]["路径"],
+        X,
+        Y,
+        _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["E落地"]["高度"],
+        _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["E落地"]["裁断距离"]
+    )
     _____8BB0_5F55_4F0A_857E_5A1C_626B_5E1A_8DEF_7EBF(
         _____65BD_6CD5_8005,
         _____6570_636E["起点X"],
@@ -249,6 +264,7 @@ local function _____91CA_653EE_626B_5E1A_8FDC_884C(_context, _____65BD_6CD5_8005
                 end
                 local _____98CE_538B = _____521B_5EFA_70B9_7279_6548({
                     ["模型路径"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E起飞风压"]["模型路径"],
+                    RGB = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E起飞风压"].RGB,
                     X = GetUnitX(_____65BD_6CD5_8005),
                     Y = GetUnitY(_____65BD_6CD5_8005),
                     Z = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E起飞风压"]["高度"],
@@ -298,6 +314,8 @@ local function _____91CA_653EE_626B_5E1A_8FDC_884C(_context, _____65BD_6CD5_8005
                 )
                 _____6570_636E["位移ID"] = _____4F4D_79FBID
                 if _____4F4D_79FBID > 0 then
+                    _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "伊蕾娜", _____4F0A_857E_5A1C_6280_80FD_914D_7F6E.E["技能ID"])
+                    Sound3DII_UnitPlayReuse(_____4F0A_857E_5A1C_97F3_6548_914D_7F6E["E起飞"]["路径"], _____65BD_6CD5_8005, _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["E起飞"]["裁断距离"])
                     if _____7528_8FC5_884C or _____7528_7070_70EC then
                         local _____5DF2_6D88_8D39 = _____6D88_8D39_4F0A_857E_5A1C_53D8_5F0F_7528_4E8E(_____65BD_6CD5_8005, "E")
                         _____6570_636E["灰烬爆发"] = _____5DF2_6D88_8D39 == "灰烬"
@@ -315,6 +333,7 @@ local function _____91CA_653EE_626B_5E1A_8FDC_884C(_context, _____65BD_6CD5_8005
                                 local _____8868_73B0 = _____5C3E_8FF9_8BA1_6570 % 2 == 0 and _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E飞行轨迹"] or _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E星光轨迹"]
                                 local _____661F_8FF9 = _____521B_5EFA_70B9_7279_6548({
                                     ["模型路径"] = _____8868_73B0["模型路径"],
+                                    RGB = _____8868_73B0.RGB,
                                     X = GetUnitX(_____65BD_6CD5_8005),
                                     Y = GetUnitY(_____65BD_6CD5_8005),
                                     Z = _____8868_73B0["高度"],

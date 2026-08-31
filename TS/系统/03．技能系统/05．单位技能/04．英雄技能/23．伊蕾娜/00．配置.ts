@@ -10,11 +10,11 @@
 
 export const 伊蕾娜技能配置 = {
   单位类型ID: "E00I",
-  Q: { 技能ID: "AIQ1", 名称: "旅风·追迹（Q）", 快捷键: "Q", 冷却秒: 5, 魔耗: 50 },
-  W: { 技能ID: "AIW1", 名称: "镜界护符（W）", 快捷键: "W", 冷却秒: 10, 魔耗: 70 },
-  E: { 技能ID: "AIE1", 名称: "扫帚·远行（E）", 快捷键: "E", 冷却秒: 12, 魔耗: 75 },
-  R: { 技能ID: "AIR1", 名称: "灰之魔女·万法回廊（R）", 快捷键: "R", 冷却秒: 70, 魔耗: 140 },
-  D: { 技能ID: "AID1", 名称: "旅途魔法变式（D）", 快捷键: "D", 冷却秒: 4, 魔耗: 20 },
+  Q: { 技能ID: "AIQ1", 名称: "旅风·追迹（Q）", 快捷键: "Q", 冷却秒: 5, 魔耗百分比: 0.05, 说明: "技能说明：向目标方向发射追踪魔弹，命中后记录旅途见闻；已有镜界或远行路线时会追加联动魔法。|n伤害：主弹造成攻击力100%的魔法伤害。|n施法距离：900|n伤害范围：命中半径100|n减速：20%，持续1.2秒|n冷却时间：5秒|n魔法消耗：最大魔法值的5%" },
+  W: { 技能ID: "AIW1", 名称: "镜界护符（W）", 快捷键: "W", 冷却秒: 10, 魔耗百分比: 0.07, 说明: "技能说明：展开镜界保护，首次受到的主要攻击会被完整偏折，结束时对周围敌人施加减速。|n伤害：本技能不直接造成伤害；成功偏折会记录一次镜界见闻，并在选择镜界变式时追加护盾。|n防御范围：自身，保护期间首次有效敌方攻击|n减速范围：半径350|n减速：35%，持续2秒|n保护持续时间：4秒|n冷却时间：10秒|n魔法消耗：最大魔法值的7%" },
+  E: { 技能ID: "AIE1", 名称: "扫帚·远行（E）", 快捷键: "E", 冷却秒: 12, 魔耗百分比: 0.075, 说明: "技能说明：骑乘扫帚向目标方向飞行，落地时冲击周围敌人，并在飞行路径上留下路线。|n伤害：落点造成攻击力110%的魔法伤害。|n施法距离：飞行550距离|n伤害范围：落点半径260|n减速：25%，持续1.5秒|n飞行高度：约220|n路线持续时间：6秒|n冷却时间：12秒|n魔法消耗：最大魔法值的7.5%" },
+  R: { 技能ID: "AIR1", 名称: "灰之魔女·万法回廊（R）", 快捷键: "R", 冷却秒: 70, 魔耗百分比: 0.14, 说明: "技能说明：蓄力后展开万法回廊，先对范围内敌人进行主结算，随后在领域内持续施法，并追加已记录的见闻魔法。|n伤害：主结算造成攻击力220%的魔法伤害；领域内每秒脉冲造成攻击力45%的魔法伤害。|n施法距离：1000，指定目标方向|n伤害范围：回廊半径450|n减速：40%，持续2.5秒|n蓄力时间：1.5秒|n领域持续时间：5秒|n追加见闻：最多3类|n冷却时间：70秒|n魔法消耗：最大魔法值的14%" },
+  D: { 技能ID: "AID1", 名称: "旅途魔法变式（D）", 快捷键: "D", 冷却秒: 4, 魔耗百分比: 0.02, 说明: "技能说明：切换下一次Q、W、E或R使用的魔法变式，按固定顺序选择迅行、镜界与灰烬。|n伤害：本技能不直接造成伤害。|n技能类型：天赋技能，初始获得|n变式保留时间：最多30秒|n冷却时间：4秒|n魔法消耗：最大魔法值的2%" },
 } as const;
 
 export const 伊蕾娜物编配置 = {
@@ -30,7 +30,9 @@ export const 伊蕾娜物编配置 = {
 /** File00005201.mdx 原始序列；语义已按用户逐组帧截图确认，时点仍待实机校准。 */
 export const 伊蕾娜模型动作配置 = {
   来源原名: "File00005201.mdx",
-  模型哈希前16位: "E6AC18863119D2D9",
+  来源模型哈希前16位: "FEE36530E17066C9",
+  /** 项目内规范化模型 Irena.mdx 的 SHA-256 前16位（2026-08-27 重算；与用户源文件 File00005201.mdx 不一致） */
+  规范化模型哈希前16位: "E6AC18863119D2D9",
   序列: [
     { 索引: 0, 名称: "stand", 原始区间: [2000, 3333], 原始时长秒: 1.333, 循环: true },
     { 索引: 1, 名称: "walk", 原始区间: [4000, 4800], 原始时长秒: 0.8, 循环: true },
@@ -206,25 +208,25 @@ export const 伊蕾娜模型动作配置 = {
  * 范围模型额外配置基准半径/基准缩放，运行时按真实判定半径换算。
  */
 export const 伊蕾娜表现配置 = {
-  D变式提示: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\feastaura.mdx", 缩放: 0.6, 高度: 20, 持续秒: 1.2 },
-  Q主弹道: { 模型路径: "Common\\Effect\\Projectile\\IrenaTrackingBolt.mdx", 缩放: 0.7, 高度: 75, 持续秒: -1 },
-  Q联动弹道: { 模型路径: "Common\\Effect\\Projectile\\IrenaTrackingBolt.mdx", 缩放: 0.7, 高度: 75, 持续秒: -1 },
-  W镜界主体: { 模型路径: "Common\\Effect\\Form\\Shield\\IrenaMirrorWard.mdx", 基准半径: 170, 基准缩放: 1, 缩放: 1, 高度: 0, 持续秒: -1 },
-  W镜界备份: { 模型路径: "Common\\Effect\\Form\\Shield\\IrenaMirrorWardBackup.mdx", 基准半径: 170, 基准缩放: 1, 缩放: 1, 高度: 0, 持续秒: -1 },
-  W偏折反馈: { 模型路径: "Common\\Effect\\Form\\Explosion\\ChargingUp.mdx", 缩放: 1, 高度: 60, 持续秒: 0.6 },
-  E飞行轨迹: { 模型路径: "Common\\Effect\\Form\\Charge\\IrenaFlightTrail.mdx", 缩放: 0.8, 高度: 260, 持续秒: 0.45 },
-  E星光轨迹: { 模型路径: "Common\\Effect\\Form\\Charge\\IrenaStarTrail.mdx", 缩放: 0.8, 高度: 260, 持续秒: 0.45 },
-  E起飞风压: { 模型路径: "Common\\Effect\\Form\\Charge\\IrenaTakeoffWind.mdx", 缩放: 1, 高度: 10, 持续秒: 0.6 },
-  E落地波纹: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaLandingRipple.mdx", 基准半径: 260, 基准缩放: 1.2, 缩放: 1.2, 高度: 8, 持续秒: 0.8 },
-  E飞行风备份: { 模型路径: "Common\\Effect\\Form\\Rotate\\IrenaFlightWindBackup.mdx", 缩放: 0.8, 高度: 260, 持续秒: 0.45 },
-  R展开: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\IrenaCorridorOpen.mdx", 基准半径: 328, 基准缩放: 1, 缩放: 1, 高度: 6, 持续秒: -1 },
-  R星阵: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\IrenaBlueStarCircle.mdx", 基准半径: 328, 基准缩放: 1, 缩放: 1, 高度: 6, 持续秒: -1 },
-  R持续领域: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\IrenaCorridorField.mdx", 基准半径: 328, 基准缩放: 1, 缩放: 1, 高度: 6, 持续秒: -1 },
-  R阵心爆发: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaCorridorCoreBurst.mdx", 基准半径: 328, 基准缩放: 1, 缩放: 1.2, 高度: 10, 持续秒: 1 },
-  R远行预示: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaLandingRipple.mdx", 基准半径: 160, 基准缩放: 1, 缩放: 1, 高度: 8, 持续秒: 0.8 },
-  R远行爆发: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaCorridorCoreBurst.mdx", 基准半径: 160, 基准缩放: 0.6, 缩放: 0.6, 高度: 10, 持续秒: 0.8 },
-  R收束: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaCorridorClose.mdx", 基准半径: 328, 基准缩放: 1, 缩放: 1, 高度: 8, 持续秒: 0.9 },
-  R追加魔弹: { 模型路径: "Common\\Effect\\Projectile\\IrenaCorridorArcBolt.mdx", 缩放: 1, 高度: 75, 持续秒: -1 },
+  D变式提示: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\feastaura.mdx", 缩放: 0.6, 高度: 20, 持续秒: 1.2, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  Q主弹道: { 模型路径: "Common\\Effect\\Projectile\\IrenaTrackingBolt.mdx", 缩放: 0.7, 高度: 75, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  Q联动弹道: { 模型路径: "Common\\Effect\\Projectile\\IrenaTrackingBolt.mdx", 缩放: 0.7, 高度: 75, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  W镜界主体: { 模型路径: "Common\\Effect\\Form\\Shield\\IrenaMirrorWard.mdx", 基准半径: 170, 基准缩放: 1, 缩放: 1, 高度: 0, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  W镜界备份: { 模型路径: "Common\\Effect\\Form\\Shield\\IrenaMirrorWardBackup.mdx", 基准半径: 170, 基准缩放: 1, 缩放: 1, 高度: 0, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  W偏折反馈: { 模型路径: "Common\\Effect\\Form\\Explosion\\ChargingUp.mdx", 缩放: 1, 高度: 60, 持续秒: 0.6, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  E飞行轨迹: { 模型路径: "Common\\Effect\\Form\\Charge\\IrenaFlightTrail.mdx", 缩放: 0.8, 高度: 260, 持续秒: 0.45, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  E星光轨迹: { 模型路径: "Common\\Effect\\Form\\Charge\\IrenaStarTrail.mdx", 缩放: 0.8, 高度: 260, 持续秒: 0.45, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  E起飞风压: { 模型路径: "Common\\Effect\\Form\\Charge\\IrenaTakeoffWind.mdx", 缩放: 1, 高度: 10, 持续秒: 0.6, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  E落地波纹: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaLandingRipple.mdx", 基准半径: 260, 基准缩放: 1.2, 缩放: 1.2, 高度: 8, 持续秒: 0.8, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  E飞行风备份: { 模型路径: "Common\\Effect\\Form\\Rotate\\IrenaFlightWindBackup.mdx", 缩放: 0.8, 高度: 260, 持续秒: 0.45, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  R展开: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\IrenaCorridorOpen.mdx", 基准半径: 328, 基准缩放: 1, 缩放: 1, 高度: 6, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  R星阵: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\IrenaBlueStarCircle.mdx", 基准半径: 328, 基准缩放: 1, 缩放: 1, 高度: 6, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  R持续领域: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\IrenaCorridorField.mdx", 基准半径: 328, 基准缩放: 1, 缩放: 1, 高度: 6, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  R阵心爆发: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaCorridorCoreBurst.mdx", 基准半径: 328, 基准缩放: 1, 缩放: 1.2, 高度: 10, 持续秒: 1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  R远行预示: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaLandingRipple.mdx", 基准半径: 160, 基准缩放: 1, 缩放: 1, 高度: 8, 持续秒: 0.8, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  R远行爆发: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaCorridorCoreBurst.mdx", 基准半径: 160, 基准缩放: 0.6, 缩放: 0.6, 高度: 10, 持续秒: 0.8, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  R收束: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaCorridorClose.mdx", 基准半径: 328, 基准缩放: 1, 缩放: 1, 高度: 8, 持续秒: 0.9, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
+  R追加魔弹: { 模型路径: "Common\\Effect\\Projectile\\IrenaCorridorArcBolt.mdx", 缩放: 1, 高度: 75, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
 } as const;
 
 export const 伊蕾娜读条配置 = { UI类型: "自然", 跟随Z偏移: 225, 显示模型进度条: false, 死亡或打断同步销毁: true } as const;
@@ -403,4 +405,28 @@ export const 伊蕾娜音效需求 = {
   E: ["起飞", "风切", "飞行低循环", "落地"],
   D: ["变式确认", "变式消费"],
   R: ["可中断蓄力", "回廊展开", "三类追加各一", "收束"],
+} as const;
+
+/** 技能音效：全部走全局 3D 播放；坐标槽按高度播放，单位槽绑定施法者。 */
+export const 伊蕾娜音效配置 = {
+  /** Q 旅风·追迹发射（坐标=施法者位置；发射延迟回调一次） */
+  Q发射: { 路径: "Sound\\Hero\\Irena\\SFX\\irena_q_cast.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 1.0 },
+  /** Q 命中（坐标=目标位置） */
+  Q命中: { 路径: "Sound\\Hero\\Irena\\SFX\\irena_q_hit.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 0.8 },
+  /** W 镜界护符窗口展开（单位） */
+  W展开: { 路径: "Sound\\Hero\\Irena\\SFX\\irena_w_open.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.5 },
+  /** W 攻击被成功偏折（坐标=结界接触点） */
+  W偏折: { 路径: "Sound\\Hero\\Irena\\SFX\\irena_w_reflect.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 1.0 },
+  /** E 扫帚起飞（单位；真实施法起点一次） */
+  E起飞: { 路径: "Sound\\Hero\\Irena\\SFX\\irena_e_takeoff.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.6 },
+  /** E 落地冲击结算（坐标=落点） */
+  E落地: { 路径: "Sound\\Hero\\Irena\\SFX\\irena_e_land.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.0 },
+  /** R 万法回廊法阵展开（坐标=阵心；充能建立后一次） */
+  R展开: { 路径: "Sound\\Hero\\Irena\\SFX\\irena_r_open.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 2.5 },
+  /** R 风行见闻追加贯穿弹（坐标=发射点；完成回调一次发射，只播一次） */
+  R追加弹: { 路径: "Sound\\Hero\\Irena\\SFX\\irena_r_bolts.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 1.3 },
+  /** R 阵心爆发（坐标=阵心；完成回调主结算爆发一次） */
+  R爆发: { 路径: "Sound\\Hero\\Irena\\SFX\\irena_r_burst.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 75, 持续秒: 2.5 },
+  /** D 变式切换成功（单位；R 锁定拒绝分支不播） */
+  D切换: { 路径: "Sound\\Hero\\Irena\\SFX\\irena_d_switch.mp3", 候选路径: undefined, 裁断距离: 1250, 音量: 1, 高度: 0, 持续秒: 1.0 },
 } as const;

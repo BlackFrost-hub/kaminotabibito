@@ -27,7 +27,7 @@ local _____63D0_7C73_8BFA_65AF_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6
 local function _____53D6_6709_6548_9B54_8017(caster, level)
     local fixedCost = getAbilityManaCost(caster, ____Q_6280_80FDID, level)
     local percentCost = getAbilityPercentCost(caster, ____Q_6280_80FDID, level)
-    local maxMana = japi:GetUnitState(caster, jass.UNIT_STATE_MAX_MANA)
+    local maxMana = japi.GetUnitState(caster, jass.UNIT_STATE_MAX_MANA)
     local reduction = getManaCostReduction(caster)
     local reductionRatio = reduction < 0 and -reduction or reduction
     local calculatedCost = _____8BA1_7B97_6700_7EC8_9B54_6CD5_6D88_8017(caster, ____Q_6280_80FDID, level)
@@ -42,15 +42,15 @@ local function ____on_63D0_7C73_8BFA_65AFQ(caster, abilityId)
     if abilityId ~= ____Q_6280_80FDID then
         return
     end
-    local casterTypeId = jass:GetUnitTypeId(caster)
+    local casterTypeId = jass.GetUnitTypeId(caster)
     if casterTypeId ~= _____63D0_7C73_8BFA_65AF_5355_4F4D_7C7B_578BID then
         return
     end
     local cfg = _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.Q
-    local level = jass:GetUnitAbilityLevel(caster, ____Q_6280_80FDID)
+    local level = jass.GetUnitAbilityLevel(caster, ____Q_6280_80FDID)
     _____64AD_653E_63D0_7C73_8BFA_65AF_5355_4F4D_97F3_6548(caster, cfg["全局音效键"])
-    local casterX = jass:GetUnitX(caster)
-    local casterY = jass:GetUnitY(caster)
+    local casterX = jass.GetUnitX(caster)
+    local casterY = jass.GetUnitY(caster)
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = cfg["主体特效模型"],
         X = casterX,
@@ -63,28 +63,28 @@ local function ____on_63D0_7C73_8BFA_65AFQ(caster, abilityId)
     if not (cost > 0) then
         return
     end
-    local owner = jass:GetOwningPlayer(caster)
+    local owner = jass.GetOwningPlayer(caster)
     local units = getUnitsInRange(casterX, casterY, cfg["范围"])
     do
         local i = 0
         while i < #units do
             do
                 local target = units[i + 1]
-                local currentLife = jass:GetUnitState(target, jass.UNIT_STATE_LIFE)
-                local maxLife = japi:GetUnitState(target, jass.UNIT_STATE_MAX_LIFE)
-                if target ~= caster and jass:IsUnitAlly(target, owner) ~= true then
+                local currentLife = jass.GetUnitState(target, jass.UNIT_STATE_LIFE)
+                local maxLife = japi.GetUnitState(target, jass.UNIT_STATE_MAX_LIFE)
+                if target ~= caster and jass.IsUnitAlly(target, owner) ~= true then
                     goto __continue9
                 end
                 if not (currentLife > 0.405) then
                     goto __continue9
                 end
-                if jass:IsUnitType(target, jass.UNIT_TYPE_ANCIENT) == true then
+                if jass.IsUnitType(target, jass.UNIT_TYPE_ANCIENT) == true then
                     goto __continue9
                 end
-                if jass:IsUnitType(target, jass.UNIT_TYPE_MECHANICAL) == true then
+                if jass.IsUnitType(target, jass.UNIT_TYPE_MECHANICAL) == true then
                     goto __continue9
                 end
-                if jass:IsUnitType(target, jass.UNIT_TYPE_STRUCTURE) == true then
+                if jass.IsUnitType(target, jass.UNIT_TYPE_STRUCTURE) == true then
                     goto __continue9
                 end
                 if currentLife >= maxLife then

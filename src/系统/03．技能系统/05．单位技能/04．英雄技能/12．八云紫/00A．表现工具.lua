@@ -16,17 +16,17 @@ ____exports["播放八云紫单位音效"] = function(unit, soundKey, restart)
         return
     end
     if restart then
-        jass:StopSound(sound, false, false)
+        jass.StopSound(sound, false, false)
     end
-    jass:AttachSoundToUnit(sound, unit)
-    jass:SetSoundVolume(sound, 127)
-    jass:StartSound(sound)
+    jass.AttachSoundToUnit(sound, unit)
+    jass.SetSoundVolume(sound, 127)
+    jass.StartSound(sound)
 end
 ____exports["播放八云紫随机单位音效"] = function(unit, soundKeys)
     if #soundKeys <= 0 then
         return
     end
-    local randomIndex = jass:GetRandomInt(1, #soundKeys)
+    local randomIndex = jass.GetRandomInt(1, #soundKeys)
     ____exports["播放八云紫单位音效"](unit, soundKeys[randomIndex])
 end
 return ____exports

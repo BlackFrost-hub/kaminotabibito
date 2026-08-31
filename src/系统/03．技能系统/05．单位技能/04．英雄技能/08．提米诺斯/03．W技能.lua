@@ -25,19 +25,19 @@ local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
 local ____W_6280_80FDID = stringToFourCCSafe(_____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E["W技能ID"])
 local _____63D0_7C73_8BFA_65AF_5355_4F4DID = stringToFourCCSafe(_____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位类型ID"])
 local function ____on_63D0_7C73_8BFA_65AFW(caster, abilityId)
-    if abilityId ~= ____W_6280_80FDID or jass:GetUnitTypeId(caster) ~= _____63D0_7C73_8BFA_65AF_5355_4F4DID then
+    if abilityId ~= ____W_6280_80FDID or jass.GetUnitTypeId(caster) ~= _____63D0_7C73_8BFA_65AF_5355_4F4DID then
         return
     end
-    local target = jass:GetSpellTargetUnit()
+    local target = jass.GetSpellTargetUnit()
     if not _____5355_4F4D_5B58_6D3B(target) then
         return
     end
     local cfg = _____63D0_7C73_8BFA_65AF_5355_4F4D_6280_80FD_914D_7F6E.W
-    local level = jass:GetUnitAbilityLevel(caster, ____W_6280_80FDID)
+    local level = jass.GetUnitAbilityLevel(caster, ____W_6280_80FDID)
     local damage = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster) * (cfg["基础攻击力倍率"] + cfg["每级攻击力倍率"] * level)
     local skillInstanceId = _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B({["技能ID"] = ____W_6280_80FDID, ["来源类型"] = "单位技能", ["标签"] = "提米诺斯-圣光", ["持续时间秒"] = 1})
     _____7ED1_5B9A_5355_4F4D_5F53_524D_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(caster, skillInstanceId)
-    local soundIndex = jass:GetRandomInt(0, #cfg["全局音效键"] - 1)
+    local soundIndex = jass.GetRandomInt(0, #cfg["全局音效键"] - 1)
     _____64AD_653E_63D0_7C73_8BFA_65AF_5355_4F4D_97F3_6548(caster, cfg["全局音效键"][soundIndex + 1])
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = caster,
@@ -56,8 +56,8 @@ local function ____on_63D0_7C73_8BFA_65AFW(caster, abilityId)
     })
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = cfg["特效模型"],
-        X = jass:GetUnitX(target),
-        Y = jass:GetUnitY(target),
+        X = jass.GetUnitX(target),
+        Y = jass.GetUnitY(target),
         Z = cfg["特效Z"],
         ["Z轴角度"] = cfg["特效Z轴角度"],
         ["缩放"] = cfg["特效缩放"],
@@ -65,8 +65,8 @@ local function ____on_63D0_7C73_8BFA_65AFW(caster, abilityId)
     })
     local targets = getEnemyUnitsInRange(
         caster,
-        jass:GetUnitX(target),
-        jass:GetUnitY(target),
+        jass.GetUnitX(target),
+        jass.GetUnitY(target),
         cfg["溅射范围"]
     )
     do

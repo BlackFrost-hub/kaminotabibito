@@ -35,7 +35,7 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
 const { 创建点特效, 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
   /** 挂载特效（scale + height 驱动；替代 createUnitEffect 无高度入口的短板） */
-  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number) => any;
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: any) => any;
   销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
 };
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
@@ -269,12 +269,13 @@ export function 施加解析(this: void, 芙莉莲: any, 目标: any, 类型: �
     registerManualBuff(目标, 解析完成BuffID, 被动配置.解析持续秒, 1, { stack: 1 });
     // 解析完成特效一次（复用 CeliaFormulaLockCore；参数配置驱动）
     创建点特效({
-      模型路径: 芙莉莲表现配置.解析完成,
-      X: GetUnitX(目标),
+      模型路径: 芙莉莲表现配置.解析完成.模型路径,
+      RGB: 芙莉莲表现配置.解析完成.RGB,
+          X: GetUnitX(目标),
       Y: GetUnitY(目标),
-      Z: 芙莉莲表现配置.特效参数.解析完成.高度,
-      缩放: 芙莉莲表现配置.特效参数.解析完成.缩放,
-      持续秒: 芙莉莲表现配置.特效参数.解析完成.持续秒,
+      Z: 芙莉莲表现配置.解析完成.高度,
+      缩放: 芙莉莲表现配置.解析完成.缩放,
+      持续秒: 芙莉莲表现配置.解析完成.持续秒,
     });
   } else {
     // 解析中标记 Buff（刷新；解析完成时不叠加中标记）
@@ -286,10 +287,14 @@ export function 施加解析(this: void, 芙莉莲: any, 目标: any, 类型: �
   if (有效类型数 >= 1) {
     const 标记 = 创建单位坐标跟随特效(
       目标,
-      芙莉莲表现配置.解析标记,
+      芙莉莲表现配置.解析标记.模型路径,
       解析标记键(芙莉莲),
-      芙莉莲表现配置.特效参数.解析标记.缩放,
-      芙莉莲表现配置.特效参数.解析标记.高度,
+      芙莉莲表现配置.解析标记.缩放,
+      芙莉莲表现配置.解析标记.高度,
+      undefined,
+      芙莉莲表现配置.解析标记.动画索引,
+      芙莉莲表现配置.解析标记.面向角度,
+      芙莉莲表现配置.解析标记.RGB,
     );
     void 标记;
   }

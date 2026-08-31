@@ -39,7 +39,7 @@ ____exports["获取玩家铃仙英雄"] = function(player)
         return nil
     end
     local hero = _____94C3_4ED9_82F1_96C4_8868[GetPlayerId(player)]
-    if hero == nil or hero == 0 or jass:IsUnitType(hero, jass.UNIT_TYPE_DEAD) then
+    if hero == nil or hero == 0 or jass.IsUnitType(hero, jass.UNIT_TYPE_DEAD) then
         return nil
     end
     return hero
@@ -182,7 +182,7 @@ ____exports["是有效敌对目标"] = function(_____65BD_6CD5_8005, target)
     if IsUnitType(target, jass.UNIT_TYPE_STRUCTURE) then
         return false
     end
-    return jass:IsUnitEnemy(
+    return jass.IsUnitEnemy(
         target,
         GetOwningPlayer(_____65BD_6CD5_8005)
     ) == true

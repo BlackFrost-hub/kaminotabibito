@@ -52,7 +52,7 @@ end
 local function _____8BA1_7B97_53EC_5524_653B_51FB_529B(_____6301_6709_8005, _____57FA_7840_503C, _____653B_51FB_72B6_6001, _____7CFB_6570)
     return _____57FA_7840_503C + GetUnitStateJapi(
         _____6301_6709_8005,
-        jass:ConvertUnitState(_____653B_51FB_72B6_6001)
+        jass.ConvertUnitState(_____653B_51FB_72B6_6001)
     ) * _____7CFB_6570
 end
 local function _____521B_5EFA_5C38_4F53_53EC_5524_7269(_____6301_6709_8005, _____4E0A_4E0B_6587)
@@ -71,12 +71,12 @@ local function _____521B_5EFA_5C38_4F53_53EC_5524_7269(_____6301_6709_8005, ____
     if _____53EC_5524_7269 == nil or _____53EC_5524_7269 == 0 then
         return
     end
-    jass:UnitApplyTimedLife(
+    jass.UnitApplyTimedLife(
         _____53EC_5524_7269,
         stringToFourCC(_____914D_7F6E["限时生命Buff"]),
         _____914D_7F6E["持续时间"]
     )
-    jass:SetUnitState(
+    jass.SetUnitState(
         _____53EC_5524_7269,
         _____5F53_524D_751F_547D_72B6_6001,
         GetUnitStateJapi(_____53EC_5524_7269, _____6700_5927_751F_547D_72B6_6001)

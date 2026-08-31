@@ -13,6 +13,7 @@ local DzSetEffectVertexColor = ____01_FF0E_5171_4EAB.DzSetEffectVertexColor
 local DzSetEffectPos = ____01_FF0E_5171_4EAB.DzSetEffectPos
 local EXEffectMatScale = ____01_FF0E_5171_4EAB.EXEffectMatScale
 local DzSetUnitModel = ____01_FF0E_5171_4EAB.DzSetUnitModel
+local DzSetUnitVertexColor = ____01_FF0E_5171_4EAB.DzSetUnitVertexColor
 local EC_CreateEffect = ____01_FF0E_5171_4EAB.EC_CreateEffect
 local GetOwningPlayer = ____01_FF0E_5171_4EAB.GetOwningPlayer
 local GetUnitFacing = ____01_FF0E_5171_4EAB.GetUnitFacing
@@ -246,6 +247,15 @@ local function _____521D_59CB_5316_5F39_5E55_8868_73B0(_____53C2_6570, _____5F39
         _____521D_59CB_5316_5F39_5E55_5355_4F4D_7C7B_522B(_____53C2_6570, _____5F39_5E55_5355_4F4D)
         if _____53C2_6570["模型"] ~= nil and _____53C2_6570["模型"] ~= "" and DzSetUnitModel ~= nil then
             DzSetUnitModel(_____5F39_5E55_5355_4F4D, _____53C2_6570["模型"])
+        end
+        if _____53C2_6570.RGB ~= nil and _____53C2_6570.RGB["红"] ~= nil and _____53C2_6570.RGB["绿"] ~= nil and _____53C2_6570.RGB["蓝"] ~= nil then
+            DzSetUnitVertexColor(
+                _____5F39_5E55_5355_4F4D,
+                _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(_____53C2_6570.RGB["红"]),
+                _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(_____53C2_6570.RGB["绿"]),
+                _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(_____53C2_6570.RGB["蓝"]),
+                _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(_____53C2_6570.RGB["透明度"] or 255)
+            )
         end
         local _____7F29_653E = _____53C2_6570["缩放"] or 1
         if _____7F29_653E > 0 then

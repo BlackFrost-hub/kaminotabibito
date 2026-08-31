@@ -17,7 +17,7 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____16_FF0E_5355_4F4D_
 local ____14_FF0E_516B_4E91_7D2B = require("系统.05．Buff系统.03．Buff表.02．英雄.14．八云紫")
 local _____516B_4E91_7D2BBuffID = ____14_FF0E_516B_4E91_7D2B["八云紫BuffID"]
 function _____53E5_67C4ID(handle)
-    return (handle == nil or handle == 0) and 0 or jass:GetHandleId(handle)
+    return (handle == nil or handle == 0) and 0 or jass.GetHandleId(handle)
 end
 function _____7ED3_675F_5217_8F66(context, _____4FDD_7559R_671F_95F4D_6392_65A5_8C41_514D)
     if _____4FDD_7559R_671F_95F4D_6392_65A5_8C41_514D == nil then
@@ -52,15 +52,15 @@ function _____6E05_9664_4E8C_6BB5_7B49_5F85(context)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(context["英雄"], _____516B_4E91_7D2BBuffID["R二段窗口"])
 end
 function _____63A8_52A8_76EE_6807(target, directionRadians)
-    local nextX = jass:GetUnitX(target) + Cos(directionRadians) * _____914D_7F6E.R["推动距离"]
-    local nextY = jass:GetUnitY(target) + Sin(directionRadians) * _____914D_7F6E.R["推动距离"]
-    if jass:IsTerrainPathable(nextX, nextY, PATHING_TYPE_WALKABILITY) == true then
+    local nextX = jass.GetUnitX(target) + Cos(directionRadians) * _____914D_7F6E.R["推动距离"]
+    local nextY = jass.GetUnitY(target) + Sin(directionRadians) * _____914D_7F6E.R["推动距离"]
+    if jass.IsTerrainPathable(nextX, nextY, PATHING_TYPE_WALKABILITY) == true then
         return
     end
-    jass:SetUnitPosition(target, nextX, nextY)
+    jass.SetUnitPosition(target, nextX, nextY)
 end
 function _____62E5_6709_5217_8F66_7729_6655(target)
-    return jass:GetUnitAbilityLevel(target, STUN_BUFF_ID) > 0 or jass:GetUnitAbilityLevel(target, PSEUDO_STUN_BUFF_ID) > 0
+    return jass.GetUnitAbilityLevel(target, STUN_BUFF_ID) > 0 or jass.GetUnitAbilityLevel(target, PSEUDO_STUN_BUFF_ID) > 0
 end
 function _____7ED3_7B97_5217_8F66_78B0_649E(context)
     local targets = getEnemyUnitsInRange(context["英雄"], context.X, context.Y, _____914D_7F6E.R["命中范围"])
@@ -97,7 +97,7 @@ function _____7ED3_7B97_5217_8F66_78B0_649E(context)
                 })
                 if _____62E5_6709_5217_8F66_7729_6655(target) then
                     _____63A8_52A8_76EE_6807(target, context["方向弧度"])
-                    jass:SetUnitAnimation(target, "Death")
+                    jass.SetUnitAnimation(target, "Death")
                 end
             end
             ::__continue16::
@@ -126,11 +126,11 @@ function _____521B_5EFA_4E8C_6BB5_5217_8F66(hero, gap, skillInstanceId, _____630
         _____8BBE_7F6E_516B_4E91_7D2BR_671F_95F4D_6392_65A5_8C41_514D(hero, false)
         return false
     end
-    local gapX = jass:GetUnitX(gap["单位"])
-    local gapY = jass:GetUnitY(gap["单位"])
+    local gapX = jass.GetUnitX(gap["单位"])
+    local gapY = jass.GetUnitY(gap["单位"])
     local direction = _____6307_5B9A_65B9_5411 or _____4E24_70B9_89D2_5EA6(
-        jass:GetUnitX(hero),
-        jass:GetUnitY(hero),
+        jass.GetUnitX(hero),
+        jass.GetUnitY(hero),
         gapX,
         gapY
     )
@@ -153,9 +153,9 @@ function _____4E8C_6BB5_7A97_53E3_8D85_65F6(variable)
         _____8BBE_7F6E_516B_4E91_7D2BR_671F_95F4D_6392_65A5_8C41_514D(context["英雄"], false)
         return
     end
-    local heroX = jass:GetUnitX(context["英雄"])
-    local heroY = jass:GetUnitY(context["英雄"])
-    local heroFacing = jass:GetUnitFacing(context["英雄"])
+    local heroX = jass.GetUnitX(context["英雄"])
+    local heroY = jass.GetUnitY(context["英雄"])
+    local heroFacing = jass.GetUnitFacing(context["英雄"])
     local behindRadians = (heroFacing + 180) * bj_DEGTORAD
     local targetX = heroX + Cos(behindRadians) * _____914D_7F6E.R["自动裂隙身后距离"]
     local targetY = heroY + Sin(behindRadians) * _____914D_7F6E.R["自动裂隙身后距离"]
@@ -214,8 +214,8 @@ function _____67E5_627E_5217_8F66_7ECF_8FC7_7684_53E6_4E00_95F4_9699(context)
                 if gapId == context["起点裂隙ID"] then
                     goto __continue33
                 end
-                local gapX = jass:GetUnitX(gap["单位"])
-                local gapY = jass:GetUnitY(gap["单位"])
+                local gapX = jass.GetUnitX(gap["单位"])
+                local gapY = jass.GetUnitY(gap["单位"])
                 local distance = _____70B9_5230_7EBF_6BB5_8DDD_79BB(
                     gapX,
                     gapY,
@@ -266,8 +266,8 @@ function _____5217_8F66Tick(variable)
     end
 end
 function _____542F_52A8_5217_8F66(hero, startGap, direction, canTriggerSecond, skillInstanceId)
-    local x = jass:GetUnitX(startGap["单位"])
-    local y = jass:GetUnitY(startGap["单位"])
+    local x = jass.GetUnitX(startGap["单位"])
+    local y = jass.GetUnitY(startGap["单位"])
     _____8BBE_7F6E_516B_4E91_7D2BR_671F_95F4D_6392_65A5_8C41_514D(hero, true)
     local effect = _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____914D_7F6E.R["列车模型"],
@@ -355,8 +355,8 @@ local function _____9009_62E9_76EE_6807_88C2_9699(hero, targetX, targetY)
             local distance = _____8DDD_79BBXY(
                 targetX,
                 targetY,
-                jass:GetUnitX(gaps[i + 1]["单位"]),
-                jass:GetUnitY(gaps[i + 1]["单位"])
+                jass.GetUnitX(gaps[i + 1]["单位"]),
+                jass.GetUnitY(gaps[i + 1]["单位"])
             )
             if distance < selectedDistance then
                 selected = gaps[i + 1]
@@ -387,12 +387,12 @@ local function _____83B7_53D6R_76D1_542C_4E0A_4E0B_6587(hero)
     return _____662F_516B_4E91_7D2B(hero) and ({["英雄"] = hero}) or nil
 end
 local function _____91CA_653ER(_entry, hero, skillInstanceId)
-    local targetX = jass:GetSpellTargetX()
-    local targetY = jass:GetSpellTargetY()
+    local targetX = jass.GetSpellTargetX()
+    local targetY = jass.GetSpellTargetY()
     local gap = _____9009_62E9_76EE_6807_88C2_9699(hero, targetX, targetY)
     if gap == nil then
-        jass:DisplayTimedTextToPlayer(
-            jass:GetOwningPlayer(hero),
+        jass.DisplayTimedTextToPlayer(
+            jass.GetOwningPlayer(hero),
             0,
             0,
             3,
@@ -402,18 +402,18 @@ local function _____91CA_653ER(_entry, hero, skillInstanceId)
         return
     end
     local direction = _____4E24_70B9_89D2_5EA6(
-        jass:GetUnitX(gap["单位"]),
-        jass:GetUnitY(gap["单位"]),
+        jass.GetUnitX(gap["单位"]),
+        jass.GetUnitY(gap["单位"]),
         targetX,
         targetY
     )
     if _____8DDD_79BBXY(
-        jass:GetUnitX(gap["单位"]),
-        jass:GetUnitY(gap["单位"]),
+        jass.GetUnitX(gap["单位"]),
+        jass.GetUnitY(gap["单位"]),
         targetX,
         targetY
     ) <= 1 then
-        direction = jass:GetUnitFacing(hero)
+        direction = jass.GetUnitFacing(hero)
     end
     _____542F_52A8_5217_8F66(
         hero,

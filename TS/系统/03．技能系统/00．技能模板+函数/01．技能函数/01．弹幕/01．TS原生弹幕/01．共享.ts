@@ -58,6 +58,7 @@ export const DzSetEffectAnimation = japi.DzSetEffectAnimation as ((effect: any, 
 export const DzPlayEffectAnimation = japi.DzPlayEffectAnimation as ((effect: any, animationName: string, link: string) => void) | undefined;
 export const DzGetColor = japi.DzGetColor as (alpha: number, red: number, green: number, blue: number) => number;
 export const DzSetEffectVertexColor = japi.DzSetEffectVertexColor as (effect: any, color: number) => void;
+export const DzSetUnitVertexColor = japi.DzSetUnitVertexColor as (unit: any, r: number, g: number, b: number, a: number) => void;
 export const EXEffectMatReset = japi.EXEffectMatReset as (effect: any) => void;
 export const EXEffectMatRotateY = japi.EXEffectMatRotateY as (effect: any, angle: number) => void;
 export const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as (effect: any, angle: number) => void;

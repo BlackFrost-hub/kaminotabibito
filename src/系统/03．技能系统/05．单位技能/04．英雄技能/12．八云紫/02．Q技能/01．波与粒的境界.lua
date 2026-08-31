@@ -65,15 +65,15 @@ local function _____5F39_5E55Tick(instance, _delta)
         instance["当前方向角"] = _____4E24_70B9_89D2_5EA6(
             instance["当前X"],
             instance["当前Y"],
-            jass:GetUnitX(targetGap["单位"]),
-            jass:GetUnitY(targetGap["单位"])
+            jass.GetUnitX(targetGap["单位"]),
+            jass.GetUnitY(targetGap["单位"])
         )
     end
     local touched = _____67E5_627E_516B_4E91_7D2B_88C2_9699(instance["当前X"], instance["当前Y"], _____914D_7F6E["裂隙"]["扩散触发半径"], context["施法者"])
     if touched == nil then
         return
     end
-    local gapId = jass:GetHandleId(touched["单位"])
+    local gapId = jass.GetHandleId(touched["单位"])
     if context["已触发裂隙"][gapId] == true then
         return
     end
@@ -127,8 +127,8 @@ ____exports["发射八云紫弹幕"] = function(options)
     return instance["弹幕ID"]
 end
 local function _____53D1_5C04_516D_5411_5F3A_5316_5F39_5E55(hero, gap)
-    local x = jass:GetUnitX(gap["单位"])
-    local y = jass:GetUnitY(gap["单位"])
+    local x = jass.GetUnitX(gap["单位"])
+    local y = jass.GetUnitY(gap["单位"])
     _____521B_5EFA_516B_4E91_7D2B_70B9_7279_6548(
         "war3mapImported\\ancientexplodeblue.mdx",
         x,
@@ -162,8 +162,8 @@ local function _____53D1_5C04_6307_5B9A_88C2_9699_6CE2(variable)
     if data == nil or not _____516B_4E91_7D2B_5355_4F4D_5B58_6D3B(data["英雄"]) or data["裂隙"]["已结束"] then
         return
     end
-    local x = jass:GetUnitX(data["裂隙"]["单位"])
-    local y = jass:GetUnitY(data["裂隙"]["单位"])
+    local x = jass.GetUnitX(data["裂隙"]["单位"])
+    local y = jass.GetUnitY(data["裂隙"]["单位"])
     _____64AD_653E_516B_4E91_7D2B_5355_4F4D_97F3_6548(data["英雄"], _____914D_7F6E.Q["裂隙爆发音效键"], true)
     _____521B_5EFA_516B_4E91_7D2B_70B9_7279_6548(
         "war3mapImported\\ancientexplodeblue.mdx",
@@ -204,13 +204,13 @@ local function _____83B7_53D6Q_4E0A_4E0B_6587(hero)
     return _____662F_516B_4E91_7D2B(hero) and ({["英雄"] = hero}) or nil
 end
 local function _____91CA_653EQ(_context, hero, skillInstanceId)
-    local heroX = jass:GetUnitX(hero)
-    local heroY = jass:GetUnitY(hero)
-    local targetX = jass:GetSpellTargetX()
-    local targetY = jass:GetSpellTargetY()
+    local heroX = jass.GetUnitX(hero)
+    local heroY = jass.GetUnitY(hero)
+    local targetX = jass.GetSpellTargetX()
+    local targetY = jass.GetSpellTargetY()
     local targetGap = _____67E5_627E_516B_4E91_7D2B_88C2_9699(targetX, targetY, 100, hero)
     _____6DFB_52A0_5355_4F4D_6682_505C(hero, ____Q_6682_505C_6765_6E90)
-    jass:SetUnitAnimation(hero, "attack,2")
+    jass.SetUnitAnimation(hero, "attack,2")
     addDelayedCallback(_____914D_7F6E.Q["硬直秒"] * 1000, _____89E3_9664Q_786C_76F4, hero)
     if targetGap ~= nil then
         _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(hero, _____914D_7F6E.Q["指定裂隙语音键"])

@@ -445,7 +445,7 @@ local function _____91CA_653EW_53D1_5C04(_entry, caster, _____6280_80FD_5B9E_4F8
     local attack = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(caster)
     local _____4F24_5BB3 = attack * _____7CFB_6570 * dMultiplier
     local _____6CBB_7597 = _____4F24_5BB3 * _____914D_7F6E.W["治疗占伤害比例"]
-    local projectileTicks = _____914D_7F6E.W["弹道基础Tick"] + jass:R2I(_____914D_7F6E.W["每系数弹道Tick"] * _____7CFB_6570 + 0.5)
+    local projectileTicks = _____914D_7F6E.W["弹道基础Tick"] + jass.R2I(_____914D_7F6E.W["每系数弹道Tick"] * _____7CFB_6570 + 0.5)
     context["阶段"] = "发射中"
     local chargeId = context["充能ID"]
     context["充能ID"] = 0

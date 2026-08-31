@@ -596,7 +596,7 @@ ____exports["静态支线交互配置列表"] = {__TS__SparseArraySpread(____arr
 local function _____6821_9A8C_9759_6001_652F_7EBF_4EA4_4E92_914D_7F6E()
     local _____5DF2_4F7F_7528_4EFB_52A1ID = {}
     for ____, _____4EA4_4E92_914D_7F6E in ipairs(____exports["静态支线交互配置列表"]) do
-        local _____4EFB_52A1_952E = tostring(nil, _____4EA4_4E92_914D_7F6E["任务ID"])
+        local _____4EFB_52A1_952E = tostring(_____4EA4_4E92_914D_7F6E["任务ID"])
         if _____5DF2_4F7F_7528_4EFB_52A1ID[_____4EFB_52A1_952E] then
             error(
                 __TS__New(Error, "静态支线交互配置存在重复任务ID: " .. _____4EFB_52A1_952E),

@@ -95,7 +95,7 @@ local function _____7ED3_675FD_6280_80FD(context)
         end
     end
     if context["枚举组"] ~= nil and context["枚举组"] ~= 0 then
-        jass:DestroyGroup(context["枚举组"])
+        jass.DestroyGroup(context["枚举组"])
     end
     context["枚举组"] = nil
     _____5B89_5168_79FB_9664_5355_4F4D_58F3(context["世界单位"])
@@ -103,8 +103,8 @@ local function _____7ED3_675FD_6280_80FD(context)
 end
 local function _____679A_4E3ED_8303_56F4_5355_4F4D(context)
     local group = context["枚举组"]
-    jass:GroupClear(group)
-    jass:GroupEnumUnitsInRange(
+    jass.GroupClear(group)
+    jass.GroupEnumUnitsInRange(
         group,
         context["中心X"],
         context["中心Y"],
@@ -114,11 +114,11 @@ local function _____679A_4E3ED_8303_56F4_5355_4F4D(context)
     local result = {}
     while true do
         do
-            local unit = jass:FirstOfGroup(group)
+            local unit = jass.FirstOfGroup(group)
             if unit == nil or unit == 0 then
                 break
             end
-            jass:GroupRemoveUnit(group, unit)
+            jass.GroupRemoveUnit(group, unit)
             if unit == context["施法者"] or unit == context["世界单位"] then
                 goto __continue17
             end
@@ -208,7 +208,7 @@ local function _____91CA_653E_5341_516D_591C_54B2_591CD(_listener, caster)
         Tick = 0,
         ["周期ID"] = 0,
         ["已结束"] = false,
-        ["枚举组"] = jass:CreateGroup(),
+        ["枚举组"] = jass.CreateGroup(),
         ["记录"] = {}
     }
     _____64AD_653E_54B2_591C_5750_6807_97F3_6548("gg_snd_FlameStrikeTargetWaveNonLoop1", x, y)

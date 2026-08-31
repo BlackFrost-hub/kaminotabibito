@@ -27,17 +27,17 @@ function ____exports.SU_SetUnitFlyHeight(whichUnit, newHeight, rate)
         return
     end
     local AMRF = 1097691750
-    jass:UnitAddAbility(whichUnit, AMRF)
-    jass:UnitRemoveAbility(whichUnit, AMRF)
-    jass:SetUnitFlyHeight(whichUnit, newHeight, rate)
+    jass.UnitAddAbility(whichUnit, AMRF)
+    jass.UnitRemoveAbility(whichUnit, AMRF)
+    jass.SetUnitFlyHeight(whichUnit, newHeight, rate)
 end
 function ____exports.SU_GetHeroAllState(u, b)
     if not SUC_IsValidUnit(u) then
         return 0
     end
-    local str = jass:GetHeroStr(u, b)
-    local agi = jass:GetHeroAgi(u, b)
-    local int = jass:GetHeroInt(u, b)
+    local str = jass.GetHeroStr(u, b)
+    local agi = jass.GetHeroAgi(u, b)
+    local int = jass.GetHeroInt(u, b)
     return str + agi + int
 end
 function ____exports.SU_GetUnitLostHPPercent(u)
@@ -45,7 +45,7 @@ function ____exports.SU_GetUnitLostHPPercent(u)
         return 0
     end
     local maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE)
-    local life = jass:GetUnitState(u, jass.UNIT_STATE_LIFE)
+    local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
     if maxLife <= 0 then
         return 0
     end
@@ -56,19 +56,19 @@ function ____exports.SU_GetUnitLostHP(u)
         return 0
     end
     local maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE)
-    local life = jass:GetUnitState(u, jass.UNIT_STATE_LIFE)
+    local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
     return maxLife - life
 end
 function ____exports.UnitAddHp(u, value, b)
     if not SUC_IsValidUnit(u) then
         return
     end
-    local life = jass:GetUnitState(u, jass.UNIT_STATE_LIFE)
+    local life = jass.GetUnitState(u, jass.UNIT_STATE_LIFE)
     local maxLife = GetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE)
     local percent = maxLife > 0 and life / maxLife or 1
     local addValue = b and maxLife * value or value
     SetUnitStateJapi(u, jass.UNIT_STATE_MAX_LIFE, maxLife + addValue)
-    jass:SetUnitState(u, jass.UNIT_STATE_LIFE, (maxLife + addValue) * percent)
+    jass.SetUnitState(u, jass.UNIT_STATE_LIFE, (maxLife + addValue) * percent)
 end
 function ____exports.SU_IsUnitDie(u)
     return SUC_IsUnitAlive(u)
@@ -78,7 +78,7 @@ function ____exports.SU_ShowOrHideUnit(u, isShow)
         return
     end
     if isShow then
-        jass:SetUnitVertexColor(
+        jass.SetUnitVertexColor(
             u,
             255,
             255,
@@ -86,7 +86,7 @@ function ____exports.SU_ShowOrHideUnit(u, isShow)
             255
         )
     else
-        jass:SetUnitVertexColor(
+        jass.SetUnitVertexColor(
             u,
             255,
             255,
@@ -105,31 +105,31 @@ function ____exports.IsWaterElement(u)
         return false
     end
     local BHWE = 1112045413
-    return jass:GetUnitAbilityLevel(u, BHWE) ~= 0
+    return jass.GetUnitAbilityLevel(u, BHWE) ~= 0
 end
 function ____exports.GetUnitTimedLifeID(u)
     if not SUC_IsValidUnit(u) then
         return ____exports.TIMED_LIFE_NONE
     end
-    if jass:GetUnitAbilityLevel(u, 1112891758) ~= 0 then
+    if jass.GetUnitAbilityLevel(u, 1112891758) ~= 0 then
         return ____exports.TIMED_LIFE_RAISE_DEAD
     end
-    if jass:GetUnitAbilityLevel(u, 1113682028) ~= 0 then
+    if jass.GetUnitAbilityLevel(u, 1113682028) ~= 0 then
         return ____exports.TIMED_LIFE_DISEASE_CLOUD
     end
-    if jass:GetUnitAbilityLevel(u, 1111844454) ~= 0 then
+    if jass.GetUnitAbilityLevel(u, 1111844454) ~= 0 then
         return ____exports.TIMED_LIFE_FORCE_OF_NATURE
     end
-    if jass:GetUnitAbilityLevel(u, 1114142564) ~= 0 then
+    if jass.GetUnitAbilityLevel(u, 1114142564) ~= 0 then
         return ____exports.TIMED_LIFE_HEALING_WARD
     end
-    if jass:GetUnitAbilityLevel(u, 1114792297) ~= 0 then
+    if jass.GetUnitAbilityLevel(u, 1114792297) ~= 0 then
         return ____exports.TIMED_LIFE_ANIMATE_DEAD
     end
-    if jass:GetUnitAbilityLevel(u, 1112045413) ~= 0 then
+    if jass.GetUnitAbilityLevel(u, 1112045413) ~= 0 then
         return ____exports.TIMED_LIFE_WATER_ELEMENTAL
     end
-    if jass:GetUnitAbilityLevel(u, 1112820806) ~= 0 then
+    if jass.GetUnitAbilityLevel(u, 1112820806) ~= 0 then
         return ____exports.TIMED_LIFE_TIMED
     end
     return ____exports.TIMED_LIFE_NONE

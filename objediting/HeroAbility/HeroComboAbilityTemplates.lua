@@ -14,14 +14,21 @@ function createPlayerHeroChannelAbility(id, name, options)
   ability:setHeroAbility(options.heroAbility ~= false)
   ability:setItemAbility(false)
   local levels = options.levels or 1
+  -- Channel duration data (102/103) is repurposed by the runtime as a
+  -- percentage mana cost for player-hero shells. A provided percentage
+  -- always replaces fixed mana so the two cost models cannot stack.
+  local percentManaCost = options.percentManaCost
+  local fixedManaCost = percentManaCost ~= nil and 0 or (options.manaCost or 0)
+  local normalDuration = options.durationNormal ~= nil and options.durationNormal or (percentManaCost or 0)
+  local heroDuration = options.durationHero ~= nil and options.durationHero or (percentManaCost or 0)
   ability:setLevels(levels)
   for level = 1, levels do
     ability:setCooldown(level, options.cooldown ~= nil and options.cooldown or 1)
-    ability:setManaCost(level, options.manaCost or 0)
+    ability:setManaCost(level, fixedManaCost)
     ability:setCastRange(level, options.castRange or 900)
     ability:setAreaofEffect(level, options.area or 0)
-    ability:setDurationNormal(level, options.durationNormal or 0)
-    ability:setDurationHero(level, options.durationHero or 0)
+    ability:setDurationNormal(level, normalDuration)
+    ability:setDurationHero(level, heroDuration)
     ability:setTargetsAllowed(level, options.targetsAllowed or 'ground,air,enemy,neutral,nonsapper')
     ability:setFollowThroughTime(level, options.followThroughTime or 0)
     ability:setTargetType(level, options.targetType ~= nil and options.targetType or 2)

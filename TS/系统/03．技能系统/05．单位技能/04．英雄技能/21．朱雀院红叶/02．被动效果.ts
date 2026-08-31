@@ -3,6 +3,7 @@
 import {
   朱雀院红叶技能配置,
   朱雀院红叶表现配置,
+  朱雀院红叶音效配置,
   朱雀院红叶Buff配置,
   朱雀院红叶被动配置,
 } from "./00．配置";
@@ -32,11 +33,14 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
 const { 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   单位存活: (this: void, unit: any) => boolean;
 };
-const { createUnitEffect, destroyUnitEffect, 创建点特效, 设置特效缩放 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
-  destroyUnitEffect: (this: void, unit: any, effectKey?: string) => void;
+const { 创建单位坐标跟随特效, 销毁单位坐标跟随特效, 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }) => any;
+  销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
   创建点特效: (this: void, 参数: any) => any;
-  设置特效缩放: (this: void, effect: any, scale: number) => void;
+};
+const { Sound3DII_UnitPlayReuse, Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院红叶技能配置.单位类型ID);
@@ -99,7 +103,7 @@ export function 清理朱雀院红叶状态(this: void, 英雄: any, _原因: st
   const 状态 = 英雄状态表[id];
   if (状态 == null) return;
   // 刀势表现与 Buff
-  destroyUnitEffect(英雄, 刀势特效键);
+  销毁单位坐标跟随特效(英雄, 刀势特效键);
   移除单位指定Buff(英雄, 刀势BuffID);
   // 技能清理表（Q2 壳 / W 招架 / E 剑痕 / D 强化等）
   for (const key in 状态.技能清理表) {
@@ -136,7 +140,7 @@ export function 移除目标破绽(this: void, 目标: any): void {
   const 状态 = 破绽目标表[id];
   if (状态 == null) return;
   if (状态.到期回调ID !== 0) removeDelayedCallback(状态.到期回调ID);
-  destroyUnitEffect(目标, 破绽特效键);
+  销毁单位坐标跟随特效(目标, 破绽特效键);
   移除单位指定Buff(目标, 破绽BuffID);
   delete 破绽目标表[id];
 }
@@ -147,6 +151,7 @@ export function 施加朱雀院破绽(this: void, 红叶: any, 目标: any): voi
   if (目标 === 红叶) return;
   const id = GetHandleId(目标);
   const 旧状态 = 破绽目标表[id];
+  const 首次获得破绽 = 旧状态 == null;
   if (旧状态 != null && 旧状态.到期回调ID !== 0) removeDelayedCallback(旧状态.到期回调ID);
   const 持续毫秒 = 朱雀院红叶被动配置.破绽持续秒 * 1000;
   const 状态: 破绽目标状态 = {
@@ -160,10 +165,23 @@ export function 施加朱雀院破绽(this: void, 红叶: any, 目标: any): voi
   });
   破绽目标表[id] = 状态;
   // 表现：目标躯干挂点朱红断刃标记（刷新时先销毁旧表现）
-  destroyUnitEffect(目标, 破绽特效键);
-  const 破绽特效 = createUnitEffect(目标, "origin", 朱雀院红叶表现配置.破绽标记, 朱雀院红叶表现配置.参数.破绽标记.持续秒, 破绽特效键);
-  设置特效缩放(破绽特效, 朱雀院红叶表现配置.参数.破绽标记.缩放);
+  销毁单位坐标跟随特效(目标, 破绽特效键);
+  创建单位坐标跟随特效(
+    目标,
+    朱雀院红叶表现配置.破绽标记.模型路径,
+    破绽特效键,
+    朱雀院红叶表现配置.破绽标记.缩放,
+    朱雀院红叶表现配置.破绽标记.高度,
+    1,
+    undefined,
+    0,
+    朱雀院红叶表现配置.破绽标记.RGB,
+  );
   registerManualBuff(目标, 破绽BuffID, 朱雀院红叶被动配置.破绽持续秒, 1, { stack: 1 });
+  // 破绽标记音（目标首次获得破绽时一次；刷新已有破绽不播；坐标=目标位置，参数配置驱动）
+  if (首次获得破绽) {
+    Sound3DII_CooPlayReuse(朱雀院红叶音效配置.破绽标记.路径, jass.GetUnitX(目标), jass.GetUnitY(目标), 朱雀院红叶音效配置.破绽标记.高度, 朱雀院红叶音效配置.破绽标记.裁断距离);
+  }
 }
 
 //=============================================================================
@@ -172,13 +190,22 @@ export function 施加朱雀院破绽(this: void, 红叶: any, 目标: any): voi
 
 function 刷新刀势表现(this: void, 英雄: any, 层数: number): void {
   // 层数特效互斥：先销毁旧层，再创建当前层
-  destroyUnitEffect(英雄, 刀势特效键);
+  销毁单位坐标跟随特效(英雄, 刀势特效键);
   移除单位指定Buff(英雄, 刀势BuffID);
   if (层数 <= 0) return;
-  const 模型 = 朱雀院红叶表现配置.刀势层数[层数 - 1];
+  const 模型 = 朱雀院红叶表现配置.刀势层数.模型路径[层数 - 1];
   if (模型 != null) {
-    const 刀势特效 = createUnitEffect(英雄, "origin", 模型, undefined, 刀势特效键);
-    设置特效缩放(刀势特效, 朱雀院红叶表现配置.参数.刀势层数.缩放);
+    创建单位坐标跟随特效(
+      英雄,
+      模型,
+      刀势特效键,
+      朱雀院红叶表现配置.刀势层数.缩放,
+      朱雀院红叶表现配置.刀势层数.高度,
+      1,
+      undefined,
+      0,
+      朱雀院红叶表现配置.刀势层数.RGB,
+    );
   }
   registerManualBuff(英雄, 刀势BuffID, 9999, 层数, { stack: 层数 });
 }
@@ -192,15 +219,20 @@ export function 增加刀势(this: void, 英雄: any, 层数: number): void {
   if (新层数 === 原层数) return;
   状态.刀势层数 = 新层数;
   刷新刀势表现(英雄, 新层数);
-  if (新层数 >= 刀势上限 && 朱雀院红叶表现配置.满刀势提示特效 != null && 朱雀院红叶表现配置.满刀势提示特效 !== "") {
+  if (新层数 >= 刀势上限 && 朱雀院红叶表现配置.满刀势提示.模型路径 !== "") {
     创建点特效({
-      模型路径: 朱雀院红叶表现配置.满刀势提示特效,
+      模型路径: 朱雀院红叶表现配置.满刀势提示.模型路径,
+      RGB: 朱雀院红叶表现配置.满刀势提示.RGB,
       X: jass.GetUnitX(英雄),
       Y: jass.GetUnitY(英雄),
-      Z: 朱雀院红叶表现配置.参数.满刀势提示.高度,
-      缩放: 朱雀院红叶表现配置.参数.满刀势提示.缩放,
-      持续秒: 朱雀院红叶表现配置.参数.满刀势提示.持续秒,
+      Z: 朱雀院红叶表现配置.满刀势提示.高度,
+      缩放: 朱雀院红叶表现配置.满刀势提示.缩放,
+      持续秒: 朱雀院红叶表现配置.满刀势提示.持续秒,
     });
+  }
+  // 刀势满层音（刀势从 2 层进入 3 层时一次；1→2 层不播；单位绑定，参数配置驱动）
+  if (新层数 >= 刀势上限) {
+    Sound3DII_UnitPlayReuse(朱雀院红叶音效配置.刀势满层.路径, 英雄, 朱雀院红叶音效配置.刀势满层.裁断距离);
   }
 }
 
@@ -273,14 +305,15 @@ function 处理红叶普攻破绽斩(this: void, target: any, attacker: any, app
     参与技能伤害加成: false,
   });
   // 破绽斩表现（候选未迁入则留空不播）
-  if (朱雀院红叶表现配置.破绽斩特效 != null && 朱雀院红叶表现配置.破绽斩特效 !== "") {
+  if (朱雀院红叶表现配置.破绽斩.模型路径 !== "") {
     创建点特效({
-      模型路径: 朱雀院红叶表现配置.破绽斩特效,
+      模型路径: 朱雀院红叶表现配置.破绽斩.模型路径,
+      RGB: 朱雀院红叶表现配置.破绽斩.RGB,
       X: jass.GetUnitX(target),
       Y: jass.GetUnitY(target),
-      Z: 朱雀院红叶表现配置.参数.破绽斩.高度,
-      缩放: 朱雀院红叶表现配置.参数.破绽斩.缩放,
-      持续秒: 朱雀院红叶表现配置.参数.破绽斩.持续秒,
+      Z: 朱雀院红叶表现配置.破绽斩.高度,
+      缩放: 朱雀院红叶表现配置.破绽斩.缩放,
+      持续秒: 朱雀院红叶表现配置.破绽斩.持续秒,
     });
   }
   // 消费目标破绽 + 同目标内部冷却（防止重新施加后立即再次触发）

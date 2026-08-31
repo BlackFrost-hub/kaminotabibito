@@ -36,7 +36,7 @@ function ____exports.isBlacklistedSkill(abilityId)
 end
 --- 检查单位是否为特殊单位（E001不参与冷却缩减）
 function ____exports.isExcludedUnit(unit)
-    local unitTypeId = jass:GetUnitTypeId(unit)
+    local unitTypeId = jass.GetUnitTypeId(unit)
     return unitTypeId == _____8F6C_56DB_5B57_8282(_____63D0_53D6_5185_90E8ID(EXCLUDED_COOLDOWN_UNIT))
 end
 --- 冷却属性读取规则：
@@ -50,7 +50,7 @@ local function getCooldownAttrValue(unit, attrName)
     if unitValue > 0.01 then
         return unitValue
     end
-    local player = jass:GetOwningPlayer(unit)
+    local player = jass.GetOwningPlayer(unit)
     if player == nil then
         return 0
     end

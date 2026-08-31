@@ -192,3 +192,4 @@ export * from "./188．黑翼守护重盾";
 export * from "./189．滴管长枪投影";
 export * from "./190．真祖女武神血铠";
 export * from "./191．英灵战乙女蔷薇镜";
+export * from "./192．深井活水囊";

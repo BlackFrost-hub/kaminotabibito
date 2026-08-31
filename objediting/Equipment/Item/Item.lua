@@ -693,3 +693,137 @@ createEquipmentItem('I0K4', '魔焰统御法印', {
   tooltipExtended = '|cffccffff[饰品/法印]-魔焰输出循环|r|n|cffffcc99等级：B+|n评分：8200|r|n|cffffffcc[基础属性]|r|n智力+50|n魔法伤害+18%|n暗属性伤害+18%|n冷却缩减+10%|n魔法恢复+18|n|cFF808080敌对领袖以法印约束麾下魔焰，失去主人后，其中的火光仍在服从更强的意志。|r',
   description = '|cffccffff[饰品/法印]-魔焰输出循环|r|n|cffffcc99等级：B+|n评分：8200|r|n|cffffffcc[基础属性]|r|n智力+50|n魔法伤害+18%|n暗属性伤害+18%|n冷却缩减+10%|n魔法恢复+18|n|cFF808080敌对领袖以法印约束麾下魔焰，失去主人后，其中的火光仍在服从更强的意志。|r',
 })
+
+createEquipmentItem('I0G8', '祭血之皿', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\blood_pact_bowl.blp',
+  model = 'Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 5,
+  score = 5400,
+  tooltipExtended = '|cffccffff[道具/饰品]-攻击/续航|r|n|cffffcc99等级：C+|n评分：5400|r|n|cffffffcc[基础属性]|r|n攻击力+75|n生命值+1000|n生命恢复+70|n|cFF808080血坛上残留的祭器，皿中血液百年不涸。触碰它的人会听见低语——那是力量与代价的古老交易。|r',
+  description = '|cffccffff[道具/饰品]-攻击/续航|r|n|cffffcc99等级：C+|n评分：5400|r|n|cffffffcc[基础属性]|r|n攻击力+75|n生命值+1000|n生命恢复+70|n|cFF808080血坛上残留的祭器，皿中血液百年不涸。触碰它的人会听见低语——那是力量与代价的古老交易。|r',
+})
+
+createEquipmentItem('I0H7', '祖地纹章徽记', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\elven_herald_crest.blp',
+  model = 'Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 5,
+  score = 5700,
+  tooltipExtended = '|cffccffff[道具/饰品]-均衡/守护|r|n|cffffcc99等级：C+|n评分：5700|r|n|cffffffcc[基础属性]|r|n全属性+22|n护甲+12|n生命值+1100|n|cFF808080沉在祖地池底的旧徽记，鹿王纹章依然清晰。它曾属于一位再也没能走出祖地的守誓者。|r',
+  description = '|cffccffff[道具/饰品]-均衡/守护|r|n|cffffcc99等级：C+|n评分：5700|r|n|cffffffcc[基础属性]|r|n全属性+22|n护甲+12|n生命值+1100|n|cFF808080沉在祖地池底的旧徽记，鹿王纹章依然清晰。它曾属于一位再也没能走出祖地的守誓者。|r',
+})
+
+createEquipmentItem('I0K6', '封印旧档书签', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\sealed_archive_bookmark.blp',
+  model = 'war3mapImported\\TomeOfRetraining.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 5,
+  score = 5600,
+  tooltipExtended = '|cffccffff[饰品/书签]-法术循环|r|n|cffffcc99等级：C+|n评分：5600|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法值+1200|n魔法恢复+16|n魔法伤害+15%|n冷却缩减+10%|n|cFF808080夹在残缺旧档中的封印书签，仍保存着王庭秘术最后一缕清醒的回响。|r',
+  description = '|cffccffff[饰品/书签]-法术循环|r|n|cffffcc99等级：C+|n评分：5600|r|n|cffffffcc[基础属性]|r|n智力+45|n魔法值+1200|n魔法恢复+16|n魔法伤害+15%|n冷却缩减+10%|n|cFF808080夹在残缺旧档中的封印书签，仍保存着王庭秘术最后一缕清醒的回响。|r',
+})
+
+createEquipmentItem('I0K7', '王庭旧誓徽章', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\royal_oath_badge.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 5,
+  score = 5800,
+  tooltipExtended = '|cffccffff[饰品/徽章]-前排守护|r|n|cffffcc99等级：C+|n评分：5800|r|n|cffffffcc[基础属性]|r|n力量+30|n生命值+1800|n护甲+28|n眩晕抗性+20%|n|cFF808080王庭旧令优先保护平民，这枚徽章将那份职责留给了后来者。|r',
+  description = '|cffccffff[饰品/徽章]-前排守护|r|n|cffffcc99等级：C+|n评分：5800|r|n|cffffffcc[基础属性]|r|n力量+30|n生命值+1800|n护甲+28|n眩晕抗性+20%|n|cFF808080王庭旧令优先保护平民，这枚徽章将那份职责留给了后来者。|r',
+})
+
+createEquipmentItem('I0K8', '影旗追猎徽记', {
+  baseId = 'ratf',
+  icon = 'Equipment\\Icon\\Item\\shadow_oath_hunt_signet.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 7000,
+  tooltipExtended = '|cffccffff[饰品/徽记]-敏捷/追猎|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n攻击力+110|n敏捷+40|n暴击率+12%|n攻击速度+25%|n移动速度+8%|n|cFF808080旧战旗后的追猎徽记曾属于负责清理洞窟退路的人，旗帜倒下后，它仍记得该往哪里追。|r',
+  description = '|cffccffff[饰品/徽记]-敏捷/追猎|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[基础属性]|r|n攻击力+110|n敏捷+40|n暴击率+12%|n攻击速度+25%|n移动速度+8%|n|cFF808080旧战旗后的追猎徽记曾属于负责清理洞窟退路的人，旗帜倒下后，它仍记得该往哪里追。|r',
+})
+
+createEquipmentItem('I0K9', '夜行教团坠饰', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\night_cult_pendant.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 6900,
+  tooltipExtended = '|cffccffff[饰品/坠饰]-游走闪避|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n敏捷+30|n生命值+1000|n护甲+22|n闪避+15%|n移动速度+10%|n生命恢复+45|n|cFF808080教团信使夜间穿越恶魔城时贴身佩戴的坠饰，链扣内侧刻着同一句告诫：别停下脚步。|r',
+  description = '|cffccffff[饰品/坠饰]-游走闪避|r|n|cffffcc99等级：B|n评分：6900|r|n|cffffffcc[基础属性]|r|n敏捷+30|n生命值+1000|n护甲+22|n闪避+15%|n移动速度+10%|n生命恢复+45|n|cFF808080教团信使夜间穿越恶魔城时贴身佩戴的坠饰，链扣内侧刻着同一句告诫：别停下脚步。|r',
+})
+
+createEquipmentItem('I0KA', '深井活水囊', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\deepwell_water_flask.blp',
+  model = 'war3mapImported\\Urn.mdl',
+  abilities = 'IN02',
+  cooldownGroup = 'IN02',
+  classification = 'PowerUp',
+  level = 6,
+  score = 7000,
+  activelyUsed = true,
+  tooltipExtended = '|cffccffff[道具/水囊]-主动恢复|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[使用]|r饮下深井活水，立即恢复30%最大生命与30%最大魔法，冷却15秒。|n|cFF808080井早已断流，囊中的水却仍在轻轻晃动——迷宫深处的供水系统，还在为记得它的人运转。|r',
+  description = '|cffccffff[道具/水囊]-主动恢复|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[使用]|r饮下深井活水，立即恢复30%最大生命与30%最大魔法，冷却15秒。|n|cFF808080井早已断流，囊中的水却仍在轻轻晃动——迷宫深处的供水系统，还在为记得它的人运转。|r',
+})
+
+createEquipmentItem('I0KB', '焚羽余烬晶核', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\phoenix_ember_core_postbattle.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 7,
+  score = 8900,
+  tooltipExtended = '|cffccffff[饰品/晶核]-元素施法|r|n|cffffcc99等级：B++|n评分：8900|r|n|cffffffcc[基础属性]|r|n智力+55|n魔法伤害+18%|n火属性伤害+18%|n水属性伤害+18%|n生命恢复+24|n|cFF808080凤凰熄灭后的晶核仍保存着冷热交替的余温，触碰时仿佛有两种火焰在同一枚碎片中呼吸。|r',
+  description = '|cffccffff[饰品/晶核]-元素施法|r|n|cffffcc99等级：B++|n评分：8900|r|n|cffffffcc[基础属性]|r|n智力+55|n魔法伤害+18%|n火属性伤害+18%|n水属性伤害+18%|n生命恢复+24|n|cFF808080凤凰熄灭后的晶核仍保存着冷热交替的余温，触碰时仿佛有两种火焰在同一枚碎片中呼吸。|r',
+})
+
+createEquipmentItem('I0KC', '七晶封印棱章', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\seven_crystal_seal_prism.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 7,
+  score = 9800,
+  tooltipExtended = '|cffccffff[饰品/棱章]-封印守护|r|n|cffffcc99等级：B++|n评分：9800|r|n|cffffffcc[基础属性]|r|n全属性+34|n生命值+2500|n护甲+28|n魔法抗性+18%|n冷却缩减+6%|n|cFF808080七颗晶石在棱面深处保持着同一频率的微光，像是把那场守护战最后稳定下来的力量封存在其中。|r',
+  description = '|cffccffff[饰品/棱章]-封印守护|r|n|cffffcc99等级：B++|n评分：9800|r|n|cffffffcc[基础属性]|r|n全属性+34|n生命值+2500|n护甲+28|n魔法抗性+18%|n冷却缩减+6%|n|cFF808080七颗晶石在棱面深处保持着同一频率的微光，像是把那场守护战最后稳定下来的力量封存在其中。|r',
+})
+
+createEquipmentItem('I0KD', '英魂归寂长灯', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\soul_rest_lantern.blp',
+  model = 'war3mapImported\\Lightforged Lantern.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 7,
+  score = 10100,
+  tooltipExtended = '|cffccffff[饰品/长灯]-技能续航|r|n|cffffcc99等级：B++|n评分：10100|r|n|cffffffcc[基础属性]|r|n冷却缩减+14%|n技能治疗率+25%|n魔法恢复+32|n生命值+2200|n控制抗性+22%|n|cFF808080长灯中的微光终于安静下来，墓地深处的英魂不再召唤后来者，只把最后一缕守望留给持灯的人。|r',
+  description = '|cffccffff[饰品/长灯]-技能续航|r|n|cffffcc99等级：B++|n评分：10100|r|n|cffffffcc[基础属性]|r|n冷却缩减+14%|n技能治疗率+25%|n魔法恢复+32|n生命值+2200|n控制抗性+22%|n|cFF808080长灯中的微光终于安静下来，墓地深处的英魂不再召唤后来者，只把最后一缕守望留给持灯的人。|r',
+})
+
+createEquipmentItem('I0KH', '熔渊坠饰', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\Item\\abyss_cult_pendant_charm.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 8300,
+  tooltipExtended = '|cffccffff[饰品/坠饰]-游走闪避·强化|r|n|cffffcc99等级：B+|n评分：8300|r|n|cffffffcc[基础属性]|r|n敏捷+35|n生命值+1800|n护甲+25|n闪避+20%|n移动速度+12%|n生命恢复+50|n|cFF808080坠饰里的教团印记被熔渊之火重新烧亮，告诫也换了措辞：现在，别停下脚步。|r',
+  description = '|cffccffff[饰品/坠饰]-游走闪避·强化|r|n|cffffcc99等级：B+|n评分：8300|r|n|cffffffcc[基础属性]|r|n敏捷+35|n生命值+1800|n护甲+25|n闪避+20%|n移动速度+12%|n生命恢复+50|n|cFF808080坠饰里的教团印记被熔渊之火重新烧亮，告诫也换了措辞：现在，别停下脚步。|r',
+})

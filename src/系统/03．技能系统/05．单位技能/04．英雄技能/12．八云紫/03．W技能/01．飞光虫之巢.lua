@@ -50,19 +50,19 @@ local function _____53D1_5C04W_4E00_6CE2(variable)
                 if not _____516B_4E91_7D2B_5355_4F4D_5B58_6D3B(gap) then
                     goto __continue6
                 end
-                local x = jass:GetUnitX(gap)
-                local y = jass:GetUnitY(gap)
+                local x = jass.GetUnitX(gap)
+                local y = jass.GetUnitY(gap)
                 local hasTarget = _____516B_4E91_7D2B_5355_4F4D_5B58_6D3B(context["目标单位"])
                 local ____hasTarget_4
                 if hasTarget then
-                    ____hasTarget_4 = jass:GetUnitX(context["目标单位"])
+                    ____hasTarget_4 = jass.GetUnitX(context["目标单位"])
                 else
                     ____hasTarget_4 = context["目标X"]
                 end
                 local targetX = ____hasTarget_4
                 local ____hasTarget_5
                 if hasTarget then
-                    ____hasTarget_5 = jass:GetUnitY(context["目标单位"])
+                    ____hasTarget_5 = jass.GetUnitY(context["目标单位"])
                 else
                     ____hasTarget_5 = context["目标Y"]
                 end
@@ -94,9 +94,9 @@ local function _____7ED3_7B97W_6307_5B9A_76EE_6807(variable)
         return
     end
     local target = context["目标单位"]
-    local targetX = jass:GetUnitX(target)
-    local targetY = jass:GetUnitY(target)
-    local _____7F3A_5931_751F_547D = jass:GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass:GetUnitState(target, UNIT_STATE_LIFE)
+    local targetX = jass.GetUnitX(target)
+    local targetY = jass.GetUnitY(target)
+    local _____7F3A_5931_751F_547D = jass.GetUnitState(target, UNIT_STATE_MAX_LIFE) - jass.GetUnitState(target, UNIT_STATE_LIFE)
     local missingLife = _____7F3A_5931_751F_547D > 0 and _____7F3A_5931_751F_547D or 0
     _____9020_6210_5355_4F53_6280_80FD_4F24_5BB3({
         ["来源"] = context["英雄"],
@@ -148,9 +148,9 @@ local function _____7ED3_7B97W_6307_5B9A_76EE_6807(variable)
     )
 end
 local function _____91CA_653EW(_entry, hero, skillInstanceId)
-    local target = jass:GetSpellTargetUnit()
-    local targetX = jass:GetSpellTargetX()
-    local targetY = jass:GetSpellTargetY()
+    local target = jass.GetSpellTargetUnit()
+    local targetX = jass.GetSpellTargetX()
+    local targetY = jass.GetSpellTargetY()
     local context = {
         ["英雄"] = hero,
         ["裂隙"] = {},
@@ -177,8 +177,8 @@ local function _____91CA_653EW(_entry, hero, skillInstanceId)
         end
     else
         _____64AD_653E_516B_4E91_7D2B_968F_673A_5355_4F4D_97F3_6548(hero, _____914D_7F6E.W["无目标语音键"])
-        local heroX = jass:GetUnitX(hero)
-        local heroY = jass:GetUnitY(hero)
+        local heroX = jass.GetUnitX(hero)
+        local heroY = jass.GetUnitY(hero)
         local angle = _____4E24_70B9_89D2_5EA6(heroX, heroY, targetX, targetY)
         local backX = _____6781_5750_6807X(heroX, angle + 180, _____914D_7F6E.W["无目标后方距离"])
         local backY = _____6781_5750_6807Y(heroY, angle + 180, _____914D_7F6E.W["无目标后方距离"])

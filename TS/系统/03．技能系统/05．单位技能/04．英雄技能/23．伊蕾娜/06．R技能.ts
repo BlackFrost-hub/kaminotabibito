@@ -18,6 +18,7 @@ import {
   伊蕾娜读条配置,
   伊蕾娜表现配置,
   伊蕾娜模型动作配置,
+  伊蕾娜音效配置,
 } from "./00．配置";
 import { 播放伊蕾娜阶段动作 } from "./01A．动作表现";
 import type { 伊蕾娜见闻 } from "./02．被动效果";
@@ -28,6 +29,10 @@ import {
   还原伊蕾娜R锁定变式,
   登记伊蕾娜技能清理,
 } from "./02．被动效果";
+
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string, 伊蕾娜变式?: string) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -88,6 +93,9 @@ const { 发射弹道 } = require("系统.03．技能系统.00．技能模板+函
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
+};
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 
 const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
@@ -158,6 +166,8 @@ function 执行见闻追加(this: void, 施法者: any, 实例: any, 数据: any
 
     if (记录.类型 === "风行") {
       // 贯穿魔弹：沿快照方向穿透
+      // 追加弹发射音（坐标=发射点=阵心；完成回调直线贯穿弹一次发射，只播一次，参数配置驱动）
+      Sound3DII_CooPlayReuse(伊蕾娜音效配置.R追加弹.路径, 数据.中心X, 数据.中心Y, 伊蕾娜音效配置.R追加弹.高度, 伊蕾娜音效配置.R追加弹.裁断距离);
       发射弹道({
         名称: "伊蕾娜-万法回廊·追迹",
         所有者: 施法者,
@@ -182,6 +192,7 @@ function 执行见闻追加(this: void, 施法者: any, 实例: any, 数据: any
         伤害形态: "AOE",
         参与技能伤害加成: false,
         模型: 伊蕾娜表现配置.R追加魔弹.模型路径,
+        RGB: 伊蕾娜表现配置.R追加魔弹.RGB,
         缩放: 伊蕾娜表现配置.R追加魔弹.缩放,
         飞行高度: 伊蕾娜表现配置.R追加魔弹.高度,
         生命周期: 伊蕾娜R配置.追加魔弹穿透距离 / 伊蕾娜R配置.追加魔弹速度 + 0.5,
@@ -205,6 +216,7 @@ function 执行见闻追加(this: void, 施法者: any, 实例: any, 数据: any
       const 预示表现 = 伊蕾娜表现配置.R远行预示;
       const 预示 = 创建点特效({
         模型路径: 预示表现.模型路径,
+        RGB: 预示表现.RGB,
         X: 边缘X,
         Y: 边缘Y,
         Z: 预示表现.高度,
@@ -218,6 +230,7 @@ function 执行见闻追加(this: void, 施法者: any, 实例: any, 数据: any
         const 爆发表现 = 伊蕾娜表现配置.R远行爆发;
         const 星爆 = 创建点特效({
           模型路径: 爆发表现.模型路径,
+          RGB: 爆发表现.RGB,
           X: 边缘X,
           Y: 边缘Y,
           Z: 爆发表现.高度,
@@ -258,6 +271,7 @@ function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: an
   const 阵心表现 = 伊蕾娜表现配置.R阵心爆发;
   const 阵心 = 创建点特效({
     模型路径: 阵心表现.模型路径,
+    RGB: 阵心表现.RGB,
     X: 数据.中心X,
     Y: 数据.中心Y,
     Z: 阵心表现.高度,
@@ -265,6 +279,8 @@ function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: an
     持续秒: 阵心表现.持续秒,
   });
   void 阵心;
+  // 阵心爆发音（坐标=阵心；充能完成主结算爆发一次，参数配置驱动）
+  Sound3DII_CooPlayReuse(伊蕾娜音效配置.R爆发.路径, 数据.中心X, 数据.中心Y, 伊蕾娜音效配置.R爆发.高度, 伊蕾娜音效配置.R爆发.裁断距离);
 
   // 变式分支：灰烬快照 → 阵心小范围额外爆发；镜界快照在下方见闻阶段已有回响时不重复
   if (数据.变式快照 === "灰烬") {
@@ -309,6 +325,7 @@ function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: an
       const 收束表现 = 伊蕾娜表现配置.R收束;
       const 收束 = 创建点特效({
         模型路径: 收束表现.模型路径,
+        RGB: 收束表现.RGB,
         X: 数据.中心X,
         Y: 数据.中心Y,
         Z: 收束表现.高度,
@@ -394,6 +411,7 @@ function 释放R万法回廊(this: void, _context: any, 施法者: any, 技能�
   const 星阵表现 = 伊蕾娜表现配置.R星阵;
   展开特效 = 创建点特效({
     模型路径: 展开表现.模型路径,
+    RGB: 展开表现.RGB,
     X: 中心X,
     Y: 中心Y,
     Z: 展开表现.高度,
@@ -402,6 +420,7 @@ function 释放R万法回廊(this: void, _context: any, 施法者: any, 技能�
   });
   星阵特效 = 创建点特效({
     模型路径: 星阵表现.模型路径,
+    RGB: 星阵表现.RGB,
     X: 中心X,
     Y: 中心Y,
     Z: 星阵表现.高度,
@@ -440,6 +459,11 @@ function 释放R万法回廊(this: void, _context: any, 施法者: any, 技能�
       }
     },
   });
+  if (充能ID > 0) {
+    播放英雄技能喊话(施法者, "伊蕾娜", 伊蕾娜技能配置.R.技能ID);
+    // 万法回廊展开音（坐标=阵心，即 R展开/星阵法阵建立位置；充能建立后一次，参数配置驱动）
+    Sound3DII_CooPlayReuse(伊蕾娜音效配置.R展开.路径, 中心X, 中心Y, 伊蕾娜音效配置.R展开.高度, 伊蕾娜音效配置.R展开.裁断距离);
+  }
 }
 
 //=============================================================================

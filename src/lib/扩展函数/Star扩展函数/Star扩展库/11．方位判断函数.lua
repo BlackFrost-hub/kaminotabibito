@@ -13,7 +13,7 @@ local ____require_result_1 = require("lib.扩展函数.BJ函数.12．数学函�
 local CosBJ = ____require_result_1.CosBJ
 --- 内部工具：计算两点间角度（度）
 local function _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2)
-    return jass:Atan2(y2 - y1, x2 - x1) / BJ_DEGTORAD
+    return jass.Atan2(y2 - y1, x2 - x1) / BJ_DEGTORAD
 end
 --- 方位：正前方（0° ± 30°）
 ____exports["方位_正前方"] = 1
@@ -35,11 +35,11 @@ ____exports["是否在指定角度范围内"] = function(unit, target, angleRang
     if not SUC_IsValidUnit(unit) or not SUC_IsValidUnit(target) then
         return false
     end
-    local x1 = jass:GetUnitX(unit)
-    local y1 = jass:GetUnitY(unit)
-    local x2 = jass:GetUnitX(target)
-    local y2 = jass:GetUnitY(target)
-    local facing = jass:GetUnitFacing(unit)
+    local x1 = jass.GetUnitX(unit)
+    local y1 = jass.GetUnitY(unit)
+    local x2 = jass.GetUnitX(target)
+    local y2 = jass.GetUnitY(target)
+    local facing = jass.GetUnitFacing(unit)
     local angle = _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2) - facing
     return CosBJ(angle) >= CosBJ(angleRange)
 end
@@ -56,11 +56,11 @@ ____exports["是否在前方角度内"] = function(unit, target, angleRange)
     if not SUC_IsValidUnit(unit) or not SUC_IsValidUnit(target) then
         return false
     end
-    local x1 = jass:GetUnitX(unit)
-    local y1 = jass:GetUnitY(unit)
-    local x2 = jass:GetUnitX(target)
-    local y2 = jass:GetUnitY(target)
-    local facing = jass:GetUnitFacing(unit)
+    local x1 = jass.GetUnitX(unit)
+    local y1 = jass.GetUnitY(unit)
+    local x2 = jass.GetUnitX(target)
+    local y2 = jass.GetUnitY(target)
+    local facing = jass.GetUnitFacing(unit)
     local angle = _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2) - facing
     local cosVal = CosBJ(angle)
     return cosVal >= CosBJ(angleRange)
@@ -78,11 +78,11 @@ ____exports["是否在后方角度内"] = function(unit, target, angleRange)
     if not SUC_IsValidUnit(unit) or not SUC_IsValidUnit(target) then
         return false
     end
-    local x1 = jass:GetUnitX(unit)
-    local y1 = jass:GetUnitY(unit)
-    local x2 = jass:GetUnitX(target)
-    local y2 = jass:GetUnitY(target)
-    local facing = jass:GetUnitFacing(unit)
+    local x1 = jass.GetUnitX(unit)
+    local y1 = jass.GetUnitY(unit)
+    local x2 = jass.GetUnitX(target)
+    local y2 = jass.GetUnitY(target)
+    local facing = jass.GetUnitFacing(unit)
     local angle = _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2) - facing
     local cosVal = CosBJ(angle)
     return cosVal <= -CosBJ(angleRange)
@@ -100,11 +100,11 @@ ____exports["是否在左侧"] = function(unit, target)
     if not SUC_IsValidUnit(unit) or not SUC_IsValidUnit(target) then
         return false
     end
-    local x1 = jass:GetUnitX(unit)
-    local y1 = jass:GetUnitY(unit)
-    local x2 = jass:GetUnitX(target)
-    local y2 = jass:GetUnitY(target)
-    local facing = jass:GetUnitFacing(unit)
+    local x1 = jass.GetUnitX(unit)
+    local y1 = jass.GetUnitY(unit)
+    local x2 = jass.GetUnitX(target)
+    local y2 = jass.GetUnitY(target)
+    local facing = jass.GetUnitFacing(unit)
     local angle = _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2) - facing
     return angle > 0 and angle < 180
 end
@@ -113,11 +113,11 @@ ____exports["是否在右侧"] = function(unit, target)
     if not SUC_IsValidUnit(unit) or not SUC_IsValidUnit(target) then
         return false
     end
-    local x1 = jass:GetUnitX(unit)
-    local y1 = jass:GetUnitY(unit)
-    local x2 = jass:GetUnitX(target)
-    local y2 = jass:GetUnitY(target)
-    local facing = jass:GetUnitFacing(unit)
+    local x1 = jass.GetUnitX(unit)
+    local y1 = jass.GetUnitY(unit)
+    local x2 = jass.GetUnitX(target)
+    local y2 = jass.GetUnitY(target)
+    local facing = jass.GetUnitFacing(unit)
     local angle = _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2) - facing
     return angle < 0 or angle > 180
 end
@@ -136,11 +136,11 @@ ____exports["获取方位区间"] = function(unit, target)
     if not SUC_IsValidUnit(unit) or not SUC_IsValidUnit(target) then
         return 3
     end
-    local x1 = jass:GetUnitX(unit)
-    local y1 = jass:GetUnitY(unit)
-    local x2 = jass:GetUnitX(target)
-    local y2 = jass:GetUnitY(target)
-    local facing = jass:GetUnitFacing(unit)
+    local x1 = jass.GetUnitX(unit)
+    local y1 = jass.GetUnitY(unit)
+    local x2 = jass.GetUnitX(target)
+    local y2 = jass.GetUnitY(target)
+    local facing = jass.GetUnitFacing(unit)
     local angle = _____8BA1_7B97_4E24_70B9_89D2_5EA6(x1, y1, x2, y2) - facing
     local c = CosBJ(angle)
     if c >= 0.866025 then

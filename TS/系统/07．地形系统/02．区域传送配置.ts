@@ -292,17 +292,17 @@ export const 区域传送配置: Record<string, RegionConfig> = {
   },
   "18": {
     id: "18",
-    name: "熔岩小镇-恶魔城",
+    name: "熔岩小镇-万浴熔灵",
     left: 9440,
     bottom: -21024,
     right: 9600,
     top: -20640,
-    teleportX: 0,
-    teleportY: 0,
+    teleportX: 21077,
+    teleportY: -16342,
+    teleportFacing: 270,
     cameraTime: 0.1,
     text: "|cffffff00『系统提示』|r：现在的场景为：|cff993366『万浴熔灵』|r",
     condition: "always",
-    rule: "40%KillUnit:|cffffff00『系统提示』|r：{unit}跳入熔浆不知所踪;20%传送:14783,-14913;20%传送:19009,-11590;20%传送:21077,-16342",
     enabled: true
   },
   "19": {

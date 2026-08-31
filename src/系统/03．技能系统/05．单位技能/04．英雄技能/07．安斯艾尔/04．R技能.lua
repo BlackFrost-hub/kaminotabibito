@@ -18,10 +18,10 @@ local function ____on_5B89_65AF_827E_5C14R(caster, abilityId)
     if caster == nil or caster == 0 then
         return
     end
-    if jass:GetUnitTypeId(caster) ~= _____5B89_65AF_827E_5C14_5355_4F4D_7C7B_578BID or abilityId ~= ____R_6280_80FD_7C7B_578BID then
+    if jass.GetUnitTypeId(caster) ~= _____5B89_65AF_827E_5C14_5355_4F4D_7C7B_578BID or abilityId ~= ____R_6280_80FD_7C7B_578BID then
         return
     end
-    local level = jass:GetUnitAbilityLevel(caster, ____R_6280_80FD_7C7B_578BID)
+    local level = jass.GetUnitAbilityLevel(caster, ____R_6280_80FD_7C7B_578BID)
     if not (level > 0) then
         return
     end

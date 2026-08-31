@@ -22,7 +22,7 @@ local function dispatchAKeyEvent(event)
     if event == nil or event.player == nil or event.player == 0 then
         return
     end
-    local playerId = jass:GetPlayerId(event.player)
+    local playerId = jass.GetPlayerId(event.player)
     local listeners = listenersByPlayer[playerId]
     if listeners == nil then
         return

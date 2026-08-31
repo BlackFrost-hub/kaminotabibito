@@ -86,7 +86,7 @@ local function _____64AD_653EE_5168_5C40_97F3_6548(soundKey)
     if sound == nil or sound == 0 then
         return
     end
-    jass:StartSound(sound)
+    jass.StartSound(sound)
 end
 --- 定时移除单位（樱花雨等不参与下落逻辑的表现壳）
 local function _____5B9A_65F6_79FB_9664_5355_4F4D(variable)
@@ -273,7 +273,7 @@ local function _____5F00_59CBE_533A_57DF(context)
     context.Tick = 0
     _____64AD_653EE_5168_5C40_97F3_6548(_____914D_7F6E.E["施放音效键"])
     local _____6A31_82B1_96E8 = _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168(
-        jass:Player(12),
+        jass.Player(12),
         _____914D_7F6E["单位壳"]["虹之雨"],
         GetUnitX(context["施法者"]),
         GetUnitY(context["施法者"]),

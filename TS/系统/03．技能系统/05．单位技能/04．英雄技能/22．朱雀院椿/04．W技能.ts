@@ -7,6 +7,7 @@ import {
   朱雀院椿动作槽,
   朱雀院椿W配置,
   朱雀院椿被动配置,
+  朱雀院椿音效配置,
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
@@ -52,6 +53,13 @@ const { createUnitEffect, destroyUnitEffect, 创建点特效, 设置特效缩放
   destroyUnitEffect: (this: void, unit: any, effectKey?: string) => void;
   创建点特效: (this: void, 参数: any) => any;
   设置特效缩放: (this: void, effect: any, scale: number) => void;
+};
+const { Sound3DII_UnitPlayReuse, Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
+};
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
 };
 const {
   是朱雀院椿,
@@ -135,22 +143,28 @@ function 结算W反击(this: void, 施法者: any, 技能实例ID: number | unde
   }
   // 完美招架特效
   if (完美) {
+    // 完美招架音（完美招架分支；单位=施法者，参数配置驱动）
+    Sound3DII_UnitPlayReuse(朱雀院椿音效配置.W完美招架.路径, 施法者, 朱雀院椿音效配置.W完美招架.裁断距离);
     创建点特效({
-      模型路径: 朱雀院椿表现配置.W完美招架,
+      模型路径: 朱雀院椿表现配置.W完美招架.模型路径,
+      RGB: 朱雀院椿表现配置.W完美招架.RGB,
       X: GetUnitX(来源),
       Y: GetUnitY(来源),
-      Z: 朱雀院椿表现配置.参数.W完美招架.高度,
-      缩放: 朱雀院椿表现配置.参数.W完美招架.缩放,
-      持续秒: 朱雀院椿表现配置.参数.W完美招架.持续秒,
+      Z: 朱雀院椿表现配置.W完美招架.高度,
+      缩放: 朱雀院椿表现配置.W完美招架.缩放,
+      持续秒: 朱雀院椿表现配置.W完美招架.持续秒,
     });
   } else {
+    // 普通招架音（普通招架分支；单位=施法者，参数配置驱动）
+    Sound3DII_UnitPlayReuse(朱雀院椿音效配置.W普通招架.路径, 施法者, 朱雀院椿音效配置.W普通招架.裁断距离);
     创建点特效({
-      模型路径: 朱雀院椿表现配置.W普通招架,
+      模型路径: 朱雀院椿表现配置.W普通招架.模型路径,
+      RGB: 朱雀院椿表现配置.W普通招架.RGB,
       X: GetUnitX(来源),
       Y: GetUnitY(来源),
-      Z: 朱雀院椿表现配置.参数.W普通招架.高度,
-      缩放: 朱雀院椿表现配置.参数.W普通招架.缩放,
-      持续秒: 朱雀院椿表现配置.参数.W普通招架.持续秒,
+      Z: 朱雀院椿表现配置.W普通招架.高度,
+      缩放: 朱雀院椿表现配置.W普通招架.缩放,
+      持续秒: 朱雀院椿表现配置.W普通招架.持续秒,
     });
   }
   // 结束本次窗口（已招架 → 不释放收刀斩）
@@ -171,6 +185,8 @@ function 结束W招架(this: void, 施法者: any, _技能实例ID: number | und
     const 方向 = 数据.方向角;
     const X = GetUnitX(施法者);
     const Y = GetUnitY(施法者);
+    // 收刀斩音（未受击收刀分支结算点；坐标=施法者位置，参数配置驱动）
+    Sound3DII_CooPlayReuse(朱雀院椿音效配置.W收刀斩.路径, X, Y, 朱雀院椿音效配置.W收刀斩.高度, 朱雀院椿音效配置.W收刀斩.裁断距离);
     const 敌人 = 获取扇形区域单位({
       X,
       Y,
@@ -205,6 +221,8 @@ function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID
   // R 蓄力期间不能重复开启 W；已有招架窗口不叠加
   if (联动R.椿R蓄力中 != null && 联动R.椿R蓄力中(施法者)) return;
   if (查询战斗技能实例(施法者, "椿W").length > 0) return;
+  // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
+  播放英雄技能喊话(施法者, "朱雀院椿", 朱雀院椿技能配置.W.技能ID);
   播放椿动作(施法者, 朱雀院椿动作槽.W开窗);
   const 数据: W数据 = {
     窗口开始: getGameTime(),
@@ -230,8 +248,8 @@ function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID
 
   // 招架窗口表现：独立招架弧（借用 W普通招架 白金半圆闪光模型——项目无独立招架窗口模型；不叠加 VF 常驻特效，VF 为 0 时窗口仍可见）
   // 窗口结束（结束W招架）/成功（结算W反击 内结束W招架）/死亡/中断（W结束回调）统一 destroyUnitEffect(招架特效键) 销毁
-  const 招架窗口特效 = createUnitEffect(施法者, "origin", 朱雀院椿表现配置.W普通招架, 朱雀院椿表现配置.参数.W招架窗口.持续秒, 招架特效键);
-  设置特效缩放(招架窗口特效, 朱雀院椿表现配置.参数.W招架窗口.缩放);
+  const 招架窗口特效 = createUnitEffect(施法者, "origin", 朱雀院椿表现配置.W招架窗口.模型路径, 朱雀院椿表现配置.W招架窗口.持续秒, 招架特效键);
+  设置特效缩放(招架窗口特效, 朱雀院椿表现配置.W招架窗口.缩放);
 
   // 正面招架伤害修改器：攻击来源在正面 → 按方向与时点区分普通/完美招架
   数据.修饰ID = registerDamageModifier(function W招架伤害修正(this: void, context: any): number {

@@ -11,7 +11,7 @@
  *   避免同步结束回调误触发终点效果；结束统一恢复 GetUnitFlyHeight 快照值。
  */
 
-import { 伊蕾娜技能配置, 伊蕾娜E配置, 伊蕾娜表现配置, 伊蕾娜变式效果配置, 伊蕾娜模型动作配置 } from "./00．配置";
+import { 伊蕾娜技能配置, 伊蕾娜E配置, 伊蕾娜表现配置, 伊蕾娜变式效果配置, 伊蕾娜模型动作配置, 伊蕾娜音效配置 } from "./00．配置";
 import { 播放伊蕾娜阶段动作, 开始伊蕾娜循环动作, 停止伊蕾娜循环动作 } from "./01A．动作表现";
 import {
   记录伊蕾娜见闻,
@@ -20,6 +20,10 @@ import {
   消费伊蕾娜变式用于,
   登记伊蕾娜技能清理,
 } from "./02．被动效果";
+
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string, 伊蕾娜变式?: string) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -84,6 +88,12 @@ const { 开始护盾, 移除护盾 } = require("系统.03．技能系统.00．�
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
+};
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+};
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 
 const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
@@ -156,6 +166,7 @@ function 结算E到达(this: void, 施法者: any, 实例ID: number | undefined,
   // 落地波纹（一次性表现）
   const 波纹 = 创建点特效({
     模型路径: 伊蕾娜表现配置.E落地波纹.模型路径,
+    RGB: 伊蕾娜表现配置.E落地波纹.RGB,
     X,
     Y,
     Z: 伊蕾娜表现配置.E落地波纹.高度,
@@ -163,6 +174,8 @@ function 结算E到达(this: void, 施法者: any, 实例ID: number | undefined,
     持续秒: 伊蕾娜表现配置.E落地波纹.持续秒,
   });
   void 波纹;
+  // 落地音（坐标=落点；只在完成原因的到达结算播一次，参数配置驱动）
+  Sound3DII_CooPlayReuse(伊蕾娜音效配置.E落地.路径, X, Y, 伊蕾娜音效配置.E落地.高度, 伊蕾娜音效配置.E落地.裁断距离);
 
   // 路线（短寿命，供 Q/R 读取）
   记录伊蕾娜扫帚路线(施法者, 数据.起点X, 数据.起点Y, 数据.终点X, 数据.终点Y, 数据.方向角);
@@ -258,6 +271,7 @@ function 释放E扫帚远行(this: void, _context: any, 施法者: any, 技能�
     // 起飞风压（一次性）
     const 风压 = 创建点特效({
       模型路径: 伊蕾娜表现配置.E起飞风压.模型路径,
+      RGB: 伊蕾娜表现配置.E起飞风压.RGB,
       X: GetUnitX(施法者),
       Y: GetUnitY(施法者),
       Z: 伊蕾娜表现配置.E起飞风压.高度,
@@ -309,6 +323,9 @@ function 释放E扫帚远行(this: void, _context: any, 施法者: any, 技能�
     数据.位移ID = 位移ID;
 
     if (位移ID > 0) {
+      播放英雄技能喊话(施法者, "伊蕾娜", 伊蕾娜技能配置.E.技能ID);
+      // 起飞音（单位=施法者；冲锋位移真正建立后的扫帚起飞时点一次，参数配置驱动）
+      Sound3DII_UnitPlayReuse(伊蕾娜音效配置.E起飞.路径, 施法者, 伊蕾娜音效配置.E起飞.裁断距离);
       // 迅行/灰烬分支真正进入后才消费；灰烬在到达时追加爆发。
       if (用迅行 || 用灰烬) {
         const 已消费 = 消费伊蕾娜变式用于(施法者, "E");
@@ -324,6 +341,7 @@ function 释放E扫帚远行(this: void, _context: any, 施法者: any, 技能�
           const 表现 = 尾迹计数 % 2 === 0 ? 伊蕾娜表现配置.E飞行轨迹 : 伊蕾娜表现配置.E星光轨迹;
           const 星迹 = 创建点特效({
             模型路径: 表现.模型路径,
+            RGB: 表现.RGB,
             X: GetUnitX(施法者),
             Y: GetUnitY(施法者),
             Z: 表现.高度,

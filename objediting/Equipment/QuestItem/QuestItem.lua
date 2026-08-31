@@ -116,3 +116,37 @@ createEquipmentItem('I0K1', '稳定余焰样本', {
   tooltipExtended = '|cffffffcc[任务物品]|r|n由四处熔核余焰共同压成的稳定样本。|n|cFF808080离开熔灵核心后仍保持固定脉动，可交给熔灵工匠重铸炉心。|r',
   description = '|cffffffcc[任务物品]|r|n由四处熔核余焰共同压成的稳定样本。|n|cFF808080离开熔灵核心后仍保持固定脉动，可交给熔灵工匠重铸炉心。|r',
 })
+
+createEquipmentItem('I0KE', '守誓圣铠合成书', {
+  baseId = 'azhr',
+  icon = 'Equipment\\Icon\\QuestItem\\oath_armor_recipe_book.blp',
+  model = 'war3mapImported\\SpellBook.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 1,
+  charges = 1,
+  priority = 50,
+  goldCost = 0,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = false,
+  tooltipExtended = '|cffffffcc[合成书]|r|n收录守誓圣铠的锻造图谱。|n|cffffcc99集齐：高原战衣、月纹熊革×3、古树韧藤×2 与本书，即会自动合成。|r|n|cFF808080圣地石匣里的锻造图谱，纸页浸过圣水却不晕墨——誓约比纸更耐久。|r',
+  description = '|cffffffcc[合成书]|r|n收录守誓圣铠的锻造图谱。|n|cffffcc99集齐：高原战衣、月纹熊革×3、古树韧藤×2 与本书，即会自动合成。|r|n|cFF808080圣地石匣里的锻造图谱，纸页浸过圣水却不晕墨——誓约比纸更耐久。|r',
+})
+
+createEquipmentItem('I0KG', '熔渊坠饰合成书', {
+  baseId = 'azhr',
+  icon = 'Equipment\Icon\QuestItem\abyss_pendant_recipe_book.blp',
+  model = 'war3mapImported\SpellBook.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 1,
+  charges = 1,
+  priority = 50,
+  goldCost = 0,
+  canBeDropped = true,
+  canBeSoldByMerchants = false,
+  canBeSoldToMerchants = false,
+  tooltipExtended = '|cffffffcc[合成书]|r|n收录熔渊坠饰的重铸法。|n|cffffcc99集齐：夜行教团坠饰、恶魔锻火结晶、恶魔结晶×2、炽热能量×2 与本书，即会自动合成。|r|n|cFF808080宝藏深处的手抄本，墨迹用的是凝干的魔血。|r',
+  description = '|cffffffcc[合成书]|r|n收录熔渊坠饰的重铸法。|n|cffffcc99集齐：夜行教团坠饰、恶魔锻火结晶、恶魔结晶×2、炽热能量×2 与本书，即会自动合成。|r|n|cFF808080宝藏深处的手抄本，墨迹用的是凝干的魔血。|r',
+})

@@ -1,5 +1,5 @@
 -- 爱蜜莉雅 Q/W/E/R/D 物编壳。
--- 这里只提供可施放、可识别的通魔入口；实际伤害、状态、特效和冷却由 TS 技能实现。
+-- 技能效果由运行时实现；通魔持续字段承载动态百分比蓝耗，固定蓝耗保持为0。
 -- 图标先使用原生占位图，待对应 BLP 正式迁移后由运行时显示初始化替换。
 
 local EMILIA_ICON = 'ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp'
@@ -13,13 +13,13 @@ createPlayerHeroChannelAbility('AEQ1', '爱蜜莉雅-冰之矢（Q）', {
   castRange = 900,
   orderId = 'frostnova',
   tooltip = '冰之矢（Q）',
-  tooltipExtended = '向目标方向发射冰之矢；实际冰晶联动与伤害由 TS 处理。',
+  tooltipExtended = '技能说明：向目标方向发射冰之矢，穿过冰晶后会分裂成冰刃。|n伤害：主矢造成攻击力120%的魔法伤害；每枚冰刃造成攻击力40%的魔法伤害。|n施法距离：900|n伤害范围：命中半径100|n冷却时间：5秒|n魔法消耗：最大魔法值的6%',
   icon = EMILIA_ICON,
   hotkey = 'Q',
   buttonX = 0,
   buttonY = 2,
   cooldown = 5,
-  manaCost = 60,
+  percentManaCost = 0.06,
 })
 
 createPlayerHeroChannelAbility('AEW1', '爱蜜莉雅-冰花绽放（W）', {
@@ -30,13 +30,13 @@ createPlayerHeroChannelAbility('AEW1', '爱蜜莉雅-冰花绽放（W）', {
   castRange = 900,
   orderId = 'blizzard',
   tooltip = '冰花绽放（W）',
-  tooltipExtended = '在目标地点展开冰花区域；实际区域、寒意与二段由 TS 处理。',
+  tooltipExtended = '技能说明：在目标地点展开冰花区域，冰花出现和结束时都会造成伤害，再次施放可提前引爆并发射冰片。|n伤害：展开时造成攻击力60%的魔法伤害；自然结束造成攻击力90%的魔法伤害；提前引爆造成攻击力120%的魔法伤害；每枚冰片造成攻击力30%的魔法伤害。|n伤害范围：半径350|n减速：区域内敌人减速30%|n持续时间：4秒|n冷却时间：9秒|n魔法消耗：最大魔法值的8%',
   icon = EMILIA_ICON,
   hotkey = 'W',
   buttonX = 1,
   buttonY = 2,
   cooldown = 9,
-  manaCost = 80,
+  percentManaCost = 0.08,
 })
 
 createPlayerHeroChannelAbility('AEE1', '爱蜜莉雅-冰晶护身（E）', {
@@ -47,13 +47,13 @@ createPlayerHeroChannelAbility('AEE1', '爱蜜莉雅-冰晶护身（E）', {
   castRange = 900,
   orderId = 'shockwave',
   tooltip = '冰晶护身（E）',
-  tooltipExtended = '获得冰晶护盾并向目标方向调整位置；护盾与冰面表现由 TS 处理。',
+  tooltipExtended = '技能说明：向目标方向移动，并召唤冰晶护盾保护自己；移动结束时攻击落点附近的敌人，护盾破碎时再次造成伤害。|n伤害：落点冰爆和破盾冰爆各造成攻击力80%的魔法伤害。|n护盾：护盾值为攻击力的300%|n施法距离：移动400距离|n伤害范围：落点半径260|n护盾持续时间：4秒|n冷却时间：10秒|n魔法消耗：最大魔法值的7%',
   icon = EMILIA_ICON,
   hotkey = 'E',
   buttonX = 2,
   buttonY = 2,
   cooldown = 10,
-  manaCost = 70,
+  percentManaCost = 0.07,
 })
 
 createPlayerHeroChannelAbility('AER1', '爱蜜莉雅-永冻之庭（R）', {
@@ -64,13 +64,13 @@ createPlayerHeroChannelAbility('AER1', '爱蜜莉雅-永冻之庭（R）', {
   castRange = 1000,
   orderId = 'monsoon',
   tooltip = '永冻之庭（R）',
-  tooltipExtended = '在目标区域展开永冻领域；实际读取冰晶、冻结与结算由 TS 处理。',
+  tooltipExtended = '技能说明：蓄力后在目标区域展开永冻领域，领域期间持续攻击范围内的敌人，读取冰晶后引发爆发。|n伤害：领域内每秒造成攻击力15%的魔法伤害；每枚读取的冰晶爆发造成攻击力80%的魔法伤害；领域结束时造成攻击力200%的最终冰爆伤害。|n伤害范围：半径600（帕克强化时半径780）|n减速：最终冰爆使敌人减速30%|n蓄力时间：0.6秒|n领域持续时间：5秒|n冷却时间：70秒|n魔法消耗：最大魔法值的14%',
   icon = EMILIA_ICON,
   hotkey = 'R',
   buttonX = 3,
   buttonY = 2,
   cooldown = 70,
-  manaCost = 140,
+  percentManaCost = 0.14,
 })
 
 createPlayerHeroActiveDChannelAbility('AED1', '爱蜜莉雅-帕克显现（D）', {
@@ -81,12 +81,11 @@ createPlayerHeroActiveDChannelAbility('AED1', '爱蜜莉雅-帕克显现（D）'
   targetsAllowed = '',
   orderId = 'roar',
   tooltip = '帕克显现（D）',
-  tooltipExtended = '召唤帕克协战并获得强化机会；持续时间与强化资源由 TS 处理。',
+  tooltipExtended = '技能说明：召唤帕克协战，并获得冰系技能强化机会。|n伤害：本技能不直接造成伤害。|n技能类型：天赋技能，初始获得|n强化次数：最多3次|n帕克持续时间：12秒|n冷却时间：15秒|n魔法消耗：最大魔法值的4%',
   icon = EMILIA_ICON,
   hotkey = 'D',
   buttonX = 0,
   buttonY = 1,
   cooldown = 15,
-  manaCost = 40,
+  percentManaCost = 0.04,
 })
-

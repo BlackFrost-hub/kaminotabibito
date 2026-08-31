@@ -7,3 +7,7 @@
 | `imports/Sound/Boss/Kasela/SFX/kasela_tentacle_release_boss_dive_01.mp3` | 声音构成：body_drag + abyss_gate + spiral_echo 三层合并 | `TS/系统/03．技能系统/05．单位技能/03．Boss技能/02．挑战与隐藏Boss/03．深渊巨鱿卡瑟拉/16．音频需求预算清单.md:85` |
 | `imports/Sound/Boss/ShadowboneMortes/SFX/shadowbone_mortes_phantom_minion_wave_spawn_07_war3_refs_short155.mp3` | 声音描述：黑雾中亡灵召唤能量启动、幽影召唤物开始连续涌出 | `TS/系统/03．技能系统/05．单位技能/03．Boss技能/02．挑战与隐藏Boss/05．影骨莫特斯/16．音频需求预算清单.md:130` |
 | `imports/Sound/Boss/ShadowboneMortes/SFX/shadowbone_mortes_shadow_slip_vanish_01.mp3` | 声音描述：亡灵盗贼首领身体虚化、暗影残影留在原地、短促幽暗闪避感 | `TS/系统/03．技能系统/05．单位技能/03．Boss技能/02．挑战与隐藏Boss/05．影骨莫特斯/16．音频需求预算清单.md:76` |
+| `imports/Sound/Hero/Momiji/SFX/momiji_w_mirror_open.mp3` | 水面镜面成形+涟漪+闪现（三层合成） | 20-25英雄音效规划.md |
+| `imports/Sound/Hero/Irena/SFX/irena_w_open.mp3` | 水晶镜面升起+轻鸣 | 20-25英雄音效规划.md |
+| `imports/Sound/Hero/Irena/SFX/irena_w_reflect.mp3` | 镜面折射清响+棱镜闪烁 | 20-25英雄音效规划.md |
+| `imports/Sound/Hero/Celia/SFX/celia_q_refract.mp3` | 棱镜分光清响 | 20-25英雄音效规划.md |

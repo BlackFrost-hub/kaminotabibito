@@ -74,21 +74,21 @@ local function npcPromptHandleKey(self, unit)
     if not unit then
         return 0
     end
-    local id = jass:GetUnitTypeId(unit)
+    local id = jass.GetUnitTypeId(unit)
     if id ~= nil and id ~= 0 then
         return id
     end
-    return jass:GetHandleId(unit)
+    return jass.GetHandleId(unit)
 end
 --- 占用表 key：用 GetHandleId（同类型多 NPC 需独立占用，不能用 UnitTypeId）
 local function npcOccupationKey(self, unit)
     if not unit then
         return 0
     end
-    return jass:GetHandleId(unit)
+    return jass.GetHandleId(unit)
 end
 local function dzGetPlayerId(self, p)
-    return jass:GetPlayerId(p)
+    return jass.GetPlayerId(p)
 end
 --- 兼容旧调用点：标记切换已改为即时执行，目前没有待取消的任务。
 function ____exports.cancelPendingNpcMarkerSchedules(self, _npcUnit)
@@ -192,8 +192,8 @@ local function npcUnitsSameForBubble(self, a, b)
     if not a or not b then
         return false
     end
-    local ha = jass:GetHandleId(a)
-    local hb = jass:GetHandleId(b)
+    local ha = jass.GetHandleId(a)
+    local hb = jass.GetHandleId(b)
     if ha ~= 0 and ha == hb then
         return true
     end

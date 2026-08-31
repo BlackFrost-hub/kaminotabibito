@@ -4,6 +4,7 @@ local _____7ED3_7B97W_5355_4F53_4F24_5BB3, _____91CA_653E_5931_8D25_524D_65A9, j
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.00．配置")
 local _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶技能配置"]
 local _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶表现配置"]
+local _____6731_96C0_9662_7EA2_53F6_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶音效配置"]
 local _____6731_96C0_9662_7EA2_53F6Buff_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶Buff配置"]
 local _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["朱雀院红叶动作槽"]
 local _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C = ____00_FF0E_914D_7F6E["朱雀院红叶待平衡数值"]
@@ -89,20 +90,28 @@ local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用
 local createUnitEffect = ____require_result_11.createUnitEffect
 local destroyUnitEffect = ____require_result_11.destroyUnitEffect
 local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_11["设置特效缩放"]
-local ____require_result_12 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.02．被动效果")
-_____65BD_52A0_6731_96C0_9662_7834_7EFD = ____require_result_12["施加朱雀院破绽"]
-local _____5C1D_8BD5_6D88_8D39_4E00_5C42_5200_52BF = ____require_result_12["尝试消费一层刀势"]
-local _____589E_52A0_5200_52BF = ____require_result_12["增加刀势"]
-local _____662F_6731_96C0_9662_7EA2_53F6 = ____require_result_12["是朱雀院红叶"]
-local _____767B_8BB0_6731_96C0_9662_6E05_7406 = ____require_result_12["登记朱雀院清理"]
-_____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_12["播放红叶动作"]
+local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_12.Sound3DII_UnitPlayReuse
+local Sound3DII_CooPlayReuse = ____require_result_12.Sound3DII_CooPlayReuse
+local ____require_result_13 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_13["播放英雄技能喊话"]
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.02．被动效果")
+_____65BD_52A0_6731_96C0_9662_7834_7EFD = ____require_result_14["施加朱雀院破绽"]
+local _____5C1D_8BD5_6D88_8D39_4E00_5C42_5200_52BF = ____require_result_14["尝试消费一层刀势"]
+local _____589E_52A0_5200_52BF = ____require_result_14["增加刀势"]
+local _____662F_6731_96C0_9662_7EA2_53F6 = ____require_result_14["是朱雀院红叶"]
+local _____767B_8BB0_6731_96C0_9662_6E05_7406 = ____require_result_14["登记朱雀院清理"]
+_____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_14["播放红叶动作"]
 local _____8054_52A8D = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.07．D技能")
-local ____require_result_13 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.03．Q技能")
-local _____5EF6_957FQ2_7A97_53E3 = ____require_result_13["延长Q2窗口"]
+local ____require_result_15 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.03．Q技能")
+local _____5EF6_957FQ2_7A97_53E3 = ____require_result_15["延长Q2窗口"]
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
 ____W_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.W["技能ID"])
 local _____6C34_955CBuffID = _____6731_96C0_9662_7EA2_53F6Buff_914D_7F6E["水镜招架"]
 ____W_914D_7F6E = _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C.W
+local ____W_6C34_955C_5C55_5F00_97F3_6548 = _____6731_96C0_9662_7EA2_53F6_97F3_6548_914D_7F6E["W水镜展开"]
+local ____W_62DB_67B6_6210_529F_97F3_6548 = _____6731_96C0_9662_7EA2_53F6_97F3_6548_914D_7F6E["W招架成功"]
+local ____W_8FD4_5203_53CD_51FB_97F3_6548 = _____6731_96C0_9662_7EA2_53F6_97F3_6548_914D_7F6E["W返刃反击"]
 local _____6C34_955C_7279_6548_952E = "朱雀院红叶W水镜"
 ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
@@ -133,6 +142,13 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_566
         return
     end
     _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["W成功反击"])
+    Sound3DII_CooPlayReuse(
+        ____W_8FD4_5203_53CD_51FB_97F3_6548["路径"],
+        GetUnitX(_____6765_6E90),
+        GetUnitY(_____6765_6E90),
+        ____W_8FD4_5203_53CD_51FB_97F3_6548["高度"],
+        ____W_8FD4_5203_53CD_51FB_97F3_6548["裁断距离"]
+    )
     _____7ED3_7B97W_5355_4F53_4F24_5BB3(
         _____65BD_6CD5_8005,
         _____6765_6E90,
@@ -176,6 +192,7 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "红叶W") > 0 then
         return
     end
+    _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院红叶", _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.W["技能ID"])
     local _____6570_636E = {
         ["方向角"] = GetUnitFacing(_____65BD_6CD5_8005),
         ["修饰ID"] = 0,
@@ -204,11 +221,11 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
     local _____6C34_955C_7279_6548 = createUnitEffect(
         _____65BD_6CD5_8005,
         "origin",
-        _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["水镜主体"],
-        _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["参数"]["水镜主体"]["持续秒"],
+        _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["水镜主体"]["模型路径"],
+        _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["水镜主体"]["持续秒"],
         _____6C34_955C_7279_6548_952E
     )
-    _____8BBE_7F6E_7279_6548_7F29_653E(_____6C34_955C_7279_6548, _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["参数"]["水镜主体"]["缩放"])
+    _____8BBE_7F6E_7279_6548_7F29_653E(_____6C34_955C_7279_6548, _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["水镜主体"]["缩放"])
     registerManualBuff(
         _____65BD_6CD5_8005,
         _____6C34_955CBuffID,
@@ -216,6 +233,7 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
         1,
         {stack = 1}
     )
+    Sound3DII_UnitPlayReuse(____W_6C34_955C_5C55_5F00_97F3_6548["路径"], _____65BD_6CD5_8005, ____W_6C34_955C_5C55_5F00_97F3_6548["裁断距离"])
     _____6570_636E["修饰ID"] = registerDamageModifier(
         function(context)
             if _____6570_636E["已招架"] or _____6570_636E["已结束"] then
@@ -241,6 +259,7 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
             addDelayedCallback(
                 0,
                 function()
+                    Sound3DII_UnitPlayReuse(____W_62DB_67B6_6210_529F_97F3_6548["路径"], _____65BD_6CD5_8005, ____W_62DB_67B6_6210_529F_97F3_6548["裁断距离"])
                     _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
                 end
             )

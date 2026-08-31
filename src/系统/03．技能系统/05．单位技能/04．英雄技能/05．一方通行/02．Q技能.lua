@@ -111,12 +111,12 @@ local function _____77E2_91CF_79FB_52A8Tick(variable)
     local currentY = GetUnitY(caster)
     local dx = runtime.targetX - currentX
     local dy = runtime.targetY - currentY
-    local distance = jass:SquareRoot(dx * dx + dy * dy)
+    local distance = jass.SquareRoot(dx * dx + dy * dy)
     if distance <= _____914D_7F6E["到达距离"] then
         _____505C_6B62Q_5F53_524D_79FB_52A8(caster)
         return
     end
-    local angle = jass:Atan2(dy, dx) * jass.bj_RADTODEG
+    local angle = jass.Atan2(dy, dx) * jass.bj_RADTODEG
     local speedPerTick = ((GetUnitMoveSpeed(caster) or 0) + _____914D_7F6E["额外移动速度"]) * _____914D_7F6E["移动周期毫秒"] / 1000
     local ____temp_9
     if distance < speedPerTick then

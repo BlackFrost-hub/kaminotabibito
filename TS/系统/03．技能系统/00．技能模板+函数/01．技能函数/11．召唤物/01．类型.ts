@@ -47,6 +47,8 @@ export interface 召唤物输入参数 {
   HP?: number;
   生命值受小怪倍率?: boolean;
   hpScaleWithCreep?: boolean;
+  生命值受难度倍率?: boolean;
+  hpScaleWithDifficulty?: boolean;
   生命恢复?: number;
   regenHP?: number;
   攻击力?: number;
@@ -115,6 +117,7 @@ export interface 规范化召唤物参数 {
   模型文件?: string;
   生命值?: number;
   生命值受小怪倍率?: boolean;
+  生命值受难度倍率?: boolean;
   生命恢复?: number;
   攻击力?: number;
   攻击间隔?: number;

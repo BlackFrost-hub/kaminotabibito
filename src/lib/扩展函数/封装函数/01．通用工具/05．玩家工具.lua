@@ -6,8 +6,8 @@ local jass = require("jass.common")
 local SOUND_GOLD = "Abilities\\\\Spells\\\\Items\\\\ResourceItems\\\\ReceiveGold.wav"
 --- 调整玩家状态（如金币、木材），在原有基础上增加 delta。
 function ____exports.AdjustPlayerStateBJ(self, delta, whichPlayer, whichPlayerState)
-    local current = jass:GetPlayerState(whichPlayer, whichPlayerState)
-    jass:SetPlayerState(whichPlayer, whichPlayerState, current + delta)
+    local current = jass.GetPlayerState(whichPlayer, whichPlayerState)
+    jass.SetPlayerState(whichPlayer, whichPlayerState, current + delta)
 end
 --- 增减金币，并自动反馈：
 -- - 传 player：只对该玩家播放"收金币"音效，不创建漂浮字
@@ -26,7 +26,7 @@ function ____exports.AddGoldWithFeedback(self, params)
     else
         local ____temp_1
         if unit ~= nil then
-            ____temp_1 = jass:GetOwningPlayer(unit)
+            ____temp_1 = jass.GetOwningPlayer(unit)
         else
             ____temp_1 = nil
         end
@@ -43,7 +43,7 @@ function ____exports.AddGoldWithFeedback(self, params)
     local _____6F02_6D6E_6587_5B57_6A21_5757 = require("lib.扩展函数.封装函数.03．漂浮文字.index")
     local CreateFloatTextOnUnit = _____6F02_6D6E_6587_5B57_6A21_5757.CreateFloatTextOnUnit
     if unit ~= nil then
-        local txt = delta > 0 and "+" .. tostring(nil, delta) or tostring(nil, delta)
+        local txt = delta > 0 and "+" .. tostring(delta) or tostring(delta)
         if type(CreateFloatTextOnUnit) == "function" then
             CreateFloatTextOnUnit(unit, txt, {red = 255, green = 215, blue = 0, alpha = 0})
         end
@@ -64,7 +64,7 @@ function ____exports.printToPlayer(self, player, msg, duration)
     if not player then
         return
     end
-    jass:DisplayTimedTextToPlayer(
+    jass.DisplayTimedTextToPlayer(
         player,
         0,
         0,
@@ -89,7 +89,7 @@ end
 -- 
 -- @returns 本地玩家句柄，如果无效则返回 null
 function ____exports.getLocalPlayerOrNull(self)
-    local lp = jass:GetLocalPlayer()
+    local lp = jass.GetLocalPlayer()
     if lp == nil or lp == 0 then
         return nil
     end
@@ -107,7 +107,7 @@ function ____exports.forEachPlayingPlayer(self, action, maxPlayers)
         local i = 0
         while i < maxPlayers do
             do
-                local p = jass:Player(i)
+                local p = jass.Player(i)
                 if not p or p == 0 then
                     goto __continue18
                 end

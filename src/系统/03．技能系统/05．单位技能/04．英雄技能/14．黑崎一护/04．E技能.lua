@@ -390,7 +390,7 @@ local function _____63A8_8FDBE_5E7B_5F71_51B2_950B(variable)
             phantom.X = phantom.X + Cos(rad) * _____914D_7F6E.E["连携"]["每Tick距离"]
             phantom.Y = phantom.Y + Sin(rad) * _____914D_7F6E.E["连携"]["每Tick距离"]
             if phantom["特效"] ~= nil and phantom["特效"] ~= 0 then
-                japi:DzSetEffectPos(phantom["特效"], phantom.X, phantom.Y, _____914D_7F6E.E["连携"]["幻影高度"])
+                japi.DzSetEffectPos(phantom["特效"], phantom.X, phantom.Y, _____914D_7F6E.E["连携"]["幻影高度"])
             end
             if not phantom["已命中"] and _____76EE_6807_5B58_6D3B then
                 local dx = phantom.X - tx
@@ -570,7 +570,7 @@ local function ____E_5355_4F4D_6B7B_4EA1_6E05_7406(dyingUnit, _killingUnit)
     if dyingUnit == nil or dyingUnit == 0 then
         return
     end
-    if jass:GetUnitTypeId(dyingUnit) ~= _____82F1_96C4_5355_4F4D_7C7B_578BID then
+    if jass.GetUnitTypeId(dyingUnit) ~= _____82F1_96C4_5355_4F4D_7C7B_578BID then
         return
     end
     local ctx = ____E_4E0A_4E0B_6587_8868[GetHandleId(dyingUnit)]

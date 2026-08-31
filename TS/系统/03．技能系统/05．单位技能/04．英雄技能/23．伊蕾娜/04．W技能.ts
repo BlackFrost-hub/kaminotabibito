@@ -11,7 +11,7 @@
  * - 友军、无效来源、窗口外伤害不触发；重复施放先收旧结界再建新窗，不叠加虚假保护。
  */
 
-import { 伊蕾娜技能配置, 伊蕾娜W配置, 伊蕾娜表现配置, 伊蕾娜模型动作配置, 伊蕾娜变式效果配置 } from "./00．配置";
+import { 伊蕾娜技能配置, 伊蕾娜W配置, 伊蕾娜表现配置, 伊蕾娜模型动作配置, 伊蕾娜变式效果配置, 伊蕾娜音效配置 } from "./00．配置";
 import { 播放伊蕾娜阶段动作, 开始伊蕾娜循环动作, 停止伊蕾娜循环动作 } from "./01A．动作表现";
 import { 伊蕾娜BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/23．伊蕾娜";
 import {
@@ -22,6 +22,10 @@ import {
   取伊蕾娜W结界,
   登记伊蕾娜技能清理,
 } from "./02．被动效果";
+
+const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
+  播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string, 伊蕾娜变式?: string) => boolean;
+};
 
 const jass = require("jass.common") as any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -74,10 +78,16 @@ const {
   创建点特效,
   销毁点特效,
 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number) => any;
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }) => any;
   销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
   创建点特效: (this: void, 参数: any) => any;
   销毁点特效: (this: void, effect: any) => void;
+};
+const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
+};
+const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
+  Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 
 const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
@@ -172,6 +182,7 @@ export function 消费伊蕾娜W折射(this: void, 英雄: any): boolean {
 
 function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
+  播放英雄技能喊话(施法者, "伊蕾娜", 伊蕾娜技能配置.W.技能ID);
 
   // 重复施放：旧结界独立收尾（无脉冲），不叠加虚假保护
   const 旧数据 = 取伊蕾娜W结界(施法者) as 伊蕾娜W结界数据 | null;
@@ -212,7 +223,9 @@ function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能�
   registerManualBuff(施法者, 伊蕾娜BuffID.镜界结界, 伊蕾娜W配置.保护窗口秒, 0);
   const 镜界表现 = 伊蕾娜表现配置.W镜界主体;
   const 镜界缩放 = 伊蕾娜W配置.结界接触半径 / 镜界表现.基准半径 * 镜界表现.基准缩放;
-  创建单位坐标跟随特效(施法者, 镜界表现.模型路径, W镜界特效键, 镜界缩放, 镜界表现.高度);
+  创建单位坐标跟随特效(施法者, 镜界表现.模型路径, W镜界特效键, 镜界缩放, 镜界表现.高度, 1, undefined, 0, 镜界表现.RGB);
+  // 镜界展开音（单位=施法者；保护窗口与结界视觉建立时一次，参数配置驱动）
+  Sound3DII_UnitPlayReuse(伊蕾娜音效配置.W展开.路径, 施法者, 伊蕾娜音效配置.W展开.裁断距离);
 
   // 常驻护盾：窗口内全程有效的减免层
   数据.护盾ID = 开始护盾(施法者, {
@@ -243,6 +256,7 @@ function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能�
     const 接触Y = 极坐标Y(GetUnitY(施法者), 接触角, 伊蕾娜W配置.结界接触半径);
     const 反馈特效 = 创建点特效({
       模型路径: 伊蕾娜表现配置.W偏折反馈.模型路径,
+      RGB: 伊蕾娜表现配置.W偏折反馈.RGB,
       X: 接触X,
       Y: 接触Y,
       Z: 伊蕾娜表现配置.W偏折反馈.高度,
@@ -251,6 +265,8 @@ function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能�
       持续秒: 伊蕾娜表现配置.W偏折反馈.持续秒,
     });
     void 反馈特效;
+    // 偏折成功音（坐标=结界接触点；主要攻击确认进入偏折分支时一次，参数配置驱动）
+    Sound3DII_CooPlayReuse(伊蕾娜音效配置.W偏折.路径, 接触X, 接触Y, 伊蕾娜音效配置.W偏折.高度, 伊蕾娜音效配置.W偏折.裁断距离);
 
     // 注销推迟到当前伤害遍历结束后执行
     addDelayedCallback(10, function W偏折结算(this: void): void {

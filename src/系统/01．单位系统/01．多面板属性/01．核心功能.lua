@@ -11,14 +11,14 @@ function multiboardSetItemValue(self, mb, col, row, val)
     if mb == nil then
         return
     end
-    local item = jass:MultiboardGetItem(mb, row - 1, col - 1)
+    local item = jass.MultiboardGetItem(mb, row - 1, col - 1)
     if item ~= nil then
-        jass:MultiboardSetItemValue(item, val)
-        jass:MultiboardReleaseItem(item)
+        jass.MultiboardSetItemValue(item, val)
+        jass.MultiboardReleaseItem(item)
     end
 end
 function getPlayerAttr(self, playerId, attrName)
-    local player = jass:Player(playerId - 1)
+    local player = jass.Player(playerId - 1)
     if player == nil then
         return 0
     end
@@ -42,13 +42,13 @@ function getPlayerHero(self, playerId)
     if heroGroup == nil then
         return nil
     end
-    local player = jass:Player(playerId - 1)
+    local player = jass.Player(playerId - 1)
     local foundUnit = nil
     forEachUnitInGroup(
         nil,
         heroGroup,
         function(____, u)
-            if u ~= nil and jass:GetOwningPlayer(u) == player then
+            if u ~= nil and jass.GetOwningPlayer(u) == player then
                 foundUnit = u
             end
         end
@@ -56,11 +56,11 @@ function getPlayerHero(self, playerId)
     return foundUnit
 end
 function formatPercent(self, value)
-    local pct = jass:R2I(value * 100 + 0.5)
+    local pct = jass.R2I(value * 100 + 0.5)
     return tostring(tostring(pct)) .. "%"
 end
 function formatNumber(self, value)
-    return tostring(jass:R2I(value + 0.5))
+    return tostring(jass.R2I(value + 0.5))
 end
 function formatReal(self, value)
     return __TS__NumberToFixed(value, 2)
@@ -75,7 +75,7 @@ function updateMultiboard(self, mb, playerId)
     local timeS = ____getGameTimeFormatted_result_4.seconds
     local difficulty = getGameDifficulty(nil)
     local title = ((((((("属性面板（难度：" .. tostring(difficulty)) .. "）游戏时间：") .. tostring(timeH)) .. "小时") .. tostring(timeM)) .. "分") .. tostring(timeS)) .. "秒"
-    jass:MultiboardSetTitleText(mb, title)
+    jass.MultiboardSetTitleText(mb, title)
     local physDmg = 100 + getPlayerAttr(nil, playerId, "物理伤害") * 100
     local physResist = 100 - getPlayerAttr(nil, playerId, "物理抗性") * 100
     multiboardSetItemValue(
@@ -403,17 +403,17 @@ function updateMultiboard(self, mb, playerId)
     )
 end
 function updatePlayerSpeed(self, playerId)
-    local player = jass:Player(playerId - 1)
+    local player = jass.Player(playerId - 1)
     local foundUnit = getPlayerHero(nil, playerId)
     if foundUnit == nil then
         return
     end
     local attackInterval = GetUnitStateJapi(
         foundUnit,
-        jass:ConvertUnitState(37)
+        jass.ConvertUnitState(37)
     )
     local attacksPerSec = attackInterval > 0 and 1 / attackInterval or 0
-    local moveSpeed = jass:GetUnitMoveSpeed(foundUnit)
+    local moveSpeed = jass.GetUnitMoveSpeed(foundUnit)
     YDUserDataSet(
         nil,
         "player",
@@ -447,7 +447,7 @@ function onRefresh(self)
                 if mb == nil then
                     goto __continue28
                 end
-                if not jass:IsMultiboardDisplayed(mb) then
+                if not jass.IsMultiboardDisplayed(mb) then
                     goto __continue28
                 end
                 updatePlayerSpeed(nil, i + 1)
@@ -489,10 +489,10 @@ local function multiboardSetItemIcon(self, mb, col, row, icon)
     if mb == nil then
         return
     end
-    local item = jass:MultiboardGetItem(mb, row - 1, col - 1)
+    local item = jass.MultiboardGetItem(mb, row - 1, col - 1)
     if item ~= nil then
-        jass:MultiboardSetItemIcon(item, icon)
-        jass:MultiboardReleaseItem(item)
+        jass.MultiboardSetItemIcon(item, icon)
+        jass.MultiboardReleaseItem(item)
     end
 end
 --- 设置多面板项目样式
@@ -500,35 +500,35 @@ local function multiboardSetItemStyle(self, mb, col, row, showValue, showIcon)
     if mb == nil then
         return
     end
-    local item = jass:MultiboardGetItem(mb, row - 1, col - 1)
+    local item = jass.MultiboardGetItem(mb, row - 1, col - 1)
     if item ~= nil then
-        jass:MultiboardSetItemStyle(item, showValue, showIcon)
-        jass:MultiboardReleaseItem(item)
+        jass.MultiboardSetItemStyle(item, showValue, showIcon)
+        jass.MultiboardReleaseItem(item)
     end
 end
 --- 创建单个多面板
 local function createMultiboard(self, playerId)
-    local player = jass:Player(playerId - 1)
-    local slotState = jass:GetPlayerSlotState(player)
+    local player = jass.Player(playerId - 1)
+    local slotState = jass.GetPlayerSlotState(player)
     local PLAYER_SLOT_STATE_PLAYING = jass.PLAYER_SLOT_STATE_PLAYING
     if slotState ~= PLAYER_SLOT_STATE_PLAYING then
         return nil
     end
-    local mb = jass:CreateMultiboard()
+    local mb = jass.CreateMultiboard()
     if mb == nil then
         return nil
     end
-    jass:MultiboardSetTitleText(mb, "属性面板")
-    jass:MultiboardSetTitleTextColor(
+    jass.MultiboardSetTitleText(mb, "属性面板")
+    jass.MultiboardSetTitleTextColor(
         mb,
         255,
         215,
         0,
         255
     )
-    jass:MultiboardSetItemsWidth(mb, 0.08)
-    jass:MultiboardSetRowCount(mb, MULTIBOARD_ROWS)
-    jass:MultiboardSetColumnCount(mb, MULTIBOARD_COLS)
+    jass.MultiboardSetItemsWidth(mb, 0.08)
+    jass.MultiboardSetRowCount(mb, MULTIBOARD_ROWS)
+    jass.MultiboardSetColumnCount(mb, MULTIBOARD_COLS)
     do
         local row = 1
         while row <= MULTIBOARD_ROWS do
@@ -860,8 +860,8 @@ local function createMultiboard(self, playerId)
         true,
         false
     )
-    if player == jass:GetLocalPlayer() then
-        jass:MultiboardDisplay(mb, true)
+    if player == jass.GetLocalPlayer() then
+        jass.MultiboardDisplay(mb, true)
     end
     return mb
 end
