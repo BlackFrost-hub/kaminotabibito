@@ -45,6 +45,8 @@ local _____8BB0_5F55_8299_8389_83B2_6D3B_52A8 = ____require_result_11["记录芙
 local _____767B_8BB0_8299_8389_83B2_6E05_7406 = ____require_result_11["登记芙莉莲清理"]
 local _____82B1_7530_5224_5B9A_63A5_53E3 = ____require_result_11["花田判定接口"]
 local _____91CD_65B0_5B89_6392_9690_533F_8BA1_65F6 = ____require_result_11["重新安排隐匿计时"]
+local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_12.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
 local ____D_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.D["技能ID"])
 local ____D_914D_7F6E = _____8299_8389_83B2D_914D_7F6E
@@ -189,6 +191,14 @@ local function _____9500_6BC1_82B1_7530(_____82B1_7530, _____81EA_7136_7ED3_675F
     if _____82B1_7530["已结束"] then
         return
     end
+    debugLogForce(
+        "芙莉莲-D",
+        "结束",
+        "原因",
+        _____81EA_7136_7ED3_675F and "自然消散" or "打断/死亡/替换",
+        "英雄",
+        _____82B1_7530["芙莉莲"]
+    )
     _____82B1_7530["已结束"] = true
     if _____82B1_7530["到期回调ID"] ~= 0 then
         removeDelayedCallback(_____82B1_7530["到期回调ID"])
@@ -197,8 +207,8 @@ local function _____9500_6BC1_82B1_7530(_____82B1_7530, _____81EA_7136_7ED3_675F
         removePeriodicCallback(_____82B1_7530["静止检测ID"])
     end
     if _____82B1_7530["区域"] ~= nil then
-        local ____self_12 = _____82B1_7530["区域"]
-        ____self_12["销毁"](____self_12)
+        local ____self_13 = _____82B1_7530["区域"]
+        ____self_13["销毁"](____self_13)
         _____82B1_7530["区域"] = nil
     end
     if _____82B1_7530["视野句柄"] ~= nil and _____82B1_7530["视野句柄"] ~= 0 then
@@ -273,8 +283,8 @@ local function _____521B_5EFA_82B1_6D77(_____82B1_7530)
                         )
                         if _____82B1_7C07 ~= nil and _____82B1_7C07 ~= 0 then
                             DzDoodadSetModel(_____82B1_7C07, _____914D_7F6E["模型路径"])
-                            local ____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_13 = _____82B1_7530["花簇句柄列表"]
-                            ____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_13[#____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_13 + 1] = _____82B1_7C07
+                            local ____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_14 = _____82B1_7530["花簇句柄列表"]
+                            ____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_14[#____82B1_7530__82B1_7C07_53E5_67C4_5217_8868_14 + 1] = _____82B1_7C07
                             _____6570_91CF = _____6570_91CF + 1
                         end
                     end
@@ -287,6 +297,7 @@ local function _____521B_5EFA_82B1_6D77(_____82B1_7530)
     end
 end
 local function _____91CA_653ED(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("芙莉莲-D", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_8299_8389_83B2(_____65BD_6CD5_8005) then
         return
     end
@@ -302,8 +313,8 @@ local function _____91CA_653ED(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         do
             local i = 0
             while i < #_____65E7_5B9E_4F8B_5217_8868 do
-                local ____self_14 = _____65E7_5B9E_4F8B_5217_8868[i + 1]
-                ____self_14["完成"](____self_14)
+                local ____self_15 = _____65E7_5B9E_4F8B_5217_8868[i + 1]
+                ____self_15["完成"](____self_15)
                 i = i + 1
             end
         end
@@ -328,6 +339,13 @@ local function _____91CA_653ED(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         ["已结束"] = false
     }
     _____82B1_7530_8868[id] = _____82B1_7530
+    debugLogForce(
+        "芙莉莲-D",
+        "状态",
+        "花田建立",
+        "英雄",
+        _____65BD_6CD5_8005
+    )
     local _____63A7_5236_5668 = _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B({
         ["技能键"] = "芙莉莲D",
         ["施法者"] = _____65BD_6CD5_8005,
@@ -398,6 +416,7 @@ local function _____91CA_653ED(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册芙莉莲D"] = function()
+    debugLogForce("芙莉莲-D", "注册", "名称", "注册芙莉莲D")
     if _____5DF2_6CE8_518C then
         return
     end

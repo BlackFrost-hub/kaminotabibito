@@ -81,6 +81,9 @@ const {
 const 花田联动 = require("./07．D技能") as {
   尝试消费花田修正?: (this: void, 芙莉莲: any) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(芙莉莲技能配置.单位类型ID);
 const Q技能ID = stringToFourCCSafe(芙莉莲技能配置.Q.技能ID);
@@ -132,6 +135,7 @@ function 结算Q命中(this: void, 施法者: any, 目标: any, 技能实例ID: 
     标签 = "芙莉莲-Q穿透";
   }
 
+  debugLogForce("芙莉莲-Q", "伤害", "标签", 标签, "数值", 攻击力 * 倍率);
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -173,6 +177,7 @@ function 结算Q命中(this: void, 施法者: any, 目标: any, 技能实例ID: 
 //=============================================================================
 
 function 释放Q(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("芙莉莲-Q", "释放", "技能实例ID", 技能实例ID || "-");
   if (!是芙莉莲(施法者)) return;
   // 重复 Q：已有活跃 Q 实例时忽略
   // 施法时点：先快照隐匿（消费判定用），再记录活动（解除隐匿并重置静默计时）
@@ -199,6 +204,7 @@ function 释放Q(this: void, _context: any, 施法者: any, 技能实例ID: numb
     技能实例ID,
     数据: { 已发射: false },
     结束回调: function Q结束(this: void, _原因: string, _c: any): void {
+      debugLogForce("芙莉莲-Q", "结束", "原因", _原因 || "-");
       // 打断发生在发射点前：延迟回调已由实例统一清理 → 不生成弹道、不命中、不消费解析
     },
   });
@@ -257,6 +263,7 @@ const { 芙莉莲D配置: 芙莉莲D数值引用 } = require("./00．配置") as
 let 已注册 = false;
 
 export function 注册芙莉莲Q(this: void): void {
+  debugLogForce("芙莉莲-Q", "注册", "名称", "注册芙莉莲Q");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

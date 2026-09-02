@@ -65,6 +65,8 @@ function _____56DE_9988Q_51B7_5374(_____82F1_96C4, _____72B6_6001)
     platformAbilityAction["技能_设置技能冷却时间"](_____82F1_96C4, ____Q_6280_80FD_7C7B_578BID, _____7F29_51CF > 0 and _____7F29_51CF or 0, _____6700_5927_51B7_5374)
 end
 local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local japi = require("jass.japi")
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
@@ -77,34 +79,36 @@ local EXSetEffectXY = japi.EXSetEffectXY
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_0.registerDeathListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-getGameTime = ____require_result_1.getGameTime
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_1.registerDeathListener
 local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_2.addPeriodicCallback
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____53D6_5355_4F4DID = ____require_result_3["取单位ID"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_3["单位存活"]
-local _____8DDD_79BB_5E73_65B9XY = ____require_result_3["距离平方XY"]
-local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____require_result_3["点到线段距离平方"]
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
-local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_4.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_4["移除单位指定Buff"]
-local ____require_result_5 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_5.registerAppliedFinalDamageListener
-local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_6["造成技能伤害"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
-local _____9500_6BC1_70B9_7279_6548 = ____require_result_7["销毁点特效"]
-local ____require_result_8 = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI")
-local _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_8["销毁世界坐标进度UI"]
+getGameTime = ____require_result_2.getGameTime
+local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_3.addPeriodicCallback
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____53D6_5355_4F4DID = ____require_result_4["取单位ID"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_4["单位存活"]
+local _____8DDD_79BB_5E73_65B9XY = ____require_result_4["距离平方XY"]
+local _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9 = ____require_result_4["点到线段距离平方"]
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
+local ____require_result_5 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_5.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_5["移除单位指定Buff"]
+local ____require_result_6 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_6.registerAppliedFinalDamageListener
+local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_7["造成技能伤害"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local _____9500_6BC1_70B9_7279_6548 = ____require_result_8["销毁点特效"]
+local ____require_result_9 = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI")
+local _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_9["销毁世界坐标进度UI"]
 platformAbilityApi = require("平台扩展API取值")
 platformAbilityAction = require("平台扩展API动作")
+local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_10.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E["单位类型ID"]
-____Q_6280_80FD_7C7B_578BID = jass.FourCC(_____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.Q["技能ID"])
+____Q_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.Q["技能ID"])
 local _____585E_8389_4E9A_72B6_6001_8868 = {}
 local _____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7 = 1
 local _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
@@ -139,7 +143,7 @@ ____exports["是塞莉亚克莱尔"] = function(unit)
     if unit == nil or unit == 0 then
         return false
     end
-    return GetUnitTypeId(unit) == jass.FourCC(_____82F1_96C4_5355_4F4D_7C7B_578BID)
+    return GetUnitTypeId(unit) == stringToFourCCSafe(_____82F1_96C4_5355_4F4D_7C7B_578BID)
 end
 local function _____5EFA_7ACB_8FDE_63A5_7EBF(_____8FDE_63A5, A, B)
     local z = _____585E_8389_4E9A_514B_83B1_5C14_8282_70B9_914D_7F6E["连接Z高度"]
@@ -285,6 +289,7 @@ ____exports["创建塞莉亚节点"] = function(_____82F1_96C4, _____7C7B_578B, 
         _____9500_6BC1_5185_90E8_8282_70B9(_____72B6_6001, _____72B6_6001["节点列表"][1]["序号"])
     end
     local _____8282_70B9_8868_73B0 = _____7C7B_578B == "棱晶" and _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["公式节点棱晶"] or (_____7C7B_578B == "结界" and _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["公式节点结界"] or _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["公式节点锚定"])
+    debugLogForce("塞莉亚-被动", "特效", "路径", _____8282_70B9_8868_73B0["模型路径"])
     local _____7279_6548_53E5_67C4 = _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____8282_70B9_8868_73B0["模型路径"],
         RGB = _____8282_70B9_8868_73B0.RGB,
@@ -297,10 +302,10 @@ ____exports["创建塞莉亚节点"] = function(_____82F1_96C4, _____7C7B_578B, 
     if _____7279_6548_53E5_67C4 == nil or _____7279_6548_53E5_67C4 == 0 then
         return nil
     end
-    local ____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7_9 = _____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7
-    _____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7 = ____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7_9 + 1
+    local ____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7_11 = _____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7
+    _____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7 = ____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7_11 + 1
     local _____8282_70B9 = {
-        ["序号"] = ____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7_9,
+        ["序号"] = ____4E0B_4E00_5168_5C40_8282_70B9_5E8F_53F7_11,
         ["类型"] = _____7C7B_578B,
         X = X,
         Y = Y,
@@ -308,8 +313,8 @@ ____exports["创建塞莉亚节点"] = function(_____82F1_96C4, _____7C7B_578B, 
         ["到期时间"] = getGameTime() + (_____5B58_7EED_6BEB_79D2 ~= nil and _____5B58_7EED_6BEB_79D2 > 0 and _____5B58_7EED_6BEB_79D2 or _____585E_8389_4E9A_514B_83B1_5C14_8282_70B9_914D_7F6E["存续毫秒"]),
         ["特效句柄"] = _____7279_6548_53E5_67C4
     }
-    local ____72B6_6001__8282_70B9_5217_8868_10 = _____72B6_6001["节点列表"]
-    ____72B6_6001__8282_70B9_5217_8868_10[#____72B6_6001__8282_70B9_5217_8868_10 + 1] = _____8282_70B9
+    local ____72B6_6001__8282_70B9_5217_8868_12 = _____72B6_6001["节点列表"]
+    ____72B6_6001__8282_70B9_5217_8868_12[#____72B6_6001__8282_70B9_5217_8868_12 + 1] = _____8282_70B9
     _____5C1D_8BD5_5EFA_7ACB_8FDE_63A5(_____72B6_6001, _____8282_70B9)
     return _____8282_70B9
 end
@@ -434,6 +439,14 @@ ____exports["授予塞莉亚演算窗口"] = function(_____82F1_96C4)
         return
     end
     _____72B6_6001["强化次数"] = _____72B6_6001["强化次数"] + 1
+    debugLogForce(
+        "塞莉亚-被动",
+        "Buff",
+        "操作",
+        "施加",
+        "目标",
+        _____82F1_96C4
+    )
     registerManualBuff(
         _____82F1_96C4,
         _____585E_8389_4E9ABuffID["演算魔弹"],
@@ -511,25 +524,25 @@ local function _____5904_7406_585E_8389_4E9A_6F14_7B97_666E_653B(target, attacke
     if not _____5355_4F4D_5B58_6D3B(target) then
         return
     end
-    local ____opt_result_13
+    local ____opt_result_15
     if snapshot ~= nil then
-        ____opt_result_13 = snapshot.isNormalAttack
+        ____opt_result_15 = snapshot.isNormalAttack
     end
-    if ____opt_result_13 ~= true then
+    if ____opt_result_15 ~= true then
         return
     end
-    local ____opt_result_16
+    local ____opt_result_18
     if snapshot ~= nil then
-        ____opt_result_16 = snapshot.isWrappedSkillDamage
+        ____opt_result_18 = snapshot.isWrappedSkillDamage
     end
-    if ____opt_result_16 == true then
+    if ____opt_result_18 == true then
         return
     end
-    local ____opt_result_19
+    local ____opt_result_21
     if snapshot ~= nil then
-        ____opt_result_19 = snapshot.originalAttacker
+        ____opt_result_21 = snapshot.originalAttacker
     end
-    if ____opt_result_19 ~= nil and snapshot.originalAttacker ~= attacker then
+    if ____opt_result_21 ~= nil and snapshot.originalAttacker ~= attacker then
         return
     end
     if _____72B6_6001["已清理"] or _____72B6_6001["强化次数"] <= 0 then
@@ -622,8 +635,8 @@ ____exports["登记塞莉亚进度UI"] = function(_____82F1_96C4, ui)
             i = i + 1
         end
     end
-    local ____72B6_6001__8FDB_5EA6UI_5217_8868_20 = _____72B6_6001["进度UI列表"]
-    ____72B6_6001__8FDB_5EA6UI_5217_8868_20[#____72B6_6001__8FDB_5EA6UI_5217_8868_20 + 1] = ui
+    local ____72B6_6001__8FDB_5EA6UI_5217_8868_22 = _____72B6_6001["进度UI列表"]
+    ____72B6_6001__8FDB_5EA6UI_5217_8868_22[#____72B6_6001__8FDB_5EA6UI_5217_8868_22 + 1] = ui
 end
 ____exports["销毁塞莉亚进度UI"] = function(_____82F1_96C4, ui)
     if ui == nil or ui == 0 then
@@ -759,7 +772,17 @@ local function _____786E_4FDD_6B7B_4EA1_76D1_542C()
         if dyingUnit == nil or dyingUnit == 0 then
             return
         end
-        ____exports["清理塞莉亚状态"](dyingUnit, "英雄死亡")
+        if ____exports["是塞莉亚克莱尔"](dyingUnit) then
+            debugLogForce(
+                "塞莉亚-被动",
+                "回调",
+                "类型",
+                "死亡",
+                "单位",
+                dyingUnit
+            )
+            ____exports["清理塞莉亚状态"](dyingUnit, "英雄死亡")
+        end
         local diedId = _____53D6_5355_4F4DID(dyingUnit)
         __TS__Delete(____E_533A_57DF_76EE_6807_8868, diedId)
         __TS__Delete(_____9635_5185_89E3_6790_4E0A_6B21_65F6_95F4, diedId)
@@ -769,6 +792,7 @@ local _____666E_653B_8054_52A8_5DF2_6CE8_518C = false
 local _____6E05_626B_5468_671F_5DF2_6CE8_518C = false
 --- 注册被动入口（幂等）：死亡清理 + 演算普攻监听。
 ____exports["注册塞莉亚被动效果"] = function()
+    debugLogForce("塞莉亚-被动", "注册", "名称", "注册塞莉亚被动效果")
     _____786E_4FDD_6B7B_4EA1_76D1_542C()
     if not _____6E05_626B_5468_671F_5DF2_6CE8_518C then
         _____6E05_626B_5468_671F_5DF2_6CE8_518C = true

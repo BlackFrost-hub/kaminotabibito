@@ -111,6 +111,8 @@ local _____83B7_53D6_59FF_6001 = ____require_result_13["获取姿态"]
 local _____767B_8BB0_693F_6E05_7406 = ____require_result_13["登记椿清理"]
 local _____64AD_653E_693F_52A8_4F5C = ____require_result_13["播放椿动作"]
 local _____8054_52A8R = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.06．R技能")
+local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_14.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 ____W_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E.W["技能ID"])
 ____W_914D_7F6E = _____6731_96C0_9662_693FW_914D_7F6E
@@ -122,6 +124,16 @@ GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
 local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E, _____5B8C_7F8E)
+    debugLogForce(
+        "椿-W",
+        "伤害",
+        "标签",
+        "朱雀院椿-W反击",
+        "目标",
+        _____6570_636E["招架来源"],
+        "数值",
+        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____W_914D_7F6E["反击伤害倍率"]
+    )
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["W成功反击"])
     local _____6765_6E90 = _____6570_636E["招架来源"]
     if _____6765_6E90 == nil or _____6765_6E90 == 0 or not _____5355_4F4D_5B58_6D3B(_____6765_6E90) then
@@ -185,6 +197,7 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9
     _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
 end
 local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("椿-W", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_693F(_____65BD_6CD5_8005) then
         return
     end
@@ -204,12 +217,14 @@ local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____628
         ["已结束"] = false,
         ["招架来源"] = nil
     }
+    debugLogForce("椿-W", "状态", "创建战斗技能实例", _____6280_80FD_5B9E_4F8BID or "-")
     local _____63A7_5236_5668 = _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B({
         ["技能键"] = "椿W",
         ["施法者"] = _____65BD_6CD5_8005,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
+            debugLogForce("椿-W", "结束", "原因", ______539F_56E0 or "-")
             if _____6570_636E["已结束"] then
                 return
             end
@@ -284,6 +299,7 @@ local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____628
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册朱雀院椿W"] = function()
+    debugLogForce("椿-W", "注册", "名称", "注册朱雀院椿W")
     if _____5DF2_6CE8_518C then
         return
     end

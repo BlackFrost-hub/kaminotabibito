@@ -4491,7 +4491,7 @@ ____exports.items.I0G8 = {
     hp = 1000,
     hpRegen = 70
 }
-____exports.items.I0H7 = {
+____exports.items.I0HH = {
     type = "道具/戒指/饰品",
     name = "祖地纹章徽记",
     goldPrice = 1140,
@@ -5024,7 +5024,7 @@ ____exports.items.I0KH = {
     movespeed2 = 0.12,
     hpRegen = 50
 }
-____exports.items.I0KB = {
+____exports.items.I0KI = {
     type = "道具/戒指/饰品",
     name = "焚羽余烬晶核",
     goldPrice = 1780,

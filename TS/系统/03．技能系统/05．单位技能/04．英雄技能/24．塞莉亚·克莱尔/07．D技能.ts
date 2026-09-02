@@ -54,6 +54,9 @@ const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．�
 const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
   播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = 塞莉亚克莱尔技能配置.单位类型ID;
 const D硬直来源 = "塞莉亚-D硬直";
@@ -83,6 +86,7 @@ function 选择最近合法节点(
 }
 
 function 释放D术式转写(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("塞莉亚-D", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
   // 技能喊话：施法成功起点（前置检查通过；全局 3D；随机二选一由喊话系统驱动）
@@ -111,9 +115,11 @@ function 释放D术式转写(this: void, _context: any, 施法者: any, 技能�
       // R 锁定或并发冲突：安全回滚（什么都不改）
       return;
     }
+    debugLogForce("塞莉亚-D", "状态", "转写成功", 目标节点.序号);
     // 转写音（转写事务真正成功时一次；坐标=新落点，内含落点短闪延迟层，参数配置驱动）
     Sound3DII_CooPlayReuse(塞莉亚音效配置.D转写.路径, 目标X, 目标Y, 塞莉亚音效配置.D转写.高度, 塞莉亚音效配置.D转写.裁断距离);
     // 新位置短闪表现
+    debugLogForce("塞莉亚-D", "特效", "路径", 塞莉亚克莱尔表现配置.D重连落点闪现.模型路径);
     const 落点闪现 = 创建点特效({
       模型路径: 塞莉亚克莱尔表现配置.D重连落点闪现.模型路径,
       RGB: 塞莉亚克莱尔表现配置.D重连落点闪现.RGB,
@@ -145,6 +151,7 @@ function 添加单位暂停收尾(this: void, 施法者: any, 来源: string): v
 let 已注册 = false;
 
 export function 注册塞莉亚D(this: void): void {
+  debugLogForce("塞莉亚-D", "注册", "名称", "注册塞莉亚D");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

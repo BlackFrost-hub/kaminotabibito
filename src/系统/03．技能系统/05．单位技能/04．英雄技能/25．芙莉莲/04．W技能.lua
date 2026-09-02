@@ -52,6 +52,8 @@ local _____767B_8BB0_8299_8389_83B2_6E05_7406 = ____require_result_12["登记芙
 local _____82B1_7530_8054_52A8 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.07．D技能")
 local ____require_result_13 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
 local _____8299_8389_83B2D_914D_7F6E = ____require_result_13["芙莉莲D配置"]
+local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_14.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
 local ____W_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.W["技能ID"])
 local ____W_914D_7F6E = _____8299_8389_83B2W_914D_7F6E
@@ -64,6 +66,14 @@ local function _____7ED3_675FW_62A4_58C1(_____65BD_6CD5_8005, _____6280_80FD_5B9
     if _____6570_636E["已结束"] then
         return
     end
+    debugLogForce(
+        "芙莉莲-W",
+        "结束",
+        "原因",
+        _____81EA_7136_7ED3_675F and "自然结束" or "成功/中断收束",
+        "英雄",
+        _____65BD_6CD5_8005
+    )
     _____6570_636E["已结束"] = true
     if _____6570_636E["动作守护"] ~= nil then
         _____505C_6B62_5FAA_73AF_5B88_62A4(_____6570_636E["动作守护"])
@@ -92,9 +102,10 @@ local function _____7ED3_675FW_62A4_58C1(_____65BD_6CD5_8005, _____6280_80FD_5B9
     end
     local ____ = _____6280_80FD_5B9E_4F8BID
 end
-local ____require_result_14 = require("系统.00．核心系统.05．中心计时器")
-removeDelayedCallback = ____require_result_14.removeDelayedCallback
+local ____require_result_15 = require("系统.00．核心系统.05．中心计时器")
+removeDelayedCallback = ____require_result_15.removeDelayedCallback
 local function _____91CA_653EW(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("芙莉莲-W", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_8299_8389_83B2(_____65BD_6CD5_8005) then
         return
     end
@@ -176,6 +187,7 @@ local function _____91CA_653EW(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
             end
             _____6570_636E["已防御"] = true
             local _____6765_6E90 = context.attacker
+            debugLogForce("芙莉莲-W", "命中", "目标", _____6765_6E90)
             addDelayedCallback(
                 0,
                 function()
@@ -215,6 +227,7 @@ local function _____91CA_653EW(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册芙莉莲W"] = function()
+    debugLogForce("芙莉莲-W", "注册", "名称", "注册芙莉莲W")
     if _____5DF2_6CE8_518C then
         return
     end

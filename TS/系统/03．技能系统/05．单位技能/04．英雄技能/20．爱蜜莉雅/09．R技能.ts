@@ -25,6 +25,9 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -69,9 +72,12 @@ const { 获取爱蜜莉雅D强化, 消费爱蜜莉雅D强化 } = require("./02�
   获取爱蜜莉雅D强化: (this: void, 英雄: any) => any;
   消费爱蜜莉雅D强化: (this: void, 英雄: any) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
-const 英雄单位类型ID = jass.FourCC(爱蜜莉雅技能配置.单位类型ID) as number;
-const R技能类型ID = jass.FourCC(爱蜜莉雅技能配置.R.技能ID) as number;
+const 英雄单位类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.单位类型ID);
+const R技能类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.R.技能ID);
 
 interface R领域数据 {
   区域: any;
@@ -140,6 +146,7 @@ function R创建领域(
   有强化: boolean,
   来源键: string,
 ): void {
+  debugLogForce("爱蜜莉雅-R", "状态", "创建领域", "半径", 半径, "有强化", 有强化);
   if (!单位存活(施法者)) return;
   if (有强化) {
     while (消费爱蜜莉雅D强化(施法者)) {
@@ -156,6 +163,7 @@ function R创建领域(
     数据,
     结束回调: function R结束(this: void, 原因: string, _c: any): void {
       // 记录结束原因（on销毁 据此区分自然结束 vs 打断/死亡）
+      debugLogForce("爱蜜莉雅-R", "结束", "原因", 原因);
       数据.结束原因 = 原因;
       R清理连接光(数据);
       if (数据.区域 != null) {
@@ -196,6 +204,7 @@ function R创建领域(
       数据.已结束 = true;
       // 最终冰爆：结束时点实时快照（刚进入结算、已离开不结算）
       const 区域内单位 = R取实时区域敌人(施法者, 中心X, 中心Y, 半径);
+      debugLogForce("爱蜜莉雅-R", "伤害", "标签", "爱蜜莉雅-R最终冰爆", "目标数", 区域内单位.length, "数值", 数据.最终伤害);
       R区域内结算(施法者, 区域内单位, 技能实例ID, 数据.最终伤害);
       创建点特效({
         模型路径: 爱蜜莉雅表现配置.最终冰爆.模型路径,
@@ -311,6 +320,7 @@ function R创建领域(
 }
 
 function 释放R永冻之庭(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("爱蜜莉雅-R", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0) return;
   播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.R);
   const 中心X = GetSpellTargetX();
@@ -367,6 +377,7 @@ function 释放R永冻之庭(this: void, _context: any, 施法者: any, 技能�
 }
 
 export function 注册爱蜜莉雅R(this: void): void {
+  debugLogForce("爱蜜莉雅-R", "注册", "名称", "注册爱蜜莉雅R");
   注册单位技能壳监听({
     名称: "爱蜜莉雅-永冻之庭（R）",
     单位类型ID: 英雄单位类型ID,

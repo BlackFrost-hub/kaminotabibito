@@ -41,6 +41,16 @@ export interface 单位技能壳监听参数<T> {
 const 监听列表: 单位技能壳监听参数<any>[] = [];
 let 已注册监听 = false;
 
+/** 20-25号新英雄调试用：单位类型ID -> 英雄名（用于一次定位定位事件流到达层级） */
+const 新英雄调试类型ID表: Record<number, string> = {
+  [stringToFourCC("E0L0")]: "爱蜜莉雅",
+  [stringToFourCC("E0L1")]: "朱雀院红叶",
+  [stringToFourCC("E0L2")]: "朱雀院椿",
+  [stringToFourCC("E0L3")]: "伊蕾娜",
+  [stringToFourCC("E0L4")]: "塞莉亚·克莱尔",
+  [stringToFourCC("E0L5")]: "芙莉莲",
+};
+
 function 转ID(this: void, id: string | number): number {
   return typeof id === "number" ? id : stringToFourCC(id);
 }
@@ -48,6 +58,19 @@ function 转ID(this: void, id: string | number): number {
 function on单位技能壳监听施法(this: void, castingUnit: any, spellAbilityId: number): void {
   if (!单位有效(castingUnit)) return;
   const unitTypeId = GetUnitTypeId(castingUnit);
+  const 调试英雄名 = 新英雄调试类型ID表[unitTypeId];
+  if (调试英雄名 != null) {
+    debugLogForce(
+      "新英雄技能壳诊断",
+      "收到施法",
+      "英雄",
+      调试英雄名,
+      "技能ID",
+      spellAbilityId,
+      "监听总数",
+      监听列表.length,
+    );
+  }
   if (unitTypeId === 转ID("H00F") || unitTypeId === 转ID("H00G")) {
     debugLogForce(
       "阿伦劳特技能壳诊断",
@@ -77,6 +100,9 @@ function on单位技能壳监听施法(this: void, castingUnit: any, spellAbilit
         持续时间秒: 参数.技能实例持续时间秒,
       });
     绑定单位当前独立技能伤害实例(castingUnit, 技能实例ID);
+    if (调试英雄名 != null) {
+      debugLogForce("新英雄技能壳诊断", "命中监听", "英雄", 调试英雄名, "技能ID", spellAbilityId, "监听名", 参数.名称, "实例ID", 技能实例ID);
+    }
     参数.释放技能(context, castingUnit, 技能实例ID);
   }
 }

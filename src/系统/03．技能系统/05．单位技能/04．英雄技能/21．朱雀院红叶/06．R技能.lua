@@ -39,6 +39,8 @@ local _____8BFB_53D6_6700_8FD1_5251_75D5_5E76_9501_5B9A = ____require_result_10[
 local ____require_result_11 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.07．D技能")
 local _____6D88_8D39_5168_90E8D_5F3A_5316 = ____require_result_11["消费全部D强化"]
 local _____7ED3_675FD_79D8_4F20 = ____require_result_11["结束D秘传"]
+local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_12.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
 local ____R_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.R["技能ID"])
 local ____R_914D_7F6E = _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C.R
@@ -67,6 +69,16 @@ local function _____53D6_7A84_7EBF_654C_4EBA(_____65BD_6CD5_8005, _____65B9_5411
     })
 end
 local function _____7ED3_7B97R_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, _____6280_80FD_5B9E_4F8BID, _____4F24_5BB3_503C, _____6807_7B7E)
+    debugLogForce(
+        "红叶-R",
+        "伤害",
+        "标签",
+        _____6807_7B7E,
+        "数值",
+        _____4F24_5BB3_503C,
+        "目标",
+        _____76EE_6807
+    )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
         ["目标"] = _____76EE_6807,
@@ -86,6 +98,7 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
     if not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
+    debugLogForce("红叶-R", "状态", "创建终式")
     _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["R释放"])
     local _____5200_52BF_5C42_6570 = _____6D88_8D39_5168_90E8_5200_52BF(_____65BD_6CD5_8005)
     local ____D_6B21_6570 = _____6D88_8D39_5168_90E8D_5F3A_5316(_____65BD_6CD5_8005)
@@ -110,6 +123,7 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
         end
     end
     if _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R主斩"]["模型路径"] ~= "" then
+        debugLogForce("红叶-R", "特效", "路径", _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R主斩"]["模型路径"])
         _____521B_5EFA_70B9_7279_6548({
             ["模型路径"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R主斩"]["模型路径"],
             RGB = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R主斩"].RGB,
@@ -159,6 +173,7 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
     end
 end
 local function _____91CA_653ER_5965_4E49(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("红叶-R", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_7EA2_53F6(_____65BD_6CD5_8005) then
         return
     end
@@ -198,6 +213,7 @@ local function _____91CA_653ER_5965_4E49(_context, _____65BD_6CD5_8005, _____628
                 end
             end,
             ["充能完成回调"] = function(______5355_4F4D, ______5145_80FDID)
+                debugLogForce("红叶-R", "状态", "蓄力完成")
                 Sound3DII_CooPlayReuse(
                     ____R_7EA2_53F6_4E00_95EA_97F3_6548["路径"],
                     GetUnitX(_____65BD_6CD5_8005),
@@ -214,6 +230,7 @@ local function _____91CA_653ER_5965_4E49(_context, _____65BD_6CD5_8005, _____628
                 )
             end,
             ["结束回调"] = function(______5355_4F4D, ______539F_56E0, ______5145_80FDID)
+                debugLogForce("红叶-R", "结束", "原因", "-")
                 if _____9884_8B66_7279_6548 ~= nil and _____9884_8B66_7279_6548 ~= 0 then
                     jass.DestroyEffect(_____9884_8B66_7279_6548)
                     _____9884_8B66_7279_6548 = nil
@@ -227,6 +244,14 @@ local function _____91CA_653ER_5965_4E49(_context, _____65BD_6CD5_8005, _____628
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册朱雀院红叶R"] = function()
+    debugLogForce(
+        "红叶-R",
+        "注册",
+        "名称",
+        "R",
+        "函数",
+        "注册朱雀院红叶R"
+    )
     if _____5DF2_6CE8_518C then
         return
     end

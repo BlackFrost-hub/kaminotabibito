@@ -13,6 +13,9 @@ local ____06_FF0ER_6280_80FD = require("系统.03．技能系统.05．单位技�
 local _____6CE8_518C_6731_96C0_9662_693FR = ____06_FF0ER_6280_80FD["注册朱雀院椿R"]
 local ____07_FF0ED_6280_80FD = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.07．D技能")
 local _____6CE8_518C_6731_96C0_9662_693FD = ____07_FF0ED_6280_80FD["注册朱雀院椿D"]
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
+debugLogForce("椿-index", "模块加载")
 _____6CE8_518C_6731_96C0_9662_693F_88AB_52A8()
 _____6CE8_518C_6731_96C0_9662_693FQ()
 _____6CE8_518C_6731_96C0_9662_693FW()

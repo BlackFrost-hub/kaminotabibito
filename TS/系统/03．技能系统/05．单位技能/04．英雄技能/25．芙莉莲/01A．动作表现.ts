@@ -21,6 +21,9 @@ const { 单位存活 } = require("系统.03．技能系统.00．技能模板+函
 const { 登记芙莉莲清理 } = require("./02．被动效果") as {
   登记芙莉莲清理: (this: void, 英雄: any, 名称: string, 清理: () => void) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (this: void, unit: any, index: number) => void;
 const SetUnitTimeScale = jass.SetUnitTimeScale as (this: void, unit: any, scale: number) => void;
@@ -54,6 +57,7 @@ export function 播放限时动作(this: void, 英雄: any, 槽: 动作槽, 登�
   if (槽.持续秒 > 0) {
     const 持续毫秒 = 槽.持续秒 * 1000;
     const 恢复ID = addDelayedCallback(持续毫秒, function 恢复站立(this: void): void {
+      debugLogForce("芙莉莲-动作表现", "结束", "原因", "限时动作到期恢复", "英雄", 英雄);
       if (单位存活(英雄)) {
         SetUnitTimeScale(英雄, 1);
         SetUnitAnimationByIndex(英雄, 芙莉莲模型动作配置.待机索引);
@@ -87,6 +91,7 @@ export function 开始循环守护(this: void, 英雄: any, 槽: 动作槽, 登�
   let 恢复ID = 0;
   if (槽.持续秒 > 0) {
     恢复ID = addDelayedCallback(槽.持续秒 * 1000, function 守护到期(this: void): void {
+      debugLogForce("芙莉莲-动作表现", "结束", "原因", "循环守护到期恢复");
       if (单位存活(英雄)) {
         SetUnitTimeScale(英雄, 1);
         SetUnitAnimationByIndex(英雄, 芙莉莲模型动作配置.待机索引);
@@ -101,6 +106,7 @@ export function 开始循环守护(this: void, 英雄: any, 槽: 动作槽, 登�
 }
 
 export function 停止循环守护(this: void, 句柄: 循环守护句柄 | null): void {
+  debugLogForce("芙莉莲-动作表现", "结束", "原因", "停止循环守护");
   if (句柄 == null) return;
   if (句柄.恢复ID !== 0) removeDelayedCallback(句柄.恢复ID);
   句柄.恢复ID = 0;

@@ -34,6 +34,9 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
 
@@ -49,6 +52,7 @@ function 计算下一个变式(this: void, 当前: string | null): string {
 }
 
 function 释放D旅途魔法变式(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
+  debugLogForce("伊蕾娜-D", "释放", "技能实例ID", _技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
   const 当前 = 获取伊蕾娜变式(施法者);
@@ -57,6 +61,7 @@ function 释放D旅途魔法变式(this: void, _context: any, 施法者: any, _�
     // R 蓄力期间被拒：不刷新任何提示
     return;
   }
+  debugLogForce("伊蕾娜-D", "状态", "切换变式", 下一个);
   播放英雄技能喊话(施法者, "伊蕾娜", 伊蕾娜技能配置.D.技能ID, 下一个);
   // 变式切换成功音（单位=施法者；R 锁定拒绝分支已在上方 return，不会播放，参数配置驱动）
   Sound3DII_UnitPlayReuse(伊蕾娜音效配置.D切换.路径, 施法者, 伊蕾娜音效配置.D切换.裁断距离);
@@ -82,6 +87,7 @@ function 释放D旅途魔法变式(this: void, _context: any, 施法者: any, _�
 let 已注册 = false;
 
 export function 注册伊蕾娜D(this: void): void {
+  debugLogForce("伊蕾娜-D", "注册", "名称", "注册伊蕾娜D");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

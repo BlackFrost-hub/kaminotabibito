@@ -66,6 +66,9 @@ const {
   获取决斗距离方向: (this: void, 英雄: any) => number;
   清除决斗距离: (this: void, 英雄: any) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院椿技能配置.单位类型ID);
 const R技能ID = stringToFourCCSafe(朱雀院椿技能配置.R.技能ID);
@@ -121,6 +124,7 @@ function R创建终式(
   受击记录: boolean,
 ): void {
   if (!单位存活(施法者)) return;
+  debugLogForce("椿-R", "伤害", "标签", "朱雀院椿-R终式", "数值", 读取单位攻击力(施法者) * R配置.主斩倍率);
   const 攻击力 = 读取单位攻击力(施法者);
   const 姿态 = 获取姿态(施法者);
   播放椿动作(施法者, 姿态 === "二刀" ? 朱雀院椿动作槽.R二刀释放 : 朱雀院椿动作槽.R一刀释放);
@@ -189,6 +193,7 @@ function R创建终式(
 //=============================================================================
 
 function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("椿-R", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (!是朱雀院椿(施法者)) return;
   // 禁止并行两个终式
   if (蓄力中表[jass.GetHandleId(施法者)] === true) return;
@@ -199,6 +204,7 @@ function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID
   // R 蓄力期间锁定姿态（D 不得中途改写本次 R 分支）
   锁定姿态(施法者, true);
   蓄力中表[jass.GetHandleId(施法者)] = true;
+  debugLogForce("椿-R", "状态", "蓄力开始", 技能实例ID ?? "-");
   // 释放前快照决斗距离（蓄力 0.7s 期间可能过期，联动按释放时快照消费，不依赖完成时再查）
   const 决斗距离快照 = { 有效: 有决斗距离(施法者), 方向: 获取决斗距离方向(施法者) };
   // 一刀守势受击记录：蓄势期间承受一次符合条件攻击 → 后之先·炎姬分支
@@ -253,6 +259,7 @@ function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID
     },
     // 蓄力结束（完成/指令中断/硬控/死亡/单位失效统一收尾）
     结束回调: function R蓄力结束(this: void, _单位: any, _原因: string, _充能ID: number): void {
+      debugLogForce("椿-R", "结束", "原因", _原因 ?? "-");
       if (预警特效 != null && 预警特效 !== 0) {
         jass.DestroyEffect(预警特效);
         预警特效 = null;
@@ -276,6 +283,7 @@ function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID
 let 已注册 = false;
 
 export function 注册朱雀院椿R(this: void): void {
+  debugLogForce("椿-R", "注册", "名称", "注册朱雀院椿R");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

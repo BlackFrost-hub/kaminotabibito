@@ -19,6 +19,9 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -66,9 +69,12 @@ const { 创建爱蜜莉雅场上冰晶 } = require("./03．被动效果") as {
 const { 消费爱蜜莉雅D强化 } = require("./02．公共状态与冰晶") as {
   消费爱蜜莉雅D强化: (this: void, 英雄: any) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
-const 英雄单位类型ID = jass.FourCC(爱蜜莉雅技能配置.单位类型ID) as number;
-const W技能类型ID = jass.FourCC(爱蜜莉雅技能配置.W.技能ID) as number;
+const 英雄单位类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.单位类型ID);
+const W技能类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.W.技能ID);
 
 interface W冰花数据 {
   区域: any;
@@ -102,6 +108,7 @@ function W区域内目标结算(this: void, 施法者: any, 区域内单位: any
   if (区域内单位 == null || 区域内单位.length <= 0) return;
   const 目标列表: any[] = [];
   for (let i = 0; i < 区域内单位.length; i++) 目标列表.push(区域内单位[i]);
+  debugLogForce("爱蜜莉雅-W", "伤害", "标签", "爱蜜莉雅-W冰花", "目标数", 目标列表.length, "数值", 伤害值);
   造成批量AOE技能伤害({
     来源: 施法者,
     目标列表,
@@ -132,6 +139,7 @@ function 施加W寒意(this: void, 施法者: any, 目标: any, 技能实例ID: 
 function 二段引爆W(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined): void {
   const 数据 = 控制器.数据 as W冰花数据;
   if (数据 == null || 数据.已二段) return;
+  debugLogForce("爱蜜莉雅-W", "状态", "二段引爆");
   数据.已二段 = true;
   // ASW2 为瞬发输入壳无目标点（GetSpellTargetX/Y 为无效坐标）→ 扇形方向取英雄当前朝向
   // 弹道编排工厂 发射方向角 为 GetUnitFacing 角度制（0-360），直接透传不做弧度换算
@@ -185,6 +193,7 @@ function 二段引爆W(this: void, 施法者: any, 控制器: any, 技能实例I
 }
 
 function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("爱蜜莉雅-W", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0) return;
   播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.W);
   // 二段：已有活跃 W 且未二段
@@ -281,11 +290,12 @@ function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID
     名称: "爱蜜莉雅-W二段",
     单位: 施法者,
     一段技能ID: W技能类型ID,
-    二段技能ID: jass.FourCC(爱蜜莉雅W配置.二段技能ID),
+    二段技能ID: stringToFourCCSafe(爱蜜莉雅W配置.二段技能ID),
     持续秒: 爱蜜莉雅W配置.持续秒,
   });
 
   // 冰花 + 寒气边界表现（常驻句柄，生命周期由实例清理统一管理：自然到期随收束销毁，打断/死亡提前销毁；不传持续秒避免 EC_CreateEffect 内置定时器与 DestroyEffect 双销毁）
+  debugLogForce("爱蜜莉雅-W", "特效", "路径", 爱蜜莉雅表现配置.冰花主体.模型路径);
   const 冰花特效 = 创建点特效({
     模型路径: 爱蜜莉雅表现配置.冰花主体.模型路径,
    RGB: 爱蜜莉雅表现配置.冰花主体.RGB,
@@ -317,6 +327,7 @@ function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID
 }
 
 function 释放W二段输入(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("爱蜜莉雅-W", "释放", "技能实例ID", 技能实例ID ?? "-", "分支", "二段输入");
   if (施法者 == null || 施法者 === 0) return;
   const 活跃列表 = 查询战斗技能实例(施法者, "W冰花");
   for (let i = 0; i < 活跃列表.length; i++) {
@@ -330,6 +341,7 @@ function 释放W二段输入(this: void, _context: any, 施法者: any, 技能�
 }
 
 export function 注册爱蜜莉雅W(this: void): void {
+  debugLogForce("爱蜜莉雅-W", "注册", "名称", "注册爱蜜莉雅W");
   注册单位技能壳监听({
     名称: "爱蜜莉雅-冰花绽放（W）",
     单位类型ID: 英雄单位类型ID,

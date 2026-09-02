@@ -79,6 +79,9 @@ const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．
 const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
   播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = 塞莉亚克莱尔技能配置.单位类型ID;
 const W结界特效键 = "塞莉亚-W结界";
@@ -108,6 +111,7 @@ function 有结界锚定连接(this: void, 英雄: any): boolean {
 
 /** 统一收口：成功 / 自然结束 / 打断 / 死亡互斥。 */
 function 关闭W结界(this: void, 数据: 塞莉亚W结界数据, 收口类型: "自然结束" | "打断"): void {
+  debugLogForce("塞莉亚-W", "结束", "原因", 收口类型);
   if (数据.已关闭) return;
   数据.已关闭 = true;
 
@@ -137,6 +141,7 @@ function 关闭W结界(this: void, 数据: 塞莉亚W结界数据, 收口类型:
 //=============================================================================
 
 function 释放W解析结界(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
+  debugLogForce("塞莉亚-W", "释放", "技能实例ID", _技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
   // 技能喊话：施法成功起点（前置检查通过；全局 3D；随机二选一由喊话系统驱动）
@@ -160,6 +165,7 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
 
   // 结界视觉 + 保护 Buff + 结界节点（A1 容器负责超限替换与连线）
   // 跟随特效：高度走子配置（无内置到期，随窗口收口销毁）
+  debugLogForce("塞莉亚-W", "特效", "路径", 塞莉亚克莱尔表现配置.W结界主体.模型路径);
   创建单位坐标跟随特效(
     施法者,
     塞莉亚克莱尔表现配置.W结界主体.模型路径,
@@ -171,6 +177,7 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
     0,
     塞莉亚克莱尔表现配置.W结界主体.RGB,
   );
+  debugLogForce("塞莉亚-W", "Buff", "操作", "施加", "目标", 施法者);
   registerManualBuff(施法者, 塞莉亚BuffID.解析结界, 塞莉亚克莱尔W配置.保护窗口秒, 0);
   // 施法真正成功（节点与保护已建立）：授予一次演算普攻窗口
   授予塞莉亚演算窗口(施法者);
@@ -210,6 +217,7 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
       数据.修改器ID = 0;
       if (单位存活(攻击者)) {
         // 反冲 + 减速（真实控制入口）
+        debugLogForce("塞莉亚-W", "伤害", "标签", "塞莉亚-解析反冲", "数值", 读取单位攻击力(施法者) * 塞莉亚克莱尔W配置.反冲伤害攻击力倍率);
         造成技能伤害({
           来源: 施法者,
           目标: 攻击者,
@@ -252,6 +260,7 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
 let 已注册 = false;
 
 export function 注册塞莉亚W(this: void): void {
+  debugLogForce("塞莉亚-W", "注册", "名称", "注册塞莉亚W");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

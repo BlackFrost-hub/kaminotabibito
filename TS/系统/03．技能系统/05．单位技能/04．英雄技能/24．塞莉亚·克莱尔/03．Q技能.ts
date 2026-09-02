@@ -21,6 +21,9 @@ import {
 import { 查询塞莉亚锚定区域, 取塞莉亚锚定区域内最近敌人 } from "./05．E技能";
 
 const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -69,9 +72,12 @@ const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．�
 const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
   播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = 塞莉亚克莱尔技能配置.单位类型ID;
-const Q技能类型ID = jass.FourCC(塞莉亚克莱尔技能配置.Q.技能ID) as number;
+const Q技能类型ID = stringToFourCCSafe(塞莉亚克莱尔技能配置.Q.技能ID) as number;
 
 //=============================================================================
 // 结算与追加分支
@@ -114,6 +120,7 @@ function 处理Q命中(this: void, 施法者: any, 目标: any, 数据: any): vo
   const X = GetUnitX(目标);
   const Y = GetUnitY(目标);
   const 伤害 = 读取单位攻击力(施法者) * 塞莉亚克莱尔Q配置.主伤害攻击力倍率;
+  debugLogForce("塞莉亚-Q", "伤害", "标签", "塞莉亚-棱晶魔弹", "数值", 伤害);
   造成Q伤害(施法者, 目标, 伤害, 数据.技能实例ID, "塞莉亚-棱晶魔弹", "单体");
   // 命中即视为到达真实终点
   尝试建立终点节点(施法者, 数据, X, Y);
@@ -271,6 +278,7 @@ function 尝试锚定追迹(this: void, 施法者: any, 数据: any): void {
 //=============================================================================
 
 function 释放Q棱晶魔弹(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("塞莉亚-Q", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
   // t0 快照
@@ -307,6 +315,7 @@ function 释放Q棱晶魔弹(this: void, _context: any, 施法者: any, 技能�
     技能实例ID,
     数据,
     结束回调: function Q实例结束(this: void, _原因: string, _控制器: any): void {
+      debugLogForce("塞莉亚-Q", "结束", "原因", _原因);
       void _原因;
       void _控制器;
     },
@@ -409,6 +418,7 @@ function 释放Q棱晶魔弹(this: void, _context: any, 施法者: any, 技能�
 let 已注册 = false;
 
 export function 注册塞莉亚Q(this: void): void {
+  debugLogForce("塞莉亚-Q", "注册", "名称", "注册塞莉亚Q");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

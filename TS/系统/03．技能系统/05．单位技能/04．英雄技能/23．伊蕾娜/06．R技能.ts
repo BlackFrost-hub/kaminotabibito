@@ -35,6 +35,9 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -97,9 +100,12 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
-const R技能类型ID = jass.FourCC(伊蕾娜技能配置.R.技能ID) as number;
+const R技能类型ID = stringToFourCCSafe(伊蕾娜技能配置.R.技能ID) as number;
 const R技能键 = "R万法回廊";
 
 function 计算范围表现缩放(this: void, 半径: number, 表现: { readonly 基准半径: number; readonly 基准缩放: number }): number {
@@ -249,6 +255,7 @@ function 执行见闻追加(this: void, 施法者: any, 实例: any, 数据: any
 //=============================================================================
 
 function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: any): void {
+  debugLogForce("伊蕾娜-R", "结束", "原因", "完成");
   // 主范围结算（AOE + 真实减速）
   const 敌人列表 = 获取坐标范围敌人(施法者, 数据.中心X, 数据.中心Y, 伊蕾娜R配置.领域半径);
   const 主伤害 = 读取单位攻击力(施法者) * 伊蕾娜R配置.主伤害攻击力倍率;
@@ -349,6 +356,7 @@ function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: an
 //=============================================================================
 
 function 释放R万法回廊(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("伊蕾娜-R", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
   // 禁止并行两个领域
   if (查询战斗技能实例(施法者, R技能键).length > 0) return;
@@ -473,6 +481,7 @@ function 释放R万法回廊(this: void, _context: any, 施法者: any, 技能�
 let 已注册 = false;
 
 export function 注册伊蕾娜R(this: void): void {
+  debugLogForce("伊蕾娜-R", "注册", "名称", "注册伊蕾娜R");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

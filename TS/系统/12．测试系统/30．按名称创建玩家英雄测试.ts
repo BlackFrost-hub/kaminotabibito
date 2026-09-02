@@ -35,12 +35,12 @@ const 单位类型死亡 = jass.UNIT_TYPE_DEAD as any;
 const 模块名 = "按名称创建玩家英雄测试";
 const 命令前缀 = "-";
 const 二十至二十五英雄单位ID表: Record<string, boolean> = {
-  E00C: true,
-  E00G: true,
-  E00H: true,
-  E00I: true,
-  E00J: true,
-  E00K: true,
+  E0L0: true,
+  E0L1: true,
+  E0L2: true,
+  E0L3: true,
+  E0L4: true,
+  E0L5: true,
 };
 
 function on按名称创建玩家英雄(this: void, 玩家: any, 命令: string): void {

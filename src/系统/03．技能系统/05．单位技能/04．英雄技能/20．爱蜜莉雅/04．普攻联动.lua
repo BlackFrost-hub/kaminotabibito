@@ -12,6 +12,8 @@ local _____67E5_8BE2_7231_871C_8389_96C5_51B0_6676 = ____02_FF0E_516C_5171_72B6_
 local ____03_FF0E_88AB_52A8_6548_679C = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.03．被动效果")
 local _____662F_7231_871C_8389_96C5 = ____03_FF0E_88AB_52A8_6548_679C["是爱蜜莉雅"]
 local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCC = ____require_result_0.stringToFourCCSafe
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -19,24 +21,25 @@ local GetUnitFacing = jass.GetUnitFacing
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local stringToFourCC = jass.FourCC
-local ____require_result_0 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_0.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_0["移除单位指定Buff"]
-local _____83B7_53D6_5355_4F4DBuff_5C42_6570 = ____require_result_0["获取单位Buff层数"]
-local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_1.registerAppliedFinalDamageListener
-local ____require_result_2 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_2["造成技能伤害"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
-local _____8DDD_79BB_5E73_65B9XY = ____require_result_3["距离平方XY"]
-local ____require_result_4 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_4.registerDeathListener
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
-local _____53D1_5C04_5F39_9053 = ____require_result_5["发射弹道"]
+local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_1.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
+local _____83B7_53D6_5355_4F4DBuff_5C42_6570 = ____require_result_1["获取单位Buff层数"]
+local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_2.registerAppliedFinalDamageListener
+local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_3["造成技能伤害"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
+local _____8DDD_79BB_5E73_65B9XY = ____require_result_4["距离平方XY"]
+local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_5.registerDeathListener
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
+local _____53D1_5C04_5F39_9053 = ____require_result_6["发射弹道"]
 local platformAbilityApi = require("平台扩展API取值")
 local platformAbilityAction = require("平台扩展API动作")
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_7.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_6280_80FDID = stringToFourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.Q["技能ID"])
 local ____W_6280_80FDID = stringToFourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.W["技能ID"])
@@ -181,25 +184,25 @@ local function _____5904_7406_7231_871C_8389_96C5_9020_6210_4F24_5BB3(target, at
     if attacker == nil or attacker == 0 or not _____662F_7231_871C_8389_96C5(attacker) then
         return
     end
-    local ____opt_result_8
+    local ____opt_result_10
     if snapshot ~= nil then
-        ____opt_result_8 = snapshot.isNormalAttack
+        ____opt_result_10 = snapshot.isNormalAttack
     end
-    if ____opt_result_8 ~= true then
+    if ____opt_result_10 ~= true then
         return
     end
-    local ____opt_result_11
+    local ____opt_result_13
     if snapshot ~= nil then
-        ____opt_result_11 = snapshot.isWrappedSkillDamage
+        ____opt_result_13 = snapshot.isWrappedSkillDamage
     end
-    if ____opt_result_11 == true then
+    if ____opt_result_13 == true then
         return
     end
-    local ____opt_result_14
+    local ____opt_result_16
     if snapshot ~= nil then
-        ____opt_result_14 = snapshot.originalAttacker
+        ____opt_result_16 = snapshot.originalAttacker
     end
-    if ____opt_result_14 ~= nil and snapshot.originalAttacker ~= attacker then
+    if ____opt_result_16 ~= nil and snapshot.originalAttacker ~= attacker then
         return
     end
     if target == nil or target == 0 then
@@ -211,6 +214,13 @@ local function _____5904_7406_7231_871C_8389_96C5_9020_6210_4F24_5BB3(target, at
     local _____5F53_524D_5C42_6570 = _____83B7_53D6_5355_4F4DBuff_5C42_6570(attacker, _____7231_871C_8389_96C5BuffID["契约应和"])
     local _____65B0_5C42_6570 = _____5F53_524D_5C42_6570 + 1
     if _____65B0_5C42_6570 >= _____7231_871C_8389_96C5_666E_653B_914D_7F6E["契约应和上限"] then
+        debugLogForce(
+            "爱蜜莉雅-普攻联动",
+            "状态",
+            "第3次有效普攻触发帕克追击",
+            "目标",
+            target
+        )
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(attacker, _____7231_871C_8389_96C5BuffID["契约应和"])
         _____53D1_5C04_5E15_514B_8FFD_51FB_51B0_5F39(attacker, target)
         _____51CF_5C11_6700_957FQWE_51B7_5374(attacker)
@@ -242,6 +252,7 @@ local function _____786E_4FDD_533A_57DF_6807_8BB0_6B7B_4EA1_6E05_7406()
     end)
 end
 ____exports["注册爱蜜莉雅普攻联动"] = function()
+    debugLogForce("爱蜜莉雅-普攻联动", "注册", "名称", "注册爱蜜莉雅普攻联动")
     if _____5DF2_6CE8_518C then
         return
     end

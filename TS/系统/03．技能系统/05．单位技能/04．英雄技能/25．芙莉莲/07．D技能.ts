@@ -70,6 +70,9 @@ const { 是芙莉莲, 记录芙莉莲活动, 登记芙莉莲清理, 花田判定
   };
   重新安排隐匿计时: (this: void, 英雄: any) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(芙莉莲技能配置.单位类型ID);
 const D技能ID = stringToFourCCSafe(芙莉莲技能配置.D.技能ID);
@@ -216,6 +219,7 @@ export function 尝试消费花田盛开(this: void, 芙莉莲: any): boolean {
 
 function 销毁花田(this: void, 花田: 花田数据, 自然结束: boolean): void {
   if (花田.已结束) return;
+  debugLogForce("芙莉莲-D", "结束", "原因", 自然结束 ? "自然消散" : "打断/死亡/替换", "英雄", 花田.芙莉莲);
   花田.已结束 = true;
   // 计时器
   if (花田.到期回调ID !== 0) removeDelayedCallback(花田.到期回调ID);
@@ -285,6 +289,7 @@ function 创建花海(this: void, 花田: 花田数据): void {
 //=============================================================================
 
 function 释放D(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("芙莉莲-D", "释放", "技能实例ID", 技能实例ID || "-");
   if (!是芙莉莲(施法者)) return;
   记录芙莉莲活动(施法者);
   // 花田施法动作（送杖候选）
@@ -322,6 +327,7 @@ function 释放D(this: void, _context: any, 施法者: any, 技能实例ID: numb
     已结束: false,
   };
   花田表[id] = 花田;
+  debugLogForce("芙莉莲-D", "状态", "花田建立", "英雄", 施法者);
 
   const 控制器 = 创建战斗技能实例({
     技能键: "芙莉莲D",
@@ -393,6 +399,7 @@ function 释放D(this: void, _context: any, 施法者: any, 技能实例ID: numb
 let 已注册 = false;
 
 export function 注册芙莉莲D(this: void): void {
+  debugLogForce("芙莉莲-D", "注册", "名称", "注册芙莉莲D");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

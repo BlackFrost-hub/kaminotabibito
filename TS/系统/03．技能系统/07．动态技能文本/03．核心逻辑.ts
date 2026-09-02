@@ -463,6 +463,8 @@ function 提取前缀倍率匹配(this: void, text: string, 属性文本名: str
  * 支持：
  * 1. 属性名×数字 / 属性名×数字%
  * 2. 属性名数字 / 属性名数字%
+ * 3. 属性名的数字% —— 例如「最大魔法值的6%」（倍率必须带 %，避免误匹配）
+ * 4. 数字%属性名 / 数字属性名（前缀倍率）
  */
 function 提取公式匹配(this: void, text: string, 属性文本名: string, 起始位置: number): 公式匹配结果 | null {
   const 乘号前缀 = 属性文本名 + "×";
@@ -493,6 +495,25 @@ function 提取公式匹配(this: void, text: string, 属性文本名: string, �
       }
     }
     属性位置 = text.indexOf(属性文本名, 属性位置 + 属性文本名.length);
+  }
+
+  // 形式三：属性名的数字% —— 例如「最大魔法值的6%」按英雄最大魔法值折算
+  const 的连接前缀 = 属性文本名 + "的";
+  let 的位置 = text.indexOf(的连接前缀, 起始位置);
+  while (的位置 >= 0) {
+    const 数字起始 = 的位置 + 的连接前缀.length;
+    const 首字符 = 数字起始 < text.length ? text.charAt(数字起始) : "";
+    if ((首字符 >= "0" && 首字符 <= "9") || 首字符 === ".") {
+      const 倍率 = 提取倍率(text, 数字起始);
+      if (倍率 != null && 倍率是否可隐式匹配(倍率)) {
+        return {
+          完整匹配: 的连接前缀 + 倍率,
+          倍率,
+          开始位置: 的位置,
+        };
+      }
+    }
+    的位置 = text.indexOf(的连接前缀, 的位置 + 的连接前缀.length);
   }
 
   return 提取前缀倍率匹配(text, 属性文本名, 起始位置);

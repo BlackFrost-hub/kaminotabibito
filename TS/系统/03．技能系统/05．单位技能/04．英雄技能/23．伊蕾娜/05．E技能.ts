@@ -26,6 +26,9 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -95,9 +98,12 @@ const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．
 const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
-const E技能类型ID = jass.FourCC(伊蕾娜技能配置.E.技能ID) as number;
+const E技能类型ID = stringToFourCCSafe(伊蕾娜技能配置.E.技能ID) as number;
 const E硬直来源 = "伊蕾娜-E硬直";
 
 //=============================================================================
@@ -106,6 +112,7 @@ const E硬直来源 = "伊蕾娜-E硬直";
 
 /** 终点冲击 + 扫帚路线 + 远行见闻（只在完成原因时调用）。 */
 function 结算E到达(this: void, 施法者: any, 实例ID: number | undefined, 数据: any): void {
+  debugLogForce("伊蕾娜-E", "结束", "原因", "完成");
   const X = GetUnitX(施法者);
   const Y = GetUnitY(施法者);
   播放伊蕾娜阶段动作(施法者, 伊蕾娜模型动作配置.技能动作.E落地);
@@ -188,6 +195,7 @@ function 结算E到达(this: void, 施法者: any, 实例ID: number | undefined,
 //=============================================================================
 
 function 释放E扫帚远行(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("伊蕾娜-E", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
   // t0 快照
@@ -293,6 +301,7 @@ function 释放E扫帚远行(this: void, _context: any, 施法者: any, 技能�
     // 高度抬升（起飞）
     SetUnitFlyHeight(施法者, 伊蕾娜E配置.飞行高度, 伊蕾娜E配置.高度恢复率);
 
+    debugLogForce("伊蕾娜-E", "位移", "类型", "冲锋", "距离", 最终距离);
     const 位移ID = 开始冲锋(施法者, {
       距离: 最终距离,
       角度: 方向角,
@@ -368,6 +377,7 @@ function 释放E扫帚远行(this: void, _context: any, 施法者: any, 技能�
 let 已注册 = false;
 
 export function 注册伊蕾娜E(this: void): void {
+  debugLogForce("伊蕾娜-E", "注册", "名称", "注册伊蕾娜E");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

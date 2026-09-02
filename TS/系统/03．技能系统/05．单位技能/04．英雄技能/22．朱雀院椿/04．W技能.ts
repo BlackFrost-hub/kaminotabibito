@@ -79,6 +79,9 @@ const {
 const 联动R = require("./06．R技能") as {
   椿R蓄力中?: (this: void, 英雄: any) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院椿技能配置.单位类型ID);
 const W技能ID = stringToFourCCSafe(朱雀院椿技能配置.W.技能ID);
@@ -103,6 +106,7 @@ interface W数据 {
 }
 
 function 结算W反击(this: void, 施法者: any, 技能实例ID: number | undefined, 数据: W数据, 完美: boolean): void {
+  debugLogForce("椿-W", "伤害", "标签", "朱雀院椿-W反击", "目标", 数据.招架来源, "数值", 读取单位攻击力(施法者) * W配置.反击伤害倍率);
   播放椿动作(施法者, 朱雀院椿动作槽.W成功反击);
   const 来源 = 数据.招架来源;
   if (来源 == null || 来源 === 0 || !单位存活(来源)) {
@@ -217,6 +221,7 @@ function 结束W招架(this: void, 施法者: any, _技能实例ID: number | und
 }
 
 function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("椿-W", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (!是朱雀院椿(施法者)) return;
   // R 蓄力期间不能重复开启 W；已有招架窗口不叠加
   if (联动R.椿R蓄力中 != null && 联动R.椿R蓄力中(施法者)) return;
@@ -232,12 +237,14 @@ function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID
     已结束: false,
     招架来源: null,
   };
+  debugLogForce("椿-W", "状态", "创建战斗技能实例", 技能实例ID ?? "-");
   const 控制器 = 创建战斗技能实例({
     技能键: "椿W",
     施法者,
     技能实例ID,
     数据,
     结束回调: function W结束(this: void, _原因: string, _c: any): void {
+      debugLogForce("椿-W", "结束", "原因", _原因 ?? "-");
       // 死亡/中断收束：补全清理（与 结束W招架 幂等）
       if (数据.已结束) return;
       数据.已结束 = true;
@@ -292,6 +299,7 @@ function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID
 let 已注册 = false;
 
 export function 注册朱雀院椿W(this: void): void {
+  debugLogForce("椿-W", "注册", "名称", "注册朱雀院椿W");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

@@ -12,6 +12,8 @@ local _____64AD_653E_9650_65F6_5355_4F4D_52A8_753B = ____require_result_0["播�
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.18．单位动画守护")
 local _____521B_5EFA_5355_4F4D_52A8_753B_5B88_62A4 = ____require_result_1["创建单位动画守护"]
 local _____505C_6B62_5355_4F4D_52A8_753B_5B88_62A4 = ____require_result_1["停止单位动画守护"]
+local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_2.debugLogForce
 local function _____53D6_69FD_914D_7F6E(_____69FD_540D)
     return _____585E_8389_4E9A_514B_83B1_5C14_52A8_4F5C_69FD_914D_7F6E[_____69FD_540D]
 end

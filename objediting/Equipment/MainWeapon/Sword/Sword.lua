@@ -51,8 +51,8 @@ createEquipmentItem('I0K5', '赤契噬魂刃', {
 
 createEquipmentItem('I0KB', '王庭礼剑', {
   baseId = 'ratc',
-  icon = 'Equipment\Icon\MainWeapon\Sword\royal_court_ceremonial_sword.blp',
-  model = 'war3mapImported\ysj.mdx',
+  icon = 'Equipment\\Icon\\MainWeapon\\Sword\\royal_court_ceremonial_sword.blp',
+  model = 'war3mapImported\\ysj.mdx',
   abilities = ' ',
   classification = 'Campaign',
   level = 6,

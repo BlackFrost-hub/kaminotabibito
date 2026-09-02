@@ -94,6 +94,9 @@ const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．�
 const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
   播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = 塞莉亚克莱尔技能配置.单位类型ID;
 const E硬直来源 = "塞莉亚-E硬直";
@@ -231,6 +234,7 @@ function Math最小值(a: number, b: number): number {
 //=============================================================================
 
 function 释放E锚定魔法阵(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("塞莉亚-E", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
   // t0 快照
@@ -243,6 +247,7 @@ function 释放E锚定魔法阵(this: void, _context: any, 施法者: any, 技�
     施法者,
     技能实例ID,
     结束回调: function E实例结束(this: void, _原因: string, _控制器: any): void {
+      debugLogForce("塞莉亚-E", "结束", "原因", _原因);
       void _原因;
       void _控制器;
     },
@@ -292,6 +297,7 @@ function 释放E锚定魔法阵(this: void, _context: any, 施法者: any, 技�
       周期ID: 0,
       已关闭: false,
     };
+    debugLogForce("塞莉亚-E", "特效", "路径", 塞莉亚克莱尔表现配置.E锚定阵.模型路径);
     数据.阵特效 = 创建点特效({
       模型路径: 塞莉亚克莱尔表现配置.E锚定阵.模型路径,
       RGB: 塞莉亚克莱尔表现配置.E锚定阵.RGB,
@@ -312,6 +318,7 @@ function 释放E锚定魔法阵(this: void, _context: any, 施法者: any, 技�
     // 生效点：一次性伤害 + 减速（实时枚举）
     const 攻击力 = 读取单位攻击力(施法者);
     const 列表 = 获取坐标范围敌人(施法者, 中心X, 中心Y, 塞莉亚克莱尔E配置.区域半径);
+    debugLogForce("塞莉亚-E", "伤害", "标签", "塞莉亚-锚定冲击", "数值", 攻击力 * 塞莉亚克莱尔E配置.生效伤害攻击力倍率);
     for (let i = 0; i < 列表.length; i++) {
       const 敌人 = 列表[i];
       if (!单位存活(敌人)) continue;
@@ -363,6 +370,7 @@ function 释放E锚定魔法阵(this: void, _context: any, 施法者: any, 技�
 let 已注册 = false;
 
 export function 注册塞莉亚E(this: void): void {
+  debugLogForce("塞莉亚-E", "注册", "名称", "注册塞莉亚E");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

@@ -14,6 +14,15 @@ local _____521B_5EFA_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_resul
 local _____7ED1_5B9A_5355_4F4D_5F53_524D_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B = ____require_result_2["绑定单位当前独立技能伤害实例"]
 local _____76D1_542C_5217_8868 = {}
 local _____5DF2_6CE8_518C_76D1_542C = false
+--- 20-25号新英雄调试用：单位类型ID -> 英雄名（用于一次定位定位事件流到达层级）
+local _____65B0_82F1_96C4_8C03_8BD5_7C7B_578BID_8868 = {
+    [stringToFourCC("E0L0")] = "爱蜜莉雅",
+    [stringToFourCC("E0L1")] = "朱雀院红叶",
+    [stringToFourCC("E0L2")] = "朱雀院椿",
+    [stringToFourCC("E0L3")] = "伊蕾娜",
+    [stringToFourCC("E0L4")] = "塞莉亚·克莱尔",
+    [stringToFourCC("E0L5")] = "芙莉莲"
+}
 local function _____8F6CID(id)
     return type(id) == "number" and id or stringToFourCC(id)
 end
@@ -22,6 +31,19 @@ local function ____on_5355_4F4D_6280_80FD_58F3_76D1_542C_65BD_6CD5(castingUnit, 
         return
     end
     local unitTypeId = GetUnitTypeId(castingUnit)
+    local _____8C03_8BD5_82F1_96C4_540D = _____65B0_82F1_96C4_8C03_8BD5_7C7B_578BID_8868[unitTypeId]
+    if _____8C03_8BD5_82F1_96C4_540D ~= nil then
+        debugLogForce(
+            "新英雄技能壳诊断",
+            "收到施法",
+            "英雄",
+            _____8C03_8BD5_82F1_96C4_540D,
+            "技能ID",
+            spellAbilityId,
+            "监听总数",
+            #_____76D1_542C_5217_8868
+        )
+    end
     if unitTypeId == _____8F6CID("H00F") or unitTypeId == _____8F6CID("H00G") then
         debugLogForce(
             "阿伦劳特技能壳诊断",
@@ -40,17 +62,17 @@ local function ____on_5355_4F4D_6280_80FD_58F3_76D1_542C_65BD_6CD5(castingUnit, 
             do
                 local _____53C2_6570 = _____76D1_542C_5217_8868[i + 1]
                 if spellAbilityId ~= _____8F6CID(_____53C2_6570["技能ID"]) then
-                    goto __continue7
+                    goto __continue8
                 end
                 if unitTypeId ~= _____8F6CID(_____53C2_6570["单位类型ID"]) then
-                    goto __continue7
+                    goto __continue8
                 end
                 local context = _____53C2_6570["获取或创建上下文"](castingUnit)
                 if context == nil then
-                    goto __continue7
+                    goto __continue8
                 end
                 if _____53C2_6570["可释放"] ~= nil and not _____53C2_6570["可释放"](context, castingUnit) then
-                    goto __continue7
+                    goto __continue8
                 end
                 local ____temp_3
                 if _____53C2_6570["创建独立技能实例"] == false then
@@ -66,9 +88,23 @@ local function ____on_5355_4F4D_6280_80FD_58F3_76D1_542C_65BD_6CD5(castingUnit, 
                 end
                 local _____6280_80FD_5B9E_4F8BID = ____temp_3
                 _____7ED1_5B9A_5355_4F4D_5F53_524D_72EC_7ACB_6280_80FD_4F24_5BB3_5B9E_4F8B(castingUnit, _____6280_80FD_5B9E_4F8BID)
+                if _____8C03_8BD5_82F1_96C4_540D ~= nil then
+                    debugLogForce(
+                        "新英雄技能壳诊断",
+                        "命中监听",
+                        "英雄",
+                        _____8C03_8BD5_82F1_96C4_540D,
+                        "技能ID",
+                        spellAbilityId,
+                        "监听名",
+                        _____53C2_6570["名称"],
+                        "实例ID",
+                        _____6280_80FD_5B9E_4F8BID
+                    )
+                end
                 _____53C2_6570["释放技能"](context, castingUnit, _____6280_80FD_5B9E_4F8BID)
             end
-            ::__continue7::
+            ::__continue8::
             i = i + 1
         end
     end

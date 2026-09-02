@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____79FB_9664D_72B6_6001, jass, removeDelayedCallback, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548, _____79D8_4F20BuffID, _____5200_73AF_7279_6548_952E, ____D_72B6_6001_8868
+local _____79FB_9664D_72B6_6001, jass, removeDelayedCallback, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548, debugLogForce, _____79D8_4F20BuffID, _____5200_73AF_7279_6548_952E, ____D_72B6_6001_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.00．配置")
 local _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶技能配置"]
 local _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶表现配置"]
@@ -22,6 +22,14 @@ function _____79FB_9664D_72B6_6001(_____82F1_96C4)
         removeDelayedCallback(_____72B6_6001["到期回调ID"])
         _____72B6_6001["到期回调ID"] = 0
     end
+    debugLogForce(
+        "红叶-D",
+        "Buff",
+        "操作",
+        "移除",
+        "目标",
+        _____82F1_96C4
+    )
     _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(_____82F1_96C4, _____5200_73AF_7279_6548_952E)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____82F1_96C4, _____79D8_4F20BuffID)
     __TS__Delete(____D_72B6_6001_8868, id)
@@ -50,6 +58,8 @@ local _____662F_6731_96C0_9662_7EA2_53F6 = ____require_result_7["是朱雀院红
 local _____767B_8BB0_6731_96C0_9662_6E05_7406 = ____require_result_7["登记朱雀院清理"]
 local _____6CE8_518C_7834_7EFD_65A9_76D1_542C = ____require_result_7["注册破绽斩监听"]
 local _____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_7["播放红叶动作"]
+local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_8.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
 _____79D8_4F20BuffID = _____6731_96C0_9662_7EA2_53F6Buff_914D_7F6E["秘传三式"]
 local ____D_914D_7F6E = _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C.D
@@ -71,6 +81,7 @@ local function _____5237_65B0D_663E_793A(_____82F1_96C4, _____72B6_6001)
     )
 end
 local function _____5F00_542FD_79D8_4F20_4E09_5F0F(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
+    debugLogForce("红叶-D", "释放", "技能实例ID", "-")
     if not _____662F_6731_96C0_9662_7EA2_53F6(_____65BD_6CD5_8005) then
         return
     end
@@ -105,6 +116,7 @@ local function _____5F00_542FD_79D8_4F20_4E09_5F0F(_context, _____65BD_6CD5_8005
         end
     )
     ____D_72B6_6001_8868[id] = _____72B6_6001
+    debugLogForce("红叶-D", "状态", "开启秘传", _____72B6_6001["剩余次数"])
     _____5237_65B0D_663E_793A(_____65BD_6CD5_8005, _____72B6_6001)
     if _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["D刀环"]["模型路径"] ~= "" then
         _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
@@ -196,6 +208,14 @@ local function _____7834_7EFD_65A9_5EF6_957FD(_____7EA2_53F6, ______76EE_6807)
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册朱雀院红叶D"] = function()
+    debugLogForce(
+        "红叶-D",
+        "注册",
+        "名称",
+        "D",
+        "函数",
+        "注册朱雀院红叶D"
+    )
     if _____5DF2_6CE8_518C then
         return
     end

@@ -62,6 +62,9 @@ const {
   登记椿清理: (this: void, 英雄: any, 名称: string, 清理: () => void) => void;
   播放椿动作: (this: void, 英雄: any, 槽: { 索引: number; 持续秒: number }) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院椿技能配置.单位类型ID);
 const Q技能ID = stringToFourCCSafe(朱雀院椿技能配置.Q.技能ID);
@@ -84,9 +87,11 @@ interface Q数据 {
 }
 
 function 结算Q斩(this: void, 施法者: any, 技能实例ID: number | undefined, 方向角: number, 伤害倍率: number, 标签: string): void {
+  debugLogForce("椿-Q", "伤害", "标签", 标签, "数值", 读取单位攻击力(施法者) * 伤害倍率);
   const X = GetUnitX(施法者);
   const Y = GetUnitY(施法者);
   // 居合/返刃斩击表现（正式主版本；备份版本按候选规则切换；按斩击方向旋转，时长覆盖 Stand 1000-1755ms）
+  debugLogForce("椿-Q", "特效", "路径", 朱雀院椿表现配置.Q主斩.模型路径);
   创建点特效({
     模型路径: 朱雀院椿表现配置.Q主斩.模型路径,
     RGB: 朱雀院椿表现配置.Q主斩.RGB,
@@ -159,6 +164,7 @@ function 执行返刃第一段(this: void, 施法者: any, 控制器: any, 技�
 }
 
 function 释放Q居合(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("椿-Q", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (!是朱雀院椿(施法者)) return;
   // 重复 Q：已有活跃 Q 实例时忽略
   if (查询战斗技能实例(施法者, "椿Q").length > 0) return;
@@ -176,12 +182,14 @@ function 释放Q居合(this: void, _context: any, 施法者: any, 技能实例ID
     已消费反击: 反击 != null || 回锋方向 != null,
     段回调ID: [],
   };
+  debugLogForce("椿-Q", "状态", "创建战斗技能实例", 技能实例ID ?? "-");
   const 控制器 = 创建战斗技能实例({
     技能键: "椿Q",
     施法者,
     技能实例ID,
     数据,
     结束回调: function Q结束(this: void, _原因: string, _c: any): void {
+      debugLogForce("椿-Q", "结束", "原因", _原因 ?? "-");
       for (let i = 0; i < 数据.段回调ID.length; i++) {
         // 延迟回调由实例统一清理（未执行段不再结算）
       }
@@ -210,6 +218,7 @@ function 释放Q居合(this: void, _context: any, 施法者: any, 技能实例ID
 let 已注册 = false;
 
 export function 注册朱雀院椿Q(this: void): void {
+  debugLogForce("椿-Q", "注册", "名称", "注册朱雀院椿Q");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

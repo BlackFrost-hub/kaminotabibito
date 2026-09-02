@@ -11,13 +11,13 @@ local _____8299_8389_83B2_8BFB_6761_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲
 local _____8299_8389_83B2_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲音效配置"]
 function _____82B1_7530_8054_52A8_53D6_89E3_6790_5FEB_7167(_____65BD_6CD5_8005)
     local _____53D6_76EE_6807 = _____89E3_6790_5FEB_7167_6E90["取芙莉莲重点目标"]
-    local ____temp_12
+    local ____temp_13
     if _____53D6_76EE_6807 ~= nil then
-        ____temp_12 = _____53D6_76EE_6807(_____65BD_6CD5_8005)
+        ____temp_13 = _____53D6_76EE_6807(_____65BD_6CD5_8005)
     else
-        ____temp_12 = nil
+        ____temp_13 = nil
     end
-    local _____76EE_6807 = ____temp_12
+    local _____76EE_6807 = ____temp_13
     if _____76EE_6807 == nil or _____76EE_6807 == 0 or not _____5355_4F4D_5B58_6D3B(_____76EE_6807) then
         return {["目标"] = nil, ["类型"] = nil, ["完成"] = false}
     end
@@ -73,6 +73,8 @@ local _____6709_89E3_6790 = ____require_result_10["有解析"]
 local _____76EE_6807_89E3_6790_5B8C_6210 = ____require_result_10["目标解析完成"]
 local _____5C1D_8BD5_6D88_8D39_89E3_6790_5B8C_6210 = ____require_result_10["尝试消费解析完成"]
 local _____82B1_7530_8054_52A8 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.07．D技能")
+local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_11.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
 local ____R_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.R["技能ID"])
 local ____R_914D_7F6E = _____8299_8389_83B2R_914D_7F6E
@@ -212,6 +214,16 @@ local function ____R_7ED3_7B97_4E3B_70AE(_____65BD_6CD5_8005, _____6280_80FD_5B9
                     })
                 end
             end
+            debugLogForce(
+                "芙莉莲-R",
+                "伤害",
+                "标签",
+                _____6807_7B7E,
+                "数值",
+                _____653B_51FB_529B * _____500D_7387,
+                "目标",
+                _____76EE_6807
+            )
             _____9020_6210_6280_80FD_4F24_5BB3({
                 ["来源"] = _____65BD_6CD5_8005,
                 ["目标"] = _____76EE_6807,
@@ -245,6 +257,7 @@ local function ____R_7ED3_7B97_4E3B_70AE(_____65BD_6CD5_8005, _____6280_80FD_5B9
     end
 end
 local function _____91CA_653ER(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("芙莉莲-R", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_8299_8389_83B2(_____65BD_6CD5_8005) then
         return
     end
@@ -257,13 +270,13 @@ local function _____91CA_653ER(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
     local _____76EE_6807X = GetSpellTargetX()
     local _____76EE_6807Y = GetSpellTargetY()
     local _____89E3_6790_5FEB_7167 = _____82B1_7530_8054_52A8_53D6_89E3_6790_5FEB_7167(_____65BD_6CD5_8005)
-    local ____temp_11
+    local ____temp_12
     if _____82B1_7530_8054_52A8["在花田内"] ~= nil then
-        ____temp_11 = _____82B1_7530_8054_52A8["在花田内"](_____65BD_6CD5_8005)
+        ____temp_12 = _____82B1_7530_8054_52A8["在花田内"](_____65BD_6CD5_8005)
     else
-        ____temp_11 = false
+        ____temp_12 = false
     end
-    local _____82B1_7530_5185_91CA_653E = ____temp_11
+    local _____82B1_7530_5185_91CA_653E = ____temp_12
     local _____5FEB_7167 = {
         ["方向角"] = _____4E24_70B9_89D2_5EA6(
             GetUnitX(_____65BD_6CD5_8005),
@@ -329,6 +342,7 @@ local function _____91CA_653ER(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
                 _____63A7_5236_5668["完成"](_____63A7_5236_5668)
             end,
             ["结束回调"] = function(______5355_4F4D, _____539F_56E0, ______5145_80FDID)
+                debugLogForce("芙莉莲-R", "结束", "原因", _____539F_56E0 or "-")
                 if _____84C4_529B_5B88_62A4 ~= nil then
                     _____505C_6B62_5FAA_73AF_5B88_62A4(_____84C4_529B_5B88_62A4)
                     _____84C4_529B_5B88_62A4 = nil
@@ -351,6 +365,7 @@ end
 _____89E3_6790_5FEB_7167_6E90 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.02．被动效果")
 local _____5DF2_6CE8_518C = false
 ____exports["注册芙莉莲R"] = function()
+    debugLogForce("芙莉莲-R", "注册", "名称", "注册芙莉莲R")
     if _____5DF2_6CE8_518C then
         return
     end

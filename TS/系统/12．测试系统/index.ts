@@ -220,6 +220,9 @@ function loadTests(): void {
     require("系统.12．测试系统.30．按名称创建玩家英雄测试");
   }
 
+  // QWERD 显示排查：聊天输入 -dc 转储命令卡槽位与快照（排查 20-25 英雄 D 技能显示）
+  require("系统.12．测试系统.40．QWERD显示调试命令");
+
 }
 
 loadTests();

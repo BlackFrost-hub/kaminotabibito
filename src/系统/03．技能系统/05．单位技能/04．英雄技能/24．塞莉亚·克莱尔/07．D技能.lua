@@ -35,6 +35,8 @@ local ____require_result_5 = require("lib.扩展函数.封装函数.02．音效�
 local Sound3DII_CooPlayReuse = ____require_result_5.Sound3DII_CooPlayReuse
 local ____require_result_6 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
 local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_6["播放英雄技能喊话"]
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_7.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E["单位类型ID"]
 local ____D_786C_76F4_6765_6E90 = "塞莉亚-D硬直"
 --- 确定性选择：距目标点最近的合法节点；同距取序号小者。
@@ -56,6 +58,7 @@ local function _____9009_62E9_6700_8FD1_5408_6CD5_8282_70B9(_____5217_8868, ____
     return _____6700_4F73
 end
 local function _____91CA_653ED_672F_5F0F_8F6C_5199(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("塞莉亚-D", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
@@ -90,6 +93,7 @@ local function _____91CA_653ED_672F_5F0F_8F6C_5199(_context, _____65BD_6CD5_8005
             if not _____6210_529F then
                 return
             end
+            debugLogForce("塞莉亚-D", "状态", "转写成功", _____76EE_6807_8282_70B9["序号"])
             Sound3DII_CooPlayReuse(
                 _____585E_8389_4E9A_97F3_6548_914D_7F6E["D转写"]["路径"],
                 _____76EE_6807X,
@@ -97,6 +101,7 @@ local function _____91CA_653ED_672F_5F0F_8F6C_5199(_context, _____65BD_6CD5_8005
                 _____585E_8389_4E9A_97F3_6548_914D_7F6E["D转写"]["高度"],
                 _____585E_8389_4E9A_97F3_6548_914D_7F6E["D转写"]["裁断距离"]
             )
+            debugLogForce("塞莉亚-D", "特效", "路径", _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["D重连落点闪现"]["模型路径"])
             local _____843D_70B9_95EA_73B0 = _____521B_5EFA_70B9_7279_6548({
                 ["模型路径"] = _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["D重连落点闪现"]["模型路径"],
                 RGB = _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["D重连落点闪现"].RGB,
@@ -121,6 +126,7 @@ local function _____91CA_653ED_672F_5F0F_8F6C_5199(_context, _____65BD_6CD5_8005
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册塞莉亚D"] = function()
+    debugLogForce("塞莉亚-D", "注册", "名称", "注册塞莉亚D")
     if _____5DF2_6CE8_518C then
         return
     end

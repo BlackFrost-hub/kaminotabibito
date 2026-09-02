@@ -37,7 +37,7 @@ const UNIT_STATE_MAX_MANA = jass.UNIT_STATE_MAX_MANA as number;
 /** 血坛奖励：攻击/续航向白嫖饰品，C+ 档。 */
 const 祭血之皿物品ID = "I0G8";
 /** 池底遗物奖励：均衡/守护向白嫖饰品，C+ 档。 */
-const 祖地纹章徽记物品ID = "I0H7";
+const 祖地纹章徽记物品ID = "I0HH";
 /** 灵泉单次恢复的生命与魔法值。 */
 const 灵泉恢复量 = 100;
 /** 灵泉永久祝福：满状态首次互动时写入玩家属性表。 */

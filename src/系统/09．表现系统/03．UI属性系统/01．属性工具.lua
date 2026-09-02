@@ -500,7 +500,7 @@ function ____exports.buildDetailTexts(player)
         singleLine(
             "|cffff00ff",
             "经验获取率：",
-            pct(player, "经验获取率")
+            pctPlus100(player, "经验获取率")
         )
     }
     local rightColumn = {

@@ -46,6 +46,8 @@ function _____53D6_9635_5185_6700_8FD1_654C_4EBA(_____6765_6E90, X, Y, _____534A
     return _____6700_8FD1
 end
 local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local GetSpellTargetX = jass.GetSpellTargetX
@@ -55,44 +57,46 @@ local DestroyEffect = jass.DestroyEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_0.addDelayedCallback
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_1["注册单位技能壳监听"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
-local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_2["创建战斗技能实例"]
-local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_2["查询战斗技能实例"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
-local _____5F00_59CB_5145_80FD = ____require_result_3["开始充能"]
-local _____505C_6B62_5145_80FD = ____require_result_3["停止充能"]
-local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_4["造成技能伤害"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
-local ____AOE_65BD_52A0_6269_5C55_63A7_5236 = ____require_result_5["AOE施加扩展控制"]
-local _____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_5["施加扩展控制"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
-local _____53D1_5C04_5F39_9053 = ____require_result_6["发射弹道"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
-_____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_7["两点角度"]
-local _____6781_5750_6807X = ____require_result_7["极坐标X"]
-local _____6781_5750_6807Y = ____require_result_7["极坐标Y"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-_____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_8["获取坐标范围敌人"]
-local ____require_result_9 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_9.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_9["移除单位指定Buff"]
-local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
-local _____5F00_59CB_62A4_76FE = ____require_result_10["开始护盾"]
-local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
-local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_CooPlayReuse = ____require_result_12.Sound3DII_CooPlayReuse
-local ____require_result_13 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
-local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_13["播放英雄技能喊话"]
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_1.addDelayedCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
+local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["创建战斗技能实例"]
+local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["查询战斗技能实例"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
+local _____5F00_59CB_5145_80FD = ____require_result_4["开始充能"]
+local _____505C_6B62_5145_80FD = ____require_result_4["停止充能"]
+local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_5["造成技能伤害"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.16．扩展控制.扩展控制系统")
+local ____AOE_65BD_52A0_6269_5C55_63A7_5236 = ____require_result_6["AOE施加扩展控制"]
+local _____65BD_52A0_6269_5C55_63A7_5236 = ____require_result_6["施加扩展控制"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
+local _____53D1_5C04_5F39_9053 = ____require_result_7["发射弹道"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
+_____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_8["两点角度"]
+local _____6781_5750_6807X = ____require_result_8["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_8["极坐标Y"]
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+_____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_9["获取坐标范围敌人"]
+local ____require_result_10 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_10.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_10["移除单位指定Buff"]
+local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
+local _____5F00_59CB_62A4_76FE = ____require_result_11["开始护盾"]
+local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_12["创建点特效"]
+local ____require_result_13 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_13.Sound3DII_CooPlayReuse
+local ____require_result_14 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_14["播放英雄技能喊话"]
+local ____require_result_15 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_15.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E["单位类型ID"]
-local ____R_6280_80FD_7C7B_578BID = jass.FourCC(_____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.R["技能ID"])
+local ____R_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.R["技能ID"])
 local ____R_6280_80FD_952E = "R高阶术式闭锁"
 local function ____R_6280_80FD_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, _____4F24_5BB3_503C, _____6570_636E, _____6807_7B7E)
     return _____9020_6210_6280_80FD_4F24_5BB3({
@@ -234,31 +238,31 @@ local function _____6267_884C_8FDE_63A5_5206_652F(_____65BD_6CD5_8005, _____5B9E
         )
     elseif _____6709_68F1_6676 and _____6709_951A_5B9A then
         local _____6700_8FD1_654C_4EBA = _____53D6_9635_5185_6700_8FD1_654C_4EBA(_____65BD_6CD5_8005, _____6570_636E["中心X"], _____6570_636E["中心Y"], _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["领域半径"])
-        local ____53D1_5C04R_9B54_5F39_23 = _____53D1_5C04R_9B54_5F39
-        local ____65BD_6CD5_8005_21 = _____65BD_6CD5_8005
-        local ____6570_636E_22 = _____6570_636E
-        local ____6570_636E__4E2D_5FC3X_15 = _____6570_636E["中心X"]
-        local ____6570_636E__4E2D_5FC3Y_16 = _____6570_636E["中心Y"]
-        local ____6570_636E__65B9_5411_89D2_17 = _____6570_636E["方向角"]
-        local ____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E__8D2F_7A7F_70AE_6700_5927_547D_4E2D_6570_18 = _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["贯穿炮最大命中数"]
-        local ____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E__8D2F_7A7F_70AE_500D_7387_19 = _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["贯穿炮倍率"]
-        local ____temp_20 = _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["分支穿透冲击距离"] + _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["领域半径"]
-        local ____6700_8FD1_654C_4EBA_14 = _____6700_8FD1_654C_4EBA
-        if ____6700_8FD1_654C_4EBA_14 == nil then
-            ____6700_8FD1_654C_4EBA_14 = nil
+        local ____53D1_5C04R_9B54_5F39_25 = _____53D1_5C04R_9B54_5F39
+        local ____65BD_6CD5_8005_23 = _____65BD_6CD5_8005
+        local ____6570_636E_24 = _____6570_636E
+        local ____6570_636E__4E2D_5FC3X_17 = _____6570_636E["中心X"]
+        local ____6570_636E__4E2D_5FC3Y_18 = _____6570_636E["中心Y"]
+        local ____6570_636E__65B9_5411_89D2_19 = _____6570_636E["方向角"]
+        local ____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E__8D2F_7A7F_70AE_6700_5927_547D_4E2D_6570_20 = _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["贯穿炮最大命中数"]
+        local ____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E__8D2F_7A7F_70AE_500D_7387_21 = _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["贯穿炮倍率"]
+        local ____temp_22 = _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["分支穿透冲击距离"] + _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["领域半径"]
+        local ____6700_8FD1_654C_4EBA_16 = _____6700_8FD1_654C_4EBA
+        if ____6700_8FD1_654C_4EBA_16 == nil then
+            ____6700_8FD1_654C_4EBA_16 = nil
         end
-        ____53D1_5C04R_9B54_5F39_23(____65BD_6CD5_8005_21, ____6570_636E_22, {
+        ____53D1_5C04R_9B54_5F39_25(____65BD_6CD5_8005_23, ____6570_636E_24, {
             ["名称"] = "塞莉亚-闭锁贯穿炮",
             ["标签"] = "塞莉亚-闭锁·贯穿炮",
-            ["发射X"] = ____6570_636E__4E2D_5FC3X_15,
-            ["发射Y"] = ____6570_636E__4E2D_5FC3Y_16,
-            ["方向角"] = ____6570_636E__65B9_5411_89D2_17,
+            ["发射X"] = ____6570_636E__4E2D_5FC3X_17,
+            ["发射Y"] = ____6570_636E__4E2D_5FC3Y_18,
+            ["方向角"] = ____6570_636E__65B9_5411_89D2_19,
             ["形态"] = "AOE",
             ["穿透"] = true,
-            ["最大命中数"] = ____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E__8D2F_7A7F_70AE_6700_5927_547D_4E2D_6570_18,
-            ["倍率"] = ____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E__8D2F_7A7F_70AE_500D_7387_19,
-            ["距离"] = ____temp_20,
-            ["追踪目标"] = ____6700_8FD1_654C_4EBA_14
+            ["最大命中数"] = ____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E__8D2F_7A7F_70AE_6700_5927_547D_4E2D_6570_20,
+            ["倍率"] = ____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E__8D2F_7A7F_70AE_500D_7387_21,
+            ["距离"] = ____temp_22,
+            ["追踪目标"] = ____6700_8FD1_654C_4EBA_16
         })
         Sound3DII_CooPlayReuse(
             _____585E_8389_4E9A_97F3_6548_914D_7F6E["R贯穿炮"]["路径"],
@@ -329,6 +333,14 @@ local function _____6267_884CR_5B8C_6210_7ED3_7B97(_____65BD_6CD5_8005, _____5B9
     )
     local _____653B_51FB_529B = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005)
     local _____5217_8868 = _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA(_____65BD_6CD5_8005, _____6570_636E["中心X"], _____6570_636E["中心Y"], _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["领域半径"])
+    debugLogForce(
+        "塞莉亚-R",
+        "伤害",
+        "标签",
+        "塞莉亚-高阶术式·闭锁",
+        "数值",
+        _____653B_51FB_529B * _____585E_8389_4E9A_514B_83B1_5C14R_914D_7F6E["主伤害攻击力倍率"]
+    )
     do
         local i = 0
         while i < #_____5217_8868 do
@@ -406,6 +418,7 @@ local function _____6267_884CR_5B8C_6210_7ED3_7B97(_____65BD_6CD5_8005, _____5B9
     _____5B9E_4F8B["完成"](_____5B9E_4F8B)
 end
 local function _____91CA_653ER_9AD8_9636_672F_5F0F(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("塞莉亚-R", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
@@ -447,6 +460,7 @@ local function _____91CA_653ER_9AD8_9636_672F_5F0F(_context, _____65BD_6CD5_8005
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(_____539F_56E0, ______63A7_5236_5668)
+            debugLogForce("塞莉亚-R", "结束", "原因", _____539F_56E0)
             _____89E3_9664_585E_8389_4E9AR_9501_5B9A(_____65BD_6CD5_8005)
             _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____65BD_6CD5_8005, _____585E_8389_4E9ABuffID["高阶术式蓄力"])
         end
@@ -469,6 +483,7 @@ local function _____91CA_653ER_9AD8_9636_672F_5F0F(_context, _____65BD_6CD5_8005
     local ____ = _____6CE8_9500
     SetUnitFacing(_____65BD_6CD5_8005, _____65B9_5411_89D2)
     local _____6CD5_9635_7279_6548 = nil
+    debugLogForce("塞莉亚-R", "特效", "路径", _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["R高阶法阵"]["模型路径"])
     _____6CD5_9635_7279_6548 = _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["R高阶法阵"]["模型路径"],
         RGB = _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["R高阶法阵"].RGB,
@@ -539,6 +554,7 @@ local function _____91CA_653ER_9AD8_9636_672F_5F0F(_context, _____65BD_6CD5_8005
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册塞莉亚R"] = function()
+    debugLogForce("塞莉亚-R", "注册", "名称", "注册塞莉亚R")
     if _____5DF2_6CE8_518C then
         return
     end

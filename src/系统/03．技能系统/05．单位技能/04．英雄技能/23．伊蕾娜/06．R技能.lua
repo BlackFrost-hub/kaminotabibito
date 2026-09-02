@@ -19,6 +19,8 @@ local _____767B_8BB0_4F0A_857E_5A1C_6280_80FD_6E05_7406 = ____02_FF0E_88AB_52A8_
 local ____require_result_0 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
 local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播放英雄技能喊话"]
 local jass = require("jass.common")
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetSpellTargetX = jass.GetSpellTargetX
@@ -28,40 +30,42 @@ local DestroyEffect = jass.DestroyEffect
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_1.addDelayedCallback
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
-local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["创建战斗技能实例"]
-local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["查询战斗技能实例"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
-local _____5F00_59CB_5145_80FD = ____require_result_4["开始充能"]
-local _____505C_6B62_5145_80FD = ____require_result_4["停止充能"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
-local _____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_5["创建持续危险区域"]
-local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_6["造成技能伤害"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_7["两点角度"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
-local _____6781_5750_6807X = ____require_result_7["极坐标X"]
-local _____6781_5750_6807Y = ____require_result_7["极坐标Y"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
-local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_8["获取坐标范围敌人"]
-local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-local SFB_setSlow = ____require_result_9.SFB_setSlow
-local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
-local _____5F00_59CB_62A4_76FE = ____require_result_10["开始护盾"]
-local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
-local _____53D1_5C04_5F39_9053 = ____require_result_11["发射弹道"]
-local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_12["创建点特效"]
-local ____require_result_13 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_CooPlayReuse = ____require_result_13.Sound3DII_CooPlayReuse
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_2.addDelayedCallback
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_3["注册单位技能壳监听"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
+local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_4["创建战斗技能实例"]
+local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_4["查询战斗技能实例"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
+local _____5F00_59CB_5145_80FD = ____require_result_5["开始充能"]
+local _____505C_6B62_5145_80FD = ____require_result_5["停止充能"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.03．持续危险区.01．持续危险区域")
+local _____521B_5EFA_6301_7EED_5371_9669_533A_57DF = ____require_result_6["创建持续危险区域"]
+local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_7["造成技能伤害"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_8["两点角度"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
+local _____6781_5750_6807X = ____require_result_8["极坐标X"]
+local _____6781_5750_6807Y = ____require_result_8["极坐标Y"]
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.02．单位与范围")
+local _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA = ____require_result_9["获取坐标范围敌人"]
+local ____require_result_10 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+local SFB_setSlow = ____require_result_10.SFB_setSlow
+local ____require_result_11 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
+local _____5F00_59CB_62A4_76FE = ____require_result_11["开始护盾"]
+local ____require_result_12 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
+local _____53D1_5C04_5F39_9053 = ____require_result_12["发射弹道"]
+local ____require_result_13 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_13["创建点特效"]
+local ____require_result_14 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_14.Sound3DII_CooPlayReuse
+local ____require_result_15 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_15.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____4F0A_857E_5A1C_6280_80FD_914D_7F6E["单位类型ID"]
-local ____R_6280_80FD_7C7B_578BID = jass.FourCC(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.R["技能ID"])
+local ____R_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.R["技能ID"])
 local ____R_6280_80FD_952E = "R万法回廊"
 local function _____8BA1_7B97_8303_56F4_8868_73B0_7F29_653E(_____534A_5F84, _____8868_73B0)
     return _____534A_5F84 / _____8868_73B0["基准半径"] * _____8868_73B0["基准缩放"]
@@ -227,6 +231,7 @@ local function _____6267_884C_89C1_95FB_8FFD_52A0(_____65BD_6CD5_8005, _____5B9E
     end
 end
 local function _____6267_884CR_5B8C_6210_7ED3_7B97(_____65BD_6CD5_8005, _____5B9E_4F8B, _____6570_636E)
+    debugLogForce("伊蕾娜-R", "结束", "原因", "完成")
     local _____654C_4EBA_5217_8868 = _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA(_____65BD_6CD5_8005, _____6570_636E["中心X"], _____6570_636E["中心Y"], _____4F0A_857E_5A1CR_914D_7F6E["领域半径"])
     local _____4E3B_4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____4F0A_857E_5A1CR_914D_7F6E["主伤害攻击力倍率"]
     do
@@ -365,6 +370,7 @@ local function _____6267_884CR_5B8C_6210_7ED3_7B97(_____65BD_6CD5_8005, _____5B9
     )
 end
 local function _____91CA_653ER_4E07_6CD5_56DE_5ECA(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("伊蕾娜-R", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
@@ -512,6 +518,7 @@ local function _____91CA_653ER_4E07_6CD5_56DE_5ECA(_context, _____65BD_6CD5_8005
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册伊蕾娜R"] = function()
+    debugLogForce("伊蕾娜-R", "注册", "名称", "注册伊蕾娜R")
     if _____5DF2_6CE8_518C then
         return
     end

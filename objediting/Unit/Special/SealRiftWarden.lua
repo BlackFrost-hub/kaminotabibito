@@ -11,6 +11,7 @@ createSealGuardUnit('n06M', 'nban', {
   mana = 0,
   manaRegen = 0.0,
   speed = 300,
+  defense = 40,
   collision = 32.0,
   acquire = 800.0,
   pointValue = 360,

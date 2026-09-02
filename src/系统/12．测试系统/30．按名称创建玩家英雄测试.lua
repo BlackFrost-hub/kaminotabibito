@@ -28,12 +28,12 @@ local _____5355_4F4D_7C7B_578B_6B7B_4EA1 = jass.UNIT_TYPE_DEAD
 local _____6A21_5757_540D = "按名称创建玩家英雄测试"
 local _____547D_4EE4_524D_7F00 = "-"
 local _____4E8C_5341_81F3_4E8C_5341_4E94_82F1_96C4_5355_4F4DID_8868 = {
-    E00C = true,
-    E00G = true,
-    E00H = true,
-    E00I = true,
-    E00J = true,
-    E00K = true
+    E0L0 = true,
+    E0L1 = true,
+    E0L2 = true,
+    E0L3 = true,
+    E0L4 = true,
+    E0L5 = true
 }
 local function ____on_6309_540D_79F0_521B_5EFA_73A9_5BB6_82F1_96C4(_____73A9_5BB6, _____547D_4EE4)
     if not _____662F_5141_8BB8_6D4B_8BD5_73A9_5BB6(_____73A9_5BB6) then

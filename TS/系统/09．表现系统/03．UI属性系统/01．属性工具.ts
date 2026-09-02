@@ -353,7 +353,7 @@ export function buildDetailTexts(player: any): string[] {
     singleLine("|cffff00ff", "最终伤害：", pct(player, "最终伤害%")),
     // --- 冷却/经验（第19-20行）---
     singleLine("|cff99ccff", "冷却缩减：", pct(player, "冷却缩减")),
-    singleLine("|cffff00ff", "经验获取率：", pct(player, "经验获取率")),
+    singleLine("|cffff00ff", "经验获取率：", pctPlus100(player, "经验获取率")),
   ];
 
   // ============================================================

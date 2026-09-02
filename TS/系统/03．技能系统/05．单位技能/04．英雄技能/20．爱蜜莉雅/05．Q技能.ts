@@ -24,6 +24,9 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -49,9 +52,12 @@ const { 读取单位攻击力, 两点角度 } = require("系统.03．技能系�
   读取单位攻击力: (this: void, unit: any) => number;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
-const 英雄单位类型ID = jass.FourCC(爱蜜莉雅技能配置.单位类型ID) as number;
-const Q技能类型ID = jass.FourCC(爱蜜莉雅技能配置.Q.技能ID) as number;
+const 英雄单位类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.单位类型ID);
+const Q技能类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.Q.技能ID);
 
 /** 分裂冰刃：从冰晶位置向前/侧方扇形分裂（复用冰矢模型，小缩放） */
 function 发射分裂冰刃(this: void, 施法者: any, X: number, Y: number, 中心角: number, 技能实例ID: number | undefined): void {
@@ -119,6 +125,7 @@ function 发射Q帕克冰弹(this: void, 施法者: any, 目标: any, 技能实�
 }
 
 function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("爱蜜莉雅-Q", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0) return;
   播放英雄技能喊话(施法者, "爱蜜莉雅", 爱蜜莉雅技能配置.Q.技能ID);
   播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.Q);
@@ -164,6 +171,7 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
     on命中: function Q命中(this: void, 目标: any, _弹幕ID: number): void {
       // 命中冰爆音：主矢真实命中结算点一次（坐标=命中位置；与穿晶分裂、冻结解除碎裂复用 Q命中 槽，参数配置驱动）
       Sound3DII_CooPlayReuse(爱蜜莉雅音效配置.Q命中.路径, GetUnitX(目标), GetUnitY(目标), 爱蜜莉雅音效配置.Q命中.高度, 爱蜜莉雅音效配置.Q命中.裁断距离);
+      debugLogForce("爱蜜莉雅-Q", "伤害", "标签", "爱蜜莉雅-Q冰之矢命中", "目标", 目标, "数值", 伤害);
       结算爱蜜莉雅技能命中(施法者, 目标, 来源键, {
         伤害值: 伤害,
         技能ID: Q技能类型ID,
@@ -197,6 +205,7 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
     },
     on到达点: function Q终点(this: void, 弹幕ID: number, _原因: string): void {
       // 终点生成新冰晶节点（超上限按配置替换最旧）
+      debugLogForce("爱蜜莉雅-Q", "状态", "弹道到达终点生成冰晶");
       const 位置 = 获取弹道当前位置(弹道);
       创建爱蜜莉雅场上冰晶(施法者, "Q", 位置.X, 位置.Y, 爱蜜莉雅Q配置.终点冰晶持续秒);
       void 弹幕ID;
@@ -211,6 +220,7 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
 }
 
 export function 注册爱蜜莉雅Q(this: void): void {
+  debugLogForce("爱蜜莉雅-Q", "注册", "名称", "注册爱蜜莉雅Q");
   注册单位技能壳监听({
     名称: "爱蜜莉雅-冰之矢（Q）",
     单位类型ID: 英雄单位类型ID,

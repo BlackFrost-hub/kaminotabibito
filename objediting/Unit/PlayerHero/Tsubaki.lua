@@ -1,15 +1,15 @@
 -- 朱雀院椿玩家英雄物编。
 -- 近战敏捷剑士；近战攻击不得配置投射物。
 
-createPlayerHeroUnit('E00H', '朱雀院椿', {
+createPlayerHeroUnit('E0L2', '朱雀院椿', {
   baseId = 'Edem',
   properNames = '朱雀院椿',
   tooltipBasic = '召唤朱雀院椿',
   tooltipExtended = '维持 VF 场、招架反击并切换一刀与二刀姿态的近战剑士。',
   description = '朱雀院流防守反击型剑士。',
   modelFile = 'Unit\\Hero\\Tsubaki\\Tsubaki.mdx',
-  scale = 1.0,
-  icon = 'ReplaceableTextures\\CommandButtons\\BTNHeroBlademaster.blp',
+  scale = 1.2,
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNTsubakiPortrait.blp',
   normalAbilities = 'A014,AInv,ATD1',
   heroAbilities = '',
   upgradesUsed = '',

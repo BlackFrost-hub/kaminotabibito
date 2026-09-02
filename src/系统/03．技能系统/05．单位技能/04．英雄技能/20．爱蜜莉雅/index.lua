@@ -12,5 +12,8 @@ do
         end
     end
 end
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
+debugLogForce("爱蜜莉雅-index", "模块加载")
 _____6CE8_518C_7231_871C_8389_96C5_8868_73B0()
 return ____exports

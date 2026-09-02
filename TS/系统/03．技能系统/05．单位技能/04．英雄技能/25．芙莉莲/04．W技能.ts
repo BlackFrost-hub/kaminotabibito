@@ -81,6 +81,9 @@ const 花田联动 = require("./07．D技能") as {
 const { 芙莉莲D配置 } = require("./00．配置") as {
   芙莉莲D配置: { 修正W持续加成秒: number };
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(芙莉莲技能配置.单位类型ID);
 const W技能ID = stringToFourCCSafe(芙莉莲技能配置.W.技能ID);
@@ -104,6 +107,7 @@ interface W数据 {
 
 function 结束W护壁(this: void, 施法者: any, 技能实例ID: number | undefined, 数据: W数据, 自然结束: boolean): void {
   if (数据.已结束) return;
+  debugLogForce("芙莉莲-W", "结束", "原因", 自然结束 ? "自然结束" : "成功/中断收束", "英雄", 施法者);
   数据.已结束 = true;
   // 保持防御动作守护停止（恢复 stand 与动画速度）
   if (数据.动作守护 != null) {
@@ -141,6 +145,7 @@ function removeDelayedCallbackSafe(this: void, id: number): void {
 }
 
 function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("芙莉莲-W", "释放", "技能实例ID", 技能实例ID || "-");
   if (!是芙莉莲(施法者)) return;
   // 不叠加窗口：已有活跃 W 实例时忽略
   if (查询战斗技能实例(施法者, "芙莉莲W").length > 0) return;
@@ -189,6 +194,7 @@ function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: numb
     // 一次性防御成功
     数据.已防御 = true;
     const 来源 = context.attacker;
+    debugLogForce("芙莉莲-W", "命中", "目标", 来源);
     // 收尾延迟到本次伤害修正遍历结束后（禁止在遍历中同步注销修改器）
     addDelayedCallback(0, function W防御成功收尾(this: void): void {
       // 受击反馈（参数配置驱动）
@@ -232,6 +238,7 @@ function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: numb
 let 已注册 = false;
 
 export function 注册芙莉莲W(this: void): void {
+  debugLogForce("芙莉莲-W", "注册", "名称", "注册芙莉莲W");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

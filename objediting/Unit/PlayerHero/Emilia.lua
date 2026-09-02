@@ -1,15 +1,15 @@
 -- 爱蜜莉雅玩家英雄物编。
 -- 远程冰系英雄；通用字段和远近战攻击分支由 UnitTemplates.lua 统一处理。
 
-createPlayerHeroUnit('E00C', '爱蜜莉雅', {
+createPlayerHeroUnit('E0L0', '爱蜜莉雅', {
   baseId = 'Emoo',
   properNames = '爱蜜莉雅',
   tooltipBasic = '召唤爱蜜莉雅',
   tooltipExtended = '冰之精灵术士爱蜜莉雅。',
   description = '冰之精灵术士爱蜜莉雅。',
   modelFile = 'Unit\\Hero\\Emilia\\[Hero]-Emilia_2.mdx',
-  scale = 1.0,
-  icon = 'ReplaceableTextures\\CommandButtons\\BTNHeroArchMage.blp',
+  scale = 1.75,
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNEmiliaPortrait.blp',
   normalAbilities = 'A014,AInv,AED1',
   heroAbilities = '',
   upgradesUsed = '',

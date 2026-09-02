@@ -122,7 +122,14 @@ function ____exports.applyEquipStatsTS(unit, stats)
             elseif name == "经验获取率" and owner then
                 local t = __TS__Number(g.udg_T) or 1
                 local base = 0.35 + 0.65 * t
-                jass.SetPlayerHandicapXP(owner, base * value)
+                local _____7D2F_8BA1_52A0_6210 = __TS__Number(YDUserDataGet2(
+                    nil,
+                    "player",
+                    owner,
+                    name,
+                    "real"
+                )) or 0
+                jass.SetPlayerHandicapXP(owner, base * (1 + _____7D2F_8BA1_52A0_6210))
             end
         end
         ::__continue19::

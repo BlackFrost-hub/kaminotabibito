@@ -33,9 +33,15 @@ const { 销毁世界坐标进度UI } = require("系统.09．表现系统.15．�
   销毁世界坐标进度UI: (this: void, ui: any) => void;
 };
 const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 
-const 英雄单位类型ID = jass.FourCC(爱蜜莉雅技能配置.单位类型ID) as number;
+const 英雄单位类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.单位类型ID);
 
 //=============================================================================
 // 类型
@@ -112,6 +118,7 @@ function 确保死亡监听(this: void): void {
   if (死亡监听已注册) return;
   死亡监听已注册 = true;
   registerDeathListener(function 爱蜜莉雅死亡清理(this: void, dyingUnit: any, _killingUnit: any): void {
+    debugLogForce("爱蜜莉雅-公共状态", "回调", "类型", "死亡", "单位", dyingUnit);
     if (dyingUnit == null || dyingUnit === 0) return;
     const id = 取单位ID(dyingUnit);
     if (爱蜜莉雅状态表[id] == null) return;
@@ -142,6 +149,8 @@ export function 创建爱蜜莉雅冰晶(
     移除爱蜜莉雅冰晶(英雄, 状态.冰晶列表[0].序号);
   }
 
+  debugLogForce("爱蜜莉雅-公共状态", "状态", "创建冰晶节点", "来源", 来源技能);
+  debugLogForce("爱蜜莉雅-公共状态", "特效", "类型", "创建", "路径", 爱蜜莉雅表现配置.冰晶节点.模型路径);
   const 特效句柄 = 创建点特效({
     模型路径: 爱蜜莉雅表现配置.冰晶节点.模型路径,
     RGB: 爱蜜莉雅表现配置.冰晶节点.RGB,
@@ -213,6 +222,7 @@ export function 移除爱蜜莉雅冰晶(this: void, 英雄: any, 序号: number
     const 节点 = 状态.冰晶列表[i];
     if (节点.序号 !== 序号) continue;
     状态.冰晶列表.splice(i, 1);
+    debugLogForce("爱蜜莉雅-公共状态", "特效", "类型", "销毁", "路径", 爱蜜莉雅表现配置.冰晶节点.模型路径);
     销毁点特效(节点.特效句柄);
     节点.已读取 = true;
     return 节点;
@@ -253,6 +263,7 @@ export function 设置爱蜜莉雅D强化(this: void, 英雄: any, 剩余次数:
     剩余次数: 剩余次数 > 0 ? 剩余次数 : 0,
     到期时间: 持续毫秒 > 0 ? getGameTime() + 持续毫秒 : 0,
   };
+  debugLogForce("爱蜜莉雅-公共状态", "状态", "D强化", "操作", "设置", "剩余次数", 剩余次数, "持续毫秒", 持续毫秒);
   状态.D强化 = 新状态;
   return 新状态;
 }
@@ -270,6 +281,7 @@ export function 消费爱蜜莉雅D强化(this: void, 英雄: any): boolean {
 export function 清理爱蜜莉雅D强化(this: void, 英雄: any): void {
   const 状态 = 爱蜜莉雅状态表[取句柄(英雄)];
   if (状态 == null) return;
+  debugLogForce("爱蜜莉雅-公共状态", "状态", "D强化", "操作", "清理");
   状态.D强化 = null;
 }
 
@@ -305,6 +317,7 @@ function 清理全部进度UI(this: void, 状态: 爱蜜莉雅英雄状态): voi
   while (状态.进度UI列表.length > 0) {
     const ui = 状态.进度UI列表[0];
     状态.进度UI列表.splice(0, 1);
+    debugLogForce("爱蜜莉雅-公共状态", "特效", "类型", "销毁", "路径", "-");
     销毁世界坐标进度UI(ui);
   }
 }
@@ -351,6 +364,7 @@ export function 清理爱蜜莉雅状态(this: void, 英雄: any, 原因: 爱蜜
   const 状态 = 爱蜜莉雅状态表[id];
   if (状态 == null) return false;
   if (状态.已清理) return true;
+  debugLogForce("爱蜜莉雅-公共状态", "状态", "清理统一状态", "原因", 原因);
   状态.已清理 = true;
   void 原因; // 原因用于日志/扩展，当前无日志输出
   清理爱蜜莉雅全部冰晶(英雄);

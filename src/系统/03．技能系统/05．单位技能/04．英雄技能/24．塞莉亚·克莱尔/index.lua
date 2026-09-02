@@ -21,6 +21,9 @@ do
         end
     end
 end
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
+debugLogForce("塞莉亚-index", "模块加载")
 _____6CE8_518C_585E_8389_4E9A_88AB_52A8_6548_679C()
 _____6CE8_518C_585E_8389_4E9AQ()
 _____6CE8_518C_585E_8389_4E9AW()

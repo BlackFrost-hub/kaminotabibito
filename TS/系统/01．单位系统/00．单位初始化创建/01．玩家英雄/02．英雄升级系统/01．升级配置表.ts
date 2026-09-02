@@ -175,7 +175,7 @@ export const 英雄升级配置列表: readonly 英雄升级配置[] = [
     ],
   },
   {
-    heroId: "E00C",
+    heroId: "E0L0",
     heroName: "爱蜜莉雅",
     properName: "冰之精灵术士",
     learnedSkills: [
@@ -187,7 +187,7 @@ export const 英雄升级配置列表: readonly 英雄升级配置[] = [
     pendingNotes: ["D：帕克显现为天赋技能，英雄创建时已放入普通技能栏。"],
   },
   {
-    heroId: "E00G",
+    heroId: "E0L1",
     heroName: "朱雀院红叶",
     properName: "朱雀院红叶",
     learnedSkills: [
@@ -199,7 +199,7 @@ export const 英雄升级配置列表: readonly 英雄升级配置[] = [
     pendingNotes: ["D：朱雀流·秘传三式为天赋技能，英雄创建时已放入普通技能栏。"],
   },
   {
-    heroId: "E00H",
+    heroId: "E0L2",
     heroName: "朱雀院椿",
     properName: "朱雀院椿",
     learnedSkills: [
@@ -211,7 +211,7 @@ export const 英雄升级配置列表: readonly 英雄升级配置[] = [
     pendingNotes: ["D：浴火鸟·二刀解放为天赋技能，英雄创建时已放入普通技能栏。"],
   },
   {
-    heroId: "E00I",
+    heroId: "E0L3",
     heroName: "伊蕾娜",
     properName: "灰之魔女",
     learnedSkills: [
@@ -223,7 +223,7 @@ export const 英雄升级配置列表: readonly 英雄升级配置[] = [
     pendingNotes: ["D：旅途魔法变式为天赋技能，英雄创建时已放入普通技能栏。"],
   },
   {
-    heroId: "E00J",
+    heroId: "E0L4",
     heroName: "塞莉亚·克莱尔",
     properName: "天才魔术师",
     learnedSkills: [
@@ -235,7 +235,7 @@ export const 英雄升级配置列表: readonly 英雄升级配置[] = [
     pendingNotes: ["D：术式转写为天赋技能，英雄创建时已放入普通技能栏。"],
   },
   {
-    heroId: "E00K",
+    heroId: "E0L5",
     heroName: "芙莉莲",
     properName: "精灵魔法使",
     learnedSkills: [

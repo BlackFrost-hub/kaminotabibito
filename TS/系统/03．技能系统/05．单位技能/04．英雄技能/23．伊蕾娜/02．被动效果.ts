@@ -27,6 +27,9 @@ import {
 import { 伊蕾娜BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/23．伊蕾娜";
 
 const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
@@ -73,11 +76,14 @@ const platformAbilityApi = require("平台扩展API取值") as {
 const platformAbilityAction = require("平台扩展API动作") as {
   技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
-const 英雄单位类型ID = jass.FourCC(伊蕾娜技能配置.单位类型ID) as number;
-const Q技能类型ID = jass.FourCC(伊蕾娜技能配置.Q.技能ID) as number;
-const W技能类型ID = jass.FourCC(伊蕾娜技能配置.W.技能ID) as number;
-const E技能类型ID = jass.FourCC(伊蕾娜技能配置.E.技能ID) as number;
+const 英雄单位类型ID = stringToFourCCSafe(伊蕾娜技能配置.单位类型ID) as number;
+const Q技能类型ID = stringToFourCCSafe(伊蕾娜技能配置.Q.技能ID) as number;
+const W技能类型ID = stringToFourCCSafe(伊蕾娜技能配置.W.技能ID) as number;
+const E技能类型ID = stringToFourCCSafe(伊蕾娜技能配置.E.技能ID) as number;
 
 //=============================================================================
 // 类型
@@ -770,6 +776,7 @@ function 确保死亡监听(this: void): void {
   if (死亡监听已注册) return;
   死亡监听已注册 = true;
   registerDeathListener(function 伊蕾娜死亡清理(this: void, dyingUnit: any, _killingUnit: any): void {
+    debugLogForce("伊蕾娜-被动", "回调", "类型", "死亡", "单位", dyingUnit);
     if (dyingUnit == null || dyingUnit === 0) return;
     if (伊蕾娜状态表[取单位ID(dyingUnit)] == null) return;
     清理伊蕾娜状态(dyingUnit, "英雄死亡");
@@ -780,6 +787,7 @@ let 普攻联动已注册 = false;
 
 /** 注册被动入口（幂等）：死亡清理监听 + 强化普攻伤害监听。 */
 export function 注册伊蕾娜被动效果(this: void): void {
+  debugLogForce("伊蕾娜-被动", "注册", "名称", "注册伊蕾娜被动效果");
   确保死亡监听();
   if (普攻联动已注册) return;
   普攻联动已注册 = true;

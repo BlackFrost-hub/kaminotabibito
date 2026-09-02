@@ -47,6 +47,9 @@ const {
   注册破绽斩监听: (this: void, 回调: (this: void, 红叶: any, 目标: any) => void) => void;
   播放红叶动作: (this: void, 英雄: any, 槽: { 索引: number; 持续秒: number }) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院红叶技能配置.单位类型ID);
 const 秘传BuffID = 朱雀院红叶Buff配置.秘传三式;
@@ -85,12 +88,14 @@ function 移除D状态(this: void, 英雄: any): void {
     removeDelayedCallback(状态.到期回调ID);
     状态.到期回调ID = 0;
   }
+  debugLogForce("红叶-D", "Buff", "操作", "移除", "目标", 英雄);
   销毁单位坐标跟随特效(英雄, 刀环特效键);
   移除单位指定Buff(英雄, 秘传BuffID);
   delete D状态表[id];
 }
 
 function 开启D秘传三式(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
+  debugLogForce("红叶-D", "释放", "技能实例ID", "-");
   if (!是朱雀院红叶(施法者)) return;
   播放红叶动作(施法者, 朱雀院红叶动作槽.D启动);
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动；重复 D 刷新同样视为成功施法）
@@ -117,6 +122,7 @@ function 开启D秘传三式(this: void, _context: any, 施法者: any, _技能�
     移除D状态(施法者);
   });
   D状态表[id] = 状态;
+  debugLogForce("红叶-D", "状态", "开启秘传", 状态.剩余次数);
   刷新D显示(施法者, 状态);
   // 秘传刀环表现（模型/缩放/高度/RGB 全由表现配置驱动；秘传结束 移除D状态 统一销毁）
   if ((朱雀院红叶表现配置.D刀环.模型路径 as string) !== "") {
@@ -202,6 +208,7 @@ function 破绽斩延长D(this: void, 红叶: any, _目标: any): void {
 let 已注册 = false;
 
 export function 注册朱雀院红叶D(this: void): void {
+  debugLogForce("红叶-D", "注册", "名称", "D", "函数", "注册朱雀院红叶D");
   if (已注册) return;
   已注册 = true;
   注册破绽斩监听(破绽斩延长D);

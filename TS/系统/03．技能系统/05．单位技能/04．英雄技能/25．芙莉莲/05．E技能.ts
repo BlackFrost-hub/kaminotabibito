@@ -87,6 +87,9 @@ const 花田联动 = require("./07．D技能") as {
 const { 芙莉莲D配置 } = require("./00．配置") as {
   芙莉莲D配置: { 修正E落点倍率加成: number };
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(芙莉莲技能配置.单位类型ID);
 const E技能ID = stringToFourCCSafe(芙莉莲技能配置.E.技能ID);
@@ -152,6 +155,7 @@ function 结算E落点(this: void, 施法者: any, 技能实例ID: number | unde
     jass.GroupRemoveUnit(组, u);
     if (u === 施法者 || !单位存活(u)) continue;
     if (!IsUnitEnemy(u, GetOwningPlayer(施法者))) continue;
+    debugLogForce("芙莉莲-E", "伤害", "标签", "芙莉莲-E落点冲击", "数值", 读取单位攻击力(施法者) * 冲击倍率, "目标", u);
     造成技能伤害({
       来源: 施法者,
       目标: u,
@@ -264,6 +268,7 @@ function E安排观察期收尾(this: void, 施法者: any, 控制器: any, 数�
 }
 
 function 释放E(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("芙莉莲-E", "释放", "技能实例ID", 技能实例ID || "-");
   if (!是芙莉莲(施法者)) return;
   // 重复 E：已有活跃 E 实例时忽略
   if (查询战斗技能实例(施法者, "芙莉莲E").length > 0) return;
@@ -299,6 +304,7 @@ function 释放E(this: void, _context: any, 施法者: any, 技能实例ID: numb
     技能实例ID,
     数据,
     结束回调: function E结束(this: void, _原因: string, _c: any): void {
+      debugLogForce("芙莉莲-E", "结束", "原因", _原因 || "-");
       // 中断/死亡：先标记结束再停止位移（防位移结束回调误触发落点结算）；不结算落点
       // 自然到达后数据.已结束也为 true，但实例仍可能因死亡/场景清理收束，必须继续清理观察资源。
       if (数据.已结束) {
@@ -401,6 +407,7 @@ function 释放E(this: void, _context: any, 施法者: any, 技能实例ID: numb
   });
 
   // 飞行位移（公共自身位移；必须传 角度，否则公共接口返回 0 不移动；位移特效的模型/缩放/高度/持续秒/RGB 由 表现配置.E起落风压 驱动）
+  debugLogForce("芙莉莲-E", "位移", "类型", "冲锋", "距离", E配置.位移距离);
   数据.位移ID = 开始冲锋(施法者, {
     距离: E配置.位移距离,
     每秒速度: E配置.位移速度,
@@ -450,6 +457,7 @@ function 释放E(this: void, _context: any, 施法者: any, 技能实例ID: numb
 let 已注册 = false;
 
 export function 注册芙莉莲E(this: void): void {
+  debugLogForce("芙莉莲-E", "注册", "名称", "注册芙莉莲E");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

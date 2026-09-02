@@ -32,6 +32,8 @@ local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
 local ____require_result_8 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 local Sound3DII_UnitPlayReuse = ____require_result_8.Sound3DII_UnitPlayReuse
 local Sound3DII_CooPlayReuse = ____require_result_8.Sound3DII_CooPlayReuse
+local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_9.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
 local _____7834_7EFDBuffID = _____6731_96C0_9662_7EA2_53F6Buff_914D_7F6E["破绽"]
 local _____5200_52BFBuffID = _____6731_96C0_9662_7EA2_53F6Buff_914D_7F6E["刀势"]
@@ -118,6 +120,14 @@ ____exports["移除目标破绽"] = function(_____76EE_6807)
         removeDelayedCallback(_____72B6_6001["到期回调ID"])
     end
     _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(_____76EE_6807, _____7834_7EFD_7279_6548_952E)
+    debugLogForce(
+        "红叶-被动",
+        "Buff",
+        "操作",
+        "移除",
+        "目标",
+        GetHandleId(_____76EE_6807)
+    )
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____76EE_6807, _____7834_7EFDBuffID)
     __TS__Delete(_____7834_7EFD_76EE_6807_8868, id)
 end
@@ -162,6 +172,14 @@ ____exports["施加朱雀院破绽"] = function(_____7EA2_53F6, _____76EE_6807)
         nil,
         0,
         _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["破绽标记"].RGB
+    )
+    debugLogForce(
+        "红叶-被动",
+        "Buff",
+        "操作",
+        "施加",
+        "目标",
+        GetHandleId(_____76EE_6807)
     )
     registerManualBuff(
         _____76EE_6807,
@@ -303,6 +321,16 @@ local function _____5904_7406_7EA2_53F6_666E_653B_7834_7EFD_65A9(target, attacke
         return
     end
     local _____8FFD_52A0_4F24_5BB3 = applied * _____6731_96C0_9662_7EA2_53F6_88AB_52A8_914D_7F6E["破绽斩伤害倍率"]
+    debugLogForce(
+        "红叶-被动",
+        "伤害",
+        "标签",
+        "朱雀院红叶-破绽斩",
+        "数值",
+        _____8FFD_52A0_4F24_5BB3,
+        "目标",
+        GetHandleId(target)
+    )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = attacker,
         ["目标"] = target,
@@ -360,6 +388,14 @@ local function _____786E_4FDD_6B7B_4EA1_6E05_7406()
             end
         end
         if ____exports["是朱雀院红叶"](dyingUnit) then
+            debugLogForce(
+                "红叶-被动",
+                "回调",
+                "类型",
+                "死亡",
+                "单位",
+                GetHandleId(dyingUnit)
+            )
             __TS__Delete(_____7834_7EFD_65A9_51B7_5374_8868, id)
             ____exports["清理朱雀院红叶状态"](dyingUnit, "英雄死亡")
         end
@@ -367,6 +403,14 @@ local function _____786E_4FDD_6B7B_4EA1_6E05_7406()
 end
 --- 注册朱雀院红叶被动（普攻破绽斩 + 死亡清理；幂等）
 ____exports["注册朱雀院红叶被动"] = function()
+    debugLogForce(
+        "红叶-被动",
+        "注册",
+        "名称",
+        "被动",
+        "函数",
+        "注册朱雀院红叶被动"
+    )
     if _____5DF2_6CE8_518C then
         return
     end

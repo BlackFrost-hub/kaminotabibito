@@ -75,6 +75,9 @@ const 联动E = require("./05．E技能") as {
 const 联动D = require("./07．D技能") as {
   尝试消费D强化?: (this: void, 英雄: any) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院红叶技能配置.单位类型ID);
 const Q技能ID = stringToFourCCSafe(朱雀院红叶技能配置.Q.技能ID);
@@ -109,6 +112,7 @@ interface Q数据 {
 //=============================================================================
 
 function 结算Q单体伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
+  debugLogForce("红叶-Q", "伤害", "标签", 标签, "数值", 伤害值, "目标", 目标);
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -131,6 +135,7 @@ function 结算Q单体伤害(this: void, 施法者: any, 目标: any, 技能实�
 
 function 开启Q2窗口(this: void, 施法者: any, 控制器: any, 数据: Q数据, 持续秒: number = Q配置.Q2窗口秒): void {
   if (数据.Q2壳 != null) return;
+  debugLogForce("红叶-Q", "状态", "开启Q2窗口", 持续秒);
   const 壳 = 创建限时二段技能壳({
     名称: "朱雀院红叶-Q2",
     单位: 施法者,
@@ -141,6 +146,7 @@ function 开启Q2窗口(this: void, 施法者: any, 控制器: any, 数据: Q数
       if (数据.Q2壳 !== 超时壳) return;
       数据.Q2壳 = null;
       数据.Q2到期时间 = 0;
+      debugLogForce("红叶-Q", "结束", "原因", "Q2窗口超时");
       控制器.完成();
     },
   });
@@ -161,6 +167,7 @@ function 开启Q2窗口(this: void, 施法者: any, 控制器: any, 数据: Q数
 }
 
 function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("红叶-Q", "释放", "技能实例ID", 技能实例ID ?? "-", "阶段", "Q1");
   if (!是朱雀院红叶(施法者)) return;
   播放红叶动作(施法者, 朱雀院红叶动作槽.Q冲刺);
   // 重复 Q：已有活跃 Q 实例时忽略本次释放（Q1 位移/Q2 窗口期间不叠加）
@@ -177,6 +184,7 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
     技能实例ID,
     数据,
     结束回调: function Q结束(this: void, _原因: string, _c: any): void {
+      debugLogForce("红叶-Q", "结束", "原因", "-");
       if (数据.位移ID !== 0) {
         停止位移(数据.位移ID, "中断");
         数据.位移ID = 0;
@@ -189,6 +197,7 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
     },
   });
 
+  debugLogForce("红叶-Q", "位移", "类型", "冲锋", "距离", Q配置.突进距离);
   const 位移ID = 开始冲锋(施法者, {
     角度: 方向,
     距离: Q配置.突进距离,
@@ -201,6 +210,7 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
     命中后结束: true,
     允许重复命中: false,
     命中回调: function Q1命中(this: void, _移动单位: any, 目标: any, _位移ID: number): void {
+      debugLogForce("红叶-Q", "命中", "目标", 目标);
       if (数据.已命中) return;
       数据.已命中 = true;
       播放红叶动作(施法者, 朱雀院红叶动作槽.Q命中斩);
@@ -278,10 +288,12 @@ function 执行Q2回身斩(this: void, 施法者: any, 控制器: any, 技能实
     数据.Q2壳 = null;
     数据.Q2到期时间 = 0;
   }
+  debugLogForce("红叶-Q", "结束", "原因", "Q2施放完成");
   控制器.完成();
 }
 
 function 释放Q2回身斩(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("红叶-Q", "释放", "技能实例ID", 技能实例ID ?? "-", "阶段", "Q2");
   if (!是朱雀院红叶(施法者)) return;
   const 活跃列表 = 查询战斗技能实例(施法者, "红叶Q");
   for (let i = 0; i < 活跃列表.length; i++) {
@@ -321,6 +333,7 @@ export function 延长Q2窗口(this: void, 施法者: any, 延长秒: number): v
 }
 
 export function 注册朱雀院红叶Q(this: void): void {
+  debugLogForce("红叶-Q", "注册", "名称", "Q", "函数", "注册朱雀院红叶Q");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

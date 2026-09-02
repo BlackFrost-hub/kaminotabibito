@@ -13,38 +13,42 @@ local _____79FB_9664_7231_871C_8389_96C5_51B0_6676 = ____02_FF0E_516C_5171_72B6_
 local _____67E5_8BE2_7231_871C_8389_96C5_51B0_6676 = ____02_FF0E_516C_5171_72B6_6001_4E0E_51B0_6676["查询爱蜜莉雅冰晶"]
 local _____767B_8BB0_7231_871C_8389_96C5_6280_80FD_6E05_7406 = ____02_FF0E_516C_5171_72B6_6001_4E0E_51B0_6676["登记爱蜜莉雅技能清理"]
 local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_0.Sound3DII_UnitPlayReuse
-local Sound3DII_CooPlayReuse = ____require_result_0.Sound3DII_CooPlayReuse
-local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_1.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
-local _____83B7_53D6_5355_4F4DBuff_5C42_6570 = ____require_result_1["获取单位Buff层数"]
-local ____require_result_2 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_2["添加单位暂停"]
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_2["移除单位暂停"]
-local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_3["造成技能伤害"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_4["单位存活"]
-local _____53D6_5355_4F4DID = ____require_result_4["取单位ID"]
-local _____8DDD_79BB_5E73_65B9XY = ____require_result_4["距离平方XY"]
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_5.addDelayedCallback
-local removeDelayedCallback = ____require_result_5.removeDelayedCallback
-local getGameTime = ____require_result_5.getGameTime
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createTimedUnitEffect = ____require_result_6.createTimedUnitEffect
-local ____require_result_7 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_7.registerDeathListener
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
+local ____require_result_1 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_1.Sound3DII_UnitPlayReuse
+local Sound3DII_CooPlayReuse = ____require_result_1.Sound3DII_CooPlayReuse
+local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_2.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
+local _____83B7_53D6_5355_4F4DBuff_5C42_6570 = ____require_result_2["获取单位Buff层数"]
+local ____require_result_3 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_3["添加单位暂停"]
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_3["移除单位暂停"]
+local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_4["造成技能伤害"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_5["单位存活"]
+local _____53D6_5355_4F4DID = ____require_result_5["取单位ID"]
+local _____8DDD_79BB_5E73_65B9XY = ____require_result_5["距离平方XY"]
+local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_6.addDelayedCallback
+local removeDelayedCallback = ____require_result_6.removeDelayedCallback
+local getGameTime = ____require_result_6.getGameTime
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createTimedUnitEffect = ____require_result_7.createTimedUnitEffect
+local ____require_result_8 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_8.registerDeathListener
+local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_9.debugLogForce
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 local _____51BB_7ED3_6682_505C_6765_6E90 = "爱蜜莉雅-冻结"
 local _____88AB_52A8_76EE_6807_8868 = {}
 --- 冻结去重：目标句柄 → 来源键 → true（同技能实例不重复冻结）
@@ -107,6 +111,16 @@ local function _____65BD_52A0_971C_88C2(_____76EE_6807)
     end
     local _____72B6_6001 = _____76EE_6807_72B6_6001(_____76EE_6807)
     _____72B6_6001["霜裂到期"] = getGameTime() + _____7231_871C_8389_96C5_88AB_52A8_914D_7F6E["霜裂秒"] * 1000
+    debugLogForce(
+        "爱蜜莉雅-被动",
+        "Buff",
+        "操作",
+        "施加",
+        "目标",
+        _____76EE_6807,
+        "类型",
+        "霜裂"
+    )
     registerManualBuff(_____76EE_6807, _____7231_871C_8389_96C5BuffID["霜裂"], _____7231_871C_8389_96C5_88AB_52A8_914D_7F6E["霜裂秒"], 0)
     if _____72B6_6001["霜裂回调ID"] ~= 0 then
         removeDelayedCallback(_____72B6_6001["霜裂回调ID"])
@@ -115,16 +129,43 @@ local function _____65BD_52A0_971C_88C2(_____76EE_6807)
         _____7231_871C_8389_96C5_88AB_52A8_914D_7F6E["霜裂秒"] * 1000,
         function()
             _____72B6_6001["霜裂回调ID"] = 0
+            debugLogForce(
+                "爱蜜莉雅-被动",
+                "Buff",
+                "操作",
+                "移除",
+                "目标",
+                _____76EE_6807,
+                "类型",
+                "霜裂"
+            )
             _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____76EE_6807, _____7231_871C_8389_96C5BuffID["霜裂"])
         end
     )
 end
 local function _____89E3_51BB_76EE_6807(_____76EE_6807, _____72B6_6001)
+    debugLogForce(
+        "爱蜜莉雅-被动",
+        "状态",
+        "解冻",
+        "目标",
+        _____76EE_6807
+    )
     if _____72B6_6001["冻结回调ID"] ~= 0 then
         removeDelayedCallback(_____72B6_6001["冻结回调ID"])
         _____72B6_6001["冻结回调ID"] = 0
     end
     _____79FB_9664_5355_4F4D_6682_505C(_____76EE_6807, _____51BB_7ED3_6682_505C_6765_6E90)
+    debugLogForce(
+        "爱蜜莉雅-被动",
+        "Buff",
+        "操作",
+        "移除",
+        "目标",
+        _____76EE_6807,
+        "类型",
+        "冻结"
+    )
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____76EE_6807, _____7231_871C_8389_96C5BuffID["冻结"])
     _____72B6_6001["冻结中"] = false
     _____72B6_6001["冻结结束时间"] = getGameTime()
@@ -170,7 +211,34 @@ ____exports["冻结爱蜜莉雅目标"] = function(_____65BD_6CD5_8005, _____76E
     _____6DFB_52A0_5355_4F4D_6682_505C(_____76EE_6807, _____51BB_7ED3_6682_505C_6765_6E90)
     _____72B6_6001["冻结中"] = true
     _____72B6_6001["冻结施法者"] = _____65BD_6CD5_8005
+    debugLogForce(
+        "爱蜜莉雅-被动",
+        "状态",
+        "冻结",
+        "目标",
+        _____76EE_6807,
+        "来源",
+        _____6765_6E90_952E
+    )
+    debugLogForce(
+        "爱蜜莉雅-被动",
+        "Buff",
+        "操作",
+        "施加",
+        "目标",
+        _____76EE_6807,
+        "类型",
+        "冻结"
+    )
     registerManualBuff(_____76EE_6807, _____7231_871C_8389_96C5BuffID["冻结"], _____7231_871C_8389_96C5_88AB_52A8_914D_7F6E["冻结秒"], 0)
+    debugLogForce(
+        "爱蜜莉雅-被动",
+        "特效",
+        "类型",
+        "创建",
+        "路径",
+        "Common\\Effect\\Element\\Ice\\sem_shen_du_dong_jie.mdx"
+    )
     createTimedUnitEffect(_____76EE_6807, "origin", "Common\\Effect\\Element\\Ice\\sem_shen_du_dong_jie.mdx", _____7231_871C_8389_96C5_88AB_52A8_914D_7F6E["冻结秒"])
     Sound3DII_UnitPlayReuse(_____7231_871C_8389_96C5_97F3_6548_914D_7F6E["冻结包裹"]["路径"], _____76EE_6807, _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["冻结包裹"]["裁断距离"])
     _____72B6_6001["冻结回调ID"] = addDelayedCallback(
@@ -192,6 +260,18 @@ ____exports["施加爱蜜莉雅寒意"] = function(_____65BD_6CD5_8005, _____76E
     local _____65B0_5C42_6570 = _____5F53_524D_5C42_6570 + 1
     _____72B6_6001["寒意层数"] = _____65B0_5C42_6570
     _____72B6_6001["寒意到期"] = now + _____7231_871C_8389_96C5_88AB_52A8_914D_7F6E["寒意持续秒"] * 1000
+    debugLogForce(
+        "爱蜜莉雅-被动",
+        "Buff",
+        "操作",
+        "施加",
+        "目标",
+        _____76EE_6807,
+        "类型",
+        "寒意",
+        "层数",
+        _____65B0_5C42_6570
+    )
     registerManualBuff(
         _____76EE_6807,
         _____7231_871C_8389_96C5BuffID["寒意"],
@@ -224,6 +304,25 @@ ____exports["触发爱蜜莉雅碎冰"] = function(_____65BD_6CD5_8005, _____76E
     end
     _____53BB_91CD[_____6765_6E90_952E] = true
     local _____4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____7231_871C_8389_96C5_88AB_52A8_914D_7F6E["碎冰攻击力倍率"]
+    debugLogForce(
+        "爱蜜莉雅-被动",
+        "状态",
+        "触发碎冰",
+        "目标",
+        _____76EE_6807,
+        "来源",
+        _____6765_6E90_952E
+    )
+    debugLogForce(
+        "爱蜜莉雅-被动",
+        "伤害",
+        "标签",
+        "爱蜜莉雅-碎冰",
+        "目标",
+        _____76EE_6807,
+        "数值",
+        _____4F24_5BB3
+    )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
         ["目标"] = _____76EE_6807,
@@ -238,6 +337,16 @@ ____exports["触发爱蜜莉雅碎冰"] = function(_____65BD_6CD5_8005, _____76E
         ["伤害形态"] = "单体",
         ["参与技能伤害加成"] = false
     })
+    debugLogForce(
+        "爱蜜莉雅-被动",
+        "Buff",
+        "操作",
+        "移除",
+        "目标",
+        _____76EE_6807,
+        "类型",
+        "霜裂"
+    )
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____76EE_6807, _____7231_871C_8389_96C5BuffID["霜裂"])
     local _____72B6_6001 = _____88AB_52A8_76EE_6807_8868[id]
     if _____72B6_6001 ~= nil then
@@ -269,19 +378,19 @@ ____exports["结算爱蜜莉雅技能命中"] = function(_____65BD_6CD5_8005, __
     if ____exports["目标受控增伤"](_____76EE_6807) then
         _____4F24_5BB3 = _____4F24_5BB3 * (1 + _____7231_871C_8389_96C5_88AB_52A8_914D_7F6E["对受控目标伤害倍率"])
     end
-    local ____9020_6210_6280_80FD_4F24_5BB3_12 = _____9020_6210_6280_80FD_4F24_5BB3
-    local ____65BD_6CD5_8005_9 = _____65BD_6CD5_8005
-    local ____76EE_6807_10 = _____76EE_6807
-    local ____4F24_5BB3_11 = _____4F24_5BB3
-    local ____53C2_6570__4F24_5BB3_7C7B_578B_8 = _____53C2_6570["伤害类型"]
-    if ____53C2_6570__4F24_5BB3_7C7B_578B_8 == nil then
-        ____53C2_6570__4F24_5BB3_7C7B_578B_8 = DAMAGE_TYPE_COLD
+    local ____9020_6210_6280_80FD_4F24_5BB3_14 = _____9020_6210_6280_80FD_4F24_5BB3
+    local ____65BD_6CD5_8005_11 = _____65BD_6CD5_8005
+    local ____76EE_6807_12 = _____76EE_6807
+    local ____4F24_5BB3_13 = _____4F24_5BB3
+    local ____53C2_6570__4F24_5BB3_7C7B_578B_10 = _____53C2_6570["伤害类型"]
+    if ____53C2_6570__4F24_5BB3_7C7B_578B_10 == nil then
+        ____53C2_6570__4F24_5BB3_7C7B_578B_10 = DAMAGE_TYPE_COLD
     end
-    ____9020_6210_6280_80FD_4F24_5BB3_12({
-        ["来源"] = ____65BD_6CD5_8005_9,
-        ["目标"] = ____76EE_6807_10,
-        ["伤害"] = ____4F24_5BB3_11,
-        ["伤害类型"] = ____53C2_6570__4F24_5BB3_7C7B_578B_8,
+    ____9020_6210_6280_80FD_4F24_5BB3_14({
+        ["来源"] = ____65BD_6CD5_8005_11,
+        ["目标"] = ____76EE_6807_12,
+        ["伤害"] = ____4F24_5BB3_13,
+        ["伤害类型"] = ____53C2_6570__4F24_5BB3_7C7B_578B_10,
         ["攻击类型"] = ATTACK_TYPE_NORMAL,
         ["武器类型"] = WEAPON_TYPE_WHOKNOWS,
         ["来源类型"] = "单位技能",

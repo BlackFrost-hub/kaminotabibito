@@ -27,6 +27,9 @@ import {
 import { 查询伊蕾娜W折射可用, 消费伊蕾娜W折射 } from "./04．W技能";
 
 const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -73,8 +76,12 @@ const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．�
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
 
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
-const Q技能类型ID = jass.FourCC(伊蕾娜技能配置.Q.技能ID) as number;
+const Q技能类型ID = stringToFourCCSafe(伊蕾娜技能配置.Q.技能ID) as number;
 
 //=============================================================================
 // 结算辅助
@@ -89,6 +96,7 @@ function 造成Q技能伤害(
   标签: string,
   形态: "单体" | "AOE",
 ): boolean {
+  debugLogForce("伊蕾娜-Q", "伤害", "标签", 标签, "目标", 目标, "数值", 伤害值);
   return 造成技能伤害({
     来源: 施法者,
     目标,

@@ -3,12 +3,16 @@ local ____exports = {}
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.00．配置")
 local _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶技能配置"]
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local registerPlayerHeroListener = ____require_result_0.registerPlayerHeroListener
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据")
-local _____52A8_6001_4FEE_6539_5355_4F4D_6280_80FD_6570_636E = ____require_result_1["动态修改单位技能数据"]
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local registerPlayerHeroListener = ____require_result_1.registerPlayerHeroListener
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据")
+local _____52A8_6001_4FEE_6539_5355_4F4D_6280_80FD_6570_636E = ____require_result_2["动态修改单位技能数据"]
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_3.debugLogForce
 local GetUnitTypeId = jass.GetUnitTypeId
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
 local _____6280_80FD_663E_793A = {
     {
         ["技能ID"] = _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.Q["技能ID"],
@@ -53,6 +57,14 @@ local function _____521D_59CB_5316_6731_96C0_9662_7EA2_53F6_6280_80FD_663E_793A(
     if GetUnitTypeId(hero) ~= _____82F1_96C4_5355_4F4D_7C7B_578BID then
         return
     end
+    debugLogForce(
+        "红叶-技能显示初始化",
+        "初始化",
+        "英雄",
+        hero,
+        "技能数",
+        #_____6280_80FD_663E_793A
+    )
     _____52A8_6001_4FEE_6539_5355_4F4D_6280_80FD_6570_636E(hero, _____6280_80FD_663E_793A)
 end
 registerPlayerHeroListener(_____521D_59CB_5316_6731_96C0_9662_7EA2_53F6_6280_80FD_663E_793A)

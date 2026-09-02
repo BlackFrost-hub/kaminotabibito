@@ -1,10 +1,11 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____53D6_5E8F_5217_540D_79F0, removeDelayedCallback, _____5355_4F4D_5B58_6D3B, SetUnitAnimationByIndex, SetUnitTimeScale
+local _____53D6_5E8F_5217_540D_79F0, removeDelayedCallback, _____5355_4F4D_5B58_6D3B, debugLogForce, SetUnitAnimationByIndex, SetUnitTimeScale
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
 local _____8299_8389_83B2_6A21_578B_52A8_4F5C_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲模型动作配置"]
 local _____8299_8389_83B2_6280_80FD_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["芙莉莲技能动作槽"]
 ____exports["停止循环守护"] = function(_____53E5_67C4)
+    debugLogForce("芙莉莲-动作表现", "结束", "原因", "停止循环守护")
     if _____53E5_67C4 == nil then
         return
     end
@@ -37,6 +38,8 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 _____5355_4F4D_5B58_6D3B = ____require_result_1["单位存活"]
 local ____require_result_2 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.02．被动效果")
 local _____767B_8BB0_8299_8389_83B2_6E05_7406 = ____require_result_2["登记芙莉莲清理"]
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_3.debugLogForce
 SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex
 SetUnitTimeScale = jass.SetUnitTimeScale
 local function _____53D6_5E8F_5217_5B9A_4E49(_____7D22_5F15)
@@ -67,6 +70,14 @@ ____exports["播放限时动作"] = function(_____82F1_96C4, _____69FD, _____767
         local _____6062_590DID = addDelayedCallback(
             _____6301_7EED_6BEB_79D2,
             function()
+                debugLogForce(
+                    "芙莉莲-动作表现",
+                    "结束",
+                    "原因",
+                    "限时动作到期恢复",
+                    "英雄",
+                    _____82F1_96C4
+                )
                 if _____5355_4F4D_5B58_6D3B(_____82F1_96C4) then
                     SetUnitTimeScale(_____82F1_96C4, 1)
                     SetUnitAnimationByIndex(_____82F1_96C4, _____8299_8389_83B2_6A21_578B_52A8_4F5C_914D_7F6E["待机索引"])
@@ -99,6 +110,7 @@ ____exports["开始循环守护"] = function(_____82F1_96C4, _____69FD, _____767
         _____6062_590DID = addDelayedCallback(
             _____69FD["持续秒"] * 1000,
             function()
+                debugLogForce("芙莉莲-动作表现", "结束", "原因", "循环守护到期恢复")
                 if _____5355_4F4D_5B58_6D3B(_____82F1_96C4) then
                     SetUnitTimeScale(_____82F1_96C4, 1)
                     SetUnitAnimationByIndex(_____82F1_96C4, _____8299_8389_83B2_6A21_578B_52A8_4F5C_914D_7F6E["待机索引"])
@@ -118,24 +130,24 @@ ____exports["开始循环守护"] = function(_____82F1_96C4, _____69FD, _____767
 end
 local function _____6784_9020_69FD(_____69FD_914D_7F6E)
     local def = _____53D6_5E8F_5217_5B9A_4E49(_____69FD_914D_7F6E["索引"])
-    local ____69FD_914D_7F6E__7D22_5F15_4 = _____69FD_914D_7F6E["索引"]
-    local ____temp_5 = def ~= nil and _____53D6_5E8F_5217_540D_79F0(_____69FD_914D_7F6E["索引"]) or ""
-    local ____temp_6 = def ~= nil and def["原始时长秒"] or 0
-    local ____69FD_914D_7F6E__64AD_653E_901F_5EA6_7 = _____69FD_914D_7F6E["播放速度"]
-    local ____69FD_914D_7F6E__6301_7EED_79D2_8 = _____69FD_914D_7F6E["持续秒"]
-    local ____temp_3
+    local ____69FD_914D_7F6E__7D22_5F15_5 = _____69FD_914D_7F6E["索引"]
+    local ____temp_6 = def ~= nil and _____53D6_5E8F_5217_540D_79F0(_____69FD_914D_7F6E["索引"]) or ""
+    local ____temp_7 = def ~= nil and def["原始时长秒"] or 0
+    local ____69FD_914D_7F6E__64AD_653E_901F_5EA6_8 = _____69FD_914D_7F6E["播放速度"]
+    local ____69FD_914D_7F6E__6301_7EED_79D2_9 = _____69FD_914D_7F6E["持续秒"]
+    local ____temp_4
     if def ~= nil then
-        ____temp_3 = def["循环"]
+        ____temp_4 = def["循环"]
     else
-        ____temp_3 = false
+        ____temp_4 = false
     end
     return {
-        ["索引"] = ____69FD_914D_7F6E__7D22_5F15_4,
-        ["名称"] = ____temp_5,
-        ["原始时长秒"] = ____temp_6,
-        ["播放速度"] = ____69FD_914D_7F6E__64AD_653E_901F_5EA6_7,
-        ["持续秒"] = ____69FD_914D_7F6E__6301_7EED_79D2_8,
-        ["循环"] = ____temp_3
+        ["索引"] = ____69FD_914D_7F6E__7D22_5F15_5,
+        ["名称"] = ____temp_6,
+        ["原始时长秒"] = ____temp_7,
+        ["播放速度"] = ____69FD_914D_7F6E__64AD_653E_901F_5EA6_8,
+        ["持续秒"] = ____69FD_914D_7F6E__6301_7EED_79D2_9,
+        ["循环"] = ____temp_4
     }
 end
 ____exports["芙莉莲动作槽"] = {

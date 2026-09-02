@@ -1,15 +1,15 @@
 -- 朱雀院红叶玩家英雄物编。
 -- 近战敏捷剑士；近战攻击不得配置投射物。
 
-createPlayerHeroUnit('E00G', '朱雀院红叶', {
+createPlayerHeroUnit('E0L1', '朱雀院红叶', {
   baseId = 'Edem',
   properNames = '朱雀院红叶',
   tooltipBasic = '召唤朱雀院红叶',
   tooltipExtended = '擅长制造破绽、招架反击与高速终式的近战剑士。',
   description = '朱雀院流近战技巧型剑士。',
   modelFile = 'Unit\\Hero\\Momiji\\Momiji.mdx',
-  scale = 1.0,
-  icon = 'ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiQ.blp',
+  scale = 1.2,
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNMomijiPortrait.blp',
   normalAbilities = 'A014,AInv,AMD1',
   heroAbilities = '',
   upgradesUsed = '',

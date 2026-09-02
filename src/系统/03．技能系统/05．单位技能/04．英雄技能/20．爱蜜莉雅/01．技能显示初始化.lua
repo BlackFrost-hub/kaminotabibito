@@ -3,12 +3,16 @@ local ____exports = {}
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.00．配置")
 local _____7231_871C_8389_96C5_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["爱蜜莉雅技能配置"]
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-local registerPlayerHeroListener = ____require_result_0.registerPlayerHeroListener
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据")
-local _____52A8_6001_4FEE_6539_5355_4F4D_6280_80FD_6570_636E = ____require_result_1["动态修改单位技能数据"]
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local registerPlayerHeroListener = ____require_result_1.registerPlayerHeroListener
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据")
+local _____52A8_6001_4FEE_6539_5355_4F4D_6280_80FD_6570_636E = ____require_result_2["动态修改单位技能数据"]
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_3.debugLogForce
 local GetUnitTypeId = jass.GetUnitTypeId
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC("E00C")
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe("E0L0")
 local _____663E_793A_914D_7F6E = {
     {
         ["技能ID"] = _____7231_871C_8389_96C5_6280_80FD_914D_7F6E.Q["技能ID"],
@@ -47,6 +51,14 @@ local _____663E_793A_914D_7F6E = {
     }
 }
 local function _____521D_59CB_5316_7231_871C_8389_96C5_6280_80FD_663E_793A(_player, hero)
+    debugLogForce(
+        "爱蜜莉雅-技能显示初始化",
+        "回调",
+        "类型",
+        "英雄注册",
+        "单位",
+        hero
+    )
     if hero == nil or hero == 0 then
         return
     end

@@ -51,6 +51,8 @@ local ____require_result_11 = require("lib.扩展函数.封装函数.02．音效
 local Sound3DII_UnitPlayReuse = ____require_result_11.Sound3DII_UnitPlayReuse
 local ____require_result_12 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
 local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_12["播放英雄技能喊话"]
+local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_13.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E["单位类型ID"]
 local ____W_7ED3_754C_7279_6548_952E = "塞莉亚-W结界"
 local ____W_786C_76F4_6765_6E90 = "塞莉亚-W硬直"
@@ -66,6 +68,7 @@ local function _____6709_7ED3_754C_951A_5B9A_8FDE_63A5(_____82F1_96C4)
 end
 --- 统一收口：成功 / 自然结束 / 打断 / 死亡互斥。
 local function _____5173_95EDW_7ED3_754C(_____6570_636E, _____6536_53E3_7C7B_578B)
+    debugLogForce("塞莉亚-W", "结束", "原因", _____6536_53E3_7C7B_578B)
     if _____6570_636E["已关闭"] then
         return
     end
@@ -102,6 +105,7 @@ local function _____5173_95EDW_7ED3_754C(_____6570_636E, _____6536_53E3_7C7B_578
     end
 end
 local function _____91CA_653EW_89E3_6790_7ED3_754C(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
+    debugLogForce("塞莉亚-W", "释放", "技能实例ID", ______6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
@@ -122,6 +126,7 @@ local function _____91CA_653EW_89E3_6790_7ED3_754C(_context, _____65BD_6CD5_8005
         ["修改器ID"] = 0,
         ["护盾ID"] = 0
     }
+    debugLogForce("塞莉亚-W", "特效", "路径", _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["W结界主体"]["模型路径"])
     _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
         _____65BD_6CD5_8005,
         _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["W结界主体"]["模型路径"],
@@ -132,6 +137,14 @@ local function _____91CA_653EW_89E3_6790_7ED3_754C(_context, _____65BD_6CD5_8005
         nil,
         0,
         _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["W结界主体"].RGB
+    )
+    debugLogForce(
+        "塞莉亚-W",
+        "Buff",
+        "操作",
+        "施加",
+        "目标",
+        _____65BD_6CD5_8005
     )
     registerManualBuff(_____65BD_6CD5_8005, _____585E_8389_4E9ABuffID["解析结界"], _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["保护窗口秒"], 0)
     _____6388_4E88_585E_8389_4E9A_6F14_7B97_7A97_53E3(_____65BD_6CD5_8005)
@@ -189,6 +202,14 @@ local function _____91CA_653EW_89E3_6790_7ED3_754C(_context, _____65BD_6CD5_8005
                     unregisterDamageModifier(_____6570_636E["修改器ID"])
                     _____6570_636E["修改器ID"] = 0
                     if _____5355_4F4D_5B58_6D3B(_____653B_51FB_8005) then
+                        debugLogForce(
+                            "塞莉亚-W",
+                            "伤害",
+                            "标签",
+                            "塞莉亚-解析反冲",
+                            "数值",
+                            _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["反冲伤害攻击力倍率"]
+                        )
                         _____9020_6210_6280_80FD_4F24_5BB3({
                             ["来源"] = _____65BD_6CD5_8005,
                             ["目标"] = _____653B_51FB_8005,
@@ -236,6 +257,7 @@ local function _____91CA_653EW_89E3_6790_7ED3_754C(_context, _____65BD_6CD5_8005
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册塞莉亚W"] = function()
+    debugLogForce("塞莉亚-W", "注册", "名称", "注册塞莉亚W")
     if _____5DF2_6CE8_518C then
         return
     end

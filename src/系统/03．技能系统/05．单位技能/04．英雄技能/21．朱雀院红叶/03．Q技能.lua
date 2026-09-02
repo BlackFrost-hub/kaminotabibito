@@ -45,6 +45,8 @@ local _____767B_8BB0_6731_96C0_9662_6E05_7406 = ____require_result_11["登记朱
 local _____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_11["播放红叶动作"]
 local _____8054_52A8E = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.05．E技能")
 local _____8054_52A8D = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.07．D技能")
+local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_12.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.Q["技能ID"])
 local ____Q2_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["Q2技能ID"])
@@ -60,6 +62,16 @@ local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetUnitFacing = jass.GetUnitFacing
 local function _____7ED3_7B97Q_5355_4F53_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, _____6280_80FD_5B9E_4F8BID, _____4F24_5BB3_503C, _____6807_7B7E)
+    debugLogForce(
+        "红叶-Q",
+        "伤害",
+        "标签",
+        _____6807_7B7E,
+        "数值",
+        _____4F24_5BB3_503C,
+        "目标",
+        _____76EE_6807
+    )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
         ["目标"] = _____76EE_6807,
@@ -82,6 +94,7 @@ local function _____5F00_542FQ2_7A97_53E3(_____65BD_6CD5_8005, _____63A7_5236_56
     if _____6570_636E["Q2壳"] ~= nil then
         return
     end
+    debugLogForce("红叶-Q", "状态", "开启Q2窗口", _____6301_7EED_79D2)
     local _____58F3 = _____521B_5EFA_9650_65F6_4E8C_6BB5_6280_80FD_58F3({
         ["名称"] = "朱雀院红叶-Q2",
         ["单位"] = _____65BD_6CD5_8005,
@@ -94,6 +107,7 @@ local function _____5F00_542FQ2_7A97_53E3(_____65BD_6CD5_8005, _____63A7_5236_56
             end
             _____6570_636E["Q2壳"] = nil
             _____6570_636E["Q2到期时间"] = 0
+            debugLogForce("红叶-Q", "结束", "原因", "Q2窗口超时")
             _____63A7_5236_5668["完成"](_____63A7_5236_5668)
         end
     })
@@ -117,6 +131,14 @@ local function _____5F00_542FQ2_7A97_53E3(_____65BD_6CD5_8005, _____63A7_5236_56
     end
 end
 local function _____91CA_653EQ_98DE_71D5_7A7F(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce(
+        "红叶-Q",
+        "释放",
+        "技能实例ID",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "阶段",
+        "Q1"
+    )
     if not _____662F_6731_96C0_9662_7EA2_53F6(_____65BD_6CD5_8005) then
         return
     end
@@ -149,6 +171,7 @@ local function _____91CA_653EQ_98DE_71D5_7A7F(_context, _____65BD_6CD5_8005, ___
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
+            debugLogForce("红叶-Q", "结束", "原因", "-")
             if _____6570_636E["位移ID"] ~= 0 then
                 _____505C_6B62_4F4D_79FB(_____6570_636E["位移ID"], "中断")
                 _____6570_636E["位移ID"] = 0
@@ -160,6 +183,14 @@ local function _____91CA_653EQ_98DE_71D5_7A7F(_context, _____65BD_6CD5_8005, ___
             _____6570_636E["Q2到期时间"] = 0
         end
     })
+    debugLogForce(
+        "红叶-Q",
+        "位移",
+        "类型",
+        "冲锋",
+        "距离",
+        ____Q_914D_7F6E["突进距离"]
+    )
     local _____4F4D_79FBID = _____5F00_59CB_51B2_950B(
         _____65BD_6CD5_8005,
         {
@@ -174,6 +205,7 @@ local function _____91CA_653EQ_98DE_71D5_7A7F(_context, _____65BD_6CD5_8005, ___
             ["命中后结束"] = true,
             ["允许重复命中"] = false,
             ["命中回调"] = function(______79FB_52A8_5355_4F4D, _____76EE_6807, ______4F4D_79FBID)
+                debugLogForce("红叶-Q", "命中", "目标", _____76EE_6807)
                 if _____6570_636E["已命中"] then
                     return
                 end
@@ -277,13 +309,13 @@ local function _____6267_884CQ2_56DE_8EAB_65A9(_____65BD_6CD5_8005, _____63A7_52
     end
     if not _____6570_636E["剑痕已读取"] then
         _____6570_636E["剑痕已读取"] = true
-        local ____temp_12
+        local ____temp_13
         if _____8054_52A8E["读取最近剑痕并锁定"] ~= nil then
-            ____temp_12 = _____8054_52A8E["读取最近剑痕并锁定"](_____65BD_6CD5_8005)
+            ____temp_13 = _____8054_52A8E["读取最近剑痕并锁定"](_____65BD_6CD5_8005)
         else
-            ____temp_12 = nil
+            ____temp_13 = nil
         end
-        local _____5251_75D5 = ____temp_12
+        local _____5251_75D5 = ____temp_13
         if _____5251_75D5 ~= nil then
             do
                 local i = 0
@@ -305,9 +337,18 @@ local function _____6267_884CQ2_56DE_8EAB_65A9(_____65BD_6CD5_8005, _____63A7_52
         _____6570_636E["Q2壳"] = nil
         _____6570_636E["Q2到期时间"] = 0
     end
+    debugLogForce("红叶-Q", "结束", "原因", "Q2施放完成")
     _____63A7_5236_5668["完成"](_____63A7_5236_5668)
 end
 local function _____91CA_653EQ2_56DE_8EAB_65A9(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce(
+        "红叶-Q",
+        "释放",
+        "技能实例ID",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "阶段",
+        "Q2"
+    )
     if not _____662F_6731_96C0_9662_7EA2_53F6(_____65BD_6CD5_8005) then
         return
     end
@@ -364,6 +405,14 @@ ____exports["延长Q2窗口"] = function(_____65BD_6CD5_8005, _____5EF6_957F_79D
     end
 end
 ____exports["注册朱雀院红叶Q"] = function()
+    debugLogForce(
+        "红叶-Q",
+        "注册",
+        "名称",
+        "Q",
+        "函数",
+        "注册朱雀院红叶Q"
+    )
     if _____5DF2_6CE8_518C then
         return
     end

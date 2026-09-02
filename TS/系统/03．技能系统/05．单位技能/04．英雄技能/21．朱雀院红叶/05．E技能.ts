@@ -60,6 +60,9 @@ const {
 const 联动D = require("./07．D技能") as {
   尝试消费D强化?: (this: void, 英雄: any) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院红叶技能配置.单位类型ID);
 const E技能ID = stringToFourCCSafe(朱雀院红叶技能配置.E.技能ID);
@@ -116,6 +119,7 @@ function 移除剑痕(this: void, 剑痕: 红叶剑痕): void {
 }
 
 function 创建剑痕(this: void, 来源英雄: any, X: number, Y: number, 方向角: number): 红叶剑痕 {
+  debugLogForce("红叶-E", "状态", "创建剑痕", "方向角", 方向角);
   const 序号 = ++剑痕序号;
   const 剑痕: 红叶剑痕 = {
     序号,
@@ -199,6 +203,7 @@ interface E数据 {
 }
 
 function 结算E段伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
+  debugLogForce("红叶-E", "伤害", "标签", 标签, "数值", 伤害值, "目标", 目标);
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -284,6 +289,7 @@ function 执行E三段(this: void, 施法者: any, 控制器: any, 技能实例I
 }
 
 function 释放E三叶散华(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("红叶-E", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (!是朱雀院红叶(施法者)) return;
   播放红叶动作(施法者, 朱雀院红叶动作槽.E连续三斩);
   // 重复 E：已有活跃 E 实例时忽略（三段未完成不叠加）
@@ -300,6 +306,7 @@ function 释放E三叶散华(this: void, _context: any, 施法者: any, 技能�
     技能实例ID,
     数据,
     结束回调: function E结束(this: void, 原因: string, _c: any): void {
+      debugLogForce("红叶-E", "结束", "原因", 原因 || "-");
       // 未执行段数回调随实例清理移除；打断/死亡销毁本 E 已创建的剑痕
       for (let i = 0; i < 数据.段回调ID.length; i++) {
         removeDelayedCallback(数据.段回调ID[i]);
@@ -344,6 +351,7 @@ function 释放E三叶散华(this: void, _context: any, 施法者: any, 技能�
 let 已注册 = false;
 
 export function 注册朱雀院红叶E(this: void): void {
+  debugLogForce("红叶-E", "注册", "名称", "E", "函数", "注册朱雀院红叶E");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

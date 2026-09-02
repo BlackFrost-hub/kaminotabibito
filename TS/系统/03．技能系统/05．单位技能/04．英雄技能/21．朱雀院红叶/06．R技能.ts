@@ -62,6 +62,9 @@ const {
   消费全部D强化: (this: void, 英雄: any) => number;
   结束D秘传: (this: void, 英雄: any) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院红叶技能配置.单位类型ID);
 const R技能ID = stringToFourCCSafe(朱雀院红叶技能配置.R.技能ID);
@@ -96,6 +99,7 @@ function 取窄线敌人(this: void, 施法者: any, 方向角: number): any[] {
 }
 
 function 结算R伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
+  debugLogForce("红叶-R", "伤害", "标签", 标签, "数值", 伤害值, "目标", 目标);
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -114,6 +118,7 @@ function 结算R伤害(this: void, 施法者: any, 目标: any, 技能实例ID: 
 
 function R创建终式(this: void, 施法者: any, 技能实例ID: number | undefined, _目标X: number, 目标Y: number, 方向角: number): void {
   if (!单位存活(施法者)) return;
+  debugLogForce("红叶-R", "状态", "创建终式");
   播放红叶动作(施法者, 朱雀院红叶动作槽.R释放);
   // 资源消费只在真正进入终式时（蓄力完成）：刀势全消费、D 全消费（失败/中断不白扣）
   const 刀势层数 = 消费全部刀势(施法者);
@@ -129,6 +134,7 @@ function R创建终式(this: void, 施法者: any, 技能实例ID: number | unde
   }
   // 主斩表现（模型路径/缩放/高度/持续秒/RGB 全由表现配置驱动）
   if ((朱雀院红叶表现配置.R主斩.模型路径 as string) !== "") {
+    debugLogForce("红叶-R", "特效", "路径", 朱雀院红叶表现配置.R主斩.模型路径 as string);
     创建点特效({
       模型路径: 朱雀院红叶表现配置.R主斩.模型路径,
       RGB: 朱雀院红叶表现配置.R主斩.RGB,
@@ -161,6 +167,7 @@ function R创建终式(this: void, 施法者: any, 技能实例ID: number | unde
 //=============================================================================
 
 function 释放R奥义(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("红叶-R", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (!是朱雀院红叶(施法者)) return;
   播放红叶动作(施法者, 朱雀院红叶动作槽.R蓄力);
   const 中心X = GetSpellTargetX();
@@ -194,12 +201,14 @@ function 释放R奥义(this: void, _context: any, 施法者: any, 技能实例ID
       },
     // 蓄力完成：创建终式（被打断/死亡不会走到这里）
     充能完成回调: function R蓄力完成(this: void, _单位: any, _充能ID: number): void {
+      debugLogForce("红叶-R", "状态", "蓄力完成");
       // 红叶一闪释放音（蓄力完成释放结算点；坐标=施法者/直线起点，参数配置驱动）
       Sound3DII_CooPlayReuse(R红叶一闪音效.路径, GetUnitX(施法者), GetUnitY(施法者), R红叶一闪音效.高度, R红叶一闪音效.裁断距离);
       R创建终式(施法者, 技能实例ID, 中心X, 中心Y, 方向角);
     },
     // 蓄力结束（完成/被打断/死亡统一销毁常驻预警特效）
     结束回调: function R蓄力结束(this: void, _单位: any, _原因: string, _充能ID: number): void {
+      debugLogForce("红叶-R", "结束", "原因", "-");
       if (预警特效 != null && 预警特效 !== 0) {
         jass.DestroyEffect(预警特效);
         预警特效 = null;
@@ -217,6 +226,7 @@ function 释放R奥义(this: void, _context: any, 施法者: any, 技能实例ID
 let 已注册 = false;
 
 export function 注册朱雀院红叶R(this: void): void {
+  debugLogForce("红叶-R", "注册", "名称", "R", "函数", "注册朱雀院红叶R");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

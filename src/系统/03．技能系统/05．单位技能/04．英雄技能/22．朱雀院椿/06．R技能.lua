@@ -42,6 +42,8 @@ local _____64AD_653E_693F_52A8_4F5C = ____require_result_10["播放椿动作"]
 local _____6709_51B3_6597_8DDD_79BB = ____require_result_10["有决斗距离"]
 local _____83B7_53D6_51B3_6597_8DDD_79BB_65B9_5411 = ____require_result_10["获取决斗距离方向"]
 local _____6E05_9664_51B3_6597_8DDD_79BB = ____require_result_10["清除决斗距离"]
+local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_11.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 local ____R_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E.R["技能ID"])
 local ____R_914D_7F6E = _____6731_96C0_9662_693FR_914D_7F6E
@@ -80,6 +82,14 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
     if not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
+    debugLogForce(
+        "椿-R",
+        "伤害",
+        "标签",
+        "朱雀院椿-R终式",
+        "数值",
+        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____R_914D_7F6E["主斩倍率"]
+    )
     local _____653B_51FB_529B = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005)
     local _____59FF_6001 = _____83B7_53D6_59FF_6001(_____65BD_6CD5_8005)
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____59FF_6001 == "二刀" and _____6731_96C0_9662_693F_52A8_4F5C_69FD["R二刀释放"] or _____6731_96C0_9662_693F_52A8_4F5C_69FD["R一刀释放"])
@@ -176,6 +186,7 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
     end
 end
 local function _____91CA_653ER_708E_59EC(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("椿-R", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_693F(_____65BD_6CD5_8005) then
         return
     end
@@ -193,6 +204,7 @@ local function _____91CA_653ER_708E_59EC(_context, _____65BD_6CD5_8005, _____628
     )
     _____9501_5B9A_59FF_6001(_____65BD_6CD5_8005, true)
     _____84C4_529B_4E2D_8868[jass.GetHandleId(_____65BD_6CD5_8005)] = true
+    debugLogForce("椿-R", "状态", "蓄力开始", _____6280_80FD_5B9E_4F8BID or "-")
     local _____51B3_6597_8DDD_79BB_5FEB_7167 = {
         ["有效"] = _____6709_51B3_6597_8DDD_79BB(_____65BD_6CD5_8005),
         ["方向"] = _____83B7_53D6_51B3_6597_8DDD_79BB_65B9_5411(_____65BD_6CD5_8005)
@@ -267,6 +279,7 @@ local function _____91CA_653ER_708E_59EC(_context, _____65BD_6CD5_8005, _____628
                 ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____7EC8_5F0F_65B9_5411, _____53D7_51FB_8BB0_5F55)
             end,
             ["结束回调"] = function(______5355_4F4D, ______539F_56E0, ______5145_80FDID)
+                debugLogForce("椿-R", "结束", "原因", ______539F_56E0 or "-")
                 if _____9884_8B66_7279_6548 ~= nil and _____9884_8B66_7279_6548 ~= 0 then
                     jass.DestroyEffect(_____9884_8B66_7279_6548)
                     _____9884_8B66_7279_6548 = nil
@@ -286,6 +299,7 @@ local function _____91CA_653ER_708E_59EC(_context, _____65BD_6CD5_8005, _____628
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册朱雀院椿R"] = function()
+    debugLogForce("椿-R", "注册", "名称", "注册朱雀院椿R")
     if _____5DF2_6CE8_518C then
         return
     end

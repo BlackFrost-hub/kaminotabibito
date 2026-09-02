@@ -89,6 +89,9 @@ const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．
 const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
 const W镜界特效键 = "伊蕾娜-W镜界";
@@ -113,6 +116,7 @@ interface 伊蕾娜W结界数据 {
 }
 
 function 关闭W镜界(this: void, 数据: 伊蕾娜W结界数据, 允许脉冲: boolean): void {
+  debugLogForce("伊蕾娜-W", "结束", "原因", 允许脉冲 ? "自然结束" : "提前收口");
   if (数据.已关闭) return; // 单一收口
   数据.已关闭 = true;
 
@@ -181,6 +185,7 @@ export function 消费伊蕾娜W折射(this: void, 英雄: any): boolean {
 //=============================================================================
 
 function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
+  debugLogForce("伊蕾娜-W", "释放", "技能实例ID", _技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
   播放英雄技能喊话(施法者, "伊蕾娜", 伊蕾娜技能配置.W.技能ID);
 
@@ -223,6 +228,7 @@ function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能�
   registerManualBuff(施法者, 伊蕾娜BuffID.镜界结界, 伊蕾娜W配置.保护窗口秒, 0);
   const 镜界表现 = 伊蕾娜表现配置.W镜界主体;
   const 镜界缩放 = 伊蕾娜W配置.结界接触半径 / 镜界表现.基准半径 * 镜界表现.基准缩放;
+  debugLogForce("伊蕾娜-W", "特效", "路径", 镜界表现.模型路径);
   创建单位坐标跟随特效(施法者, 镜界表现.模型路径, W镜界特效键, 镜界缩放, 镜界表现.高度, 1, undefined, 0, 镜界表现.RGB);
   // 镜界展开音（单位=施法者；保护窗口与结界视觉建立时一次，参数配置驱动）
   Sound3DII_UnitPlayReuse(伊蕾娜音效配置.W展开.路径, 施法者, 伊蕾娜音效配置.W展开.裁断距离);
@@ -314,6 +320,7 @@ function 实例化W收尾守护(this: void, 施法者: any, 数据: 伊蕾娜W�
 let 已注册 = false;
 
 export function 注册伊蕾娜W(this: void): void {
+  debugLogForce("伊蕾娜-W", "注册", "名称", "注册伊蕾娜W");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

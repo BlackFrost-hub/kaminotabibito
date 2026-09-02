@@ -83,6 +83,9 @@ const 联动D = require("./07．D技能") as {
 const { 延长Q2窗口 } = require("./03．Q技能") as {
   延长Q2窗口: (this: void, 施法者: any, 延长秒: number) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院红叶技能配置.单位类型ID);
 const W技能ID = stringToFourCCSafe(朱雀院红叶技能配置.W.技能ID);
@@ -115,6 +118,7 @@ interface W数据 {
 //=============================================================================
 
 function 结算W单体伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
+  debugLogForce("红叶-W", "伤害", "标签", 标签, "数值", 伤害值, "目标", 目标);
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -148,6 +152,7 @@ function 结束W招架(this: void, 施法者: any, 控制器: any, 技能实例I
   if (!数据.已招架) {
     释放失败前斩(施法者, 技能实例ID);
   }
+  debugLogForce("红叶-W", "结束", "原因", 数据.已招架 ? "招架成功" : "招架失败");
   控制器.完成();
 }
 
@@ -199,6 +204,7 @@ function 结算W反击(this: void, 施法者: any, 控制器: any, 技能实例I
     const 来源X = GetUnitX(来源);
     const 来源Y = GetUnitY(来源);
     const 拉回角度 = 两点角度(来源X, 来源Y, GetUnitX(施法者), GetUnitY(施法者));
+    debugLogForce("红叶-W", "位移", "类型", "击退", "距离", W配置.D强化拉回距离);
     开始击退(来源, {
       距离: W配置.D强化拉回距离,
       角度: 拉回角度,
@@ -210,6 +216,7 @@ function 结算W反击(this: void, 施法者: any, 控制器: any, 技能实例I
 }
 
 function 释放W水镜返刃(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("红叶-W", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (!是朱雀院红叶(施法者)) return;
   播放红叶动作(施法者, 朱雀院红叶动作槽.W开窗);
   // 不叠加窗口：已有活跃招架时忽略本次释放
@@ -230,6 +237,7 @@ function 释放W水镜返刃(this: void, _context: any, 施法者: any, 技能�
     技能实例ID,
     数据,
     结束回调: function W结束(this: void, _原因: string, _c: any): void {
+      debugLogForce("红叶-W", "结束", "原因", "-");
       // 死亡/中断收束：补全清理（与 结束W招架 幂等）
       if (数据.已结束) return;
       数据.已结束 = true;
@@ -253,6 +261,7 @@ function 释放W水镜返刃(this: void, _context: any, 施法者: any, 技能�
     if (context.attacker == null || context.attacker === 0) return context.currentDamage;
     const 来源方向 = 两点方向角(GetUnitX(施法者), GetUnitY(施法者), GetUnitX(context.attacker), GetUnitY(context.attacker));
     if (角度差绝对值(数据.方向角, 来源方向) > W配置.正面角度 / 2) return context.currentDamage;
+    debugLogForce("红叶-W", "回调", "类型", "招架成功", "来源", context.attacker);
     数据.已招架 = true;
     数据.招架来源 = context.attacker;
     // 收尾延迟到本次伤害修正遍历结束后执行（禁止在伤害遍历中同步注销修改器）
@@ -281,6 +290,7 @@ function 释放W水镜返刃(this: void, _context: any, 施法者: any, 技能�
 let 已注册 = false;
 
 export function 注册朱雀院红叶W(this: void): void {
+  debugLogForce("红叶-W", "注册", "名称", "W", "函数", "注册朱雀院红叶W");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

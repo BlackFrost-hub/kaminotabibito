@@ -14,6 +14,9 @@ local ____06_FF0ER_6280_80FD = require("系统.03．技能系统.05．单位技�
 local _____6CE8_518C_8299_8389_83B2R = ____06_FF0ER_6280_80FD["注册芙莉莲R"]
 local ____07_FF0ED_6280_80FD = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.07．D技能")
 local _____6CE8_518C_8299_8389_83B2D = ____07_FF0ED_6280_80FD["注册芙莉莲D"]
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
+debugLogForce("芙莉莲-index", "模块加载")
 _____6CE8_518C_8299_8389_83B2_88AB_52A8()
 _____6CE8_518C_8299_8389_83B2Q()
 _____6CE8_518C_8299_8389_83B2W()

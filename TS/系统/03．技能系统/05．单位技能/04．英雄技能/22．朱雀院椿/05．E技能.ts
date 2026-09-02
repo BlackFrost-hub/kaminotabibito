@@ -67,6 +67,9 @@ const {
   登记椿清理: (this: void, 英雄: any, 名称: string, 清理: () => void) => void;
   播放椿动作: (this: void, 英雄: any, 槽: { 索引: number; 持续秒: number }) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院椿技能配置.单位类型ID);
 const E技能ID = stringToFourCCSafe(朱雀院椿技能配置.E.技能ID);
@@ -121,6 +124,7 @@ interface E数据 {
 }
 
 function 结算E终点横斩(this: void, 施法者: any, 技能实例ID: number | undefined, 数据: E数据): void {
+  debugLogForce("椿-E", "伤害", "标签", "朱雀院椿-E横斩", "数值", 读取单位攻击力(施法者) * E配置.横斩倍率);
   播放椿动作(施法者, 朱雀院椿动作槽.E终点横斩);
   if (数据.已结算) return;
   数据.已结算 = true;
@@ -195,6 +199,7 @@ function 结算E终点横斩(this: void, 施法者: any, 技能实例ID: number 
 }
 
 function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("椿-E", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (!是朱雀院椿(施法者)) return;
   // 重复 E：已有活跃位移时忽略
   if (查询战斗技能实例(施法者, "椿E").length > 0) return;
@@ -222,12 +227,14 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
     方向角: 方向,
     精确回锋,
   };
+  debugLogForce("椿-E", "状态", "创建战斗技能实例", 技能实例ID ?? "-");
   const 控制器 = 创建战斗技能实例({
     技能键: "椿E",
     施法者,
     技能实例ID,
     数据,
     结束回调: function E结束(this: void, _原因: string, _c: any): void {
+      debugLogForce("椿-E", "结束", "原因", _原因 ?? "-");
       // 中断/死亡：先标记结束，再停止位移（防止位移结束回调误触发落点结算）
       if (数据.已结束) return;
       数据.已结束 = true;
@@ -237,6 +244,7 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
       }
     },
   });
+  debugLogForce("椿-E", "位移", "类型", "冲锋", "距离", E配置.位移距离);
   数据.位移ID = 开始冲锋(施法者, {
     距离: E配置.位移距离,
     每秒速度: E配置.位移速度,
@@ -260,6 +268,7 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
     },
     结束回调: function E位移结束(this: void, 单位: any, 原因: string, _位移ID: number): void {
       if (数据.已结束) return;
+      debugLogForce("椿-E", "命中", "目标", 单位);
       const 落点X = GetUnitX(单位);
       const 落点Y = GetUnitY(单位);
       数据.终点X = 落点X;
@@ -288,6 +297,7 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
 let 已注册 = false;
 
 export function 注册朱雀院椿E(this: void): void {
+  debugLogForce("椿-E", "注册", "名称", "注册朱雀院椿E");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

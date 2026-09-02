@@ -7,8 +7,12 @@ import { 注册芙莉莲W } from "./04．W技能";
 import { 注册芙莉莲E } from "./05．E技能";
 import { 注册芙莉莲R } from "./06．R技能";
 import { 注册芙莉莲D } from "./07．D技能";
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 // 被动/技能为全局懒注册（幂等），模块加载即接入
+debugLogForce("芙莉莲-index", "模块加载");
 注册芙莉莲被动();
 注册芙莉莲Q();
 注册芙莉莲W();

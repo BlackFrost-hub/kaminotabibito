@@ -83,7 +83,10 @@ export function applyEquipStatsTS(this: void, unit: any, stats: EquipStatEntry[]
     } else if (name === "经验获取率" && owner) {
       const t = Number(g.udg_T) || 1;
       const base = 0.35 + 0.65 * t;
-      jass.SetPlayerHandicapXP(owner, base * value);
+      // 经验倍率 = base * (1 + 累计加成)。此处用覆盖式 SetPlayerHandicapXP，
+      // 务必基于“写入后的累计值”计算：拾取 +0.2 → base*1.2；丢弃 → base*1.0 回到正常。
+      const 累计加成 = Number(YDUserDataGet2("player", owner, name, "real")) || 0;
+      jass.SetPlayerHandicapXP(owner, base * (1 + 累计加成));
     }
   }
 

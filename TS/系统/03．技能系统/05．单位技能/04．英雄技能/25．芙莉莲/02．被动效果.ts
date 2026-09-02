@@ -55,6 +55,9 @@ const platformAbilityApi = require("平台扩展API取值") as {
 const platformAbilityAction = require("平台扩展API动作") as {
   技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(芙莉莲技能配置.单位类型ID);
 const Q技能ID = stringToFourCCSafe(芙莉莲技能配置.Q.技能ID);
@@ -154,6 +157,7 @@ export function 记录芙莉莲活动(this: void, 英雄: any): void {
   if (英雄 == null || 英雄 === 0) return;
   const 状态 = 取英雄状态(英雄);
   if (状态.隐匿) {
+    debugLogForce("芙莉莲-被动", "Buff", "操作", "移除", "目标", 英雄, "BuffID", 隐匿BuffID);
     状态.隐匿 = false;
     移除单位指定Buff(英雄, 隐匿BuffID);
   }
@@ -196,7 +200,9 @@ function 启动隐匿计时(this: void, 英雄: any): void {
     if (!单位存活(英雄)) return;
     // 期间无新活动（最后活动时间未变）才进入隐匿
     if (getGameTime() - s.最后活动时间 < 被动配置.隐匿静默秒 / (静止倍率 > 0 ? 静止倍率 : 1) - 0.05) return;
+    debugLogForce("芙莉莲-被动", "状态", "进入隐匿", "英雄", 英雄);
     s.隐匿 = true;
+    debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "目标", 英雄, "BuffID", 隐匿BuffID);
     registerManualBuff(英雄, 隐匿BuffID, 9999, 1, { stack: 1 });
   });
   隐匿计时回调表[id] = 回调ID;
@@ -227,8 +233,11 @@ function 解析标记键(this: void, 芙莉莲: any): string {
 /** 清理指定芙莉莲的重点目标解析（标记/Buff/完成状态；不触碰技能清理器） */
 function 清理重点目标解析(this: void, 芙莉莲: any, 状态: 芙莉莲英雄状态): void {
   if (状态.重点目标 != null && 状态.重点目标 !== 0) {
+    debugLogForce("芙莉莲-被动", "特效", "类型", "销毁", "路径", 芙莉莲表现配置.解析标记.模型路径);
     销毁单位坐标跟随特效(状态.重点目标, 解析标记键(芙莉莲));
+    debugLogForce("芙莉莲-被动", "Buff", "操作", "移除", "目标", 状态.重点目标, "BuffID", 解析中BuffID);
     移除单位指定Buff(状态.重点目标, 解析中BuffID);
+    debugLogForce("芙莉莲-被动", "Buff", "操作", "移除", "目标", 状态.重点目标, "BuffID", 解析完成BuffID);
     移除单位指定Buff(状态.重点目标, 解析完成BuffID);
   }
   状态.重点目标 = null;
@@ -266,8 +275,10 @@ export function 施加解析(this: void, 芙莉莲: any, 目标: any, 类型: �
   // 解析完成状态同步为惰性判定（两种未到期解析即完成；到期自动失效）
   状态.解析完成 = 有效类型数 >= 2;
   if (状态.解析完成) {
+    debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "目标", 目标, "BuffID", 解析完成BuffID);
     registerManualBuff(目标, 解析完成BuffID, 被动配置.解析持续秒, 1, { stack: 1 });
     // 解析完成特效一次（复用 CeliaFormulaLockCore；参数配置驱动）
+    debugLogForce("芙莉莲-被动", "特效", "类型", "创建", "路径", 芙莉莲表现配置.解析完成.模型路径);
     创建点特效({
       模型路径: 芙莉莲表现配置.解析完成.模型路径,
       RGB: 芙莉莲表现配置.解析完成.RGB,
@@ -280,11 +291,13 @@ export function 施加解析(this: void, 芙莉莲: any, 目标: any, 类型: �
   } else {
     // 解析中标记 Buff（刷新；解析完成时不叠加中标记）
     if (有效类型数 >= 1) {
+      debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "目标", 目标, "BuffID", 解析中BuffID);
       registerManualBuff(目标, 解析中BuffID, 被动配置.解析持续秒, 有效类型数, { stack: 有效类型数 });
     }
   }
   // 解析标记特效（常驻句柄，键管理；已存在时同键覆盖；缩放/高度 经 创建单位坐标跟随特效 配置驱动）
   if (有效类型数 >= 1) {
+    debugLogForce("芙莉莲-被动", "特效", "类型", "创建", "路径", 芙莉莲表现配置.解析标记.模型路径);
     const 标记 = 创建单位坐标跟随特效(
       目标,
       芙莉莲表现配置.解析标记.模型路径,
@@ -364,6 +377,7 @@ export function 提供演算普攻(this: void, 芙莉莲: any): void {
   if (芙莉莲 == null || 芙莉莲 === 0) return;
   const 状态 = 取英雄状态(芙莉莲);
   状态.演算普攻到期 = getGameTime() + 被动配置.演算普攻窗口秒;
+  debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "目标", 芙莉莲, "BuffID", 演算BuffID);
   registerManualBuff(芙莉莲, 演算BuffID, 被动配置.演算普攻窗口秒, 1, { stack: 1 });
 }
 
@@ -452,6 +466,7 @@ export function 清理芙莉莲状态(this: void, 英雄: any): void {
 let 已注册 = false;
 
 export function 注册芙莉莲被动(this: void): void {
+  debugLogForce("芙莉莲-被动", "注册", "名称", "注册芙莉莲被动");
   if (已注册) return;
   已注册 = true;
   // 死亡清理：芙莉莲死亡清自身状态；目标死亡清对应解析

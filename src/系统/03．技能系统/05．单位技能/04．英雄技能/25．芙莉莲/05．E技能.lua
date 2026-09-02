@@ -54,6 +54,8 @@ local _____767B_8BB0_8299_8389_83B2_6E05_7406 = ____require_result_12["登记芙
 local _____82B1_7530_8054_52A8 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.07．D技能")
 local ____require_result_13 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
 local _____8299_8389_83B2D_914D_7F6E = ____require_result_13["芙莉莲D配置"]
+local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_14.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
 local ____E_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.E["技能ID"])
 local ____E_914D_7F6E = _____8299_8389_83B2E_914D_7F6E
@@ -105,6 +107,16 @@ local function _____7ED3_7B97E_843D_70B9(_____65BD_6CD5_8005, _____6280_80FD_5B9
             ) then
                 goto __continue5
             end
+            debugLogForce(
+                "芙莉莲-E",
+                "伤害",
+                "标签",
+                "芙莉莲-E落点冲击",
+                "数值",
+                _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____51B2_51FB_500D_7387,
+                "目标",
+                u
+            )
             _____9020_6210_6280_80FD_4F24_5BB3({
                 ["来源"] = _____65BD_6CD5_8005,
                 ["目标"] = u,
@@ -210,6 +222,7 @@ local function ____E_5B89_6392_89C2_5BDF_671F_6536_5C3E(_____65BD_6CD5_8005, ___
     _____63A7_5236_5668["登记延迟回调"](_____63A7_5236_5668, _____89C2_5BDF_622A_6B62ID)
 end
 local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("芙莉莲-E", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_8299_8389_83B2(_____65BD_6CD5_8005) then
         return
     end
@@ -217,13 +230,13 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         return
     end
     _____8BB0_5F55_8299_8389_83B2_6D3B_52A8(_____65BD_6CD5_8005)
-    local ____temp_14
+    local ____temp_15
     if _____82B1_7530_8054_52A8["尝试消费花田修正"] ~= nil and _____82B1_7530_8054_52A8["在花田内"] ~= nil then
-        ____temp_14 = _____82B1_7530_8054_52A8["在花田内"](_____65BD_6CD5_8005)
+        ____temp_15 = _____82B1_7530_8054_52A8["在花田内"](_____65BD_6CD5_8005)
     else
-        ____temp_14 = false
+        ____temp_15 = false
     end
-    local _____82B1_7530_4FEE_6B63 = ____temp_14
+    local _____82B1_7530_4FEE_6B63 = ____temp_15
     _____64AD_653E_9650_65F6_52A8_4F5C(_____65BD_6CD5_8005, _____8299_8389_83B2_52A8_4F5C_69FD["E起飞"], "芙莉莲E起飞")
     local _____8D77_70B9X = GetUnitX(_____65BD_6CD5_8005)
     local _____8D77_70B9Y = GetUnitY(_____65BD_6CD5_8005)
@@ -255,6 +268,7 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
+            debugLogForce("芙莉莲-E", "结束", "原因", ______539F_56E0 or "-")
             if _____6570_636E["已结束"] then
                 _____5B8C_6210E_6536_5C3E(_____65BD_6CD5_8005, _____6570_636E)
                 return
@@ -395,8 +409,8 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
                         if _____53E5_67C4 == nil or _____53E5_67C4 == 0 then
                             goto __continue48
                         end
-                        local ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_15 = _____6570_636E["观察闪电列表"]
-                        ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_15[#____6570_636E__89C2_5BDF_95EA_7535_5217_8868_15 + 1] = {["目标"] = u, ["句柄"] = _____53E5_67C4}
+                        local ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_16 = _____6570_636E["观察闪电列表"]
+                        ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_16[#____6570_636E__89C2_5BDF_95EA_7535_5217_8868_16 + 1] = {["目标"] = u, ["句柄"] = _____53E5_67C4}
                         Sound3DII_CooPlayReuse(
                             _____8299_8389_83B2_97F3_6548_914D_7F6E["E观察"]["路径"],
                             GetUnitX(u),
@@ -414,6 +428,14 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
                 jass.DestroyGroup(_____7EC4)
             end
         end
+    )
+    debugLogForce(
+        "芙莉莲-E",
+        "位移",
+        "类型",
+        "冲锋",
+        "距离",
+        ____E_914D_7F6E["位移距离"]
     )
     _____6570_636E["位移ID"] = _____5F00_59CB_51B2_950B(
         _____65BD_6CD5_8005,
@@ -461,6 +483,7 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册芙莉莲E"] = function()
+    debugLogForce("芙莉莲-E", "注册", "名称", "注册芙莉莲E")
     if _____5DF2_6CE8_518C then
         return
     end

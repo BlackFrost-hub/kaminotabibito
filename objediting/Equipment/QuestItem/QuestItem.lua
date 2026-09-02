@@ -136,8 +136,8 @@ createEquipmentItem('I0KE', '守誓圣铠合成书', {
 
 createEquipmentItem('I0KG', '熔渊坠饰合成书', {
   baseId = 'azhr',
-  icon = 'Equipment\Icon\QuestItem\abyss_pendant_recipe_book.blp',
-  model = 'war3mapImported\SpellBook.mdl',
+  icon = 'Equipment\\Icon\\QuestItem\\abyss_pendant_recipe_book.blp',
+  model = 'war3mapImported\\SpellBook.mdl',
   abilities = ' ',
   classification = 'Charged',
   level = 1,

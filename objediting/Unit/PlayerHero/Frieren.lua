@@ -1,15 +1,15 @@
 -- 芙莉莲玩家英雄物编。
 -- 远程智力英雄；普通攻击使用独立白紫魔法弹。
 
-createPlayerHeroUnit('E00K', '芙莉莲', {
+createPlayerHeroUnit('E0L5', '芙莉莲', {
   baseId = 'Emoo',
   properNames = '芙莉莲',
   tooltipBasic = '召唤芙莉莲',
   tooltipExtended = '通过长期解析、魔力护壁和贯穿魔法完成战斗的精灵魔法使。',
   description = '解析与远程贯穿型智力英雄。',
   modelFile = 'Unit\\Hero\\Frieren\\Frieren.mdx',
-  scale = 1.0,
-  icon = 'ReplaceableTextures\\CommandButtons\\BTNHeroArchMage.blp',
+  scale = 2.2,
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNFrierenPortrait.blp',
   normalAbilities = 'A014,AInv,AFD1',
   heroAbilities = '',
   upgradesUsed = '',

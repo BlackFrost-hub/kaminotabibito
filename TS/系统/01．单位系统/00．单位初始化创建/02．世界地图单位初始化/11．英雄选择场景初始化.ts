@@ -88,10 +88,11 @@ const TriggerRegisterUnitEvent = jass.TriggerRegisterUnitEvent as (
   whichUnit: any,
   whichEvent: any,
 ) => any;
-const TriggerRegisterTimerEventSingle = jass.TriggerRegisterTimerEventSingle as (
+// TriggerRegisterTimerEventSingle 为 BJ(blizzard.j) 函数，不参与jass.common引用，改用 common.j 原生原语复刻对齐。
+const TriggerRegisterTimerExpireEvent = jass.TriggerRegisterTimerExpireEvent as (
   this: void,
   whichTrigger: any,
-  timeout: number,
+  whichTimer: any,
 ) => any;
 const TriggerAddCondition = jass.TriggerAddCondition as (this: void, whichTrigger: any, condition: any) => any;
 const Condition = jass.Condition as (callback: (this: void) => boolean) => any;
@@ -144,6 +145,17 @@ const 第四批英雄展示配置: 英雄展示配置[] = [
   { 名称: "欧菲莉亚", 单位ID: "H013", X: -29679.9, Y: 29203.4, 朝向: 0, 头像: "war3mapImported\\XX5.mdx" },
   { 名称: "提米诺斯", 单位ID: "H015", X: -29311.9, Y: 29083.5, 朝向: 180, 头像: "war3mapImported\\XX2.mdx" },
   { 名称: "塞拉斯", 单位ID: "H014", X: -28797.8, Y: 28265.8, 朝向: 237.8, 头像: "war3mapImported\\XX4.mdx" },
+];
+
+// 第20-25号英雄展示配置；头像图标由玩家英雄物编的 Art/ScoreScreenIcon 提供。
+// `头像` 字段专用于 DzSetUnitPortrait 的 MDX 肖像模型，不能传入 BLP 图标。
+const 第五批英雄展示配置: 英雄展示配置[] = [
+  { 名称: "朱雀院红叶", 单位ID: "E0L1", X: -28007.2, Y: 27128.4, 朝向: 90, 头像: "Unit\\Hero\\Momiji\\Momiji_Portrait.mdx" },
+  { 名称: "朱雀院椿", 单位ID: "E0L2", X: -27907.2, Y: 27128.4, 朝向: 90, 头像: "Unit\\Hero\\Tsubaki\\Tsubaki_Portrait.mdx" },
+  { 名称: "爱蜜莉雅", 单位ID: "E0L0", X: -26124.7, Y: 27919.5, 朝向: 90, 头像: "Unit\\Hero\\Emilia\\Emilia_Portrait.mdx" },
+  { 名称: "伊蕾娜", 单位ID: "E0L3", X: -26024.7, Y: 27919.5, 朝向: 90, 头像: "Unit\\Hero\\Irena\\Irena_Portrait.mdx" },
+  { 名称: "塞莉亚·克莱尔", 单位ID: "E0L4", X: -25924.7, Y: 27919.5, 朝向: 90, 头像: "Unit\\Hero\\Celia\\Celia_Portrait.mdx" },
+  { 名称: "芙莉莲", 单位ID: "E0L5", X: -25824.7, Y: 27919.5, 朝向: 90, 头像: "Unit\\Hero\\Frieren\\Frieren_Portrait.mdx" },
 ];
 
 let 英雄选择场景已初始化 = false;
@@ -234,7 +246,12 @@ function 准备英雄技能查看(this: void): void {
     return;
   }
   ForGroupBJ(英雄组, 初始化英雄技能查看单位);
-  TriggerRegisterTimerEventSingle(英雄技能查看触发, 300.0);
+  // 复刻 BJ TriggerRegisterTimerEventSingle：300秒后触发一次 EV/T_GAME_TIMER_EXPIRED，供 英雄技能查看触发条件 销毁触发。
+  const 查看计时器 = CreateTimer();
+  if (查看计时器 != null && 查看计时器 !== 0) {
+    TimerStart(查看计时器, 300.0, false, undefined);
+    TriggerRegisterTimerExpireEvent(英雄技能查看触发, 查看计时器);
+  }
   TriggerAddCondition(英雄技能查看触发, Condition(英雄技能查看触发条件));
   DestroyGroup(英雄组);
 }
@@ -249,6 +266,10 @@ function 创建第三批英雄展示(this: void): void {
 
 function 创建第四批英雄展示(this: void): void {
   创建英雄展示批次(第四批英雄展示配置);
+}
+
+function 创建第五批英雄展示(this: void): void {
+  创建英雄展示批次(第五批英雄展示配置);
 }
 
 function 清理英雄选择场景计时器(this: void): void {
@@ -278,6 +299,7 @@ function 初始化英雄选择场景(this: void): void {
   addDelayedCallback(900, 创建第二批英雄展示);
   addDelayedCallback(1650, 创建第三批英雄展示);
   addDelayedCallback(2400, 创建第四批英雄展示);
+  addDelayedCallback(3150, 创建第五批英雄展示);
   addDelayedCallback(4900, 准备英雄技能查看);
   addDelayedCallback(179900, 清理英雄选择场景计时器);
 }

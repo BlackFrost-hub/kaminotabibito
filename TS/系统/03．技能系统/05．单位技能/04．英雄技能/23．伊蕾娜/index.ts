@@ -10,7 +10,12 @@ import { 注册伊蕾娜E } from "./05．E技能";
 import { 注册伊蕾娜R } from "./06．R技能";
 import { 注册伊蕾娜D } from "./07．D技能";
 
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 // 唯一注册入口：被动 + 全部技能壳监听在模块加载时挂接。
+debugLogForce("伊蕾娜-index", "模块加载");
 注册伊蕾娜被动效果();
 注册伊蕾娜Q();
 注册伊蕾娜W();

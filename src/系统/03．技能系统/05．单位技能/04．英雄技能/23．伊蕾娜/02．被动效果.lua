@@ -13,6 +13,8 @@ local _____4F0A_857E_5A1CE_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜E配置"]
 local ____23_FF0E_4F0A_857E_5A1C = require("系统.05．Buff系统.03．Buff表.02．英雄.23．伊蕾娜")
 local _____4F0A_857E_5A1CBuffID = ____23_FF0E_4F0A_857E_5A1C["伊蕾娜BuffID"]
 local jass = require("jass.common")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -20,34 +22,36 @@ local GetUnitFacing = jass.GetUnitFacing
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_0.registerDeathListener
-local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
-local getGameTime = ____require_result_1.getGameTime
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____53D6_5355_4F4DID = ____require_result_2["取单位ID"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_2["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_2["两点角度"]
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_2["读取单位攻击力"]
-local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_3.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_3["移除单位指定Buff"]
-local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_4.registerAppliedFinalDamageListener
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
-local _____53D1_5C04_5F39_9053 = ____require_result_5["发射弹道"]
-local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
-local SFB_setSlow = ____require_result_6.SFB_setSlow
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
-local _____5145_80FD_5355_4F4D_6807_7B7E_62A4_76FE = ____require_result_7["充能单位标签护盾"]
-local ____require_result_8 = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI")
-local _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_8["销毁世界坐标进度UI"]
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_1.registerDeathListener
+local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
+local getGameTime = ____require_result_2.getGameTime
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____53D6_5355_4F4DID = ____require_result_3["取单位ID"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_3["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_3["两点角度"]
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_3["读取单位攻击力"]
+local ____require_result_4 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_4.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_4["移除单位指定Buff"]
+local ____require_result_5 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_5.registerAppliedFinalDamageListener
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
+local _____53D1_5C04_5F39_9053 = ____require_result_6["发射弹道"]
+local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
+local SFB_setSlow = ____require_result_7.SFB_setSlow
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
+local _____5145_80FD_5355_4F4D_6807_7B7E_62A4_76FE = ____require_result_8["充能单位标签护盾"]
+local ____require_result_9 = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI")
+local _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_9["销毁世界坐标进度UI"]
 local platformAbilityApi = require("平台扩展API取值")
 local platformAbilityAction = require("平台扩展API动作")
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E["单位类型ID"])
-local ____Q_6280_80FD_7C7B_578BID = jass.FourCC(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.Q["技能ID"])
-local ____W_6280_80FD_7C7B_578BID = jass.FourCC(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.W["技能ID"])
-local ____E_6280_80FD_7C7B_578BID = jass.FourCC(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.E["技能ID"])
+local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_10.debugLogForce
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E["单位类型ID"])
+local ____Q_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.Q["技能ID"])
+local ____W_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.W["技能ID"])
+local ____E_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.E["技能ID"])
 local _____4F0A_857E_5A1C_72B6_6001_8868 = {}
 local _____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7 = 1
 local _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = false
@@ -156,19 +160,19 @@ ____exports["记录伊蕾娜见闻"] = function(_____82F1_96C4, _____7C7B_578B, 
                 local _____8BB0_5F55 = __TS__ArraySplice(_____72B6_6001["见闻列表"], i, 1)[1]
                 _____8BB0_5F55["到期时间"] = now + _____4F0A_857E_5A1C_89C1_95FB_914D_7F6E["持续毫秒"]
                 _____8BB0_5F55["来源实例ID"] = _____6765_6E90_5B9E_4F8BID
-                local ____72B6_6001__89C1_95FB_5217_8868_9 = _____72B6_6001["见闻列表"]
-                ____72B6_6001__89C1_95FB_5217_8868_9[#____72B6_6001__89C1_95FB_5217_8868_9 + 1] = _____8BB0_5F55
+                local ____72B6_6001__89C1_95FB_5217_8868_11 = _____72B6_6001["见闻列表"]
+                ____72B6_6001__89C1_95FB_5217_8868_11[#____72B6_6001__89C1_95FB_5217_8868_11 + 1] = _____8BB0_5F55
                 _____5237_65B0_89C1_95FBBuff(_____82F1_96C4, _____72B6_6001)
                 return _____8BB0_5F55
             end
             i = i - 1
         end
     end
-    local ____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7_10 = _____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7
-    _____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7 = ____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7_10 + 1
-    local _____8BB0_5F55 = {["序号"] = ____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7_10, ["类型"] = _____7C7B_578B, ["到期时间"] = now + _____4F0A_857E_5A1C_89C1_95FB_914D_7F6E["持续毫秒"], ["来源实例ID"] = _____6765_6E90_5B9E_4F8BID}
-    local ____72B6_6001__89C1_95FB_5217_8868_11 = _____72B6_6001["见闻列表"]
-    ____72B6_6001__89C1_95FB_5217_8868_11[#____72B6_6001__89C1_95FB_5217_8868_11 + 1] = _____8BB0_5F55
+    local ____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7_12 = _____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7
+    _____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7 = ____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7_12 + 1
+    local _____8BB0_5F55 = {["序号"] = ____4E0B_4E00_5168_5C40_89C1_95FB_5E8F_53F7_12, ["类型"] = _____7C7B_578B, ["到期时间"] = now + _____4F0A_857E_5A1C_89C1_95FB_914D_7F6E["持续毫秒"], ["来源实例ID"] = _____6765_6E90_5B9E_4F8BID}
+    local ____72B6_6001__89C1_95FB_5217_8868_13 = _____72B6_6001["见闻列表"]
+    ____72B6_6001__89C1_95FB_5217_8868_13[#____72B6_6001__89C1_95FB_5217_8868_13 + 1] = _____8BB0_5F55
     while #_____72B6_6001["见闻列表"] > _____4F0A_857E_5A1C_89C1_95FB_914D_7F6E["上限"] do
         table.remove(_____72B6_6001["见闻列表"], 1)
     end
@@ -462,8 +466,8 @@ ____exports["登记伊蕾娜进度UI"] = function(_____82F1_96C4, ui)
             i = i + 1
         end
     end
-    local ____72B6_6001__8FDB_5EA6UI_5217_8868_12 = _____72B6_6001["进度UI列表"]
-    ____72B6_6001__8FDB_5EA6UI_5217_8868_12[#____72B6_6001__8FDB_5EA6UI_5217_8868_12 + 1] = ui
+    local ____72B6_6001__8FDB_5EA6UI_5217_8868_14 = _____72B6_6001["进度UI列表"]
+    ____72B6_6001__8FDB_5EA6UI_5217_8868_14[#____72B6_6001__8FDB_5EA6UI_5217_8868_14 + 1] = ui
 end
 --- 立即销毁指定进度 UI 并摘除登记。
 ____exports["销毁伊蕾娜进度UI"] = function(_____82F1_96C4, ui)
@@ -721,25 +725,25 @@ local function _____5904_7406_4F0A_857E_5A1C_5F3A_5316_666E_653B(target, attacke
     if attacker == nil or attacker == 0 or not ____exports["是伊蕾娜"](attacker) then
         return
     end
-    local ____opt_result_15
+    local ____opt_result_17
     if snapshot ~= nil then
-        ____opt_result_15 = snapshot.isNormalAttack
+        ____opt_result_17 = snapshot.isNormalAttack
     end
-    if ____opt_result_15 ~= true then
+    if ____opt_result_17 ~= true then
         return
     end
-    local ____opt_result_18
+    local ____opt_result_20
     if snapshot ~= nil then
-        ____opt_result_18 = snapshot.isWrappedSkillDamage
+        ____opt_result_20 = snapshot.isWrappedSkillDamage
     end
-    if ____opt_result_18 == true then
+    if ____opt_result_20 == true then
         return
     end
-    local ____opt_result_21
+    local ____opt_result_23
     if snapshot ~= nil then
-        ____opt_result_21 = snapshot.originalAttacker
+        ____opt_result_23 = snapshot.originalAttacker
     end
-    if ____opt_result_21 ~= nil and snapshot.originalAttacker ~= attacker then
+    if ____opt_result_23 ~= nil and snapshot.originalAttacker ~= attacker then
         return
     end
     if not _____5355_4F4D_5B58_6D3B(target) then
@@ -777,6 +781,14 @@ local function _____786E_4FDD_6B7B_4EA1_76D1_542C()
     end
     _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = true
     registerDeathListener(function(dyingUnit, _killingUnit)
+        debugLogForce(
+            "伊蕾娜-被动",
+            "回调",
+            "类型",
+            "死亡",
+            "单位",
+            dyingUnit
+        )
         if dyingUnit == nil or dyingUnit == 0 then
             return
         end
@@ -789,6 +801,7 @@ end
 local _____666E_653B_8054_52A8_5DF2_6CE8_518C = false
 --- 注册被动入口（幂等）：死亡清理监听 + 强化普攻伤害监听。
 ____exports["注册伊蕾娜被动效果"] = function()
+    debugLogForce("伊蕾娜-被动", "注册", "名称", "注册伊蕾娜被动效果")
     _____786E_4FDD_6B7B_4EA1_76D1_542C()
     if _____666E_653B_8054_52A8_5DF2_6CE8_518C then
         return

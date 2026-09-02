@@ -52,7 +52,7 @@ local UnitAddAbility = jass.UnitAddAbility
 local CreateTrigger = jass.CreateTrigger
 local DestroyTrigger = jass.DestroyTrigger
 local TriggerRegisterUnitEvent = jass.TriggerRegisterUnitEvent
-local TriggerRegisterTimerEventSingle = jass.TriggerRegisterTimerEventSingle
+local TriggerRegisterTimerExpireEvent = jass.TriggerRegisterTimerExpireEvent
 local TriggerAddCondition = jass.TriggerAddCondition
 local Condition = jass.Condition
 local FOG_OF_WAR_VISIBLE = jass.FOG_OF_WAR_VISIBLE
@@ -219,6 +219,56 @@ local _____7B2C_56DB_6279_82F1_96C4_5C55_793A_914D_7F6E = {
         ["头像"] = "war3mapImported\\XX4.mdx"
     }
 }
+local _____7B2C_4E94_6279_82F1_96C4_5C55_793A_914D_7F6E = {
+    {
+        ["名称"] = "朱雀院红叶",
+        ["单位ID"] = "E0L1",
+        X = -28007.2,
+        Y = 27128.4,
+        ["朝向"] = 90,
+        ["头像"] = "Unit\\Hero\\Momiji\\Momiji_Portrait.mdx"
+    },
+    {
+        ["名称"] = "朱雀院椿",
+        ["单位ID"] = "E0L2",
+        X = -27907.2,
+        Y = 27128.4,
+        ["朝向"] = 90,
+        ["头像"] = "Unit\\Hero\\Tsubaki\\Tsubaki_Portrait.mdx"
+    },
+    {
+        ["名称"] = "爱蜜莉雅",
+        ["单位ID"] = "E0L0",
+        X = -26124.7,
+        Y = 27919.5,
+        ["朝向"] = 90,
+        ["头像"] = "Unit\\Hero\\Emilia\\Emilia_Portrait.mdx"
+    },
+    {
+        ["名称"] = "伊蕾娜",
+        ["单位ID"] = "E0L3",
+        X = -26024.7,
+        Y = 27919.5,
+        ["朝向"] = 90,
+        ["头像"] = "Unit\\Hero\\Irena\\Irena_Portrait.mdx"
+    },
+    {
+        ["名称"] = "塞莉亚·克莱尔",
+        ["单位ID"] = "E0L4",
+        X = -25924.7,
+        Y = 27919.5,
+        ["朝向"] = 90,
+        ["头像"] = "Unit\\Hero\\Celia\\Celia_Portrait.mdx"
+    },
+    {
+        ["名称"] = "芙莉莲",
+        ["单位ID"] = "E0L5",
+        X = -25824.7,
+        Y = 27919.5,
+        ["朝向"] = 90,
+        ["头像"] = "Unit\\Hero\\Frieren\\Frieren_Portrait.mdx"
+    }
+}
 local _____82F1_96C4_9009_62E9_573A_666F_5DF2_521D_59CB_5316 = false
 local _____82F1_96C4_9009_62E9_8BA1_65F6_5668 = nil
 local _____82F1_96C4_9009_62E9_8BA1_65F6_5668_7A97_53E3 = nil
@@ -331,7 +381,11 @@ local function _____51C6_5907_82F1_96C4_6280_80FD_67E5_770B()
         return
     end
     ForGroupBJ(_____82F1_96C4_7EC4, _____521D_59CB_5316_82F1_96C4_6280_80FD_67E5_770B_5355_4F4D)
-    TriggerRegisterTimerEventSingle(_____82F1_96C4_6280_80FD_67E5_770B_89E6_53D1, 300)
+    local _____67E5_770B_8BA1_65F6_5668 = CreateTimer()
+    if _____67E5_770B_8BA1_65F6_5668 ~= nil and _____67E5_770B_8BA1_65F6_5668 ~= 0 then
+        TimerStart(_____67E5_770B_8BA1_65F6_5668, 300, false, nil)
+        TriggerRegisterTimerExpireEvent(_____82F1_96C4_6280_80FD_67E5_770B_89E6_53D1, _____67E5_770B_8BA1_65F6_5668)
+    end
     TriggerAddCondition(
         _____82F1_96C4_6280_80FD_67E5_770B_89E6_53D1,
         Condition(_____82F1_96C4_6280_80FD_67E5_770B_89E6_53D1_6761_4EF6)
@@ -346,6 +400,9 @@ local function _____521B_5EFA_7B2C_4E09_6279_82F1_96C4_5C55_793A()
 end
 local function _____521B_5EFA_7B2C_56DB_6279_82F1_96C4_5C55_793A()
     _____521B_5EFA_82F1_96C4_5C55_793A_6279_6B21(_____7B2C_56DB_6279_82F1_96C4_5C55_793A_914D_7F6E)
+end
+local function _____521B_5EFA_7B2C_4E94_6279_82F1_96C4_5C55_793A()
+    _____521B_5EFA_82F1_96C4_5C55_793A_6279_6B21(_____7B2C_4E94_6279_82F1_96C4_5C55_793A_914D_7F6E)
 end
 local function _____6E05_7406_82F1_96C4_9009_62E9_573A_666F_8BA1_65F6_5668()
     if _____82F1_96C4_9009_62E9_8BA1_65F6_5668_7A97_53E3 ~= nil and _____82F1_96C4_9009_62E9_8BA1_65F6_5668_7A97_53E3 ~= 0 then
@@ -371,6 +428,7 @@ local function _____521D_59CB_5316_82F1_96C4_9009_62E9_573A_666F()
     addDelayedCallback(900, _____521B_5EFA_7B2C_4E8C_6279_82F1_96C4_5C55_793A)
     addDelayedCallback(1650, _____521B_5EFA_7B2C_4E09_6279_82F1_96C4_5C55_793A)
     addDelayedCallback(2400, _____521B_5EFA_7B2C_56DB_6279_82F1_96C4_5C55_793A)
+    addDelayedCallback(3150, _____521B_5EFA_7B2C_4E94_6279_82F1_96C4_5C55_793A)
     addDelayedCallback(4900, _____51C6_5907_82F1_96C4_6280_80FD_67E5_770B)
     addDelayedCallback(179900, _____6E05_7406_82F1_96C4_9009_62E9_573A_666F_8BA1_65F6_5668)
 end

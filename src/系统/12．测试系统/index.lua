@@ -174,6 +174,7 @@ local function loadTests(self)
     if ENABLE_CREATE_PLAYER_HERO_BY_NAME_TEST then
         require("系统.12．测试系统.30．按名称创建玩家英雄测试")
     end
+    require("系统.12．测试系统.40．QWERD显示调试命令")
 end
 loadTests(nil)
 return ____exports

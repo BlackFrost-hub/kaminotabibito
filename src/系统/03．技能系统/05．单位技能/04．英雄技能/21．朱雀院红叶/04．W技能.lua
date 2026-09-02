@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____7ED3_7B97W_5355_4F53_4F24_5BB3, _____91CA_653E_5931_8D25_524D_65A9, jass, _____9020_6210_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D, _____65BD_52A0_6731_96C0_9662_7834_7EFD, _____64AD_653E_7EA2_53F6_52A8_4F5C, ____W_6280_80FDID, ____W_914D_7F6E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitX, GetUnitY, GetUnitFacing
+local _____7ED3_7B97W_5355_4F53_4F24_5BB3, _____91CA_653E_5931_8D25_524D_65A9, jass, _____9020_6210_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D, _____65BD_52A0_6731_96C0_9662_7834_7EFD, _____64AD_653E_7EA2_53F6_52A8_4F5C, debugLogForce, ____W_6280_80FDID, ____W_914D_7F6E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitX, GetUnitY, GetUnitFacing
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.00．配置")
 local _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶技能配置"]
 local _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶表现配置"]
@@ -9,6 +9,16 @@ local _____6731_96C0_9662_7EA2_53F6Buff_914D_7F6E = ____00_FF0E_914D_7F6E["朱�
 local _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["朱雀院红叶动作槽"]
 local _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C = ____00_FF0E_914D_7F6E["朱雀院红叶待平衡数值"]
 function _____7ED3_7B97W_5355_4F53_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, _____6280_80FD_5B9E_4F8BID, _____4F24_5BB3_503C, _____6807_7B7E)
+    debugLogForce(
+        "红叶-W",
+        "伤害",
+        "标签",
+        _____6807_7B7E,
+        "数值",
+        _____4F24_5BB3_503C,
+        "目标",
+        _____76EE_6807
+    )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
         ["目标"] = _____76EE_6807,
@@ -105,6 +115,8 @@ _____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_14["播放红叶动作"]
 local _____8054_52A8D = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.07．D技能")
 local ____require_result_15 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.03．Q技能")
 local _____5EF6_957FQ2_7A97_53E3 = ____require_result_15["延长Q2窗口"]
+local ____require_result_16 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_16.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
 ____W_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.W["技能ID"])
 local _____6C34_955CBuffID = _____6731_96C0_9662_7EA2_53F6Buff_914D_7F6E["水镜招架"]
@@ -133,6 +145,7 @@ local function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____63A7_5236_566
     if not _____6570_636E["已招架"] then
         _____91CA_653E_5931_8D25_524D_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
     end
+    debugLogForce("红叶-W", "结束", "原因", _____6570_636E["已招架"] and "招架成功" or "招架失败")
     _____63A7_5236_5668["完成"](_____63A7_5236_5668)
 end
 local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
@@ -180,11 +193,20 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_566
             GetUnitX(_____65BD_6CD5_8005),
             GetUnitY(_____65BD_6CD5_8005)
         )
+        debugLogForce(
+            "红叶-W",
+            "位移",
+            "类型",
+            "击退",
+            "距离",
+            ____W_914D_7F6E["D强化拉回距离"]
+        )
         _____5F00_59CB_51FB_9000(_____6765_6E90, {["距离"] = ____W_914D_7F6E["D强化拉回距离"], ["角度"] = _____62C9_56DE_89D2_5EA6, ["来源单位"] = _____65BD_6CD5_8005, ["主单位死亡时中断"] = true})
     end
     _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
 end
 local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("红叶-W", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_7EA2_53F6(_____65BD_6CD5_8005) then
         return
     end
@@ -207,6 +229,7 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
+            debugLogForce("红叶-W", "结束", "原因", "-")
             if _____6570_636E["已结束"] then
                 return
             end
@@ -254,6 +277,14 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
             if _____89D2_5EA6_5DEE_7EDD_5BF9_503C(_____6570_636E["方向角"], _____6765_6E90_65B9_5411) > ____W_914D_7F6E["正面角度"] / 2 then
                 return context.currentDamage
             end
+            debugLogForce(
+                "红叶-W",
+                "回调",
+                "类型",
+                "招架成功",
+                "来源",
+                context.attacker
+            )
             _____6570_636E["已招架"] = true
             _____6570_636E["招架来源"] = context.attacker
             addDelayedCallback(
@@ -284,6 +315,14 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册朱雀院红叶W"] = function()
+    debugLogForce(
+        "红叶-W",
+        "注册",
+        "名称",
+        "W",
+        "函数",
+        "注册朱雀院红叶W"
+    )
     if _____5DF2_6CE8_518C then
         return
     end

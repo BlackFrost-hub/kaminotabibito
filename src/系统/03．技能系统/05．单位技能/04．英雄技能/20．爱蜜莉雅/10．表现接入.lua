@@ -12,8 +12,11 @@ local ____08_FF0ED_6280_80FD = require("系统.03．技能系统.05．单位技�
 local _____6CE8_518C_7231_871C_8389_96C5D = ____08_FF0ED_6280_80FD["注册爱蜜莉雅D"]
 local ____09_FF0ER_6280_80FD = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.09．R技能")
 local _____6CE8_518C_7231_871C_8389_96C5R = ____09_FF0ER_6280_80FD["注册爱蜜莉雅R"]
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local _____5DF2_6CE8_518C = false
 ____exports["注册爱蜜莉雅表现"] = function()
+    debugLogForce("爱蜜莉雅-表现接入", "注册", "名称", "注册爱蜜莉雅表现")
     if _____5DF2_6CE8_518C then
         return
     end

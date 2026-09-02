@@ -76,6 +76,9 @@ const 花田联动 = require("./07．D技能") as {
   尝试消费花田盛开?: (this: void, 芙莉莲: any) => boolean;
   在花田内?: (this: void, 芙莉莲: any) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(芙莉莲技能配置.单位类型ID);
 const R技能ID = stringToFourCCSafe(芙莉莲技能配置.R.技能ID);
@@ -195,6 +198,7 @@ function R结算主炮(this: void, 施法者: any, 技能实例ID: number | unde
       }
     }
 
+    debugLogForce("芙莉莲-R", "伤害", "标签", 标签, "数值", 攻击力 * 倍率, "目标", 目标);
     造成技能伤害({
       来源: 施法者,
       目标,
@@ -244,6 +248,7 @@ interface R快照 {
 //=============================================================================
 
 function 释放R(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
+  debugLogForce("芙莉莲-R", "释放", "技能实例ID", 技能实例ID || "-");
   if (!是芙莉莲(施法者)) return;
   // 重复 R：已有活跃 R 实例时忽略
   if (查询战斗技能实例(施法者, "芙莉莲R").length > 0) return;
@@ -322,6 +327,7 @@ function 释放R(this: void, _context: any, 施法者: any, 技能实例ID: numb
     },
     // 充能结束（完成/指令中断/硬控/死亡/单位失效统一收尾）：销毁读条与预警
     结束回调: function R蓄力结束(this: void, _单位: any, 原因: string, _充能ID: number): void {
+      debugLogForce("芙莉莲-R", "结束", "原因", 原因 || "-");
       // 蓄力保持守护停止（指令/硬控/死亡打断后不继续举杖姿势）
       if (蓄力守护 != null) {
         停止循环守护(蓄力守护);
@@ -369,6 +375,7 @@ function 花田联动取解析快照(this: void, 施法者: any): { 目标: any;
 let 已注册 = false;
 
 export function 注册芙莉莲R(this: void): void {
+  debugLogForce("芙莉莲-R", "注册", "名称", "注册芙莉莲R");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

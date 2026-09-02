@@ -65,6 +65,8 @@ local ____require_result_11 = require("lib.扩展函数.封装函数.02．音效
 local Sound3DII_CooPlayReuse = ____require_result_11.Sound3DII_CooPlayReuse
 local ____require_result_12 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
 local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_12["播放英雄技能喊话"]
+local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_13.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E["单位类型ID"]
 local ____E_786C_76F4_6765_6E90 = "塞莉亚-E硬直"
 local _____585E_8389_4E9A_951A_5B9A_533A_57DF_8868 = {}
@@ -217,6 +219,7 @@ local function ____on_951A_5B9A_533A_57DF_5468_671F(_____6570_636E, _____6B65_95
     end
 end
 local function _____91CA_653EE_951A_5B9A_9B54_6CD5_9635(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("塞莉亚-E", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
@@ -236,6 +239,7 @@ local function _____91CA_653EE_951A_5B9A_9B54_6CD5_9635(_context, _____65BD_6CD5
         ["施法者"] = _____65BD_6CD5_8005,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["结束回调"] = function(______539F_56E0, ______63A7_5236_5668)
+            debugLogForce("塞莉亚-E", "结束", "原因", ______539F_56E0)
             local ____ = ______539F_56E0
             local ____ = ______63A7_5236_5668
         end
@@ -290,6 +294,7 @@ local function _____91CA_653EE_951A_5B9A_9B54_6CD5_9635(_context, _____65BD_6CD5
                     ["周期ID"] = 0,
                     ["已关闭"] = false
                 }
+                debugLogForce("塞莉亚-E", "特效", "路径", _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["E锚定阵"]["模型路径"])
                 _____6570_636E["阵特效"] = _____521B_5EFA_70B9_7279_6548({
                     ["模型路径"] = _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["E锚定阵"]["模型路径"],
                     RGB = _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["E锚定阵"].RGB,
@@ -310,6 +315,14 @@ local function _____91CA_653EE_951A_5B9A_9B54_6CD5_9635(_context, _____65BD_6CD5
                 _____6388_4E88_585E_8389_4E9A_6F14_7B97_7A97_53E3(_____65BD_6CD5_8005)
                 local _____653B_51FB_529B = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005)
                 local _____5217_8868 = _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA(_____65BD_6CD5_8005, _____4E2D_5FC3X, _____4E2D_5FC3Y, _____585E_8389_4E9A_514B_83B1_5C14E_914D_7F6E["区域半径"])
+                debugLogForce(
+                    "塞莉亚-E",
+                    "伤害",
+                    "标签",
+                    "塞莉亚-锚定冲击",
+                    "数值",
+                    _____653B_51FB_529B * _____585E_8389_4E9A_514B_83B1_5C14E_914D_7F6E["生效伤害攻击力倍率"]
+                )
                 do
                     local i = 0
                     while i < #_____5217_8868 do
@@ -381,6 +394,7 @@ local function _____91CA_653EE_951A_5B9A_9B54_6CD5_9635(_context, _____65BD_6CD5
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册塞莉亚E"] = function()
+    debugLogForce("塞莉亚-E", "注册", "名称", "注册塞莉亚E")
     if _____5DF2_6CE8_518C then
         return
     end

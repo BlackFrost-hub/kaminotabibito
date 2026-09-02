@@ -15,10 +15,10 @@ function createPlayerHeroChannelAbility(id, name, options)
   ability:setItemAbility(false)
   local levels = options.levels or 1
   -- Channel duration data (102/103) is repurposed by the runtime as a
-  -- percentage mana cost for player-hero shells. A provided percentage
-  -- always replaces fixed mana so the two cost models cannot stack.
+  -- percentage mana cost for player-hero shells. Fixed mana cost (104)
+  -- stacks on top: the runtime sync computes fixed + percent * max mana.
   local percentManaCost = options.percentManaCost
-  local fixedManaCost = percentManaCost ~= nil and 0 or (options.manaCost or 0)
+  local fixedManaCost = options.manaCost or 0
   local normalDuration = options.durationNormal ~= nil and options.durationNormal or (percentManaCost or 0)
   local heroDuration = options.durationHero ~= nil and options.durationHero or (percentManaCost or 0)
   ability:setLevels(levels)
@@ -50,7 +50,9 @@ function createPlayerHeroChannelAbility(id, name, options)
   ability:setBaseOrderID(1, options.orderId or 'channel')
   ability:setButtonPositionNormalX(options.buttonX or 0)
   ability:setButtonPositionNormalY(options.buttonY or 2)
-  ability:setIconNormal(options.icon or 'ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp')
+  local icon = options.icon or 'ReplaceableTextures\\CommandButtons\\BTNSelectHeroOn.blp'
+  ability:setIconNormal(icon)
+  ability:setIconTurnOff(options.iconTurnOff or icon)
   if options.hotkey ~= nil then
     ability:setHotkeyNormal(options.hotkey)
   end

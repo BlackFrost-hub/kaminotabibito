@@ -46,6 +46,9 @@ const {
   登记椿清理: (this: void, 英雄: any, 名称: string, 清理: () => void) => void;
   播放椿动作: (this: void, 英雄: any, 槽: { 索引: number; 持续秒: number }) => void;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院椿技能配置.单位类型ID);
 const D配置 = 朱雀院椿D配置;
@@ -71,6 +74,7 @@ function 停止二刀消耗(this: void, 英雄: any): void {
 }
 
 function 进入二刀攻势(this: void, 施法者: any): void {
+  debugLogForce("椿-D", "状态", "切换至二刀", "持续秒", D配置.二刀持续秒);
   设置姿态(施法者, "二刀");
   停止二刀消耗(施法者);
   const 状态: 二刀状态 = { 到期回调ID: 0, 消耗周期ID: 0 };
@@ -98,6 +102,7 @@ function 进入二刀攻势(this: void, 施法者: any): void {
 }
 
 function 释放D姿态切换(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
+  debugLogForce("椿-D", "释放", "技能实例ID", _技能实例ID ?? "-");
   if (!是朱雀院椿(施法者)) return;
   // R 蓄力期间姿态锁定：禁止切换
   if (姿态是否锁定(施法者)) return;
@@ -107,6 +112,7 @@ function 释放D姿态切换(this: void, _context: any, 施法者: any, _技能�
     进入二刀攻势(施法者);
   } else {
     // 切回一刀：停止消耗 + 恢复部分 VF
+    debugLogForce("椿-D", "状态", "切回一刀");
     停止二刀消耗(施法者);
     设置姿态(施法者, "一刀");
     恢复VF(施法者, D配置.切回一刀恢复VF);
@@ -124,6 +130,7 @@ function 释放D姿态切换(this: void, _context: any, 施法者: any, _技能�
 let 已注册 = false;
 
 export function 注册朱雀院椿D(this: void): void {
+  debugLogForce("椿-D", "注册", "名称", "注册朱雀院椿D");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____5173_95EDW_955C_754C, _____5B9E_4F8B_5316W_6536_5C3E_5B88_62A4, GetUnitX, GetUnitY, unregisterDamageModifier, _____79FB_9664_62A4_76FE, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA, SFB_setSlow, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548, ____W_955C_754C_7279_6548_952E
+local _____5173_95EDW_955C_754C, _____5B9E_4F8B_5316W_6536_5C3E_5B88_62A4, GetUnitX, GetUnitY, unregisterDamageModifier, _____79FB_9664_62A4_76FE, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA, SFB_setSlow, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548, debugLogForce, ____W_955C_754C_7279_6548_952E
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.23．伊蕾娜.00．配置")
 local _____4F0A_857E_5A1C_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜技能配置"]
 local _____4F0A_857E_5A1CW_914D_7F6E = ____00_FF0E_914D_7F6E["伊蕾娜W配置"]
@@ -22,6 +22,7 @@ local _____5B58_4F0A_857E_5A1CW_7ED3_754C = ____02_FF0E_88AB_52A8_6548_679C["存
 local _____53D6_4F0A_857E_5A1CW_7ED3_754C = ____02_FF0E_88AB_52A8_6548_679C["取伊蕾娜W结界"]
 local _____767B_8BB0_4F0A_857E_5A1C_6280_80FD_6E05_7406 = ____02_FF0E_88AB_52A8_6548_679C["登记伊蕾娜技能清理"]
 function _____5173_95EDW_955C_754C(_____6570_636E, _____5141_8BB8_8109_51B2)
+    debugLogForce("伊蕾娜-W", "结束", "原因", _____5141_8BB8_8109_51B2 and "自然结束" or "提前收口")
     if _____6570_636E["已关闭"] then
         return
     end
@@ -127,6 +128,8 @@ local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效
 local Sound3DII_UnitPlayReuse = ____require_result_12.Sound3DII_UnitPlayReuse
 local ____require_result_13 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 local Sound3DII_CooPlayReuse = ____require_result_13.Sound3DII_CooPlayReuse
+local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_14.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____4F0A_857E_5A1C_6280_80FD_914D_7F6E["单位类型ID"]
 ____W_955C_754C_7279_6548_952E = "伊蕾娜-W镜界"
 local ____W_786C_76F4_6765_6E90 = "伊蕾娜-W硬直"
@@ -157,6 +160,7 @@ ____exports["消费伊蕾娜W折射"] = function(_____82F1_96C4)
     return true
 end
 local function _____91CA_653EW_955C_754C_62A4_7B26(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
+    debugLogForce("伊蕾娜-W", "释放", "技能实例ID", ______6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
@@ -199,6 +203,7 @@ local function _____91CA_653EW_955C_754C_62A4_7B26(_context, _____65BD_6CD5_8005
     registerManualBuff(_____65BD_6CD5_8005, _____4F0A_857E_5A1CBuffID["镜界结界"], _____4F0A_857E_5A1CW_914D_7F6E["保护窗口秒"], 0)
     local _____955C_754C_8868_73B0 = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W镜界主体"]
     local _____955C_754C_7F29_653E = _____4F0A_857E_5A1CW_914D_7F6E["结界接触半径"] / _____955C_754C_8868_73B0["基准半径"] * _____955C_754C_8868_73B0["基准缩放"]
+    debugLogForce("伊蕾娜-W", "特效", "路径", _____955C_754C_8868_73B0["模型路径"])
     _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
         _____65BD_6CD5_8005,
         _____955C_754C_8868_73B0["模型路径"],
@@ -318,6 +323,7 @@ local function _____91CA_653EW_955C_754C_62A4_7B26(_context, _____65BD_6CD5_8005
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册伊蕾娜W"] = function()
+    debugLogForce("伊蕾娜-W", "注册", "名称", "注册伊蕾娜W")
     if _____5DF2_6CE8_518C then
         return
     end

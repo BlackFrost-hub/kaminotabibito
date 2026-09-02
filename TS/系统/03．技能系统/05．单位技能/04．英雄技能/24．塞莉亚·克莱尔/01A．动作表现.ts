@@ -30,6 +30,10 @@ const {
   停止单位动画守护: (this: void, 句柄: any) => void;
 };
 
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 export interface 塞莉亚动作槽 {
   /** 模型序列的显示索引（0-based）；null = 待映射槽，业务不得播放 */
   索引: number | null;

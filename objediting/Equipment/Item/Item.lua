@@ -706,7 +706,7 @@ createEquipmentItem('I0G8', '祭血之皿', {
   description = '|cffccffff[道具/饰品]-攻击/续航|r|n|cffffcc99等级：C+|n评分：5400|r|n|cffffffcc[基础属性]|r|n攻击力+75|n生命值+1000|n生命恢复+70|n|cFF808080血坛上残留的祭器，皿中血液百年不涸。触碰它的人会听见低语——那是力量与代价的古老交易。|r',
 })
 
-createEquipmentItem('I0H7', '祖地纹章徽记', {
+createEquipmentItem('I0HH', '祖地纹章徽记', {
   baseId = 'ratf',
   icon = 'Equipment\\Icon\\Item\\elven_herald_crest.blp',
   model = 'Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl',
@@ -780,7 +780,7 @@ createEquipmentItem('I0KA', '深井活水囊', {
   description = '|cffccffff[道具/水囊]-主动恢复|r|n|cffffcc99等级：B|n评分：7000|r|n|cffffffcc[使用]|r饮下深井活水，立即恢复30%最大生命与30%最大魔法，冷却15秒。|n|cFF808080井早已断流，囊中的水却仍在轻轻晃动——迷宫深处的供水系统，还在为记得它的人运转。|r',
 })
 
-createEquipmentItem('I0KB', '焚羽余烬晶核', {
+createEquipmentItem('I0KI', '焚羽余烬晶核', {
   baseId = 'azhr',
   icon = 'Equipment\\Icon\\Item\\phoenix_ember_core_postbattle.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',

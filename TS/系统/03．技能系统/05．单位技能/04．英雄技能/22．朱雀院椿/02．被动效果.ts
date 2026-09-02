@@ -42,6 +42,9 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
 const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院椿技能配置.单位类型ID);
 const VF场BuffID = 朱雀院椿Buff配置.VF场;
@@ -100,6 +103,7 @@ function 取英雄状态(this: void, 英雄: any): 椿英雄状态 {
     英雄状态表[id] = 状态;
     // 首次建状态：初始 VF 完整 + 初始一刀姿态（Buff 表自带特效；此前无调用方，新建/复活椿零防护）
     刷新VF表现(英雄, 状态);
+    debugLogForce("椿-被动", "Buff", "操作", "施加", "目标", GetHandleId(英雄), "Buff", 一刀BuffID);
     registerManualBuff(英雄, 一刀BuffID, 9999, 1, { stack: 1 });
   }
   return 状态;
@@ -123,11 +127,17 @@ export function 清理朱雀院椿状态(this: void, 英雄: any, _原因: strin
   const id = GetHandleId(英雄);
   const 状态 = 英雄状态表[id];
   if (状态 == null) return;
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", VF场BuffID);
   移除单位指定Buff(英雄, VF场BuffID);
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", VF残缺BuffID);
   移除单位指定Buff(英雄, VF残缺BuffID);
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", 反击准备BuffID);
   移除单位指定Buff(英雄, 反击准备BuffID);
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", 一刀BuffID);
   移除单位指定Buff(英雄, 一刀BuffID);
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", 二刀BuffID);
   移除单位指定Buff(英雄, 二刀BuffID);
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", 决斗BuffID);
   移除单位指定Buff(英雄, 决斗BuffID);
   for (const key in 状态.技能清理表) {
     const 清理 = 状态.技能清理表[key];
@@ -151,13 +161,17 @@ function 刷新VF表现(this: void, 英雄: any, 状态: 椿英雄状态): void 
   // 跳变判定：上一次刷新的 VF残缺 标记覆盖"无（VF归零）/残缺"两种旧状态，本次回到完整即为跳变
   const 之前残缺 = 状态.VF残缺;
   状态.VF残缺 = 残缺;
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", VF场BuffID);
   移除单位指定Buff(英雄, VF场BuffID);
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", VF残缺BuffID);
   移除单位指定Buff(英雄, VF残缺BuffID);
   // 特效由 Buff 表 effect 字段统一管理（此前手动 createUnitEffect + Buff 双层特效）
   if (状态.VF当前 > 0) {
     if (残缺) {
+      debugLogForce("椿-被动", "Buff", "操作", "施加", "目标", GetHandleId(英雄), "Buff", VF残缺BuffID);
       registerManualBuff(英雄, VF残缺BuffID, 9999, 1, { stack: 1 });
     } else {
+      debugLogForce("椿-被动", "Buff", "操作", "施加", "目标", GetHandleId(英雄), "Buff", VF场BuffID);
       registerManualBuff(英雄, VF场BuffID, 9999, 状态.VF当前, { stack: 1 });
       // VF 场展开音：仅"无/残缺→完整"跳变时播一次（常规刷新/初始化满 VF 不播；单位=施法者，参数配置驱动）
       if (之前残缺) {
@@ -239,6 +253,7 @@ export function 创建反击准备(this: void, 英雄: any, 方向: number, 来�
   状态.反击准备到期 = getGameTime() + 被动配置.反击准备持续秒;
   状态.反击准备方向 = 方向;
   状态.反击准备来源 = 来源 != null && 来源 !== 0 ? 来源 : null;
+  debugLogForce("椿-被动", "Buff", "操作", "施加", "目标", GetHandleId(英雄), "Buff", 反击准备BuffID);
   registerManualBuff(英雄, 反击准备BuffID, 被动配置.反击准备持续秒, 1, { stack: 1 });
 }
 
@@ -249,6 +264,7 @@ export function 消费反击准备(this: void, 英雄: any): 反击准备数据 
   if (状态 == null) return null;
   if (getGameTime() > 状态.反击准备到期) return null;
   状态.反击准备到期 = 0;
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", 反击准备BuffID);
   移除单位指定Buff(英雄, 反击准备BuffID);
   return { 方向: 状态.反击准备方向, 来源: 状态.反击准备来源 };
 }
@@ -269,12 +285,16 @@ export function 设置姿态(this: void, 英雄: any, 姿态: 椿姿态): void {
   const 状态 = 取英雄状态(英雄);
   if (状态.姿态 === 姿态) return;
   状态.姿态 = 姿态;
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", 一刀BuffID);
   移除单位指定Buff(英雄, 一刀BuffID);
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", 二刀BuffID);
   移除单位指定Buff(英雄, 二刀BuffID);
   // 姿态特效由 Buff 表 effect 字段统一管理（此前手动 createUnitEffect + Buff 双层特效）
   if (姿态 === "一刀") {
+    debugLogForce("椿-被动", "Buff", "操作", "施加", "目标", GetHandleId(英雄), "Buff", 一刀BuffID);
     registerManualBuff(英雄, 一刀BuffID, 9999, 1, { stack: 1 });
   } else {
+    debugLogForce("椿-被动", "Buff", "操作", "施加", "目标", GetHandleId(英雄), "Buff", 二刀BuffID);
     registerManualBuff(英雄, 二刀BuffID, 9999, 1, { stack: 1 });
   }
 }
@@ -301,6 +321,7 @@ export function 设置决斗距离(this: void, 英雄: any, 方向: number, 持�
   const 状态 = 取英雄状态(英雄);
   状态.决斗距离到期 = getGameTime() + 持续秒;
   状态.决斗距离方向 = 方向;
+  debugLogForce("椿-被动", "Buff", "操作", "施加", "目标", GetHandleId(英雄), "Buff", 决斗BuffID);
   registerManualBuff(英雄, 决斗BuffID, 持续秒, 1, { stack: 1 });
 }
 
@@ -322,6 +343,7 @@ export function 清除决斗距离(this: void, 英雄: any): void {
   const 状态 = 英雄状态表[GetHandleId(英雄)];
   if (状态 == null) return;
   状态.决斗距离到期 = 0;
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(英雄), "Buff", 决斗BuffID);
   移除单位指定Buff(英雄, 决斗BuffID);
 }
 
@@ -341,9 +363,11 @@ function 处理椿普攻反击斩(this: void, target: any, attacker: any, applie
   if (getGameTime() > 状态.反击准备到期) return;
   // 消费反击准备
   状态.反击准备到期 = 0;
+  debugLogForce("椿-被动", "Buff", "操作", "移除", "目标", GetHandleId(attacker), "Buff", 反击准备BuffID);
   移除单位指定Buff(attacker, 反击准备BuffID);
   // 反击斩：以本次普攻实际伤害为基准追加（普攻联动，不触发技能暴击）
   const 追加伤害 = applied * 被动配置.反击斩伤害倍率;
+  debugLogForce("椿-被动", "伤害", "标签", "朱雀院椿-反击斩", "目标", GetHandleId(target), "数值", 追加伤害);
   造成技能伤害({
     来源: attacker,
     目标: target,
@@ -361,6 +385,7 @@ function 处理椿普攻反击斩(this: void, target: any, attacker: any, applie
   if (状态.姿态 === "一刀") {
     恢复VF(attacker, 被动配置.反击斩恢复VF);
   } else {
+    debugLogForce("椿-被动", "伤害", "标签", "朱雀院椿-反击斩二刀", "目标", GetHandleId(target), "数值", applied * 被动配置.二刀反击斩额外倍率);
     造成技能伤害({
       来源: attacker,
       目标: target,
@@ -388,6 +413,7 @@ function 确保死亡清理(this: void): void {
   if (死亡监听已注册) return;
   死亡监听已注册 = true;
   registerDeathListener(function 朱雀院椿死亡清理(this: void, dyingUnit: any, _killingUnit: any): void {
+    debugLogForce("椿-被动", "回调", "类型", "死亡", "单位", dyingUnit != null && dyingUnit !== 0 ? GetHandleId(dyingUnit) : "-");
     if (dyingUnit == null || dyingUnit === 0) return;
     if (是朱雀院椿(dyingUnit)) 清理朱雀院椿状态(dyingUnit, "英雄死亡");
   });
@@ -395,10 +421,12 @@ function 确保死亡清理(this: void): void {
 
 /** 注册朱雀院椿被动（VF 吸收 + 普攻反击斩 + 死亡清理；幂等） */
 export function 注册朱雀院椿被动(this: void): void {
+  debugLogForce("椿-被动", "注册", "名称", "注册朱雀院椿被动");
   if (已注册) return;
   已注册 = true;
   确保死亡清理();
   registerPlayerHeroListener(function 椿英雄注册初始化(this: void, _player: any, hero: any): void {
+    debugLogForce("椿-被动", "回调", "类型", "英雄注册", "单位", hero != null && hero !== 0 ? GetHandleId(hero) : "-");
     // 英雄创建/选择即显式初始化（VF 满 + 初始一刀 Buff/特效），不依赖技能首次访问
     if (是朱雀院椿(hero)) 初始化VF(hero);
   });

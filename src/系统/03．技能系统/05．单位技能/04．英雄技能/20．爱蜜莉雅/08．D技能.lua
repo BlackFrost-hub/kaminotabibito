@@ -19,32 +19,37 @@ local _____7231_871C_8389_96C5_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["爱蜜莉
 local ____require_result_0 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
 local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播放英雄技能喊话"]
 local jass = require("jass.common")
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_1.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
-local createUnitEffect = ____require_result_2.createUnitEffect
-local destroyUnitEffect = ____require_result_2.destroyUnitEffect
-local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_2["设置特效缩放"]
-local ____require_result_3 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_3.Sound3DII_UnitPlayReuse
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_4["注册单位技能壳监听"]
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_5.addDelayedCallback
-local removeDelayedCallback = ____require_result_5.removeDelayedCallback
-local getGameTime = ____require_result_5.getGameTime
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
+local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_2.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
+local createUnitEffect = ____require_result_3.createUnitEffect
+local destroyUnitEffect = ____require_result_3.destroyUnitEffect
+local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_3["设置特效缩放"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_4.Sound3DII_UnitPlayReuse
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_5["注册单位技能壳监听"]
+local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_6.addDelayedCallback
+local removeDelayedCallback = ____require_result_6.removeDelayedCallback
+local getGameTime = ____require_result_6.getGameTime
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_7.debugLogForce
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 local _____73AF_7ED5_7279_6548_952E = "爱蜜莉雅D环绕"
 --- 每英雄 D 到期回调 ID（重复开启时先取消旧回调，防止旧回调提前清掉新 D 状态）
 local ____D_5230_671F_56DE_8C03_8868 = {}
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____53D6_5355_4F4DID = ____require_result_6["取单位ID"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____53D6_5355_4F4DID = ____require_result_8["取单位ID"]
 --- 清理 D 表现与状态（到期/打断/死亡/R 收束共用；幂等）
 ____exports["结束爱蜜莉雅D"] = function(_____65BD_6CD5_8005)
+    debugLogForce("爱蜜莉雅-D", "结束", "原因", "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
         return
     end
@@ -61,6 +66,7 @@ ____exports["结束爱蜜莉雅D"] = function(_____65BD_6CD5_8005)
     _____6E05_7406_7231_871C_8389_96C5D_5F3A_5316(_____65BD_6CD5_8005)
 end
 local function _____91CA_653ED_5E15_514B_663E_73B0(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
+    debugLogForce("爱蜜莉雅-D", "释放", "技能实例ID", ______6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
         return
     end
@@ -83,6 +89,7 @@ local function _____91CA_653ED_5E15_514B_663E_73B0(_context, _____65BD_6CD5_8005
         _____7231_871C_8389_96C5D_914D_7F6E["强化次数"],
         {stack = _____7231_871C_8389_96C5D_914D_7F6E["强化次数"]}
     )
+    debugLogForce("爱蜜莉雅-D", "特效", "路径", _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["帕克环绕"]["模型路径"])
     local _____73AF_7ED5_7279_6548 = createUnitEffect(
         _____65BD_6CD5_8005,
         "origin",
@@ -124,6 +131,7 @@ local function _____91CA_653ED_5E15_514B_663E_73B0(_context, _____65BD_6CD5_8005
     local ____ = _____6CE8_9500
 end
 ____exports["注册爱蜜莉雅D"] = function()
+    debugLogForce("爱蜜莉雅-D", "注册", "名称", "注册爱蜜莉雅D")
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "爱蜜莉雅-帕克显现（D）",
         ["单位类型ID"] = _____82F1_96C4_5355_4F4D_7C7B_578BID,

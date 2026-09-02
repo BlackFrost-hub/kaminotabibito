@@ -38,6 +38,8 @@ local _____6062_590DVF = ____require_result_10["恢复VF"]
 local _____83B7_53D6_59FF_6001 = ____require_result_10["获取姿态"]
 local _____767B_8BB0_693F_6E05_7406 = ____require_result_10["登记椿清理"]
 local _____64AD_653E_693F_52A8_4F5C = ____require_result_10["播放椿动作"]
+local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_11.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E.Q["技能ID"])
 local ____Q_914D_7F6E = _____6731_96C0_9662_693FQ_914D_7F6E
@@ -49,8 +51,17 @@ local GetUnitY = jass.GetUnitY
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local function _____7ED3_7B97Q_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____65B9_5411_89D2, _____4F24_5BB3_500D_7387, _____6807_7B7E)
+    debugLogForce(
+        "椿-Q",
+        "伤害",
+        "标签",
+        _____6807_7B7E,
+        "数值",
+        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____4F24_5BB3_500D_7387
+    )
     local X = GetUnitX(_____65BD_6CD5_8005)
     local Y = GetUnitY(_____65BD_6CD5_8005)
+    debugLogForce("椿-Q", "特效", "路径", _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q主斩"]["模型路径"])
     _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q主斩"]["模型路径"],
         RGB = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q主斩"].RGB,
@@ -168,11 +179,12 @@ local function _____6267_884C_8FD4_5203_7B2C_4E00_6BB5(_____65BD_6CD5_8005, ____
             _____63A7_5236_5668["完成"](_____63A7_5236_5668)
         end
     )
-    local ____6570_636E__6BB5_56DE_8C03ID_11 = _____6570_636E["段回调ID"]
-    ____6570_636E__6BB5_56DE_8C03ID_11[#____6570_636E__6BB5_56DE_8C03ID_11 + 1] = _____7B2C_4E8C_6BB5ID
+    local ____6570_636E__6BB5_56DE_8C03ID_12 = _____6570_636E["段回调ID"]
+    ____6570_636E__6BB5_56DE_8C03ID_12[#____6570_636E__6BB5_56DE_8C03ID_12 + 1] = _____7B2C_4E8C_6BB5ID
     _____63A7_5236_5668["登记延迟回调"](_____63A7_5236_5668, _____7B2C_4E8C_6BB5ID)
 end
 local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("椿-Q", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_693F(_____65BD_6CD5_8005) then
         return
     end
@@ -188,20 +200,22 @@ local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____628
         GetSpellTargetY()
     )
     local _____53CD_51FB = _____6D88_8D39_53CD_51FB_51C6_5907(_____65BD_6CD5_8005)
-    local ____temp_12
+    local ____temp_13
     if ____E_8054_52A8["获取椿回锋方向"] ~= nil then
-        ____temp_12 = ____E_8054_52A8["获取椿回锋方向"](_____65BD_6CD5_8005)
+        ____temp_13 = ____E_8054_52A8["获取椿回锋方向"](_____65BD_6CD5_8005)
     else
-        ____temp_12 = nil
+        ____temp_13 = nil
     end
-    local _____56DE_950B_65B9_5411 = ____temp_12
+    local _____56DE_950B_65B9_5411 = ____temp_13
     local _____6570_636E = {["输入方向"] = _____8F93_5165_65B9_5411, ["反击方向"] = _____56DE_950B_65B9_5411 ~= nil and _____56DE_950B_65B9_5411 or (_____53CD_51FB ~= nil and _____53CD_51FB["方向"] or _____8F93_5165_65B9_5411), ["已消费反击"] = _____53CD_51FB ~= nil or _____56DE_950B_65B9_5411 ~= nil, ["段回调ID"] = {}}
+    debugLogForce("椿-Q", "状态", "创建战斗技能实例", _____6280_80FD_5B9E_4F8BID or "-")
     local _____63A7_5236_5668 = _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B({
         ["技能键"] = "椿Q",
         ["施法者"] = _____65BD_6CD5_8005,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
+            debugLogForce("椿-Q", "结束", "原因", ______539F_56E0 or "-")
             do
                 local i = 0
                 while i < #_____6570_636E["段回调ID"] do
@@ -221,8 +235,8 @@ local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____628
             end
         end
     )
-    local ____6570_636E__6BB5_56DE_8C03ID_13 = _____6570_636E["段回调ID"]
-    ____6570_636E__6BB5_56DE_8C03ID_13[#____6570_636E__6BB5_56DE_8C03ID_13 + 1] = _____7B2C_4E00_6BB5ID
+    local ____6570_636E__6BB5_56DE_8C03ID_14 = _____6570_636E["段回调ID"]
+    ____6570_636E__6BB5_56DE_8C03ID_14[#____6570_636E__6BB5_56DE_8C03ID_14 + 1] = _____7B2C_4E00_6BB5ID
     _____63A7_5236_5668["登记延迟回调"](_____63A7_5236_5668, _____7B2C_4E00_6BB5ID)
     _____767B_8BB0_693F_6E05_7406(
         _____65BD_6CD5_8005,
@@ -236,6 +250,7 @@ local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____628
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册朱雀院椿Q"] = function()
+    debugLogForce("椿-Q", "注册", "名称", "注册朱雀院椿Q")
     if _____5DF2_6CE8_518C then
         return
     end

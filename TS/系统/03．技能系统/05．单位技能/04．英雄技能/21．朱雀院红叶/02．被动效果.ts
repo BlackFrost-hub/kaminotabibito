@@ -42,6 +42,9 @@ const { Sound3DII_UnitPlayReuse, Sound3DII_CooPlayReuse } = require("lib.扩展�
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = stringToFourCCSafe(朱雀院红叶技能配置.单位类型ID);
 const 破绽BuffID = 朱雀院红叶Buff配置.破绽;
@@ -141,6 +144,7 @@ export function 移除目标破绽(this: void, 目标: any): void {
   if (状态 == null) return;
   if (状态.到期回调ID !== 0) removeDelayedCallback(状态.到期回调ID);
   销毁单位坐标跟随特效(目标, 破绽特效键);
+  debugLogForce("红叶-被动", "Buff", "操作", "移除", "目标", GetHandleId(目标));
   移除单位指定Buff(目标, 破绽BuffID);
   delete 破绽目标表[id];
 }
@@ -177,6 +181,7 @@ export function 施加朱雀院破绽(this: void, 红叶: any, 目标: any): voi
     0,
     朱雀院红叶表现配置.破绽标记.RGB,
   );
+  debugLogForce("红叶-被动", "Buff", "操作", "施加", "目标", GetHandleId(目标));
   registerManualBuff(目标, 破绽BuffID, 朱雀院红叶被动配置.破绽持续秒, 1, { stack: 1 });
   // 破绽标记音（目标首次获得破绽时一次；刷新已有破绽不播；坐标=目标位置，参数配置驱动）
   if (首次获得破绽) {
@@ -291,6 +296,7 @@ function 处理红叶普攻破绽斩(this: void, target: any, attacker: any, app
   if (现在 < (目标冷却表[id] ?? 0)) return;
   // 破绽斩：以本次普攻实际伤害为基准追加（普攻联动伤害，不触发技能暴击）
   const 追加伤害 = applied * 朱雀院红叶被动配置.破绽斩伤害倍率;
+  debugLogForce("红叶-被动", "伤害", "标签", "朱雀院红叶-破绽斩", "数值", 追加伤害, "目标", GetHandleId(target));
   造成技能伤害({
     来源: attacker,
     目标: target,
@@ -346,6 +352,7 @@ function 确保死亡清理(this: void): void {
     }
     // 红叶死亡：清理自身状态
     if (是朱雀院红叶(dyingUnit)) {
+      debugLogForce("红叶-被动", "回调", "类型", "死亡", "单位", GetHandleId(dyingUnit));
       delete 破绽斩冷却表[id];
       清理朱雀院红叶状态(dyingUnit, "英雄死亡");
     }
@@ -354,6 +361,7 @@ function 确保死亡清理(this: void): void {
 
 /** 注册朱雀院红叶被动（普攻破绽斩 + 死亡清理；幂等） */
 export function 注册朱雀院红叶被动(this: void): void {
+  debugLogForce("红叶-被动", "注册", "名称", "被动", "函数", "注册朱雀院红叶被动");
   if (已注册) return;
   已注册 = true;
   确保死亡清理();

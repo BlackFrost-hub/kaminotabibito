@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____53D6_82F1_96C4_72B6_6001, _____542F_52A8_9690_533F_8BA1_65F6, addDelayedCallbackSafe, removeDelayedCallbackSafe, getGameTime, registerManualBuff, _____5355_4F4D_5B58_6D3B, _____9690_533FBuffID, _____88AB_52A8_914D_7F6E, GetHandleId, _____82F1_96C4_72B6_6001_8868, _____9690_533F_8BA1_65F6_56DE_8C03_8868, addDelayedCallback, removeDelayedCallback
+local _____53D6_82F1_96C4_72B6_6001, _____542F_52A8_9690_533F_8BA1_65F6, addDelayedCallbackSafe, removeDelayedCallbackSafe, getGameTime, registerManualBuff, _____5355_4F4D_5B58_6D3B, debugLogForce, _____9690_533FBuffID, _____88AB_52A8_914D_7F6E, GetHandleId, _____82F1_96C4_72B6_6001_8868, _____9690_533F_8BA1_65F6_56DE_8C03_8868, addDelayedCallback, removeDelayedCallback
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
 local _____8299_8389_83B2_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲技能配置"]
 local _____8299_8389_83B2Buff_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲Buff配置"]
@@ -51,7 +51,24 @@ function _____542F_52A8_9690_533F_8BA1_65F6(_____82F1_96C4)
             if getGameTime() - s["最后活动时间"] < _____88AB_52A8_914D_7F6E["隐匿静默秒"] / (_____9759_6B62_500D_7387 > 0 and _____9759_6B62_500D_7387 or 1) - 0.05 then
                 return
             end
+            debugLogForce(
+                "芙莉莲-被动",
+                "状态",
+                "进入隐匿",
+                "英雄",
+                _____82F1_96C4
+            )
             s["隐匿"] = true
+            debugLogForce(
+                "芙莉莲-被动",
+                "Buff",
+                "操作",
+                "施加",
+                "目标",
+                _____82F1_96C4,
+                "BuffID",
+                _____9690_533FBuffID
+            )
             registerManualBuff(
                 _____82F1_96C4,
                 _____9690_533FBuffID,
@@ -95,6 +112,8 @@ _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
 local _____53D6_5355_4F4DID = ____require_result_8["取单位ID"]
 local platformAbilityApi = require("平台扩展API取值")
 local platformAbilityAction = require("平台扩展API动作")
+local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_9.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.Q["技能ID"])
 local ____W_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.W["技能ID"])
@@ -135,6 +154,16 @@ ____exports["记录芙莉莲活动"] = function(_____82F1_96C4)
     end
     local _____72B6_6001 = _____53D6_82F1_96C4_72B6_6001(_____82F1_96C4)
     if _____72B6_6001["隐匿"] then
+        debugLogForce(
+            "芙莉莲-被动",
+            "Buff",
+            "操作",
+            "移除",
+            "目标",
+            _____82F1_96C4,
+            "BuffID",
+            _____9690_533FBuffID
+        )
         _____72B6_6001["隐匿"] = false
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____82F1_96C4, _____9690_533FBuffID)
     end
@@ -154,9 +183,9 @@ ____exports["快照隐匿"] = function(_____82F1_96C4)
     return _____72B6_6001 ~= nil and _____72B6_6001["隐匿"]
 end
 _____9690_533F_8BA1_65F6_56DE_8C03_8868 = {}
-local ____require_result_9 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_9.addDelayedCallback
-removeDelayedCallback = ____require_result_9.removeDelayedCallback
+local ____require_result_10 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_10.addDelayedCallback
+removeDelayedCallback = ____require_result_10.removeDelayedCallback
 --- 解析标记特效键（挂重点目标；目标切换/清理销毁）
 local function _____89E3_6790_6807_8BB0_952E(_____8299_8389_83B2)
     return "芙莉莲解析标记-" .. tostring(GetHandleId(_____8299_8389_83B2))
@@ -164,11 +193,39 @@ end
 --- 清理指定芙莉莲的重点目标解析（标记/Buff/完成状态；不触碰技能清理器）
 local function _____6E05_7406_91CD_70B9_76EE_6807_89E3_6790(_____8299_8389_83B2, _____72B6_6001)
     if _____72B6_6001["重点目标"] ~= nil and _____72B6_6001["重点目标"] ~= 0 then
+        debugLogForce(
+            "芙莉莲-被动",
+            "特效",
+            "类型",
+            "销毁",
+            "路径",
+            _____8299_8389_83B2_8868_73B0_914D_7F6E["解析标记"]["模型路径"]
+        )
         _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
             _____72B6_6001["重点目标"],
             _____89E3_6790_6807_8BB0_952E(_____8299_8389_83B2)
         )
+        debugLogForce(
+            "芙莉莲-被动",
+            "Buff",
+            "操作",
+            "移除",
+            "目标",
+            _____72B6_6001["重点目标"],
+            "BuffID",
+            _____89E3_6790_4E2DBuffID
+        )
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____72B6_6001["重点目标"], _____89E3_6790_4E2DBuffID)
+        debugLogForce(
+            "芙莉莲-被动",
+            "Buff",
+            "操作",
+            "移除",
+            "目标",
+            _____72B6_6001["重点目标"],
+            "BuffID",
+            _____89E3_6790_5B8C_6210BuffID
+        )
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____72B6_6001["重点目标"], _____89E3_6790_5B8C_6210BuffID)
     end
     _____72B6_6001["重点目标"] = nil
@@ -199,12 +256,30 @@ ____exports["施加解析"] = function(_____8299_8389_83B2, _____76EE_6807, ____
     local _____6709_6548_7C7B_578B_6570 = (_____72B6_6001["解析到期"]["攻击"] > _____73B0_5728 and 1 or 0) + (_____72B6_6001["解析到期"]["防御"] > _____73B0_5728 and 1 or 0) + (_____72B6_6001["解析到期"]["位置"] > _____73B0_5728 and 1 or 0)
     _____72B6_6001["解析完成"] = _____6709_6548_7C7B_578B_6570 >= 2
     if _____72B6_6001["解析完成"] then
+        debugLogForce(
+            "芙莉莲-被动",
+            "Buff",
+            "操作",
+            "施加",
+            "目标",
+            _____76EE_6807,
+            "BuffID",
+            _____89E3_6790_5B8C_6210BuffID
+        )
         registerManualBuff(
             _____76EE_6807,
             _____89E3_6790_5B8C_6210BuffID,
             _____88AB_52A8_914D_7F6E["解析持续秒"],
             1,
             {stack = 1}
+        )
+        debugLogForce(
+            "芙莉莲-被动",
+            "特效",
+            "类型",
+            "创建",
+            "路径",
+            _____8299_8389_83B2_8868_73B0_914D_7F6E["解析完成"]["模型路径"]
         )
         _____521B_5EFA_70B9_7279_6548({
             ["模型路径"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["解析完成"]["模型路径"],
@@ -217,6 +292,16 @@ ____exports["施加解析"] = function(_____8299_8389_83B2, _____76EE_6807, ____
         })
     else
         if _____6709_6548_7C7B_578B_6570 >= 1 then
+            debugLogForce(
+                "芙莉莲-被动",
+                "Buff",
+                "操作",
+                "施加",
+                "目标",
+                _____76EE_6807,
+                "BuffID",
+                _____89E3_6790_4E2DBuffID
+            )
             registerManualBuff(
                 _____76EE_6807,
                 _____89E3_6790_4E2DBuffID,
@@ -227,6 +312,14 @@ ____exports["施加解析"] = function(_____8299_8389_83B2, _____76EE_6807, ____
         end
     end
     if _____6709_6548_7C7B_578B_6570 >= 1 then
+        debugLogForce(
+            "芙莉莲-被动",
+            "特效",
+            "类型",
+            "创建",
+            "路径",
+            _____8299_8389_83B2_8868_73B0_914D_7F6E["解析标记"]["模型路径"]
+        )
         local _____6807_8BB0 = _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
             _____76EE_6807,
             _____8299_8389_83B2_8868_73B0_914D_7F6E["解析标记"]["模型路径"],
@@ -309,6 +402,16 @@ ____exports["提供演算普攻"] = function(_____8299_8389_83B2)
     end
     local _____72B6_6001 = _____53D6_82F1_96C4_72B6_6001(_____8299_8389_83B2)
     _____72B6_6001["演算普攻到期"] = getGameTime() + _____88AB_52A8_914D_7F6E["演算普攻窗口秒"]
+    debugLogForce(
+        "芙莉莲-被动",
+        "Buff",
+        "操作",
+        "施加",
+        "目标",
+        _____8299_8389_83B2,
+        "BuffID",
+        _____6F14_7B97BuffID
+    )
     registerManualBuff(
         _____8299_8389_83B2,
         _____6F14_7B97BuffID,
@@ -403,6 +506,7 @@ ____exports["清理芙莉莲状态"] = function(_____82F1_96C4)
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册芙莉莲被动"] = function()
+    debugLogForce("芙莉莲-被动", "注册", "名称", "注册芙莉莲被动")
     if _____5DF2_6CE8_518C then
         return
     end

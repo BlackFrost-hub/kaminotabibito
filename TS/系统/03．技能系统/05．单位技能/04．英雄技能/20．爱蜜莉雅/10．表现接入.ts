@@ -15,9 +15,14 @@ import { 注册爱蜜莉雅E } from "./07．E技能";
 import { 注册爱蜜莉雅D } from "./08．D技能";
 import { 注册爱蜜莉雅R } from "./09．R技能";
 
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+
 let 已注册 = false;
 
 export function 注册爱蜜莉雅表现(this: void): void {
+  debugLogForce("爱蜜莉雅-表现接入", "注册", "名称", "注册爱蜜莉雅表现");
   if (已注册) return;
   已注册 = true;
   注册爱蜜莉雅普攻联动();

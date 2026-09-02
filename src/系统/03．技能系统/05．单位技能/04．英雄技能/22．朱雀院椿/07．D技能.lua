@@ -29,6 +29,8 @@ local _____6263_9664VF = ____require_result_5["扣除VF"]
 local _____6062_590DVF = ____require_result_5["恢复VF"]
 local _____767B_8BB0_693F_6E05_7406 = ____require_result_5["登记椿清理"]
 local _____64AD_653E_693F_52A8_4F5C = ____require_result_5["播放椿动作"]
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_6.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 local ____D_914D_7F6E = _____6731_96C0_9662_693FD_914D_7F6E
 local _____4E8C_5200_72B6_6001_8868 = {}
@@ -47,6 +49,13 @@ local function _____505C_6B62_4E8C_5200_6D88_8017(_____82F1_96C4)
     __TS__Delete(_____4E8C_5200_72B6_6001_8868, id)
 end
 local function _____8FDB_5165_4E8C_5200_653B_52BF(_____65BD_6CD5_8005)
+    debugLogForce(
+        "椿-D",
+        "状态",
+        "切换至二刀",
+        "持续秒",
+        ____D_914D_7F6E["二刀持续秒"]
+    )
     _____8BBE_7F6E_59FF_6001(_____65BD_6CD5_8005, "二刀")
     _____505C_6B62_4E8C_5200_6D88_8017(_____65BD_6CD5_8005)
     local _____72B6_6001 = {["到期回调ID"] = 0, ["消耗周期ID"] = 0}
@@ -81,6 +90,7 @@ local function _____8FDB_5165_4E8C_5200_653B_52BF(_____65BD_6CD5_8005)
     )
 end
 local function _____91CA_653ED_59FF_6001_5207_6362(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
+    debugLogForce("椿-D", "释放", "技能实例ID", ______6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_693F(_____65BD_6CD5_8005) then
         return
     end
@@ -92,6 +102,7 @@ local function _____91CA_653ED_59FF_6001_5207_6362(_context, _____65BD_6CD5_8005
     if _____5F53_524D == "一刀" then
         _____8FDB_5165_4E8C_5200_653B_52BF(_____65BD_6CD5_8005)
     else
+        debugLogForce("椿-D", "状态", "切回一刀")
         _____505C_6B62_4E8C_5200_6D88_8017(_____65BD_6CD5_8005)
         _____8BBE_7F6E_59FF_6001(_____65BD_6CD5_8005, "一刀")
         _____6062_590DVF(_____65BD_6CD5_8005, ____D_914D_7F6E["切回一刀恢复VF"])
@@ -101,6 +112,7 @@ local function _____91CA_653ED_59FF_6001_5207_6362(_context, _____65BD_6CD5_8005
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册朱雀院椿D"] = function()
+    debugLogForce("椿-D", "注册", "名称", "注册朱雀院椿D")
     if _____5DF2_6CE8_518C then
         return
     end

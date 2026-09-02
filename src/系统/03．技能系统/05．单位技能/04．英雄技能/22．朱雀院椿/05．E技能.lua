@@ -44,6 +44,8 @@ local _____83B7_53D6_59FF_6001 = ____require_result_11["获取姿态"]
 local _____8BBE_7F6E_51B3_6597_8DDD_79BB = ____require_result_11["设置决斗距离"]
 local _____767B_8BB0_693F_6E05_7406 = ____require_result_11["登记椿清理"]
 local _____64AD_653E_693F_52A8_4F5C = ____require_result_11["播放椿动作"]
+local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_12.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 local ____E_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E.E["技能ID"])
 local ____E_914D_7F6E = _____6731_96C0_9662_693FE_914D_7F6E
@@ -77,6 +79,14 @@ local function _____8BBE_7F6E_56DE_950B_65B9_5411(_____82F1_96C4, _____65B9_5411
     }
 end
 local function _____7ED3_7B97E_7EC8_70B9_6A2A_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
+    debugLogForce(
+        "椿-E",
+        "伤害",
+        "标签",
+        "朱雀院椿-E横斩",
+        "数值",
+        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____E_914D_7F6E["横斩倍率"]
+    )
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["E终点横斩"])
     if _____6570_636E["已结算"] then
         return
@@ -164,6 +174,7 @@ local function _____7ED3_7B97E_7EC8_70B9_6A2A_65A9(_____65BD_6CD5_8005, _____628
     _____8BBE_7F6E_51B3_6597_8DDD_79BB(_____65BD_6CD5_8005, _____6570_636E["方向角"], ____E_914D_7F6E["决斗距离持续秒"])
 end
 local function _____91CA_653EE_95F4_5408(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("椿-E", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_693F(_____65BD_6CD5_8005) then
         return
     end
@@ -201,12 +212,14 @@ local function _____91CA_653EE_95F4_5408(_context, _____65BD_6CD5_8005, _____628
         ["方向角"] = _____65B9_5411,
         ["精确回锋"] = _____7CBE_786E_56DE_950B
     }
+    debugLogForce("椿-E", "状态", "创建战斗技能实例", _____6280_80FD_5B9E_4F8BID or "-")
     local _____63A7_5236_5668 = _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B({
         ["技能键"] = "椿E",
         ["施法者"] = _____65BD_6CD5_8005,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
+            debugLogForce("椿-E", "结束", "原因", ______539F_56E0 or "-")
             if _____6570_636E["已结束"] then
                 return
             end
@@ -217,6 +230,14 @@ local function _____91CA_653EE_95F4_5408(_context, _____65BD_6CD5_8005, _____628
             end
         end
     })
+    debugLogForce(
+        "椿-E",
+        "位移",
+        "类型",
+        "冲锋",
+        "距离",
+        ____E_914D_7F6E["位移距离"]
+    )
     _____6570_636E["位移ID"] = _____5F00_59CB_51B2_950B(
         _____65BD_6CD5_8005,
         {
@@ -243,6 +264,7 @@ local function _____91CA_653EE_95F4_5408(_context, _____65BD_6CD5_8005, _____628
                 if _____6570_636E["已结束"] then
                     return
                 end
+                debugLogForce("椿-E", "命中", "目标", _____5355_4F4D)
                 local _____843D_70B9X = GetUnitX(_____5355_4F4D)
                 local _____843D_70B9Y = GetUnitY(_____5355_4F4D)
                 _____6570_636E["终点X"] = _____843D_70B9X
@@ -269,6 +291,7 @@ local function _____91CA_653EE_95F4_5408(_context, _____65BD_6CD5_8005, _____628
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册朱雀院椿E"] = function()
+    debugLogForce("椿-E", "注册", "名称", "注册朱雀院椿E")
     if _____5DF2_6CE8_518C then
         return
     end

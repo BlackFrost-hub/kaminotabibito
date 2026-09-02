@@ -7,10 +7,11 @@ local ____exports = {}
 -- 动作语义与分阶段映射已按用户帧截图接入；序列速度与技能时点仍待 A10 实机校准。
 -- 物编冷却/魔耗以 objediting/HeroAbility/Irena.lua 为准，本表 同步字段 仅用于核对一致。
 ____exports["伊蕾娜技能配置"] = {
-    ["单位类型ID"] = "E00I",
+    ["单位类型ID"] = "E0L3",
     Q = {
         ["技能ID"] = "AIQ1",
         ["名称"] = "旅风·追迹（Q）",
+        ["图标"] = "ReplaceableTextures\\CommandButtons\\Irena\\BTNIrenaQ.blp",
         ["快捷键"] = "Q",
         ["冷却秒"] = 5,
         ["魔耗百分比"] = 0.05,
@@ -19,6 +20,7 @@ ____exports["伊蕾娜技能配置"] = {
     W = {
         ["技能ID"] = "AIW1",
         ["名称"] = "镜界护符（W）",
+        ["图标"] = "ReplaceableTextures\\CommandButtons\\Irena\\BTNIrenaW.blp",
         ["快捷键"] = "W",
         ["冷却秒"] = 10,
         ["魔耗百分比"] = 0.07,
@@ -27,6 +29,7 @@ ____exports["伊蕾娜技能配置"] = {
     E = {
         ["技能ID"] = "AIE1",
         ["名称"] = "扫帚·远行（E）",
+        ["图标"] = "ReplaceableTextures\\CommandButtons\\Irena\\BTNIrenaE.blp",
         ["快捷键"] = "E",
         ["冷却秒"] = 12,
         ["魔耗百分比"] = 0.075,
@@ -35,6 +38,7 @@ ____exports["伊蕾娜技能配置"] = {
     R = {
         ["技能ID"] = "AIR1",
         ["名称"] = "灰之魔女·万法回廊（R）",
+        ["图标"] = "ReplaceableTextures\\CommandButtons\\Irena\\BTNIrenaR.blp",
         ["快捷键"] = "R",
         ["冷却秒"] = 70,
         ["魔耗百分比"] = 0.14,
@@ -43,6 +47,7 @@ ____exports["伊蕾娜技能配置"] = {
     D = {
         ["技能ID"] = "AID1",
         ["名称"] = "旅途魔法变式（D）",
+        ["图标"] = "ReplaceableTextures\\CommandButtons\\Irena\\BTNIrenaD.blp",
         ["快捷键"] = "D",
         ["冷却秒"] = 4,
         ["魔耗百分比"] = 0.02,
@@ -51,7 +56,7 @@ ____exports["伊蕾娜技能配置"] = {
 }
 ____exports["伊蕾娜物编配置"] = {
     ["模型"] = "Unit\\Hero\\Irena\\Irena.mdx",
-    ["模型缩放"] = 1,
+    ["模型缩放"] = 1.8,
     ["主属性"] = "INT",
     ["初始属性"] = {["力量"] = 20, ["敏捷"] = 22, ["智力"] = 28},
     ["属性成长"] = {["力量"] = 1.5, ["敏捷"] = 2, ["智力"] = 3.5},

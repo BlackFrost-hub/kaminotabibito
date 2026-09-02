@@ -47,6 +47,8 @@ local _____76EE_6807_89E3_6790_5B8C_6210 = ____require_result_12["目标解析�
 local _____5C1D_8BD5_6D88_8D39_89E3_6790_5B8C_6210 = ____require_result_12["尝试消费解析完成"]
 local _____63D0_4F9B_6F14_7B97_666E_653B = ____require_result_12["提供演算普攻"]
 local _____82B1_7530_8054_52A8 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.07．D技能")
+local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_13.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.Q["技能ID"])
 local ____Q_914D_7F6E = _____8299_8389_83B2Q_914D_7F6E
@@ -90,6 +92,14 @@ local function _____7ED3_7B97Q_547D_4E2D(_____65BD_6CD5_8005, _____76EE_6807, __
         _____500D_7387 = _____500D_7387 + ____Q_914D_7F6E["穿透追加倍率"]
         _____6807_7B7E = "芙莉莲-Q穿透"
     end
+    debugLogForce(
+        "芙莉莲-Q",
+        "伤害",
+        "标签",
+        _____6807_7B7E,
+        "数值",
+        _____653B_51FB_529B * _____500D_7387
+    )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
         ["目标"] = _____76EE_6807,
@@ -126,6 +136,7 @@ local function _____7ED3_7B97Q_547D_4E2D(_____65BD_6CD5_8005, _____76EE_6807, __
     _____63D0_4F9B_6F14_7B97_666E_653B(_____65BD_6CD5_8005)
 end
 local function _____91CA_653EQ(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("芙莉莲-Q", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_8299_8389_83B2(_____65BD_6CD5_8005) then
         return
     end
@@ -150,6 +161,7 @@ local function _____91CA_653EQ(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = {["已发射"] = false},
         ["结束回调"] = function(______539F_56E0, _c)
+            debugLogForce("芙莉莲-Q", "结束", "原因", ______539F_56E0 or "-")
         end
     })
     local _____53D1_5C04ID = addDelayedCallback(
@@ -197,10 +209,11 @@ local function _____91CA_653EQ(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
     )
     _____63A7_5236_5668["登记延迟回调"](_____63A7_5236_5668, _____53D1_5C04ID)
 end
-local ____require_result_13 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
-_____8299_8389_83B2D_6570_503C_5F15_7528 = ____require_result_13["芙莉莲D配置"]
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
+_____8299_8389_83B2D_6570_503C_5F15_7528 = ____require_result_14["芙莉莲D配置"]
 local _____5DF2_6CE8_518C = false
 ____exports["注册芙莉莲Q"] = function()
+    debugLogForce("芙莉莲-Q", "注册", "名称", "注册芙莉莲Q")
     if _____5DF2_6CE8_518C then
         return
     end

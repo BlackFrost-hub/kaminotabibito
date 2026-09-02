@@ -40,42 +40,42 @@ ____exports["英雄升级配置列表"] = {
     {heroId = "E006", heroName = "死神", properName = "黑崎一护", awakeningSkills = {{level = 2, abilityId = "A01G"}, {level = 5, abilityId = "A01K"}, {level = 10, abilityId = "A01L"}, {level = 15, abilityId = "A01H"}}},
     {heroId = "H00Q", heroName = "爱德华·艾尔利克", properName = "钢之炼金术师", extraAttrs = {{level = 2, repeatEveryLevel = true, manaRegenBonus = 0.3, note = "旧JASS逻辑：爱德华从2级开始，每次升级额外增加0.30法力回复。"}}},
     {
-        heroId = "E00C",
+        heroId = "E0L0",
         heroName = "爱蜜莉雅",
         properName = "冰之精灵术士",
         learnedSkills = {{level = 2, abilityId = "AEQ1", note = "2级学习Q：冰之矢"}, {level = 5, abilityId = "AEW1", note = "5级学习W：冰花绽放"}, {level = 10, abilityId = "AEE1", note = "10级学习E：冰晶护身"}, {level = 15, abilityId = "AER1", note = "15级学习R：永冻之庭"}},
         pendingNotes = {"D：帕克显现为天赋技能，英雄创建时已放入普通技能栏。"}
     },
     {
-        heroId = "E00G",
+        heroId = "E0L1",
         heroName = "朱雀院红叶",
         properName = "朱雀院红叶",
         learnedSkills = {{level = 2, abilityId = "AMQ1", note = "2级学习Q：飞燕·穿"}, {level = 5, abilityId = "AMW1", note = "5级学习W：水镜·返刃"}, {level = 10, abilityId = "AME1", note = "10级学习E：三叶·散华"}, {level = 15, abilityId = "AMR1", note = "15级学习R：奥义·红叶一闪"}},
         pendingNotes = {"D：朱雀流·秘传三式为天赋技能，英雄创建时已放入普通技能栏。"}
     },
     {
-        heroId = "E00H",
+        heroId = "E0L2",
         heroName = "朱雀院椿",
         properName = "朱雀院椿",
         learnedSkills = {{level = 2, abilityId = "ATQ1", note = "2级学习Q：居合·返"}, {level = 5, abilityId = "ATW1", note = "5级学习W：VF场·后之先"}, {level = 10, abilityId = "ATE1", note = "10级学习E：刃道·间合"}, {level = 15, abilityId = "ATR1", note = "15级学习R：炎姬·黄泉凤凰"}},
         pendingNotes = {"D：浴火鸟·二刀解放为天赋技能，英雄创建时已放入普通技能栏。"}
     },
     {
-        heroId = "E00I",
+        heroId = "E0L3",
         heroName = "伊蕾娜",
         properName = "灰之魔女",
         learnedSkills = {{level = 2, abilityId = "AIQ1", note = "2级学习Q：旅风·追迹"}, {level = 5, abilityId = "AIW1", note = "5级学习W：镜界护符"}, {level = 10, abilityId = "AIE1", note = "10级学习E：扫帚·远行"}, {level = 15, abilityId = "AIR1", note = "15级学习R：万法回廊"}},
         pendingNotes = {"D：旅途魔法变式为天赋技能，英雄创建时已放入普通技能栏。"}
     },
     {
-        heroId = "E00J",
+        heroId = "E0L4",
         heroName = "塞莉亚·克莱尔",
         properName = "天才魔术师",
         learnedSkills = {{level = 2, abilityId = "AKQ1", note = "2级学习Q：棱晶魔弹"}, {level = 5, abilityId = "AKW1", note = "5级学习W：解析结界"}, {level = 10, abilityId = "AKE1", note = "10级学习E：锚定魔法阵"}, {level = 15, abilityId = "AKR1", note = "15级学习R：高阶术式·闭锁"}},
         pendingNotes = {"D：术式转写为天赋技能，英雄创建时已放入普通技能栏。"}
     },
     {
-        heroId = "E00K",
+        heroId = "E0L5",
         heroName = "芙莉莲",
         properName = "精灵魔法使",
         learnedSkills = {{level = 2, abilityId = "AFQ1", note = "2级学习Q：普通攻击魔法·Zoltraak"}, {level = 5, abilityId = "AFW1", note = "5级学习W：防御魔法·魔力护壁"}, {level = 10, abilityId = "AFE1", note = "10级学习E：飞行魔法·高处观察"}, {level = 15, abilityId = "AFR1", note = "15级学习R：解析魔法·贯穿射杀"}},

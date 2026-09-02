@@ -22,27 +22,31 @@ local _____8BFB_53D6_7231_871C_8389_96C5_51B0_6676_8282_70B9 = ____03_FF0E_88AB_
 local ____require_result_0 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
 local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播放英雄技能喊话"]
 local jass = require("jass.common")
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
-local _____53D1_5C04_5F39_9053 = ____require_result_1["发射弹道"]
-local _____83B7_53D6_5F39_9053_5F53_524D_4F4D_7F6E = ____require_result_1["获取弹道当前位置"]
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_2["创建点特效"]
-local ____require_result_3 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_3.Sound3DII_UnitPlayReuse
-local Sound3DII_CooPlayReuse = ____require_result_3.Sound3DII_CooPlayReuse
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_4["注册单位技能壳监听"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_5["两点角度"]
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
-local ____Q_6280_80FD_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.Q["技能ID"])
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
+local _____53D1_5C04_5F39_9053 = ____require_result_2["发射弹道"]
+local _____83B7_53D6_5F39_9053_5F53_524D_4F4D_7F6E = ____require_result_2["获取弹道当前位置"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_4.Sound3DII_UnitPlayReuse
+local Sound3DII_CooPlayReuse = ____require_result_4.Sound3DII_CooPlayReuse
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_5["注册单位技能壳监听"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_6["两点角度"]
+local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_7.debugLogForce
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
+local ____Q_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.Q["技能ID"])
 --- 分裂冰刃：从冰晶位置向前/侧方扇形分裂（复用冰矢模型，小缩放）
 local function _____53D1_5C04_5206_88C2_51B0_5203(_____65BD_6CD5_8005, X, Y, _____4E2D_5FC3_89D2, _____6280_80FD_5B9E_4F8BID)
     local _____6570_91CF = _____7231_871C_8389_96C5Q_914D_7F6E["分裂冰刃数量"]
@@ -116,6 +120,7 @@ local function _____53D1_5C04Q_5E15_514B_51B0_5F39(_____65BD_6CD5_8005, _____76E
     _____53D1_5C04_5F39_9053(_____53D1_5C04_53C2_6570)
 end
 local function _____91CA_653EQ_51B0_4E4B_77E2(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("爱蜜莉雅-Q", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
         return
     end
@@ -161,6 +166,16 @@ local function _____91CA_653EQ_51B0_4E4B_77E2(_context, _____65BD_6CD5_8005, ___
                 _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["Q命中"]["高度"],
                 _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["Q命中"]["裁断距离"]
             )
+            debugLogForce(
+                "爱蜜莉雅-Q",
+                "伤害",
+                "标签",
+                "爱蜜莉雅-Q冰之矢命中",
+                "目标",
+                _____76EE_6807,
+                "数值",
+                _____4F24_5BB3
+            )
             _____7ED3_7B97_7231_871C_8389_96C5_6280_80FD_547D_4E2D(_____65BD_6CD5_8005, _____76EE_6807, _____6765_6E90_952E, {
                 ["伤害值"] = _____4F24_5BB3,
                 ["技能ID"] = ____Q_6280_80FD_7C7B_578BID,
@@ -199,24 +214,25 @@ local function _____91CA_653EQ_51B0_4E4B_77E2(_context, _____65BD_6CD5_8005, ___
                 _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["Q命中"]["高度"],
                 _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["Q命中"]["裁断距离"]
             )
-            local ____53D1_5C04_5206_88C2_51B0_5203_8 = _____53D1_5C04_5206_88C2_51B0_5203
-            local ____array_7 = __TS__SparseArrayNew(_____65BD_6CD5_8005, _____5750_6807.X, _____5750_6807.Y)
-            local ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_6 = _____5B9E_4F8B["当前方向角"]
-            if ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_6 == nil then
-                ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_6 = _____57FA_7840_65B9_5411
+            local ____53D1_5C04_5206_88C2_51B0_5203_10 = _____53D1_5C04_5206_88C2_51B0_5203
+            local ____array_9 = __TS__SparseArrayNew(_____65BD_6CD5_8005, _____5750_6807.X, _____5750_6807.Y)
+            local ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_8 = _____5B9E_4F8B["当前方向角"]
+            if ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_8 == nil then
+                ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_8 = _____57FA_7840_65B9_5411
             end
-            __TS__SparseArrayPush(____array_7, ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_6, _____6280_80FD_5B9E_4F8BID)
-            ____53D1_5C04_5206_88C2_51B0_5203_8(__TS__SparseArraySpread(____array_7))
-            local ____53D1_5C04Q_5E15_514B_51B0_5F39_12 = _____53D1_5C04Q_5E15_514B_51B0_5F39
-            local ____65BD_6CD5_8005_10 = _____65BD_6CD5_8005
-            local ____6280_80FD_5B9E_4F8BID_11 = _____6280_80FD_5B9E_4F8BID
-            local ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_9 = _____5B9E_4F8B["当前方向角"]
-            if ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_9 == nil then
-                ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_9 = _____57FA_7840_65B9_5411
+            __TS__SparseArrayPush(____array_9, ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_8, _____6280_80FD_5B9E_4F8BID)
+            ____53D1_5C04_5206_88C2_51B0_5203_10(__TS__SparseArraySpread(____array_9))
+            local ____53D1_5C04Q_5E15_514B_51B0_5F39_14 = _____53D1_5C04Q_5E15_514B_51B0_5F39
+            local ____65BD_6CD5_8005_12 = _____65BD_6CD5_8005
+            local ____6280_80FD_5B9E_4F8BID_13 = _____6280_80FD_5B9E_4F8BID
+            local ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_11 = _____5B9E_4F8B["当前方向角"]
+            if ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_11 == nil then
+                ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_11 = _____57FA_7840_65B9_5411
             end
-            ____53D1_5C04Q_5E15_514B_51B0_5F39_12(____65BD_6CD5_8005_10, _____76EE_6807_5355_4F4D, ____6280_80FD_5B9E_4F8BID_11, ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_9)
+            ____53D1_5C04Q_5E15_514B_51B0_5F39_14(____65BD_6CD5_8005_12, _____76EE_6807_5355_4F4D, ____6280_80FD_5B9E_4F8BID_13, ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_11)
         end,
         ["on到达点"] = function(_____5F39_5E55ID, ______539F_56E0)
+            debugLogForce("爱蜜莉雅-Q", "状态", "弹道到达终点生成冰晶")
             local _____4F4D_7F6E = _____83B7_53D6_5F39_9053_5F53_524D_4F4D_7F6E(_____5F39_9053)
             _____521B_5EFA_7231_871C_8389_96C5_573A_4E0A_51B0_6676(
                 _____65BD_6CD5_8005,
@@ -240,6 +256,7 @@ local function _____91CA_653EQ_51B0_4E4B_77E2(_context, _____65BD_6CD5_8005, ___
     local ____ = _____6CE8_9500
 end
 ____exports["注册爱蜜莉雅Q"] = function()
+    debugLogForce("爱蜜莉雅-Q", "注册", "名称", "注册爱蜜莉雅Q")
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "爱蜜莉雅-冰之矢（Q）",
         ["单位类型ID"] = _____82F1_96C4_5355_4F4D_7C7B_578BID,

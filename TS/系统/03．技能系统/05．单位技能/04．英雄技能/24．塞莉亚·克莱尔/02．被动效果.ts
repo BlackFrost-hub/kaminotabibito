@@ -29,6 +29,9 @@ import {
 import { 塞莉亚BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/24．塞莉亚·克莱尔";
 
 const jass = require("jass.common") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const japi = require("jass.japi") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -88,9 +91,12 @@ const platformAbilityApi = require("平台扩展API取值") as {
 const platformAbilityAction = require("平台扩展API动作") as {
   技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 const 英雄单位类型ID = 塞莉亚克莱尔技能配置.单位类型ID;
-const Q技能类型ID = jass.FourCC(塞莉亚克莱尔技能配置.Q.技能ID) as number;
+const Q技能类型ID = stringToFourCCSafe(塞莉亚克莱尔技能配置.Q.技能ID) as number;
 
 //=============================================================================
 // 类型
@@ -180,7 +186,7 @@ function 查找状态(this: void, 英雄: any): 塞莉亚英雄状态 | undefine
 /** 判断单位是否为塞莉亚·克莱尔 */
 export function 是塞莉亚克莱尔(this: void, unit: any): boolean {
   if (unit == null || unit === 0) return false;
-  return GetUnitTypeId(unit) === jass.FourCC(英雄单位类型ID);
+  return GetUnitTypeId(unit) === stringToFourCCSafe(英雄单位类型ID);
 }
 
 //=============================================================================
@@ -336,6 +342,7 @@ export function 创建塞莉亚节点(
     : 类型 === "结界"
       ? 塞莉亚克莱尔表现配置.公式节点结界
       : 塞莉亚克莱尔表现配置.公式节点锚定;
+  debugLogForce("塞莉亚-被动", "特效", "路径", 节点表现.模型路径);
   const 特效句柄 = 创建点特效({
     模型路径: 节点表现.模型路径,
     RGB: 节点表现.RGB,
@@ -469,6 +476,7 @@ export function 授予塞莉亚演算窗口(this: void, 英雄: any): void {
   if (状态.已清理) return;
   if (状态.强化次数 >= 塞莉亚克莱尔演算普攻配置.强化上限) return;
   状态.强化次数 += 1;
+  debugLogForce("塞莉亚-被动", "Buff", "操作", "施加", "目标", 英雄);
   registerManualBuff(英雄, 塞莉亚BuffID.演算魔弹, 8, 状态.强化次数, { stack: 状态.强化次数 });
 }
 
@@ -742,7 +750,10 @@ function 确保死亡监听(this: void): void {
   registerDeathListener(function 塞莉亚死亡清理(this: void, dyingUnit: any, _killingUnit: any): void {
     if (dyingUnit == null || dyingUnit === 0) return;
     // 1) 作为英雄本体
-    清理塞莉亚状态(dyingUnit, "英雄死亡");
+    if (是塞莉亚克莱尔(dyingUnit)) {
+      debugLogForce("塞莉亚-被动", "回调", "类型", "死亡", "单位", dyingUnit);
+      清理塞莉亚状态(dyingUnit, "英雄死亡");
+    }
     // 2) 作为 E 区域成员：直接整行摘除（跨区域计数一并清零，各阵周期会自行对账）
     const diedId = 取单位ID(dyingUnit);
     delete E区域目标表[diedId];
@@ -755,6 +766,7 @@ let 清扫周期已注册 = false;
 
 /** 注册被动入口（幂等）：死亡清理 + 演算普攻监听。 */
 export function 注册塞莉亚被动效果(this: void): void {
+  debugLogForce("塞莉亚-被动", "注册", "名称", "注册塞莉亚被动效果");
   确保死亡监听();
   if (!清扫周期已注册) {
     清扫周期已注册 = true;

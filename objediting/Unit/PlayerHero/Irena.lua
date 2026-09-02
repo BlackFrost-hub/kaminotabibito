@@ -1,15 +1,15 @@
 -- 伊蕾娜玩家英雄物编。
 -- 远程智力英雄；普通攻击使用独立蓝紫魔法弹。
 
-createPlayerHeroUnit('E00I', '伊蕾娜', {
+createPlayerHeroUnit('E0L3', '伊蕾娜', {
   baseId = 'Emoo',
   properNames = '伊蕾娜',
   tooltipBasic = '召唤伊蕾娜',
   tooltipExtended = '记录旅途见闻、切换魔法变式并以扫帚调整战场位置的灰之魔女。',
   description = '灰之魔女，远程魔法与机动型英雄。',
   modelFile = 'Unit\\Hero\\Irena\\Irena.mdx',
-  scale = 1.0,
-  icon = 'ReplaceableTextures\\CommandButtons\\BTNHeroArchMage.blp',
+  scale = 1.05,
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNIrenaPortrait.blp',
   normalAbilities = 'A014,AInv,AID1',
   heroAbilities = '',
   upgradesUsed = '',

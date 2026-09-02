@@ -78,6 +78,8 @@ end
 local ____require_result_0 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
 local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播放英雄技能喊话"]
 jass = require("jass.common")
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
@@ -86,42 +88,44 @@ local GetSpellTargetY = jass.GetSpellTargetY
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
-registerManualBuff = ____require_result_1.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_1["移除单位指定Buff"]
-local ____require_result_2 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-registerDamageModifier = ____require_result_2.registerDamageModifier
-unregisterDamageModifier = ____require_result_2.unregisterDamageModifier
-local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_3["造成技能伤害"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
-local _____5F00_59CB_51B2_950B = ____require_result_4["开始冲锋"]
-local _____505C_6B62_4F4D_79FB = ____require_result_4["停止位移"]
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_5["创建点特效"]
-local createUnitEffect = ____require_result_5.createUnitEffect
-local destroyUnitEffect = ____require_result_5.destroyUnitEffect
-local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_5["设置特效缩放"]
-local ____require_result_6 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_6.Sound3DII_UnitPlayReuse
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_7["注册单位技能壳监听"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
-_____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_8["两点角度"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.25．限时二段技能壳")
-local _____521B_5EFA_9650_65F6_4E8C_6BB5_6280_80FD_58F3 = ____require_result_9["创建限时二段技能壳"]
-local _____786E_8BA4_9650_65F6_4E8C_6BB5_6280_80FD_58F3 = ____require_result_9["确认限时二段技能壳"]
-local _____6E05_7406_9650_65F6_4E8C_6BB5_6280_80FD_58F3 = ____require_result_9["清理限时二段技能壳"]
-local ____require_result_10 = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.02．公共状态与冰晶")
-local _____6D88_8D39_7231_871C_8389_96C5D_5F3A_5316 = ____require_result_10["消费爱蜜莉雅D强化"]
+local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
+registerManualBuff = ____require_result_2.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
+local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
+registerDamageModifier = ____require_result_3.registerDamageModifier
+unregisterDamageModifier = ____require_result_3.unregisterDamageModifier
+local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_4["造成技能伤害"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
+local _____5F00_59CB_51B2_950B = ____require_result_5["开始冲锋"]
+local _____505C_6B62_4F4D_79FB = ____require_result_5["停止位移"]
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
+local createUnitEffect = ____require_result_6.createUnitEffect
+local destroyUnitEffect = ____require_result_6.destroyUnitEffect
+local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_6["设置特效缩放"]
+local ____require_result_7 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_7.Sound3DII_UnitPlayReuse
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_8["注册单位技能壳监听"]
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_9["读取单位攻击力"]
+_____5355_4F4D_5B58_6D3B = ____require_result_9["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_9["两点角度"]
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.25．限时二段技能壳")
+local _____521B_5EFA_9650_65F6_4E8C_6BB5_6280_80FD_58F3 = ____require_result_10["创建限时二段技能壳"]
+local _____786E_8BA4_9650_65F6_4E8C_6BB5_6280_80FD_58F3 = ____require_result_10["确认限时二段技能壳"]
+local _____6E05_7406_9650_65F6_4E8C_6BB5_6280_80FD_58F3 = ____require_result_10["清理限时二段技能壳"]
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.02．公共状态与冰晶")
+local _____6D88_8D39_7231_871C_8389_96C5D_5F3A_5316 = ____require_result_11["消费爱蜜莉雅D强化"]
 local platformAbilityApi = require("平台扩展API取值")
 local platformAbilityAction = require("平台扩展API动作")
-local ____require_result_11 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_11.addDelayedCallback
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
-local ____E_6280_80FD_7C7B_578BID = jass.FourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.E["技能ID"])
+local ____require_result_12 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_12.addDelayedCallback
+local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_13.debugLogForce
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
+local ____E_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.E["技能ID"])
 local _____62A4_76FE_7279_6548_952E = "爱蜜莉雅E护盾"
 local function _____65BD_52A0_843D_70B9_51B0_7206(_____65BD_6CD5_8005, X, Y, _____6280_80FD_5B9E_4F8BID, _____4F24_5BB3_503C)
     _____521B_5EFA_70B9_7279_6548({
@@ -157,6 +161,16 @@ local function _____65BD_52A0_843D_70B9_51B0_7206(_____65BD_6CD5_8005, X, Y, ___
             ) then
                 goto __continue3
             end
+            debugLogForce(
+                "爱蜜莉雅-E",
+                "伤害",
+                "标签",
+                "爱蜜莉雅-E冰爆",
+                "目标",
+                u,
+                "数值",
+                _____4F24_5BB3_503C
+            )
             _____9020_6210_6280_80FD_4F24_5BB3({
                 ["来源"] = _____65BD_6CD5_8005,
                 ["目标"] = u,
@@ -181,6 +195,7 @@ local function _____7ED3_675FE_62A4_76FE_5206_652F(_____65BD_6CD5_8005, _____63A
     if _____6570_636E == nil or _____6570_636E["已结束"] then
         return
     end
+    debugLogForce("爱蜜莉雅-E", "结束", "原因", _____5206_652F)
     _____6570_636E["已结束"] = true
     if _____5206_652F == "提前" and _____6570_636E["位移ID"] ~= 0 then
         _____505C_6B62_4F4D_79FB(_____6570_636E["位移ID"], "中断")
@@ -215,6 +230,7 @@ local function _____7ED3_675FE_62A4_76FE_5206_652F(_____65BD_6CD5_8005, _____63A
     _____63A7_5236_5668["完成"](_____63A7_5236_5668)
 end
 local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce("爱蜜莉雅-E", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
         return
     end
@@ -305,7 +321,7 @@ local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005
         ["名称"] = "爱蜜莉雅-E二段",
         ["单位"] = _____65BD_6CD5_8005,
         ["一段技能ID"] = ____E_6280_80FD_7C7B_578BID,
-        ["二段技能ID"] = jass.FourCC(_____7231_871C_8389_96C5E_914D_7F6E["二段技能ID"]),
+        ["二段技能ID"] = stringToFourCCSafe(_____7231_871C_8389_96C5E_914D_7F6E["二段技能ID"]),
         ["持续秒"] = _____7231_871C_8389_96C5E_914D_7F6E["护盾持续秒"]
     })
     local _____76EE_6807X = GetSpellTargetX()
@@ -326,6 +342,14 @@ local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005
         ["缩放"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰面路径"]["缩放"],
         ["持续秒"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰面路径"]["持续秒"]
     })
+    debugLogForce(
+        "爱蜜莉雅-E",
+        "位移",
+        "类型",
+        "冲锋",
+        "距离",
+        _____7231_871C_8389_96C5E_914D_7F6E["位移距离"]
+    )
     _____6570_636E["位移ID"] = _____5F00_59CB_51B2_950B(
         _____65BD_6CD5_8005,
         {
@@ -371,6 +395,14 @@ local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005
     Sound3DII_UnitPlayReuse(_____7231_871C_8389_96C5_97F3_6548_914D_7F6E["E位移"]["路径"], _____65BD_6CD5_8005, _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["E位移"]["裁断距离"])
 end
 local function _____91CA_653EE_4E8C_6BB5_8F93_5165(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    debugLogForce(
+        "爱蜜莉雅-E",
+        "释放",
+        "技能实例ID",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "分支",
+        "二段输入"
+    )
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
         return
     end
@@ -384,6 +416,7 @@ local function _____91CA_653EE_4E8C_6BB5_8F93_5165(_context, _____65BD_6CD5_8005
     end
 end
 ____exports["注册爱蜜莉雅E"] = function()
+    debugLogForce("爱蜜莉雅-E", "注册", "名称", "注册爱蜜莉雅E")
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "爱蜜莉雅-冰晶护身（E）",
         ["单位类型ID"] = _____82F1_96C4_5355_4F4D_7C7B_578BID,

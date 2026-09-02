@@ -25,6 +25,8 @@ local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用�
 local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
 local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 local Sound3DII_UnitPlayReuse = ____require_result_4.Sound3DII_UnitPlayReuse
+local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_5.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____4F0A_857E_5A1C_6280_80FD_914D_7F6E["单位类型ID"]
 local function _____8BA1_7B97_4E0B_4E00_4E2A_53D8_5F0F(_____5F53_524D)
     local _____5217_8868 = _____4F0A_857E_5A1C_53D8_5F0F_914D_7F6E["变式列表"]
@@ -35,6 +37,7 @@ local function _____8BA1_7B97_4E0B_4E00_4E2A_53D8_5F0F(_____5F53_524D)
     return _____5217_8868[_____4E0B_4E00_7D22_5F15 + 1]
 end
 local function _____91CA_653ED_65C5_9014_9B54_6CD5_53D8_5F0F(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
+    debugLogForce("伊蕾娜-D", "释放", "技能实例ID", ______6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
@@ -43,6 +46,7 @@ local function _____91CA_653ED_65C5_9014_9B54_6CD5_53D8_5F0F(_context, _____65BD
     if not _____8BBE_7F6E_4F0A_857E_5A1C_53D8_5F0F(_____65BD_6CD5_8005, _____4E0B_4E00_4E2A) then
         return
     end
+    debugLogForce("伊蕾娜-D", "状态", "切换变式", _____4E0B_4E00_4E2A)
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "伊蕾娜", _____4F0A_857E_5A1C_6280_80FD_914D_7F6E.D["技能ID"], _____4E0B_4E00_4E2A)
     Sound3DII_UnitPlayReuse(_____4F0A_857E_5A1C_97F3_6548_914D_7F6E["D切换"]["路径"], _____65BD_6CD5_8005, _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["D切换"]["裁断距离"])
     _____64AD_653E_4F0A_857E_5A1C_9636_6BB5_52A8_4F5C(_____65BD_6CD5_8005, _____4F0A_857E_5A1C_6A21_578B_52A8_4F5C_914D_7F6E["技能动作"]["D切换"])
@@ -59,6 +63,7 @@ local function _____91CA_653ED_65C5_9014_9B54_6CD5_53D8_5F0F(_context, _____65BD
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册伊蕾娜D"] = function()
+    debugLogForce("伊蕾娜-D", "注册", "名称", "注册伊蕾娜D")
     if _____5DF2_6CE8_518C then
         return
     end
