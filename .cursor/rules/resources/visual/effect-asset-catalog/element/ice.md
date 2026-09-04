@@ -24,3 +24,4 @@
 | `Common\Effect\Element\Ice\BY_Wood_Effect_Ord_DanGe_Wav_Kuosan_1_3_1s.mdx` | 与主版本同形态的冷蓝环形扩散，持续更长。 | `death`，约 `1s`；360 度一次性播放。 | 爱蜜莉雅 D 帕克显现扩散备份。 | 与 `0.5s` 版本二选一，不能重复叠放。 | 17734 | `742C6E40A40B7C48` |
 | `Common\Effect\Element\Ice\icespirits.mdx` | 蓝白冰灵粒子与弧形能量围绕中心流动。 | `Stand / Death`；跟随英雄或契约冰核。 | 爱蜜莉雅 D 帕克环绕主版本。 | 不代替帕克实体和强化次数；D 结束、打断和死亡时清理。 | 7342 | `5F059B157DDEF25F` |
 | `Common\Effect\Element\Ice\FrostHands.mdx` | 冰霜灵体般的双侧能量环绕目标，轮廓较轻。 | `Birth / Stand / Death`；随英雄位置维持。 | 爱蜜莉雅 D 帕克环绕备份。 | 与主版本二选一，不脱离 D 实例常驻。 | 5613 | `97269C8C49C4F0F8` |
+| `Common\Effect\Element\Ice\FrostyCrystalDrop.mdx` | 冰山从目标点上方坠落并形成厚重的冰霜落点表现，带冰蓝能量与垂直冲击感。 | `Stand`；约 `3.8s`；在目标点创建，1 倍播放速度约 `1.95s` 时暂停。 | 爱蜜莉雅 R 蓄力目标点的冰山预警/坠落主体。 | 只负责蓄力期间的视觉表现，不负责伤害、范围或命中判定；蓄力中断、死亡或 R 领域结束时由技能实例清理。 | 84989 | `3A84DA194CB48DB5` |

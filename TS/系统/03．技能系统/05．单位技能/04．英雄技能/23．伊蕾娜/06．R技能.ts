@@ -35,11 +35,15 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, angle: number) => void;
@@ -154,7 +158,11 @@ function 范围爆发(
   const 伤害 = 读取单位攻击力(施法者) * 倍率;
   for (let i = 0; i < 敌人列表.length; i++) {
     const 敌人 = 敌人列表[i];
-    if (!单位存活(敌人)) continue;
+    if (!单位存活(敌人)) {
+      debugLogForce("伊蕾娜-R", "命中失败", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "原因", "目标无效", "目标", GetUnitName(敌人), "handle", 敌人);
+      continue;
+    }
+    debugLogForce("伊蕾娜-R", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "目标", GetUnitName(敌人), "handle", 敌人, "X", Math.floor(GetUnitX(敌人)), "Y", Math.floor(GetUnitY(敌人)), "伤害", Math.floor(伤害), "标签", 标签);
     R技能伤害(施法者, 敌人, 伤害, 数据, 标签);
   }
 }
@@ -255,13 +263,17 @@ function 执行见闻追加(this: void, 施法者: any, 实例: any, 数据: any
 //=============================================================================
 
 function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: any): void {
-  debugLogForce("伊蕾娜-R", "结束", "原因", "完成");
+  debugLogForce("伊蕾娜-R", "结束", "原因", "完成", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "实例", 数据.技能实例ID ?? "-", "X", Math.floor(数据.中心X), "Y", Math.floor(数据.中心Y));
   // 主范围结算（AOE + 真实减速）
   const 敌人列表 = 获取坐标范围敌人(施法者, 数据.中心X, 数据.中心Y, 伊蕾娜R配置.领域半径);
   const 主伤害 = 读取单位攻击力(施法者) * 伊蕾娜R配置.主伤害攻击力倍率;
   for (let i = 0; i < 敌人列表.length; i++) {
     const 敌人 = 敌人列表[i];
-    if (!单位存活(敌人)) continue;
+    if (!单位存活(敌人)) {
+      debugLogForce("伊蕾娜-R", "命中失败", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "原因", "目标无效", "目标", GetUnitName(敌人), "handle", 敌人);
+      continue;
+    }
+    debugLogForce("伊蕾娜-R", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "目标", GetUnitName(敌人), "handle", 敌人, "X", Math.floor(GetUnitX(敌人)), "Y", Math.floor(GetUnitY(敌人)), "伤害", Math.floor(主伤害), "标签", "伊蕾娜-万法回廊");
     R技能伤害(施法者, 敌人, 主伤害, 数据, "伊蕾娜-万法回廊");
     SFB_setSlow(
       施法者,
@@ -356,10 +368,15 @@ function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: an
 //=============================================================================
 
 function 释放R万法回廊(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("伊蕾娜-R", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
+  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) {
+    debugLogForce("伊蕾娜-R", "释放被拒", "原因", "施法者无效", "handle", 施法者);
+    return;
+  }
   // 禁止并行两个领域
-  if (查询战斗技能实例(施法者, R技能键).length > 0) return;
+  if (查询战斗技能实例(施法者, R技能键).length > 0) {
+    debugLogForce("伊蕾娜-R", "释放被拒", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "原因", "已存在领域");
+    return;
+  }
 
   // t0 快照
   const 中心X = GetSpellTargetX();
@@ -367,6 +384,7 @@ function 释放R万法回廊(this: void, _context: any, 施法者: any, 技能�
   const 方向角 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), 中心X, 中心Y);
   const 见闻快照 = 查询伊蕾娜见闻(施法者).slice(0, 3);
   const 变式快照 = 锁定伊蕾娜R变式(施法者);
+  debugLogForce("伊蕾娜-R", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(中心X), "Y", Math.floor(中心Y), "见闻", 见闻快照.length, "变式", 变式快照 ?? "无");
 
   const 数据: any = {
     技能实例ID,

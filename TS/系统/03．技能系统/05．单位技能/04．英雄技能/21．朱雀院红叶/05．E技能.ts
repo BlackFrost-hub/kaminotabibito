@@ -10,8 +10,9 @@ import {
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -79,6 +80,9 @@ const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 
 //=============================================================================
 // 剑痕（固定世界坐标，不阻挡路径，不可选取；供 Q/W/R 读取，先锁再消费）
@@ -119,7 +123,7 @@ function 移除剑痕(this: void, 剑痕: 红叶剑痕): void {
 }
 
 function 创建剑痕(this: void, 来源英雄: any, X: number, Y: number, 方向角: number): 红叶剑痕 {
-  debugLogForce("红叶-E", "状态", "创建剑痕", "方向角", 方向角);
+  debugLogForce("红叶-E", "状态", "创建剑痕", "玩家", GetPlayerId(GetOwningPlayer(来源英雄)) + 1, "X", Math.floor(X), "Y", Math.floor(Y), "方向角", 方向角);
   const 序号 = ++剑痕序号;
   const 剑痕: 红叶剑痕 = {
     序号,
@@ -203,7 +207,7 @@ interface E数据 {
 }
 
 function 结算E段伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
-  debugLogForce("红叶-E", "伤害", "标签", 标签, "数值", 伤害值, "目标", 目标);
+  debugLogForce("红叶-E", "伤害", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", Math.floor(伤害值), "标签", 标签, "实例", 技能实例ID ?? "-");
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -289,11 +293,17 @@ function 执行E三段(this: void, 施法者: any, 控制器: any, 技能实例I
 }
 
 function 释放E三叶散华(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("红叶-E", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (!是朱雀院红叶(施法者)) return;
+  debugLogForce("红叶-E", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "施法者X", Math.floor(GetUnitX(施法者)), "施法者Y", Math.floor(GetUnitY(施法者)), "目标X", Math.floor(GetSpellTargetX()), "目标Y", Math.floor(GetSpellTargetY()));
+  if (!是朱雀院红叶(施法者)) {
+    debugLogForce("红叶-E", "释放被拒", "原因", "非红叶单位", "施法者", 施法者);
+    return;
+  }
   播放红叶动作(施法者, 朱雀院红叶动作槽.E连续三斩);
   // 重复 E：已有活跃 E 实例时忽略（三段未完成不叠加）
-  if (查询战斗技能实例(施法者, "红叶E").length > 0) return;
+  if (查询战斗技能实例(施法者, "红叶E").length > 0) {
+    debugLogForce("红叶-E", "释放被拒", "原因", "重复E活跃实例", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
+    return;
+  }
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
   播放英雄技能喊话(施法者, "朱雀院红叶", 朱雀院红叶技能配置.E.技能ID);
   const 目标X = GetSpellTargetX();
@@ -306,7 +316,7 @@ function 释放E三叶散华(this: void, _context: any, 施法者: any, 技能�
     技能实例ID,
     数据,
     结束回调: function E结束(this: void, 原因: string, _c: any): void {
-      debugLogForce("红叶-E", "结束", "原因", 原因 || "-");
+      debugLogForce("红叶-E", "结束", "原因", 原因 || "-", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
       // 未执行段数回调随实例清理移除；打断/死亡销毁本 E 已创建的剑痕
       for (let i = 0; i < 数据.段回调ID.length; i++) {
         removeDelayedCallback(数据.段回调ID[i]);

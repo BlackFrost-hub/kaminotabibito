@@ -25,11 +25,15 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 
 const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
@@ -57,6 +61,7 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
 };
 
 const 英雄单位类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.单位类型ID);
+const D技能类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.D.技能ID);
 const 环绕特效键 = "爱蜜莉雅D环绕";
 /** 每英雄 D 到期回调 ID（重复开启时先取消旧回调，防止旧回调提前清掉新 D 状态） */
 const D到期回调表: Record<number, number | undefined> = {};
@@ -67,8 +72,11 @@ const { 取单位ID } = require("系统.03．技能系统.00．技能模板+函�
 
 /** 清理 D 表现与状态（到期/打断/死亡/R 收束共用；幂等） */
 export function 结束爱蜜莉雅D(this: void, 施法者: any): void {
-  debugLogForce("爱蜜莉雅-D", "结束", "原因", "-");
-  if (施法者 == null || 施法者 === 0) return;
+  if (施法者 == null || 施法者 === 0) {
+    debugLogForce("爱蜜莉雅-D", "结束", "原因", "施法者无效", "分支", "清理");
+    return;
+  }
+  debugLogForce("爱蜜莉雅-D", "结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(D技能类型ID), "原因", "-", "X", Math.floor(GetUnitX(施法者)), "Y", Math.floor(GetUnitY(施法者)), "分支", "清理");
   // 取消挂起的到期回调（若仍存在）
   const 旧ID = D到期回调表[取单位ID(施法者)];
   if (旧ID != null && 旧ID !== 0) {
@@ -81,8 +89,26 @@ export function 结束爱蜜莉雅D(this: void, 施法者: any): void {
 }
 
 function 释放D帕克显现(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
-  debugLogForce("爱蜜莉雅-D", "释放", "技能实例ID", _技能实例ID ?? "-");
-  if (施法者 == null || 施法者 === 0) return;
+  if (施法者 == null || 施法者 === 0) {
+    debugLogForce("爱蜜莉雅-D", "释放被拒", "原因", "施法者无效");
+    return;
+  }
+  debugLogForce(
+    "爱蜜莉雅-D",
+    "释放",
+    "玩家",
+    GetPlayerId(GetOwningPlayer(施法者)) + 1,
+    "四码",
+    fourCCToStringSafe(D技能类型ID),
+    "实例",
+    _技能实例ID ?? "-",
+    "目标",
+    "无",
+    "X",
+    Math.floor(GetUnitX(施法者)),
+    "Y",
+    Math.floor(GetUnitY(施法者)),
+  );
   const 英雄ID = 取单位ID(施法者);
   播放英雄技能喊话(施法者, "爱蜜莉雅", 爱蜜莉雅技能配置.D.技能ID);
   播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.D);
@@ -100,7 +126,7 @@ function 释放D帕克显现(this: void, _context: any, 施法者: any, _技能�
   });
 
   // 帕克环绕（常驻，到期/结束销毁）+ 360° 显现扩散（一次性）
-  debugLogForce("爱蜜莉雅-D", "特效", "路径", 爱蜜莉雅表现配置.帕克环绕.模型路径);
+  debugLogForce("爱蜜莉雅-D", "特效", "类型", "创建", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(D技能类型ID), "路径", 爱蜜莉雅表现配置.帕克环绕.模型路径);
   const 环绕特效 = createUnitEffect(施法者, "origin", 爱蜜莉雅表现配置.帕克环绕.模型路径, 爱蜜莉雅表现配置.帕克环绕.持续秒, 环绕特效键);
   设置特效缩放(环绕特效, 爱蜜莉雅表现配置.帕克环绕.缩放);
   创建点特效({

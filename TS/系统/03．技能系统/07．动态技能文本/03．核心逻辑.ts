@@ -19,6 +19,9 @@ const selectionSnapshotSystem = require("系统.03．技能系统.00．本地选
     skills: Record<"Q" | "W" | "E" | "R" | "D", number>;
   };
 };
+const dynamicSkillData = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据") as {
+  刷新单位技能数据: (this: void, unit: any) => void;
+};
 
 const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
@@ -55,6 +58,8 @@ type 公式匹配结果 = {
   完整匹配: string;
   倍率: string;
   开始位置: number;
+  /** 着色文案中属性名与数值之间的颜色码（如 攻击力|cff87ceeb120%|r）；替换时原样回填到计算结果前 */
+  数值颜色前缀?: string;
 };
 
 type 属性匹配项 = {
@@ -369,6 +374,36 @@ function 是否十六进制字符(this: void, 字符: string): boolean {
   return 字符 >= "A" && 字符 <= "F";
 }
 
+/**
+ * 跳过指定位置开始的连续颜色码（|cffXXXXXXXX 或 |r），返回跳过后的位置。
+ * 着色文案中属性名与数值之间会插入颜色码（攻击力|cff87ceeb120%|r），
+ * 公式匹配必须越过它们才能重新邻接。
+ */
+function 跳过颜色码(this: void, text: string, 位置: number): number {
+  let 当前 = 位置;
+  while (当前 < text.length) {
+    if (text.substring(当前, 当前 + 2) === "|r") {
+      当前 += 2;
+      continue;
+    }
+    if (当前 + 10 <= text.length && text.substring(当前, 当前 + 2) === "|c") {
+      let 合法 = true;
+      for (let i = 0; i < 8; i++) {
+        if (!是否十六进制字符(text.charAt(当前 + 2 + i))) {
+          合法 = false;
+          break;
+        }
+      }
+      if (合法) {
+        当前 += 10;
+        continue;
+      }
+    }
+    break;
+  }
+  return 当前;
+}
+
 function 倍率是否可隐式匹配(this: void, 倍率: string): boolean {
   return 倍率.indexOf("%") >= 0;
 }
@@ -470,12 +505,14 @@ function 提取公式匹配(this: void, text: string, 属性文本名: string, �
   const 乘号前缀 = 属性文本名 + "×";
   const 乘号位置 = text.indexOf(乘号前缀, 起始位置);
   if (乘号位置 >= 0) {
-    const 倍率 = 提取倍率(text, 乘号位置 + 乘号前缀.length);
+    const 乘号数字起点 = 跳过颜色码(text, 乘号位置 + 乘号前缀.length);
+    const 倍率 = 提取倍率(text, 乘号数字起点);
     if (倍率 != null) {
       return {
-        完整匹配: 乘号前缀 + 倍率,
+        完整匹配: text.substring(乘号位置, 乘号数字起点 + 倍率.length),
         倍率,
         开始位置: 乘号位置,
+        数值颜色前缀: text.substring(乘号位置 + 乘号前缀.length, 乘号数字起点),
       };
     }
   }
@@ -483,14 +520,25 @@ function 提取公式匹配(this: void, text: string, 属性文本名: string, �
   let 属性位置 = text.indexOf(属性文本名, 起始位置);
   while (属性位置 >= 0) {
     const 数字起始 = 属性位置 + 属性文本名.length;
-    const 首字符 = 数字起始 < text.length ? text.charAt(数字起始) : "";
-    if ((首字符 >= "0" && 首字符 <= "9") || 首字符 === ".") {
-      const 倍率 = 提取倍率(text, 数字起始);
-      if (倍率 != null && 倍率是否可隐式匹配(倍率)) {
+    // 直连形态：属性名后紧跟数值（攻击力120%）
+    const 直连倍率 = 提取倍率(text, 数字起始);
+    if (直连倍率 != null && 倍率是否可隐式匹配(直连倍率)) {
+      return {
+        完整匹配: 属性文本名 + 直连倍率,
+        倍率: 直连倍率,
+        开始位置: 属性位置,
+      };
+    }
+    // 着色形态：属性名与数值之间隔着颜色码（攻击力|cff87ceeb120%|r）
+    const 跳过后 = 跳过颜色码(text, 数字起始);
+    if (跳过后 > 数字起始) {
+      const 着色倍率 = 提取倍率(text, 跳过后);
+      if (着色倍率 != null && 倍率是否可隐式匹配(着色倍率)) {
         return {
-          完整匹配: 属性文本名 + 倍率,
-          倍率,
+          完整匹配: text.substring(属性位置, 跳过后 + 着色倍率.length),
+          倍率: 着色倍率,
           开始位置: 属性位置,
+          数值颜色前缀: text.substring(数字起始, 跳过后),
         };
       }
     }
@@ -502,14 +550,24 @@ function 提取公式匹配(this: void, text: string, 属性文本名: string, �
   let 的位置 = text.indexOf(的连接前缀, 起始位置);
   while (的位置 >= 0) {
     const 数字起始 = 的位置 + 的连接前缀.length;
-    const 首字符 = 数字起始 < text.length ? text.charAt(数字起始) : "";
-    if ((首字符 >= "0" && 首字符 <= "9") || 首字符 === ".") {
-      const 倍率 = 提取倍率(text, 数字起始);
-      if (倍率 != null && 倍率是否可隐式匹配(倍率)) {
+    const 直连倍率 = 提取倍率(text, 数字起始);
+    if (直连倍率 != null && 倍率是否可隐式匹配(直连倍率)) {
+      return {
+        完整匹配: 的连接前缀 + 直连倍率,
+        倍率: 直连倍率,
+        开始位置: 的位置,
+      };
+    }
+    // 着色形态：最大魔法值的|cff87ceeb6%|r
+    const 跳过后 = 跳过颜色码(text, 数字起始);
+    if (跳过后 > 数字起始) {
+      const 着色倍率 = 提取倍率(text, 跳过后);
+      if (着色倍率 != null && 倍率是否可隐式匹配(着色倍率)) {
         return {
-          完整匹配: 的连接前缀 + 倍率,
-          倍率,
+          完整匹配: text.substring(的位置, 跳过后 + 着色倍率.length),
+          倍率: 着色倍率,
           开始位置: 的位置,
+          数值颜色前缀: text.substring(数字起始, 跳过后),
         };
       }
     }
@@ -581,7 +639,8 @@ function 替换公式(this: void, unit: any, tip: string, options?: 动态文本
 
       const 伤害 = 计算公式伤害(unit, 属性匹配项.计算属性名, 匹配结果.倍率);
       const 动态数值 = 包装动态数值(格式化动态整数(伤害));
-      let 替换值 = 动态数值;
+      // 着色文案：数值自带的颜色前缀回填到计算结果前，保持数值高亮色不变
+      let 替换值 = (匹配结果.数值颜色前缀 != null ? 匹配结果.数值颜色前缀 : "") + 动态数值;
       if (options != null && options.preserveFormula === true) {
         const 保护标记 = "__DYN_SKIP_" + 保护片段表.length.toString() + "__";
         保护片段表.push({ 标记: 保护标记, 原文: 完整匹配文本 + "（" + 动态数值 + "）" });
@@ -672,8 +731,14 @@ function 解析配置技能列表(this: void, hero: any): number[] {
 export function 检查英雄技能(this: void, hero: any): void {
   if (!isValidHandle(hero)) return;
 
+  // Q/W/E/R 可能在英雄注册后才由升级系统加入，先把已登记的显示配置写入新技能。
+  dynamicSkillData.刷新单位技能数据(hero);
   const abilityIds = 获取快照技能列表(hero);
   已处理技能缓存[生成英雄缓存键(hero)] = abilityIds;
+  // 丢弃可能在技能加入前读取的物编提示，避免后学技能继续沿用无色原文。
+  for (let i = 0; i < abilityIds.length; i++) {
+    delete 原始提示缓存[生成提示缓存键(hero, abilityIds[i])];
+  }
   for (let i = 0; i < abilityIds.length; i++) {
     const level = GetUnitAbilityLevel(hero, abilityIds[i]);
     if (level > 0) {

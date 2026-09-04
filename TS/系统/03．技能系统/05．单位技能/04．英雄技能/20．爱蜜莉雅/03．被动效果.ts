@@ -22,12 +22,16 @@ import {
 } from "./02．公共状态与冰晶";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -152,24 +156,24 @@ function 施加霜裂(this: void, 目标: any): void {
   if (目标 == null || 目标 === 0 || !单位存活(目标)) return;
   const 状态 = 目标状态(目标);
   状态.霜裂到期 = getGameTime() + 爱蜜莉雅被动配置.霜裂秒 * 1000;
-  debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "施加", "目标", 目标, "类型", "霜裂");
+  debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "施加", "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "类型", "霜裂");
   registerManualBuff(目标, 爱蜜莉雅BuffID.霜裂, 爱蜜莉雅被动配置.霜裂秒, 0);
   if (状态.霜裂回调ID !== 0) removeDelayedCallback(状态.霜裂回调ID);
   状态.霜裂回调ID = addDelayedCallback(爱蜜莉雅被动配置.霜裂秒 * 1000, function 霜裂到期清理(this: void): void {
     状态.霜裂回调ID = 0;
-    debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "移除", "目标", 目标, "类型", "霜裂");
+    debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "移除", "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "类型", "霜裂");
     移除单位指定Buff(目标, 爱蜜莉雅BuffID.霜裂);
   });
 }
 
 function 解冻目标(this: void, 目标: any, 状态: 被动目标状态): void {
-  debugLogForce("爱蜜莉雅-被动", "状态", "解冻", "目标", 目标);
+  debugLogForce("爱蜜莉雅-被动", "状态", "解冻", "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)));
   if (状态.冻结回调ID !== 0) {
     removeDelayedCallback(状态.冻结回调ID);
     状态.冻结回调ID = 0;
   }
   移除单位暂停(目标, 冻结暂停来源);
-  debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "移除", "目标", 目标, "类型", "冻结");
+  debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "移除", "目标", GetUnitName(目标), "handle", 目标, "类型", "冻结");
   移除单位指定Buff(目标, 爱蜜莉雅BuffID.冻结);
   状态.冻结中 = false;
   状态.冻结结束时间 = getGameTime();
@@ -207,10 +211,10 @@ export function 冻结爱蜜莉雅目标(this: void, 施法者: any, 目标: any
   添加单位暂停(目标, 冻结暂停来源);
   状态.冻结中 = true;
   状态.冻结施法者 = 施法者;
-  debugLogForce("爱蜜莉雅-被动", "状态", "冻结", "目标", 目标, "来源", 来源键);
-  debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "施加", "目标", 目标, "类型", "冻结");
+  debugLogForce("爱蜜莉雅-被动", "状态", "冻结", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "来源", 来源键, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)));
+  debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "施加", "目标", GetUnitName(目标), "handle", 目标, "类型", "冻结");
   registerManualBuff(目标, 爱蜜莉雅BuffID.冻结, 爱蜜莉雅被动配置.冻结秒, 0);
-  debugLogForce("爱蜜莉雅-被动", "特效", "类型", "创建", "路径", "Common\\Effect\\Element\\Ice\\sem_shen_du_dong_jie.mdx");
+  debugLogForce("爱蜜莉雅-被动", "特效", "类型", "创建", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "路径", "Common\\Effect\\Element\\Ice\\sem_shen_du_dong_jie.mdx");
   createTimedUnitEffect(目标, "origin", "Common\\Effect\\Element\\Ice\\sem_shen_du_dong_jie.mdx", 爱蜜莉雅被动配置.冻结秒);
   // 冻结包裹音：目标被冻结的状态建立时一次（冻结中/抗性/同实例去重均已在上方拦截，状态转移单次触发；单位=目标，参数配置驱动）
   Sound3DII_UnitPlayReuse(爱蜜莉雅音效配置.冻结包裹.路径, 目标, 爱蜜莉雅音效配置.冻结包裹.裁断距离);
@@ -233,7 +237,6 @@ export function 施加爱蜜莉雅寒意(this: void, 施法者: any, 目标: any
   const 新层数 = 当前层数 + 1;
   状态.寒意层数 = 新层数;
   状态.寒意到期 = now + 爱蜜莉雅被动配置.寒意持续秒 * 1000;
-  debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "施加", "目标", 目标, "类型", "寒意", "层数", 新层数);
   registerManualBuff(目标, 爱蜜莉雅BuffID.寒意, 爱蜜莉雅被动配置.寒意持续秒, 新层数, {
     stack: 新层数,
     sourceUnit: 施法者,
@@ -259,8 +262,8 @@ export function 触发爱蜜莉雅碎冰(this: void, 施法者: any, 目标: any
   去重[来源键] = true;
 
   const 伤害 = 读取单位攻击力(施法者) * 爱蜜莉雅被动配置.碎冰攻击力倍率;
-  debugLogForce("爱蜜莉雅-被动", "状态", "触发碎冰", "目标", 目标, "来源", 来源键);
-  debugLogForce("爱蜜莉雅-被动", "伤害", "标签", "爱蜜莉雅-碎冰", "目标", 目标, "数值", 伤害);
+  debugLogForce("爱蜜莉雅-被动", "状态", "触发碎冰", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(技能ID), "实例", 技能实例ID ?? "-", "来源", 来源键, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)));
+  debugLogForce("爱蜜莉雅-被动", "伤害", "标签", "爱蜜莉雅-碎冰", "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "数值", 伤害);
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -276,7 +279,7 @@ export function 触发爱蜜莉雅碎冰(this: void, 施法者: any, 目标: any
     参与技能伤害加成: false,
   });
   // 消费霜裂标记
-  debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "移除", "目标", 目标, "类型", "霜裂");
+  debugLogForce("爱蜜莉雅-被动", "Buff", "操作", "移除", "目标", GetUnitName(目标), "handle", 目标, "类型", "霜裂");
   移除单位指定Buff(目标, 爱蜜莉雅BuffID.霜裂);
   const 状态 = 被动目标表[id];
   if (状态 != null) 状态.霜裂到期 = 0;
@@ -309,7 +312,14 @@ export function 结算爱蜜莉雅技能命中(
   来源键: string,
   参数: 爱蜜莉雅技能命中参数,
 ): boolean {
-  if (施法者 == null || 目标 == null || 目标 === 0 || !单位存活(目标)) return false;
+  if (施法者 == null || 施法者 === 0) {
+    debugLogForce("爱蜜莉雅-被动", "命中失败", "原因", "施法者无效", "标签", 参数.标签);
+    return false;
+  }
+  if (目标 == null || 目标 === 0 || !单位存活(目标)) {
+    debugLogForce("爱蜜莉雅-被动", "命中失败", "原因", "目标无效", "标签", 参数.标签, "目标", 目标 == null || 目标 === 0 ? "-" : GetUnitName(目标));
+    return false;
+  }
   let 伤害 = 参数.伤害值;
   // ① 碎冰（霜裂目标；同技能实例只一次）
   触发爱蜜莉雅碎冰(施法者, 目标, 来源键, 参数.技能ID, 参数.技能实例ID);

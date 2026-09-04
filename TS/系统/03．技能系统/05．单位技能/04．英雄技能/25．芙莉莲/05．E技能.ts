@@ -24,8 +24,9 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { getGameTime, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   getGameTime: (this: void) => number;
@@ -96,17 +97,22 @@ const E技能ID = stringToFourCCSafe(芙莉莲技能配置.E.技能ID);
 const E配置 = 芙莉莲E配置;
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
-const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const GetHandleId = jass.GetHandleId as (this: void, h: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
 const GetUnitZ = jass.GetUnitFlyHeight as (this: void, unit: any) => number;
-const SetUnitFlyHeight = jass.SetUnitFlyHeight as (this: void, unit: any, height: number, rate: number) => void;
+// SetUnitFlyHeight 只对拥有乌鸦形态（Amrf）能力的单位生效——用 Star 扩展库的现成封装（内部自动加移 Amrf）
+const { SU_SetUnitFlyHeight } = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位基础与生命周期函数") as {
+  SU_SetUnitFlyHeight: (this: void, whichUnit: any, newHeight: number, rate: number) => void;
+};
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, player: any) => boolean;
 const AddLightningEx = jass.AddLightningEx as (this: void, codeName: string, checkVisibility: boolean, x1: number, y1: number, z1: number, x2: number, y2: number, z2: number) => any;
 const MoveLightningEx = jass.MoveLightningEx as (this: void, lightning: any, checkVisibility: boolean, x1: number, y1: number, z1: number, x2: number, y2: number, z2: number) => boolean;
@@ -155,12 +161,12 @@ function 结算E落点(this: void, 施法者: any, 技能实例ID: number | unde
     jass.GroupRemoveUnit(组, u);
     if (u === 施法者 || !单位存活(u)) continue;
     if (!IsUnitEnemy(u, GetOwningPlayer(施法者))) continue;
-    debugLogForce("芙莉莲-E", "伤害", "标签", "芙莉莲-E落点冲击", "数值", 读取单位攻击力(施法者) * 冲击倍率, "目标", u);
+    debugLogForce("芙莉莲-E", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "目标", GetUnitName(u), "handle", u, "X", Math.floor(GetUnitX(u)), "Y", Math.floor(GetUnitY(u)), "伤害", 读取单位攻击力(施法者) * 冲击倍率, "标签", "芙莉莲-E落点冲击");
     造成技能伤害({
       来源: 施法者,
       目标: u,
       伤害: 读取单位攻击力(施法者) * 冲击倍率,
-      伤害类型: DAMAGE_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_MAGIC,
       攻击类型: ATTACK_TYPE_NORMAL,
       武器类型: WEAPON_TYPE_WHOKNOWS,
       来源类型: "单位技能",
@@ -218,7 +224,7 @@ function 完成E收尾(this: void, 施法者: any, 数据: E数据): void {
   清理观察闪电(数据);
   // 恢复飞行高度（任何结束路径必须恢复）
   if (施法者 != null && 施法者 !== 0) {
-    SetUnitFlyHeight(施法者, 数据.起点高度, E配置.高度变化率);
+    SU_SetUnitFlyHeight(施法者, 数据.起点高度, E配置.高度变化率);
   }
 }
 
@@ -242,7 +248,7 @@ function 结束E(this: void, 施法者: any, 技能实例ID: number | undefined,
       数据.减伤ID = 0;
     }
     // 观察期：Tick 与闪电继续按 观察持续秒 运行（配置驱动），到期统一收尾
-    数据.观察截止 = getGameTime() + E配置.观察持续秒;
+    数据.观察截止 = getGameTime() + E配置.观察持续秒 * 1000;
     // 观察保持动作：位移到达/撞墙后启动（持续=观察持续秒，与观察截止起算点对齐；
     // 不再用固定延迟回调，避免位移未到达时提前覆盖起飞动作）
     if (数据.观察守护 == null) {
@@ -268,8 +274,11 @@ function E安排观察期收尾(this: void, 施法者: any, 控制器: any, 数�
 }
 
 function 释放E(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("芙莉莲-E", "释放", "技能实例ID", 技能实例ID || "-");
-  if (!是芙莉莲(施法者)) return;
+  if (!是芙莉莲(施法者)) {
+    debugLogForce("芙莉莲-E", "释放被拒", "原因", "非芙莉莲施法者", "施法者", 施法者, "handle", 施法者, "实例", 技能实例ID ?? "-");
+    return;
+  }
+  debugLogForce("芙莉莲-E", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者, "目标", "点施放", "X", Math.floor(GetSpellTargetX()), "Y", Math.floor(GetSpellTargetY()));
   // 重复 E：已有活跃 E 实例时忽略
   if (查询战斗技能实例(施法者, "芙莉莲E").length > 0) return;
   记录芙莉莲活动(施法者);
@@ -304,7 +313,7 @@ function 释放E(this: void, _context: any, 施法者: any, 技能实例ID: numb
     技能实例ID,
     数据,
     结束回调: function E结束(this: void, _原因: string, _c: any): void {
-      debugLogForce("芙莉莲-E", "结束", "原因", _原因 || "-");
+      debugLogForce("芙莉莲-E", "结束", "原因", _原因 || "-", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者);
       // 中断/死亡：先标记结束再停止位移（防位移结束回调误触发落点结算）；不结算落点
       // 自然到达后数据.已结束也为 true，但实例仍可能因死亡/场景清理收束，必须继续清理观察资源。
       if (数据.已结束) {
@@ -321,7 +330,7 @@ function 释放E(this: void, _context: any, 施法者: any, 技能实例ID: numb
   });
 
   // 起飞：抬升飞行高度
-  SetUnitFlyHeight(施法者, 数据.起点高度 + E配置.飞行高度, E配置.高度变化率);
+  SU_SetUnitFlyHeight(施法者, 数据.起点高度 + E配置.飞行高度, E配置.高度变化率);
   // 升空音（起飞动作实际建立；单位绑定，参数配置驱动）
   Sound3DII_UnitPlayReuse(芙莉莲音效配置.E升空.路径, 施法者, 芙莉莲音效配置.E升空.裁断距离);
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
@@ -407,7 +416,7 @@ function 释放E(this: void, _context: any, 施法者: any, 技能实例ID: numb
   });
 
   // 飞行位移（公共自身位移；必须传 角度，否则公共接口返回 0 不移动；位移特效的模型/缩放/高度/持续秒/RGB 由 表现配置.E起落风压 驱动）
-  debugLogForce("芙莉莲-E", "位移", "类型", "冲锋", "距离", E配置.位移距离);
+  debugLogForce("芙莉莲-E", "位移", "类型", "冲锋", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者, "距离", E配置.位移距离);
   数据.位移ID = 开始冲锋(施法者, {
     距离: E配置.位移距离,
     每秒速度: E配置.位移速度,

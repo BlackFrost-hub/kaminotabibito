@@ -11,8 +11,9 @@ import {
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { getGameTime, addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   getGameTime: (this: void) => number;
@@ -95,6 +96,9 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 
 interface W数据 {
   窗口开始: number;
@@ -106,14 +110,17 @@ interface W数据 {
 }
 
 function 结算W反击(this: void, 施法者: any, 技能实例ID: number | undefined, 数据: W数据, 完美: boolean): void {
-  debugLogForce("椿-W", "伤害", "标签", "朱雀院椿-W反击", "目标", 数据.招架来源, "数值", 读取单位攻击力(施法者) * W配置.反击伤害倍率);
+  const 玩家ID = GetPlayerId(GetOwningPlayer(施法者)) + 1;
+  debugLogForce("椿-W", "反击", "玩家", 玩家ID, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "完美", 完美, "目标", 数据.招架来源 != null && 数据.招架来源 !== 0 ? GetUnitName(数据.招架来源) : "-", "handle", 数据.招架来源 ?? "-", "伤害", 读取单位攻击力(施法者) * W配置.反击伤害倍率);
   播放椿动作(施法者, 朱雀院椿动作槽.W成功反击);
   const 来源 = 数据.招架来源;
   if (来源 == null || 来源 === 0 || !单位存活(来源)) {
+    debugLogForce("椿-W", "命中失败", "原因", "目标无效", "玩家", 玩家ID, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "目标", 来源 ?? "-");
     结束W招架(施法者, 技能实例ID, 数据);
     return;
   }
   const 攻击力 = 读取单位攻击力(施法者);
+  debugLogForce("椿-W", "命中", "玩家", 玩家ID, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "标签", "朱雀院椿-W反击", "目标", GetUnitName(来源), "handle", 来源, "X", Math.floor(GetUnitX(来源)), "Y", Math.floor(GetUnitY(来源)), "伤害", 攻击力 * W配置.反击伤害倍率);
   造成技能伤害({
     来源: 施法者,
     目标: 来源,
@@ -130,6 +137,7 @@ function 结算W反击(this: void, 施法者: any, 技能实例ID: number | unde
   });
   // 二刀攻势完美招架：来源两侧各一道短刀光
   if (完美 && 获取姿态(施法者) === "二刀") {
+    debugLogForce("椿-W", "命中", "玩家", 玩家ID, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "标签", "朱雀院椿-W两侧刀光", "目标", GetUnitName(来源), "handle", 来源, "X", Math.floor(GetUnitX(来源)), "Y", Math.floor(GetUnitY(来源)), "伤害", 攻击力 * W配置.二刀两侧刀光倍率);
     造成技能伤害({
       来源: 施法者,
       目标: 来源,
@@ -202,6 +210,7 @@ function 结束W招架(this: void, 施法者: any, _技能实例ID: number | und
       },
     });
     for (let i = 0; i < 敌人.length; i++) {
+      debugLogForce("椿-W", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", "收刀斩", "标签", "朱雀院椿-W收刀斩", "目标", GetUnitName(敌人[i]), "handle", 敌人[i], "X", Math.floor(GetUnitX(敌人[i])), "Y", Math.floor(GetUnitY(敌人[i])), "伤害", 读取单位攻击力(施法者) * W配置.收刀斩倍率);
       造成技能伤害({
         来源: 施法者,
         目标: 敌人[i],
@@ -221,11 +230,20 @@ function 结束W招架(this: void, 施法者: any, _技能实例ID: number | und
 }
 
 function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("椿-W", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (!是朱雀院椿(施法者)) return;
+  if (!是朱雀院椿(施法者)) {
+    debugLogForce("椿-W", "释放被拒", "原因", "非朱雀院椿", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-");
+    return;
+  }
+  debugLogForce("椿-W", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(GetUnitX(施法者)), "Y", Math.floor(GetUnitY(施法者)), "朝向", GetUnitFacing(施法者));
   // R 蓄力期间不能重复开启 W；已有招架窗口不叠加
-  if (联动R.椿R蓄力中 != null && 联动R.椿R蓄力中(施法者)) return;
-  if (查询战斗技能实例(施法者, "椿W").length > 0) return;
+  if (联动R.椿R蓄力中 != null && 联动R.椿R蓄力中(施法者)) {
+    debugLogForce("椿-W", "释放被拒", "原因", "R蓄力中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-");
+    return;
+  }
+  if (查询战斗技能实例(施法者, "椿W").length > 0) {
+    debugLogForce("椿-W", "释放被拒", "原因", "已有招架窗口", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-");
+    return;
+  }
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
   播放英雄技能喊话(施法者, "朱雀院椿", 朱雀院椿技能配置.W.技能ID);
   播放椿动作(施法者, 朱雀院椿动作槽.W开窗);
@@ -237,14 +255,14 @@ function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID
     已结束: false,
     招架来源: null,
   };
-  debugLogForce("椿-W", "状态", "创建战斗技能实例", 技能实例ID ?? "-");
+  debugLogForce("椿-W", "状态", "创建战斗技能实例", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-");
   const 控制器 = 创建战斗技能实例({
     技能键: "椿W",
     施法者,
     技能实例ID,
     数据,
     结束回调: function W结束(this: void, _原因: string, _c: any): void {
-      debugLogForce("椿-W", "结束", "原因", _原因 ?? "-");
+      debugLogForce("椿-W", "结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "原因", _原因 ?? "-");
       // 死亡/中断收束：补全清理（与 结束W招架 幂等）
       if (数据.已结束) return;
       数据.已结束 = true;
@@ -270,6 +288,7 @@ function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID
     const 进入秒 = getGameTime() - 数据.窗口开始;
     const 来源方向 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), GetUnitX(context.attacker), GetUnitY(context.attacker));
     const 完美 = 进入秒 <= W配置.完美时点秒 && 角度差绝对值(数据.方向角, 来源方向) <= W配置.完美角度;
+    debugLogForce("椿-W", "招架成功", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "完美", 完美, "进入秒", 进入秒, "来源", GetUnitName(context.attacker), "handle", context.attacker);
     // 反击准备（方向 = 招架来源方向）
     创建反击准备(施法者, 来源方向, context.attacker);
     // 招架恢复 VF（完美招架额外恢复；合并一次调用，恢复VF 有 1s 全局冷却，连续两次第二次必失败）

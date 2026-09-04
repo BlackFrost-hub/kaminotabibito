@@ -58,6 +58,11 @@ const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const GetHandleId = jass.GetHandleId as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
+const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
+const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 
 //=============================================================================
 // A1：按英雄句柄隔离的状态容器 + 统一清理
@@ -144,15 +149,21 @@ export function 移除目标破绽(this: void, 目标: any): void {
   if (状态 == null) return;
   if (状态.到期回调ID !== 0) removeDelayedCallback(状态.到期回调ID);
   销毁单位坐标跟随特效(目标, 破绽特效键);
-  debugLogForce("红叶-被动", "Buff", "操作", "移除", "目标", GetHandleId(目标));
+  debugLogForce("红叶-被动", "Buff", "操作", "移除", "玩家", GetPlayerId(GetOwningPlayer(状态.来源英雄)) + 1, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)));
   移除单位指定Buff(目标, 破绽BuffID);
   delete 破绽目标表[id];
 }
 
 /** 统一施加或刷新破绽（Q/W/E/R 技能命中调用）；刷新持续时间和表现 */
 export function 施加朱雀院破绽(this: void, 红叶: any, 目标: any): void {
-  if (红叶 == null || 红叶 === 0 || 目标 == null || 目标 === 0) return;
-  if (目标 === 红叶) return;
+  if (红叶 == null || 红叶 === 0 || 目标 == null || 目标 === 0) {
+    debugLogForce("红叶-被动", "命中失败", "目标无效", "红叶", 红叶, "目标", 目标);
+    return;
+  }
+  if (目标 === 红叶) {
+    debugLogForce("红叶-被动", "命中失败", "目标无效", "目标=施法者");
+    return;
+  }
   const id = GetHandleId(目标);
   const 旧状态 = 破绽目标表[id];
   const 首次获得破绽 = 旧状态 == null;
@@ -160,7 +171,7 @@ export function 施加朱雀院破绽(this: void, 红叶: any, 目标: any): voi
   const 持续毫秒 = 朱雀院红叶被动配置.破绽持续秒 * 1000;
   const 状态: 破绽目标状态 = {
     来源英雄: 红叶,
-    到期时间: getGameTime() + 朱雀院红叶被动配置.破绽持续秒,
+    到期时间: getGameTime() + 朱雀院红叶被动配置.破绽持续秒 * 1000,
     到期回调ID: 0,
   };
   状态.到期回调ID = addDelayedCallback(持续毫秒, function 破绽到期(this: void): void {
@@ -181,10 +192,10 @@ export function 施加朱雀院破绽(this: void, 红叶: any, 目标: any): voi
     0,
     朱雀院红叶表现配置.破绽标记.RGB,
   );
-  debugLogForce("红叶-被动", "Buff", "操作", "施加", "目标", GetHandleId(目标));
   registerManualBuff(目标, 破绽BuffID, 朱雀院红叶被动配置.破绽持续秒, 1, { stack: 1 });
   // 破绽标记音（目标首次获得破绽时一次；刷新已有破绽不播；坐标=目标位置，参数配置驱动）
   if (首次获得破绽) {
+    debugLogForce("红叶-被动", "Buff", "操作", "施加", "玩家", GetPlayerId(GetOwningPlayer(红叶)) + 1, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)));
     Sound3DII_CooPlayReuse(朱雀院红叶音效配置.破绽标记.路径, jass.GetUnitX(目标), jass.GetUnitY(目标), 朱雀院红叶音效配置.破绽标记.高度, 朱雀院红叶音效配置.破绽标记.裁断距离);
   }
 }
@@ -296,7 +307,7 @@ function 处理红叶普攻破绽斩(this: void, target: any, attacker: any, app
   if (现在 < (目标冷却表[id] ?? 0)) return;
   // 破绽斩：以本次普攻实际伤害为基准追加（普攻联动伤害，不触发技能暴击）
   const 追加伤害 = applied * 朱雀院红叶被动配置.破绽斩伤害倍率;
-  debugLogForce("红叶-被动", "伤害", "标签", "朱雀院红叶-破绽斩", "数值", 追加伤害, "目标", GetHandleId(target));
+  debugLogForce("红叶-被动", "命中", "玩家", GetPlayerId(GetOwningPlayer(attacker)) + 1, "目标", GetUnitName(target), "handle", target, "X", Math.floor(GetUnitX(target)), "Y", Math.floor(GetUnitY(target)), "伤害", Math.floor(追加伤害));
   造成技能伤害({
     来源: attacker,
     目标: target,
@@ -352,7 +363,7 @@ function 确保死亡清理(this: void): void {
     }
     // 红叶死亡：清理自身状态
     if (是朱雀院红叶(dyingUnit)) {
-      debugLogForce("红叶-被动", "回调", "类型", "死亡", "单位", GetHandleId(dyingUnit));
+      debugLogForce("红叶-被动", "回调", "类型", "死亡", "单位", GetUnitName(dyingUnit), "handle", dyingUnit);
       delete 破绽斩冷却表[id];
       清理朱雀院红叶状态(dyingUnit, "英雄死亡");
     }

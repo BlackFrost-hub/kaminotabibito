@@ -308,6 +308,7 @@ EC_CreateEffect = ____require_result_1.EC_CreateEffect
 local EC_GetPointZ = ____require_result_1.EC_GetPointZ
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitFacing = jass.GetUnitFacing
 local Cos = jass.Cos
 local Sin = jass.Sin
 local AddSpecialEffectTarget = jass.AddSpecialEffectTarget
@@ -735,6 +736,12 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
                 record.effect,
                 EC_GetPointZ(x, y) + record.height
             )
+            if record["面向跟随"] == true then
+                EXEffectMatRotateZ(
+                    record.effect,
+                    GetUnitFacing(record.unit) * 0.017453292519943295
+                )
+            end
         end
         ::__continue147::
     end
@@ -748,7 +755,7 @@ local function _____786E_4FDD_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
     end
     _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_56DE_8C03ID = addPeriodicCallback(_____5355_4F4D_5750_6807_8DDF_968F_7279_6548_95F4_9694_6BEB_79D2, ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick)
 end
-____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effectKey, scale, height, animSpeed, _____52A8_753B_7D22_5F15, _____9762_5411_5F27_5EA6, RGB)
+____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effectKey, scale, height, animSpeed, _____52A8_753B_7D22_5F15, _____9762_5411_5F27_5EA6, RGB, _____9762_5411_8DDF_968F_5355_4F4D)
     if effectKey == nil then
         effectKey = "default"
     end
@@ -801,12 +808,19 @@ ____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effect
             DzGetColor(RGB["透明度"] or 255, RGB["红"], RGB["绿"], RGB["蓝"])
         )
     end
+    if _____9762_5411_8DDF_968F_5355_4F4D == true then
+        EXEffectMatRotateZ(
+            effect,
+            GetUnitFacing(unit) * 0.017453292519943295
+        )
+    end
     _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_8868[key] = {
         unit = unit,
         effect = effect,
         scale = scale,
         height = height,
-        animSpeed = animSpeed
+        animSpeed = animSpeed,
+        ["面向跟随"] = _____9762_5411_8DDF_968F_5355_4F4D == true
     }
     _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF + 1
     _____786E_4FDD_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()

@@ -13,10 +13,11 @@ local DzSetEffectVertexColor = ____01_FF0E_5171_4EAB.DzSetEffectVertexColor
 local DzSetEffectPos = ____01_FF0E_5171_4EAB.DzSetEffectPos
 local EXEffectMatScale = ____01_FF0E_5171_4EAB.EXEffectMatScale
 local DzSetUnitModel = ____01_FF0E_5171_4EAB.DzSetUnitModel
-local DzSetUnitVertexColor = ____01_FF0E_5171_4EAB.DzSetUnitVertexColor
+local SetUnitVertexColor = ____01_FF0E_5171_4EAB.SetUnitVertexColor
 local EC_CreateEffect = ____01_FF0E_5171_4EAB.EC_CreateEffect
 local GetOwningPlayer = ____01_FF0E_5171_4EAB.GetOwningPlayer
 local GetUnitFacing = ____01_FF0E_5171_4EAB.GetUnitFacing
+local GetUnitFlyHeight = ____01_FF0E_5171_4EAB.GetUnitFlyHeight
 local GetUnitX = ____01_FF0E_5171_4EAB.GetUnitX
 local GetUnitY = ____01_FF0E_5171_4EAB.GetUnitY
 local Player = ____01_FF0E_5171_4EAB.Player
@@ -249,7 +250,7 @@ local function _____521D_59CB_5316_5F39_5E55_8868_73B0(_____53C2_6570, _____5F39
             DzSetUnitModel(_____5F39_5E55_5355_4F4D, _____53C2_6570["模型"])
         end
         if _____53C2_6570.RGB ~= nil and _____53C2_6570.RGB["红"] ~= nil and _____53C2_6570.RGB["绿"] ~= nil and _____53C2_6570.RGB["蓝"] ~= nil then
-            DzSetUnitVertexColor(
+            SetUnitVertexColor(
                 _____5F39_5E55_5355_4F4D,
                 _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(_____53C2_6570.RGB["红"]),
                 _____9650_5236_5F39_5E55_7279_6548_989C_8272_5B57_8282(_____53C2_6570.RGB["绿"]),
@@ -316,6 +317,14 @@ local function _____521B_5EFA_5F39_5E55_5B9E_4F8B_5BF9_8C61(_____5B9E_4F8B)
         end
     }
 end
+--- 让单位可被 SetUnitFlyHeight 调整高度（乌鸦形态 'Amrf' 加后即移；同位移系统残影表现处理）。
+local function _____786E_4FDD_5355_4F4D_53EF_8BBE_7F6E_98DE_884C_9AD8_5EA6(_____5355_4F4D)
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 then
+        return
+    end
+    UnitAddAbility(_____5355_4F4D, 1097691750)
+    UnitRemoveAbility(_____5355_4F4D, 1097691750)
+end
 ____exports["创建原生弹幕"] = function(_____53C2_6570)
     _____53C2_6570 = _____5F52_4E00_5316_5F39_5E55_8DDD_79BB_53C2_6570(_____53C2_6570)
     local x = _____89E3_6790_5F39_5E55X(_____53C2_6570)
@@ -323,6 +332,17 @@ ____exports["创建原生弹幕"] = function(_____53C2_6570)
     local face = _____89E3_6790_5F39_5E55_65B9_5411(_____53C2_6570)
     local z = _____53C2_6570["飞行高度"] or 0
     local _____5F39_5E55_5355_4F4D = _____521B_5EFA_6216_53D6_5F97_5F39_5E55_5355_4F4D(_____53C2_6570, x, y, face)
+    if _____53C2_6570["飞行高度"] == nil and _____53C2_6570["发射高度来源"] == "发射者" then
+        local _____53D1_5C04_8005 = _____53C2_6570["所有者"]
+        if _____53D1_5C04_8005 ~= nil and _____53D1_5C04_8005 ~= 0 then
+            _____786E_4FDD_5355_4F4D_53EF_8BBE_7F6E_98DE_884C_9AD8_5EA6(_____53D1_5C04_8005)
+            z = GetUnitFlyHeight(_____53D1_5C04_8005)
+            if z > 0 and _____5F39_5E55_5355_4F4D ~= nil and _____5F39_5E55_5355_4F4D ~= 0 then
+                _____786E_4FDD_5355_4F4D_53EF_8BBE_7F6E_98DE_884C_9AD8_5EA6(_____5F39_5E55_5355_4F4D)
+                SetUnitFlyHeight(_____5F39_5E55_5355_4F4D, z, 0)
+            end
+        end
+    end
     local id = _____5206_914D_539F_751F_5F39_5E55ID()
     local _____5B9E_4F8B = {
         id = id,

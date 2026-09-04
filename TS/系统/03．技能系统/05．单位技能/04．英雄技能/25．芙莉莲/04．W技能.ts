@@ -26,8 +26,9 @@ const { 开始循环守护, 停止循环守护, 芙莉莲动作槽 } = require("
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { getGameTime, addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   getGameTime: (this: void) => number;
@@ -52,8 +53,8 @@ const { 角度差绝对值 } = require("系统.03．技能系统.00．技能模�
 };
 const { 创建点特效, 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
-  /** 挂载特效（scale + height 驱动；替代 createUnitEffect 无高度入口的短板） */
-  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: any) => any;
+  /** 挂载特效（scale + height 驱动；替代 createUnitEffect 无高度入口的短板；面向跟随单位 使特效每帧同步单位面向） */
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: any, 面向跟随单位?: boolean) => any;
   销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
 };
 const { 读取单位攻击力, 单位存活, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
@@ -94,6 +95,9 @@ const 公式层特效键 = "芙莉莲W公式层";
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 
 interface W数据 {
   方向角: number;
@@ -107,7 +111,7 @@ interface W数据 {
 
 function 结束W护壁(this: void, 施法者: any, 技能实例ID: number | undefined, 数据: W数据, 自然结束: boolean): void {
   if (数据.已结束) return;
-  debugLogForce("芙莉莲-W", "结束", "原因", 自然结束 ? "自然结束" : "成功/中断收束", "英雄", 施法者);
+  debugLogForce("芙莉莲-W", "结束", "原因", 自然结束 ? "自然结束" : "成功/中断收束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者);
   数据.已结束 = true;
   // 保持防御动作守护停止（恢复 stand 与动画速度）
   if (数据.动作守护 != null) {
@@ -145,8 +149,11 @@ function removeDelayedCallbackSafe(this: void, id: number): void {
 }
 
 function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("芙莉莲-W", "释放", "技能实例ID", 技能实例ID || "-");
-  if (!是芙莉莲(施法者)) return;
+  if (!是芙莉莲(施法者)) {
+    debugLogForce("芙莉莲-W", "释放被拒", "原因", "非芙莉莲施法者", "施法者", 施法者, "handle", 施法者, "实例", 技能实例ID ?? "-");
+    return;
+  }
+  debugLogForce("芙莉莲-W", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者);
   // 不叠加窗口：已有活跃 W 实例时忽略
   if (查询战斗技能实例(施法者, "芙莉莲W").length > 0) return;
   记录芙莉莲活动(施法者);
@@ -174,10 +181,10 @@ function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: numb
     },
   });
 
-  // 护壁主体 + 防御公式层（常驻句柄，随实例/窗口统一销毁；不叠加定时自毁；缩放/高度 经 创建单位坐标跟随特效 配置驱动）
-  const 护壁句柄 = 创建单位坐标跟随特效(施法者, 芙莉莲表现配置.W护壁.模型路径, 护壁特效键, 芙莉莲表现配置.W护壁.缩放, 芙莉莲表现配置.W护壁.高度, undefined, 芙莉莲表现配置.W护壁.动画索引, 芙莉莲表现配置.W护壁.面向角度, 芙莉莲表现配置.W护壁.RGB);
+  // 护壁主体 + 防御公式层（常驻句柄，随实例/窗口统一销毁；不叠加定时自毁；缩放/高度 经 创建单位坐标跟随特效 配置驱动；面向跟随单位 使护盾始终朝向芙莉莲当前面向）
+  const 护壁句柄 = 创建单位坐标跟随特效(施法者, 芙莉莲表现配置.W护壁.模型路径, 护壁特效键, 芙莉莲表现配置.W护壁.缩放, 芙莉莲表现配置.W护壁.高度, undefined, 芙莉莲表现配置.W护壁.动画索引, 芙莉莲表现配置.W护壁.面向角度, 芙莉莲表现配置.W护壁.RGB, 芙莉莲表现配置.W护壁.面向跟随单位);
   void 护壁句柄;
-  const 公式层句柄 = 创建单位坐标跟随特效(施法者, 芙莉莲表现配置.W公式层.模型路径, 公式层特效键, 芙莉莲表现配置.W公式层.缩放, 芙莉莲表现配置.W公式层.高度, undefined, 芙莉莲表现配置.W公式层.动画索引, 芙莉莲表现配置.W公式层.面向角度, 芙莉莲表现配置.W公式层.RGB);
+  const 公式层句柄 = 创建单位坐标跟随特效(施法者, 芙莉莲表现配置.W公式层.模型路径, 公式层特效键, 芙莉莲表现配置.W公式层.缩放, 芙莉莲表现配置.W公式层.高度, undefined, 芙莉莲表现配置.W公式层.动画索引, 芙莉莲表现配置.W公式层.面向角度, 芙莉莲表现配置.W公式层.RGB, 芙莉莲表现配置.W公式层.面向跟随单位);
   void 公式层句柄;
   // 护壁展开音（护壁与公式层实际建立后；单位绑定，参数配置驱动）
   Sound3DII_UnitPlayReuse(芙莉莲音效配置.W展开.路径, 施法者, 芙莉莲音效配置.W展开.裁断距离);
@@ -194,7 +201,7 @@ function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: numb
     // 一次性防御成功
     数据.已防御 = true;
     const 来源 = context.attacker;
-    debugLogForce("芙莉莲-W", "命中", "目标", 来源);
+    debugLogForce("芙莉莲-W", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "目标", GetUnitName(来源), "handle", 来源, "X", Math.floor(GetUnitX(来源)), "Y", Math.floor(GetUnitY(来源)), "伤害", context.currentDamage);
     // 收尾延迟到本次伤害修正遍历结束后（禁止在遍历中同步注销修改器）
     addDelayedCallback(0, function W防御成功收尾(this: void): void {
       // 受击反馈（参数配置驱动）

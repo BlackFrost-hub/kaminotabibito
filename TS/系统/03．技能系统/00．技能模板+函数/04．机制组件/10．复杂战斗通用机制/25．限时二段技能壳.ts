@@ -4,6 +4,12 @@
 
 const jass = require("jass.common") as any;
 
+const 技能说明动作 = require("平台扩展API动作") as {
+  技能_设置技能提示: (this: void, unit: any, abilityId: number, tip: string) => boolean;
+  技能_设置技能提示扩展: (this: void, unit: any, abilityId: number, uberTip: string) => boolean;
+  技能_设置刷新数据: (this: void, unit: any, abilityId: number) => boolean;
+};
+
 const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removeDelayedCallback: (this: void, id: number) => void;
@@ -47,6 +53,8 @@ export interface 限时二段技能壳参数 {
   持续秒: number;
   数据?: any;
   超时回调?: (this: void, 控制器: 限时二段技能壳控制器) => void;
+  /** 二段窗口内给二段按钮设置的实例说明（写明二段效果；不传保持物编文案） */
+  二段说明?: string;
 }
 
 function 单位有效(this: void, unit: any): boolean {
@@ -89,6 +97,15 @@ export function 创建限时二段技能壳(this: void, 参数: 限时二段技�
     return undefined;
   }
   SetPlayerAbilityAvailable(owner, 参数.二段技能ID, true);
+
+  SetPlayerAbilityAvailable(owner, 参数.二段技能ID, true);
+
+  // 二段按钮实例说明：让玩家知道再次施放会触发什么（着色文案由调用方组装）
+  if (参数.二段说明 != null && 参数.二段说明 !== "") {
+    技能说明动作.技能_设置技能提示(参数.单位, 参数.二段技能ID, 参数.名称);
+    技能说明动作.技能_设置技能提示扩展(参数.单位, 参数.二段技能ID, 参数.二段说明);
+    技能说明动作.技能_设置刷新数据(参数.单位, 参数.二段技能ID);
+  }
 
   const 控制器: 限时二段技能壳控制器 = {
     名称: 参数.名称,

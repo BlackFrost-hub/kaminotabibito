@@ -23,8 +23,12 @@ local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播�
 local jass = require("jass.common")
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_1.fourCCToStringSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
@@ -63,13 +67,25 @@ local ____Q_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____4F0A_857E_5A1C_6280_
 local function _____9020_6210Q_6280_80FD_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, _____4F24_5BB3_503C, _____6280_80FD_5B9E_4F8BID, _____6807_7B7E, _____5F62_6001)
     debugLogForce(
         "伊蕾娜-Q",
+        "命中",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____Q_6280_80FD_7C7B_578BID),
+        "目标",
+        GetUnitName(_____76EE_6807),
+        "handle",
+        _____76EE_6807,
+        "X",
+        math.floor(GetUnitX(_____76EE_6807)),
+        "Y",
+        math.floor(GetUnitY(_____76EE_6807)),
         "伤害",
+        math.floor(_____4F24_5BB3_503C),
         "标签",
         _____6807_7B7E,
-        "目标",
-        _____76EE_6807,
-        "数值",
-        _____4F24_5BB3_503C
+        "形态",
+        _____5F62_6001
     )
     return _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
@@ -89,6 +105,18 @@ end
 --- 命中共用：主伤害 + 追迹减速 + 风行见闻 + 灰烬爆发（按需）。
 local function _____5904_7406Q_547D_4E2D(_____65BD_6CD5_8005, _____76EE_6807, _____6570_636E)
     if not _____5355_4F4D_5B58_6D3B(_____76EE_6807) then
+        debugLogForce(
+            "伊蕾娜-Q",
+            "命中失败",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "原因",
+            "目标无效",
+            "目标",
+            GetUnitName(_____76EE_6807),
+            "handle",
+            _____76EE_6807
+        )
         return
     end
     local _____4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____4F0A_857E_5A1CQ_914D_7F6E["主伤害攻击力倍率"]
@@ -249,6 +277,14 @@ local function _____5C1D_8BD5E_8DEF_7EBF_8FFD_52A0(_____65BD_6CD5_8005, _____657
 end
 local function _____91CA_653EQ_65C5_98CE_8FFD_8FF9(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "伊蕾娜-Q",
+            "释放被拒",
+            "原因",
+            "施法者无效",
+            "handle",
+            _____65BD_6CD5_8005
+        )
         return
     end
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "伊蕾娜", _____4F0A_857E_5A1C_6280_80FD_914D_7F6E.Q["技能ID"])
@@ -260,6 +296,22 @@ local function _____91CA_653EQ_65C5_98CE_8FFD_8FF9(_context, _____65BD_6CD5_8005
         _____76EE_6807X = GetUnitX(_____76EE_6807_5355_4F4D)
         _____76EE_6807Y = GetUnitY(_____76EE_6807_5355_4F4D)
     end
+    debugLogForce(
+        "伊蕾娜-Q",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____Q_6280_80FD_7C7B_578BID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        _____6709_76EE_6807 and GetUnitName(_____76EE_6807_5355_4F4D) or "点施放",
+        "X",
+        math.floor(_____76EE_6807X),
+        "Y",
+        math.floor(_____76EE_6807Y)
+    )
     local _____786C_76F4_6765_6E90 = "伊蕾娜-Q硬直"
     local _____6570_636E = {
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,

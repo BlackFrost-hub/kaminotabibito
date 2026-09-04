@@ -1,7 +1,10 @@
 local ____lualib = require("lualib_bundle")
+local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
+local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
+local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____53D6_82F1_96C4_72B6_6001, _____542F_52A8_9690_533F_8BA1_65F6, addDelayedCallbackSafe, removeDelayedCallbackSafe, getGameTime, registerManualBuff, _____5355_4F4D_5B58_6D3B, debugLogForce, _____9690_533FBuffID, _____88AB_52A8_914D_7F6E, GetHandleId, _____82F1_96C4_72B6_6001_8868, _____9690_533F_8BA1_65F6_56DE_8C03_8868, addDelayedCallback, removeDelayedCallback
+local _____53D6_82F1_96C4_72B6_6001, _____542F_52A8_9690_533F_8BA1_65F6, addDelayedCallbackSafe, removeDelayedCallbackSafe, fourCCToStringSafe, getGameTime, registerManualBuff, _____5355_4F4D_5B58_6D3B, debugLogForce, _____82F1_96C4_5355_4F4D_7C7B_578BID, _____9690_533FBuffID, _____88AB_52A8_914D_7F6E, GetHandleId, GetOwningPlayer, GetPlayerId, _____82F1_96C4_72B6_6001_8868, _____9690_533F_8BA1_65F6_56DE_8C03_8868, addDelayedCallback, removeDelayedCallback
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
 local _____8299_8389_83B2_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲技能配置"]
 local _____8299_8389_83B2Buff_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲Buff配置"]
@@ -48,14 +51,20 @@ function _____542F_52A8_9690_533F_8BA1_65F6(_____82F1_96C4)
             if not _____5355_4F4D_5B58_6D3B(_____82F1_96C4) then
                 return
             end
-            if getGameTime() - s["最后活动时间"] < _____88AB_52A8_914D_7F6E["隐匿静默秒"] / (_____9759_6B62_500D_7387 > 0 and _____9759_6B62_500D_7387 or 1) - 0.05 then
+            if getGameTime() - s["最后活动时间"] < _____9700_8981_6BEB_79D2 - 50 then
                 return
             end
             debugLogForce(
                 "芙莉莲-被动",
                 "状态",
                 "进入隐匿",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____82F1_96C4)) + 1,
+                "四码",
+                fourCCToStringSafe(_____82F1_96C4_5355_4F4D_7C7B_578BID),
                 "英雄",
+                _____82F1_96C4,
+                "handle",
                 _____82F1_96C4
             )
             s["隐匿"] = true
@@ -64,7 +73,13 @@ function _____542F_52A8_9690_533F_8BA1_65F6(_____82F1_96C4)
                 "Buff",
                 "操作",
                 "施加",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____82F1_96C4)) + 1,
+                "四码",
+                fourCCToStringSafe(_____82F1_96C4_5355_4F4D_7C7B_578BID),
                 "目标",
+                _____82F1_96C4,
+                "handle",
                 _____82F1_96C4,
                 "BuffID",
                 _____9690_533FBuffID
@@ -90,6 +105,7 @@ end
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 getGameTime = ____require_result_1.getGameTime
 local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
@@ -114,7 +130,7 @@ local platformAbilityApi = require("平台扩展API取值")
 local platformAbilityAction = require("平台扩展API动作")
 local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 debugLogForce = ____require_result_9.debugLogForce
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
+_____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.Q["技能ID"])
 local ____W_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.W["技能ID"])
 _____9690_533FBuffID = _____8299_8389_83B2Buff_914D_7F6E["魔力隐匿"]
@@ -125,8 +141,11 @@ _____88AB_52A8_914D_7F6E = _____8299_8389_83B2_88AB_52A8_914D_7F6E
 GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitName = jass.GetUnitName
+GetOwningPlayer = jass.GetOwningPlayer
+GetPlayerId = jass.GetPlayerId
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
-local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 _____82F1_96C4_72B6_6001_8868 = {}
 --- 花田判定接口（D 模块注入；默认无花田）
@@ -156,10 +175,15 @@ ____exports["记录芙莉莲活动"] = function(_____82F1_96C4)
     if _____72B6_6001["隐匿"] then
         debugLogForce(
             "芙莉莲-被动",
-            "Buff",
-            "操作",
-            "移除",
-            "目标",
+            "状态",
+            "解除隐匿",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____82F1_96C4)) + 1,
+            "四码",
+            fourCCToStringSafe(_____82F1_96C4_5355_4F4D_7C7B_578BID),
+            "英雄",
+            _____82F1_96C4,
+            "handle",
             _____82F1_96C4,
             "BuffID",
             _____9690_533FBuffID
@@ -198,8 +222,14 @@ local function _____6E05_7406_91CD_70B9_76EE_6807_89E3_6790(_____8299_8389_83B2,
             "特效",
             "类型",
             "销毁",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____8299_8389_83B2)) + 1,
             "路径",
-            _____8299_8389_83B2_8868_73B0_914D_7F6E["解析标记"]["模型路径"]
+            _____8299_8389_83B2_8868_73B0_914D_7F6E["解析标记"]["模型路径"],
+            "目标",
+            _____72B6_6001["重点目标"],
+            "handle",
+            _____72B6_6001["重点目标"]
         )
         _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
             _____72B6_6001["重点目标"],
@@ -210,7 +240,11 @@ local function _____6E05_7406_91CD_70B9_76EE_6807_89E3_6790(_____8299_8389_83B2,
             "Buff",
             "操作",
             "移除",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____8299_8389_83B2)) + 1,
             "目标",
+            _____72B6_6001["重点目标"],
+            "handle",
             _____72B6_6001["重点目标"],
             "BuffID",
             _____89E3_6790_4E2DBuffID
@@ -221,7 +255,11 @@ local function _____6E05_7406_91CD_70B9_76EE_6807_89E3_6790(_____8299_8389_83B2,
             "Buff",
             "操作",
             "移除",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____8299_8389_83B2)) + 1,
             "目标",
+            _____72B6_6001["重点目标"],
+            "handle",
             _____72B6_6001["重点目标"],
             "BuffID",
             _____89E3_6790_5B8C_6210BuffID
@@ -246,22 +284,30 @@ ____exports["施加解析"] = function(_____8299_8389_83B2, _____76EE_6807, ____
         _____6E05_7406_91CD_70B9_76EE_6807_89E3_6790(_____8299_8389_83B2, _____72B6_6001)
     end
     _____72B6_6001["重点目标"] = _____76EE_6807
-    local _____5230_671F = getGameTime() + _____88AB_52A8_914D_7F6E["解析持续秒"]
+    local _____5230_671F = getGameTime() + _____88AB_52A8_914D_7F6E["解析持续秒"] * 1000
     local _____73B0_5728 = getGameTime()
-    local _____5DF2_6709_7C7B_578B_6570 = (_____72B6_6001["解析到期"]["攻击"] > _____73B0_5728 and 1 or 0) + (_____72B6_6001["解析到期"]["防御"] > _____73B0_5728 and 1 or 0) + (_____72B6_6001["解析到期"]["位置"] > _____73B0_5728 and 1 or 0)
+    local _____653B_51FB_5DF2_6709_6548 = _____72B6_6001["解析到期"]["攻击"] > _____73B0_5728
+    local _____9632_5FA1_5DF2_6709_6548 = _____72B6_6001["解析到期"]["防御"] > _____73B0_5728
+    local _____4F4D_7F6E_5DF2_6709_6548 = _____72B6_6001["解析到期"]["位置"] > _____73B0_5728
+    local _____5DF2_6709_7C7B_578B_6570 = (_____653B_51FB_5DF2_6709_6548 and 1 or 0) + (_____9632_5FA1_5DF2_6709_6548 and 1 or 0) + (_____4F4D_7F6E_5DF2_6709_6548 and 1 or 0)
     if _____5DF2_6709_7C7B_578B_6570 >= 2 and not (_____72B6_6001["解析到期"][_____7C7B_578B] > _____73B0_5728) then
         return
     end
+    local _____540C_7C7B_578B_4E8C_6B21_547D_4E2D = _____7C7B_578B == "攻击" and _____653B_51FB_5DF2_6709_6548
     _____72B6_6001["解析到期"][_____7C7B_578B] = _____5230_671F
     local _____6709_6548_7C7B_578B_6570 = (_____72B6_6001["解析到期"]["攻击"] > _____73B0_5728 and 1 or 0) + (_____72B6_6001["解析到期"]["防御"] > _____73B0_5728 and 1 or 0) + (_____72B6_6001["解析到期"]["位置"] > _____73B0_5728 and 1 or 0)
-    _____72B6_6001["解析完成"] = _____6709_6548_7C7B_578B_6570 >= 2
+    _____72B6_6001["解析完成"] = _____6709_6548_7C7B_578B_6570 >= 2 or _____540C_7C7B_578B_4E8C_6B21_547D_4E2D
     if _____72B6_6001["解析完成"] then
         debugLogForce(
             "芙莉莲-被动",
             "Buff",
             "操作",
             "施加",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____8299_8389_83B2)) + 1,
             "目标",
+            _____76EE_6807,
+            "handle",
             _____76EE_6807,
             "BuffID",
             _____89E3_6790_5B8C_6210BuffID
@@ -278,8 +324,14 @@ ____exports["施加解析"] = function(_____8299_8389_83B2, _____76EE_6807, ____
             "特效",
             "类型",
             "创建",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____8299_8389_83B2)) + 1,
             "路径",
-            _____8299_8389_83B2_8868_73B0_914D_7F6E["解析完成"]["模型路径"]
+            _____8299_8389_83B2_8868_73B0_914D_7F6E["解析完成"]["模型路径"],
+            "目标",
+            _____76EE_6807,
+            "handle",
+            _____76EE_6807
         )
         _____521B_5EFA_70B9_7279_6548({
             ["模型路径"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["解析完成"]["模型路径"],
@@ -297,7 +349,11 @@ ____exports["施加解析"] = function(_____8299_8389_83B2, _____76EE_6807, ____
                 "Buff",
                 "操作",
                 "施加",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____8299_8389_83B2)) + 1,
                 "目标",
+                _____76EE_6807,
+                "handle",
                 _____76EE_6807,
                 "BuffID",
                 _____89E3_6790_4E2DBuffID
@@ -317,8 +373,14 @@ ____exports["施加解析"] = function(_____8299_8389_83B2, _____76EE_6807, ____
             "特效",
             "类型",
             "创建",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____8299_8389_83B2)) + 1,
             "路径",
-            _____8299_8389_83B2_8868_73B0_914D_7F6E["解析标记"]["模型路径"]
+            _____8299_8389_83B2_8868_73B0_914D_7F6E["解析标记"]["模型路径"],
+            "目标",
+            _____76EE_6807,
+            "handle",
+            _____76EE_6807
         )
         local _____6807_8BB0 = _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
             _____76EE_6807,
@@ -401,13 +463,19 @@ ____exports["提供演算普攻"] = function(_____8299_8389_83B2)
         return
     end
     local _____72B6_6001 = _____53D6_82F1_96C4_72B6_6001(_____8299_8389_83B2)
-    _____72B6_6001["演算普攻到期"] = getGameTime() + _____88AB_52A8_914D_7F6E["演算普攻窗口秒"]
+    _____72B6_6001["演算普攻到期"] = getGameTime() + _____88AB_52A8_914D_7F6E["演算普攻窗口秒"] * 1000
     debugLogForce(
         "芙莉莲-被动",
         "Buff",
         "操作",
         "施加",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____8299_8389_83B2)) + 1,
+        "四码",
+        fourCCToStringSafe(_____82F1_96C4_5355_4F4D_7C7B_578BID),
         "目标",
+        _____8299_8389_83B2,
+        "handle",
         _____8299_8389_83B2,
         "BuffID",
         _____6F14_7B97BuffID
@@ -438,7 +506,39 @@ local function _____5904_7406_8299_8389_83B2_666E_653B(target, attacker, applied
     if snapshot == nil then
         return
     end
+    local ____debugLogForce_13 = debugLogForce
+    local ____array_12 = __TS__SparseArrayNew(
+        "芙莉莲-被动",
+        "普攻收到",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(attacker)) + 1,
+        "attacker",
+        attacker,
+        "target",
+        target,
+        "伤害",
+        appliedDamage,
+        "isNormalAttack",
+        snapshot.isNormalAttack,
+        "isWrappedSkillDamage",
+        snapshot.isWrappedSkillDamage,
+        "originalAttacker"
+    )
+    local ____snapshot_originalAttacker_11 = snapshot.originalAttacker
+    if ____snapshot_originalAttacker_11 == nil then
+        ____snapshot_originalAttacker_11 = "-"
+    end
+    __TS__SparseArrayPush(____array_12, ____snapshot_originalAttacker_11)
+    ____debugLogForce_13(__TS__SparseArraySpread(____array_12))
     if snapshot.isNormalAttack ~= true then
+        debugLogForce(
+            "芙莉莲-被动",
+            "普攻拦截",
+            "原因",
+            "isNormalAttack不为true",
+            "实际",
+            snapshot.isNormalAttack
+        )
         return
     end
     if snapshot.isWrappedSkillDamage == true then
@@ -450,24 +550,75 @@ local function _____5904_7406_8299_8389_83B2_666E_653B(target, attacker, applied
     ____exports["记录芙莉莲活动"](attacker)
     local _____72B6_6001 = _____82F1_96C4_72B6_6001_8868[GetHandleId(attacker)]
     if _____72B6_6001 == nil or _____72B6_6001["演算普攻到期"] <= getGameTime() then
+        debugLogForce(
+            "芙莉莲-被动",
+            "普攻拦截",
+            "原因",
+            "演算窗口无效",
+            "到期",
+            _____72B6_6001 ~= nil and _____72B6_6001["演算普攻到期"] or "-"
+        )
         return
     end
     if _____72B6_6001["重点目标"] == nil or _____72B6_6001["重点目标"] ~= target then
+        local ____debugLogForce_15 = debugLogForce
+        local ____72B6_6001__91CD_70B9_76EE_6807_14 = _____72B6_6001["重点目标"]
+        if ____72B6_6001__91CD_70B9_76EE_6807_14 == nil then
+            ____72B6_6001__91CD_70B9_76EE_6807_14 = "-"
+        end
+        ____debugLogForce_15(
+            "芙莉莲-被动",
+            "普攻拦截",
+            "原因",
+            "非重点目标",
+            "重点",
+            ____72B6_6001__91CD_70B9_76EE_6807_14,
+            "本次",
+            target
+        )
         return
     end
     local _____73B0_5728 = getGameTime()
     local _____6709_6548_7C7B_578B_6570 = (_____72B6_6001["解析到期"]["攻击"] > _____73B0_5728 and 1 or 0) + (_____72B6_6001["解析到期"]["防御"] > _____73B0_5728 and 1 or 0) + (_____72B6_6001["解析到期"]["位置"] > _____73B0_5728 and 1 or 0)
     if _____6709_6548_7C7B_578B_6570 <= 0 then
+        debugLogForce(
+            "芙莉莲-被动",
+            "普攻拦截",
+            "原因",
+            "重点目标无有效解析",
+            "有效类型数",
+            _____6709_6548_7C7B_578B_6570
+        )
         return
     end
     _____72B6_6001["演算普攻到期"] = 0
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(attacker, _____6F14_7B97BuffID)
     local _____500D_7387 = _____6709_6548_7C7B_578B_6570 >= 2 and _____88AB_52A8_914D_7F6E["演算完成目标倍率"] or _____88AB_52A8_914D_7F6E["演算伤害倍率"]
+    debugLogForce(
+        "芙莉莲-被动",
+        "命中",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(attacker)) + 1,
+        "四码",
+        fourCCToStringSafe(_____82F1_96C4_5355_4F4D_7C7B_578BID),
+        "目标",
+        GetUnitName(target),
+        "handle",
+        target,
+        "X",
+        math.floor(GetUnitX(target)),
+        "Y",
+        math.floor(GetUnitY(target)),
+        "伤害",
+        appliedDamage * _____500D_7387,
+        "标签",
+        "芙莉莲-演算魔弹"
+    )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = attacker,
         ["目标"] = target,
         ["伤害"] = appliedDamage * _____500D_7387,
-        ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+        ["伤害类型"] = DAMAGE_TYPE_MAGIC,
         ["攻击类型"] = ATTACK_TYPE_NORMAL,
         ["武器类型"] = WEAPON_TYPE_WHOKNOWS,
         ["来源类型"] = "单位技能",
@@ -488,6 +639,20 @@ ____exports["清理芙莉莲状态"] = function(_____82F1_96C4)
     if _____72B6_6001 == nil then
         return
     end
+    debugLogForce(
+        "芙莉莲-被动",
+        "清理",
+        "类型",
+        "死亡/复活重置/场景清理",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____82F1_96C4)) + 1,
+        "四码",
+        fourCCToStringSafe(_____82F1_96C4_5355_4F4D_7C7B_578BID),
+        "英雄",
+        _____82F1_96C4,
+        "handle",
+        _____82F1_96C4
+    )
     local _____8BA1_65F6ID = _____9690_533F_8BA1_65F6_56DE_8C03_8868[id]
     if _____8BA1_65F6ID ~= nil then
         removeDelayedCallback(_____8BA1_65F6ID)

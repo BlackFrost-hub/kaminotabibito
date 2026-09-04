@@ -18,6 +18,7 @@ const { EC_CreateEffect, EC_GetPointZ } = require("lib.扩展函数.Star扩展�
 
 const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
+const GetUnitFacing = jass.GetUnitFacing as (whichUnit: any) => number;
 const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const AddSpecialEffectTarget = jass.AddSpecialEffectTarget as (modelName: string, targetWidget: any, attachPointName: string) => any;
@@ -678,6 +679,9 @@ function on单位坐标跟随特效Tick(this: void): void {
     const y = GetUnitY(record.unit);
     安全设置特效坐标(record.effect, x, y);
     EXSetEffectZ(record.effect, EC_GetPointZ(x, y) + record.height);
+    if (record.面向跟随 === true) {
+      EXEffectMatRotateZ(record.effect, GetUnitFacing(record.unit) * 0.017453292519943295);
+    }
   }
   if (单位坐标跟随特效数量 <= 0) {
     停止单位坐标跟随特效Tick();
@@ -689,7 +693,7 @@ function 确保单位坐标跟随特效Tick(this: void): void {
   单位坐标跟随特效回调ID = addPeriodicCallback(单位坐标跟随特效间隔毫秒, on单位坐标跟随特效Tick);
 }
 
-export function 创建单位坐标跟随特效(unit: any, modelPath: string, effectKey: string = "default", scale: number = 1, height: number = 单位坐标跟随特效默认高度, animSpeed?: number, 动画索引?: number, 面向弧度: number = 0, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }): any {
+export function 创建单位坐标跟随特效(unit: any, modelPath: string, effectKey: string = "default", scale: number = 1, height: number = 单位坐标跟随特效默认高度, animSpeed?: number, 动画索引?: number, 面向弧度: number = 0, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }, 面向跟随单位?: boolean): any {
   if (!单位可坐标跟随(unit) || modelPath === "") return null;
   const key = getUnitEffectKey(unit, effectKey);
   if (key === "") return null;
@@ -711,7 +715,10 @@ export function 创建单位坐标跟随特效(unit: any, modelPath: string, eff
   if (RGB != null) {
     DzSetEffectVertexColor(effect, DzGetColor(RGB.透明度 ?? 255, RGB.红, RGB.绿, RGB.蓝));
   }
-  单位坐标跟随特效表[key] = { unit, effect, scale, height, animSpeed };
+  if (面向跟随单位 === true) {
+    EXEffectMatRotateZ(effect, GetUnitFacing(unit) * 0.017453292519943295);
+  }
+  单位坐标跟随特效表[key] = { unit, effect, scale, height, animSpeed, 面向跟随: 面向跟随单位 === true };
   单位坐标跟随特效数量 += 1;
   确保单位坐标跟随特效Tick();
   return effect;

@@ -16,8 +16,9 @@ import {
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { getGameTime } = require("系统.00．核心系统.05．中心计时器") as {
   getGameTime: (this: void) => number;
@@ -71,9 +72,12 @@ const 被动配置 = 芙莉莲被动配置;
 const GetHandleId = jass.GetHandleId as (this: void, h: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
-const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 //=============================================================================
@@ -156,8 +160,9 @@ export function 登记芙莉莲清理(this: void, 英雄: any, 名称: string, �
 export function 记录芙莉莲活动(this: void, 英雄: any): void {
   if (英雄 == null || 英雄 === 0) return;
   const 状态 = 取英雄状态(英雄);
+  // 隐匿→非隐匿 状态跳变才打（每次施法/普攻都调用本函数，但不能每次刷屏；此处仅跳变打一次）
   if (状态.隐匿) {
-    debugLogForce("芙莉莲-被动", "Buff", "操作", "移除", "目标", 英雄, "BuffID", 隐匿BuffID);
+    debugLogForce("芙莉莲-被动", "状态", "解除隐匿", "玩家", GetPlayerId(GetOwningPlayer(英雄)) + 1, "四码", fourCCToStringSafe(英雄单位类型ID), "英雄", 英雄, "handle", 英雄, "BuffID", 隐匿BuffID);
     状态.隐匿 = false;
     移除单位指定Buff(英雄, 隐匿BuffID);
   }
@@ -199,10 +204,10 @@ function 启动隐匿计时(this: void, 英雄: any): void {
     if (s == null || s.隐匿) return;
     if (!单位存活(英雄)) return;
     // 期间无新活动（最后活动时间未变）才进入隐匿
-    if (getGameTime() - s.最后活动时间 < 被动配置.隐匿静默秒 / (静止倍率 > 0 ? 静止倍率 : 1) - 0.05) return;
-    debugLogForce("芙莉莲-被动", "状态", "进入隐匿", "英雄", 英雄);
+    if (getGameTime() - s.最后活动时间 < 需要毫秒 - 50) return;
+    debugLogForce("芙莉莲-被动", "状态", "进入隐匿", "玩家", GetPlayerId(GetOwningPlayer(英雄)) + 1, "四码", fourCCToStringSafe(英雄单位类型ID), "英雄", 英雄, "handle", 英雄);
     s.隐匿 = true;
-    debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "目标", 英雄, "BuffID", 隐匿BuffID);
+    debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "玩家", GetPlayerId(GetOwningPlayer(英雄)) + 1, "四码", fourCCToStringSafe(英雄单位类型ID), "目标", 英雄, "handle", 英雄, "BuffID", 隐匿BuffID);
     registerManualBuff(英雄, 隐匿BuffID, 9999, 1, { stack: 1 });
   });
   隐匿计时回调表[id] = 回调ID;
@@ -233,11 +238,11 @@ function 解析标记键(this: void, 芙莉莲: any): string {
 /** 清理指定芙莉莲的重点目标解析（标记/Buff/完成状态；不触碰技能清理器） */
 function 清理重点目标解析(this: void, 芙莉莲: any, 状态: 芙莉莲英雄状态): void {
   if (状态.重点目标 != null && 状态.重点目标 !== 0) {
-    debugLogForce("芙莉莲-被动", "特效", "类型", "销毁", "路径", 芙莉莲表现配置.解析标记.模型路径);
+    debugLogForce("芙莉莲-被动", "特效", "类型", "销毁", "玩家", GetPlayerId(GetOwningPlayer(芙莉莲)) + 1, "路径", 芙莉莲表现配置.解析标记.模型路径, "目标", 状态.重点目标, "handle", 状态.重点目标);
     销毁单位坐标跟随特效(状态.重点目标, 解析标记键(芙莉莲));
-    debugLogForce("芙莉莲-被动", "Buff", "操作", "移除", "目标", 状态.重点目标, "BuffID", 解析中BuffID);
+    debugLogForce("芙莉莲-被动", "Buff", "操作", "移除", "玩家", GetPlayerId(GetOwningPlayer(芙莉莲)) + 1, "目标", 状态.重点目标, "handle", 状态.重点目标, "BuffID", 解析中BuffID);
     移除单位指定Buff(状态.重点目标, 解析中BuffID);
-    debugLogForce("芙莉莲-被动", "Buff", "操作", "移除", "目标", 状态.重点目标, "BuffID", 解析完成BuffID);
+    debugLogForce("芙莉莲-被动", "Buff", "操作", "移除", "玩家", GetPlayerId(GetOwningPlayer(芙莉莲)) + 1, "目标", 状态.重点目标, "handle", 状态.重点目标, "BuffID", 解析完成BuffID);
     移除单位指定Buff(状态.重点目标, 解析完成BuffID);
   }
   状态.重点目标 = null;
@@ -258,27 +263,30 @@ export function 施加解析(this: void, 芙莉莲: any, 目标: any, 类型: �
     清理重点目标解析(芙莉莲, 状态);
   }
   状态.重点目标 = 目标;
-  const 到期 = getGameTime() + 被动配置.解析持续秒;
+  const 到期 = getGameTime() + 被动配置.解析持续秒 * 1000;
   const 现在 = getGameTime();
-  // 单目标最多维护两种解析（制作规划）：已有两种未到期解析且新类型未持有 → 忽略本次施加（刷新已持有类型仍允许）
-  const 已有类型数 =
-    (状态.解析到期.攻击 > 现在 ? 1 : 0) +
-    (状态.解析到期.防御 > 现在 ? 1 : 0) +
-    (状态.解析到期.位置 > 现在 ? 1 : 0);
+  // 解析完成规则：
+  // - 攻击解析（Q）特殊：同类型二次命中即完成（Q+Q 允许）
+  // - 防御（W）/位置（E）：必须与另一种不同类型搭配，同类型重复（W+W、E+E）只刷新不算完成
+  const 攻击已有效 = 状态.解析到期.攻击 > 现在;
+  const 防御已有效 = 状态.解析到期.防御 > 现在;
+  const 位置已有效 = 状态.解析到期.位置 > 现在;
+  const 已有类型数 = (攻击已有效 ? 1 : 0) + (防御已有效 ? 1 : 0) + (位置已有效 ? 1 : 0);
   if (已有类型数 >= 2 && !(状态.解析到期[类型] > 现在)) return;
+  const 同类型二次命中 = 类型 === "攻击" && 攻击已有效;
   状态.解析到期[类型] = 到期;
   // 相同类型刷新；不同类型累加（最多两种不同即完成）；已过期解析不计入（惰性）
   const 有效类型数 =
     (状态.解析到期.攻击 > 现在 ? 1 : 0) +
     (状态.解析到期.防御 > 现在 ? 1 : 0) +
     (状态.解析到期.位置 > 现在 ? 1 : 0);
-  // 解析完成状态同步为惰性判定（两种未到期解析即完成；到期自动失效）
-  状态.解析完成 = 有效类型数 >= 2;
+  // 解析完成状态同步为惰性判定（两种未到期解析即完成；攻击解析同类型二次命中也完成；到期自动失效）
+  状态.解析完成 = 有效类型数 >= 2 || 同类型二次命中;
   if (状态.解析完成) {
-    debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "目标", 目标, "BuffID", 解析完成BuffID);
+    debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "玩家", GetPlayerId(GetOwningPlayer(芙莉莲)) + 1, "目标", 目标, "handle", 目标, "BuffID", 解析完成BuffID);
     registerManualBuff(目标, 解析完成BuffID, 被动配置.解析持续秒, 1, { stack: 1 });
     // 解析完成特效一次（复用 CeliaFormulaLockCore；参数配置驱动）
-    debugLogForce("芙莉莲-被动", "特效", "类型", "创建", "路径", 芙莉莲表现配置.解析完成.模型路径);
+    debugLogForce("芙莉莲-被动", "特效", "类型", "创建", "玩家", GetPlayerId(GetOwningPlayer(芙莉莲)) + 1, "路径", 芙莉莲表现配置.解析完成.模型路径, "目标", 目标, "handle", 目标);
     创建点特效({
       模型路径: 芙莉莲表现配置.解析完成.模型路径,
       RGB: 芙莉莲表现配置.解析完成.RGB,
@@ -291,13 +299,13 @@ export function 施加解析(this: void, 芙莉莲: any, 目标: any, 类型: �
   } else {
     // 解析中标记 Buff（刷新；解析完成时不叠加中标记）
     if (有效类型数 >= 1) {
-      debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "目标", 目标, "BuffID", 解析中BuffID);
+      debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "玩家", GetPlayerId(GetOwningPlayer(芙莉莲)) + 1, "目标", 目标, "handle", 目标, "BuffID", 解析中BuffID);
       registerManualBuff(目标, 解析中BuffID, 被动配置.解析持续秒, 有效类型数, { stack: 有效类型数 });
     }
   }
   // 解析标记特效（常驻句柄，键管理；已存在时同键覆盖；缩放/高度 经 创建单位坐标跟随特效 配置驱动）
   if (有效类型数 >= 1) {
-    debugLogForce("芙莉莲-被动", "特效", "类型", "创建", "路径", 芙莉莲表现配置.解析标记.模型路径);
+    debugLogForce("芙莉莲-被动", "特效", "类型", "创建", "玩家", GetPlayerId(GetOwningPlayer(芙莉莲)) + 1, "路径", 芙莉莲表现配置.解析标记.模型路径, "目标", 目标, "handle", 目标);
     const 标记 = 创建单位坐标跟随特效(
       目标,
       芙莉莲表现配置.解析标记.模型路径,
@@ -376,8 +384,8 @@ export function 尝试消费解析完成(this: void, 芙莉莲: any, 目标: any
 export function 提供演算普攻(this: void, 芙莉莲: any): void {
   if (芙莉莲 == null || 芙莉莲 === 0) return;
   const 状态 = 取英雄状态(芙莉莲);
-  状态.演算普攻到期 = getGameTime() + 被动配置.演算普攻窗口秒;
-  debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "目标", 芙莉莲, "BuffID", 演算BuffID);
+  状态.演算普攻到期 = getGameTime() + 被动配置.演算普攻窗口秒 * 1000;
+  debugLogForce("芙莉莲-被动", "Buff", "操作", "施加", "玩家", GetPlayerId(GetOwningPlayer(芙莉莲)) + 1, "四码", fourCCToStringSafe(英雄单位类型ID), "目标", 芙莉莲, "handle", 芙莉莲, "BuffID", 演算BuffID);
   registerManualBuff(芙莉莲, 演算BuffID, 被动配置.演算普攻窗口秒, 1, { stack: 1 });
 }
 
@@ -395,31 +403,45 @@ function 处理芙莉莲普攻(this: void, target: any, attacker: any, appliedDa
   // 只处理芙莉莲真实普通攻击（技能伤害/包装伤害不递归触发）
   if (!是芙莉莲(attacker)) return;
   if (snapshot == null) return;
-  if (snapshot.isNormalAttack !== true) return;
+  debugLogForce("芙莉莲-被动", "普攻收到", "玩家", GetPlayerId(GetOwningPlayer(attacker)) + 1, "attacker", attacker, "target", target, "伤害", appliedDamage, "isNormalAttack", snapshot.isNormalAttack, "isWrappedSkillDamage", snapshot.isWrappedSkillDamage, "originalAttacker", snapshot.originalAttacker ?? "-");
+  if (snapshot.isNormalAttack !== true) {
+    debugLogForce("芙莉莲-被动", "普攻拦截", "原因", "isNormalAttack不为true", "实际", snapshot.isNormalAttack);
+    return;
+  }
   if (snapshot.isWrappedSkillDamage === true) return;
   if (snapshot.originalAttacker != null && snapshot.originalAttacker !== attacker) return;
   // 普攻也是隐匿活动（记录芙莉莲活动 内部会重新安排隐匿计时）
   记录芙莉莲活动(attacker);
   // 演算魔弹：窗口有效 + 命中重点目标（有解析）才追加
   const 状态 = 英雄状态表[GetHandleId(attacker)];
-  if (状态 == null || 状态.演算普攻到期 <= getGameTime()) return;
-  if (状态.重点目标 == null || 状态.重点目标 !== target) return;
+  if (状态 == null || 状态.演算普攻到期 <= getGameTime()) {
+    debugLogForce("芙莉莲-被动", "普攻拦截", "原因", "演算窗口无效", "到期", 状态 != null ? 状态.演算普攻到期 : "-");
+    return;
+  }
+  if (状态.重点目标 == null || 状态.重点目标 !== target) {
+    debugLogForce("芙莉莲-被动", "普攻拦截", "原因", "非重点目标", "重点", 状态.重点目标 ?? "-", "本次", target);
+    return;
+  }
   const 现在 = getGameTime();
   const 有效类型数 =
     (状态.解析到期.攻击 > 现在 ? 1 : 0) +
     (状态.解析到期.防御 > 现在 ? 1 : 0) +
     (状态.解析到期.位置 > 现在 ? 1 : 0);
-  if (有效类型数 <= 0) return;
+  if (有效类型数 <= 0) {
+    debugLogForce("芙莉莲-被动", "普攻拦截", "原因", "重点目标无有效解析", "有效类型数", 有效类型数);
+    return;
+  }
   // 消费窗口（一次）
   状态.演算普攻到期 = 0;
   移除单位指定Buff(attacker, 演算BuffID);
   // 追加小伤害（归属芙莉莲；两种未到期解析（解析完成）用更高倍率，但不清除解析完成——只有 Q/R 能消费）
   const 倍率 = 有效类型数 >= 2 ? 被动配置.演算完成目标倍率 : 被动配置.演算伤害倍率;
+  debugLogForce("芙莉莲-被动", "命中", "玩家", GetPlayerId(GetOwningPlayer(attacker)) + 1, "四码", fourCCToStringSafe(英雄单位类型ID), "目标", GetUnitName(target), "handle", target, "X", Math.floor(GetUnitX(target)), "Y", Math.floor(GetUnitY(target)), "伤害", appliedDamage * 倍率, "标签", "芙莉莲-演算魔弹");
   造成技能伤害({
     来源: attacker,
     目标: target,
     伤害: appliedDamage * 倍率,
-    伤害类型: DAMAGE_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_MAGIC,
     攻击类型: ATTACK_TYPE_NORMAL,
     武器类型: WEAPON_TYPE_WHOKNOWS,
     来源类型: "单位技能",
@@ -442,6 +464,7 @@ export function 清理芙莉莲状态(this: void, 英雄: any): void {
   const id = GetHandleId(英雄);
   const 状态 = 英雄状态表[id];
   if (状态 == null) return;
+  debugLogForce("芙莉莲-被动", "清理", "类型", "死亡/复活重置/场景清理", "玩家", GetPlayerId(GetOwningPlayer(英雄)) + 1, "四码", fourCCToStringSafe(英雄单位类型ID), "英雄", 英雄, "handle", 英雄);
   // 隐匿计时回调
   const 计时ID = 隐匿计时回调表[id];
   if (计时ID != null) removeDelayedCallback(计时ID);

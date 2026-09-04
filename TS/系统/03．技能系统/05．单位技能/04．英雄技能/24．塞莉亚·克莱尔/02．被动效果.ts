@@ -32,8 +32,14 @@ const jass = require("jass.common") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
+const { fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
+};
 const japi = require("jass.japi") as any;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const AddLightningEx = jass.AddLightningEx as (this: void, codeName: string, checkVisibility: boolean, x1: number, y1: number, z1: number, x2: number, y2: number, z2: number) => any;
@@ -342,7 +348,6 @@ export function 创建塞莉亚节点(
     : 类型 === "结界"
       ? 塞莉亚克莱尔表现配置.公式节点结界
       : 塞莉亚克莱尔表现配置.公式节点锚定;
-  debugLogForce("塞莉亚-被动", "特效", "路径", 节点表现.模型路径);
   const 特效句柄 = 创建点特效({
     模型路径: 节点表现.模型路径,
     RGB: 节点表现.RGB,
@@ -365,6 +370,7 @@ export function 创建塞莉亚节点(
   };
   状态.节点列表.push(节点);
   尝试建立连接(状态, 节点);
+  debugLogForce("塞莉亚-被动", "节点", "创建", "玩家", GetPlayerId(GetOwningPlayer(英雄)) + 1, "类型", 类型, "序号", 节点.序号, "X", Math.floor(X), "Y", Math.floor(Y), "来源实例", 来源实例ID ?? "-");
   return 节点;
 }
 
@@ -474,9 +480,12 @@ export function 是否塞莉亚R锁定中(this: void, 英雄: any): boolean {
 export function 授予塞莉亚演算窗口(this: void, 英雄: any): void {
   const 状态 = 取或建状态(英雄);
   if (状态.已清理) return;
-  if (状态.强化次数 >= 塞莉亚克莱尔演算普攻配置.强化上限) return;
+  if (状态.强化次数 >= 塞莉亚克莱尔演算普攻配置.强化上限) {
+    debugLogForce("塞莉亚-被动", "状态", "授予被拒", "玩家", GetPlayerId(GetOwningPlayer(英雄)) + 1, "原因", "叠加已达上限");
+    return;
+  }
   状态.强化次数 += 1;
-  debugLogForce("塞莉亚-被动", "Buff", "操作", "施加", "目标", 英雄);
+  debugLogForce("塞莉亚-被动", "Buff", "操作", "施加", "目标", 英雄, "玩家", GetPlayerId(GetOwningPlayer(英雄)) + 1, "次数", 状态.强化次数);
   registerManualBuff(英雄, 塞莉亚BuffID.演算魔弹, 8, 状态.强化次数, { stack: 状态.强化次数 });
 }
 
@@ -566,6 +575,7 @@ function 处理塞莉亚演算普攻(this: void, target: any, attacker: any, sna
   // 分支真正进入：结算后消费窗口
   const 攻击力 = 读取单位攻击力(attacker);
   const 追加伤害 = 攻击力 * 塞莉亚克莱尔演算普攻配置.追加伤害攻击力倍率;
+  debugLogForce("塞莉亚-被动", "命中", "玩家", GetPlayerId(GetOwningPlayer(attacker)) + 1, "目标", GetUnitName(target), "handle", target, "X", Math.floor(GetUnitX(target)), "Y", Math.floor(GetUnitY(target)), "伤害", 追加伤害, "判定", 近连接 ? "连接" : "节点");
   造成塞莉亚演算伤害(attacker, target, 追加伤害, "塞莉亚-演算完成");
 
   if (近连接 && 状态.连接 != null) {
@@ -695,7 +705,6 @@ function 复位状态数据(this: void, 英雄: any, 状态: 塞莉亚英雄状�
   if (英雄 != null && 单位存活(英雄)) {
     移除单位指定Buff(英雄, 塞莉亚BuffID.演算魔弹);
     移除单位指定Buff(英雄, 塞莉亚BuffID.解析结界);
-    移除单位指定Buff(英雄, 塞莉亚BuffID.高阶术式蓄力);
   }
 }
 
@@ -751,7 +760,7 @@ function 确保死亡监听(this: void): void {
     if (dyingUnit == null || dyingUnit === 0) return;
     // 1) 作为英雄本体
     if (是塞莉亚克莱尔(dyingUnit)) {
-      debugLogForce("塞莉亚-被动", "回调", "类型", "死亡", "单位", dyingUnit);
+      debugLogForce("塞莉亚-被动", "回调", "类型", "死亡", "玩家", GetPlayerId(GetOwningPlayer(dyingUnit)) + 1, "单位", dyingUnit);
       清理塞莉亚状态(dyingUnit, "英雄死亡");
     }
     // 2) 作为 E 区域成员：直接整行摘除（跨区域计数一并清零，各阵周期会自行对账）

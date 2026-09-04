@@ -3,7 +3,7 @@ local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local __TS__Delete = ____lualib.__TS__Delete
 local __TS__Number = ____lualib.__TS__Number
 local ____exports = {}
-local _____53D6_53E5_67C4, _____6E05_7406_5168_90E8_8FDB_5EA6UI, _____6267_884C_5168_90E8_6280_80FD_6E05_7406, _____53D6_5355_4F4DID, _____9500_6BC1_70B9_7279_6548, _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI, debugLogForce, _____7231_871C_8389_96C5_72B6_6001_8868
+local _____53D6_53E5_67C4, _____6E05_7406_5168_90E8_8FDB_5EA6UI, _____6267_884C_5168_90E8_6280_80FD_6E05_7406, _____53D6_5355_4F4DID, _____9500_6BC1_70B9_7279_6548, _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI, DzSetEffectVisible, debugLogForce, _____7231_871C_8389_96C5_72B6_6001_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.00．配置")
 local _____7231_871C_8389_96C5_51B0_6676_914D_7F6E = ____00_FF0E_914D_7F6E["爱蜜莉雅冰晶配置"]
 local _____7231_871C_8389_96C5_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["爱蜜莉雅技能配置"]
@@ -34,6 +34,9 @@ ____exports["移除爱蜜莉雅冰晶"] = function(_____82F1_96C4, _____5E8F_53F
                     "路径",
                     _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰晶节点"]["模型路径"]
                 )
+                if _____8282_70B9["特效句柄"] ~= nil and _____8282_70B9["特效句柄"] ~= 0 and type(DzSetEffectVisible) == "function" then
+                    DzSetEffectVisible(_____8282_70B9["特效句柄"], false)
+                end
                 _____9500_6BC1_70B9_7279_6548(_____8282_70B9["特效句柄"])
                 _____8282_70B9["已读取"] = true
                 return _____8282_70B9
@@ -147,6 +150,8 @@ _____9500_6BC1_70B9_7279_6548 = ____require_result_3["销毁点特效"]
 local ____require_result_4 = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI")
 _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_4["销毁世界坐标进度UI"]
 local jass = require("jass.common")
+local japi = require("jass.japi")
+DzSetEffectVisible = japi.DzSetEffectVisible
 local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_5.stringToFourCCSafe
 local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
@@ -234,6 +239,7 @@ ____exports["创建爱蜜莉雅冰晶"] = function(_____82F1_96C4, _____6765_6E9
         Z = Z,
         ["面向角度"] = 0,
         ["缩放"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰晶节点"]["缩放"],
+        ["动画速度"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰晶节点"]["动画速度"] or 0,
         ["持续秒"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰晶节点"]["持续秒"]
     })
     if _____7279_6548_53E5_67C4 == nil or _____7279_6548_53E5_67C4 == 0 then
@@ -395,6 +401,9 @@ local function _____9500_6BC1_72B6_6001_5185_5168_90E8_51B0_6676_7279_6548(_____
     while #_____72B6_6001["冰晶列表"] > 0 do
         local _____8282_70B9 = _____72B6_6001["冰晶列表"][1]
         __TS__ArraySplice(_____72B6_6001["冰晶列表"], 0, 1)
+        if _____8282_70B9["特效句柄"] ~= nil and _____8282_70B9["特效句柄"] ~= 0 and type(DzSetEffectVisible) == "function" then
+            DzSetEffectVisible(_____8282_70B9["特效句柄"], false)
+        end
         _____9500_6BC1_70B9_7279_6548(_____8282_70B9["特效句柄"])
         _____8282_70B9["已读取"] = true
     end
@@ -415,7 +424,7 @@ ____exports["清理全部爱蜜莉雅状态"] = function(_____539F_56E0)
             do
                 local _____72B6_6001 = _____7231_871C_8389_96C5_72B6_6001_8868[ids[i + 1]]
                 if _____72B6_6001 == nil or _____72B6_6001["已清理"] then
-                    goto __continue74
+                    goto __continue76
                 end
                 _____72B6_6001["已清理"] = true
                 local ____ = _____539F_56E0
@@ -425,7 +434,7 @@ ____exports["清理全部爱蜜莉雅状态"] = function(_____539F_56E0)
                 __TS__Delete(_____7231_871C_8389_96C5_72B6_6001_8868, ids[i + 1])
                 _____6570_91CF = _____6570_91CF + 1
             end
-            ::__continue74::
+            ::__continue76::
             i = i + 1
         end
     end

@@ -36,6 +36,12 @@ const jass = require("jass.common") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
+const { fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
+};
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -146,6 +152,7 @@ function 范围爆发(this: void, 施法者: any, X: number, Y: number, 半径: 
   for (let i = 0; i < 列表.length; i++) {
     const 敌人 = 列表[i];
     if (!单位存活(敌人)) continue;
+    debugLogForce("塞莉亚-R", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 数据.技能实例ID ?? "-", "目标", GetUnitName(敌人), "handle", 敌人, "X", Math.floor(GetUnitX(敌人)), "Y", Math.floor(GetUnitY(敌人)), "伤害", 伤害);
     R技能伤害(施法者, 敌人, 伤害, 数据, 标签);
   }
 }
@@ -341,10 +348,10 @@ function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: an
   // 基础主效果始终结算：主伤害 + 减速 + 短硬直
   const 攻击力 = 读取单位攻击力(施法者);
   const 列表 = 获取坐标范围敌人(施法者, 数据.中心X, 数据.中心Y, 塞莉亚克莱尔R配置.领域半径);
-  debugLogForce("塞莉亚-R", "伤害", "标签", "塞莉亚-高阶术式·闭锁", "数值", 攻击力 * 塞莉亚克莱尔R配置.主伤害攻击力倍率);
   for (let i = 0; i < 列表.length; i++) {
     const 敌人 = 列表[i];
     if (!单位存活(敌人)) continue;
+    debugLogForce("塞莉亚-R", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 数据.技能实例ID ?? "-", "目标", GetUnitName(敌人), "handle", 敌人, "X", Math.floor(GetUnitX(敌人)), "Y", Math.floor(GetUnitY(敌人)), "伤害", 攻击力 * 塞莉亚克莱尔R配置.主伤害攻击力倍率);
     R技能伤害(施法者, 敌人, 攻击力 * 塞莉亚克莱尔R配置.主伤害攻击力倍率, 数据, "塞莉亚-高阶术式·闭锁");
     施加扩展控制(施法者, 敌人, "slow", 塞莉亚克莱尔R配置.主减速秒);
     施加扩展控制(施法者, 敌人, "stagger", 塞莉亚克莱尔R配置.主控制硬直秒);
@@ -412,15 +419,19 @@ function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: an
 //=============================================================================
 
 function 释放R高阶术式(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("塞莉亚-R", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
   // 禁止并行两个高阶领域
-  if (查询战斗技能实例(施法者, R技能键).length > 0) return;
+  if (查询战斗技能实例(施法者, R技能键).length > 0) {
+    debugLogForce("塞莉亚-R", "释放被拒", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "原因", "已有高阶领域进行中");
+    return;
+  }
 
   // t0 快照：节点（≤2）与连接；同时锁定 D 改写入口
   const 中心X = GetSpellTargetX();
   const 中心Y = GetSpellTargetY();
   const 方向角 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), 中心X, 中心Y);
+
+  debugLogForce("塞莉亚-R", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(中心X), "Y", Math.floor(中心Y));
   const 存活节点 = 查询塞莉亚节点(施法者);
   const 节点快照: { 序号: number; 类型: 塞莉亚节点类型 }[] = [];
   for (let i = 0; i < 存活节点.length && i < 2; i++) {
@@ -447,10 +458,9 @@ function 释放R高阶术式(this: void, _context: any, 施法者: any, 技能�
     技能实例ID,
     数据,
     结束回调: function R实例结束(this: void, 原因: string, _控制器: any): void {
-      debugLogForce("塞莉亚-R", "结束", "原因", 原因);
-      // 所有结束路径解除 D 锁并移除蓄力 Buff；失败路径不再做任何结算
+      debugLogForce("塞莉亚-R", "结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "原因", 原因);
+      // 所有结束路径解除 D 锁；蓄力状态由充能系统表达（不进玩家 Buff 栏）
       解除塞莉亚R锁定(施法者);
-      移除单位指定Buff(施法者, 塞莉亚BuffID.高阶术式蓄力);
     },
   });
 
@@ -473,7 +483,7 @@ function 释放R高阶术式(this: void, _context: any, 施法者: any, 技能�
 
   // 蓄力预警（大型高阶法阵），常驻句柄由充能结束回调统一销毁
   let 法阵特效: any = null;
-  debugLogForce("塞莉亚-R", "特效", "路径", 塞莉亚克莱尔表现配置.R高阶法阵.模型路径);
+  debugLogForce("塞莉亚-R", "特效", "路径", 塞莉亚克莱尔表现配置.R高阶法阵.模型路径, "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "X", Math.floor(中心X), "Y", Math.floor(中心Y), "实例", 技能实例ID ?? "-");
   法阵特效 = 创建点特效({
     模型路径: 塞莉亚克莱尔表现配置.R高阶法阵.模型路径,
     RGB: 塞莉亚克莱尔表现配置.R高阶法阵.RGB,
@@ -521,7 +531,7 @@ function 释放R高阶术式(this: void, _context: any, 施法者: any, 技能�
     // R 展开音（充能真正建立时一次；坐标=法阵中心，总长对齐蓄力秒，参数配置驱动）
     Sound3DII_CooPlayReuse(塞莉亚音效配置.R展开.路径, 中心X, 中心Y, 塞莉亚音效配置.R展开.高度, 塞莉亚音效配置.R展开.裁断距离);
     R守护 = 开始塞莉亚循环动作(施法者, "R蓄力");
-    registerManualBuff(施法者, 塞莉亚BuffID.高阶术式蓄力, 塞莉亚克莱尔R配置.蓄力秒, 0);
+    // 规划明确「高阶术式蓄力」不进玩家 Buff 栏，蓄力状态由充能系统与读条表达
   } else {
     // 充能被拒（单位异常等）：安全收口——清预警、解除锁定、结束实例
     if (法阵特效 != null && 法阵特效 !== 0) {
@@ -529,7 +539,6 @@ function 释放R高阶术式(this: void, _context: any, 施法者: any, 技能�
       法阵特效 = null;
     }
     解除塞莉亚R锁定(施法者);
-    移除单位指定Buff(施法者, 塞莉亚BuffID.高阶术式蓄力);
     if (!实例.已结束()) 实例.结束("中断");
     注销();
   }

@@ -26,11 +26,15 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const SetUnitFacing = jass.SetUnitFacing as (this: void, unit: any, angle: number) => void;
@@ -112,9 +116,9 @@ const E硬直来源 = "伊蕾娜-E硬直";
 
 /** 终点冲击 + 扫帚路线 + 远行见闻（只在完成原因时调用）。 */
 function 结算E到达(this: void, 施法者: any, 实例ID: number | undefined, 数据: any): void {
-  debugLogForce("伊蕾娜-E", "结束", "原因", "完成");
   const X = GetUnitX(施法者);
   const Y = GetUnitY(施法者);
+  debugLogForce("伊蕾娜-E", "结束", "原因", "完成", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "实例", 实例ID ?? "-", "X", Math.floor(X), "Y", Math.floor(Y));
   播放伊蕾娜阶段动作(施法者, 伊蕾娜模型动作配置.技能动作.E落地);
 
   // 冲击（AOE + 真实减速）
@@ -122,7 +126,11 @@ function 结算E到达(this: void, 施法者: any, 实例ID: number | undefined,
   const 冲击伤害 = 读取单位攻击力(施法者) * 伊蕾娜E配置.冲击伤害攻击力倍率;
   for (let i = 0; i < 敌人列表.length; i++) {
     const 敌人 = 敌人列表[i];
-    if (!单位存活(敌人)) continue;
+    if (!单位存活(敌人)) {
+      debugLogForce("伊蕾娜-E", "命中失败", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "原因", "目标无效", "目标", GetUnitName(敌人), "handle", 敌人);
+      continue;
+    }
+    debugLogForce("伊蕾娜-E", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能类型ID), "目标", GetUnitName(敌人), "handle", 敌人, "X", Math.floor(GetUnitX(敌人)), "Y", Math.floor(GetUnitY(敌人)), "伤害", Math.floor(冲击伤害), "标签", "伊蕾娜-扫帚冲击");
     造成技能伤害({
       来源: 施法者,
       目标: 敌人,
@@ -152,7 +160,11 @@ function 结算E到达(this: void, 施法者: any, 实例ID: number | undefined,
     const 灰烬伤害 = 读取单位攻击力(施法者) * 伊蕾娜变式效果配置.灰烬_爆发伤害攻击力倍率;
     for (let i = 0; i < 灰烬敌人.length; i++) {
       const 敌人 = 灰烬敌人[i];
-      if (!单位存活(敌人)) continue;
+      if (!单位存活(敌人)) {
+        debugLogForce("伊蕾娜-E", "命中失败", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "原因", "目标无效", "目标", GetUnitName(敌人), "handle", 敌人);
+        continue;
+      }
+      debugLogForce("伊蕾娜-E", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能类型ID), "目标", GetUnitName(敌人), "handle", 敌人, "X", Math.floor(GetUnitX(敌人)), "Y", Math.floor(GetUnitY(敌人)), "伤害", Math.floor(灰烬伤害), "标签", "伊蕾娜-远行灰烬爆发");
       造成技能伤害({
         来源: 施法者,
         目标: 敌人,
@@ -195,8 +207,11 @@ function 结算E到达(this: void, 施法者: any, 实例ID: number | undefined,
 //=============================================================================
 
 function 释放E扫帚远行(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("伊蕾娜-E", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
+  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) {
+    debugLogForce("伊蕾娜-E", "释放被拒", "原因", "施法者无效", "handle", 施法者);
+    return;
+  }
+  debugLogForce("伊蕾娜-E", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能类型ID), "实例", 技能实例ID ?? "-", "目标", "点施放");
 
   // t0 快照
   const 目标X = GetSpellTargetX();
@@ -301,7 +316,7 @@ function 释放E扫帚远行(this: void, _context: any, 施法者: any, 技能�
     // 高度抬升（起飞）
     SetUnitFlyHeight(施法者, 伊蕾娜E配置.飞行高度, 伊蕾娜E配置.高度恢复率);
 
-    debugLogForce("伊蕾娜-E", "位移", "类型", "冲锋", "距离", 最终距离);
+    debugLogForce("伊蕾娜-E", "位移", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "类型", "冲锋", "距离", Math.floor(最终距离));
     const 位移ID = 开始冲锋(施法者, {
       距离: 最终距离,
       角度: 方向角,

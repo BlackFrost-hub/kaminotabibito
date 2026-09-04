@@ -27,8 +27,9 @@ const { 播放限时动作, 芙莉莲动作槽 } = require("./01A．动作表现
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { getGameTime, addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   getGameTime: (this: void) => number;
@@ -85,6 +86,8 @@ const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const 距离平方 = function 距离平方XY(this: void, x1: number, y1: number, x2: number, y2: number): number {
   const dx = x2 - x1;
   const dy = y2 - y1;
@@ -219,7 +222,7 @@ export function 尝试消费花田盛开(this: void, 芙莉莲: any): boolean {
 
 function 销毁花田(this: void, 花田: 花田数据, 自然结束: boolean): void {
   if (花田.已结束) return;
-  debugLogForce("芙莉莲-D", "结束", "原因", 自然结束 ? "自然消散" : "打断/死亡/替换", "英雄", 花田.芙莉莲);
+  debugLogForce("芙莉莲-D", "结束", "原因", 自然结束 ? "自然消散" : "打断/死亡/替换", "玩家", GetPlayerId(GetOwningPlayer(花田.芙莉莲)) + 1, "四码", fourCCToStringSafe(D技能ID), "英雄", 花田.芙莉莲, "handle", 花田.芙莉莲);
   花田.已结束 = true;
   // 计时器
   if (花田.到期回调ID !== 0) removeDelayedCallback(花田.到期回调ID);
@@ -289,8 +292,11 @@ function 创建花海(this: void, 花田: 花田数据): void {
 //=============================================================================
 
 function 释放D(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("芙莉莲-D", "释放", "技能实例ID", 技能实例ID || "-");
-  if (!是芙莉莲(施法者)) return;
+  if (!是芙莉莲(施法者)) {
+    debugLogForce("芙莉莲-D", "释放被拒", "原因", "非芙莉莲施法者", "施法者", 施法者, "handle", 施法者, "实例", 技能实例ID ?? "-");
+    return;
+  }
+  debugLogForce("芙莉莲-D", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(D技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者, "目标", "点施放", "X", Math.floor(GetSpellTargetX()), "Y", Math.floor(GetSpellTargetY()));
   记录芙莉莲活动(施法者);
   // 花田施法动作（送杖候选）
   播放限时动作(施法者, 芙莉莲动作槽.D花田, "芙莉莲D动作");
@@ -327,7 +333,7 @@ function 释放D(this: void, _context: any, 施法者: any, 技能实例ID: numb
     已结束: false,
   };
   花田表[id] = 花田;
-  debugLogForce("芙莉莲-D", "状态", "花田建立", "英雄", 施法者);
+  debugLogForce("芙莉莲-D", "状态", "花田建立", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(D技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者, "中心X", Math.floor(目标X), "中心Y", Math.floor(目标Y), "半径", D配置.半径);
 
   const 控制器 = 创建战斗技能实例({
     技能键: "芙莉莲D",
@@ -358,8 +364,11 @@ function 释放D(this: void, _context: any, 施法者: any, 技能实例ID: numb
   });
 
   // 配置化视野（芙莉莲所有者玩家；真实 FogModifier，随花田销毁）
-  花田.视野句柄 = jass.CreateFogModifierRadius(GetOwningPlayer(施法者), jass.FOG_OF_WAR_VISIBLE, 目标X, 目标Y, D配置.半径, true, false);
-  if (花田.视野句柄 != null && 花田.视野句柄 !== 0) jass.EnableFogModifier(花田.视野句柄);
+  // 正确 API 名：FogModifierStart（项目通用先例）；CreateFogModifierRadius 为标准 native，加存在性守卫防运行时缺失
+  if (jass.CreateFogModifierRadius != null) {
+    花田.视野句柄 = jass.CreateFogModifierRadius(GetOwningPlayer(施法者), jass.FOG_OF_WAR_VISIBLE, 目标X, 目标Y, D配置.半径, true, false);
+    if (花田.视野句柄 != null && 花田.视野句柄 !== 0) jass.FogModifierStart(花田.视野句柄);
+  }
 
   // 环境粒子辅助层（常驻句柄随花田销毁）
   花田.花瓣句柄 = 创建点特效({

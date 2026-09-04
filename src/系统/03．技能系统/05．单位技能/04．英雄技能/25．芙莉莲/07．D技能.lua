@@ -16,6 +16,7 @@ local _____8299_8389_83B2_52A8_4F5C_69FD = ____require_result_2["芙莉莲动作
 local jass = require("jass.common")
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_3.fourCCToStringSafe
 local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
 local getGameTime = ____require_result_4.getGameTime
 local addDelayedCallback = ____require_result_4.addDelayedCallback
@@ -57,6 +58,8 @@ local GetUnitY = jass.GetUnitY
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetOwningPlayer = jass.GetOwningPlayer
+local GetUnitName = jass.GetUnitName
+local GetPlayerId = jass.GetPlayerId
 local function _____8DDD_79BB_5E73_65B9(x1, y1, x2, y2)
     local dx = x2 - x1
     local dy = y2 - y1
@@ -196,7 +199,13 @@ local function _____9500_6BC1_82B1_7530(_____82B1_7530, _____81EA_7136_7ED3_675F
         "结束",
         "原因",
         _____81EA_7136_7ED3_675F and "自然消散" or "打断/死亡/替换",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____82B1_7530["芙莉莲"])) + 1,
+        "四码",
+        fourCCToStringSafe(____D_6280_80FDID),
         "英雄",
+        _____82B1_7530["芙莉莲"],
+        "handle",
         _____82B1_7530["芙莉莲"]
     )
     _____82B1_7530["已结束"] = true
@@ -297,10 +306,41 @@ local function _____521B_5EFA_82B1_6D77(_____82B1_7530)
     end
 end
 local function _____91CA_653ED(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("芙莉莲-D", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_8299_8389_83B2(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "芙莉莲-D",
+            "释放被拒",
+            "原因",
+            "非芙莉莲施法者",
+            "施法者",
+            _____65BD_6CD5_8005,
+            "handle",
+            _____65BD_6CD5_8005,
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
+    debugLogForce(
+        "芙莉莲-D",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____D_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "英雄",
+        _____65BD_6CD5_8005,
+        "handle",
+        _____65BD_6CD5_8005,
+        "目标",
+        "点施放",
+        "X",
+        math.floor(GetSpellTargetX()),
+        "Y",
+        math.floor(GetSpellTargetY())
+    )
     _____8BB0_5F55_8299_8389_83B2_6D3B_52A8(_____65BD_6CD5_8005)
     _____64AD_653E_9650_65F6_52A8_4F5C(_____65BD_6CD5_8005, _____8299_8389_83B2_52A8_4F5C_69FD["D花田"], "芙莉莲D动作")
     local _____76EE_6807X = GetSpellTargetX()
@@ -343,8 +383,22 @@ local function _____91CA_653ED(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         "芙莉莲-D",
         "状态",
         "花田建立",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____D_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
         "英雄",
-        _____65BD_6CD5_8005
+        _____65BD_6CD5_8005,
+        "handle",
+        _____65BD_6CD5_8005,
+        "中心X",
+        math.floor(_____76EE_6807X),
+        "中心Y",
+        math.floor(_____76EE_6807Y),
+        "半径",
+        ____D_914D_7F6E["半径"]
     )
     local _____63A7_5236_5668 = _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B({
         ["技能键"] = "芙莉莲D",
@@ -369,17 +423,19 @@ local function _____91CA_653ED(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
             end
         end
     })
-    _____82B1_7530["视野句柄"] = jass.CreateFogModifierRadius(
-        GetOwningPlayer(_____65BD_6CD5_8005),
-        jass.FOG_OF_WAR_VISIBLE,
-        _____76EE_6807X,
-        _____76EE_6807Y,
-        ____D_914D_7F6E["半径"],
-        true,
-        false
-    )
-    if _____82B1_7530["视野句柄"] ~= nil and _____82B1_7530["视野句柄"] ~= 0 then
-        jass.EnableFogModifier(_____82B1_7530["视野句柄"])
+    if jass.CreateFogModifierRadius ~= nil then
+        _____82B1_7530["视野句柄"] = jass.CreateFogModifierRadius(
+            GetOwningPlayer(_____65BD_6CD5_8005),
+            jass.FOG_OF_WAR_VISIBLE,
+            _____76EE_6807X,
+            _____76EE_6807Y,
+            ____D_914D_7F6E["半径"],
+            true,
+            false
+        )
+        if _____82B1_7530["视野句柄"] ~= nil and _____82B1_7530["视野句柄"] ~= 0 then
+            jass.FogModifierStart(_____82B1_7530["视野句柄"])
+        end
     end
     _____82B1_7530["花瓣句柄"] = _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["D花瓣"]["模型路径"],

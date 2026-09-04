@@ -26,6 +26,8 @@ import {
 } from "./02．被动效果";
 
 const jass = require("jass.common") as any;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -86,7 +88,6 @@ function 选择最近合法节点(
 }
 
 function 释放D术式转写(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("塞莉亚-D", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
   // 技能喊话：施法成功起点（前置检查通过；全局 3D；随机二选一由喊话系统驱动）
@@ -94,6 +95,7 @@ function 释放D术式转写(this: void, _context: any, 施法者: any, 技能�
 
   const 目标X = GetSpellTargetX();
   const 目标Y = GetSpellTargetY();
+  debugLogForce("塞莉亚-D", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 塞莉亚克莱尔技能配置.D.技能ID, "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(目标X), "Y", Math.floor(目标Y));
   const 硬直来源 = D硬直来源;
 
   // 无节点兜底：在脚下创建短寿命临时节点（不伤害），本次转写随之完成
@@ -104,6 +106,7 @@ function 释放D术式转写(this: void, _context: any, 施法者: any, 技能�
     const 列表 = 查询塞莉亚节点(施法者);
     if (列表.length <= 0) {
       // 兜底分支：短寿命临时节点（存续读 D 配置，不占普通节点的 20 秒周期）
+      debugLogForce("塞莉亚-D", "状态", "无节点兜底", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "实例", 技能实例ID ?? "-", "X", Math.floor(GetUnitX(施法者)), "Y", Math.floor(GetUnitY(施法者)));
       创建塞莉亚节点(施法者, "棱晶", GetUnitX(施法者), GetUnitY(施法者), 技能实例ID, 塞莉亚克莱尔D配置.临时节点存续毫秒);
       return;
     }
@@ -112,14 +115,15 @@ function 释放D术式转写(this: void, _context: any, 施法者: any, 技能�
     if (目标节点 == null) return;
     const 成功 = 转写塞莉亚节点事务(施法者, 目标节点.序号, 目标X, 目标Y);
     if (!成功) {
+      debugLogForce("塞莉亚-D", "状态", "转写被拒", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "实例", 技能实例ID ?? "-", "节点", 目标节点.序号, "原因", "R锁定或转写中冲突");
       // R 锁定或并发冲突：安全回滚（什么都不改）
       return;
     }
-    debugLogForce("塞莉亚-D", "状态", "转写成功", 目标节点.序号);
+    debugLogForce("塞莉亚-D", "状态", "转写成功", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 塞莉亚克莱尔技能配置.D.技能ID, "实例", 技能实例ID ?? "-", "节点", 目标节点.序号, "X", Math.floor(目标X), "Y", Math.floor(目标Y));
     // 转写音（转写事务真正成功时一次；坐标=新落点，内含落点短闪延迟层，参数配置驱动）
     Sound3DII_CooPlayReuse(塞莉亚音效配置.D转写.路径, 目标X, 目标Y, 塞莉亚音效配置.D转写.高度, 塞莉亚音效配置.D转写.裁断距离);
     // 新位置短闪表现
-    debugLogForce("塞莉亚-D", "特效", "路径", 塞莉亚克莱尔表现配置.D重连落点闪现.模型路径);
+    debugLogForce("塞莉亚-D", "特效", "路径", 塞莉亚克莱尔表现配置.D重连落点闪现.模型路径, "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "X", Math.floor(目标X), "Y", Math.floor(目标Y));
     const 落点闪现 = 创建点特效({
       模型路径: 塞莉亚克莱尔表现配置.D重连落点闪现.模型路径,
       RGB: 塞莉亚克莱尔表现配置.D重连落点闪现.RGB,

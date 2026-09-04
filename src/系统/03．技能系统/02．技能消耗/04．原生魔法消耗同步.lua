@@ -4,6 +4,8 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
 local Player = jass.Player
 local GetHandleId = jass.GetHandleId
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
@@ -19,6 +21,8 @@ local _____8BA1_7B97_6700_7EC8_9B54_6CD5_6D88_8017 = ____require_result_2["计�
 local platformAbilityAction = require("平台扩展API动作")
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据")
+local _____83B7_53D6_52A8_6001_6280_80FD_9B54_8017_767E_5206_6BD4 = ____require_result_4["获取动态技能魔耗百分比"]
 local _____6280_80FD__8BBE_7F6E_6280_80FD_9B54_6CD5_6D88_8017 = platformAbilityAction["技能_设置技能魔法消耗"]
 local REFRESH_MS = 300
 local PLAYER_SYNC_COUNT = 4
@@ -117,7 +121,8 @@ local function _____540C_6B65_5355_4E2A_6280_80FD(whichHero, abilityId)
     if level <= 0 then
         return
     end
-    local manaCost = _____8BA1_7B97_6700_7EC8_9B54_6CD5_6D88_8017(whichHero, abilityId, level)
+    local _____914D_7F6E_767E_5206_6BD4 = _____83B7_53D6_52A8_6001_6280_80FD_9B54_8017_767E_5206_6BD4(abilityId)
+    local manaCost = _____914D_7F6E_767E_5206_6BD4 >= 0 and (GetUnitStateJapi(whichHero, jass.UNIT_STATE_MAX_MANA) or 0) * _____914D_7F6E_767E_5206_6BD4 or _____8BA1_7B97_6700_7EC8_9B54_6CD5_6D88_8017(whichHero, abilityId, level)
     if manaCost < 0 then
         return
     end

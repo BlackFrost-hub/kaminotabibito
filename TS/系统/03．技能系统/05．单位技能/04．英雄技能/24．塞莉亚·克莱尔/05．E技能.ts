@@ -27,6 +27,9 @@ import {
 } from "./02．被动效果";
 
 const jass = require("jass.common") as any;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -234,7 +237,6 @@ function Math最小值(a: number, b: number): number {
 //=============================================================================
 
 function 释放E锚定魔法阵(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("塞莉亚-E", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
   // t0 快照
@@ -242,12 +244,14 @@ function 释放E锚定魔法阵(this: void, _context: any, 施法者: any, 技�
   const 中心Y = GetSpellTargetY();
   SetUnitFacing(施法者, 两点角度(GetUnitX(施法者), GetUnitY(施法者), 中心X, 中心Y));
 
+  debugLogForce("塞莉亚-E", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 塞莉亚克莱尔技能配置.E.技能ID, "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(中心X), "Y", Math.floor(中心Y));
+
   const 实例 = 创建战斗技能实例({
     技能键: "E锚定魔法阵",
     施法者,
     技能实例ID,
     结束回调: function E实例结束(this: void, _原因: string, _控制器: any): void {
-      debugLogForce("塞莉亚-E", "结束", "原因", _原因);
+      debugLogForce("塞莉亚-E", "结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 塞莉亚克莱尔技能配置.E.技能ID, "原因", _原因);
       void _原因;
       void _控制器;
     },
@@ -297,7 +301,7 @@ function 释放E锚定魔法阵(this: void, _context: any, 施法者: any, 技�
       周期ID: 0,
       已关闭: false,
     };
-    debugLogForce("塞莉亚-E", "特效", "路径", 塞莉亚克莱尔表现配置.E锚定阵.模型路径);
+    debugLogForce("塞莉亚-E", "特效", "路径", 塞莉亚克莱尔表现配置.E锚定阵.模型路径, "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "X", Math.floor(中心X), "Y", Math.floor(中心Y));
     数据.阵特效 = 创建点特效({
       模型路径: 塞莉亚克莱尔表现配置.E锚定阵.模型路径,
       RGB: 塞莉亚克莱尔表现配置.E锚定阵.RGB,
@@ -318,10 +322,10 @@ function 释放E锚定魔法阵(this: void, _context: any, 施法者: any, 技�
     // 生效点：一次性伤害 + 减速（实时枚举）
     const 攻击力 = 读取单位攻击力(施法者);
     const 列表 = 获取坐标范围敌人(施法者, 中心X, 中心Y, 塞莉亚克莱尔E配置.区域半径);
-    debugLogForce("塞莉亚-E", "伤害", "标签", "塞莉亚-锚定冲击", "数值", 攻击力 * 塞莉亚克莱尔E配置.生效伤害攻击力倍率);
     for (let i = 0; i < 列表.length; i++) {
       const 敌人 = 列表[i];
       if (!单位存活(敌人)) continue;
+      debugLogForce("塞莉亚-E", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 塞莉亚克莱尔技能配置.E.技能ID, "实例", 技能实例ID ?? "-", "目标", GetUnitName(敌人), "handle", 敌人, "X", Math.floor(GetUnitX(敌人)), "Y", Math.floor(GetUnitY(敌人)), "伤害", 攻击力 * 塞莉亚克莱尔E配置.生效伤害攻击力倍率);
       造成技能伤害({
         来源: 施法者,
         目标: 敌人,

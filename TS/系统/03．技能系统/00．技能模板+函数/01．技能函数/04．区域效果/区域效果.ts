@@ -91,6 +91,8 @@ export interface 区域效果实例 {
   readonly 剩余时间: number;
   readonly 当前区域内单位: any[];
   readonly 已暂停: boolean;
+  /** 普通方法形式的单位快照；跨模块请用这个而不是「当前区域内单位」getter（见实现注释）。 */
+  获取当前区域内单位(): any[];
   销毁(): void;
   暂停(): void;
   恢复(): void;
@@ -211,6 +213,16 @@ class 区域效果实现 implements 区域效果实例 {
 
   get 已暂停(): boolean {
     return this.已暂停值;
+  }
+
+  /**
+   * 以普通方法形式获取区域内单位快照。
+   * 不要在外部通过「当前区域内单位」getter 后再取 .length：
+   * TSTL 对 getter 返回值的 .length 会编译成 raw 索引（Lua 表上为 nil），
+   * 曾导致爱蜜莉雅 W/R on销毁 中 compare number with nil 崩溃。
+   */
+  获取当前区域内单位(): any[] {
+    return 获取单位集合有序单位数组(this.当前单位集合);
   }
 
   private 刷新锚点位置(): void {

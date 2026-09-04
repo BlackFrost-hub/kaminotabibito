@@ -10,6 +10,7 @@ local _____6731_96C0_9662_693F_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["朱�
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_1["注册单位技能壳监听"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
@@ -52,6 +53,9 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local _____84C4_529B_4E2D_8868 = {}
@@ -63,6 +67,28 @@ ____exports["椿R蓄力中"] = function(_____82F1_96C4)
     return _____84C4_529B_4E2D_8868[jass.GetHandleId(_____82F1_96C4)] == true
 end
 local function _____7ED3_7B97R_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, _____6280_80FD_5B9E_4F8BID, _____4F24_5BB3_503C, _____6807_7B7E)
+    debugLogForce(
+        "椿-R",
+        "命中",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____R_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "标签",
+        _____6807_7B7E,
+        "目标",
+        GetUnitName(_____76EE_6807),
+        "handle",
+        _____76EE_6807,
+        "X",
+        math.floor(GetUnitX(_____76EE_6807)),
+        "Y",
+        math.floor(GetUnitY(_____76EE_6807)),
+        "伤害",
+        _____4F24_5BB3_503C
+    )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
         ["目标"] = _____76EE_6807,
@@ -80,14 +106,39 @@ local function _____7ED3_7B97R_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, __
 end
 local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____65B9_5411_89D2, _____53D7_51FB_8BB0_5F55)
     if not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "椿-R",
+            "命中失败",
+            "原因",
+            "施法者已死亡",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____R_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
+    local _____73A9_5BB6ID = GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
     debugLogForce(
         "椿-R",
-        "伤害",
+        "结算",
+        "玩家",
+        _____73A9_5BB6ID,
+        "四码",
+        fourCCToStringSafe(____R_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
         "标签",
         "朱雀院椿-R终式",
-        "数值",
+        "姿态",
+        _____83B7_53D6_59FF_6001(_____65BD_6CD5_8005),
+        "方向",
+        _____65B9_5411_89D2,
+        "受击记录",
+        _____53D7_51FB_8BB0_5F55,
+        "伤害",
         _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____R_914D_7F6E["主斩倍率"]
     )
     local _____653B_51FB_529B = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005)
@@ -106,6 +157,22 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
             )
         end
     })
+    if #_____654C_4EBA == 0 then
+        debugLogForce(
+            "椿-R",
+            "命中失败",
+            "原因",
+            "无目标",
+            "玩家",
+            _____73A9_5BB6ID,
+            "四码",
+            fourCCToStringSafe(____R_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-",
+            "方向",
+            _____65B9_5411_89D2
+        )
+    end
     do
         local i = 0
         while i < #_____654C_4EBA do
@@ -186,11 +253,52 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
     end
 end
 local function _____91CA_653ER_708E_59EC(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("椿-R", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_693F(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "椿-R",
+            "释放被拒",
+            "原因",
+            "非朱雀院椿",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____R_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
+    debugLogForce(
+        "椿-R",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____R_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "点施放",
+        "X",
+        math.floor(GetSpellTargetX()),
+        "Y",
+        math.floor(GetSpellTargetY()),
+        "姿态",
+        _____83B7_53D6_59FF_6001(_____65BD_6CD5_8005)
+    )
     if _____84C4_529B_4E2D_8868[jass.GetHandleId(_____65BD_6CD5_8005)] == true then
+        debugLogForce(
+            "椿-R",
+            "释放被拒",
+            "原因",
+            "已有蓄力/终式",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____R_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["R蓄力"])
@@ -204,7 +312,19 @@ local function _____91CA_653ER_708E_59EC(_context, _____65BD_6CD5_8005, _____628
     )
     _____9501_5B9A_59FF_6001(_____65BD_6CD5_8005, true)
     _____84C4_529B_4E2D_8868[jass.GetHandleId(_____65BD_6CD5_8005)] = true
-    debugLogForce("椿-R", "状态", "蓄力开始", _____6280_80FD_5B9E_4F8BID or "-")
+    debugLogForce(
+        "椿-R",
+        "状态",
+        "蓄力开始",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____R_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "方向",
+        _____65B9_5411_89D2
+    )
     local _____51B3_6597_8DDD_79BB_5FEB_7167 = {
         ["有效"] = _____6709_51B3_6597_8DDD_79BB(_____65BD_6CD5_8005),
         ["方向"] = _____83B7_53D6_51B3_6597_8DDD_79BB_65B9_5411(_____65BD_6CD5_8005)
@@ -279,7 +399,18 @@ local function _____91CA_653ER_708E_59EC(_context, _____65BD_6CD5_8005, _____628
                 ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____7EC8_5F0F_65B9_5411, _____53D7_51FB_8BB0_5F55)
             end,
             ["结束回调"] = function(______5355_4F4D, ______539F_56E0, ______5145_80FDID)
-                debugLogForce("椿-R", "结束", "原因", ______539F_56E0 or "-")
+                debugLogForce(
+                    "椿-R",
+                    "结束",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                    "四码",
+                    fourCCToStringSafe(____R_6280_80FDID),
+                    "实例",
+                    _____6280_80FD_5B9E_4F8BID or "-",
+                    "原因",
+                    ______539F_56E0 or "-"
+                )
                 if _____9884_8B66_7279_6548 ~= nil and _____9884_8B66_7279_6548 ~= 0 then
                     jass.DestroyEffect(_____9884_8B66_7279_6548)
                     _____9884_8B66_7279_6548 = nil

@@ -196,6 +196,9 @@ function _____533A_57DF_6548_679C_5B9E_73B0.prototype.____constructor(self, ____
     end
     _____6CE8_518C_533A_57DF_6548_679C_5B9E_4F8B(self)
 end
+_____533A_57DF_6548_679C_5B9E_73B0.prototype["获取当前区域内单位"] = function(self)
+    return _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4D_6570_7EC4(self["当前单位集合"])
+end
 _____533A_57DF_6548_679C_5B9E_73B0.prototype["刷新锚点位置"] = function(self)
     local _____951A_70B9_5355_4F4D = self["参数"]["锚点单位"]
     if _____951A_70B9_5355_4F4D == nil or _____951A_70B9_5355_4F4D == 0 then
@@ -252,7 +255,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
         do
             local hid = GetHandleId(_____5355_4F4D)
             if not self["是否影响目标"](self, _____5355_4F4D) then
-                goto __continue32
+                goto __continue33
             end
             _____65B0_96C6_5408[hid] = _____5355_4F4D
             if (not _____662F_9996_6B21 or self["参数"]["首次扫描触发进入"] == true) and not self["当前单位集合"][hid] then
@@ -266,7 +269,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                 self["单位最后进入时间"][hid] = _____5F53_524D_65F6_95F4
             end
         end
-        ::__continue32::
+        ::__continue33::
     end
     local _____5F53_524D_5355_4F4DID_5217_8868 = _____83B7_53D6_5355_4F4D_96C6_5408_6709_5E8F_5355_4F4DID_6570_7EC4(self["当前单位集合"])
     do
@@ -299,7 +302,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                     local _____53BB_91CDKey = ____make_533A_57DF_6548_679C_53BB_91CDKey(_____53BB_91CD_7EC4, _____5355_4F4DID)
                     local _____4E0A_6B21_4F24_5BB3_65F6_95F4 = _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey]
                     if _____4E0A_6B21_4F24_5BB3_65F6_95F4 ~= nil and _____5F53_524D_65F6_95F4 - _____4E0A_6B21_4F24_5BB3_65F6_95F4 < _____53BB_91CD_95F4_9694_6BEB_79D2 then
-                        goto __continue42
+                        goto __continue43
                     end
                     _____533A_57DF_6548_679C_5468_671F_4F24_5BB3_53BB_91CD_8BB0_5F55[_____53BB_91CDKey] = _____5F53_524D_65F6_95F4
                 end
@@ -324,7 +327,7 @@ _____533A_57DF_6548_679C_5B9E_73B0.prototype["执行检测"] = function(self)
                     {["伤害形态"] = "AOE"}
                 )
             end
-            ::__continue42::
+            ::__continue43::
         end
     end
     local ____opt_23 = self["参数"]["on周期"]

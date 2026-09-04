@@ -13,6 +13,9 @@ local _____6388_4E88_585E_8389_4E9A_6F14_7B97_7A97_53E3 = ____02_FF0E_88AB_52A8_
 local _____67E5_8BE2_585E_8389_4E9A_6709_6548_8FDE_63A5 = ____02_FF0E_88AB_52A8_6548_679C["查询塞莉亚有效连接"]
 local _____767B_8BB0_585E_8389_4E9A_6280_80FD_6E05_7406 = ____02_FF0E_88AB_52A8_6548_679C["登记塞莉亚技能清理"]
 local jass = require("jass.common")
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
@@ -105,7 +108,22 @@ local function _____5173_95EDW_7ED3_754C(_____6570_636E, _____6536_53E3_7C7B_578
     end
 end
 local function _____91CA_653EW_89E3_6790_7ED3_754C(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
-    debugLogForce("塞莉亚-W", "释放", "技能实例ID", ______6280_80FD_5B9E_4F8BID or "-")
+    debugLogForce(
+        "塞莉亚-W",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.W["技能ID"],
+        "实例",
+        ______6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "自身",
+        "X",
+        math.floor(GetUnitX(_____65BD_6CD5_8005)),
+        "Y",
+        math.floor(GetUnitY(_____65BD_6CD5_8005))
+    )
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
@@ -126,7 +144,18 @@ local function _____91CA_653EW_89E3_6790_7ED3_754C(_context, _____65BD_6CD5_8005
         ["修改器ID"] = 0,
         ["护盾ID"] = 0
     }
-    debugLogForce("塞莉亚-W", "特效", "路径", _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["W结界主体"]["模型路径"])
+    debugLogForce(
+        "塞莉亚-W",
+        "特效",
+        "路径",
+        _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["W结界主体"]["模型路径"],
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "X",
+        math.floor(GetUnitX(_____65BD_6CD5_8005)),
+        "Y",
+        math.floor(GetUnitY(_____65BD_6CD5_8005))
+    )
     _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
         _____65BD_6CD5_8005,
         _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["W结界主体"]["模型路径"],
@@ -144,7 +173,9 @@ local function _____91CA_653EW_89E3_6790_7ED3_754C(_context, _____65BD_6CD5_8005
         "操作",
         "施加",
         "目标",
-        _____65BD_6CD5_8005
+        _____65BD_6CD5_8005,
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
     )
     registerManualBuff(_____65BD_6CD5_8005, _____585E_8389_4E9ABuffID["解析结界"], _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["保护窗口秒"], 0)
     _____6388_4E88_585E_8389_4E9A_6F14_7B97_7A97_53E3(_____65BD_6CD5_8005)
@@ -204,10 +235,20 @@ local function _____91CA_653EW_89E3_6790_7ED3_754C(_context, _____65BD_6CD5_8005
                     if _____5355_4F4D_5B58_6D3B(_____653B_51FB_8005) then
                         debugLogForce(
                             "塞莉亚-W",
+                            "命中",
+                            "玩家",
+                            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                            "四码",
+                            _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.W["技能ID"],
+                            "目标",
+                            GetUnitName(_____653B_51FB_8005),
+                            "handle",
+                            _____653B_51FB_8005,
+                            "X",
+                            math.floor(GetUnitX(_____653B_51FB_8005)),
+                            "Y",
+                            math.floor(GetUnitY(_____653B_51FB_8005)),
                             "伤害",
-                            "标签",
-                            "塞莉亚-解析反冲",
-                            "数值",
                             _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["反冲伤害攻击力倍率"]
                         )
                         _____9020_6210_6280_80FD_4F24_5BB3({

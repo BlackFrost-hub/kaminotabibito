@@ -26,13 +26,15 @@ const { 取单位ID, 单位存活 } = require("系统.03．技能系统.00．技
   单位存活: (this: void, unit: any) => boolean;
 };
 const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; Z?: number; 面向角度?: number; 缩放?: number; 持续秒?: number; RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number } }) => any;
+  创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; Z?: number; 面向角度?: number; 缩放?: number; 动画速度?: number; 持续秒?: number; RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number } }) => any;
   销毁点特效: (this: void, effect: any) => void;
 };
 const { 销毁世界坐标进度UI } = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI") as {
   销毁世界坐标进度UI: (this: void, ui: any) => void;
 };
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const DzSetEffectVisible = (japi as any)["DzSetEffectVisible"] as ((eff: any, enable: boolean) => void) | undefined;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
@@ -159,6 +161,7 @@ export function 创建爱蜜莉雅冰晶(
     Z,
     面向角度: 0,
     缩放: 爱蜜莉雅表现配置.冰晶节点.缩放,
+    动画速度: 爱蜜莉雅表现配置.冰晶节点.动画速度 ?? 0,
     持续秒: 爱蜜莉雅表现配置.冰晶节点.持续秒,
   });
   if (特效句柄 == null || 特效句柄 === 0) return null;
@@ -223,6 +226,8 @@ export function 移除爱蜜莉雅冰晶(this: void, 英雄: any, 序号: number
     if (节点.序号 !== 序号) continue;
     状态.冰晶列表.splice(i, 1);
     debugLogForce("爱蜜莉雅-公共状态", "特效", "类型", "销毁", "路径", 爱蜜莉雅表现配置.冰晶节点.模型路径);
+    // 销毁前先隐藏：避免播放"变小"的死亡动画造成残留视觉
+    if (节点.特效句柄 != null && 节点.特效句柄 !== 0 && typeof DzSetEffectVisible === "function") DzSetEffectVisible(节点.特效句柄, false);
     销毁点特效(节点.特效句柄);
     节点.已读取 = true;
     return 节点;
@@ -379,6 +384,8 @@ function 销毁状态内全部冰晶特效(this: void, 状态: 爱蜜莉雅英�
   while (状态.冰晶列表.length > 0) {
     const 节点 = 状态.冰晶列表[0];
     状态.冰晶列表.splice(0, 1);
+    // 销毁前先隐藏：避免播放"变小"的死亡动画造成残留视觉
+    if (节点.特效句柄 != null && 节点.特效句柄 !== 0 && typeof DzSetEffectVisible === "function") DzSetEffectVisible(节点.特效句柄, false);
     销毁点特效(节点.特效句柄);
     节点.已读取 = true;
   }

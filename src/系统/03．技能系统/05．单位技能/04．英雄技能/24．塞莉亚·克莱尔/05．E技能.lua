@@ -21,6 +21,9 @@ function ____Math_6700_5C0F_503C(a, b)
     return a < b and a or b
 end
 local jass = require("jass.common")
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetSpellTargetX = jass.GetSpellTargetX
@@ -219,7 +222,6 @@ local function ____on_951A_5B9A_533A_57DF_5468_671F(_____6570_636E, _____6B65_95
     end
 end
 local function _____91CA_653EE_951A_5B9A_9B54_6CD5_9635(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("塞莉亚-E", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
@@ -234,12 +236,37 @@ local function _____91CA_653EE_951A_5B9A_9B54_6CD5_9635(_context, _____65BD_6CD5
             _____4E2D_5FC3Y
         )
     )
+    debugLogForce(
+        "塞莉亚-E",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.E["技能ID"],
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "点施放",
+        "X",
+        math.floor(_____4E2D_5FC3X),
+        "Y",
+        math.floor(_____4E2D_5FC3Y)
+    )
     local _____5B9E_4F8B = _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B({
         ["技能键"] = "E锚定魔法阵",
         ["施法者"] = _____65BD_6CD5_8005,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["结束回调"] = function(______539F_56E0, ______63A7_5236_5668)
-            debugLogForce("塞莉亚-E", "结束", "原因", ______539F_56E0)
+            debugLogForce(
+                "塞莉亚-E",
+                "结束",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.E["技能ID"],
+                "原因",
+                ______539F_56E0
+            )
             local ____ = ______539F_56E0
             local ____ = ______63A7_5236_5668
         end
@@ -294,7 +321,18 @@ local function _____91CA_653EE_951A_5B9A_9B54_6CD5_9635(_context, _____65BD_6CD5
                     ["周期ID"] = 0,
                     ["已关闭"] = false
                 }
-                debugLogForce("塞莉亚-E", "特效", "路径", _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["E锚定阵"]["模型路径"])
+                debugLogForce(
+                    "塞莉亚-E",
+                    "特效",
+                    "路径",
+                    _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["E锚定阵"]["模型路径"],
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                    "X",
+                    math.floor(_____4E2D_5FC3X),
+                    "Y",
+                    math.floor(_____4E2D_5FC3Y)
+                )
                 _____6570_636E["阵特效"] = _____521B_5EFA_70B9_7279_6548({
                     ["模型路径"] = _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["E锚定阵"]["模型路径"],
                     RGB = _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["E锚定阵"].RGB,
@@ -315,14 +353,6 @@ local function _____91CA_653EE_951A_5B9A_9B54_6CD5_9635(_context, _____65BD_6CD5
                 _____6388_4E88_585E_8389_4E9A_6F14_7B97_7A97_53E3(_____65BD_6CD5_8005)
                 local _____653B_51FB_529B = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005)
                 local _____5217_8868 = _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA(_____65BD_6CD5_8005, _____4E2D_5FC3X, _____4E2D_5FC3Y, _____585E_8389_4E9A_514B_83B1_5C14E_914D_7F6E["区域半径"])
-                debugLogForce(
-                    "塞莉亚-E",
-                    "伤害",
-                    "标签",
-                    "塞莉亚-锚定冲击",
-                    "数值",
-                    _____653B_51FB_529B * _____585E_8389_4E9A_514B_83B1_5C14E_914D_7F6E["生效伤害攻击力倍率"]
-                )
                 do
                     local i = 0
                     while i < #_____5217_8868 do
@@ -331,6 +361,26 @@ local function _____91CA_653EE_951A_5B9A_9B54_6CD5_9635(_context, _____65BD_6CD5
                             if not _____5355_4F4D_5B58_6D3B(_____654C_4EBA) then
                                 goto __continue43
                             end
+                            debugLogForce(
+                                "塞莉亚-E",
+                                "命中",
+                                "玩家",
+                                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                                "四码",
+                                _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.E["技能ID"],
+                                "实例",
+                                _____6280_80FD_5B9E_4F8BID or "-",
+                                "目标",
+                                GetUnitName(_____654C_4EBA),
+                                "handle",
+                                _____654C_4EBA,
+                                "X",
+                                math.floor(GetUnitX(_____654C_4EBA)),
+                                "Y",
+                                math.floor(GetUnitY(_____654C_4EBA)),
+                                "伤害",
+                                _____653B_51FB_529B * _____585E_8389_4E9A_514B_83B1_5C14E_914D_7F6E["生效伤害攻击力倍率"]
+                            )
                             _____9020_6210_6280_80FD_4F24_5BB3({
                                 ["来源"] = _____65BD_6CD5_8005,
                                 ["目标"] = _____654C_4EBA,

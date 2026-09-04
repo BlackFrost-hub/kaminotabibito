@@ -15,6 +15,7 @@ local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_1["播�
 local jass = require("jass.common")
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_2.fourCCToStringSafe
 local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
 local getGameTime = ____require_result_3.getGameTime
 local addDelayedCallback = ____require_result_3.addDelayedCallback
@@ -60,16 +61,19 @@ local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_8
 local ____E_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.E["技能ID"])
 local ____E_914D_7F6E = _____8299_8389_83B2E_914D_7F6E
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
-local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitName = jass.GetUnitName
 local GetUnitZ = jass.GetUnitFlyHeight
-local SetUnitFlyHeight = jass.SetUnitFlyHeight
+local ____require_result_15 = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位基础与生命周期函数")
+local SU_SetUnitFlyHeight = ____require_result_15.SU_SetUnitFlyHeight
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local IsUnitEnemy = jass.IsUnitEnemy
 local AddLightningEx = jass.AddLightningEx
 local MoveLightningEx = jass.MoveLightningEx
@@ -109,19 +113,31 @@ local function _____7ED3_7B97E_843D_70B9(_____65BD_6CD5_8005, _____6280_80FD_5B9
             end
             debugLogForce(
                 "芙莉莲-E",
-                "伤害",
-                "标签",
-                "芙莉莲-E落点冲击",
-                "数值",
-                _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____51B2_51FB_500D_7387,
+                "命中",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                fourCCToStringSafe(____E_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
                 "目标",
-                u
+                GetUnitName(u),
+                "handle",
+                u,
+                "X",
+                math.floor(GetUnitX(u)),
+                "Y",
+                math.floor(GetUnitY(u)),
+                "伤害",
+                _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____51B2_51FB_500D_7387,
+                "标签",
+                "芙莉莲-E落点冲击"
             )
             _____9020_6210_6280_80FD_4F24_5BB3({
                 ["来源"] = _____65BD_6CD5_8005,
                 ["目标"] = u,
                 ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____51B2_51FB_500D_7387,
-                ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+                ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                 ["攻击类型"] = ATTACK_TYPE_NORMAL,
                 ["武器类型"] = WEAPON_TYPE_WHOKNOWS,
                 ["来源类型"] = "单位技能",
@@ -178,7 +194,7 @@ local function _____5B8C_6210E_6536_5C3E(_____65BD_6CD5_8005, _____6570_636E)
     end
     _____6E05_7406_89C2_5BDF_95EA_7535(_____6570_636E)
     if _____65BD_6CD5_8005 ~= nil and _____65BD_6CD5_8005 ~= 0 then
-        SetUnitFlyHeight(_____65BD_6CD5_8005, _____6570_636E["起点高度"], ____E_914D_7F6E["高度变化率"])
+        SU_SetUnitFlyHeight(_____65BD_6CD5_8005, _____6570_636E["起点高度"], ____E_914D_7F6E["高度变化率"])
     end
 end
 --- 结束位移阶段：自然到达 → 结算落点 + 进入观察期（观察持续秒 后收尾）；
@@ -198,7 +214,7 @@ local function _____7ED3_675FE(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, 
             unregisterDamageModifier(_____6570_636E["减伤ID"])
             _____6570_636E["减伤ID"] = 0
         end
-        _____6570_636E["观察截止"] = getGameTime() + ____E_914D_7F6E["观察持续秒"]
+        _____6570_636E["观察截止"] = getGameTime() + ____E_914D_7F6E["观察持续秒"] * 1000
         if _____6570_636E["观察守护"] == nil then
             _____6570_636E["观察守护"] = _____5F00_59CB_5FAA_73AF_5B88_62A4(
                 _____65BD_6CD5_8005,
@@ -222,21 +238,52 @@ local function ____E_5B89_6392_89C2_5BDF_671F_6536_5C3E(_____65BD_6CD5_8005, ___
     _____63A7_5236_5668["登记延迟回调"](_____63A7_5236_5668, _____89C2_5BDF_622A_6B62ID)
 end
 local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("芙莉莲-E", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_8299_8389_83B2(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "芙莉莲-E",
+            "释放被拒",
+            "原因",
+            "非芙莉莲施法者",
+            "施法者",
+            _____65BD_6CD5_8005,
+            "handle",
+            _____65BD_6CD5_8005,
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
+    debugLogForce(
+        "芙莉莲-E",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____E_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "英雄",
+        _____65BD_6CD5_8005,
+        "handle",
+        _____65BD_6CD5_8005,
+        "目标",
+        "点施放",
+        "X",
+        math.floor(GetSpellTargetX()),
+        "Y",
+        math.floor(GetSpellTargetY())
+    )
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "芙莉莲E") > 0 then
         return
     end
     _____8BB0_5F55_8299_8389_83B2_6D3B_52A8(_____65BD_6CD5_8005)
-    local ____temp_15
+    local ____temp_16
     if _____82B1_7530_8054_52A8["尝试消费花田修正"] ~= nil and _____82B1_7530_8054_52A8["在花田内"] ~= nil then
-        ____temp_15 = _____82B1_7530_8054_52A8["在花田内"](_____65BD_6CD5_8005)
+        ____temp_16 = _____82B1_7530_8054_52A8["在花田内"](_____65BD_6CD5_8005)
     else
-        ____temp_15 = false
+        ____temp_16 = false
     end
-    local _____82B1_7530_4FEE_6B63 = ____temp_15
+    local _____82B1_7530_4FEE_6B63 = ____temp_16
     _____64AD_653E_9650_65F6_52A8_4F5C(_____65BD_6CD5_8005, _____8299_8389_83B2_52A8_4F5C_69FD["E起飞"], "芙莉莲E起飞")
     local _____8D77_70B9X = GetUnitX(_____65BD_6CD5_8005)
     local _____8D77_70B9Y = GetUnitY(_____65BD_6CD5_8005)
@@ -268,7 +315,22 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
-            debugLogForce("芙莉莲-E", "结束", "原因", ______539F_56E0 or "-")
+            debugLogForce(
+                "芙莉莲-E",
+                "结束",
+                "原因",
+                ______539F_56E0 or "-",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                fourCCToStringSafe(____E_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
+                "英雄",
+                _____65BD_6CD5_8005,
+                "handle",
+                _____65BD_6CD5_8005
+            )
             if _____6570_636E["已结束"] then
                 _____5B8C_6210E_6536_5C3E(_____65BD_6CD5_8005, _____6570_636E)
                 return
@@ -281,7 +343,7 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
             _____5B8C_6210E_6536_5C3E(_____65BD_6CD5_8005, _____6570_636E)
         end
     })
-    SetUnitFlyHeight(_____65BD_6CD5_8005, _____6570_636E["起点高度"] + ____E_914D_7F6E["飞行高度"], ____E_914D_7F6E["高度变化率"])
+    SU_SetUnitFlyHeight(_____65BD_6CD5_8005, _____6570_636E["起点高度"] + ____E_914D_7F6E["飞行高度"], ____E_914D_7F6E["高度变化率"])
     Sound3DII_UnitPlayReuse(_____8299_8389_83B2_97F3_6548_914D_7F6E["E升空"]["路径"], _____65BD_6CD5_8005, _____8299_8389_83B2_97F3_6548_914D_7F6E["E升空"]["裁断距离"])
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "芙莉莲", _____8299_8389_83B2_6280_80FD_914D_7F6E.E["技能ID"])
     _____521B_5EFA_70B9_7279_6548({
@@ -409,8 +471,8 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
                         if _____53E5_67C4 == nil or _____53E5_67C4 == 0 then
                             goto __continue48
                         end
-                        local ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_16 = _____6570_636E["观察闪电列表"]
-                        ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_16[#____6570_636E__89C2_5BDF_95EA_7535_5217_8868_16 + 1] = {["目标"] = u, ["句柄"] = _____53E5_67C4}
+                        local ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_17 = _____6570_636E["观察闪电列表"]
+                        ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_17[#____6570_636E__89C2_5BDF_95EA_7535_5217_8868_17 + 1] = {["目标"] = u, ["句柄"] = _____53E5_67C4}
                         Sound3DII_CooPlayReuse(
                             _____8299_8389_83B2_97F3_6548_914D_7F6E["E观察"]["路径"],
                             GetUnitX(u),
@@ -434,6 +496,16 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         "位移",
         "类型",
         "冲锋",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____E_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "英雄",
+        _____65BD_6CD5_8005,
+        "handle",
+        _____65BD_6CD5_8005,
         "距离",
         ____E_914D_7F6E["位移距离"]
     )

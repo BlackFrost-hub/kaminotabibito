@@ -5,10 +5,16 @@ import { stringToFourCC, 单位有效 } from "../../02．通用函数/19．战�
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
+};
 
 const jass = require("jass.common") as any;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
+const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (player: any) => number;
+const GetSpellTargetUnit = jass.GetSpellTargetUnit as () => any;
 
 const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellEffectListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
@@ -65,8 +71,12 @@ function on单位技能壳监听施法(this: void, castingUnit: any, spellAbilit
       "收到施法",
       "英雄",
       调试英雄名,
-      "技能ID",
-      spellAbilityId,
+      "玩家",
+      GetPlayerId(GetOwningPlayer(castingUnit)) + 1,
+      "技能四码",
+      fourCCToStringSafe(spellAbilityId),
+      "目标",
+      GetSpellTargetUnit() != null ? "单位" : "点",
       "监听总数",
       监听列表.length,
     );
@@ -89,7 +99,12 @@ function on单位技能壳监听施法(this: void, castingUnit: any, spellAbilit
     if (unitTypeId !== 转ID(参数.单位类型ID)) continue;
     const context = 参数.获取或创建上下文(castingUnit);
     if (context == null) continue;
-    if (参数.可释放 != null && !参数.可释放(context, castingUnit)) continue;
+    if (参数.可释放 != null && !参数.可释放(context, castingUnit)) {
+      if (调试英雄名 != null) {
+        debugLogForce("新英雄技能壳诊断", "施法被拒", "英雄", 调试英雄名, "玩家", GetPlayerId(GetOwningPlayer(castingUnit)) + 1, "技能四码", fourCCToStringSafe(spellAbilityId), "监听名", 参数.名称, "原因", "可释放条件不满足(冷却/状态/条件)");
+      }
+      continue;
+    }
     const 技能实例ID = 参数.创建独立技能实例 === false
       ? undefined
       : 创建独立技能伤害实例({
@@ -101,7 +116,7 @@ function on单位技能壳监听施法(this: void, castingUnit: any, spellAbilit
       });
     绑定单位当前独立技能伤害实例(castingUnit, 技能实例ID);
     if (调试英雄名 != null) {
-      debugLogForce("新英雄技能壳诊断", "命中监听", "英雄", 调试英雄名, "技能ID", spellAbilityId, "监听名", 参数.名称, "实例ID", 技能实例ID);
+      debugLogForce("新英雄技能壳诊断", "命中监听", "英雄", 调试英雄名, "玩家", GetPlayerId(GetOwningPlayer(castingUnit)) + 1, "技能四码", fourCCToStringSafe(spellAbilityId), "监听名", 参数.名称, "实例ID", 技能实例ID);
     }
     参数.释放技能(context, castingUnit, 技能实例ID);
   }

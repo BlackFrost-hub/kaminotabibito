@@ -48,6 +48,7 @@ local _____8299_8389_83B2_52A8_4F5C_69FD = ____require_result_2["芙莉莲动作
 local jass = require("jass.common")
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_3.fourCCToStringSafe
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_4["注册单位技能壳监听"]
 local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
@@ -80,13 +81,15 @@ local ____R_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_
 local ____R_914D_7F6E = _____8299_8389_83B2R_914D_7F6E
 local _____88AB_52A8_914D_7F6E = _____8299_8389_83B2_88AB_52A8_914D_7F6E
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
-local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
+local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetOwningPlayer = jass.GetOwningPlayer
+local GetUnitName = jass.GetUnitName
+local GetPlayerId = jass.GetPlayerId
 local IsUnitEnemy = jass.IsUnitEnemy
 local function ____R_7ED3_7B97_4E3B_70AE(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____5FEB_7167)
     if not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
@@ -202,7 +205,7 @@ local function ____R_7ED3_7B97_4E3B_70AE(_____65BD_6CD5_8005, _____6280_80FD_5B9
                         ["来源"] = _____65BD_6CD5_8005,
                         ["目标"] = _____76EE_6807,
                         ["伤害"] = _____653B_51FB_529B * ____R_914D_7F6E["完成爆发倍率"],
-                        ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+                        ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                         ["攻击类型"] = ATTACK_TYPE_NORMAL,
                         ["武器类型"] = WEAPON_TYPE_WHOKNOWS,
                         ["来源类型"] = "单位技能",
@@ -216,19 +219,31 @@ local function ____R_7ED3_7B97_4E3B_70AE(_____65BD_6CD5_8005, _____6280_80FD_5B9
             end
             debugLogForce(
                 "芙莉莲-R",
-                "伤害",
-                "标签",
-                _____6807_7B7E,
-                "数值",
-                _____653B_51FB_529B * _____500D_7387,
+                "命中",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                fourCCToStringSafe(____R_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
                 "目标",
-                _____76EE_6807
+                GetUnitName(_____76EE_6807),
+                "handle",
+                _____76EE_6807,
+                "X",
+                math.floor(GetUnitX(_____76EE_6807)),
+                "Y",
+                math.floor(GetUnitY(_____76EE_6807)),
+                "伤害",
+                _____653B_51FB_529B * _____500D_7387,
+                "标签",
+                _____6807_7B7E
             )
             _____9020_6210_6280_80FD_4F24_5BB3({
                 ["来源"] = _____65BD_6CD5_8005,
                 ["目标"] = _____76EE_6807,
                 ["伤害"] = _____653B_51FB_529B * _____500D_7387,
-                ["伤害类型"] = DAMAGE_TYPE_NORMAL,
+                ["伤害类型"] = DAMAGE_TYPE_MAGIC,
                 ["攻击类型"] = ATTACK_TYPE_NORMAL,
                 ["武器类型"] = WEAPON_TYPE_WHOKNOWS,
                 ["来源类型"] = "单位技能",
@@ -257,10 +272,41 @@ local function ____R_7ED3_7B97_4E3B_70AE(_____65BD_6CD5_8005, _____6280_80FD_5B9
     end
 end
 local function _____91CA_653ER(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("芙莉莲-R", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_8299_8389_83B2(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "芙莉莲-R",
+            "释放被拒",
+            "原因",
+            "非芙莉莲施法者",
+            "施法者",
+            _____65BD_6CD5_8005,
+            "handle",
+            _____65BD_6CD5_8005,
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
+    debugLogForce(
+        "芙莉莲-R",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____R_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "英雄",
+        _____65BD_6CD5_8005,
+        "handle",
+        _____65BD_6CD5_8005,
+        "目标",
+        "点施放",
+        "X",
+        math.floor(GetSpellTargetX()),
+        "Y",
+        math.floor(GetSpellTargetY())
+    )
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "芙莉莲R") > 0 then
         return
     end
@@ -342,7 +388,22 @@ local function _____91CA_653ER(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
                 _____63A7_5236_5668["完成"](_____63A7_5236_5668)
             end,
             ["结束回调"] = function(______5355_4F4D, _____539F_56E0, ______5145_80FDID)
-                debugLogForce("芙莉莲-R", "结束", "原因", _____539F_56E0 or "-")
+                debugLogForce(
+                    "芙莉莲-R",
+                    "结束",
+                    "原因",
+                    _____539F_56E0 or "-",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                    "四码",
+                    fourCCToStringSafe(____R_6280_80FDID),
+                    "实例",
+                    _____6280_80FD_5B9E_4F8BID or "-",
+                    "英雄",
+                    _____65BD_6CD5_8005,
+                    "handle",
+                    _____65BD_6CD5_8005
+                )
                 if _____84C4_529B_5B88_62A4 ~= nil then
                     _____505C_6B62_5FAA_73AF_5B88_62A4(_____84C4_529B_5B88_62A4)
                     _____84C4_529B_5B88_62A4 = nil

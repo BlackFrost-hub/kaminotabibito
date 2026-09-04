@@ -9,8 +9,9 @@ import {
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { getGameTime } = require("系统.00．核心系统.05．中心计时器") as {
   getGameTime: (this: void) => number;
@@ -95,6 +96,9 @@ const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 
 interface Q数据 {
   位移ID: number;
@@ -112,7 +116,7 @@ interface Q数据 {
 //=============================================================================
 
 function 结算Q单体伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
-  debugLogForce("红叶-Q", "伤害", "标签", 标签, "数值", 伤害值, "目标", 目标);
+  debugLogForce("红叶-Q", "伤害", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", Math.floor(伤害值), "标签", 标签, "实例", 技能实例ID ?? "-");
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -135,24 +139,28 @@ function 结算Q单体伤害(this: void, 施法者: any, 目标: any, 技能实�
 
 function 开启Q2窗口(this: void, 施法者: any, 控制器: any, 数据: Q数据, 持续秒: number = Q配置.Q2窗口秒): void {
   if (数据.Q2壳 != null) return;
-  debugLogForce("红叶-Q", "状态", "开启Q2窗口", 持续秒);
+  debugLogForce("红叶-Q", "状态", "开启Q2窗口", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "持续秒", 持续秒);
   const 壳 = 创建限时二段技能壳({
-    名称: "朱雀院红叶-Q2",
+    名称: "飞燕·回身斩（Q）",
     单位: 施法者,
     一段技能ID: Q技能ID,
     二段技能ID: Q2技能ID,
     持续秒,
+    二段说明:
+      "|cffffcc00技能说明：|r立即施展回身斩，攻击身后的敌人。|n"
+      + "|cffffcc00伤害：|r回身斩造成攻击力|cff87ceeb80%|r的物理伤害。|n"
+      + "|cffffcc00不做任何操作：|r二段窗口结束后机会消失，按钮自动恢复。",
     超时回调: function Q2窗口超时(this: void, 超时壳: any): void {
       if (数据.Q2壳 !== 超时壳) return;
       数据.Q2壳 = null;
       数据.Q2到期时间 = 0;
-      debugLogForce("红叶-Q", "结束", "原因", "Q2窗口超时");
+      debugLogForce("红叶-Q", "结束", "原因", "Q2窗口超时", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
       控制器.完成();
     },
   });
   if (壳 != null) {
     数据.Q2壳 = 壳;
-    数据.Q2到期时间 = getGameTime() + 持续秒;
+    数据.Q2到期时间 = getGameTime() + 持续秒 * 1000;
     登记朱雀院清理(施法者, "红叶Q2窗口", function Q2窗口清理(this: void): void {
       if (数据.Q2壳 != null) {
         清理限时二段技能壳(数据.Q2壳);
@@ -167,11 +175,17 @@ function 开启Q2窗口(this: void, 施法者: any, 控制器: any, 数据: Q数
 }
 
 function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("红叶-Q", "释放", "技能实例ID", 技能实例ID ?? "-", "阶段", "Q1");
-  if (!是朱雀院红叶(施法者)) return;
+  debugLogForce("红叶-Q", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "阶段", "Q1", "目标", "点施放", "施法者X", Math.floor(GetUnitX(施法者)), "施法者Y", Math.floor(GetUnitY(施法者)), "目标X", Math.floor(GetSpellTargetX()), "目标Y", Math.floor(GetSpellTargetY()));
+  if (!是朱雀院红叶(施法者)) {
+    debugLogForce("红叶-Q", "释放被拒", "原因", "非红叶单位", "施法者", 施法者);
+    return;
+  }
   播放红叶动作(施法者, 朱雀院红叶动作槽.Q冲刺);
   // 重复 Q：已有活跃 Q 实例时忽略本次释放（Q1 位移/Q2 窗口期间不叠加）
-  if (查询战斗技能实例(施法者, "红叶Q").length > 0) return;
+  if (查询战斗技能实例(施法者, "红叶Q").length > 0) {
+    debugLogForce("红叶-Q", "释放被拒", "原因", "重复Q活跃实例", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
+    return;
+  }
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
   播放英雄技能喊话(施法者, "朱雀院红叶", 朱雀院红叶技能配置.Q.技能ID);
   const 起点X = GetUnitX(施法者);
@@ -184,7 +198,7 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
     技能实例ID,
     数据,
     结束回调: function Q结束(this: void, _原因: string, _c: any): void {
-      debugLogForce("红叶-Q", "结束", "原因", "-");
+      debugLogForce("红叶-Q", "结束", "原因", "-", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
       if (数据.位移ID !== 0) {
         停止位移(数据.位移ID, "中断");
         数据.位移ID = 0;
@@ -197,7 +211,7 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
     },
   });
 
-  debugLogForce("红叶-Q", "位移", "类型", "冲锋", "距离", Q配置.突进距离);
+  debugLogForce("红叶-Q", "位移", "类型", "冲锋", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "距离", Q配置.突进距离);
   const 位移ID = 开始冲锋(施法者, {
     角度: 方向,
     距离: Q配置.突进距离,
@@ -210,7 +224,7 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
     命中后结束: true,
     允许重复命中: false,
     命中回调: function Q1命中(this: void, _移动单位: any, 目标: any, _位移ID: number): void {
-      debugLogForce("红叶-Q", "命中", "目标", 目标);
+      debugLogForce("红叶-Q", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", Math.floor(读取单位攻击力(施法者) * Q配置.伤害攻击力倍率), "实例", 技能实例ID ?? "-");
       if (数据.已命中) return;
       数据.已命中 = true;
       播放红叶动作(施法者, 朱雀院红叶动作槽.Q命中斩);
@@ -235,7 +249,10 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
   数据.位移ID = 位移ID;
   // 冲锋启动音（突进真实启动后；单位绑定，参数配置驱动；启动失败不播）
   if (位移ID !== 0) Sound3DII_UnitPlayReuse(Q冲锋音效.路径, 施法者, Q冲锋音效.裁断距离);
-  if (位移ID === 0) 控制器.中断();
+  if (位移ID === 0) {
+    debugLogForce("红叶-Q", "释放被拒", "原因", "冲锋位移启动失败", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
+    控制器.中断();
+  }
 }
 
 //=============================================================================
@@ -288,12 +305,12 @@ function 执行Q2回身斩(this: void, 施法者: any, 控制器: any, 技能实
     数据.Q2壳 = null;
     数据.Q2到期时间 = 0;
   }
-  debugLogForce("红叶-Q", "结束", "原因", "Q2施放完成");
+  debugLogForce("红叶-Q", "结束", "原因", "Q2施放完成", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
   控制器.完成();
 }
 
 function 释放Q2回身斩(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("红叶-Q", "释放", "技能实例ID", 技能实例ID ?? "-", "阶段", "Q2");
+  debugLogForce("红叶-Q", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q2技能ID), "实例", 技能实例ID ?? "-", "阶段", "Q2");
   if (!是朱雀院红叶(施法者)) return;
   const 活跃列表 = 查询战斗技能实例(施法者, "红叶Q");
   for (let i = 0; i < 活跃列表.length; i++) {
@@ -322,7 +339,7 @@ export function 延长Q2窗口(this: void, 施法者: any, 延长秒: number): v
     if (数据 == null || 数据.Q2壳 == null || 数据.已Q2) continue;
     if (数据.已延长窗口) return;
     数据.已延长窗口 = true;
-    const 剩余秒 = 数据.Q2到期时间 - getGameTime();
+    const 剩余秒 = (数据.Q2到期时间 - getGameTime()) / 1000;
     const 新窗口秒 = (剩余秒 > 0 ? 剩余秒 : 0) + 延长秒;
     清理限时二段技能壳(数据.Q2壳);
     数据.Q2壳 = null;

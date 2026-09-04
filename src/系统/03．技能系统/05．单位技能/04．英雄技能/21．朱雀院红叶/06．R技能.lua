@@ -10,6 +10,7 @@ local _____6731_96C0_9662_7EA2_53F6_8BFB_6761_914D_7F6E = ____00_FF0E_914D_7F6E[
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_1["注册单位技能壳监听"]
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
@@ -53,6 +54,9 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local function _____53D6_7A84_7EBF_654C_4EBA(_____65BD_6CD5_8005, _____65B9_5411_89D2)
     return _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D({
         X = GetUnitX(_____65BD_6CD5_8005),
@@ -72,12 +76,22 @@ local function _____7ED3_7B97R_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, __
     debugLogForce(
         "红叶-R",
         "伤害",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "目标",
+        GetUnitName(_____76EE_6807),
+        "handle",
+        _____76EE_6807,
+        "X",
+        math.floor(GetUnitX(_____76EE_6807)),
+        "Y",
+        math.floor(GetUnitY(_____76EE_6807)),
+        "伤害",
+        math.floor(_____4F24_5BB3_503C),
         "标签",
         _____6807_7B7E,
-        "数值",
-        _____4F24_5BB3_503C,
-        "目标",
-        _____76EE_6807
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-"
     )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
@@ -96,9 +110,26 @@ local function _____7ED3_7B97R_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, __
 end
 local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, ______76EE_6807X, _____76EE_6807Y, _____65B9_5411_89D2)
     if not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
+        debugLogForce("红叶-R", "命中失败", "目标无效", "施法者已死亡")
         return
     end
-    debugLogForce("红叶-R", "状态", "创建终式")
+    debugLogForce(
+        "红叶-R",
+        "状态",
+        "创建终式",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____R_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "施法者X",
+        math.floor(GetUnitX(_____65BD_6CD5_8005)),
+        "施法者Y",
+        math.floor(GetUnitY(_____65BD_6CD5_8005)),
+        "方向角",
+        _____65B9_5411_89D2
+    )
     _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["R释放"])
     local _____5200_52BF_5C42_6570 = _____6D88_8D39_5168_90E8_5200_52BF(_____65BD_6CD5_8005)
     local ____D_6B21_6570 = _____6D88_8D39_5168_90E8D_5F3A_5316(_____65BD_6CD5_8005)
@@ -173,8 +204,35 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
     end
 end
 local function _____91CA_653ER_5965_4E49(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("红叶-R", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
+    debugLogForce(
+        "红叶-R",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____R_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "点施放",
+        "施法者X",
+        math.floor(GetUnitX(_____65BD_6CD5_8005)),
+        "施法者Y",
+        math.floor(GetUnitY(_____65BD_6CD5_8005)),
+        "目标X",
+        math.floor(GetSpellTargetX()),
+        "目标Y",
+        math.floor(GetSpellTargetY())
+    )
     if not _____662F_6731_96C0_9662_7EA2_53F6(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "红叶-R",
+            "释放被拒",
+            "原因",
+            "非红叶单位",
+            "施法者",
+            _____65BD_6CD5_8005
+        )
         return
     end
     _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["R蓄力"])
@@ -213,7 +271,13 @@ local function _____91CA_653ER_5965_4E49(_context, _____65BD_6CD5_8005, _____628
                 end
             end,
             ["充能完成回调"] = function(______5355_4F4D, ______5145_80FDID)
-                debugLogForce("红叶-R", "状态", "蓄力完成")
+                debugLogForce(
+                    "红叶-R",
+                    "状态",
+                    "蓄力完成",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+                )
                 Sound3DII_CooPlayReuse(
                     ____R_7EA2_53F6_4E00_95EA_97F3_6548["路径"],
                     GetUnitX(_____65BD_6CD5_8005),
@@ -230,7 +294,14 @@ local function _____91CA_653ER_5965_4E49(_context, _____65BD_6CD5_8005, _____628
                 )
             end,
             ["结束回调"] = function(______5355_4F4D, ______539F_56E0, ______5145_80FDID)
-                debugLogForce("红叶-R", "结束", "原因", "-")
+                debugLogForce(
+                    "红叶-R",
+                    "结束",
+                    "原因",
+                    "-",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+                )
                 if _____9884_8B66_7279_6548 ~= nil and _____9884_8B66_7279_6548 ~= 0 then
                     jass.DestroyEffect(_____9884_8B66_7279_6548)
                     _____9884_8B66_7279_6548 = nil
@@ -240,6 +311,15 @@ local function _____91CA_653ER_5965_4E49(_context, _____65BD_6CD5_8005, _____628
     )
     if _____5145_80FDID > 0 then
         _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院红叶", _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.R["技能ID"])
+    else
+        debugLogForce(
+            "红叶-R",
+            "释放被拒",
+            "原因",
+            "蓄力未建立",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+        )
     end
 end
 local _____5DF2_6CE8_518C = false

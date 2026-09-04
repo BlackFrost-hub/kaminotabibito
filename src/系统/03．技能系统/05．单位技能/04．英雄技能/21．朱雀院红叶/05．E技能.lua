@@ -13,6 +13,7 @@ local _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C = ____00_FF0E_914D_
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local removeDelayedCallback = ____require_result_1.removeDelayedCallback
@@ -57,6 +58,9 @@ local GetUnitY = jass.GetUnitY
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetRandomInt = jass.GetRandomInt
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local _____5251_75D5_5E8F_53F7 = 0
 local _____5251_75D5_8868 = {}
 local _____82F1_96C4_5251_75D5_5217_8868 = {}
@@ -87,6 +91,12 @@ local function _____521B_5EFA_5251_75D5(_____6765_6E90_82F1_96C4, X, Y, _____65B
         "红叶-E",
         "状态",
         "创建剑痕",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____6765_6E90_82F1_96C4)) + 1,
+        "X",
+        math.floor(X),
+        "Y",
+        math.floor(Y),
         "方向角",
         _____65B9_5411_89D2
     )
@@ -184,12 +194,22 @@ local function _____7ED3_7B97E_6BB5_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_680
     debugLogForce(
         "红叶-E",
         "伤害",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "目标",
+        GetUnitName(_____76EE_6807),
+        "handle",
+        _____76EE_6807,
+        "X",
+        math.floor(GetUnitX(_____76EE_6807)),
+        "Y",
+        math.floor(GetUnitY(_____76EE_6807)),
+        "伤害",
+        math.floor(_____4F24_5BB3_503C),
         "标签",
         _____6807_7B7E,
-        "数值",
-        _____4F24_5BB3_503C,
-        "目标",
-        _____76EE_6807
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-"
     )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
@@ -335,12 +355,47 @@ local function _____6267_884CE_4E09_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
     _____63A7_5236_5668["完成"](_____63A7_5236_5668)
 end
 local function _____91CA_653EE_4E09_53F6_6563_534E(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("红叶-E", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
+    debugLogForce(
+        "红叶-E",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____E_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "点施放",
+        "施法者X",
+        math.floor(GetUnitX(_____65BD_6CD5_8005)),
+        "施法者Y",
+        math.floor(GetUnitY(_____65BD_6CD5_8005)),
+        "目标X",
+        math.floor(GetSpellTargetX()),
+        "目标Y",
+        math.floor(GetSpellTargetY())
+    )
     if not _____662F_6731_96C0_9662_7EA2_53F6(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "红叶-E",
+            "释放被拒",
+            "原因",
+            "非红叶单位",
+            "施法者",
+            _____65BD_6CD5_8005
+        )
         return
     end
     _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["E连续三斩"])
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "红叶E") > 0 then
+        debugLogForce(
+            "红叶-E",
+            "释放被拒",
+            "原因",
+            "重复E活跃实例",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+        )
         return
     end
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院红叶", _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.E["技能ID"])
@@ -367,7 +422,14 @@ local function _____91CA_653EE_4E09_53F6_6563_534E(_context, _____65BD_6CD5_8005
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(_____539F_56E0, _c)
-            debugLogForce("红叶-E", "结束", "原因", _____539F_56E0 or "-")
+            debugLogForce(
+                "红叶-E",
+                "结束",
+                "原因",
+                _____539F_56E0 or "-",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+            )
             do
                 local i = 0
                 while i < #_____6570_636E["段回调ID"] do

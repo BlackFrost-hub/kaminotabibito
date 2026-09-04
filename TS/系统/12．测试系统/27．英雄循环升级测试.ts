@@ -89,5 +89,10 @@ function on英雄循环升级命令(this: void, player: any, command: string): v
 }
 
 注册聊天命令前缀监听(英雄升级命令前缀, on英雄循环升级命令);
+// 确认模块加载与监听注册（测试定位用）
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+debugLogForce("英雄循环升级测试", "已注册监听", "前缀", 英雄升级命令前缀);
 
 export {};

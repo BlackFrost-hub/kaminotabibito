@@ -10,8 +10,9 @@ import {
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { getGameTime } = require("系统.00．核心系统.05．中心计时器") as {
   getGameTime: (this: void) => number;
@@ -81,6 +82,9 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 
@@ -106,7 +110,7 @@ export function 获取椿回锋方向(this: void, 英雄: any): number | null {
 
 function 设置回锋方向(this: void, 英雄: any, 方向: number): void {
   if (英雄 == null || 英雄 === 0) return;
-  回锋表[jass.GetHandleId(英雄)] = { 到期: getGameTime() + E配置.回锋方向有效秒, 方向 };
+  回锋表[jass.GetHandleId(英雄)] = { 到期: getGameTime() + E配置.回锋方向有效秒 * 1000, 方向 };
 }
 
 //=============================================================================
@@ -124,7 +128,8 @@ interface E数据 {
 }
 
 function 结算E终点横斩(this: void, 施法者: any, 技能实例ID: number | undefined, 数据: E数据): void {
-  debugLogForce("椿-E", "伤害", "标签", "朱雀院椿-E横斩", "数值", 读取单位攻击力(施法者) * E配置.横斩倍率);
+  const 玩家ID = GetPlayerId(GetOwningPlayer(施法者)) + 1;
+  debugLogForce("椿-E", "结算", "玩家", 玩家ID, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "标签", "朱雀院椿-E横斩", "伤害", 读取单位攻击力(施法者) * E配置.横斩倍率, "方向", 数据.方向角, "落点X", Math.floor(数据.终点X), "落点Y", Math.floor(数据.终点Y));
   播放椿动作(施法者, 朱雀院椿动作槽.E终点横斩);
   if (数据.已结算) return;
   数据.已结算 = true;
@@ -152,7 +157,11 @@ function 结算E终点横斩(this: void, 施法者: any, 技能实例ID: number 
       return 单位 !== 施法者 && 单位存活(单位) && jass.IsUnitEnemy(单位, jass.GetOwningPlayer(施法者));
     },
   });
+  if (敌人.length === 0) {
+    debugLogForce("椿-E", "命中失败", "原因", "无目标", "玩家", 玩家ID, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "方向", 数据.方向角);
+  }
   for (let i = 0; i < 敌人.length; i++) {
+    debugLogForce("椿-E", "命中", "玩家", 玩家ID, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "标签", "朱雀院椿-E横斩", "目标", GetUnitName(敌人[i]), "handle", 敌人[i], "X", Math.floor(GetUnitX(敌人[i])), "Y", Math.floor(GetUnitY(敌人[i])), "伤害", 读取单位攻击力(施法者) * E配置.横斩倍率);
     造成技能伤害({
       来源: 施法者,
       目标: 敌人[i],
@@ -178,6 +187,7 @@ function 结算E终点横斩(this: void, 施法者: any, 技能实例ID: number 
   } else {
     扣除VF(施法者, E配置.二刀VF代价);
     for (let i = 0; i < 敌人.length; i++) {
+      debugLogForce("椿-E", "命中", "玩家", 玩家ID, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "标签", "朱雀院椿-E二刀横斩", "目标", GetUnitName(敌人[i]), "handle", 敌人[i], "X", Math.floor(GetUnitX(敌人[i])), "Y", Math.floor(GetUnitY(敌人[i])), "伤害", 读取单位攻击力(施法者) * E配置.二刀追加倍率);
       造成技能伤害({
         来源: 施法者,
         目标: 敌人[i],
@@ -199,10 +209,16 @@ function 结算E终点横斩(this: void, 施法者: any, 技能实例ID: number 
 }
 
 function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("椿-E", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (!是朱雀院椿(施法者)) return;
+  if (!是朱雀院椿(施法者)) {
+    debugLogForce("椿-E", "释放被拒", "原因", "非朱雀院椿", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-");
+    return;
+  }
+  debugLogForce("椿-E", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(GetSpellTargetX()), "Y", Math.floor(GetSpellTargetY()));
   // 重复 E：已有活跃位移时忽略
-  if (查询战斗技能实例(施法者, "椿E").length > 0) return;
+  if (查询战斗技能实例(施法者, "椿E").length > 0) {
+    debugLogForce("椿-E", "释放被拒", "原因", "已有活跃位移", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-");
+    return;
+  }
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
   播放英雄技能喊话(施法者, "朱雀院椿", 朱雀院椿技能配置.E.技能ID);
   播放椿动作(施法者, 朱雀院椿动作槽.E冲刺);
@@ -227,14 +243,14 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
     方向角: 方向,
     精确回锋,
   };
-  debugLogForce("椿-E", "状态", "创建战斗技能实例", 技能实例ID ?? "-");
+  debugLogForce("椿-E", "状态", "创建战斗技能实例", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-");
   const 控制器 = 创建战斗技能实例({
     技能键: "椿E",
     施法者,
     技能实例ID,
     数据,
     结束回调: function E结束(this: void, _原因: string, _c: any): void {
-      debugLogForce("椿-E", "结束", "原因", _原因 ?? "-");
+      debugLogForce("椿-E", "结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "原因", _原因 ?? "-");
       // 中断/死亡：先标记结束，再停止位移（防止位移结束回调误触发落点结算）
       if (数据.已结束) return;
       数据.已结束 = true;
@@ -244,7 +260,7 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
       }
     },
   });
-  debugLogForce("椿-E", "位移", "类型", "冲锋", "距离", E配置.位移距离);
+  debugLogForce("椿-E", "位移", "类型", "冲锋", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "距离", E配置.位移距离);
   数据.位移ID = 开始冲锋(施法者, {
     距离: E配置.位移距离,
     每秒速度: E配置.位移速度,
@@ -268,7 +284,7 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
     },
     结束回调: function E位移结束(this: void, 单位: any, 原因: string, _位移ID: number): void {
       if (数据.已结束) return;
-      debugLogForce("椿-E", "命中", "目标", 单位);
+      debugLogForce("椿-E", "位移结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "单位", 单位 != null && 单位 !== 0 ? GetUnitName(单位) : "-", "handle", 单位 ?? "-", "X", Math.floor(GetUnitX(单位)), "Y", Math.floor(GetUnitY(单位)), "原因", 原因 ?? "-");
       const 落点X = GetUnitX(单位);
       const 落点Y = GetUnitY(单位);
       数据.终点X = 落点X;

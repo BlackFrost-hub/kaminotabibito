@@ -19,8 +19,15 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
+const { fourCCToStringSafe, stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
@@ -52,16 +59,20 @@ function 计算下一个变式(this: void, 当前: string | null): string {
 }
 
 function 释放D旅途魔法变式(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
-  debugLogForce("伊蕾娜-D", "释放", "技能实例ID", _技能实例ID ?? "-");
-  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
+  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) {
+    debugLogForce("伊蕾娜-D", "释放被拒", "原因", "施法者无效", "handle", 施法者);
+    return;
+  }
+  debugLogForce("伊蕾娜-D", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(stringToFourCCSafe(伊蕾娜技能配置.D.技能ID)), "实例", _技能实例ID ?? "-", "目标", "自身");
 
   const 当前 = 获取伊蕾娜变式(施法者);
   const 下一个 = 计算下一个变式(当前);
   if (!设置伊蕾娜变式(施法者, 下一个 as any)) {
     // R 蓄力期间被拒：不刷新任何提示
+    debugLogForce("伊蕾娜-D", "释放被拒", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "原因", "R锁定变式", "目标变式", 下一个);
     return;
   }
-  debugLogForce("伊蕾娜-D", "状态", "切换变式", 下一个);
+  debugLogForce("伊蕾娜-D", "状态", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "切换变式", 下一个);
   播放英雄技能喊话(施法者, "伊蕾娜", 伊蕾娜技能配置.D.技能ID, 下一个);
   // 变式切换成功音（单位=施法者；R 锁定拒绝分支已在上方 return，不会播放，参数配置驱动）
   Sound3DII_UnitPlayReuse(伊蕾娜音效配置.D切换.路径, 施法者, 伊蕾娜音效配置.D切换.裁断距离);

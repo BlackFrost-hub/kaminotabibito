@@ -71,6 +71,7 @@ end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
+local _____6280_80FD_8BF4_660E_52A8_4F5C = require("平台扩展API动作")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
 removeDelayedCallback = ____require_result_0.removeDelayedCallback
@@ -136,6 +137,12 @@ ____exports["创建限时二段技能壳"] = function(_____53C2_6570)
         return nil
     end
     SetPlayerAbilityAvailable(owner, _____53C2_6570["二段技能ID"], true)
+    SetPlayerAbilityAvailable(owner, _____53C2_6570["二段技能ID"], true)
+    if _____53C2_6570["二段说明"] ~= nil and _____53C2_6570["二段说明"] ~= "" then
+        _____6280_80FD_8BF4_660E_52A8_4F5C["技能_设置技能提示"](_____53C2_6570["单位"], _____53C2_6570["二段技能ID"], _____53C2_6570["名称"])
+        _____6280_80FD_8BF4_660E_52A8_4F5C["技能_设置技能提示扩展"](_____53C2_6570["单位"], _____53C2_6570["二段技能ID"], _____53C2_6570["二段说明"])
+        _____6280_80FD_8BF4_660E_52A8_4F5C["技能_设置刷新数据"](_____53C2_6570["单位"], _____53C2_6570["二段技能ID"])
+    end
     local _____63A7_5236_5668 = {
         ["名称"] = _____53C2_6570["名称"],
         ["单位"] = _____53C2_6570["单位"],

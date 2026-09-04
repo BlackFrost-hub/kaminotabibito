@@ -15,18 +15,24 @@ local _____83B7_53D6_4F0A_857E_5A1C_53D8_5F0F = ____02_FF0E_88AB_52A8_6548_679C[
 local ____require_result_0 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
 local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播放英雄技能喊话"]
 local jass = require("jass.common")
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local fourCCToStringSafe = ____require_result_1.fourCCToStringSafe
+local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_1["注册单位技能壳监听"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____5355_4F4D_5B58_6D3B = ____require_result_2["单位存活"]
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_3["创建点特效"]
-local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_4.Sound3DII_UnitPlayReuse
-local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_5.debugLogForce
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____5355_4F4D_5B58_6D3B = ____require_result_3["单位存活"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
+local ____require_result_5 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_5.Sound3DII_UnitPlayReuse
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_6.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = _____4F0A_857E_5A1C_6280_80FD_914D_7F6E["单位类型ID"]
 local function _____8BA1_7B97_4E0B_4E00_4E2A_53D8_5F0F(_____5F53_524D)
     local _____5217_8868 = _____4F0A_857E_5A1C_53D8_5F0F_914D_7F6E["变式列表"]
@@ -37,16 +43,52 @@ local function _____8BA1_7B97_4E0B_4E00_4E2A_53D8_5F0F(_____5F53_524D)
     return _____5217_8868[_____4E0B_4E00_7D22_5F15 + 1]
 end
 local function _____91CA_653ED_65C5_9014_9B54_6CD5_53D8_5F0F(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
-    debugLogForce("伊蕾娜-D", "释放", "技能实例ID", ______6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "伊蕾娜-D",
+            "释放被拒",
+            "原因",
+            "施法者无效",
+            "handle",
+            _____65BD_6CD5_8005
+        )
         return
     end
+    debugLogForce(
+        "伊蕾娜-D",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(stringToFourCCSafe(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.D["技能ID"])),
+        "实例",
+        ______6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "自身"
+    )
     local _____5F53_524D = _____83B7_53D6_4F0A_857E_5A1C_53D8_5F0F(_____65BD_6CD5_8005)
     local _____4E0B_4E00_4E2A = _____8BA1_7B97_4E0B_4E00_4E2A_53D8_5F0F(_____5F53_524D)
     if not _____8BBE_7F6E_4F0A_857E_5A1C_53D8_5F0F(_____65BD_6CD5_8005, _____4E0B_4E00_4E2A) then
+        debugLogForce(
+            "伊蕾娜-D",
+            "释放被拒",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "原因",
+            "R锁定变式",
+            "目标变式",
+            _____4E0B_4E00_4E2A
+        )
         return
     end
-    debugLogForce("伊蕾娜-D", "状态", "切换变式", _____4E0B_4E00_4E2A)
+    debugLogForce(
+        "伊蕾娜-D",
+        "状态",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "切换变式",
+        _____4E0B_4E00_4E2A
+    )
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "伊蕾娜", _____4F0A_857E_5A1C_6280_80FD_914D_7F6E.D["技能ID"], _____4E0B_4E00_4E2A)
     Sound3DII_UnitPlayReuse(_____4F0A_857E_5A1C_97F3_6548_914D_7F6E["D切换"]["路径"], _____65BD_6CD5_8005, _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["D切换"]["裁断距离"])
     _____64AD_653E_4F0A_857E_5A1C_9636_6BB5_52A8_4F5C(_____65BD_6CD5_8005, _____4F0A_857E_5A1C_6A21_578B_52A8_4F5C_914D_7F6E["技能动作"]["D切换"])

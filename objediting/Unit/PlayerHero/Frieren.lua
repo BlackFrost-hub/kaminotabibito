@@ -24,6 +24,7 @@ createPlayerHeroUnit('E0L5', '芙莉莲', {
 
   attackMode = 'ranged',
   attackType = AttackType.Magic,
+  damageBase = 20,
   attackRange = 700,
   acquire = 700.0,
   attackTargets = 'ground,structure,debris,air,item,ward',

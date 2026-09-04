@@ -11,8 +11,9 @@ import {
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
@@ -80,6 +81,9 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 
@@ -100,6 +104,7 @@ export function 椿R蓄力中(this: void, 英雄: any): boolean {
 //=============================================================================
 
 function 结算R伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
+  debugLogForce("椿-R", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "标签", 标签, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", 伤害值);
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -123,8 +128,12 @@ function R创建终式(
   方向角: number,
   受击记录: boolean,
 ): void {
-  if (!单位存活(施法者)) return;
-  debugLogForce("椿-R", "伤害", "标签", "朱雀院椿-R终式", "数值", 读取单位攻击力(施法者) * R配置.主斩倍率);
+  if (!单位存活(施法者)) {
+    debugLogForce("椿-R", "命中失败", "原因", "施法者已死亡", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-");
+    return;
+  }
+  const 玩家ID = GetPlayerId(GetOwningPlayer(施法者)) + 1;
+  debugLogForce("椿-R", "结算", "玩家", 玩家ID, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "标签", "朱雀院椿-R终式", "姿态", 获取姿态(施法者), "方向", 方向角, "受击记录", 受击记录, "伤害", 读取单位攻击力(施法者) * R配置.主斩倍率);
   const 攻击力 = 读取单位攻击力(施法者);
   const 姿态 = 获取姿态(施法者);
   播放椿动作(施法者, 姿态 === "二刀" ? 朱雀院椿动作槽.R二刀释放 : 朱雀院椿动作槽.R一刀释放);
@@ -138,6 +147,9 @@ function R创建终式(
       return 单位 !== 施法者 && 单位存活(单位) && jass.IsUnitEnemy(单位, jass.GetOwningPlayer(施法者));
     },
   });
+  if (敌人.length === 0) {
+    debugLogForce("椿-R", "命中失败", "原因", "无目标", "玩家", 玩家ID, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "方向", 方向角);
+  }
   // 主斩
   for (let i = 0; i < 敌人.length; i++) {
     结算R伤害(施法者, 敌人[i], 技能实例ID, 攻击力 * R配置.主斩倍率, "朱雀院椿-R主斩");
@@ -193,10 +205,16 @@ function R创建终式(
 //=============================================================================
 
 function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("椿-R", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (!是朱雀院椿(施法者)) return;
+  if (!是朱雀院椿(施法者)) {
+    debugLogForce("椿-R", "释放被拒", "原因", "非朱雀院椿", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-");
+    return;
+  }
+  debugLogForce("椿-R", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(GetSpellTargetX()), "Y", Math.floor(GetSpellTargetY()), "姿态", 获取姿态(施法者));
   // 禁止并行两个终式
-  if (蓄力中表[jass.GetHandleId(施法者)] === true) return;
+  if (蓄力中表[jass.GetHandleId(施法者)] === true) {
+    debugLogForce("椿-R", "释放被拒", "原因", "已有蓄力/终式", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-");
+    return;
+  }
   播放椿动作(施法者, 朱雀院椿动作槽.R蓄力);
   const 目标X = GetSpellTargetX();
   const 目标Y = GetSpellTargetY();
@@ -204,7 +222,7 @@ function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID
   // R 蓄力期间锁定姿态（D 不得中途改写本次 R 分支）
   锁定姿态(施法者, true);
   蓄力中表[jass.GetHandleId(施法者)] = true;
-  debugLogForce("椿-R", "状态", "蓄力开始", 技能实例ID ?? "-");
+  debugLogForce("椿-R", "状态", "蓄力开始", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "方向", 方向角);
   // 释放前快照决斗距离（蓄力 0.7s 期间可能过期，联动按释放时快照消费，不依赖完成时再查）
   const 决斗距离快照 = { 有效: 有决斗距离(施法者), 方向: 获取决斗距离方向(施法者) };
   // 一刀守势受击记录：蓄势期间承受一次符合条件攻击 → 后之先·炎姬分支
@@ -259,7 +277,7 @@ function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID
     },
     // 蓄力结束（完成/指令中断/硬控/死亡/单位失效统一收尾）
     结束回调: function R蓄力结束(this: void, _单位: any, _原因: string, _充能ID: number): void {
-      debugLogForce("椿-R", "结束", "原因", _原因 ?? "-");
+      debugLogForce("椿-R", "结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "原因", _原因 ?? "-");
       if (预警特效 != null && 预警特效 !== 0) {
         jass.DestroyEffect(预警特效);
         预警特效 = null;

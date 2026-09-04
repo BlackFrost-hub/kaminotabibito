@@ -15,10 +15,14 @@ local _____4F0A_857E_5A1CBuffID = ____23_FF0E_4F0A_857E_5A1C["伊蕾娜BuffID"]
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -516,6 +520,16 @@ ____exports["清理伊蕾娜状态"] = function(_____82F1_96C4, _____539F_56E0)
         return true
     end
     _____72B6_6001["已清理"] = true
+    debugLogForce(
+        "伊蕾娜-被动",
+        "清理",
+        "原因",
+        _____539F_56E0,
+        "单位",
+        GetUnitName(_____82F1_96C4),
+        "handle",
+        _____82F1_96C4
+    )
     local ____ = _____539F_56E0
     _____6267_884C_5168_90E8_6280_80FD_6E05_7406(_____72B6_6001)
     _____72B6_6001["见闻列表"] = {}
@@ -747,10 +761,30 @@ local function _____5904_7406_4F0A_857E_5A1C_5F3A_5316_666E_653B(target, attacke
         return
     end
     if not _____5355_4F4D_5B58_6D3B(target) then
+        debugLogForce(
+            "伊蕾娜-被动",
+            "命中失败",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(attacker)) + 1,
+            "原因",
+            "目标无效",
+            "目标",
+            GetUnitName(target),
+            "handle",
+            target
+        )
         return
     end
     local _____72B6_6001 = _____67E5_627E_72B6_6001(attacker)
     if _____72B6_6001 == nil or _____72B6_6001["已清理"] then
+        debugLogForce(
+            "伊蕾娜-被动",
+            "异常",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(attacker)) + 1,
+            "原因",
+            "状态为空或已清理"
+        )
         return
     end
     if _____60F0_6027_5254_9664_8FC7_671F_89C1_95FB(_____72B6_6001) then
@@ -760,6 +794,26 @@ local function _____5904_7406_4F0A_857E_5A1C_5F3A_5316_666E_653B(target, attacke
     if _____4E0B_4E00_6761 == nil then
         return
     end
+    debugLogForce(
+        "伊蕾娜-被动",
+        "命中",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(attacker)) + 1,
+        "四码",
+        fourCCToStringSafe(_____82F1_96C4_5355_4F4D_7C7B_578BID),
+        "目标",
+        GetUnitName(target),
+        "handle",
+        target,
+        "X",
+        math.floor(GetUnitX(target)),
+        "Y",
+        math.floor(GetUnitY(target)),
+        "伤害",
+        math.floor(_____8BFB_53D6_5355_4F4D_653B_51FB_529B(attacker) * _____4F0A_857E_5A1C_666E_653B_8054_52A8_914D_7F6E["伤害攻击力倍率"]),
+        "类型",
+        _____4E0B_4E00_6761["类型"]
+    )
     if _____4E0B_4E00_6761["类型"] == "风行" then
         _____53D1_5C04_98CE_884C_7A7F_900F_5F39(
             attacker,
@@ -783,10 +837,12 @@ local function _____786E_4FDD_6B7B_4EA1_76D1_542C()
     registerDeathListener(function(dyingUnit, _killingUnit)
         debugLogForce(
             "伊蕾娜-被动",
-            "回调",
+            "清理",
             "类型",
             "死亡",
             "单位",
+            GetUnitName(dyingUnit),
+            "handle",
             dyingUnit
         )
         if dyingUnit == nil or dyingUnit == 0 then

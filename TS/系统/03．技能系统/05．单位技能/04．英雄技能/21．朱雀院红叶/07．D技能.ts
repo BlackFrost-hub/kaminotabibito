@@ -57,6 +57,10 @@ const D配置 = 朱雀院红叶待平衡数值.D;
 const D秘传三式音效 = 朱雀院红叶音效配置.D秘传三式;
 const 刀环特效键 = "朱雀院红叶D刀环";
 
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
+
 //=============================================================================
 // D 秘传三式：8 秒、3 次强化资源
 //=============================================================================
@@ -71,7 +75,8 @@ interface D状态 {
 const D状态表: Record<number, D状态 | undefined> = {};
 
 function 刷新D显示(this: void, 英雄: any, 状态: D状态): void {
-  const 剩余秒 = 状态.到期时间 - getGameTime();
+  // getGameTime 返回毫秒，到期时间是毫秒时间戳 → 转秒用于 Buff 时长
+  const 剩余秒 = (状态.到期时间 - getGameTime()) / 1000;
   if (剩余秒 <= 0) {
     移除D状态(英雄);
     return;
@@ -88,15 +93,18 @@ function 移除D状态(this: void, 英雄: any): void {
     removeDelayedCallback(状态.到期回调ID);
     状态.到期回调ID = 0;
   }
-  debugLogForce("红叶-D", "Buff", "操作", "移除", "目标", 英雄);
+  debugLogForce("红叶-D", "Buff", "操作", "移除", "玩家", GetPlayerId(GetOwningPlayer(英雄)) + 1, "目标", GetUnitName(英雄), "handle", 英雄);
   销毁单位坐标跟随特效(英雄, 刀环特效键);
   移除单位指定Buff(英雄, 秘传BuffID);
   delete D状态表[id];
 }
 
 function 开启D秘传三式(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
-  debugLogForce("红叶-D", "释放", "技能实例ID", "-");
-  if (!是朱雀院红叶(施法者)) return;
+  debugLogForce("红叶-D", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 朱雀院红叶技能配置.D.技能ID, "实例", "-", "目标", "-", "X", Math.floor(jass.GetUnitX(施法者)), "Y", Math.floor(jass.GetUnitY(施法者)));
+  if (!是朱雀院红叶(施法者)) {
+    debugLogForce("红叶-D", "释放被拒", "原因", "非红叶单位", "施法者", 施法者);
+    return;
+  }
   播放红叶动作(施法者, 朱雀院红叶动作槽.D启动);
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动；重复 D 刷新同样视为成功施法）
   播放英雄技能喊话(施法者, "朱雀院红叶", 朱雀院红叶技能配置.D.技能ID);
@@ -105,7 +113,7 @@ function 开启D秘传三式(this: void, _context: any, 施法者: any, _技能�
   if (已有 != null) {
     // 重复 D：刷新持续时间，次数保持（不叠加到 6 次）
     if (已有.到期回调ID !== 0) removeDelayedCallback(已有.到期回调ID);
-    已有.到期时间 = getGameTime() + D配置.持续秒;
+    已有.到期时间 = getGameTime() + D配置.持续秒 * 1000;
     已有.到期回调ID = addDelayedCallback(D配置.持续秒 * 1000, function D到期(this: void): void {
       移除D状态(施法者);
     });
@@ -114,7 +122,7 @@ function 开启D秘传三式(this: void, _context: any, 施法者: any, _技能�
   }
   const 状态: D状态 = {
     剩余次数: D配置.强化次数,
-    到期时间: getGameTime() + D配置.持续秒,
+    到期时间: getGameTime() + D配置.持续秒 * 1000,
     延长次数: 0,
     到期回调ID: 0,
   };
@@ -122,7 +130,7 @@ function 开启D秘传三式(this: void, _context: any, 施法者: any, _技能�
     移除D状态(施法者);
   });
   D状态表[id] = 状态;
-  debugLogForce("红叶-D", "状态", "开启秘传", 状态.剩余次数);
+  debugLogForce("红叶-D", "状态", "开启秘传", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "剩余次数", 状态.剩余次数);
   刷新D显示(施法者, 状态);
   // 秘传刀环表现（模型/缩放/高度/RGB 全由表现配置驱动；秘传结束 移除D状态 统一销毁）
   if ((朱雀院红叶表现配置.D刀环.模型路径 as string) !== "") {
@@ -193,9 +201,9 @@ function 破绽斩延长D(this: void, 红叶: any, _目标: any): void {
   if (状态 == null) return;
   if (状态.延长次数 >= D配置.最大延长次数) return;
   状态.延长次数 = 状态.延长次数 + 1;
-  状态.到期时间 = 状态.到期时间 + D配置.延长秒;
+  状态.到期时间 = 状态.到期时间 + D配置.延长秒 * 1000;
   if (状态.到期回调ID !== 0) removeDelayedCallback(状态.到期回调ID);
-  状态.到期回调ID = addDelayedCallback((状态.到期时间 - getGameTime()) * 1000, function D延长到期(this: void): void {
+  状态.到期回调ID = addDelayedCallback(状态.到期时间 - getGameTime(), function D延长到期(this: void): void {
     移除D状态(红叶);
   });
   刷新D显示(红叶, 状态);

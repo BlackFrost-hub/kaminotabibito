@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____5237_65B0VF_8868_73B0, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, Sound3DII_UnitPlayReuse, debugLogForce, ____VF_573ABuffID, ____VF_6B8B_7F3ABuffID, _____88AB_52A8_914D_7F6E, GetHandleId
+local _____5237_65B0VF_8868_73B0, registerManualBuff, _____79FB_9664_5355_4F4D_6307_5B9ABuff, Sound3DII_UnitPlayReuse, ____VF_573ABuffID, ____VF_6B8B_7F3ABuffID, _____88AB_52A8_914D_7F6E
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.00．配置")
 local _____6731_96C0_9662_693F_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿技能配置"]
 local _____6731_96C0_9662_693FBuff_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿Buff配置"]
@@ -11,40 +11,10 @@ function _____5237_65B0VF_8868_73B0(_____82F1_96C4, _____72B6_6001)
     local _____6B8B_7F3A = _____72B6_6001["VF当前"] <= 0 or _____72B6_6001["VF当前"] < _____88AB_52A8_914D_7F6E["VF上限"] * _____88AB_52A8_914D_7F6E["VF残缺阈值"]
     local _____4E4B_524D_6B8B_7F3A = _____72B6_6001["VF残缺"]
     _____72B6_6001["VF残缺"] = _____6B8B_7F3A
-    debugLogForce(
-        "椿-被动",
-        "Buff",
-        "操作",
-        "移除",
-        "目标",
-        GetHandleId(_____82F1_96C4),
-        "Buff",
-        ____VF_573ABuffID
-    )
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____82F1_96C4, ____VF_573ABuffID)
-    debugLogForce(
-        "椿-被动",
-        "Buff",
-        "操作",
-        "移除",
-        "目标",
-        GetHandleId(_____82F1_96C4),
-        "Buff",
-        ____VF_6B8B_7F3ABuffID
-    )
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____82F1_96C4, ____VF_6B8B_7F3ABuffID)
     if _____72B6_6001["VF当前"] > 0 then
         if _____6B8B_7F3A then
-            debugLogForce(
-                "椿-被动",
-                "Buff",
-                "操作",
-                "施加",
-                "目标",
-                GetHandleId(_____82F1_96C4),
-                "Buff",
-                ____VF_6B8B_7F3ABuffID
-            )
             registerManualBuff(
                 _____82F1_96C4,
                 ____VF_6B8B_7F3ABuffID,
@@ -53,16 +23,6 @@ function _____5237_65B0VF_8868_73B0(_____82F1_96C4, _____72B6_6001)
                 {stack = 1}
             )
         else
-            debugLogForce(
-                "椿-被动",
-                "Buff",
-                "操作",
-                "施加",
-                "目标",
-                GetHandleId(_____82F1_96C4),
-                "Buff",
-                ____VF_573ABuffID
-            )
             registerManualBuff(
                 _____82F1_96C4,
                 ____VF_573ABuffID,
@@ -101,19 +61,23 @@ _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_8["移除单位指�
 local ____require_result_9 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 Sound3DII_UnitPlayReuse = ____require_result_9.Sound3DII_UnitPlayReuse
 local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_10.debugLogForce
+local debugLogForce = ____require_result_10.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 ____VF_573ABuffID = _____6731_96C0_9662_693FBuff_914D_7F6E["VF场"]
 ____VF_6B8B_7F3ABuffID = _____6731_96C0_9662_693FBuff_914D_7F6E["VF残缺"]
 local _____53CD_51FB_51C6_5907BuffID = _____6731_96C0_9662_693FBuff_914D_7F6E["反击准备"]
 local _____4E00_5200BuffID = _____6731_96C0_9662_693FBuff_914D_7F6E["一刀守势"]
 local _____4E8C_5200BuffID = _____6731_96C0_9662_693FBuff_914D_7F6E["二刀攻势"]
-local _____51B3_6597BuffID = _____6731_96C0_9662_693FBuff_914D_7F6E["决斗距离"]
 _____88AB_52A8_914D_7F6E = _____6731_96C0_9662_693F_88AB_52A8_914D_7F6E
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
-GetHandleId = jass.GetHandleId
+local GetHandleId = jass.GetHandleId
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local _____82F1_96C4_72B6_6001_8868 = {}
 local function _____53D6_82F1_96C4_72B6_6001(_____82F1_96C4)
     local id = GetHandleId(_____82F1_96C4)
@@ -233,17 +197,6 @@ ____exports["清理朱雀院椿状态"] = function(_____82F1_96C4, ______539F_56
         _____4E8C_5200BuffID
     )
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____82F1_96C4, _____4E8C_5200BuffID)
-    debugLogForce(
-        "椿-被动",
-        "Buff",
-        "操作",
-        "移除",
-        "目标",
-        GetHandleId(_____82F1_96C4),
-        "Buff",
-        _____51B3_6597BuffID
-    )
-    _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____82F1_96C4, _____51B3_6597BuffID)
     for key in pairs(_____72B6_6001["技能清理表"]) do
         local _____6E05_7406 = _____72B6_6001["技能清理表"][key]
         if _____6E05_7406 ~= nil then
@@ -339,7 +292,7 @@ ____exports["创建反击准备"] = function(_____82F1_96C4, _____65B9_5411, ___
         return
     end
     local _____72B6_6001 = _____53D6_82F1_96C4_72B6_6001(_____82F1_96C4)
-    _____72B6_6001["反击准备到期"] = getGameTime() + _____88AB_52A8_914D_7F6E["反击准备持续秒"]
+    _____72B6_6001["反击准备到期"] = getGameTime() + _____88AB_52A8_914D_7F6E["反击准备持续秒"] * 1000
     _____72B6_6001["反击准备方向"] = _____65B9_5411
     local ____temp_12
     if _____6765_6E90 ~= nil and _____6765_6E90 ~= 0 then
@@ -483,31 +436,14 @@ ____exports["姿态是否锁定"] = function(_____82F1_96C4)
     local _____72B6_6001 = _____82F1_96C4_72B6_6001_8868[GetHandleId(_____82F1_96C4)]
     return _____72B6_6001 ~= nil and _____72B6_6001["姿态锁"]
 end
---- 设置决斗距离（默认 2.5s，供 R 读取方向）
+--- 设置决斗距离（默认 2.5s，供 R 读取方向）；规划明确该状态不进玩家 Buff 栏，仅维护内部数据
 ____exports["设置决斗距离"] = function(_____82F1_96C4, _____65B9_5411, _____6301_7EED_79D2)
     if _____82F1_96C4 == nil or _____82F1_96C4 == 0 then
         return
     end
     local _____72B6_6001 = _____53D6_82F1_96C4_72B6_6001(_____82F1_96C4)
-    _____72B6_6001["决斗距离到期"] = getGameTime() + _____6301_7EED_79D2
+    _____72B6_6001["决斗距离到期"] = getGameTime() + _____6301_7EED_79D2 * 1000
     _____72B6_6001["决斗距离方向"] = _____65B9_5411
-    debugLogForce(
-        "椿-被动",
-        "Buff",
-        "操作",
-        "施加",
-        "目标",
-        GetHandleId(_____82F1_96C4),
-        "Buff",
-        _____51B3_6597BuffID
-    )
-    registerManualBuff(
-        _____82F1_96C4,
-        _____51B3_6597BuffID,
-        _____6301_7EED_79D2,
-        1,
-        {stack = 1}
-    )
 end
 ____exports["有决斗距离"] = function(_____82F1_96C4)
     if _____82F1_96C4 == nil or _____82F1_96C4 == 0 then
@@ -533,17 +469,6 @@ ____exports["清除决斗距离"] = function(_____82F1_96C4)
         return
     end
     _____72B6_6001["决斗距离到期"] = 0
-    debugLogForce(
-        "椿-被动",
-        "Buff",
-        "操作",
-        "移除",
-        "目标",
-        GetHandleId(_____82F1_96C4),
-        "Buff",
-        _____51B3_6597BuffID
-    )
-    _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____82F1_96C4, _____51B3_6597BuffID)
 end
 local function _____5904_7406_693F_666E_653B_53CD_51FB_65A9(target, attacker, applied, snapshot)
     if not ____exports["是朱雀院椿"](attacker) then
@@ -583,12 +508,20 @@ local function _____5904_7406_693F_666E_653B_53CD_51FB_65A9(target, attacker, ap
     local _____8FFD_52A0_4F24_5BB3 = applied * _____88AB_52A8_914D_7F6E["反击斩伤害倍率"]
     debugLogForce(
         "椿-被动",
-        "伤害",
+        "命中",
         "标签",
         "朱雀院椿-反击斩",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(attacker)) + 1,
         "目标",
-        GetHandleId(target),
-        "数值",
+        GetUnitName(target),
+        "handle",
+        target,
+        "X",
+        math.floor(GetUnitX(target)),
+        "Y",
+        math.floor(GetUnitY(target)),
+        "伤害",
         _____8FFD_52A0_4F24_5BB3
     )
     _____9020_6210_6280_80FD_4F24_5BB3({
@@ -609,12 +542,20 @@ local function _____5904_7406_693F_666E_653B_53CD_51FB_65A9(target, attacker, ap
     else
         debugLogForce(
             "椿-被动",
-            "伤害",
+            "命中",
             "标签",
             "朱雀院椿-反击斩二刀",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(attacker)) + 1,
             "目标",
-            GetHandleId(target),
-            "数值",
+            GetUnitName(target),
+            "handle",
+            target,
+            "X",
+            math.floor(GetUnitX(target)),
+            "Y",
+            math.floor(GetUnitY(target)),
+            "伤害",
             applied * _____88AB_52A8_914D_7F6E["二刀反击斩额外倍率"]
         )
         _____9020_6210_6280_80FD_4F24_5BB3({
@@ -640,18 +581,20 @@ local function _____786E_4FDD_6B7B_4EA1_6E05_7406()
     end
     _____6B7B_4EA1_76D1_542C_5DF2_6CE8_518C = true
     registerDeathListener(function(dyingUnit, _killingUnit)
-        debugLogForce(
-            "椿-被动",
-            "回调",
-            "类型",
-            "死亡",
-            "单位",
-            dyingUnit ~= nil and dyingUnit ~= 0 and GetHandleId(dyingUnit) or "-"
-        )
         if dyingUnit == nil or dyingUnit == 0 then
             return
         end
         if ____exports["是朱雀院椿"](dyingUnit) then
+            debugLogForce(
+                "椿-被动",
+                "回调",
+                "类型",
+                "死亡",
+                "单位",
+                GetHandleId(dyingUnit),
+                "玩家",
+                GetPlayerId(GetOwningPlayer(dyingUnit)) + 1
+            )
             ____exports["清理朱雀院椿状态"](dyingUnit, "英雄死亡")
         end
     end)
@@ -665,15 +608,20 @@ ____exports["注册朱雀院椿被动"] = function()
     _____5DF2_6CE8_518C = true
     _____786E_4FDD_6B7B_4EA1_6E05_7406()
     registerPlayerHeroListener(function(_player, hero)
-        debugLogForce(
-            "椿-被动",
-            "回调",
-            "类型",
-            "英雄注册",
-            "单位",
-            hero ~= nil and hero ~= 0 and GetHandleId(hero) or "-"
-        )
+        if hero == nil or hero == 0 then
+            return
+        end
         if ____exports["是朱雀院椿"](hero) then
+            debugLogForce(
+                "椿-被动",
+                "回调",
+                "类型",
+                "英雄注册",
+                "单位",
+                GetHandleId(hero),
+                "玩家",
+                GetPlayerId(GetOwningPlayer(hero)) + 1
+            )
             ____exports["初始化VF"](hero)
         end
     end)

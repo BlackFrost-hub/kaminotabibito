@@ -22,8 +22,12 @@ local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播�
 local jass = require("jass.common")
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_1.fourCCToStringSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local SetUnitFacing = jass.SetUnitFacing
@@ -75,9 +79,22 @@ local ____E_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____4F0A_857E_5A1C_6280_
 local ____E_786C_76F4_6765_6E90 = "伊蕾娜-E硬直"
 --- 终点冲击 + 扫帚路线 + 远行见闻（只在完成原因时调用）。
 local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, _____6570_636E)
-    debugLogForce("伊蕾娜-E", "结束", "原因", "完成")
     local X = GetUnitX(_____65BD_6CD5_8005)
     local Y = GetUnitY(_____65BD_6CD5_8005)
+    debugLogForce(
+        "伊蕾娜-E",
+        "结束",
+        "原因",
+        "完成",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "实例",
+        _____5B9E_4F8BID or "-",
+        "X",
+        math.floor(X),
+        "Y",
+        math.floor(Y)
+    )
     _____64AD_653E_4F0A_857E_5A1C_9636_6BB5_52A8_4F5C(_____65BD_6CD5_8005, _____4F0A_857E_5A1C_6A21_578B_52A8_4F5C_914D_7F6E["技能动作"]["E落地"])
     local _____654C_4EBA_5217_8868 = _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA(_____65BD_6CD5_8005, X, Y, _____4F0A_857E_5A1CE_914D_7F6E["冲击半径"])
     local _____51B2_51FB_4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____4F0A_857E_5A1CE_914D_7F6E["冲击伤害攻击力倍率"]
@@ -87,8 +104,40 @@ local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, 
             do
                 local _____654C_4EBA = _____654C_4EBA_5217_8868[i + 1]
                 if not _____5355_4F4D_5B58_6D3B(_____654C_4EBA) then
+                    debugLogForce(
+                        "伊蕾娜-E",
+                        "命中失败",
+                        "玩家",
+                        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                        "原因",
+                        "目标无效",
+                        "目标",
+                        GetUnitName(_____654C_4EBA),
+                        "handle",
+                        _____654C_4EBA
+                    )
                     goto __continue4
                 end
+                debugLogForce(
+                    "伊蕾娜-E",
+                    "命中",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                    "四码",
+                    fourCCToStringSafe(____E_6280_80FD_7C7B_578BID),
+                    "目标",
+                    GetUnitName(_____654C_4EBA),
+                    "handle",
+                    _____654C_4EBA,
+                    "X",
+                    math.floor(GetUnitX(_____654C_4EBA)),
+                    "Y",
+                    math.floor(GetUnitY(_____654C_4EBA)),
+                    "伤害",
+                    math.floor(_____51B2_51FB_4F24_5BB3),
+                    "标签",
+                    "伊蕾娜-扫帚冲击"
+                )
                 _____9020_6210_6280_80FD_4F24_5BB3({
                     ["来源"] = _____65BD_6CD5_8005,
                     ["目标"] = _____654C_4EBA,
@@ -126,8 +175,40 @@ local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, 
                 do
                     local _____654C_4EBA = _____7070_70EC_654C_4EBA[i + 1]
                     if not _____5355_4F4D_5B58_6D3B(_____654C_4EBA) then
+                        debugLogForce(
+                            "伊蕾娜-E",
+                            "命中失败",
+                            "玩家",
+                            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                            "原因",
+                            "目标无效",
+                            "目标",
+                            GetUnitName(_____654C_4EBA),
+                            "handle",
+                            _____654C_4EBA
+                        )
                         goto __continue8
                     end
+                    debugLogForce(
+                        "伊蕾娜-E",
+                        "命中",
+                        "玩家",
+                        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                        "四码",
+                        fourCCToStringSafe(____E_6280_80FD_7C7B_578BID),
+                        "目标",
+                        GetUnitName(_____654C_4EBA),
+                        "handle",
+                        _____654C_4EBA,
+                        "X",
+                        math.floor(GetUnitX(_____654C_4EBA)),
+                        "Y",
+                        math.floor(GetUnitY(_____654C_4EBA)),
+                        "伤害",
+                        math.floor(_____7070_70EC_4F24_5BB3),
+                        "标签",
+                        "伊蕾娜-远行灰烬爆发"
+                    )
                     _____9020_6210_6280_80FD_4F24_5BB3({
                         ["来源"] = _____65BD_6CD5_8005,
                         ["目标"] = _____654C_4EBA,
@@ -176,10 +257,29 @@ local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, 
     _____8BB0_5F55_4F0A_857E_5A1C_89C1_95FB(_____65BD_6CD5_8005, "远行", _____5B9E_4F8BID)
 end
 local function _____91CA_653EE_626B_5E1A_8FDC_884C(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("伊蕾娜-E", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "伊蕾娜-E",
+            "释放被拒",
+            "原因",
+            "施法者无效",
+            "handle",
+            _____65BD_6CD5_8005
+        )
         return
     end
+    debugLogForce(
+        "伊蕾娜-E",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____E_6280_80FD_7C7B_578BID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "点施放"
+    )
     local _____76EE_6807X = GetSpellTargetX()
     local _____76EE_6807Y = GetSpellTargetY()
     local _____8D77_70B9X = GetUnitX(_____65BD_6CD5_8005)
@@ -293,10 +393,12 @@ local function _____91CA_653EE_626B_5E1A_8FDC_884C(_context, _____65BD_6CD5_8005
                 debugLogForce(
                     "伊蕾娜-E",
                     "位移",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
                     "类型",
                     "冲锋",
                     "距离",
-                    _____6700_7EC8_8DDD_79BB
+                    math.floor(_____6700_7EC8_8DDD_79BB)
                 )
                 local _____4F4D_79FBID = _____5F00_59CB_51B2_950B(
                     _____65BD_6CD5_8005,

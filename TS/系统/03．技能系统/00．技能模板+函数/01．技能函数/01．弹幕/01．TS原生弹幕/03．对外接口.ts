@@ -15,10 +15,11 @@ import {
   DzSetEffectPos,
   EXEffectMatScale,
   DzSetUnitModel,
-  DzSetUnitVertexColor,
+  SetUnitVertexColor,
   EC_CreateEffect,
   GetOwningPlayer,
   GetUnitFacing,
+  GetUnitFlyHeight,
   GetUnitX,
   GetUnitY,
   Player,
@@ -189,7 +190,7 @@ function 初始化弹幕表现(this: void, 参数: 原生弹幕参数, 弹幕单
     }
     // 主弹幕模型着色（RGB 配置驱动）
     if (参数.RGB != null && 参数.RGB.红 != null && 参数.RGB.绿 != null && 参数.RGB.蓝 != null) {
-      DzSetUnitVertexColor(
+      SetUnitVertexColor(
         弹幕单位,
         限制弹幕特效颜色字节(参数.RGB.红),
         限制弹幕特效颜色字节(参数.RGB.绿),
@@ -245,13 +246,32 @@ function 创建弹幕实例对象(this: void, 实例: 原生弹幕内部实例):
   };
 }
 
+/** 让单位可被 SetUnitFlyHeight 调整高度（乌鸦形态 'Amrf' 加后即移；同位移系统残影表现处理）。 */
+function 确保单位可设置飞行高度(this: void, 单位: any): void {
+  if (单位 == null || 单位 === 0) return;
+  UnitAddAbility(单位, 1097691750); // 'Amrf'
+  UnitRemoveAbility(单位, 1097691750);
+}
+
 export function 创建原生弹幕(this: void, 参数: 原生弹幕参数): 原生弹幕实例 {
   参数 = 归一化弹幕距离参数(参数);
   const x = 解析弹幕X(参数);
   const y = 解析弹幕Y(参数);
   const face = 解析弹幕方向(参数);
-  const z = 参数.飞行高度 ?? 0;
+  // 发射高度：优先显式 飞行高度；否则 发射高度来源="发射者" 时继承发射者当前飞行高度
+  let z = 参数.飞行高度 ?? 0;
   const 弹幕单位 = 创建或取得弹幕单位(参数, x, y, face);
+  if (参数.飞行高度 == null && 参数.发射高度来源 === "发射者") {
+    const 发射者 = 参数.所有者;
+    if (发射者 != null && 发射者 !== 0) {
+      确保单位可设置飞行高度(发射者);
+      z = GetUnitFlyHeight(发射者);
+      if (z > 0 && 弹幕单位 != null && 弹幕单位 !== 0) {
+        确保单位可设置飞行高度(弹幕单位);
+        SetUnitFlyHeight(弹幕单位, z, 0);
+      }
+    }
+  }
   const id = 分配原生弹幕ID();
 
   const 实例: 原生弹幕内部实例 = {

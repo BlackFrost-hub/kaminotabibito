@@ -9,6 +9,9 @@ import {
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
+
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
 };
@@ -74,7 +77,7 @@ function 停止二刀消耗(this: void, 英雄: any): void {
 }
 
 function 进入二刀攻势(this: void, 施法者: any): void {
-  debugLogForce("椿-D", "状态", "切换至二刀", "持续秒", D配置.二刀持续秒);
+  debugLogForce("椿-D", "状态", "切换至二刀", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 朱雀院椿技能配置.D.技能ID, "持续秒", D配置.二刀持续秒);
   设置姿态(施法者, "二刀");
   停止二刀消耗(施法者);
   const 状态: 二刀状态 = { 到期回调ID: 0, 消耗周期ID: 0 };
@@ -102,17 +105,23 @@ function 进入二刀攻势(this: void, 施法者: any): void {
 }
 
 function 释放D姿态切换(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
-  debugLogForce("椿-D", "释放", "技能实例ID", _技能实例ID ?? "-");
-  if (!是朱雀院椿(施法者)) return;
+  if (!是朱雀院椿(施法者)) {
+    debugLogForce("椿-D", "释放被拒", "原因", "非朱雀院椿", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 朱雀院椿技能配置.D.技能ID, "实例", _技能实例ID ?? "-");
+    return;
+  }
+  debugLogForce("椿-D", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 朱雀院椿技能配置.D.技能ID, "实例", _技能实例ID ?? "-", "姿态", 获取姿态(施法者));
   // R 蓄力期间姿态锁定：禁止切换
-  if (姿态是否锁定(施法者)) return;
+  if (姿态是否锁定(施法者)) {
+    debugLogForce("椿-D", "释放被拒", "原因", "姿态锁定(R蓄力)", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 朱雀院椿技能配置.D.技能ID, "实例", _技能实例ID ?? "-");
+    return;
+  }
   播放椿动作(施法者, 朱雀院椿动作槽.D切换);
   const 当前 = 获取姿态(施法者);
   if (当前 === "一刀") {
     进入二刀攻势(施法者);
   } else {
     // 切回一刀：停止消耗 + 恢复部分 VF
-    debugLogForce("椿-D", "状态", "切回一刀");
+    debugLogForce("椿-D", "状态", "切回一刀", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 朱雀院椿技能配置.D.技能ID);
     停止二刀消耗(施法者);
     设置姿态(施法者, "一刀");
     恢复VF(施法者, D配置.切回一刀恢复VF);

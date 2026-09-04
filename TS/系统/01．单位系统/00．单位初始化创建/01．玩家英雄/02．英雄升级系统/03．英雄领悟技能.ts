@@ -13,6 +13,9 @@ const { YDWEGetUnitAbilityDataString } = require("lib.扩展函数.YDWE函数.00
 const { 获取英雄升级配置 } = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.02．英雄升级系统.01．升级配置表") as {
   获取英雄升级配置: (this: void, heroRawcode: string) => import("./00．类型定义").英雄升级配置 | null;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 function 显示领悟提示(this: void, whichHero: any, abilityId: number): void {
   const owner = jass.GetOwningPlayer(whichHero);
@@ -36,6 +39,8 @@ export function 应用英雄领悟技能(this: void, whichHero: any): void {
   const heroRawcode = 获取单位英雄Rawcode(whichHero);
   const heroConfig = 获取英雄升级配置(heroRawcode);
   const rules = heroConfig?.awakeningSkills;
+  // 升级事件每次触发打一条（仅测试定位用；正式环境可注释）
+  debugLogForce("英雄领悟技能", "回调", "等级", level, "英雄", heroRawcode, "英雄名", jass.GetUnitName(whichHero), "有领悟规则", rules != null && rules.length > 0);
   if (rules == null) return;
 
   for (let i = 0; i < rules.length; i++) {

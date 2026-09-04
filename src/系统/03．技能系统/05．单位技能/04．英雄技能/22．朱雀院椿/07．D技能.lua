@@ -7,6 +7,8 @@ local _____6731_96C0_9662_693F_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["朱雀院
 local _____6731_96C0_9662_693FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿D配置"]
 local _____6731_96C0_9662_693F_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿音效配置"]
 local jass = require("jass.common")
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
@@ -53,6 +55,10 @@ local function _____8FDB_5165_4E8C_5200_653B_52BF(_____65BD_6CD5_8005)
         "椿-D",
         "状态",
         "切换至二刀",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.D["技能ID"],
         "持续秒",
         ____D_914D_7F6E["二刀持续秒"]
     )
@@ -90,11 +96,46 @@ local function _____8FDB_5165_4E8C_5200_653B_52BF(_____65BD_6CD5_8005)
     )
 end
 local function _____91CA_653ED_59FF_6001_5207_6362(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
-    debugLogForce("椿-D", "释放", "技能实例ID", ______6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_693F(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "椿-D",
+            "释放被拒",
+            "原因",
+            "非朱雀院椿",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.D["技能ID"],
+            "实例",
+            ______6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
+    debugLogForce(
+        "椿-D",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.D["技能ID"],
+        "实例",
+        ______6280_80FD_5B9E_4F8BID or "-",
+        "姿态",
+        _____83B7_53D6_59FF_6001(_____65BD_6CD5_8005)
+    )
     if _____59FF_6001_662F_5426_9501_5B9A(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "椿-D",
+            "释放被拒",
+            "原因",
+            "姿态锁定(R蓄力)",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.D["技能ID"],
+            "实例",
+            ______6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["D切换"])
@@ -102,7 +143,15 @@ local function _____91CA_653ED_59FF_6001_5207_6362(_context, _____65BD_6CD5_8005
     if _____5F53_524D == "一刀" then
         _____8FDB_5165_4E8C_5200_653B_52BF(_____65BD_6CD5_8005)
     else
-        debugLogForce("椿-D", "状态", "切回一刀")
+        debugLogForce(
+            "椿-D",
+            "状态",
+            "切回一刀",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.D["技能ID"]
+        )
         _____505C_6B62_4E8C_5200_6D88_8017(_____65BD_6CD5_8005)
         _____8BBE_7F6E_59FF_6001(_____65BD_6CD5_8005, "一刀")
         _____6062_590DVF(_____65BD_6CD5_8005, ____D_914D_7F6E["切回一刀恢复VF"])

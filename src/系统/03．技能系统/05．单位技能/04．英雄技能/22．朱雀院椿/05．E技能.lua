@@ -1,5 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
+local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
+local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
+local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.00．配置")
 local _____6731_96C0_9662_693F_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿技能配置"]
@@ -10,6 +13,7 @@ local _____6731_96C0_9662_693F_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["朱�
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getGameTime = ____require_result_1.getGameTime
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
@@ -54,6 +58,9 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local _____56DE_950B_8868 = {}
@@ -74,18 +81,31 @@ local function _____8BBE_7F6E_56DE_950B_65B9_5411(_____82F1_96C4, _____65B9_5411
         return
     end
     _____56DE_950B_8868[jass.GetHandleId(_____82F1_96C4)] = {
-        ["到期"] = getGameTime() + ____E_914D_7F6E["回锋方向有效秒"],
+        ["到期"] = getGameTime() + ____E_914D_7F6E["回锋方向有效秒"] * 1000,
         ["方向"] = _____65B9_5411
     }
 end
 local function _____7ED3_7B97E_7EC8_70B9_6A2A_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
+    local _____73A9_5BB6ID = GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
     debugLogForce(
         "椿-E",
-        "伤害",
+        "结算",
+        "玩家",
+        _____73A9_5BB6ID,
+        "四码",
+        fourCCToStringSafe(____E_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
         "标签",
         "朱雀院椿-E横斩",
-        "数值",
-        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____E_914D_7F6E["横斩倍率"]
+        "伤害",
+        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____E_914D_7F6E["横斩倍率"],
+        "方向",
+        _____6570_636E["方向角"],
+        "落点X",
+        math.floor(_____6570_636E["终点X"]),
+        "落点Y",
+        math.floor(_____6570_636E["终点Y"])
     )
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["E终点横斩"])
     if _____6570_636E["已结算"] then
@@ -123,9 +143,47 @@ local function _____7ED3_7B97E_7EC8_70B9_6A2A_65A9(_____65BD_6CD5_8005, _____628
             )
         end
     })
+    if #_____654C_4EBA == 0 then
+        debugLogForce(
+            "椿-E",
+            "命中失败",
+            "原因",
+            "无目标",
+            "玩家",
+            _____73A9_5BB6ID,
+            "四码",
+            fourCCToStringSafe(____E_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-",
+            "方向",
+            _____6570_636E["方向角"]
+        )
+    end
     do
         local i = 0
         while i < #_____654C_4EBA do
+            debugLogForce(
+                "椿-E",
+                "命中",
+                "玩家",
+                _____73A9_5BB6ID,
+                "四码",
+                fourCCToStringSafe(____E_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
+                "标签",
+                "朱雀院椿-E横斩",
+                "目标",
+                GetUnitName(_____654C_4EBA[i + 1]),
+                "handle",
+                _____654C_4EBA[i + 1],
+                "X",
+                math.floor(GetUnitX(_____654C_4EBA[i + 1])),
+                "Y",
+                math.floor(GetUnitY(_____654C_4EBA[i + 1])),
+                "伤害",
+                _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____E_914D_7F6E["横斩倍率"]
+            )
             _____9020_6210_6280_80FD_4F24_5BB3({
                 ["来源"] = _____65BD_6CD5_8005,
                 ["目标"] = _____654C_4EBA[i + 1],
@@ -153,6 +211,28 @@ local function _____7ED3_7B97E_7EC8_70B9_6A2A_65A9(_____65BD_6CD5_8005, _____628
         do
             local i = 0
             while i < #_____654C_4EBA do
+                debugLogForce(
+                    "椿-E",
+                    "命中",
+                    "玩家",
+                    _____73A9_5BB6ID,
+                    "四码",
+                    fourCCToStringSafe(____E_6280_80FDID),
+                    "实例",
+                    _____6280_80FD_5B9E_4F8BID or "-",
+                    "标签",
+                    "朱雀院椿-E二刀横斩",
+                    "目标",
+                    GetUnitName(_____654C_4EBA[i + 1]),
+                    "handle",
+                    _____654C_4EBA[i + 1],
+                    "X",
+                    math.floor(GetUnitX(_____654C_4EBA[i + 1])),
+                    "Y",
+                    math.floor(GetUnitY(_____654C_4EBA[i + 1])),
+                    "伤害",
+                    _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____E_914D_7F6E["二刀追加倍率"]
+                )
                 _____9020_6210_6280_80FD_4F24_5BB3({
                     ["来源"] = _____65BD_6CD5_8005,
                     ["目标"] = _____654C_4EBA[i + 1],
@@ -174,11 +254,50 @@ local function _____7ED3_7B97E_7EC8_70B9_6A2A_65A9(_____65BD_6CD5_8005, _____628
     _____8BBE_7F6E_51B3_6597_8DDD_79BB(_____65BD_6CD5_8005, _____6570_636E["方向角"], ____E_914D_7F6E["决斗距离持续秒"])
 end
 local function _____91CA_653EE_95F4_5408(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("椿-E", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_693F(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "椿-E",
+            "释放被拒",
+            "原因",
+            "非朱雀院椿",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____E_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
+    debugLogForce(
+        "椿-E",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____E_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "点施放",
+        "X",
+        math.floor(GetSpellTargetX()),
+        "Y",
+        math.floor(GetSpellTargetY())
+    )
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "椿E") > 0 then
+        debugLogForce(
+            "椿-E",
+            "释放被拒",
+            "原因",
+            "已有活跃位移",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____E_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院椿", _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.E["技能ID"])
@@ -212,14 +331,35 @@ local function _____91CA_653EE_95F4_5408(_context, _____65BD_6CD5_8005, _____628
         ["方向角"] = _____65B9_5411,
         ["精确回锋"] = _____7CBE_786E_56DE_950B
     }
-    debugLogForce("椿-E", "状态", "创建战斗技能实例", _____6280_80FD_5B9E_4F8BID or "-")
+    debugLogForce(
+        "椿-E",
+        "状态",
+        "创建战斗技能实例",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____E_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-"
+    )
     local _____63A7_5236_5668 = _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B({
         ["技能键"] = "椿E",
         ["施法者"] = _____65BD_6CD5_8005,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
-            debugLogForce("椿-E", "结束", "原因", ______539F_56E0 or "-")
+            debugLogForce(
+                "椿-E",
+                "结束",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                fourCCToStringSafe(____E_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
+                "原因",
+                ______539F_56E0 or "-"
+            )
             if _____6570_636E["已结束"] then
                 return
             end
@@ -235,6 +375,12 @@ local function _____91CA_653EE_95F4_5408(_context, _____65BD_6CD5_8005, _____628
         "位移",
         "类型",
         "冲锋",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____E_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
         "距离",
         ____E_914D_7F6E["位移距离"]
     )
@@ -264,7 +410,35 @@ local function _____91CA_653EE_95F4_5408(_context, _____65BD_6CD5_8005, _____628
                 if _____6570_636E["已结束"] then
                     return
                 end
-                debugLogForce("椿-E", "命中", "目标", _____5355_4F4D)
+                local ____debugLogForce_15 = debugLogForce
+                local ____array_14 = __TS__SparseArrayNew(
+                    "椿-E",
+                    "位移结束",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                    "四码",
+                    fourCCToStringSafe(____E_6280_80FDID),
+                    "实例",
+                    _____6280_80FD_5B9E_4F8BID or "-",
+                    "单位",
+                    _____5355_4F4D ~= nil and _____5355_4F4D ~= 0 and GetUnitName(_____5355_4F4D) or "-",
+                    "handle"
+                )
+                local ____5355_4F4D_13 = _____5355_4F4D
+                if ____5355_4F4D_13 == nil then
+                    ____5355_4F4D_13 = "-"
+                end
+                __TS__SparseArrayPush(
+                    ____array_14,
+                    ____5355_4F4D_13,
+                    "X",
+                    math.floor(GetUnitX(_____5355_4F4D)),
+                    "Y",
+                    math.floor(GetUnitY(_____5355_4F4D)),
+                    "原因",
+                    _____539F_56E0 or "-"
+                )
+                ____debugLogForce_15(__TS__SparseArraySpread(____array_14))
                 local _____843D_70B9X = GetUnitX(_____5355_4F4D)
                 local _____843D_70B9Y = GetUnitY(_____5355_4F4D)
                 _____6570_636E["终点X"] = _____843D_70B9X

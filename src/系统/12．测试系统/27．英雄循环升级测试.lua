@@ -84,4 +84,7 @@ local function ____on_82F1_96C4_5FAA_73AF_5347_7EA7_547D_4EE4(player, command)
     )
 end
 _____6CE8_518C_804A_5929_547D_4EE4_524D_7F00_76D1_542C(_____82F1_96C4_5347_7EA7_547D_4EE4_524D_7F00, ____on_82F1_96C4_5FAA_73AF_5347_7EA7_547D_4EE4)
+local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_3.debugLogForce
+debugLogForce("英雄循环升级测试", "已注册监听", "前缀", _____82F1_96C4_5347_7EA7_547D_4EE4_524D_7F00)
 return ____exports

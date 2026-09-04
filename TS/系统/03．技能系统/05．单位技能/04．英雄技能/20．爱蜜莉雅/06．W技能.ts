@@ -4,7 +4,7 @@
  *
  * - 目标点创建冰花 + 真实减速区域（视觉范围不代替判定；判定由持续危险区域承载）。
  * - 持续期间按配置周期结算（伤害/寒意/减速），不每 tick 重建完整特效。
- * - 二段：窗口内再次按 W 锁定方向引爆冰花（扇形冰片 + 引爆伤害），窗口结束后再次按 W 创建新区域。
+ * - 二段：窗口内再次按[W] 锁定方向引爆冰花（扇形冰片 + 引爆伤害），窗口结束后再次按[W] 创建新区域。
  * - 自然结束 / 主动引爆 / 打断 / 死亡走可区分的收尾路径（H-01 实例统一收束）。
  */
 
@@ -19,11 +19,15 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
@@ -73,6 +77,53 @@ const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．�
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
+// 二段引爆方向联机同步：施法者主人本机读鼠标地面坐标 → DzSyncData → 各端在同步回调中引爆（对称执行，参照「按B传送BB」先例）
+const W二段同步前缀 = "EMW2";
+const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
+const R2S = jass.R2S as (this: void, r: number) => string;
+const CreateTrigger = jass.CreateTrigger as (this: void) => any;
+const TriggerAddAction = jass.TriggerAddAction as (this: void, trig: any, action: () => void) => void;
+const japiAny = require("jass.japi") as any;
+const DzGetMouseTerrainX = japiAny.DzGetMouseTerrainX as (this: void) => number;
+const DzGetMouseTerrainY = japiAny.DzGetMouseTerrainY as (this: void) => number;
+const { DzSyncData, DzTriggerRegisterSyncDataTrg, DzGetTriggerSyncPlayer, DzGetTriggerSyncData } = require("lib.扩展函数.KK扩展API.02．事件注册函数") as {
+  DzSyncData: (this: void, prefix: string, data: string) => void;
+  DzTriggerRegisterSyncDataTrg: (this: void, trigger: any, prefix: string, server: boolean) => void;
+  DzGetTriggerSyncPlayer: (this: void) => any;
+  DzGetTriggerSyncData: (this: void) => string;
+};
+const S2R = jass.S2R as (this: void, s: string) => number;
+
+/** 待引爆队列：施法时各端登记（对称），同步数据到达后按施法者主人匹配消费 */
+const W二段待引爆列表: Array<{ 施法者: any; 控制器: any; 技能实例ID: number | undefined }> = [];
+let W二段同步已注册 = false;
+
+function 注册W二段鼠标同步(this: void): void {
+  if (W二段同步已注册) return;
+  W二段同步已注册 = true;
+  const trig = CreateTrigger();
+  TriggerAddAction(trig, function W二段鼠标同步回调(this: void): void {
+    const player = DzGetTriggerSyncPlayer();
+    const syncData = DzGetTriggerSyncData();
+    if (player == null || player === 0) return;
+    const parts = syncData.split("|");
+    if (parts.length < 2) return;
+    const 鼠标X = S2R(parts[0] || "0");
+    const 鼠标Y = S2R(parts[1] || "0");
+    // 消费该玩家最早的待引爆请求（施法与同步一一对应）
+    for (let i = 0; i < W二段待引爆列表.length; i++) {
+      const 待 = W二段待引爆列表[i];
+      if (待.施法者 != null && 待.施法者 !== 0 && jass.GetOwningPlayer(待.施法者) === player) {
+        W二段待引爆列表.splice(i, 1);
+        二段引爆W(待.施法者, 待.控制器, 待.技能实例ID, 鼠标X, 鼠标Y);
+        return;
+      }
+    }
+    debugLogForce("爱蜜莉雅-W", "二段同步", "警告", "无匹配的待引爆实例", "玩家", GetPlayerId(player) + 1, "X", 鼠标X, "Y", 鼠标Y);
+  });
+  DzTriggerRegisterSyncDataTrg(trig, W二段同步前缀, false);
+}
+
 const 英雄单位类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.单位类型ID);
 const W技能类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.W.技能ID);
 
@@ -108,7 +159,7 @@ function W区域内目标结算(this: void, 施法者: any, 区域内单位: any
   if (区域内单位 == null || 区域内单位.length <= 0) return;
   const 目标列表: any[] = [];
   for (let i = 0; i < 区域内单位.length; i++) 目标列表.push(区域内单位[i]);
-  debugLogForce("爱蜜莉雅-W", "伤害", "标签", "爱蜜莉雅-W冰花", "目标数", 目标列表.length, "数值", 伤害值);
+  debugLogForce("爱蜜莉雅-W", "伤害", "标签", "爱蜜莉雅-W冰花", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能类型ID), "实例", 技能实例ID ?? "-", "目标数", 目标列表.length, "数值", 伤害值);
   造成批量AOE技能伤害({
     来源: 施法者,
     目标列表,
@@ -136,14 +187,13 @@ function 施加W寒意(this: void, 施法者: any, 目标: any, 技能实例ID: 
   施加爱蜜莉雅寒意(施法者, 目标, "W:" + (技能实例ID ?? 0));
 }
 
-function 二段引爆W(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined): void {
+function 二段引爆W(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 瞄准X: number, 瞄准Y: number): void {
   const 数据 = 控制器.数据 as W冰花数据;
   if (数据 == null || 数据.已二段) return;
-  debugLogForce("爱蜜莉雅-W", "状态", "二段引爆");
+  debugLogForce("爱蜜莉雅-W", "状态", "二段引爆", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能类型ID), "实例", 技能实例ID ?? "-", "X", Math.floor(数据.目标X), "Y", Math.floor(数据.目标Y), "瞄准X", Math.floor(瞄准X), "瞄准Y", Math.floor(瞄准Y));
   数据.已二段 = true;
-  // ASW2 为瞬发输入壳无目标点（GetSpellTargetX/Y 为无效坐标）→ 扇形方向取英雄当前朝向
-  // 弹道编排工厂 发射方向角 为 GetUnitFacing 角度制（0-360），直接透传不做弧度换算
-  const 方向 = jass.GetUnitFacing(施法者);
+  // 冰片方向：从冰花区域中心指向施法者主人按下二段瞬间的鼠标地面点（同步坐标，各端一致）
+  const 方向 = 两点角度(数据.目标X, 数据.目标Y, 瞄准X, 瞄准Y);
   const 伤害 = 读取单位攻击力(施法者) * 爱蜜莉雅W配置.二段伤害攻击力倍率;
   const 冰片伤害 = 读取单位攻击力(施法者) * 爱蜜莉雅W配置.冰片伤害攻击力倍率;
   // 引爆伤害（结束时点实时快照）
@@ -187,22 +237,50 @@ function 二段引爆W(this: void, 施法者: any, 控制器: any, 技能实例I
          缩放: 爱蜜莉雅表现配置.冰片.缩放,
     });
   }
-  // 收束区域（销毁触发 on销毁，不再结算自然结束伤害）
-  数据.区域.销毁();
+  // 收束区域（销毁触发 on销毁，不再结算自然结束伤害）。
+  // 二段同步可能在区域自然销毁后的同一时序到达，此时句柄已被 on销毁 清空；幂等保护避免 nil 崩溃。
+  if (数据.区域 != null) {
+    数据.区域.销毁();
+    数据.区域 = null;
+  }
   控制器.完成();
 }
 
 function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("爱蜜莉雅-W", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (施法者 == null || 施法者 === 0) return;
+  if (施法者 == null || 施法者 === 0) {
+    debugLogForce("爱蜜莉雅-W", "释放被拒", "原因", "施法者无效", "分支", "冰花");
+    return;
+  }
+  debugLogForce(
+    "爱蜜莉雅-W",
+    "释放",
+    "玩家",
+    GetPlayerId(GetOwningPlayer(施法者)) + 1,
+    "四码",
+    fourCCToStringSafe(W技能类型ID),
+    "实例",
+    技能实例ID ?? "-",
+    "目标",
+    "点施放",
+    "目标X",
+    Math.floor(GetSpellTargetX()),
+    "目标Y",
+    Math.floor(GetSpellTargetY()),
+  );
   播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.W);
-  // 二段：已有活跃 W 且未二段
+  // 二段：已有活跃 W 且未二段（走鼠标同步路径；一段施法事件先于此分支返回）
   const 活跃列表 = 查询战斗技能实例(施法者, "W冰花");
   for (let i = 0; i < 活跃列表.length; i++) {
     const 活跃 = 活跃列表[i];
     const 数据 = 活跃.数据 as W冰花数据;
     if (数据 != null && !数据.已二段) {
-      二段引爆W(施法者, 活跃, 技能实例ID);
+      // 联机同步：施法者主人本机读鼠标地面坐标并广播；各端先登记待引爆，同步数据到达后统一引爆
+      注册W二段鼠标同步();
+      W二段待引爆列表.push({ 施法者, 控制器: 活跃, 技能实例ID });
+      const 本地玩家 = GetLocalPlayer();
+      if (本地玩家 != null && 本地玩家 !== 0 && GetOwningPlayer(施法者) === 本地玩家) {
+        DzSyncData(W二段同步前缀, R2S(DzGetMouseTerrainX()) + "|" + R2S(DzGetMouseTerrainY()));
+      }
       return;
     }
   }
@@ -233,6 +311,9 @@ function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID
     Y: 目标Y,
     半径: 爱蜜莉雅W配置.半径,
     持续时间: 爱蜜莉雅W配置.持续秒,
+    // 检测间隔必须传：区域效果 on周期 触发频率由 检测间隔 控制（默认0.02s），
+    // 漏传会导致周期寒意按 50 倍频率叠层（日志里寒意叠到200层即由此而来）
+    检测间隔: 爱蜜莉雅W配置.周期秒,
     影响目标: "敌方",
     所有者: 施法者,
     首次扫描触发进入: true,
@@ -254,7 +335,7 @@ function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID
       // 二段壳兜底关闭（按钮恢复一段）
       if (数据.二段壳 != null) 清理限时二段技能壳(数据.二段壳);
       // 先逐个取消区域标记：底层销毁只调 on销毁 后直接清空集合、不触发 on离开（打断/死亡也必须取消，否则计数残留到目标死亡）
-      const 残留单位 = 区域.区域效果.当前区域内单位;
+      const 残留单位: any[] = 区域.区域效果.获取当前区域内单位();
       for (let i = 0; i < 残留单位.length; i++) 取消标记目标在爱蜜莉雅区域(残留单位[i]);
       数据.区域 = null;
       // 仅区域自然到期（未被打断/未死亡）才结算自然结束；打断/死亡只清理不结算
@@ -287,15 +368,19 @@ function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID
 
   // 二段输入壳：W 持续期间切换 W 按钮为二段输入（ASW2），窗口结束自动恢复
   数据.二段壳 = 创建限时二段技能壳({
-    名称: "爱蜜莉雅-W二段",
+    名称: "冰花绽放·引爆（W）",
     单位: 施法者,
     一段技能ID: W技能类型ID,
     二段技能ID: stringToFourCCSafe(爱蜜莉雅W配置.二段技能ID),
     持续秒: 爱蜜莉雅W配置.持续秒,
+    二段说明:
+      "|cffffcc00技能说明：|r从冰花中心向鼠标位置扇形发射冰片并立即引爆。|n"
+      + "|cffffcc00伤害：|r提前引爆造成攻击力|cff87ceeb120%|r的|cff66ccff冰魔法伤害|r；每枚冰片造成攻击力|cff87ceeb30%|r的|cff66ccff冰魔法伤害|r。|n"
+      + "|cffffcc00不做任何操作：|r冰花自然结束（伤害降为攻击力|cff87ceeb90%|r），按钮自动恢复。",
   });
 
   // 冰花 + 寒气边界表现（常驻句柄，生命周期由实例清理统一管理：自然到期随收束销毁，打断/死亡提前销毁；不传持续秒避免 EC_CreateEffect 内置定时器与 DestroyEffect 双销毁）
-  debugLogForce("爱蜜莉雅-W", "特效", "路径", 爱蜜莉雅表现配置.冰花主体.模型路径);
+  debugLogForce("爱蜜莉雅-W", "特效", "类型", "创建", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能类型ID), "实例", 技能实例ID ?? "-", "路径", 爱蜜莉雅表现配置.冰花主体.模型路径);
   const 冰花特效 = 创建点特效({
     模型路径: 爱蜜莉雅表现配置.冰花主体.模型路径,
    RGB: 爱蜜莉雅表现配置.冰花主体.RGB,
@@ -327,14 +412,36 @@ function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID
 }
 
 function 释放W二段输入(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("爱蜜莉雅-W", "释放", "技能实例ID", 技能实例ID ?? "-", "分支", "二段输入");
-  if (施法者 == null || 施法者 === 0) return;
+  if (施法者 == null || 施法者 === 0) {
+    debugLogForce("爱蜜莉雅-W", "释放被拒", "原因", "施法者无效", "分支", "二段输入");
+    return;
+  }
+  debugLogForce(
+    "爱蜜莉雅-W",
+    "释放",
+    "玩家",
+    GetPlayerId(GetOwningPlayer(施法者)) + 1,
+    "四码",
+    fourCCToStringSafe(W技能类型ID),
+    "实例",
+    技能实例ID ?? "-",
+    "目标",
+    "点施放",
+    "分支",
+    "二段输入",
+  );
   const 活跃列表 = 查询战斗技能实例(施法者, "W冰花");
   for (let i = 0; i < 活跃列表.length; i++) {
     const 活跃 = 活跃列表[i];
     const 数据 = 活跃.数据 as W冰花数据;
     if (数据 != null && !数据.已二段) {
-      二段引爆W(施法者, 活跃, 技能实例ID);
+      // 联机同步：施法者主人本机读鼠标地面坐标并广播；各端先登记待引爆，同步数据到达后统一引爆
+      注册W二段鼠标同步();
+      W二段待引爆列表.push({ 施法者, 控制器: 活跃, 技能实例ID });
+      const 本地玩家 = GetLocalPlayer();
+      if (本地玩家 != null && 本地玩家 !== 0 && jass.GetOwningPlayer(施法者) === 本地玩家) {
+        DzSyncData(W二段同步前缀, R2S(japiAny.DzGetMouseTerrainX()) + "|" + R2S(japiAny.DzGetMouseTerrainY()));
+      }
       return;
     }
   }

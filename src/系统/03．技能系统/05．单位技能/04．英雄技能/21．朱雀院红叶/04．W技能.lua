@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____7ED3_7B97W_5355_4F53_4F24_5BB3, _____91CA_653E_5931_8D25_524D_65A9, jass, _____9020_6210_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D, _____65BD_52A0_6731_96C0_9662_7834_7EFD, _____64AD_653E_7EA2_53F6_52A8_4F5C, debugLogForce, ____W_6280_80FDID, ____W_914D_7F6E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitX, GetUnitY, GetUnitFacing
+local _____7ED3_7B97W_5355_4F53_4F24_5BB3, _____91CA_653E_5931_8D25_524D_65A9, jass, _____9020_6210_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D, _____65BD_52A0_6731_96C0_9662_7834_7EFD, _____64AD_653E_7EA2_53F6_52A8_4F5C, debugLogForce, ____W_6280_80FDID, ____W_914D_7F6E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitX, GetUnitY, GetUnitFacing, GetUnitName, GetOwningPlayer, GetPlayerId
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.00．配置")
 local _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶技能配置"]
 local _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶表现配置"]
@@ -12,12 +12,22 @@ function _____7ED3_7B97W_5355_4F53_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807
     debugLogForce(
         "红叶-W",
         "伤害",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "目标",
+        GetUnitName(_____76EE_6807),
+        "handle",
+        _____76EE_6807,
+        "X",
+        math.floor(GetUnitX(_____76EE_6807)),
+        "Y",
+        math.floor(GetUnitY(_____76EE_6807)),
+        "伤害",
+        math.floor(_____4F24_5BB3_503C),
         "标签",
         _____6807_7B7E,
-        "数值",
-        _____4F24_5BB3_503C,
-        "目标",
-        _____76EE_6807
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-"
     )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
@@ -70,6 +80,7 @@ end
 jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
@@ -131,6 +142,9 @@ WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetUnitFacing = jass.GetUnitFacing
+GetUnitName = jass.GetUnitName
+GetOwningPlayer = jass.GetOwningPlayer
+GetPlayerId = jass.GetPlayerId
 local function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
     if _____6570_636E["已结束"] then
         return
@@ -145,12 +159,28 @@ local function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____63A7_5236_566
     if not _____6570_636E["已招架"] then
         _____91CA_653E_5931_8D25_524D_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
     end
-    debugLogForce("红叶-W", "结束", "原因", _____6570_636E["已招架"] and "招架成功" or "招架失败")
+    debugLogForce(
+        "红叶-W",
+        "结束",
+        "原因",
+        _____6570_636E["已招架"] and "招架成功" or "招架失败",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+    )
     _____63A7_5236_5668["完成"](_____63A7_5236_5668)
 end
 local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
     local _____6765_6E90 = _____6570_636E["招架来源"]
     if _____6765_6E90 == nil or _____6765_6E90 == 0 or not _____5355_4F4D_5B58_6D3B(_____6765_6E90) then
+        debugLogForce(
+            "红叶-W",
+            "命中失败",
+            "目标无效",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "来源",
+            _____6765_6E90
+        )
         _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
         return
     end
@@ -198,6 +228,8 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_566
             "位移",
             "类型",
             "击退",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
             "距离",
             ____W_914D_7F6E["D强化拉回距离"]
         )
@@ -206,12 +238,43 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_566
     _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
 end
 local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("红叶-W", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
+    debugLogForce(
+        "红叶-W",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____W_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "-",
+        "X",
+        math.floor(GetUnitX(_____65BD_6CD5_8005)),
+        "Y",
+        math.floor(GetUnitY(_____65BD_6CD5_8005))
+    )
     if not _____662F_6731_96C0_9662_7EA2_53F6(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "红叶-W",
+            "释放被拒",
+            "原因",
+            "非红叶单位",
+            "施法者",
+            _____65BD_6CD5_8005
+        )
         return
     end
     _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["W开窗"])
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "红叶W") > 0 then
+        debugLogForce(
+            "红叶-W",
+            "释放被拒",
+            "原因",
+            "重复W活跃招架",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+        )
         return
     end
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院红叶", _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.W["技能ID"])
@@ -229,7 +292,14 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
-            debugLogForce("红叶-W", "结束", "原因", "-")
+            debugLogForce(
+                "红叶-W",
+                "结束",
+                "原因",
+                "-",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+            )
             if _____6570_636E["已结束"] then
                 return
             end
@@ -282,8 +352,16 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
                 "回调",
                 "类型",
                 "招架成功",
-                "来源",
-                context.attacker
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "目标",
+                GetUnitName(context.attacker),
+                "handle",
+                context.attacker,
+                "X",
+                math.floor(GetUnitX(context.attacker)),
+                "Y",
+                math.floor(GetUnitY(context.attacker))
             )
             _____6570_636E["已招架"] = true
             _____6570_636E["招架来源"] = context.attacker

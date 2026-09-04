@@ -40,8 +40,8 @@ createPlayerHeroChannelAbility('AFE1', '芙莉莲-飞行魔法·高处观察（E
 createPlayerHeroChannelAbility('AFR1', '芙莉莲-解析魔法·贯穿射杀（R）', {
   editorSuffix = 'FrierenR', heroAbility = true, levels = HERO_LEVELS,
   targetType = 2, castRange = 1200, orderId = 'monsoon',
-  tooltip = '解析魔法·贯穿射杀（R）', tooltipExtended = '技能说明：蓄力后沿目标方向发射窄幅贯穿魔法炮，解析效果会追加伤害或扩大命中宽度。|n伤害：基础造成攻击力220%的魔法伤害；攻击解析或防御解析目标额外受到攻击力20%的魔法伤害；解析完成目标额外受到攻击力100%的破防伤害和攻击力50%的爆发伤害；位置解析会使命中半宽扩大50%。|n施法距离：1200|n伤害范围：窄直线，命中半宽120|n蓄力时间：0.9秒|n冷却时间：75秒|n魔法消耗：最大魔法值的15%',
-  icon = ICONS.R, iconTurnOff = DISABLED_ICONS.R, hotkey = 'R', buttonX = 3, buttonY = 2, cooldown = 75, manaCost = 300, percentManaCost = 0.15,
+  tooltip = '解析魔法·贯穿射杀（R）', tooltipExtended = '技能说明：蓄力后沿目标方向发射窄幅贯穿魔法炮，解析效果会追加伤害或扩大命中宽度。|n伤害：基础造成攻击力220%的魔法伤害；攻击解析或防御解析目标额外受到攻击力20%的魔法伤害；解析完成目标额外受到攻击力100%的破防伤害和攻击力50%的爆发伤害；位置解析会使命中半宽扩大50%。|n施法距离：1200|n伤害范围：窄直线，命中半宽120|n蓄力时间：0.9秒|n冷却时间：25秒|n魔法消耗：最大魔法值的15%',
+  icon = ICONS.R, iconTurnOff = DISABLED_ICONS.R, hotkey = 'R', buttonX = 3, buttonY = 2, cooldown = 25, manaCost = 300, percentManaCost = 0.15,
 })
 
 createPlayerHeroActiveDChannelAbility('AFD1', '芙莉莲-创造花田的魔法（D）', {

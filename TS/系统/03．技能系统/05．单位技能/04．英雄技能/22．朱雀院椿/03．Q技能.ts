@@ -10,8 +10,9 @@ import {
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -76,6 +77,9 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 
@@ -87,7 +91,8 @@ interface Q数据 {
 }
 
 function 结算Q斩(this: void, 施法者: any, 技能实例ID: number | undefined, 方向角: number, 伤害倍率: number, 标签: string): void {
-  debugLogForce("椿-Q", "伤害", "标签", 标签, "数值", 读取单位攻击力(施法者) * 伤害倍率);
+  const 玩家ID = GetPlayerId(GetOwningPlayer(施法者)) + 1;
+  debugLogForce("椿-Q", "结算", "玩家", 玩家ID, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "标签", 标签, "伤害", 读取单位攻击力(施法者) * 伤害倍率);
   const X = GetUnitX(施法者);
   const Y = GetUnitY(施法者);
   // 居合/返刃斩击表现（正式主版本；备份版本按候选规则切换；按斩击方向旋转，时长覆盖 Stand 1000-1755ms）
@@ -113,7 +118,11 @@ function 结算Q斩(this: void, 施法者: any, 技能实例ID: number | undefin
       return 单位 !== 施法者 && 单位存活(单位) && jass.IsUnitEnemy(单位, jass.GetOwningPlayer(施法者));
     },
   });
+  if (敌人.length === 0) {
+    debugLogForce("椿-Q", "命中失败", "原因", "无目标", "玩家", 玩家ID, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "标签", 标签, "方向", 方向角);
+  }
   for (let i = 0; i < 敌人.length; i++) {
+    debugLogForce("椿-Q", "命中", "玩家", 玩家ID, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "标签", 标签, "目标", GetUnitName(敌人[i]), "handle", 敌人[i], "X", Math.floor(GetUnitX(敌人[i])), "Y", Math.floor(GetUnitY(敌人[i])), "伤害", 读取单位攻击力(施法者) * 伤害倍率);
     造成技能伤害({
       来源: 施法者,
       目标: 敌人[i],
@@ -164,10 +173,16 @@ function 执行返刃第一段(this: void, 施法者: any, 控制器: any, 技�
 }
 
 function 释放Q居合(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("椿-Q", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (!是朱雀院椿(施法者)) return;
+  if (!是朱雀院椿(施法者)) {
+    debugLogForce("椿-Q", "释放被拒", "原因", "非朱雀院椿", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-");
+    return;
+  }
+  debugLogForce("椿-Q", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(GetSpellTargetX()), "Y", Math.floor(GetSpellTargetY()));
   // 重复 Q：已有活跃 Q 实例时忽略
-  if (查询战斗技能实例(施法者, "椿Q").length > 0) return;
+  if (查询战斗技能实例(施法者, "椿Q").length > 0) {
+    debugLogForce("椿-Q", "释放被拒", "原因", "已有活跃Q实例", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-");
+    return;
+  }
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
   播放英雄技能喊话(施法者, "朱雀院椿", 朱雀院椿技能配置.Q.技能ID);
   播放椿动作(施法者, 朱雀院椿动作槽.Q居合);
@@ -182,14 +197,14 @@ function 释放Q居合(this: void, _context: any, 施法者: any, 技能实例ID
     已消费反击: 反击 != null || 回锋方向 != null,
     段回调ID: [],
   };
-  debugLogForce("椿-Q", "状态", "创建战斗技能实例", 技能实例ID ?? "-");
+  debugLogForce("椿-Q", "状态", "创建战斗技能实例", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-");
   const 控制器 = 创建战斗技能实例({
     技能键: "椿Q",
     施法者,
     技能实例ID,
     数据,
     结束回调: function Q结束(this: void, _原因: string, _c: any): void {
-      debugLogForce("椿-Q", "结束", "原因", _原因 ?? "-");
+      debugLogForce("椿-Q", "结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "原因", _原因 ?? "-");
       for (let i = 0; i < 数据.段回调ID.length; i++) {
         // 延迟回调由实例统一清理（未执行段不再结算）
       }

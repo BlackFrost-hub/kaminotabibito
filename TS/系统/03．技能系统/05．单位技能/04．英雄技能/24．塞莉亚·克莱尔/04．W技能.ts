@@ -27,6 +27,9 @@ import {
 } from "./02．被动效果";
 
 const jass = require("jass.common") as any;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
@@ -141,7 +144,7 @@ function 关闭W结界(this: void, 数据: 塞莉亚W结界数据, 收口类型:
 //=============================================================================
 
 function 释放W解析结界(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
-  debugLogForce("塞莉亚-W", "释放", "技能实例ID", _技能实例ID ?? "-");
+  debugLogForce("塞莉亚-W", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 塞莉亚克莱尔技能配置.W.技能ID, "实例", _技能实例ID ?? "-", "目标", "自身", "X", Math.floor(GetUnitX(施法者)), "Y", Math.floor(GetUnitY(施法者)));
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
   // 技能喊话：施法成功起点（前置检查通过；全局 3D；随机二选一由喊话系统驱动）
@@ -165,7 +168,7 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
 
   // 结界视觉 + 保护 Buff + 结界节点（A1 容器负责超限替换与连线）
   // 跟随特效：高度走子配置（无内置到期，随窗口收口销毁）
-  debugLogForce("塞莉亚-W", "特效", "路径", 塞莉亚克莱尔表现配置.W结界主体.模型路径);
+  debugLogForce("塞莉亚-W", "特效", "路径", 塞莉亚克莱尔表现配置.W结界主体.模型路径, "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "X", Math.floor(GetUnitX(施法者)), "Y", Math.floor(GetUnitY(施法者)));
   创建单位坐标跟随特效(
     施法者,
     塞莉亚克莱尔表现配置.W结界主体.模型路径,
@@ -177,7 +180,7 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
     0,
     塞莉亚克莱尔表现配置.W结界主体.RGB,
   );
-  debugLogForce("塞莉亚-W", "Buff", "操作", "施加", "目标", 施法者);
+  debugLogForce("塞莉亚-W", "Buff", "操作", "施加", "目标", 施法者, "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
   registerManualBuff(施法者, 塞莉亚BuffID.解析结界, 塞莉亚克莱尔W配置.保护窗口秒, 0);
   // 施法真正成功（节点与保护已建立）：授予一次演算普攻窗口
   授予塞莉亚演算窗口(施法者);
@@ -217,7 +220,7 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
       数据.修改器ID = 0;
       if (单位存活(攻击者)) {
         // 反冲 + 减速（真实控制入口）
-        debugLogForce("塞莉亚-W", "伤害", "标签", "塞莉亚-解析反冲", "数值", 读取单位攻击力(施法者) * 塞莉亚克莱尔W配置.反冲伤害攻击力倍率);
+        debugLogForce("塞莉亚-W", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 塞莉亚克莱尔技能配置.W.技能ID, "目标", GetUnitName(攻击者), "handle", 攻击者, "X", Math.floor(GetUnitX(攻击者)), "Y", Math.floor(GetUnitY(攻击者)), "伤害", 读取单位攻击力(施法者) * 塞莉亚克莱尔W配置.反冲伤害攻击力倍率);
         造成技能伤害({
           来源: 施法者,
           目标: 攻击者,

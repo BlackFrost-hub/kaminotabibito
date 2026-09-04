@@ -27,11 +27,15 @@ import {
 import { 查询伊蕾娜W折射可用, 消费伊蕾娜W折射 } from "./04．W技能";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
@@ -96,7 +100,7 @@ function 造成Q技能伤害(
   标签: string,
   形态: "单体" | "AOE",
 ): boolean {
-  debugLogForce("伊蕾娜-Q", "伤害", "标签", 标签, "目标", 目标, "数值", 伤害值);
+  debugLogForce("伊蕾娜-Q", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能类型ID), "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", Math.floor(伤害值), "标签", 标签, "形态", 形态);
   return 造成技能伤害({
     来源: 施法者,
     目标,
@@ -115,7 +119,10 @@ function 造成Q技能伤害(
 
 /** 命中共用：主伤害 + 追迹减速 + 风行见闻 + 灰烬爆发（按需）。 */
 function 处理Q命中(this: void, 施法者: any, 目标: any, 数据: any): void {
-  if (!单位存活(目标)) return; // 失效句柄不再结算
+  if (!单位存活(目标)) {
+    debugLogForce("伊蕾娜-Q", "命中失败", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "原因", "目标无效", "目标", GetUnitName(目标), "handle", 目标);
+    return; // 失效句柄不再结算
+  }
   const 伤害 = 读取单位攻击力(施法者) * 伊蕾娜Q配置.主伤害攻击力倍率;
   造成Q技能伤害(施法者, 目标, 伤害, 数据.技能实例ID, "伊蕾娜-旅风·追迹", "单体");
   SFB_setSlow(
@@ -240,7 +247,10 @@ function 尝试E路线追加(this: void, 施法者: any, 数据: any, 当前X: n
 //=============================================================================
 
 function 释放Q旅风追迹(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
+  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) {
+    debugLogForce("伊蕾娜-Q", "释放被拒", "原因", "施法者无效", "handle", 施法者);
+    return;
+  }
   播放英雄技能喊话(施法者, "伊蕾娜", 伊蕾娜技能配置.Q.技能ID);
 
   // t0 快照：合法目标与目标点同时保存，后续异步只使用快照
@@ -252,6 +262,7 @@ function 释放Q旅风追迹(this: void, _context: any, 施法者: any, 技能�
     目标X = GetUnitX(目标单位);
     目标Y = GetUnitY(目标单位);
   }
+  debugLogForce("伊蕾娜-Q", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能类型ID), "实例", 技能实例ID ?? "-", "目标", 有目标 ? GetUnitName(目标单位) : "点施放", "X", Math.floor(目标X), "Y", Math.floor(目标Y));
 
   // 战斗技能实例：收敛打断/死亡/清理路径
   const 硬直来源 = "伊蕾娜-Q硬直";

@@ -30,8 +30,9 @@ const { 播放限时动作, 开始循环守护, 停止循环守护, 芙莉莲动
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
@@ -86,7 +87,7 @@ const R配置 = 芙莉莲R配置;
 const 被动配置 = 芙莉莲被动配置;
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
-const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
@@ -94,6 +95,8 @@ const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, player: any) => boolean;
 
 //=============================================================================
@@ -185,7 +188,7 @@ function R结算主炮(this: void, 施法者: any, 技能实例ID: number | unde
           来源: 施法者,
           目标,
           伤害: 攻击力 * R配置.完成爆发倍率,
-          伤害类型: DAMAGE_TYPE_NORMAL,
+          伤害类型: DAMAGE_TYPE_MAGIC,
           攻击类型: ATTACK_TYPE_NORMAL,
           武器类型: WEAPON_TYPE_WHOKNOWS,
           来源类型: "单位技能",
@@ -198,12 +201,12 @@ function R结算主炮(this: void, 施法者: any, 技能实例ID: number | unde
       }
     }
 
-    debugLogForce("芙莉莲-R", "伤害", "标签", 标签, "数值", 攻击力 * 倍率, "目标", 目标);
+    debugLogForce("芙莉莲-R", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", 攻击力 * 倍率, "标签", 标签);
     造成技能伤害({
       来源: 施法者,
       目标,
       伤害: 攻击力 * 倍率,
-      伤害类型: DAMAGE_TYPE_NORMAL,
+      伤害类型: DAMAGE_TYPE_MAGIC,
       攻击类型: ATTACK_TYPE_NORMAL,
       武器类型: WEAPON_TYPE_WHOKNOWS,
       来源类型: "单位技能",
@@ -248,8 +251,11 @@ interface R快照 {
 //=============================================================================
 
 function 释放R(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("芙莉莲-R", "释放", "技能实例ID", 技能实例ID || "-");
-  if (!是芙莉莲(施法者)) return;
+  if (!是芙莉莲(施法者)) {
+    debugLogForce("芙莉莲-R", "释放被拒", "原因", "非芙莉莲施法者", "施法者", 施法者, "handle", 施法者, "实例", 技能实例ID ?? "-");
+    return;
+  }
+  debugLogForce("芙莉莲-R", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者, "目标", "点施放", "X", Math.floor(GetSpellTargetX()), "Y", Math.floor(GetSpellTargetY()));
   // 重复 R：已有活跃 R 实例时忽略
   if (查询战斗技能实例(施法者, "芙莉莲R").length > 0) return;
   // t0 快照：先取隐匿快照，再记录活动（解除隐匿）
@@ -327,7 +333,7 @@ function 释放R(this: void, _context: any, 施法者: any, 技能实例ID: numb
     },
     // 充能结束（完成/指令中断/硬控/死亡/单位失效统一收尾）：销毁读条与预警
     结束回调: function R蓄力结束(this: void, _单位: any, 原因: string, _充能ID: number): void {
-      debugLogForce("芙莉莲-R", "结束", "原因", 原因 || "-");
+      debugLogForce("芙莉莲-R", "结束", "原因", 原因 || "-", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者);
       // 蓄力保持守护停止（指令/硬控/死亡打断后不继续举杖姿势）
       if (蓄力守护 != null) {
         停止循环守护(蓄力守护);

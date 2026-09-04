@@ -11,8 +11,9 @@ import {
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
@@ -80,6 +81,9 @@ const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 
 //=============================================================================
 // 终式（仅充能完成回调创建；中断/死亡不会走到这里，资源不白扣）
@@ -99,7 +103,7 @@ function 取窄线敌人(this: void, 施法者: any, 方向角: number): any[] {
 }
 
 function 结算R伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
-  debugLogForce("红叶-R", "伤害", "标签", 标签, "数值", 伤害值, "目标", 目标);
+  debugLogForce("红叶-R", "伤害", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", Math.floor(伤害值), "标签", 标签, "实例", 技能实例ID ?? "-");
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -117,8 +121,11 @@ function 结算R伤害(this: void, 施法者: any, 目标: any, 技能实例ID: 
 }
 
 function R创建终式(this: void, 施法者: any, 技能实例ID: number | undefined, _目标X: number, 目标Y: number, 方向角: number): void {
-  if (!单位存活(施法者)) return;
-  debugLogForce("红叶-R", "状态", "创建终式");
+  if (!单位存活(施法者)) {
+    debugLogForce("红叶-R", "命中失败", "目标无效", "施法者已死亡");
+    return;
+  }
+  debugLogForce("红叶-R", "状态", "创建终式", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "施法者X", Math.floor(GetUnitX(施法者)), "施法者Y", Math.floor(GetUnitY(施法者)), "方向角", 方向角);
   播放红叶动作(施法者, 朱雀院红叶动作槽.R释放);
   // 资源消费只在真正进入终式时（蓄力完成）：刀势全消费、D 全消费（失败/中断不白扣）
   const 刀势层数 = 消费全部刀势(施法者);
@@ -167,8 +174,11 @@ function R创建终式(this: void, 施法者: any, 技能实例ID: number | unde
 //=============================================================================
 
 function 释放R奥义(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("红叶-R", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (!是朱雀院红叶(施法者)) return;
+  debugLogForce("红叶-R", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "施法者X", Math.floor(GetUnitX(施法者)), "施法者Y", Math.floor(GetUnitY(施法者)), "目标X", Math.floor(GetSpellTargetX()), "目标Y", Math.floor(GetSpellTargetY()));
+  if (!是朱雀院红叶(施法者)) {
+    debugLogForce("红叶-R", "释放被拒", "原因", "非红叶单位", "施法者", 施法者);
+    return;
+  }
   播放红叶动作(施法者, 朱雀院红叶动作槽.R蓄力);
   const 中心X = GetSpellTargetX();
   const 中心Y = GetSpellTargetY();
@@ -201,14 +211,14 @@ function 释放R奥义(this: void, _context: any, 施法者: any, 技能实例ID
       },
     // 蓄力完成：创建终式（被打断/死亡不会走到这里）
     充能完成回调: function R蓄力完成(this: void, _单位: any, _充能ID: number): void {
-      debugLogForce("红叶-R", "状态", "蓄力完成");
+      debugLogForce("红叶-R", "状态", "蓄力完成", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
       // 红叶一闪释放音（蓄力完成释放结算点；坐标=施法者/直线起点，参数配置驱动）
       Sound3DII_CooPlayReuse(R红叶一闪音效.路径, GetUnitX(施法者), GetUnitY(施法者), R红叶一闪音效.高度, R红叶一闪音效.裁断距离);
       R创建终式(施法者, 技能实例ID, 中心X, 中心Y, 方向角);
     },
     // 蓄力结束（完成/被打断/死亡统一销毁常驻预警特效）
     结束回调: function R蓄力结束(this: void, _单位: any, _原因: string, _充能ID: number): void {
-      debugLogForce("红叶-R", "结束", "原因", "-");
+      debugLogForce("红叶-R", "结束", "原因", "-", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
       if (预警特效 != null && 预警特效 !== 0) {
         jass.DestroyEffect(预警特效);
         预警特效 = null;
@@ -217,6 +227,7 @@ function 释放R奥义(this: void, _context: any, 施法者: any, 技能实例ID
   });
   // 技能喊话在充能真正建立后播放（蓄力被拒/中断不播；随机二选一由喊话系统驱动）
   if (充能ID > 0) 播放英雄技能喊话(施法者, "朱雀院红叶", 朱雀院红叶技能配置.R.技能ID);
+  else debugLogForce("红叶-R", "释放被拒", "原因", "蓄力未建立", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
 }
 
 //=============================================================================

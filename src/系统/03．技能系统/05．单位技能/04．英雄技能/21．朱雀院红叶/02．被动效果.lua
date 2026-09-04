@@ -44,6 +44,11 @@ local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local GetHandleId = jass.GetHandleId
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local _____82F1_96C4_72B6_6001_8868 = {}
 local function _____53D6_82F1_96C4_72B6_6001(_____82F1_96C4)
     local id = GetHandleId(_____82F1_96C4)
@@ -125,8 +130,16 @@ ____exports["移除目标破绽"] = function(_____76EE_6807)
         "Buff",
         "操作",
         "移除",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____72B6_6001["来源英雄"])) + 1,
         "目标",
-        GetHandleId(_____76EE_6807)
+        GetUnitName(_____76EE_6807),
+        "handle",
+        _____76EE_6807,
+        "X",
+        math.floor(GetUnitX(_____76EE_6807)),
+        "Y",
+        math.floor(GetUnitY(_____76EE_6807))
     )
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____76EE_6807, _____7834_7EFDBuffID)
     __TS__Delete(_____7834_7EFD_76EE_6807_8868, id)
@@ -134,9 +147,19 @@ end
 --- 统一施加或刷新破绽（Q/W/E/R 技能命中调用）；刷新持续时间和表现
 ____exports["施加朱雀院破绽"] = function(_____7EA2_53F6, _____76EE_6807)
     if _____7EA2_53F6 == nil or _____7EA2_53F6 == 0 or _____76EE_6807 == nil or _____76EE_6807 == 0 then
+        debugLogForce(
+            "红叶-被动",
+            "命中失败",
+            "目标无效",
+            "红叶",
+            _____7EA2_53F6,
+            "目标",
+            _____76EE_6807
+        )
         return
     end
     if _____76EE_6807 == _____7EA2_53F6 then
+        debugLogForce("红叶-被动", "命中失败", "目标无效", "目标=施法者")
         return
     end
     local id = GetHandleId(_____76EE_6807)
@@ -148,7 +171,7 @@ ____exports["施加朱雀院破绽"] = function(_____7EA2_53F6, _____76EE_6807)
     local _____6301_7EED_6BEB_79D2 = _____6731_96C0_9662_7EA2_53F6_88AB_52A8_914D_7F6E["破绽持续秒"] * 1000
     local _____72B6_6001 = {
         ["来源英雄"] = _____7EA2_53F6,
-        ["到期时间"] = getGameTime() + _____6731_96C0_9662_7EA2_53F6_88AB_52A8_914D_7F6E["破绽持续秒"],
+        ["到期时间"] = getGameTime() + _____6731_96C0_9662_7EA2_53F6_88AB_52A8_914D_7F6E["破绽持续秒"] * 1000,
         ["到期回调ID"] = 0
     }
     _____72B6_6001["到期回调ID"] = addDelayedCallback(
@@ -173,14 +196,6 @@ ____exports["施加朱雀院破绽"] = function(_____7EA2_53F6, _____76EE_6807)
         0,
         _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["破绽标记"].RGB
     )
-    debugLogForce(
-        "红叶-被动",
-        "Buff",
-        "操作",
-        "施加",
-        "目标",
-        GetHandleId(_____76EE_6807)
-    )
     registerManualBuff(
         _____76EE_6807,
         _____7834_7EFDBuffID,
@@ -189,6 +204,22 @@ ____exports["施加朱雀院破绽"] = function(_____7EA2_53F6, _____76EE_6807)
         {stack = 1}
     )
     if _____9996_6B21_83B7_5F97_7834_7EFD then
+        debugLogForce(
+            "红叶-被动",
+            "Buff",
+            "操作",
+            "施加",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____7EA2_53F6)) + 1,
+            "目标",
+            GetUnitName(_____76EE_6807),
+            "handle",
+            _____76EE_6807,
+            "X",
+            math.floor(GetUnitX(_____76EE_6807)),
+            "Y",
+            math.floor(GetUnitY(_____76EE_6807))
+        )
         Sound3DII_CooPlayReuse(
             _____6731_96C0_9662_7EA2_53F6_97F3_6548_914D_7F6E["破绽标记"]["路径"],
             jass.GetUnitX(_____76EE_6807),
@@ -323,13 +354,19 @@ local function _____5904_7406_7EA2_53F6_666E_653B_7834_7EFD_65A9(target, attacke
     local _____8FFD_52A0_4F24_5BB3 = applied * _____6731_96C0_9662_7EA2_53F6_88AB_52A8_914D_7F6E["破绽斩伤害倍率"]
     debugLogForce(
         "红叶-被动",
-        "伤害",
-        "标签",
-        "朱雀院红叶-破绽斩",
-        "数值",
-        _____8FFD_52A0_4F24_5BB3,
+        "命中",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(attacker)) + 1,
         "目标",
-        GetHandleId(target)
+        GetUnitName(target),
+        "handle",
+        target,
+        "X",
+        math.floor(GetUnitX(target)),
+        "Y",
+        math.floor(GetUnitY(target)),
+        "伤害",
+        math.floor(_____8FFD_52A0_4F24_5BB3)
     )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = attacker,
@@ -394,7 +431,9 @@ local function _____786E_4FDD_6B7B_4EA1_6E05_7406()
                 "类型",
                 "死亡",
                 "单位",
-                GetHandleId(dyingUnit)
+                GetUnitName(dyingUnit),
+                "handle",
+                dyingUnit
             )
             __TS__Delete(_____7834_7EFD_65A9_51B7_5374_8868, id)
             ____exports["清理朱雀院红叶状态"](dyingUnit, "英雄死亡")

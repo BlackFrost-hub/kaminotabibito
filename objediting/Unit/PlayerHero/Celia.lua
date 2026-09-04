@@ -24,6 +24,7 @@ createPlayerHeroUnit('E0L4', '塞莉亚·克莱尔', {
 
   attackMode = 'ranged',
   attackType = AttackType.Magic,
+  damageBase = 20,
   attackRange = 650,
   acquire = 650.0,
   attackTargets = 'ground,structure,debris,air,item,ward',

@@ -28,9 +28,15 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
+const { fourCCToStringSafe, stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
+  stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+};
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const IsUnitEnemy = jass.IsUnitEnemy as (this: void, unit: any, player: any) => boolean;
 
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
@@ -116,7 +122,7 @@ interface 伊蕾娜W结界数据 {
 }
 
 function 关闭W镜界(this: void, 数据: 伊蕾娜W结界数据, 允许脉冲: boolean): void {
-  debugLogForce("伊蕾娜-W", "结束", "原因", 允许脉冲 ? "自然结束" : "提前收口");
+  debugLogForce("伊蕾娜-W", "结束", "原因", 允许脉冲 ? "自然结束" : "提前收口", "单位", GetUnitName(数据.英雄), "handle", 数据.英雄);
   if (数据.已关闭) return; // 单一收口
   数据.已关闭 = true;
 
@@ -185,8 +191,11 @@ export function 消费伊蕾娜W折射(this: void, 英雄: any): boolean {
 //=============================================================================
 
 function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能实例ID: number | undefined): void {
-  debugLogForce("伊蕾娜-W", "释放", "技能实例ID", _技能实例ID ?? "-");
-  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
+  if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) {
+    debugLogForce("伊蕾娜-W", "释放被拒", "原因", "施法者无效", "handle", 施法者);
+    return;
+  }
+  debugLogForce("伊蕾娜-W", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(stringToFourCCSafe(伊蕾娜技能配置.W.技能ID)), "实例", _技能实例ID ?? "-", "目标", "自身", "X", Math.floor(GetUnitX(施法者)), "Y", Math.floor(GetUnitY(施法者)));
   播放英雄技能喊话(施法者, "伊蕾娜", 伊蕾娜技能配置.W.技能ID);
 
   // 重复施放：旧结界独立收尾（无脉冲），不叠加虚假保护
@@ -228,7 +237,7 @@ function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能�
   registerManualBuff(施法者, 伊蕾娜BuffID.镜界结界, 伊蕾娜W配置.保护窗口秒, 0);
   const 镜界表现 = 伊蕾娜表现配置.W镜界主体;
   const 镜界缩放 = 伊蕾娜W配置.结界接触半径 / 镜界表现.基准半径 * 镜界表现.基准缩放;
-  debugLogForce("伊蕾娜-W", "特效", "路径", 镜界表现.模型路径);
+  debugLogForce("伊蕾娜-W", "特效", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "路径", 镜界表现.模型路径);
   创建单位坐标跟随特效(施法者, 镜界表现.模型路径, W镜界特效键, 镜界缩放, 镜界表现.高度, 1, undefined, 0, 镜界表现.RGB);
   // 镜界展开音（单位=施法者；保护窗口与结界视觉建立时一次，参数配置驱动）
   Sound3DII_UnitPlayReuse(伊蕾娜音效配置.W展开.路径, 施法者, 伊蕾娜音效配置.W展开.裁断距离);
@@ -255,6 +264,7 @@ function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能�
 
     // 主要攻击确认进入偏折分支
     数据.主要攻击已处理 = true;
+    debugLogForce("伊蕾娜-W", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(stringToFourCCSafe(伊蕾娜技能配置.W.技能ID)), "目标", GetUnitName(攻击者), "handle", 攻击者, "X", Math.floor(GetUnitX(攻击者)), "Y", Math.floor(GetUnitY(攻击者)), "伤害", Math.floor(context.currentDamage), "类型", "主要攻击偏折");
 
     // 接触点：由攻击方向与结界近似圆面求出，禁止绑定骨骼或固定在中心冒充接触位置
     const 接触角 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), GetUnitX(攻击者), GetUnitY(攻击者));

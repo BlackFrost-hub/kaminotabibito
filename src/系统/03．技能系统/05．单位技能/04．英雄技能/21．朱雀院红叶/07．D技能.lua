@@ -1,7 +1,7 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____79FB_9664D_72B6_6001, jass, removeDelayedCallback, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548, debugLogForce, _____79D8_4F20BuffID, _____5200_73AF_7279_6548_952E, ____D_72B6_6001_8868
+local _____79FB_9664D_72B6_6001, jass, removeDelayedCallback, _____79FB_9664_5355_4F4D_6307_5B9ABuff, _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548, debugLogForce, _____79D8_4F20BuffID, _____5200_73AF_7279_6548_952E, GetUnitName, GetOwningPlayer, GetPlayerId, ____D_72B6_6001_8868
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.00．配置")
 local _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶技能配置"]
 local _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶表现配置"]
@@ -27,7 +27,11 @@ function _____79FB_9664D_72B6_6001(_____82F1_96C4)
         "Buff",
         "操作",
         "移除",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____82F1_96C4)) + 1,
         "目标",
+        GetUnitName(_____82F1_96C4),
+        "handle",
         _____82F1_96C4
     )
     _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(_____82F1_96C4, _____5200_73AF_7279_6548_952E)
@@ -65,9 +69,12 @@ _____79D8_4F20BuffID = _____6731_96C0_9662_7EA2_53F6Buff_914D_7F6E["秘传三式
 local ____D_914D_7F6E = _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C.D
 local ____D_79D8_4F20_4E09_5F0F_97F3_6548 = _____6731_96C0_9662_7EA2_53F6_97F3_6548_914D_7F6E["D秘传三式"]
 _____5200_73AF_7279_6548_952E = "朱雀院红叶D刀环"
+GetUnitName = jass.GetUnitName
+GetOwningPlayer = jass.GetOwningPlayer
+GetPlayerId = jass.GetPlayerId
 ____D_72B6_6001_8868 = {}
 local function _____5237_65B0D_663E_793A(_____82F1_96C4, _____72B6_6001)
-    local _____5269_4F59_79D2 = _____72B6_6001["到期时间"] - getGameTime()
+    local _____5269_4F59_79D2 = (_____72B6_6001["到期时间"] - getGameTime()) / 1000
     if _____5269_4F59_79D2 <= 0 then
         _____79FB_9664D_72B6_6001(_____82F1_96C4)
         return
@@ -81,8 +88,31 @@ local function _____5237_65B0D_663E_793A(_____82F1_96C4, _____72B6_6001)
     )
 end
 local function _____5F00_542FD_79D8_4F20_4E09_5F0F(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
-    debugLogForce("红叶-D", "释放", "技能实例ID", "-")
+    debugLogForce(
+        "红叶-D",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.D["技能ID"],
+        "实例",
+        "-",
+        "目标",
+        "-",
+        "X",
+        math.floor(jass.GetUnitX(_____65BD_6CD5_8005)),
+        "Y",
+        math.floor(jass.GetUnitY(_____65BD_6CD5_8005))
+    )
     if not _____662F_6731_96C0_9662_7EA2_53F6(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "红叶-D",
+            "释放被拒",
+            "原因",
+            "非红叶单位",
+            "施法者",
+            _____65BD_6CD5_8005
+        )
         return
     end
     _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["D启动"])
@@ -93,7 +123,7 @@ local function _____5F00_542FD_79D8_4F20_4E09_5F0F(_context, _____65BD_6CD5_8005
         if _____5DF2_6709["到期回调ID"] ~= 0 then
             removeDelayedCallback(_____5DF2_6709["到期回调ID"])
         end
-        _____5DF2_6709["到期时间"] = getGameTime() + ____D_914D_7F6E["持续秒"]
+        _____5DF2_6709["到期时间"] = getGameTime() + ____D_914D_7F6E["持续秒"] * 1000
         _____5DF2_6709["到期回调ID"] = addDelayedCallback(
             ____D_914D_7F6E["持续秒"] * 1000,
             function()
@@ -105,7 +135,7 @@ local function _____5F00_542FD_79D8_4F20_4E09_5F0F(_context, _____65BD_6CD5_8005
     end
     local _____72B6_6001 = {
         ["剩余次数"] = ____D_914D_7F6E["强化次数"],
-        ["到期时间"] = getGameTime() + ____D_914D_7F6E["持续秒"],
+        ["到期时间"] = getGameTime() + ____D_914D_7F6E["持续秒"] * 1000,
         ["延长次数"] = 0,
         ["到期回调ID"] = 0
     }
@@ -116,7 +146,15 @@ local function _____5F00_542FD_79D8_4F20_4E09_5F0F(_context, _____65BD_6CD5_8005
         end
     )
     ____D_72B6_6001_8868[id] = _____72B6_6001
-    debugLogForce("红叶-D", "状态", "开启秘传", _____72B6_6001["剩余次数"])
+    debugLogForce(
+        "红叶-D",
+        "状态",
+        "开启秘传",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "剩余次数",
+        _____72B6_6001["剩余次数"]
+    )
     _____5237_65B0D_663E_793A(_____65BD_6CD5_8005, _____72B6_6001)
     if _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["D刀环"]["模型路径"] ~= "" then
         _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
@@ -194,12 +232,12 @@ local function _____7834_7EFD_65A9_5EF6_957FD(_____7EA2_53F6, ______76EE_6807)
         return
     end
     _____72B6_6001["延长次数"] = _____72B6_6001["延长次数"] + 1
-    _____72B6_6001["到期时间"] = _____72B6_6001["到期时间"] + ____D_914D_7F6E["延长秒"]
+    _____72B6_6001["到期时间"] = _____72B6_6001["到期时间"] + ____D_914D_7F6E["延长秒"] * 1000
     if _____72B6_6001["到期回调ID"] ~= 0 then
         removeDelayedCallback(_____72B6_6001["到期回调ID"])
     end
     _____72B6_6001["到期回调ID"] = addDelayedCallback(
-        (_____72B6_6001["到期时间"] - getGameTime()) * 1000,
+        _____72B6_6001["到期时间"] - getGameTime(),
         function()
             _____79FB_9664D_72B6_6001(_____7EA2_53F6)
         end

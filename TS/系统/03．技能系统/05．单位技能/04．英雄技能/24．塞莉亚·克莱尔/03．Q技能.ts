@@ -24,6 +24,12 @@ const jass = require("jass.common") as any;
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
 };
+const { fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
+};
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
@@ -44,9 +50,8 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
 const { 创建战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
   创建战斗技能实例: (this: void, 参数: any) => any;
 };
-const { 发射弹道, 获取弹道当前位置 } = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂") as {
+const { 发射弹道 } = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂") as {
   发射弹道: (this: void, 参数: any) => any;
-  获取弹道当前位置: (this: void, 弹道: any) => { X: number; Y: number };
 };
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
@@ -116,11 +121,14 @@ function 尝试建立终点节点(this: void, 施法者: any, 数据: any, X: nu
 }
 
 function 处理Q命中(this: void, 施法者: any, 目标: any, 数据: any): void {
-  if (!单位存活(目标)) return; // 失效句柄不再结算
+  if (!单位存活(目标)) {
+    debugLogForce("塞莉亚-Q", "命中失败", "目标无效", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "handle", 目标);
+    return; // 失效句柄不再结算
+  }
   const X = GetUnitX(目标);
   const Y = GetUnitY(目标);
   const 伤害 = 读取单位攻击力(施法者) * 塞莉亚克莱尔Q配置.主伤害攻击力倍率;
-  debugLogForce("塞莉亚-Q", "伤害", "标签", "塞莉亚-棱晶魔弹", "数值", 伤害);
+  debugLogForce("塞莉亚-Q", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能类型ID), "实例", 数据.技能实例ID ?? "-", "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(X), "Y", Math.floor(Y), "伤害", 伤害);
   造成Q伤害(施法者, 目标, 伤害, 数据.技能实例ID, "塞莉亚-棱晶魔弹", "单体");
   // 命中即视为到达真实终点
   尝试建立终点节点(施法者, 数据, X, Y);
@@ -278,7 +286,6 @@ function 尝试锚定追迹(this: void, 施法者: any, 数据: any): void {
 //=============================================================================
 
 function 释放Q棱晶魔弹(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("塞莉亚-Q", "释放", "技能实例ID", 技能实例ID ?? "-");
   if (施法者 == null || 施法者 === 0 || !单位存活(施法者)) return;
 
   // t0 快照
@@ -290,6 +297,8 @@ function 释放Q棱晶魔弹(this: void, _context: any, 施法者: any, 技能�
     目标X = GetUnitX(目标单位);
     目标Y = GetUnitY(目标单位);
   }
+
+  debugLogForce("塞莉亚-Q", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能类型ID), "实例", 技能实例ID ?? "-", "目标", 有目标 ? GetUnitName(目标单位) : "点施放", "X", Math.floor(目标X), "Y", Math.floor(目标Y));
 
   const 数据: any = {
     技能实例ID,
@@ -315,7 +324,7 @@ function 释放Q棱晶魔弹(this: void, _context: any, 施法者: any, 技能�
     技能实例ID,
     数据,
     结束回调: function Q实例结束(this: void, _原因: string, _控制器: any): void {
-      debugLogForce("塞莉亚-Q", "结束", "原因", _原因);
+      debugLogForce("塞莉亚-Q", "结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能类型ID), "原因", _原因);
       void _原因;
       void _控制器;
     },
@@ -392,8 +401,8 @@ function 释放Q棱晶魔弹(this: void, _context: any, 施法者: any, 技能�
       },
       on到达点: function Q终点(this: void, _弹幕ID: number, _原因: string): void {
         if (!实例.仍有效()) return;
-        const 位置 = 获取弹道当前位置(弹道);
-        尝试建立终点节点(施法者, 数据, 位置 != null ? 位置.X : 目标X, 位置 != null ? 位置.Y : 目标Y);
+        // on到达点 触发时弹道已结束，获取弹道当前位置 会返回 (0,0) 兜底；用 onTick 记录的最后坐标
+        尝试建立终点节点(施法者, 数据, 数据.最后已知X, 数据.最后已知Y);
       },
     });
     void 弹道;

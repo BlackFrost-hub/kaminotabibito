@@ -23,8 +23,9 @@ const { 播放限时动作, 芙莉莲动作槽 } = require("./01A．动作表现
 const 被动配置 = 芙莉莲被动配置;
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -91,13 +92,16 @@ const Q配置 = 芙莉莲Q配置;
 const Q音效 = 芙莉莲音效配置.Q发射;
 
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
-const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
+const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 
 //=============================================================================
 // Q 命中结算：基础伤害 + 攻击解析 + 穿透/破防分支（伤害全部归属本次 Q 实例）
@@ -135,12 +139,12 @@ function 结算Q命中(this: void, 施法者: any, 目标: any, 技能实例ID: 
     标签 = "芙莉莲-Q穿透";
   }
 
-  debugLogForce("芙莉莲-Q", "伤害", "标签", 标签, "数值", 攻击力 * 倍率);
+  debugLogForce("芙莉莲-Q", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", 攻击力 * 倍率, "标签", 标签);
   造成技能伤害({
     来源: 施法者,
     目标,
     伤害: 攻击力 * 倍率,
-    伤害类型: DAMAGE_TYPE_NORMAL,
+    伤害类型: DAMAGE_TYPE_MAGIC,
     攻击类型: ATTACK_TYPE_NORMAL,
     武器类型: WEAPON_TYPE_WHOKNOWS,
     来源类型: "单位技能",
@@ -177,8 +181,11 @@ function 结算Q命中(this: void, 施法者: any, 目标: any, 技能实例ID: 
 //=============================================================================
 
 function 释放Q(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("芙莉莲-Q", "释放", "技能实例ID", 技能实例ID || "-");
-  if (!是芙莉莲(施法者)) return;
+  if (!是芙莉莲(施法者)) {
+    debugLogForce("芙莉莲-Q", "释放被拒", "原因", "非芙莉莲施法者", "施法者", 施法者, "handle", 施法者, "实例", 技能实例ID ?? "-");
+    return;
+  }
+  debugLogForce("芙莉莲-Q", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者, "目标", "点施放", "X", Math.floor(GetSpellTargetX()), "Y", Math.floor(GetSpellTargetY()));
   // 重复 Q：已有活跃 Q 实例时忽略
   // 施法时点：先快照隐匿（消费判定用），再记录活动（解除隐匿并重置静默计时）
   const 隐匿强化 = 快照隐匿(施法者);
@@ -204,7 +211,7 @@ function 释放Q(this: void, _context: any, 施法者: any, 技能实例ID: numb
     技能实例ID,
     数据: { 已发射: false },
     结束回调: function Q结束(this: void, _原因: string, _c: any): void {
-      debugLogForce("芙莉莲-Q", "结束", "原因", _原因 || "-");
+      debugLogForce("芙莉莲-Q", "结束", "原因", _原因 || "-", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者);
       // 打断发生在发射点前：延迟回调已由实例统一清理 → 不生成弹道、不命中、不消费解析
     },
   });
@@ -218,6 +225,7 @@ function 释放Q(this: void, _context: any, 施法者: any, 技能实例ID: numb
       发射方向角: 方向角,
       速度: Q配置.弹道速度,
       轨迹: { 类型: "直线", 距离: 射程 },
+      发射高度来源: "发射者", // 从芙莉莲当前飞行高度射出（隐匿观察期高空 Q 从高处平飞）
       命中半径: Q配置.命中半径,
       影响目标: "敌方",
       碰撞消失: true,

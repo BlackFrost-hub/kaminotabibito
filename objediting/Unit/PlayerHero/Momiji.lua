@@ -24,6 +24,7 @@ createPlayerHeroUnit('E0L1', '朱雀院红叶', {
 
   attackMode = 'melee',
   attackType = AttackType.Normal,
+  damageBase = 20,
   attackRange = 150,
   acquire = 600.0,
   attackTargets = 'ground,structure,debris,air,item,ward',

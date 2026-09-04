@@ -25,11 +25,15 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const AddLightning = jass.AddLightning as (this: void, codeName: string, checkVisibility: boolean, x1: number, y1: number, x2: number, y2: number) => any;
@@ -54,6 +58,9 @@ const { 开始充能 } = require("系统.03．技能系统.00．技能模板+函
 const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removeDelayedCallback: (this: void, id: number) => void;
+};
+const { 扩展_设特效速度 } = require("平台扩展API动作") as {
+  扩展_设特效速度: (this: void, 特效: any, 速度: number) => void;
 };
 const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
@@ -145,9 +152,11 @@ function R创建领域(
   最终伤害: number,
   有强化: boolean,
   来源键: string,
-): void {
-  debugLogForce("爱蜜莉雅-R", "状态", "创建领域", "半径", 半径, "有强化", 有强化);
-  if (!单位存活(施法者)) return;
+  冰山特效?: any,
+  清理冰山?: (this: void) => void,
+): boolean {
+  debugLogForce("爱蜜莉雅-R", "状态", "创建领域", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 技能实例ID ?? "-", "X", Math.floor(中心X), "Y", Math.floor(中心Y), "半径", 半径, "有强化", 有强化);
+  if (!单位存活(施法者)) return false;
   if (有强化) {
     while (消费爱蜜莉雅D强化(施法者)) {
       // 消耗全部剩余强化
@@ -163,7 +172,7 @@ function R创建领域(
     数据,
     结束回调: function R结束(this: void, 原因: string, _c: any): void {
       // 记录结束原因（on销毁 据此区分自然结束 vs 打断/死亡）
-      debugLogForce("爱蜜莉雅-R", "结束", "原因", 原因);
+      debugLogForce("爱蜜莉雅-R", "结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 技能实例ID ?? "-", "原因", 原因);
       数据.结束原因 = 原因;
       R清理连接光(数据);
       if (数据.区域 != null) {
@@ -173,11 +182,18 @@ function R创建领域(
     },
   });
 
+  if (冰山特效 != null && 冰山特效 !== 0 && 清理冰山 != null) {
+    控制器.登记自定义清理("R冰山坠落", 清理冰山);
+  }
+
   const 区域 = 创建持续危险区域({
     X: 中心X,
     Y: 中心Y,
     半径,
     持续时间: 爱蜜莉雅R配置.持续秒,
+    // 检测间隔必须传：区域效果 on周期 触发频率由 检测间隔 控制（默认0.02s），
+    // 漏传会导致周期伤害按 50 倍频率结算（300攻击力可秒杀1万血木桩）
+    检测间隔: 爱蜜莉雅R配置.周期秒,
     影响目标: "敌方",
     所有者: 施法者,
     首次扫描触发进入: true,
@@ -194,7 +210,7 @@ function R创建领域(
     },
     on销毁: function R区域销毁(this: void): void {
       // 先逐个取消区域标记：底层销毁只调 on销毁 后直接清空集合、不触发 on离开
-      const 残留单位 = 区域.区域效果.当前区域内单位;
+      const 残留单位: any[] = 区域.区域效果.获取当前区域内单位();
       for (let i = 0; i < 残留单位.length; i++) 取消标记目标在爱蜜莉雅区域(残留单位[i]);
       R清理连接光(数据);
       数据.区域 = null;
@@ -204,7 +220,7 @@ function R创建领域(
       数据.已结束 = true;
       // 最终冰爆：结束时点实时快照（刚进入结算、已离开不结算）
       const 区域内单位 = R取实时区域敌人(施法者, 中心X, 中心Y, 半径);
-      debugLogForce("爱蜜莉雅-R", "伤害", "标签", "爱蜜莉雅-R最终冰爆", "目标数", 区域内单位.length, "数值", 数据.最终伤害);
+      debugLogForce("爱蜜莉雅-R", "伤害", "标签", "爱蜜莉雅-R最终冰爆", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 技能实例ID ?? "-", "X", Math.floor(中心X), "Y", Math.floor(中心Y), "目标数", 区域内单位.length, "数值", 数据.最终伤害);
       R区域内结算(施法者, 区域内单位, 技能实例ID, 数据.最终伤害);
       创建点特效({
         模型路径: 爱蜜莉雅表现配置.最终冰爆.模型路径,
@@ -317,14 +333,33 @@ function R创建领域(
     控制器.登记延迟回调(爆发ID);
   }
   void 来源键;
+  return true;
 }
 
 function 释放R永冻之庭(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("爱蜜莉雅-R", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (施法者 == null || 施法者 === 0) return;
-  播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.R);
+  if (施法者 == null || 施法者 === 0) {
+    debugLogForce("爱蜜莉雅-R", "释放被拒", "原因", "施法者无效");
+    return;
+  }
   const 中心X = GetSpellTargetX();
   const 中心Y = GetSpellTargetY();
+  debugLogForce(
+    "爱蜜莉雅-R",
+    "释放",
+    "玩家",
+    GetPlayerId(GetOwningPlayer(施法者)) + 1,
+    "四码",
+    fourCCToStringSafe(R技能类型ID),
+    "实例",
+    技能实例ID ?? "-",
+    "目标",
+    "点施放",
+    "目标X",
+    Math.floor(中心X),
+    "目标Y",
+    Math.floor(中心Y),
+  );
+  播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.R);
   const 攻击力 = 读取单位攻击力(施法者);
 
   // D 强化：蓄力完成后生效（消耗剩余强化资源并结束 D）
@@ -338,6 +373,25 @@ function 释放R永冻之庭(this: void, _context: any, 施法者: any, 技能�
 
   // 蓄力：通用充能系统（指令中断 / 硬控中断 / 死亡中断 / 世界坐标进度 UI 倒计时与销毁）
   let 法阵特效: any = null;
+  let 冰山特效: any = null;
+  let 冰山暂停回调ID = 0;
+  let 冰山已移交R实例 = false;
+  function 清理冰山坠落(this: void): void {
+    if (冰山暂停回调ID !== 0) {
+      removeDelayedCallback(冰山暂停回调ID);
+      冰山暂停回调ID = 0;
+    }
+    if (冰山特效 != null && 冰山特效 !== 0) {
+      // 冰山可能已在蓄力中被暂停；销毁前恢复速度，避免 0 倍速状态残留。
+      扩展_设特效速度(冰山特效, 1);
+      jass.DestroyEffect(冰山特效);
+      冰山特效 = null;
+    }
+  }
+  function 暂停冰山坠落(this: void): void {
+    冰山暂停回调ID = 0;
+    if (冰山特效 != null && 冰山特效 !== 0) 扩展_设特效速度(冰山特效, 0);
+  }
   开始充能(施法者, {
     持续时间: 爱蜜莉雅R配置.蓄力秒,
     指令中断: true,
@@ -348,7 +402,8 @@ function 释放R永冻之庭(this: void, _context: any, 施法者: any, 技能�
     世界坐标进度UI高度偏移: 爱蜜莉雅读条配置.跟随Z偏移,
     显示进度条特效: false,
     // 蓄力预警法阵（一次）
-    开始回调: function R蓄力开始(this: void, _单位: any, _充能ID: number): void {
+    开始回调: function R蓄力开始(this: void, _单位: any, 充能ID: number): void {
+      debugLogForce("爱蜜莉雅-R", "状态", "蓄力开始", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 技能实例ID ?? "-", "充能ID", 充能ID);
       播放英雄技能喊话(施法者, "爱蜜莉雅", 爱蜜莉雅技能配置.R.技能ID);
       法阵特效 = 创建点特效({
         模型路径: 爱蜜莉雅表现配置.蓄力法阵.模型路径,
@@ -359,19 +414,38 @@ function 释放R永冻之庭(this: void, _context: any, 施法者: any, 技能�
         缩放: 半径 / 爱蜜莉雅表现配置.蓄力法阵.基准半径 * 爱蜜莉雅表现配置.蓄力法阵.基准缩放,
         持续秒: 爱蜜莉雅表现配置.蓄力法阵.持续秒,
       });
+      const 冰山配置 = 爱蜜莉雅表现配置.R冰山坠落;
+      冰山特效 = 创建点特效({
+        模型路径: 冰山配置.模型路径,
+        RGB: 冰山配置.RGB,
+        X: 中心X,
+        Y: 中心Y,
+        Z: 冰山配置.高度,
+        缩放: 冰山配置.缩放,
+        动画索引: 冰山配置.动画索引,
+        动画速度: 冰山配置.动画速度,
+        持续秒: 冰山配置.持续秒,
+      });
+      if (冰山特效 != null && 冰山特效 !== 0 && 冰山配置.暂停秒 > 0) {
+        const 播放速度 = 冰山配置.动画速度 > 0 ? 冰山配置.动画速度 : 1;
+        冰山暂停回调ID = addDelayedCallback(冰山配置.暂停秒 / 播放速度 * 1000, 暂停冰山坠落);
+      }
       // 蓄力法阵展开音：充能成功建立、法阵展开时一次（被打断/死亡不会先播法阵音以外的领域音；坐标=领域中心，参数配置驱动）
       Sound3DII_CooPlayReuse(爱蜜莉雅音效配置.R蓄力.路径, 中心X, 中心Y, 爱蜜莉雅音效配置.R蓄力.高度, 爱蜜莉雅音效配置.R蓄力.裁断距离);
     },
     // 蓄力结束（完成/被打断/死亡统一销毁常驻法阵；充能系统结束回调对任意原因都会调用）
-    结束回调: function R蓄力结束(this: void, _单位: any, _原因: string, _充能ID: number): void {
+    结束回调: function R蓄力结束(this: void, _单位: any, 原因: string, 充能ID: number): void {
+      debugLogForce("爱蜜莉雅-R", "状态", "蓄力结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 技能实例ID ?? "-", "充能ID", 充能ID, "原因", 原因);
       if (法阵特效 != null && 法阵特效 !== 0) {
         jass.DestroyEffect(法阵特效);
         法阵特效 = null;
       }
+      if (原因 !== "完成" || !冰山已移交R实例) 清理冰山坠落();
     },
     // 蓄力完成：创建领域（被打断/死亡不会走到这里）
-    充能完成回调: function R蓄力完成(this: void, _单位: any, _充能ID: number): void {
-      R创建领域(施法者, 技能实例ID, 中心X, 中心Y, 半径, 最终伤害, 有强化, 来源键);
+    充能完成回调: function R蓄力完成(this: void, _单位: any, 充能ID: number): void {
+      debugLogForce("爱蜜莉雅-R", "状态", "蓄力完成→创建领域", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 技能实例ID ?? "-", "充能ID", 充能ID);
+      冰山已移交R实例 = R创建领域(施法者, 技能实例ID, 中心X, 中心Y, 半径, 最终伤害, 有强化, 来源键, 冰山特效, 清理冰山坠落);
     },
   });
 }

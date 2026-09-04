@@ -45,6 +45,7 @@ import {
   同步刷新英雄技能界面,
   同步刷新英雄技能原始界面,
 } from "./03．核心逻辑";
+import { 初始化技能提示UI } from "./05．技能提示UI";
 
 const MODULE_NAME = "动态技能文本";
 const REFRESH_MS = 300;
@@ -152,6 +153,8 @@ export function initDynamicSkillTextSystem(this: void): void {
   if (initialized) return;
   initialized = true;
   selectionSnapshotSystem.初始化本地选中技能快照();
+  // 技能提示帧在初始化时同步创建并注册悬停事件，不使用延迟回调。
+  初始化技能提示UI();
   addPeriodicCallback(REFRESH_MS, onTick);
   syncHardwareInput.registerSyncHardwareKey(ALT_KEY_CODE, KEY_STATE.DOWN, 处理同步Alt按下);
   syncHardwareInput.registerSyncHardwareKey(ALT_KEY_CODE, KEY_STATE.UP, 处理同步Alt松开);

@@ -1,6 +1,8 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const Player = jass.Player as (playerId: number) => any;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (unit: any, abilityId: number) => number;
@@ -30,6 +32,9 @@ const platformAbilityAction = require("平台扩展API动作") as {
 };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string) => number;
+};
+const { 获取动态技能魔耗百分比 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据") as {
+  获取动态技能魔耗百分比: (this: void, abilityId: number) => number;
 };
 
 const { 技能_设置技能魔法消耗 } = platformAbilityAction;
@@ -118,7 +123,10 @@ function 同步单个技能(this: void, whichHero: any, abilityId: number): void
   const level = GetUnitAbilityLevel(whichHero, abilityId);
   if (level <= 0) return;
 
-  const manaCost = 计算最终魔法消耗(whichHero, abilityId, level);
+  const 配置百分比 = 获取动态技能魔耗百分比(abilityId);
+  const manaCost = 配置百分比 >= 0
+    ? (GetUnitStateJapi(whichHero, jass.UNIT_STATE_MAX_MANA) || 0) * 配置百分比
+    : 计算最终魔法消耗(whichHero, abilityId, level);
   if (manaCost < 0) return;
   写入单个技能同步结果(whichHero, abilityId, manaCost);
 }

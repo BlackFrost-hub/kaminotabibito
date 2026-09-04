@@ -9,6 +9,8 @@ local _____6062_590D_82F1_96C4_6280_80FD_539F_59CB_6587_672C = ____03_FF0E_6838_
 local _____68C0_67E5_82F1_96C4_6280_80FD = ____03_FF0E_6838_5FC3_903B_8F91["检查英雄技能"]
 local _____540C_6B65_5237_65B0_82F1_96C4_6280_80FD_754C_9762 = ____03_FF0E_6838_5FC3_903B_8F91["同步刷新英雄技能界面"]
 local _____540C_6B65_5237_65B0_82F1_96C4_6280_80FD_539F_59CB_754C_9762 = ____03_FF0E_6838_5FC3_903B_8F91["同步刷新英雄技能原始界面"]
+local ____05_FF0E_6280_80FD_63D0_793AUI = require("系统.03．技能系统.07．动态技能文本.05．技能提示UI")
+local _____521D_59CB_5316_6280_80FD_63D0_793AUI = ____05_FF0E_6280_80FD_63D0_793AUI["初始化技能提示UI"]
 --- 动态技能文本系统 - 入口与导出
 -- 
 -- 改为和冷却/蓝耗一致的本地选中驱动：
@@ -166,6 +168,7 @@ function ____exports.initDynamicSkillTextSystem()
     end
     initialized = true
     selectionSnapshotSystem["初始化本地选中技能快照"]()
+    _____521D_59CB_5316_6280_80FD_63D0_793AUI()
     addPeriodicCallback(REFRESH_MS, onTick)
     syncHardwareInput.registerSyncHardwareKey(ALT_KEY_CODE, KEY_STATE.DOWN, _____5904_7406_540C_6B65Alt_6309_4E0B)
     syncHardwareInput.registerSyncHardwareKey(ALT_KEY_CODE, KEY_STATE.UP, _____5904_7406_540C_6B65Alt_677E_5F00)

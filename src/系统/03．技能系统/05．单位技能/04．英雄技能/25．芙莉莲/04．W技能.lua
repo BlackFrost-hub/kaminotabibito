@@ -20,6 +20,7 @@ local _____8299_8389_83B2_52A8_4F5C_69FD = ____require_result_2["芙莉莲动作
 local jass = require("jass.common")
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_3.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_3.fourCCToStringSafe
 local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
 local getGameTime = ____require_result_4.getGameTime
 local addDelayedCallback = ____require_result_4.addDelayedCallback
@@ -62,6 +63,9 @@ local _____516C_5F0F_5C42_7279_6548_952E = "芙莉莲W公式层"
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local function _____7ED3_675FW_62A4_58C1(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E, _____81EA_7136_7ED3_675F)
     if _____6570_636E["已结束"] then
         return
@@ -71,7 +75,15 @@ local function _____7ED3_675FW_62A4_58C1(_____65BD_6CD5_8005, _____6280_80FD_5B9
         "结束",
         "原因",
         _____81EA_7136_7ED3_675F and "自然结束" or "成功/中断收束",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____W_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
         "英雄",
+        _____65BD_6CD5_8005,
+        "handle",
         _____65BD_6CD5_8005
     )
     _____6570_636E["已结束"] = true
@@ -105,10 +117,35 @@ end
 local ____require_result_15 = require("系统.00．核心系统.05．中心计时器")
 removeDelayedCallback = ____require_result_15.removeDelayedCallback
 local function _____91CA_653EW(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("芙莉莲-W", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_8299_8389_83B2(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "芙莉莲-W",
+            "释放被拒",
+            "原因",
+            "非芙莉莲施法者",
+            "施法者",
+            _____65BD_6CD5_8005,
+            "handle",
+            _____65BD_6CD5_8005,
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
+    debugLogForce(
+        "芙莉莲-W",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____W_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "英雄",
+        _____65BD_6CD5_8005,
+        "handle",
+        _____65BD_6CD5_8005
+    )
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "芙莉莲W") > 0 then
         return
     end
@@ -146,7 +183,8 @@ local function _____91CA_653EW(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         nil,
         _____8299_8389_83B2_8868_73B0_914D_7F6E["W护壁"]["动画索引"],
         _____8299_8389_83B2_8868_73B0_914D_7F6E["W护壁"]["面向角度"],
-        _____8299_8389_83B2_8868_73B0_914D_7F6E["W护壁"].RGB
+        _____8299_8389_83B2_8868_73B0_914D_7F6E["W护壁"].RGB,
+        _____8299_8389_83B2_8868_73B0_914D_7F6E["W护壁"]["面向跟随单位"]
     )
     local ____ = _____62A4_58C1_53E5_67C4
     local _____516C_5F0F_5C42_53E5_67C4 = _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
@@ -158,7 +196,8 @@ local function _____91CA_653EW(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         nil,
         _____8299_8389_83B2_8868_73B0_914D_7F6E["W公式层"]["动画索引"],
         _____8299_8389_83B2_8868_73B0_914D_7F6E["W公式层"]["面向角度"],
-        _____8299_8389_83B2_8868_73B0_914D_7F6E["W公式层"].RGB
+        _____8299_8389_83B2_8868_73B0_914D_7F6E["W公式层"].RGB,
+        _____8299_8389_83B2_8868_73B0_914D_7F6E["W公式层"]["面向跟随单位"]
     )
     local ____ = _____516C_5F0F_5C42_53E5_67C4
     Sound3DII_UnitPlayReuse(_____8299_8389_83B2_97F3_6548_914D_7F6E["W展开"]["路径"], _____65BD_6CD5_8005, _____8299_8389_83B2_97F3_6548_914D_7F6E["W展开"]["裁断距离"])
@@ -187,7 +226,26 @@ local function _____91CA_653EW(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
             end
             _____6570_636E["已防御"] = true
             local _____6765_6E90 = context.attacker
-            debugLogForce("芙莉莲-W", "命中", "目标", _____6765_6E90)
+            debugLogForce(
+                "芙莉莲-W",
+                "命中",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                fourCCToStringSafe(____W_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
+                "目标",
+                GetUnitName(_____6765_6E90),
+                "handle",
+                _____6765_6E90,
+                "X",
+                math.floor(GetUnitX(_____6765_6E90)),
+                "Y",
+                math.floor(GetUnitY(_____6765_6E90)),
+                "伤害",
+                context.currentDamage
+            )
             addDelayedCallback(
                 0,
                 function()

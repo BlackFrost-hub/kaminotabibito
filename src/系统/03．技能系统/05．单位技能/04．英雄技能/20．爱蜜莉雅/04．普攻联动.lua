@@ -11,13 +11,19 @@ local ____02_FF0E_516C_5171_72B6_6001_4E0E_51B0_6676 = require("系统.03．技�
 local _____67E5_8BE2_7231_871C_8389_96C5_51B0_6676 = ____02_FF0E_516C_5171_72B6_6001_4E0E_51B0_6676["查询爱蜜莉雅冰晶"]
 local ____03_FF0E_88AB_52A8_6548_679C = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.03．被动效果")
 local _____662F_7231_871C_8389_96C5 = ____03_FF0E_88AB_52A8_6548_679C["是爱蜜莉雅"]
+local ____01_FF0E_82F1_96C4_6280_80FD_558A_8BDD = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____01_FF0E_82F1_96C4_6280_80FD_558A_8BDD["播放英雄技能喊话"]
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCC = ____require_result_0.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -151,7 +157,7 @@ local function _____51CF_5C11_6700_957FQWE_51B7_5374(_____82F1_96C4)
 end
 local function _____53D1_5C04_5E15_514B_8FFD_51FB_51B0_5F39(_____82F1_96C4, _____76EE_6807)
     if _____82F1_96C4 == nil or _____76EE_6807 == nil or _____76EE_6807 == 0 then
-        return
+        return false
     end
     local _____4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____82F1_96C4) * _____7231_871C_8389_96C5_666E_653B_914D_7F6E["帕克追击伤害攻击力倍率"]
     local _____8FFD_8E2A_5F39 = _____53D1_5C04_5F39_9053({
@@ -178,7 +184,7 @@ local function _____53D1_5C04_5E15_514B_8FFD_51FB_51B0_5F39(_____82F1_96C4, ____
         RGB = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["帕克追击"].RGB,
         ["缩放"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["帕克追击"]["缩放"]
     })
-    local ____ = _____8FFD_8E2A_5F39
+    return _____8FFD_8E2A_5F39 ~= nil and _____8FFD_8E2A_5F39 ~= 0
 end
 local function _____5904_7406_7231_871C_8389_96C5_9020_6210_4F24_5BB3(target, attacker, _applied, snapshot)
     if attacker == nil or attacker == 0 or not _____662F_7231_871C_8389_96C5(attacker) then
@@ -218,11 +224,21 @@ local function _____5904_7406_7231_871C_8389_96C5_9020_6210_4F24_5BB3(target, at
             "爱蜜莉雅-普攻联动",
             "状态",
             "第3次有效普攻触发帕克追击",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(attacker)) + 1,
             "目标",
-            target
+            GetUnitName(target),
+            "handle",
+            target,
+            "X",
+            math.floor(GetUnitX(target)),
+            "Y",
+            math.floor(GetUnitY(target))
         )
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(attacker, _____7231_871C_8389_96C5BuffID["契约应和"])
-        _____53D1_5C04_5E15_514B_8FFD_51FB_51B0_5F39(attacker, target)
+        if _____53D1_5C04_5E15_514B_8FFD_51FB_51B0_5F39(attacker, target) then
+            _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(attacker, "爱蜜莉雅", "AEP1")
+        end
         _____51CF_5C11_6700_957FQWE_51B7_5374(attacker)
         return
     end

@@ -11,8 +11,9 @@ import {
 } from "./00．配置";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
@@ -103,6 +104,9 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 
 interface W数据 {
   方向角: number;
@@ -118,7 +122,7 @@ interface W数据 {
 //=============================================================================
 
 function 结算W单体伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
-  debugLogForce("红叶-W", "伤害", "标签", 标签, "数值", 伤害值, "目标", 目标);
+  debugLogForce("红叶-W", "伤害", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", Math.floor(伤害值), "标签", 标签, "实例", 技能实例ID ?? "-");
   造成技能伤害({
     来源: 施法者,
     目标,
@@ -152,7 +156,7 @@ function 结束W招架(this: void, 施法者: any, 控制器: any, 技能实例I
   if (!数据.已招架) {
     释放失败前斩(施法者, 技能实例ID);
   }
-  debugLogForce("红叶-W", "结束", "原因", 数据.已招架 ? "招架成功" : "招架失败");
+  debugLogForce("红叶-W", "结束", "原因", 数据.已招架 ? "招架成功" : "招架失败", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
   控制器.完成();
 }
 
@@ -181,6 +185,7 @@ function 结算W反击(this: void, 施法者: any, 控制器: any, 技能实例I
   const 来源 = 数据.招架来源;
   // 来源失效：安全收尾（已招架成功，不释放失败前斩）
   if (来源 == null || 来源 === 0 || !单位存活(来源)) {
+    debugLogForce("红叶-W", "命中失败", "目标无效", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "来源", 来源);
     结束W招架(施法者, 控制器, 技能实例ID, 数据);
     return;
   }
@@ -204,7 +209,7 @@ function 结算W反击(this: void, 施法者: any, 控制器: any, 技能实例I
     const 来源X = GetUnitX(来源);
     const 来源Y = GetUnitY(来源);
     const 拉回角度 = 两点角度(来源X, 来源Y, GetUnitX(施法者), GetUnitY(施法者));
-    debugLogForce("红叶-W", "位移", "类型", "击退", "距离", W配置.D强化拉回距离);
+    debugLogForce("红叶-W", "位移", "类型", "击退", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "距离", W配置.D强化拉回距离);
     开始击退(来源, {
       距离: W配置.D强化拉回距离,
       角度: 拉回角度,
@@ -216,11 +221,17 @@ function 结算W反击(this: void, 施法者: any, 控制器: any, 技能实例I
 }
 
 function 释放W水镜返刃(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("红叶-W", "释放", "技能实例ID", 技能实例ID ?? "-");
-  if (!是朱雀院红叶(施法者)) return;
+  debugLogForce("红叶-W", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "目标", "-", "X", Math.floor(GetUnitX(施法者)), "Y", Math.floor(GetUnitY(施法者)));
+  if (!是朱雀院红叶(施法者)) {
+    debugLogForce("红叶-W", "释放被拒", "原因", "非红叶单位", "施法者", 施法者);
+    return;
+  }
   播放红叶动作(施法者, 朱雀院红叶动作槽.W开窗);
   // 不叠加窗口：已有活跃招架时忽略本次释放
-  if (查询战斗技能实例(施法者, "红叶W").length > 0) return;
+  if (查询战斗技能实例(施法者, "红叶W").length > 0) {
+    debugLogForce("红叶-W", "释放被拒", "原因", "重复W活跃招架", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
+    return;
+  }
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
   播放英雄技能喊话(施法者, "朱雀院红叶", 朱雀院红叶技能配置.W.技能ID);
   const 数据: W数据 = {
@@ -237,7 +248,7 @@ function 释放W水镜返刃(this: void, _context: any, 施法者: any, 技能�
     技能实例ID,
     数据,
     结束回调: function W结束(this: void, _原因: string, _c: any): void {
-      debugLogForce("红叶-W", "结束", "原因", "-");
+      debugLogForce("红叶-W", "结束", "原因", "-", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
       // 死亡/中断收束：补全清理（与 结束W招架 幂等）
       if (数据.已结束) return;
       数据.已结束 = true;
@@ -261,7 +272,7 @@ function 释放W水镜返刃(this: void, _context: any, 施法者: any, 技能�
     if (context.attacker == null || context.attacker === 0) return context.currentDamage;
     const 来源方向 = 两点方向角(GetUnitX(施法者), GetUnitY(施法者), GetUnitX(context.attacker), GetUnitY(context.attacker));
     if (角度差绝对值(数据.方向角, 来源方向) > W配置.正面角度 / 2) return context.currentDamage;
-    debugLogForce("红叶-W", "回调", "类型", "招架成功", "来源", context.attacker);
+    debugLogForce("红叶-W", "回调", "类型", "招架成功", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "目标", GetUnitName(context.attacker), "handle", context.attacker, "X", Math.floor(GetUnitX(context.attacker)), "Y", Math.floor(GetUnitY(context.attacker)));
     数据.已招架 = true;
     数据.招架来源 = context.attacker;
     // 收尾延迟到本次伤害修正遍历结束后执行（禁止在伤害遍历中同步注销修改器）

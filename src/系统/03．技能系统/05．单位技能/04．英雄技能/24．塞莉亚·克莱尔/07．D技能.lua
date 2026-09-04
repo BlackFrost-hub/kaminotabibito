@@ -15,6 +15,8 @@ function _____6DFB_52A0_5355_4F4D_6682_505C_6536_5C3E(_____65BD_6CD5_8005, _____
     _____79FB_9664_5355_4F4D_6682_505C(_____65BD_6CD5_8005, _____6765_6E90)
 end
 local jass = require("jass.common")
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetSpellTargetX = jass.GetSpellTargetX
@@ -58,13 +60,28 @@ local function _____9009_62E9_6700_8FD1_5408_6CD5_8282_70B9(_____5217_8868, ____
     return _____6700_4F73
 end
 local function _____91CA_653ED_672F_5F0F_8F6C_5199(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("塞莉亚-D", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 or not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return
     end
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "塞莉亚·克莱尔", _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.D["技能ID"])
     local _____76EE_6807X = GetSpellTargetX()
     local _____76EE_6807Y = GetSpellTargetY()
+    debugLogForce(
+        "塞莉亚-D",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.D["技能ID"],
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "点施放",
+        "X",
+        math.floor(_____76EE_6807X),
+        "Y",
+        math.floor(_____76EE_6807Y)
+    )
     local _____786C_76F4_6765_6E90 = ____D_786C_76F4_6765_6E90
     addDelayedCallback(
         _____585E_8389_4E9A_514B_83B1_5C14D_914D_7F6E["硬直秒"] * 1000,
@@ -75,6 +92,19 @@ local function _____91CA_653ED_672F_5F0F_8F6C_5199(_context, _____65BD_6CD5_8005
             _____6DFB_52A0_5355_4F4D_6682_505C_6536_5C3E(_____65BD_6CD5_8005, _____786C_76F4_6765_6E90)
             local _____5217_8868 = _____67E5_8BE2_585E_8389_4E9A_8282_70B9(_____65BD_6CD5_8005)
             if #_____5217_8868 <= 0 then
+                debugLogForce(
+                    "塞莉亚-D",
+                    "状态",
+                    "无节点兜底",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                    "实例",
+                    _____6280_80FD_5B9E_4F8BID or "-",
+                    "X",
+                    math.floor(GetUnitX(_____65BD_6CD5_8005)),
+                    "Y",
+                    math.floor(GetUnitY(_____65BD_6CD5_8005))
+                )
                 _____521B_5EFA_585E_8389_4E9A_8282_70B9(
                     _____65BD_6CD5_8005,
                     "棱晶",
@@ -91,9 +121,38 @@ local function _____91CA_653ED_672F_5F0F_8F6C_5199(_context, _____65BD_6CD5_8005
             end
             local _____6210_529F = _____8F6C_5199_585E_8389_4E9A_8282_70B9_4E8B_52A1(_____65BD_6CD5_8005, _____76EE_6807_8282_70B9["序号"], _____76EE_6807X, _____76EE_6807Y)
             if not _____6210_529F then
+                debugLogForce(
+                    "塞莉亚-D",
+                    "状态",
+                    "转写被拒",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                    "实例",
+                    _____6280_80FD_5B9E_4F8BID or "-",
+                    "节点",
+                    _____76EE_6807_8282_70B9["序号"],
+                    "原因",
+                    "R锁定或转写中冲突"
+                )
                 return
             end
-            debugLogForce("塞莉亚-D", "状态", "转写成功", _____76EE_6807_8282_70B9["序号"])
+            debugLogForce(
+                "塞莉亚-D",
+                "状态",
+                "转写成功",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.D["技能ID"],
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
+                "节点",
+                _____76EE_6807_8282_70B9["序号"],
+                "X",
+                math.floor(_____76EE_6807X),
+                "Y",
+                math.floor(_____76EE_6807Y)
+            )
             Sound3DII_CooPlayReuse(
                 _____585E_8389_4E9A_97F3_6548_914D_7F6E["D转写"]["路径"],
                 _____76EE_6807X,
@@ -101,7 +160,18 @@ local function _____91CA_653ED_672F_5F0F_8F6C_5199(_context, _____65BD_6CD5_8005
                 _____585E_8389_4E9A_97F3_6548_914D_7F6E["D转写"]["高度"],
                 _____585E_8389_4E9A_97F3_6548_914D_7F6E["D转写"]["裁断距离"]
             )
-            debugLogForce("塞莉亚-D", "特效", "路径", _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["D重连落点闪现"]["模型路径"])
+            debugLogForce(
+                "塞莉亚-D",
+                "特效",
+                "路径",
+                _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["D重连落点闪现"]["模型路径"],
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "X",
+                math.floor(_____76EE_6807X),
+                "Y",
+                math.floor(_____76EE_6807Y)
+            )
             local _____843D_70B9_95EA_73B0 = _____521B_5EFA_70B9_7279_6548({
                 ["模型路径"] = _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["D重连落点闪现"]["模型路径"],
                 RGB = _____585E_8389_4E9A_514B_83B1_5C14_8868_73B0_914D_7F6E["D重连落点闪现"].RGB,

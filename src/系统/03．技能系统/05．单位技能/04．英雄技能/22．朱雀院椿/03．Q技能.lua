@@ -9,6 +9,7 @@ local _____6731_96C0_9662_693F_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["朱�
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
@@ -48,15 +49,25 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local function _____7ED3_7B97Q_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____65B9_5411_89D2, _____4F24_5BB3_500D_7387, _____6807_7B7E)
+    local _____73A9_5BB6ID = GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
     debugLogForce(
         "椿-Q",
-        "伤害",
+        "结算",
+        "玩家",
+        _____73A9_5BB6ID,
+        "四码",
+        fourCCToStringSafe(____Q_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
         "标签",
         _____6807_7B7E,
-        "数值",
+        "伤害",
         _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____4F24_5BB3_500D_7387
     )
     local X = GetUnitX(_____65BD_6CD5_8005)
@@ -86,9 +97,49 @@ local function _____7ED3_7B97Q_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8
             )
         end
     })
+    if #_____654C_4EBA == 0 then
+        debugLogForce(
+            "椿-Q",
+            "命中失败",
+            "原因",
+            "无目标",
+            "玩家",
+            _____73A9_5BB6ID,
+            "四码",
+            fourCCToStringSafe(____Q_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-",
+            "标签",
+            _____6807_7B7E,
+            "方向",
+            _____65B9_5411_89D2
+        )
+    end
     do
         local i = 0
         while i < #_____654C_4EBA do
+            debugLogForce(
+                "椿-Q",
+                "命中",
+                "玩家",
+                _____73A9_5BB6ID,
+                "四码",
+                fourCCToStringSafe(____Q_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
+                "标签",
+                _____6807_7B7E,
+                "目标",
+                GetUnitName(_____654C_4EBA[i + 1]),
+                "handle",
+                _____654C_4EBA[i + 1],
+                "X",
+                math.floor(GetUnitX(_____654C_4EBA[i + 1])),
+                "Y",
+                math.floor(GetUnitY(_____654C_4EBA[i + 1])),
+                "伤害",
+                _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____4F24_5BB3_500D_7387
+            )
             _____9020_6210_6280_80FD_4F24_5BB3({
                 ["来源"] = _____65BD_6CD5_8005,
                 ["目标"] = _____654C_4EBA[i + 1],
@@ -184,11 +235,50 @@ local function _____6267_884C_8FD4_5203_7B2C_4E00_6BB5(_____65BD_6CD5_8005, ____
     _____63A7_5236_5668["登记延迟回调"](_____63A7_5236_5668, _____7B2C_4E8C_6BB5ID)
 end
 local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("椿-Q", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_693F(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "椿-Q",
+            "释放被拒",
+            "原因",
+            "非朱雀院椿",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____Q_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
+    debugLogForce(
+        "椿-Q",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____Q_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "点施放",
+        "X",
+        math.floor(GetSpellTargetX()),
+        "Y",
+        math.floor(GetSpellTargetY())
+    )
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "椿Q") > 0 then
+        debugLogForce(
+            "椿-Q",
+            "释放被拒",
+            "原因",
+            "已有活跃Q实例",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____Q_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院椿", _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.Q["技能ID"])
@@ -208,14 +298,35 @@ local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____628
     end
     local _____56DE_950B_65B9_5411 = ____temp_13
     local _____6570_636E = {["输入方向"] = _____8F93_5165_65B9_5411, ["反击方向"] = _____56DE_950B_65B9_5411 ~= nil and _____56DE_950B_65B9_5411 or (_____53CD_51FB ~= nil and _____53CD_51FB["方向"] or _____8F93_5165_65B9_5411), ["已消费反击"] = _____53CD_51FB ~= nil or _____56DE_950B_65B9_5411 ~= nil, ["段回调ID"] = {}}
-    debugLogForce("椿-Q", "状态", "创建战斗技能实例", _____6280_80FD_5B9E_4F8BID or "-")
+    debugLogForce(
+        "椿-Q",
+        "状态",
+        "创建战斗技能实例",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____Q_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-"
+    )
     local _____63A7_5236_5668 = _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B({
         ["技能键"] = "椿Q",
         ["施法者"] = _____65BD_6CD5_8005,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
-            debugLogForce("椿-Q", "结束", "原因", ______539F_56E0 or "-")
+            debugLogForce(
+                "椿-Q",
+                "结束",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                fourCCToStringSafe(____Q_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
+                "原因",
+                ______539F_56E0 or "-"
+            )
             do
                 local i = 0
                 while i < #_____6570_636E["段回调ID"] do

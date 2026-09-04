@@ -14,15 +14,20 @@ import { 爱蜜莉雅技能配置, 爱蜜莉雅普攻配置, 爱蜜莉雅被动�
 import { 爱蜜莉雅BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/20．爱蜜莉雅";
 import { 查询爱蜜莉雅冰晶 } from "./02．公共状态与冰晶";
 import { 是爱蜜莉雅 } from "./03．被动效果";
+import { 播放英雄技能喊话 } from "../../../../09．表现系统/10．英雄语音/10．技能喊话/01．英雄技能喊话";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe: stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe: stringToFourCC, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -151,8 +156,8 @@ function 减少最长QWE冷却(this: void, 英雄: any): void {
   platformAbilityAction.技能_设置技能冷却时间(英雄, 目标技能.id, 新冷却, 最大冷却);
 }
 
-function 发射帕克追击冰弹(this: void, 英雄: any, 目标: any): void {
-  if (英雄 == null || 目标 == null || 目标 === 0) return;
+function 发射帕克追击冰弹(this: void, 英雄: any, 目标: any): boolean {
+  if (英雄 == null || 目标 == null || 目标 === 0) return false;
   const 伤害 = 读取单位攻击力(英雄) * 爱蜜莉雅普攻配置.帕克追击伤害攻击力倍率;
   const 追踪弹 = 发射弹道({
     名称: "爱蜜莉雅-帕克追击",
@@ -178,7 +183,7 @@ function 发射帕克追击冰弹(this: void, 英雄: any, 目标: any): void {
    RGB: 爱蜜莉雅表现配置.帕克追击.RGB,
        缩放: 爱蜜莉雅表现配置.帕克追击.缩放,
   });
-  void 追踪弹;
+  return 追踪弹 != null && 追踪弹 !== 0;
 }
 
 //=============================================================================
@@ -201,9 +206,11 @@ function 处理爱蜜莉雅造成伤害(this: void, target: any, attacker: any, 
   const 新层数 = 当前层数 + 1;
   if (新层数 >= 爱蜜莉雅普攻配置.契约应和上限) {
     // 第 3 次：消耗全部应和，触发帕克追击
-    debugLogForce("爱蜜莉雅-普攻联动", "状态", "第3次有效普攻触发帕克追击", "目标", target);
+    debugLogForce("爱蜜莉雅-普攻联动", "状态", "第3次有效普攻触发帕克追击", "玩家", GetPlayerId(GetOwningPlayer(attacker)) + 1, "目标", GetUnitName(target), "handle", target, "X", Math.floor(GetUnitX(target)), "Y", Math.floor(GetUnitY(target)));
     移除单位指定Buff(attacker, 爱蜜莉雅BuffID.契约应和);
-    发射帕克追击冰弹(attacker, target);
+    if (发射帕克追击冰弹(attacker, target)) {
+      播放英雄技能喊话(attacker, "爱蜜莉雅", "AEP1");
+    }
     减少最长QWE冷却(attacker);
     return;
   }

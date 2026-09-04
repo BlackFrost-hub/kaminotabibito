@@ -27,13 +27,17 @@ import {
 import { 伊蕾娜BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/23．伊蕾娜";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
+  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
+const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -564,6 +568,7 @@ export function 清理伊蕾娜状态(this: void, 英雄: any, 原因: 伊蕾娜
   if (状态 == null) return false;
   if (状态.已清理) return true;
   状态.已清理 = true;
+  debugLogForce("伊蕾娜-被动", "清理", "原因", 原因, "单位", GetUnitName(英雄), "handle", 英雄);
   void 原因;
 
   执行全部技能清理(状态);
@@ -750,15 +755,22 @@ function 处理伊蕾娜强化普攻(this: void, target: any, attacker: any, _ap
   if (snapshot?.isNormalAttack !== true) return;
   if (snapshot?.isWrappedSkillDamage === true) return;
   if (snapshot?.originalAttacker != null && snapshot.originalAttacker !== attacker) return;
-  if (!单位存活(target)) return;
+  if (!单位存活(target)) {
+    debugLogForce("伊蕾娜-被动", "命中失败", "玩家", GetPlayerId(GetOwningPlayer(attacker)) + 1, "原因", "目标无效", "目标", GetUnitName(target), "handle", target);
+    return;
+  }
 
   const 状态 = 查找状态(attacker);
-  if (状态 == null || 状态.已清理) return;
+  if (状态 == null || 状态.已清理) {
+    debugLogForce("伊蕾娜-被动", "异常", "玩家", GetPlayerId(GetOwningPlayer(attacker)) + 1, "原因", "状态为空或已清理");
+    return;
+  }
   if (惰性剔除过期见闻(状态)) 刷新见闻Buff(attacker, 状态);
   const 下一条 = 预览伊蕾娜消费见闻(attacker);
   if (下一条 == null) return;
 
   // 先让分支真正进入（发射对应的强化魔弹），再确认消费，失败不白扣
+  debugLogForce("伊蕾娜-被动", "命中", "玩家", GetPlayerId(GetOwningPlayer(attacker)) + 1, "四码", fourCCToStringSafe(英雄单位类型ID), "目标", GetUnitName(target), "handle", target, "X", Math.floor(GetUnitX(target)), "Y", Math.floor(GetUnitY(target)), "伤害", Math.floor(读取单位攻击力(attacker) * 伊蕾娜普攻联动配置.伤害攻击力倍率), "类型", 下一条.类型);
   if (下一条.类型 === "风行") {
     发射风行穿透弹(attacker, GetUnitX(target), GetUnitY(target));
   } else if (下一条.类型 === "镜界") {
@@ -776,7 +788,7 @@ function 确保死亡监听(this: void): void {
   if (死亡监听已注册) return;
   死亡监听已注册 = true;
   registerDeathListener(function 伊蕾娜死亡清理(this: void, dyingUnit: any, _killingUnit: any): void {
-    debugLogForce("伊蕾娜-被动", "回调", "类型", "死亡", "单位", dyingUnit);
+    debugLogForce("伊蕾娜-被动", "清理", "类型", "死亡", "单位", GetUnitName(dyingUnit), "handle", dyingUnit);
     if (dyingUnit == null || dyingUnit === 0) return;
     if (伊蕾娜状态表[取单位ID(dyingUnit)] == null) return;
     清理伊蕾娜状态(dyingUnit, "英雄死亡");

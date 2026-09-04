@@ -21,8 +21,12 @@ local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播�
 local jass = require("jass.common")
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
+local fourCCToStringSafe = ____require_result_1.fourCCToStringSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetUnitName = jass.GetUnitName
+local GetOwningPlayer = jass.GetOwningPlayer
+local GetPlayerId = jass.GetPlayerId
 local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_2.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_2["移除单位指定Buff"]
@@ -42,6 +46,7 @@ local getGameTime = ____require_result_6.getGameTime
 local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_7.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
+local ____D_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.D["技能ID"])
 local _____73AF_7ED5_7279_6548_952E = "爱蜜莉雅D环绕"
 --- 每英雄 D 到期回调 ID（重复开启时先取消旧回调，防止旧回调提前清掉新 D 状态）
 local ____D_5230_671F_56DE_8C03_8868 = {}
@@ -49,10 +54,33 @@ local ____require_result_8 = require("系统.03．技能系统.00．技能模板
 local _____53D6_5355_4F4DID = ____require_result_8["取单位ID"]
 --- 清理 D 表现与状态（到期/打断/死亡/R 收束共用；幂等）
 ____exports["结束爱蜜莉雅D"] = function(_____65BD_6CD5_8005)
-    debugLogForce("爱蜜莉雅-D", "结束", "原因", "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
+        debugLogForce(
+            "爱蜜莉雅-D",
+            "结束",
+            "原因",
+            "施法者无效",
+            "分支",
+            "清理"
+        )
         return
     end
+    debugLogForce(
+        "爱蜜莉雅-D",
+        "结束",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____D_6280_80FD_7C7B_578BID),
+        "原因",
+        "-",
+        "X",
+        math.floor(GetUnitX(_____65BD_6CD5_8005)),
+        "Y",
+        math.floor(GetUnitY(_____65BD_6CD5_8005)),
+        "分支",
+        "清理"
+    )
     local _____65E7ID = ____D_5230_671F_56DE_8C03_8868[_____53D6_5355_4F4DID(_____65BD_6CD5_8005)]
     if _____65E7ID ~= nil and _____65E7ID ~= 0 then
         removeDelayedCallback(_____65E7ID)
@@ -66,10 +94,26 @@ ____exports["结束爱蜜莉雅D"] = function(_____65BD_6CD5_8005)
     _____6E05_7406_7231_871C_8389_96C5D_5F3A_5316(_____65BD_6CD5_8005)
 end
 local function _____91CA_653ED_5E15_514B_663E_73B0(_context, _____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8BID)
-    debugLogForce("爱蜜莉雅-D", "释放", "技能实例ID", ______6280_80FD_5B9E_4F8BID or "-")
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
+        debugLogForce("爱蜜莉雅-D", "释放被拒", "原因", "施法者无效")
         return
     end
+    debugLogForce(
+        "爱蜜莉雅-D",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____D_6280_80FD_7C7B_578BID),
+        "实例",
+        ______6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "无",
+        "X",
+        math.floor(GetUnitX(_____65BD_6CD5_8005)),
+        "Y",
+        math.floor(GetUnitY(_____65BD_6CD5_8005))
+    )
     local _____82F1_96C4ID = _____53D6_5355_4F4DID(_____65BD_6CD5_8005)
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "爱蜜莉雅", _____7231_871C_8389_96C5_6280_80FD_914D_7F6E.D["技能ID"])
     _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C(_____65BD_6CD5_8005, _____7231_871C_8389_96C5_52A8_4F5C_69FD.D)
@@ -89,7 +133,18 @@ local function _____91CA_653ED_5E15_514B_663E_73B0(_context, _____65BD_6CD5_8005
         _____7231_871C_8389_96C5D_914D_7F6E["强化次数"],
         {stack = _____7231_871C_8389_96C5D_914D_7F6E["强化次数"]}
     )
-    debugLogForce("爱蜜莉雅-D", "特效", "路径", _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["帕克环绕"]["模型路径"])
+    debugLogForce(
+        "爱蜜莉雅-D",
+        "特效",
+        "类型",
+        "创建",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____D_6280_80FD_7C7B_578BID),
+        "路径",
+        _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["帕克环绕"]["模型路径"]
+    )
     local _____73AF_7ED5_7279_6548 = createUnitEffect(
         _____65BD_6CD5_8005,
         "origin",

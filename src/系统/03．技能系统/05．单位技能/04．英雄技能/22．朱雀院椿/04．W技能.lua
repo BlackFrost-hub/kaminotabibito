@@ -1,6 +1,9 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
+local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
+local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
-local _____7ED3_675FW_62DB_67B6, jass, unregisterDamageModifier, _____9020_6210_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D, destroyUnitEffect, Sound3DII_CooPlayReuse, _____6062_590DVF, ____W_6280_80FDID, ____W_914D_7F6E, _____62DB_67B6_7279_6548_952E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitX, GetUnitY
+local _____7ED3_675FW_62DB_67B6, jass, fourCCToStringSafe, unregisterDamageModifier, _____9020_6210_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D, destroyUnitEffect, Sound3DII_CooPlayReuse, _____6062_590DVF, debugLogForce, ____W_6280_80FDID, ____W_914D_7F6E, _____62DB_67B6_7279_6548_952E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitX, GetUnitY, GetUnitName, GetOwningPlayer, GetPlayerId
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.00．配置")
 local _____6731_96C0_9662_693F_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿技能配置"]
 local _____6731_96C0_9662_693F_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿表现配置"]
@@ -46,6 +49,28 @@ function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8
         do
             local i = 0
             while i < #_____654C_4EBA do
+                debugLogForce(
+                    "椿-W",
+                    "命中",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                    "四码",
+                    fourCCToStringSafe(____W_6280_80FDID),
+                    "实例",
+                    "收刀斩",
+                    "标签",
+                    "朱雀院椿-W收刀斩",
+                    "目标",
+                    GetUnitName(_____654C_4EBA[i + 1]),
+                    "handle",
+                    _____654C_4EBA[i + 1],
+                    "X",
+                    math.floor(GetUnitX(_____654C_4EBA[i + 1])),
+                    "Y",
+                    math.floor(GetUnitY(_____654C_4EBA[i + 1])),
+                    "伤害",
+                    _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____W_914D_7F6E["收刀斩倍率"]
+                )
                 _____9020_6210_6280_80FD_4F24_5BB3({
                     ["来源"] = _____65BD_6CD5_8005,
                     ["目标"] = _____654C_4EBA[i + 1],
@@ -68,6 +93,7 @@ end
 jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local getGameTime = ____require_result_1.getGameTime
 local addDelayedCallback = ____require_result_1.addDelayedCallback
@@ -112,7 +138,7 @@ local _____767B_8BB0_693F_6E05_7406 = ____require_result_13["登记椿清理"]
 local _____64AD_653E_693F_52A8_4F5C = ____require_result_13["播放椿动作"]
 local _____8054_52A8R = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.06．R技能")
 local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_14.debugLogForce
+debugLogForce = ____require_result_14.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 ____W_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E.W["技能ID"])
 ____W_914D_7F6E = _____6731_96C0_9662_693FW_914D_7F6E
@@ -123,24 +149,88 @@ WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
+GetUnitName = jass.GetUnitName
+GetOwningPlayer = jass.GetOwningPlayer
+GetPlayerId = jass.GetPlayerId
 local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E, _____5B8C_7F8E)
-    debugLogForce(
+    local _____73A9_5BB6ID = GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+    local ____debugLogForce_17 = debugLogForce
+    local ____array_16 = __TS__SparseArrayNew(
         "椿-W",
-        "伤害",
-        "标签",
-        "朱雀院椿-W反击",
+        "反击",
+        "玩家",
+        _____73A9_5BB6ID,
+        "四码",
+        fourCCToStringSafe(____W_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "完美",
+        _____5B8C_7F8E,
         "目标",
-        _____6570_636E["招架来源"],
-        "数值",
+        _____6570_636E["招架来源"] ~= nil and _____6570_636E["招架来源"] ~= 0 and GetUnitName(_____6570_636E["招架来源"]) or "-",
+        "handle"
+    )
+    local ____6570_636E__62DB_67B6_6765_6E90_15 = _____6570_636E["招架来源"]
+    if ____6570_636E__62DB_67B6_6765_6E90_15 == nil then
+        ____6570_636E__62DB_67B6_6765_6E90_15 = "-"
+    end
+    __TS__SparseArrayPush(
+        ____array_16,
+        ____6570_636E__62DB_67B6_6765_6E90_15,
+        "伤害",
         _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____W_914D_7F6E["反击伤害倍率"]
     )
+    ____debugLogForce_17(__TS__SparseArraySpread(____array_16))
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["W成功反击"])
     local _____6765_6E90 = _____6570_636E["招架来源"]
     if _____6765_6E90 == nil or _____6765_6E90 == 0 or not _____5355_4F4D_5B58_6D3B(_____6765_6E90) then
+        local ____debugLogForce_21 = debugLogForce
+        local ____fourCCToStringSafe_result_19 = fourCCToStringSafe(____W_6280_80FDID)
+        local ____temp_20 = _____6280_80FD_5B9E_4F8BID or "-"
+        local ____6765_6E90_18 = _____6765_6E90
+        if ____6765_6E90_18 == nil then
+            ____6765_6E90_18 = "-"
+        end
+        ____debugLogForce_21(
+            "椿-W",
+            "命中失败",
+            "原因",
+            "目标无效",
+            "玩家",
+            _____73A9_5BB6ID,
+            "四码",
+            ____fourCCToStringSafe_result_19,
+            "实例",
+            ____temp_20,
+            "目标",
+            ____6765_6E90_18
+        )
         _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
         return
     end
     local _____653B_51FB_529B = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005)
+    debugLogForce(
+        "椿-W",
+        "命中",
+        "玩家",
+        _____73A9_5BB6ID,
+        "四码",
+        fourCCToStringSafe(____W_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "标签",
+        "朱雀院椿-W反击",
+        "目标",
+        GetUnitName(_____6765_6E90),
+        "handle",
+        _____6765_6E90,
+        "X",
+        math.floor(GetUnitX(_____6765_6E90)),
+        "Y",
+        math.floor(GetUnitY(_____6765_6E90)),
+        "伤害",
+        _____653B_51FB_529B * ____W_914D_7F6E["反击伤害倍率"]
+    )
     _____9020_6210_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
         ["目标"] = _____6765_6E90,
@@ -156,6 +246,28 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9
         ["参与技能伤害加成"] = true
     })
     if _____5B8C_7F8E and _____83B7_53D6_59FF_6001(_____65BD_6CD5_8005) == "二刀" then
+        debugLogForce(
+            "椿-W",
+            "命中",
+            "玩家",
+            _____73A9_5BB6ID,
+            "四码",
+            fourCCToStringSafe(____W_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-",
+            "标签",
+            "朱雀院椿-W两侧刀光",
+            "目标",
+            GetUnitName(_____6765_6E90),
+            "handle",
+            _____6765_6E90,
+            "X",
+            math.floor(GetUnitX(_____6765_6E90)),
+            "Y",
+            math.floor(GetUnitY(_____6765_6E90)),
+            "伤害",
+            _____653B_51FB_529B * ____W_914D_7F6E["二刀两侧刀光倍率"]
+        )
         _____9020_6210_6280_80FD_4F24_5BB3({
             ["来源"] = _____65BD_6CD5_8005,
             ["目标"] = _____6765_6E90,
@@ -197,14 +309,67 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9
     _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
 end
 local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
-    debugLogForce("椿-W", "释放", "技能实例ID", _____6280_80FD_5B9E_4F8BID or "-")
     if not _____662F_6731_96C0_9662_693F(_____65BD_6CD5_8005) then
+        debugLogForce(
+            "椿-W",
+            "释放被拒",
+            "原因",
+            "非朱雀院椿",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____W_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
+    debugLogForce(
+        "椿-W",
+        "释放",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____W_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-",
+        "目标",
+        "点施放",
+        "X",
+        math.floor(GetUnitX(_____65BD_6CD5_8005)),
+        "Y",
+        math.floor(GetUnitY(_____65BD_6CD5_8005)),
+        "朝向",
+        GetUnitFacing(_____65BD_6CD5_8005)
+    )
     if _____8054_52A8R["椿R蓄力中"] ~= nil and _____8054_52A8R["椿R蓄力中"](_____65BD_6CD5_8005) then
+        debugLogForce(
+            "椿-W",
+            "释放被拒",
+            "原因",
+            "R蓄力中",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____W_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "椿W") > 0 then
+        debugLogForce(
+            "椿-W",
+            "释放被拒",
+            "原因",
+            "已有招架窗口",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____W_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-"
+        )
         return
     end
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院椿", _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.W["技能ID"])
@@ -217,14 +382,35 @@ local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____628
         ["已结束"] = false,
         ["招架来源"] = nil
     }
-    debugLogForce("椿-W", "状态", "创建战斗技能实例", _____6280_80FD_5B9E_4F8BID or "-")
+    debugLogForce(
+        "椿-W",
+        "状态",
+        "创建战斗技能实例",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "四码",
+        fourCCToStringSafe(____W_6280_80FDID),
+        "实例",
+        _____6280_80FD_5B9E_4F8BID or "-"
+    )
     local _____63A7_5236_5668 = _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B({
         ["技能键"] = "椿W",
         ["施法者"] = _____65BD_6CD5_8005,
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(______539F_56E0, _c)
-            debugLogForce("椿-W", "结束", "原因", ______539F_56E0 or "-")
+            debugLogForce(
+                "椿-W",
+                "结束",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                fourCCToStringSafe(____W_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
+                "原因",
+                ______539F_56E0 or "-"
+            )
             if _____6570_636E["已结束"] then
                 return
             end
@@ -267,6 +453,24 @@ local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____628
                 GetUnitY(context.attacker)
             )
             local _____5B8C_7F8E = _____8FDB_5165_79D2 <= ____W_914D_7F6E["完美时点秒"] and _____89D2_5EA6_5DEE_7EDD_5BF9_503C(_____6570_636E["方向角"], _____6765_6E90_65B9_5411) <= ____W_914D_7F6E["完美角度"]
+            debugLogForce(
+                "椿-W",
+                "招架成功",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                fourCCToStringSafe(____W_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-",
+                "完美",
+                _____5B8C_7F8E,
+                "进入秒",
+                _____8FDB_5165_79D2,
+                "来源",
+                GetUnitName(context.attacker),
+                "handle",
+                context.attacker
+            )
             _____521B_5EFA_53CD_51FB_51C6_5907(_____65BD_6CD5_8005, _____6765_6E90_65B9_5411, context.attacker)
             _____6062_590DVF(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_88AB_52A8_914D_7F6E["招架恢复VF"] + (_____5B8C_7F8E and _____6731_96C0_9662_693F_88AB_52A8_914D_7F6E["完美招架额外VF"] or 0))
             addDelayedCallback(
