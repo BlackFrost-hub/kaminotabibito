@@ -15,6 +15,7 @@ const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封
   stringToFourCCSafe: (this: void, id: string) => number;
   fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
+const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as { addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number; removePeriodicCallback: (this: void, id: number) => void; };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
@@ -24,16 +25,27 @@ const { 开始充能 } = require("系统.03．技能系统.00．技能模板+函
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
 };
-const { 读取单位攻击力, 单位存活, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
+const { 读取单位攻击力, 单位存活, 两点角度, 距离XY } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   单位存活: (this: void, unit: any) => boolean;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
+  距离XY: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
 };
 const { 获取扇形区域单位 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域") as {
   获取扇形区域单位: (this: void, 参数: any) => any[];
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
+};
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, 单位: any, 持续时间: number) => void;
+};
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+};
+const { 创建世界坐标进度UI, 销毁世界坐标进度UI } = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI") as {
+  创建世界坐标进度UI: (this: void, 参数: any) => any;
+  销毁世界坐标进度UI: (this: void, ui: any) => void;
 };
 const { Sound3DII_UnitPlayReuse, Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
@@ -44,11 +56,13 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 const {
   施加朱雀院破绽,
+  目标带有破绽,
   消费全部刀势,
   是朱雀院红叶,
   播放红叶动作,
 } = require("./02．被动效果") as {
   施加朱雀院破绽: (this: void, 红叶: any, 目标: any) => void;
+  目标带有破绽: (this: void, 目标: any) => boolean;
   消费全部刀势: (this: void, 英雄: any) => number;
   是朱雀院红叶: (this: void, unit: any) => boolean;
   播放红叶动作: (this: void, 英雄: any, 槽: { 索引: number; 持续秒: number }) => void;
@@ -84,16 +98,43 @@ const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
+const GetRandomReal = jass.GetRandomReal as (this: void, min: number, max: number) => number;
+/** 主斩命中星爆：每个被命中的敌人独立一条，逐层在该敌人当前位置创建（跟随位移），随机朝向；目标死亡提前停止 */
+function 创建R命中星爆(this: void, 配置: any, 目标: any): void {
+  let 已创建次数 = 0;
+  let 周期ID = 0;
+  const 创建一次 = function R命中星爆Tick(this: void): void {
+    if (!单位存活(目标)) {
+      if (周期ID !== 0) {
+        removePeriodicCallback(周期ID);
+        周期ID = 0;
+      }
+      return;
+    }
+    创建点特效({ 模型路径: 配置.模型路径, RGB: 配置.RGB, X: GetUnitX(目标), Y: GetUnitY(目标), Z: 配置.高度, 面向角度: GetRandomReal(0, 360), 缩放: 配置.缩放, 持续秒: 配置.单次持续秒 });
+    已创建次数 += 1;
+    if (已创建次数 >= 配置.创建次数 && 周期ID !== 0) {
+      removePeriodicCallback(周期ID);
+      周期ID = 0;
+    }
+  };
+  周期ID = addPeriodicCallback(配置.创建间隔秒 * 1000, 创建一次);
+  创建一次();
+}
+
 
 //=============================================================================
 // 终式（仅充能完成回调创建；中断/死亡不会走到这里，资源不白扣）
 //=============================================================================
 
-function 取窄线敌人(this: void, 施法者: any, 方向角: number): any[] {
+function 取窄线敌人(this: void, 施法者: any, 方向角: number, 目标X: number, 目标Y: number): any[] {
+  const 施法者X = GetUnitX(施法者);
+  const 施法者Y = GetUnitY(施法者);
+  const 目标距离 = 距离XY(施法者X, 施法者Y, 目标X, 目标Y);
   return 获取扇形区域单位({
-    X: GetUnitX(施法者),
-    Y: GetUnitY(施法者),
-    半径: R配置.距离,
+    X: 施法者X,
+    Y: 施法者Y,
+    半径: R配置.距离 > 目标距离 + 100 ? R配置.距离 : 目标距离 + 100,
     方向角,
     扇形角度: R配置.窄线角度,
     单位筛选: function R窄线筛选(this: void, 单位: any): boolean {
@@ -120,24 +161,59 @@ function 结算R伤害(this: void, 施法者: any, 目标: any, 技能实例ID: 
   });
 }
 
-function R创建终式(this: void, 施法者: any, 技能实例ID: number | undefined, _目标X: number, 目标Y: number, 方向角: number): void {
+function R创建终式(this: void, 施法者: any, 技能实例ID: number | undefined, 目标X: number, 目标Y: number, 方向角: number): void {
   if (!单位存活(施法者)) {
     debugLogForce("红叶-R", "命中失败", "目标无效", "施法者已死亡");
     return;
   }
   debugLogForce("红叶-R", "状态", "创建终式", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "施法者X", Math.floor(GetUnitX(施法者)), "施法者Y", Math.floor(GetUnitY(施法者)), "方向角", 方向角);
-  播放红叶动作(施法者, 朱雀院红叶动作槽.R释放);
+  开始硬直(施法者, 0.6); // 终式拔刀斩硬直（拔刀动作已在蓄力阶段播放）
+  // 终式硬直世界坐标进度条（跟随施法者；0.6 秒硬直结束销毁）
+  const R进度UI = 创建世界坐标进度UI({
+    X: GetUnitX(施法者),
+    Y: GetUnitY(施法者),
+    Z: 0,
+    跟随单位: 施法者,
+    跟随Z偏移: 朱雀院红叶读条配置.跟随Z偏移,
+    最大值: 600,
+    当前值: 0,
+    标题: "奥义·红叶一闪",
+    数值后缀: "",
+    类型: 朱雀院红叶读条配置.UI类型 as any,
+  });
+  addDelayedCallback(600, function R硬直进度结束(this: void): void {
+    销毁世界坐标进度UI(R进度UI);
+  });
   // 资源消费只在真正进入终式时（蓄力完成）：刀势全消费、D 全消费（失败/中断不白扣）
   const 刀势层数 = 消费全部刀势(施法者);
   const D次数 = 消费全部D强化(施法者);
-  if (D次数 > 0) 结束D秘传(施法者);
+  if (D次数 > 0) {
+    debugLogForce("红叶-R", "秘传消耗", "次数", D次数);
+    结束D秘传(施法者);
+  }
   const 攻击力 = 读取单位攻击力(施法者);
   // 主斩伤害：D 强化按剩余次数加成
   const 主斩伤害 = 攻击力 * (R配置.主斩攻击力倍率 + D次数 * R配置.D强化每次加成);
-  const 敌人 = 取窄线敌人(施法者, 方向角);
+  const 敌人 = 取窄线敌人(施法者, 方向角, 目标X, 目标Y);
   for (let i = 0; i < 敌人.length; i++) {
     结算R伤害(施法者, 敌人[i], 技能实例ID, 主斩伤害, "朱雀院红叶-R主斩");
+    // 破绽终式：命中时身上已带破绽的目标，追加一段引爆伤害（攻击力 × 1.5）
+    if (目标带有破绽(敌人[i])) {
+      debugLogForce("红叶-R", "破绽终式", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "目标", GetUnitName(敌人[i]), "伤害", Math.floor(攻击力 * R配置.破绽终式攻击力倍率));
+      结算R伤害(施法者, 敌人[i], 技能实例ID, 攻击力 * R配置.破绽终式攻击力倍率, "朱雀院红叶-R破绽终式");
+    }
     施加朱雀院破绽(施法者, 敌人[i]);
+    创建点特效({
+      模型路径: 朱雀院红叶表现配置.R命中收尾.模型路径,
+      RGB: 朱雀院红叶表现配置.R命中收尾.RGB,
+      X: GetUnitX(敌人[i]),
+      Y: GetUnitY(敌人[i]),
+      Z: 朱雀院红叶表现配置.R命中收尾.高度,
+      缩放: 朱雀院红叶表现配置.R命中收尾.缩放,
+      持续秒: 朱雀院红叶表现配置.R命中收尾.持续秒,
+    });
+    // 命中星爆：只在命中时创建，逐层跟随该敌人的当前位置
+    创建R命中星爆(朱雀院红叶表现配置.R命中叠加, 敌人[i]);
   }
   // 主斩表现（模型路径/缩放/高度/持续秒/RGB 全由表现配置驱动）
   if ((朱雀院红叶表现配置.R主斩.模型路径 as string) !== "") {
@@ -145,8 +221,8 @@ function R创建终式(this: void, 施法者: any, 技能实例ID: number | unde
     创建点特效({
       模型路径: 朱雀院红叶表现配置.R主斩.模型路径,
       RGB: 朱雀院红叶表现配置.R主斩.RGB,
-      X: GetUnitX(施法者),
-      Y: GetUnitY(施法者),
+      X: 目标X,
+      Y: 目标Y,
       Z: 朱雀院红叶表现配置.R主斩.高度,
       面向角度: 方向角,
       缩放: 朱雀院红叶表现配置.R主斩.缩放,
@@ -154,6 +230,7 @@ function R创建终式(this: void, 施法者: any, 技能实例ID: number | unde
     });
   }
   // 刀势回响：层数与回响数量一一对应（最多 3 道；全部归属本次 R 实例）
+  if (刀势层数 > 0) debugLogForce("红叶-R", "刀势回响", "层数", 刀势层数);
   for (let 层 = 0; 层 < 刀势层数 && 层 < 3; 层++) {
     for (let i = 0; i < 敌人.length; i++) {
       结算R伤害(施法者, 敌人[i], 技能实例ID, 攻击力 * R配置.刀势回响攻击力倍率, "朱雀院红叶-R刀势回响");
@@ -162,10 +239,50 @@ function R创建终式(this: void, 施法者: any, 技能实例ID: number | unde
   // 剑痕回响：读取最近一条有效 E 剑痕并立即锁定，沿剑痕方向追加一道回响
   const 剑痕 = 读取最近剑痕并锁定(施法者);
   if (剑痕 != null) {
+    debugLogForce("红叶-R", "剑痕回响", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
     for (let i = 0; i < 敌人.length; i++) {
       结算R伤害(施法者, 敌人[i], 技能实例ID, 攻击力 * R配置.剑痕回响攻击力倍率, "朱雀院红叶-R剑痕回响");
     }
-    void 剑痕;
+    // 回响表现：剑痕复燃——先短促闪现提示"被读取"，再沿剑痕方向重放斩痕（同 E 剑痕模型，crimson 同源）
+    const 回响配置 = 朱雀院红叶表现配置.R剑痕回响;
+    if ((回响配置.模型路径 as string) !== "") {
+      创建点特效({
+        模型路径: 回响配置.模型路径,
+        RGB: 回响配置.RGB,
+        X: 剑痕.X,
+        Y: 剑痕.Y,
+        Z: 回响配置.高度,
+        面向角度: 剑痕.方向角,
+        缩放: 回响配置.闪现缩放,
+        持续秒: 回响配置.闪现持续秒,
+      });
+      addDelayedCallback(回响配置.闪现提前毫秒, function R剑痕回响斩(this: void): void {
+        创建点特效({
+          模型路径: 回响配置.模型路径,
+          RGB: 回响配置.RGB,
+          X: 剑痕.X,
+          Y: 剑痕.Y,
+          Z: 回响配置.高度,
+          面向角度: 剑痕.方向角,
+          缩放: 回响配置.缩放,
+          持续秒: 回响配置.持续秒,
+        });
+        // 叠加爆发层（2.0 缩放，与回响斩同拍；候选未迁入则留空不播）
+        const 叠加路径 = 回响配置.叠加模型路径 as string;
+        if (叠加路径 !== "") {
+          创建点特效({
+            模型路径: 叠加路径,
+            RGB: 回响配置.RGB,
+            X: 剑痕.X,
+            Y: 剑痕.Y,
+            Z: 回响配置.叠加高度,
+            面向角度: 剑痕.方向角,
+            缩放: 回响配置.叠加缩放,
+            持续秒: 回响配置.叠加持续秒,
+          });
+        }
+      });
+    }
   }
 }
 

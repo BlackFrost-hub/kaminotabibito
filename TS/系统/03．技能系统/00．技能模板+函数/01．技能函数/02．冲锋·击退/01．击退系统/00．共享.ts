@@ -7,6 +7,7 @@ const japi = require("jass.japi") as any;
 const DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha as ((effect: any, alpha: number) => void) | undefined;
 const EXSetEffectSize = japi.EXSetEffectSize as ((effect: any, scale: number) => void) | undefined;
 const EXSetEffectZ = japi.EXSetEffectZ as ((effect: any, z: number) => void) | undefined;
+const EXEffectMatRotateZ = japi.EXEffectMatRotateZ as ((effect: any, angle: number) => void) | undefined;
 const DestroyEffect = jass.DestroyEffect as (effect: any) => void;
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
@@ -95,6 +96,12 @@ export interface 通用位移参数 {
   附加位移特效缩放?: number;
   附加位移特效高度?: number;
   附加位移特效持续秒?: number;
+  位移特效面向角度?: number;
+  附加位移特效面向角度?: number;
+  /** 附加位移特效相对位移起点的偏移方向（角度制）；配合偏移距离将特效创建在偏移点。 */
+  附加位移特效偏移角度?: number;
+  /** 附加位移特效相对位移起点的偏移距离（码）。 */
+  附加位移特效偏移距离?: number;
 
   命中半径?: number;
   只命中敌人?: boolean;
@@ -155,6 +162,10 @@ export interface 位移实例 {
   附加位移特效缩放: number;
   附加位移特效高度: number;
   附加位移特效持续秒: number;
+  位移特效面向角度?: number;
+  附加位移特效面向角度?: number;
+  附加位移特效偏移角度?: number;
+  附加位移特效偏移距离?: number;
   命中半径: number;
   只命中敌人: boolean;
   允许命中自己: boolean;
@@ -254,18 +265,24 @@ export function 单位已被暂停(单位: any): boolean {
 }
 
 export function 播放位移特效(实例: 位移实例): void {
-  播放单个位移特效(实例.位移特效, 实例, 实例.位移特效缩放, 实例.位移特效高度, 实例.位移特效持续秒);
-  播放单个位移特效(实例.附加位移特效, 实例, 实例.附加位移特效缩放, 实例.附加位移特效高度, 实例.附加位移特效持续秒);
+  播放单个位移特效(实例.位移特效, 实例, 实例.位移特效缩放, 实例.位移特效高度, 实例.位移特效持续秒, 实例.位移特效面向角度);
+  播放单个位移特效(实例.附加位移特效, 实例, 实例.附加位移特效缩放, 实例.附加位移特效高度, 实例.附加位移特效持续秒, 实例.附加位移特效面向角度, 实例.附加位移特效偏移角度, 实例.附加位移特效偏移距离);
 }
 
-function 播放单个位移特效(模型: string, 实例: 位移实例, 缩放: number, 高度: number, 持续秒: number): void {
+function 播放单个位移特效(模型: string, 实例: 位移实例, 缩放: number, 高度: number, 持续秒: number, 面向角度?: number, 偏移角度?: number, 偏移距离?: number): void {
   if (模型 == null || 模型 === "") return;
-  const x = jass.GetUnitX(实例.单位) as number;
-  const y = jass.GetUnitY(实例.单位) as number;
+  let x = jass.GetUnitX(实例.单位) as number;
+  let y = jass.GetUnitY(实例.单位) as number;
+  if (偏移角度 != null && 偏移距离 != null && 偏移距离 > 0) {
+    const 弧度 = 偏移角度 * BJ_DEGTORAD;
+    x = x + (jass.Cos(弧度) as number) * 偏移距离;
+    y = y + (jass.Sin(弧度) as number) * 偏移距离;
+  }
   const 特效 = jass.AddSpecialEffect(模型, x, y);
   if (特效 != null && 特效 !== 0) {
     if (typeof EXSetEffectSize === "function") EXSetEffectSize(特效, 缩放);
     if (typeof EXSetEffectZ === "function") EXSetEffectZ(特效, EC_GetPointZ(x, y) + 高度);
+    if (面向角度 != null && typeof EXEffectMatRotateZ === "function") EXEffectMatRotateZ(特效, 面向角度);
     addDelayedCallback((持续秒 > 0 ? 持续秒 : 0.3) * 1000, 冲锋位移特效到期, 特效);
   }
 }
@@ -298,3 +315,6 @@ export function 销毁枚举组(): void {
     枚举组 = null;
   }
 }
+
+
+

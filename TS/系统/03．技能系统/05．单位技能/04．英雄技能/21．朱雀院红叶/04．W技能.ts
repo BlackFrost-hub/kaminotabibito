@@ -33,6 +33,9 @@ const { register护盾前拦截修改器, unregisterDamageModifier } = require("
 const { 开始击退 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口") as {
   开始击退: (this: void, 单位: any, 参数: any) => number;
 };
+const { 发射弹道 } = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂") as {
+  发射弹道: (this: void, 参数: any) => any;
+};
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
 };
@@ -52,10 +55,11 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
 };
-const { createUnitEffect, destroyUnitEffect, 设置特效缩放 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
-  destroyUnitEffect: (this: void, unit: any, effectKey?: string) => void;
+const { 创建单位坐标跟随特效, 销毁单位坐标跟随特效, 设置特效缩放, 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: any, 面向跟随单位?: boolean, 前方偏移距离?: number) => any;
+  销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
   设置特效缩放: (this: void, effect: any, scale: number) => void;
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { Sound3DII_UnitPlayReuse, Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
@@ -140,6 +144,69 @@ function 结算W单体伤害(this: void, 施法者: any, 目标: any, 技能实�
   });
 }
 
+function 发射W回刃剑气(this: void, 施法者: any, 来源: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined): void {
+  const 起点X = GetUnitX(施法者);
+  const 起点Y = GetUnitY(施法者);
+  const 方向角 = 两点角度(起点X, 起点Y, GetUnitX(来源), GetUnitY(来源));
+  const 伤害 = 读取单位攻击力(施法者) * W配置.回刃剑气攻击力倍率;
+  debugLogForce("红叶-W", "回刃剑气", "类型", "直线弹道", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "距离", W配置.回刃剑气距离, "方向角", 方向角);
+  发射弹道({
+    名称: "朱雀院红叶-W回刃剑气",
+    所有者: 施法者,
+    发射X: 起点X,
+    发射Y: 起点Y,
+    发射方向角: 方向角,
+    速度: W配置.回刃剑气速度,
+    轨迹: { 类型: "直线", 距离: W配置.回刃剑气距离 },
+    模型: 朱雀院红叶表现配置.派生刀光.模型路径,
+    缩放: 朱雀院红叶表现配置.派生刀光.缩放,
+    飞行高度: 朱雀院红叶表现配置.派生刀光.高度,
+    RGB: 朱雀院红叶表现配置.派生刀光.RGB,
+    命中半径: W配置.回刃剑气命中半径,
+    影响目标: "敌方",
+    碰撞消失: false,
+    每单位最大命中次数: 1,
+    目标筛选: function W回刃剑气目标筛选(this: void, 单位: any): boolean {
+      return 单位 !== 施法者 && 单位存活(单位) && jass.IsUnitEnemy(单位, GetOwningPlayer(施法者));
+    },
+    on命中: function W回刃剑气命中(this: void, 单位: any, _弹幕ID: number): void {
+      结算W单体伤害(施法者, 单位, 技能实例ID, 伤害, "朱雀院红叶-W回刃剑气");
+    },
+    伤害形态: "AOE",
+    实例控制器: 控制器,
+  });
+}
+
+function 发射W刀光表现(this: void, 施法者: any, 来源: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined): void {
+  const 起点X = GetUnitX(施法者);
+  const 起点Y = GetUnitY(施法者);
+  发射弹道({
+    名称: "朱雀院红叶-W反击刀光表现",
+    所有者: 施法者,
+    发射X: 起点X,
+    发射Y: 起点Y,
+    发射方向角: 两点角度(起点X, 起点Y, GetUnitX(来源), GetUnitY(来源)),
+    速度: 朱雀院红叶表现配置.派生刀光.冲锋速度,
+    轨迹: { 类型: "直线", 距离: 朱雀院红叶表现配置.派生刀光.冲锋距离 },
+    模型: 朱雀院红叶表现配置.派生刀光.模型路径,
+    RGB: 朱雀院红叶表现配置.派生刀光.RGB,
+    缩放: 朱雀院红叶表现配置.派生刀光.缩放,
+    飞行高度: 朱雀院红叶表现配置.派生刀光.高度,
+    命中半径: 朱雀院红叶表现配置.派生刀光.命中半径,
+    影响目标: "敌方",
+    碰撞消失: false,
+    每单位最大命中次数: 1,
+    目标筛选: function 红叶W反击刀光目标筛选(this: void, 单位: any): boolean {
+      return 单位 !== 施法者 && 单位存活(单位) && jass.IsUnitEnemy(单位, GetOwningPlayer(施法者));
+    },
+    on命中: function 红叶W反击刀光命中(this: void, 单位: any, _弹幕ID: number): void {
+      结算W单体伤害(施法者, 单位, 技能实例ID, 读取单位攻击力(施法者) * W配置.反击攻击力倍率, "朱雀院红叶-W反击");
+    },
+    伤害形态: "AOE",
+    实例控制器: 控制器,
+  });
+}
+
 //=============================================================================
 // 招架窗口
 //=============================================================================
@@ -151,7 +218,7 @@ function 结束W招架(this: void, 施法者: any, 控制器: 战斗技能实例
     unregisterDamageModifier(数据.修饰ID);
     数据.修饰ID = 0;
   }
-  destroyUnitEffect(施法者, 水镜特效键);
+  销毁单位坐标跟随特效(施法者, 水镜特效键);
   移除单位指定Buff(施法者, 水镜BuffID);
   // 成功与失败互斥：未招架成功才释放失败前斩
   if (!数据.已招架) {
@@ -166,10 +233,16 @@ function 释放失败前斩(this: void, 施法者: any, 技能实例ID: number |
   const 方向 = GetUnitFacing(施法者);
   const X = GetUnitX(施法者);
   const Y = GetUnitY(施法者);
+  const 半径 = W配置.前斩半径;
+  if (!(半径 > 0) || X !== X || Y !== Y) {
+    debugLogForce("红叶-W", "失败前斩跳过", "原因", "范围参数无效", "X", X, "Y", Y, "半径", 半径);
+    return;
+  }
+  debugLogForce("红叶-W", "失败前斩范围", "X", X, "Y", Y, "半径", 半径, "角度", 方向);
   const 扇形敌人 = 获取扇形区域单位({
     X,
     Y,
-    半径: W配置.前斩半径,
+    半径,
     方向角: 方向,
     扇形角度: W配置.前斩扇形角度,
     单位筛选: function W前斩筛选(this: void, 单位: any): boolean {
@@ -191,10 +264,10 @@ function 结算W反击(this: void, 施法者: any, 控制器: 战斗技能实例
     return;
   }
   播放红叶动作(施法者, 朱雀院红叶动作槽.W成功反击);
+  发射W刀光表现(施法者, 来源, 控制器, 技能实例ID);
   // 返刃反击音（招架后反击结算点；坐标=反击目标位置，参数配置驱动）
   Sound3DII_CooPlayReuse(W返刃反击音效.路径, GetUnitX(来源), GetUnitY(来源), W返刃反击音效.高度, W返刃反击音效.裁断距离);
   // 反击：对攻击来源结算伤害 + 破绽 + 刀势
-  结算W单体伤害(施法者, 来源, 技能实例ID, 读取单位攻击力(施法者) * W配置.反击攻击力倍率, "朱雀院红叶-W反击");
   施加朱雀院破绽(施法者, 来源);
   增加刀势(施法者, 1);
   延长Q2窗口(施法者, W配置.Q2延长秒);
@@ -202,7 +275,7 @@ function 结算W反击(this: void, 施法者: any, 控制器: 战斗技能实例
   if (!数据.刀势已消费) {
     数据.刀势已消费 = true;
     if (尝试消费一层刀势(施法者)) {
-      结算W单体伤害(施法者, 来源, 技能实例ID, 读取单位攻击力(施法者) * W配置.回刃剑气攻击力倍率, "朱雀院红叶-W回刃剑气");
+      发射W回刃剑气(施法者, 来源, 控制器, 技能实例ID);
     }
   }
   // D 强化：把攻击来源短暂拉回红叶前方（距离/目标类型/内部冷却受限）
@@ -254,14 +327,14 @@ function 释放W水镜返刃(this: void, _context: any, 施法者: any, 技能�
       if (数据.已结束) return;
       数据.已结束 = true;
       if (数据.修饰ID !== 0) unregisterDamageModifier(数据.修饰ID);
-      destroyUnitEffect(施法者, 水镜特效键);
+      销毁单位坐标跟随特效(施法者, 水镜特效键);
       移除单位指定Buff(施法者, 水镜BuffID);
     },
   });
 
-  // 招架窗口表现：水镜主体 + 招架 Buff
-  const 水镜特效 = createUnitEffect(施法者, "origin", 朱雀院红叶表现配置.水镜主体.模型路径, 朱雀院红叶表现配置.水镜主体.持续秒, 水镜特效键);
-  设置特效缩放(水镜特效, 朱雀院红叶表现配置.水镜主体.缩放);
+  // 招架窗口表现：水镜主体（始终位于红叶面向正前方75距离，随转身同步）+ 招架 Buff
+  const 水镜特效 = 创建单位坐标跟随特效(施法者, 朱雀院红叶表现配置.水镜主体.模型路径, 水镜特效键, 朱雀院红叶表现配置.水镜主体.缩放, 朱雀院红叶表现配置.水镜主体.高度, undefined, undefined, 0, 朱雀院红叶表现配置.水镜主体.RGB, true, 75);
+  void 水镜特效;
   registerManualBuff(施法者, 水镜BuffID, W配置.招架窗口秒, 1, { stack: 1 });
   // 水镜展开音（水镜主体与招架 Buff 实际建立后；单位绑定，参数配置驱动）
   Sound3DII_UnitPlayReuse(W水镜展开音效.路径, 施法者, W水镜展开音效.裁断距离);

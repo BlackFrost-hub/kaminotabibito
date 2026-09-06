@@ -49,10 +49,38 @@ function _____91CA_653E_5931_8D25_524D_65A9(_____65BD_6CD5_8005, _____6280_80FD_
     local _____65B9_5411 = GetUnitFacing(_____65BD_6CD5_8005)
     local X = GetUnitX(_____65BD_6CD5_8005)
     local Y = GetUnitY(_____65BD_6CD5_8005)
+    local _____534A_5F84 = ____W_914D_7F6E["前斩半径"]
+    if not (_____534A_5F84 > 0) or X ~= X or Y ~= Y then
+        debugLogForce(
+            "红叶-W",
+            "失败前斩跳过",
+            "原因",
+            "范围参数无效",
+            "X",
+            X,
+            "Y",
+            Y,
+            "半径",
+            _____534A_5F84
+        )
+        return
+    end
+    debugLogForce(
+        "红叶-W",
+        "失败前斩范围",
+        "X",
+        X,
+        "Y",
+        Y,
+        "半径",
+        _____534A_5F84,
+        "角度",
+        _____65B9_5411
+    )
     local _____6247_5F62_654C_4EBA = _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D({
         X = X,
         Y = Y,
-        ["半径"] = ____W_914D_7F6E["前斩半径"],
+        ["半径"] = _____534A_5F84,
         ["方向角"] = _____65B9_5411,
         ["扇形角度"] = ____W_914D_7F6E["前斩扇形角度"],
         ["单位筛选"] = function(_____5355_4F4D)
@@ -93,41 +121,44 @@ local ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668 = ____require_result_
 local unregisterDamageModifier = ____require_result_4.unregisterDamageModifier
 local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
 local _____5F00_59CB_51FB_9000 = ____require_result_5["开始击退"]
-local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_6["造成技能伤害"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
-_____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_7["两点角度"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
-_____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_8["获取扇形区域单位"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.08．方位判定工具")
-local _____4E24_70B9_65B9_5411_89D2 = ____require_result_9["两点方向角"]
-local _____89D2_5EA6_5DEE_7EDD_5BF9_503C = ____require_result_9["角度差绝对值"]
-local ____require_result_10 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_10.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_10["移除单位指定Buff"]
-local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_11.createUnitEffect
-local destroyUnitEffect = ____require_result_11.destroyUnitEffect
-local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_11["设置特效缩放"]
-local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_12.Sound3DII_UnitPlayReuse
-local Sound3DII_CooPlayReuse = ____require_result_12.Sound3DII_CooPlayReuse
-local ____require_result_13 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
-local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_13["播放英雄技能喊话"]
-local ____require_result_14 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.02．被动效果")
-_____65BD_52A0_6731_96C0_9662_7834_7EFD = ____require_result_14["施加朱雀院破绽"]
-local _____5C1D_8BD5_6D88_8D39_4E00_5C42_5200_52BF = ____require_result_14["尝试消费一层刀势"]
-local _____589E_52A0_5200_52BF = ____require_result_14["增加刀势"]
-local _____662F_6731_96C0_9662_7EA2_53F6 = ____require_result_14["是朱雀院红叶"]
-local _____767B_8BB0_6731_96C0_9662_6E05_7406 = ____require_result_14["登记朱雀院清理"]
-_____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_14["播放红叶动作"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂")
+local _____53D1_5C04_5F39_9053 = ____require_result_6["发射弹道"]
+local ____require_result_7 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_7["造成技能伤害"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_8["读取单位攻击力"]
+_____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_8["两点角度"]
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
+_____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_9["获取扇形区域单位"]
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.08．方位判定工具")
+local _____4E24_70B9_65B9_5411_89D2 = ____require_result_10["两点方向角"]
+local _____89D2_5EA6_5DEE_7EDD_5BF9_503C = ____require_result_10["角度差绝对值"]
+local ____require_result_11 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_11.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_11["移除单位指定Buff"]
+local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_12["创建单位坐标跟随特效"]
+local _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_12["销毁单位坐标跟随特效"]
+local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_12["设置特效缩放"]
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_12["创建点特效"]
+local ____require_result_13 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_13.Sound3DII_UnitPlayReuse
+local Sound3DII_CooPlayReuse = ____require_result_13.Sound3DII_CooPlayReuse
+local ____require_result_14 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_14["播放英雄技能喊话"]
+local ____require_result_15 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.02．被动效果")
+_____65BD_52A0_6731_96C0_9662_7834_7EFD = ____require_result_15["施加朱雀院破绽"]
+local _____5C1D_8BD5_6D88_8D39_4E00_5C42_5200_52BF = ____require_result_15["尝试消费一层刀势"]
+local _____589E_52A0_5200_52BF = ____require_result_15["增加刀势"]
+local _____662F_6731_96C0_9662_7EA2_53F6 = ____require_result_15["是朱雀院红叶"]
+local _____767B_8BB0_6731_96C0_9662_6E05_7406 = ____require_result_15["登记朱雀院清理"]
+_____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_15["播放红叶动作"]
 local _____8054_52A8D = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.07．D技能")
-local ____require_result_15 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.03．Q技能")
-local _____5EF6_957FQ2_7A97_53E3 = ____require_result_15["延长Q2窗口"]
-local ____require_result_16 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_16.debugLogForce
+local ____require_result_16 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.03．Q技能")
+local _____5EF6_957FQ2_7A97_53E3 = ____require_result_16["延长Q2窗口"]
+local ____require_result_17 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_17.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
 ____W_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.W["技能ID"])
 local _____6C34_955CBuffID = _____6731_96C0_9662_7EA2_53F6Buff_914D_7F6E["水镜招架"]
@@ -145,6 +176,106 @@ GetUnitFacing = jass.GetUnitFacing
 GetUnitName = jass.GetUnitName
 GetOwningPlayer = jass.GetOwningPlayer
 GetPlayerId = jass.GetPlayerId
+local function _____53D1_5C04W_56DE_5203_5251_6C14(_____65BD_6CD5_8005, _____6765_6E90, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID)
+    local _____8D77_70B9X = GetUnitX(_____65BD_6CD5_8005)
+    local _____8D77_70B9Y = GetUnitY(_____65BD_6CD5_8005)
+    local _____65B9_5411_89D2 = _____4E24_70B9_89D2_5EA6(
+        _____8D77_70B9X,
+        _____8D77_70B9Y,
+        GetUnitX(_____6765_6E90),
+        GetUnitY(_____6765_6E90)
+    )
+    local _____4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____W_914D_7F6E["回刃剑气攻击力倍率"]
+    debugLogForce(
+        "红叶-W",
+        "回刃剑气",
+        "类型",
+        "直线弹道",
+        "玩家",
+        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+        "距离",
+        ____W_914D_7F6E["回刃剑气距离"],
+        "方向角",
+        _____65B9_5411_89D2
+    )
+    _____53D1_5C04_5F39_9053({
+        ["名称"] = "朱雀院红叶-W回刃剑气",
+        ["所有者"] = _____65BD_6CD5_8005,
+        ["发射X"] = _____8D77_70B9X,
+        ["发射Y"] = _____8D77_70B9Y,
+        ["发射方向角"] = _____65B9_5411_89D2,
+        ["速度"] = ____W_914D_7F6E["回刃剑气速度"],
+        ["轨迹"] = {["类型"] = "直线", ["距离"] = ____W_914D_7F6E["回刃剑气距离"]},
+        ["模型"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"]["模型路径"],
+        ["缩放"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"]["缩放"],
+        ["飞行高度"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"]["高度"],
+        RGB = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"].RGB,
+        ["命中半径"] = ____W_914D_7F6E["回刃剑气命中半径"],
+        ["影响目标"] = "敌方",
+        ["碰撞消失"] = false,
+        ["每单位最大命中次数"] = 1,
+        ["目标筛选"] = function(_____5355_4F4D)
+            return _____5355_4F4D ~= _____65BD_6CD5_8005 and _____5355_4F4D_5B58_6D3B(_____5355_4F4D) and jass.IsUnitEnemy(
+                _____5355_4F4D,
+                GetOwningPlayer(_____65BD_6CD5_8005)
+            )
+        end,
+        ["on命中"] = function(_____5355_4F4D, ______5F39_5E55ID)
+            _____7ED3_7B97W_5355_4F53_4F24_5BB3(
+                _____65BD_6CD5_8005,
+                _____5355_4F4D,
+                _____6280_80FD_5B9E_4F8BID,
+                _____4F24_5BB3,
+                "朱雀院红叶-W回刃剑气"
+            )
+        end,
+        ["伤害形态"] = "AOE",
+        ["实例控制器"] = _____63A7_5236_5668
+    })
+end
+local function _____53D1_5C04W_5200_5149_8868_73B0(_____65BD_6CD5_8005, _____6765_6E90, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID)
+    local _____8D77_70B9X = GetUnitX(_____65BD_6CD5_8005)
+    local _____8D77_70B9Y = GetUnitY(_____65BD_6CD5_8005)
+    _____53D1_5C04_5F39_9053({
+        ["名称"] = "朱雀院红叶-W反击刀光表现",
+        ["所有者"] = _____65BD_6CD5_8005,
+        ["发射X"] = _____8D77_70B9X,
+        ["发射Y"] = _____8D77_70B9Y,
+        ["发射方向角"] = _____4E24_70B9_89D2_5EA6(
+            _____8D77_70B9X,
+            _____8D77_70B9Y,
+            GetUnitX(_____6765_6E90),
+            GetUnitY(_____6765_6E90)
+        ),
+        ["速度"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"]["冲锋速度"],
+        ["轨迹"] = {["类型"] = "直线", ["距离"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"]["冲锋距离"]},
+        ["模型"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"]["模型路径"],
+        RGB = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"].RGB,
+        ["缩放"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"]["缩放"],
+        ["飞行高度"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"]["高度"],
+        ["命中半径"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["派生刀光"]["命中半径"],
+        ["影响目标"] = "敌方",
+        ["碰撞消失"] = false,
+        ["每单位最大命中次数"] = 1,
+        ["目标筛选"] = function(_____5355_4F4D)
+            return _____5355_4F4D ~= _____65BD_6CD5_8005 and _____5355_4F4D_5B58_6D3B(_____5355_4F4D) and jass.IsUnitEnemy(
+                _____5355_4F4D,
+                GetOwningPlayer(_____65BD_6CD5_8005)
+            )
+        end,
+        ["on命中"] = function(_____5355_4F4D, ______5F39_5E55ID)
+            _____7ED3_7B97W_5355_4F53_4F24_5BB3(
+                _____65BD_6CD5_8005,
+                _____5355_4F4D,
+                _____6280_80FD_5B9E_4F8BID,
+                _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____W_914D_7F6E["反击攻击力倍率"],
+                "朱雀院红叶-W反击"
+            )
+        end,
+        ["伤害形态"] = "AOE",
+        ["实例控制器"] = _____63A7_5236_5668
+    })
+end
 local function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
     if _____6570_636E["已结束"] then
         return
@@ -154,7 +285,7 @@ local function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____63A7_5236_566
         unregisterDamageModifier(_____6570_636E["修饰ID"])
         _____6570_636E["修饰ID"] = 0
     end
-    destroyUnitEffect(_____65BD_6CD5_8005, _____6C34_955C_7279_6548_952E)
+    _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(_____65BD_6CD5_8005, _____6C34_955C_7279_6548_952E)
     _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____65BD_6CD5_8005, _____6C34_955CBuffID)
     if not _____6570_636E["已招架"] then
         _____91CA_653E_5931_8D25_524D_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
@@ -185,6 +316,7 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_566
         return
     end
     _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["W成功反击"])
+    _____53D1_5C04W_5200_5149_8868_73B0(_____65BD_6CD5_8005, _____6765_6E90, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID)
     Sound3DII_CooPlayReuse(
         ____W_8FD4_5203_53CD_51FB_97F3_6548["路径"],
         GetUnitX(_____6765_6E90),
@@ -192,26 +324,13 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_566
         ____W_8FD4_5203_53CD_51FB_97F3_6548["高度"],
         ____W_8FD4_5203_53CD_51FB_97F3_6548["裁断距离"]
     )
-    _____7ED3_7B97W_5355_4F53_4F24_5BB3(
-        _____65BD_6CD5_8005,
-        _____6765_6E90,
-        _____6280_80FD_5B9E_4F8BID,
-        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____W_914D_7F6E["反击攻击力倍率"],
-        "朱雀院红叶-W反击"
-    )
     _____65BD_52A0_6731_96C0_9662_7834_7EFD(_____65BD_6CD5_8005, _____6765_6E90)
     _____589E_52A0_5200_52BF(_____65BD_6CD5_8005, 1)
     _____5EF6_957FQ2_7A97_53E3(_____65BD_6CD5_8005, ____W_914D_7F6E["Q2延长秒"])
     if not _____6570_636E["刀势已消费"] then
         _____6570_636E["刀势已消费"] = true
         if _____5C1D_8BD5_6D88_8D39_4E00_5C42_5200_52BF(_____65BD_6CD5_8005) then
-            _____7ED3_7B97W_5355_4F53_4F24_5BB3(
-                _____65BD_6CD5_8005,
-                _____6765_6E90,
-                _____6280_80FD_5B9E_4F8BID,
-                _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____W_914D_7F6E["回刃剑气攻击力倍率"],
-                "朱雀院红叶-W回刃剑气"
-            )
+            _____53D1_5C04W_56DE_5203_5251_6C14(_____65BD_6CD5_8005, _____6765_6E90, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID)
         end
     end
     if _____8054_52A8D["尝试消费D强化"] ~= nil and _____8054_52A8D["尝试消费D强化"](_____65BD_6CD5_8005) then
@@ -307,18 +426,24 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
             if _____6570_636E["修饰ID"] ~= 0 then
                 unregisterDamageModifier(_____6570_636E["修饰ID"])
             end
-            destroyUnitEffect(_____65BD_6CD5_8005, _____6C34_955C_7279_6548_952E)
+            _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(_____65BD_6CD5_8005, _____6C34_955C_7279_6548_952E)
             _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____65BD_6CD5_8005, _____6C34_955CBuffID)
         end
     })
-    local _____6C34_955C_7279_6548 = createUnitEffect(
+    local _____6C34_955C_7279_6548 = _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
         _____65BD_6CD5_8005,
-        "origin",
         _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["水镜主体"]["模型路径"],
-        _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["水镜主体"]["持续秒"],
-        _____6C34_955C_7279_6548_952E
+        _____6C34_955C_7279_6548_952E,
+        _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["水镜主体"]["缩放"],
+        _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["水镜主体"]["高度"],
+        nil,
+        nil,
+        0,
+        _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["水镜主体"].RGB,
+        true,
+        75
     )
-    _____8BBE_7F6E_7279_6548_7F29_653E(_____6C34_955C_7279_6548, _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["水镜主体"]["缩放"])
+    local ____ = _____6C34_955C_7279_6548
     registerManualBuff(
         _____65BD_6CD5_8005,
         _____6C34_955CBuffID,

@@ -7,6 +7,7 @@ import {
   朱雀院红叶动作配置,
   朱雀院红叶动作槽,
   朱雀院红叶待平衡数值,
+  朱雀院红叶读条配置,
 } from "./00．配置";
 import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 
@@ -15,12 +16,17 @@ const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封
   stringToFourCCSafe: (this: void, id: string) => number;
   fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
-const { addDelayedCallback, removeDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, removeDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
   removeDelayedCallback: (this: void, id: number) => void;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
 };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
+};
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, 单位: any, 持续时间: number) => void;
 };
 const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
   创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
@@ -39,6 +45,11 @@ const { 获取扇形区域单位 } = require("系统.03．技能系统.00．技�
 };
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
+};
+const { 创建世界坐标进度UI, 更新世界坐标进度UI, 销毁世界坐标进度UI } = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI") as {
+  创建世界坐标进度UI: (this: void, 参数: any) => any;
+  更新世界坐标进度UI: (this: void, ui: any, 当前值: number, 立即更新?: boolean) => void;
+  销毁世界坐标进度UI: (this: void, ui: any) => void;
 };
 const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
@@ -148,9 +159,10 @@ function 创建剑痕(this: void, 来源英雄: any, X: number, Y: number, 方�
   }
   列表.push(序号);
   // 地面表现（候选未迁入则留空不播）
-  if (朱雀院红叶表现配置.E剑痕.模型路径 != null && 朱雀院红叶表现配置.E剑痕.模型路径 !== "") {
+  const E剑痕模型路径 = 朱雀院红叶表现配置.E剑痕.模型路径 as string;
+  if (E剑痕模型路径 !== "") {
     剑痕.特效句柄 = 创建点特效({
-      模型路径: 朱雀院红叶表现配置.E剑痕.模型路径,
+      模型路径: E剑痕模型路径,
       RGB: 朱雀院红叶表现配置.E剑痕.RGB,
       X,
       Y,
@@ -205,6 +217,7 @@ interface E数据 {
   段回调ID: number[];
   同目标次数: Record<number, number>;
   本E剑痕: 红叶剑痕[];
+  进度UI?: any;
 }
 
 function 结算E段伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
@@ -239,8 +252,14 @@ function 取段扇形敌人(this: void, 施法者: any, 数据: E数据, 半径:
   });
 }
 
+function 创建E叠加斩光(this: void, 配置: any, X: number, Y: number, 方向角: number): void {
+  创建点特效({ 模型路径: 配置.模型路径, RGB: 配置.RGB, X, Y, Z: 配置.高度, 面向角度: GetRandomInt(0, 359), 动画索引: 0, 缩放: 配置.叠加缩放 ?? 配置.缩放, 持续秒: 配置.持续秒 });
+  if (配置.叠加模型路径 != null && 配置.叠加模型路径 !== "") 创建点特效({ 模型路径: 配置.叠加模型路径, RGB: 配置.RGB, X, Y, Z: 配置.高度, 面向角度: GetRandomInt(0, 359), 动画索引: 0, 缩放: 配置.叠加缩放 ?? 配置.缩放, 持续秒: 配置.持续秒 });
+}
+
 function 执行E一段(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: E数据): void {
   数据.已斩段数 = 1;
+  创建E叠加斩光(朱雀院红叶表现配置.E第一斩, 数据.目标X, 数据.目标Y, 数据.方向角);
   // 第一斩轻斩音（段回调结算点一次；坐标=斩击点，参数配置驱动）
   Sound3DII_CooPlayReuse(E轻斩音效.路径, 数据.目标X, 数据.目标Y, E轻斩音效.高度, E轻斩音效.裁断距离);
   const 敌人 = 取段扇形敌人(施法者, 数据, E配置.第一斩半径, E配置.第一斩扇形角度);
@@ -255,6 +274,7 @@ function 执行E一段(this: void, 施法者: any, 控制器: 战斗技能实例
 
 function 执行E二段(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: E数据): void {
   数据.已斩段数 = 2;
+  创建E叠加斩光(朱雀院红叶表现配置.E第二斩, 数据.目标X, 数据.目标Y, 数据.方向角);
   // 第二斩轻斩音（段回调结算点一次；坐标=斩击点，参数配置驱动）
   Sound3DII_CooPlayReuse(E轻斩音效.路径, 数据.目标X, 数据.目标Y, E轻斩音效.高度, E轻斩音效.裁断距离);
   const 敌人 = 取段扇形敌人(施法者, 数据, E配置.第二斩半径, E配置.第二斩扇形角度);
@@ -269,6 +289,17 @@ function 执行E二段(this: void, 施法者: any, 控制器: 战斗技能实例
 
 function 执行E三段(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: E数据): void {
   数据.已斩段数 = 3;
+  创建E叠加斩光(朱雀院红叶表现配置.E第三斩, 数据.目标X, 数据.目标Y, 数据.方向角);
+  /*
+    RGB: 朱雀院红叶表现配置.E第三斩.RGB,
+    X: 数据.目标X,
+    Y: 数据.目标Y,
+    Z: 朱雀院红叶表现配置.E第三斩.高度,
+    面向角度: 数据.方向角,
+    动画索引: 0,
+    缩放: 朱雀院红叶表现配置.E第三斩.缩放,
+    持续秒: 朱雀院红叶表现配置.E第三斩.持续秒,
+  }); */
   // 第三斩终结音（确认的二选一随机槽：运行时从 槽.候选路径 随机取一；坐标=第三斩结算点，参数配置驱动）
   const 候选 = E终结音效.候选路径;
   const 终结路径 = 候选 != null && 候选.length > 0 ? 候选[GetRandomInt(1, 候选.length) - 1] : E终结音效.路径;
@@ -294,23 +325,55 @@ function 执行E三段(this: void, 施法者: any, 控制器: 战斗技能实例
 }
 
 function 释放E三叶散华(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
-  debugLogForce("红叶-E", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "施法者X", Math.floor(GetUnitX(施法者)), "施法者Y", Math.floor(GetUnitY(施法者)), "目标X", Math.floor(GetSpellTargetX()), "目标Y", Math.floor(GetSpellTargetY()));
+  const 目标X = GetSpellTargetX();
+  const 目标Y = GetSpellTargetY();
+  debugLogForce("红叶-E", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "施法者X", Math.floor(GetUnitX(施法者)), "施法者Y", Math.floor(GetUnitY(施法者)), "目标X", Math.floor(目标X), "目标Y", Math.floor(目标Y));
   if (!是朱雀院红叶(施法者)) {
     debugLogForce("红叶-E", "释放被拒", "原因", "非红叶单位", "施法者", 施法者);
     return;
   }
-  播放红叶动作(施法者, 朱雀院红叶动作槽.E连续三斩);
   // 重复 E：已有活跃 E 实例时忽略（三段未完成不叠加）
   if (查询战斗技能实例(施法者, "红叶E").length > 0) {
     debugLogForce("红叶-E", "释放被拒", "原因", "重复E活跃实例", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
     return;
   }
+  // 硬直必须同步先于动作建立（与妹红 Q 同模式）：若硬直晚一帧落地，会把刚播放的动作冻结在起始帧，表现为整段 E 站桩无动作。
+  开始硬直(施法者, 朱雀院红叶动作槽.E连续三斩.持续秒);
+  播放红叶动作(施法者, 朱雀院红叶动作槽.E连续三斩);
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
   播放英雄技能喊话(施法者, "朱雀院红叶", 朱雀院红叶技能配置.E.技能ID);
-  const 目标X = GetSpellTargetX();
-  const 目标Y = GetSpellTargetY();
   const 方向角 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), 目标X, 目标Y);
   const 数据: E数据 = { 方向角, 目标X, 目标Y, 已斩段数: 0, 段回调ID: [], 同目标次数: {}, 本E剑痕: [] };
+  // E 三段连斩硬直期间世界坐标进度条（跟随施法者）：正常走满硬直时长自毁；打断/死亡由结束回调立即销毁
+  const E进度最大值 = 朱雀院红叶动作槽.E连续三斩.持续秒;
+  数据.进度UI = 创建世界坐标进度UI({
+    X: GetUnitX(施法者),
+    Y: GetUnitY(施法者),
+    Z: 0,
+    跟随单位: 施法者,
+    跟随Z偏移: 朱雀院红叶读条配置.跟随Z偏移,
+    最大值: E进度最大值,
+    当前值: 0,
+    标题: 朱雀院红叶读条配置.标题 || "三叶·散华",
+    数值后缀: 朱雀院红叶读条配置.数值后缀,
+    类型: 朱雀院红叶读条配置.UI类型 as any,
+  });
+  // 进度条不会自走：周期回调推进 0→最大值；走满硬直时长后由到期回调销毁（实例完成早于硬直结束，不能挂实例篮子）
+  let E已流逝秒 = 0;
+  const E进度周期ID = addPeriodicCallback(50, function E进度推进(this: void): void {
+    if (数据.进度UI == null) {
+      removePeriodicCallback(E进度周期ID);
+      return;
+    }
+    E已流逝秒 += 0.05;
+    更新世界坐标进度UI(数据.进度UI, E已流逝秒);
+    if (E已流逝秒 >= E进度最大值) removePeriodicCallback(E进度周期ID);
+  });
+  addDelayedCallback(E进度最大值 * 1000, function E进度条到期销毁(this: void): void {
+    if (数据.进度UI == null) return;
+    销毁世界坐标进度UI(数据.进度UI);
+    数据.进度UI = null;
+  });
   const 控制器 = 创建战斗技能实例({
     技能键: "红叶E",
     施法者,
@@ -318,6 +381,11 @@ function 释放E三叶散华(this: void, _context: any, 施法者: any, 技能�
     数据,
     结束回调: function E结束(this: void, 原因: string, _c: any): void {
       debugLogForce("红叶-E", "结束", "原因", 原因 || "-", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
+      // 异常结束（打断/死亡）立即销毁进度条；正常完成时进度条走满硬直时长后由到期回调销毁
+      if (原因 !== "完成") {
+        销毁世界坐标进度UI(数据.进度UI);
+        数据.进度UI = null;
+      }
       // 未执行段数回调随实例清理移除；打断/死亡销毁本 E 已创建的剑痕
       for (let i = 0; i < 数据.段回调ID.length; i++) {
         removeDelayedCallback(数据.段回调ID[i]);
@@ -384,3 +452,14 @@ export const 朱雀院红叶E模块 = {
   剑痕持续秒: E配置.剑痕持续秒,
   注册: 注册朱雀院红叶E,
 } as const;
+
+
+
+
+
+
+
+
+
+
+

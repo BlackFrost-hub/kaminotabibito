@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 import type { BuffData } from "../../01．Buff表";
+import { 朱雀院椿表现配置 } from "../../../03．技能系统/05．单位技能/04．英雄技能/22．朱雀院椿/00．配置";
 
 /**
  * 朱雀院椿 - 英雄 Buff 表（B1 登记）
@@ -27,7 +28,7 @@ export const 朱雀院椿Buff表: Record<string, BuffData> = {
     buffID: 朱雀院椿BuffID.VF场,
     buffName: "VF场",
     icon: "ReplaceableTextures\\CommandButtons\\HeroBuff\\Tsubaki\\BTNTsubakiVFChang.blp",
-    effect: "Common\\Effect\\Form\\Shield\\TsubakiVFBarrier.mdx",
+    effect: 朱雀院椿表现配置.VF完整.模型路径,
     effectMode: "attach",
     effectAttachPoint: "origin",
     effectScale: 1,
@@ -45,7 +46,7 @@ export const 朱雀院椿Buff表: Record<string, BuffData> = {
     buffID: 朱雀院椿BuffID.VF残缺,
     buffName: "VF残缺",
     icon: "ReplaceableTextures\\CommandButtons\\HeroBuff\\Tsubaki\\BTNTsubakiVFCanQue.blp",
-    effect: "Common\\Effect\\Form\\Shield\\TsubakiVFCracked.mdx",
+    effect: 朱雀院椿表现配置.VF残缺.模型路径,
     effectMode: "attach",
     effectAttachPoint: "origin",
     effectScale: 1,
@@ -81,7 +82,7 @@ export const 朱雀院椿Buff表: Record<string, BuffData> = {
     buffID: 朱雀院椿BuffID.一刀守势,
     buffName: "一刀守势",
     icon: "ReplaceableTextures\\CommandButtons\\HeroBuff\\Tsubaki\\BTNTsubakiYiDaoShouShi.blp",
-    effect: "Common\\Effect\\Form\\Rotate\\TsubakiIchiGuard.mdx",
+    effect: 朱雀院椿表现配置.D一刀守势.模型路径,
     effectMode: "attach",
     effectAttachPoint: "origin",
     effectScale: 1,
@@ -99,7 +100,7 @@ export const 朱雀院椿Buff表: Record<string, BuffData> = {
     buffID: 朱雀院椿BuffID.二刀攻势,
     buffName: "二刀攻势",
     icon: "ReplaceableTextures\\CommandButtons\\HeroBuff\\Tsubaki\\BTNTsubakiErDaoGongShi.blp",
-    effect: "Common\\Effect\\Form\\Rotate\\TsubakiNitoAssault.mdx",
+    effect: 朱雀院椿表现配置.D二刀攻势.模型路径,
     effectMode: "attach",
     effectAttachPoint: "origin",
     effectScale: 1,
@@ -115,3 +116,4 @@ export const 朱雀院椿Buff表: Record<string, BuffData> = {
   },
   // 决斗距离为内部状态（E 建立、R 读取），规划明确不进玩家 Buff 栏，不登记 Buff 表
 };
+

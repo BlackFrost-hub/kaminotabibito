@@ -1,13 +1,18 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548, _____51B2_950B_4F4D_79FB_7279_6548_5230_671F, jass, DzSetEffectVertexAlpha, EXSetEffectSize, EXSetEffectZ, DestroyEffect, addDelayedCallback, EC_GetPointZ
-function _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548(_____6A21_578B, _____5B9E_4F8B, _____7F29_653E, _____9AD8_5EA6, _____6301_7EED_79D2)
+local _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548, _____51B2_950B_4F4D_79FB_7279_6548_5230_671F, jass, DzSetEffectVertexAlpha, EXSetEffectSize, EXSetEffectZ, EXEffectMatRotateZ, DestroyEffect, addDelayedCallback, EC_GetPointZ
+function _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548(_____6A21_578B, _____5B9E_4F8B, _____7F29_653E, _____9AD8_5EA6, _____6301_7EED_79D2, _____9762_5411_89D2_5EA6, _____504F_79FB_89D2_5EA6, _____504F_79FB_8DDD_79BB)
     if _____6A21_578B == nil or _____6A21_578B == "" then
         return
     end
     local x = jass.GetUnitX(_____5B9E_4F8B["单位"])
     local y = jass.GetUnitY(_____5B9E_4F8B["单位"])
+    if _____504F_79FB_89D2_5EA6 ~= nil and _____504F_79FB_8DDD_79BB ~= nil and _____504F_79FB_8DDD_79BB > 0 then
+        local _____5F27_5EA6 = _____504F_79FB_89D2_5EA6 * ____exports.BJ_DEGTORAD
+        x = x + jass.Cos(_____5F27_5EA6) * _____504F_79FB_8DDD_79BB
+        y = y + jass.Sin(_____5F27_5EA6) * _____504F_79FB_8DDD_79BB
+    end
     local _____7279_6548 = jass.AddSpecialEffect(_____6A21_578B, x, y)
     if _____7279_6548 ~= nil and _____7279_6548 ~= 0 then
         if type(EXSetEffectSize) == "function" then
@@ -18,6 +23,9 @@ function _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548(_____6A21_578B, _____5B9E_
                 _____7279_6548,
                 EC_GetPointZ(x, y) + _____9AD8_5EA6
             )
+        end
+        if _____9762_5411_89D2_5EA6 ~= nil and type(EXEffectMatRotateZ) == "function" then
+            EXEffectMatRotateZ(_____7279_6548, _____9762_5411_89D2_5EA6)
         end
         addDelayedCallback((_____6301_7EED_79D2 > 0 and _____6301_7EED_79D2 or 0.3) * 1000, _____51B2_950B_4F4D_79FB_7279_6548_5230_671F, _____7279_6548)
     end
@@ -36,6 +44,7 @@ local japi = require("jass.japi")
 DzSetEffectVertexAlpha = japi.DzSetEffectVertexAlpha
 EXSetEffectSize = japi.EXSetEffectSize
 EXSetEffectZ = japi.EXSetEffectZ
+EXEffectMatRotateZ = japi.EXEffectMatRotateZ
 DestroyEffect = jass.DestroyEffect
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -160,14 +169,18 @@ ____exports["播放位移特效"] = function(_____5B9E_4F8B)
         _____5B9E_4F8B,
         _____5B9E_4F8B["位移特效缩放"],
         _____5B9E_4F8B["位移特效高度"],
-        _____5B9E_4F8B["位移特效持续秒"]
+        _____5B9E_4F8B["位移特效持续秒"],
+        _____5B9E_4F8B["位移特效面向角度"]
     )
     _____64AD_653E_5355_4E2A_4F4D_79FB_7279_6548(
         _____5B9E_4F8B["附加位移特效"],
         _____5B9E_4F8B,
         _____5B9E_4F8B["附加位移特效缩放"],
         _____5B9E_4F8B["附加位移特效高度"],
-        _____5B9E_4F8B["附加位移特效持续秒"]
+        _____5B9E_4F8B["附加位移特效持续秒"],
+        _____5B9E_4F8B["附加位移特效面向角度"],
+        _____5B9E_4F8B["附加位移特效偏移角度"],
+        _____5B9E_4F8B["附加位移特效偏移距离"]
     )
 end
 ____exports["获取枚举组"] = function()

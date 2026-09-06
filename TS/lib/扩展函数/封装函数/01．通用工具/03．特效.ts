@@ -675,13 +675,18 @@ function on单位坐标跟随特效Tick(this: void): void {
       销毁单位坐标跟随特效记录(key, record);
       continue;
     }
-    const x = GetUnitX(record.unit);
-    const y = GetUnitY(record.unit);
+    let x = GetUnitX(record.unit);
+    let y = GetUnitY(record.unit);
+    if (record.面向跟随 === true) {
+      const 面向弧度 = GetUnitFacing(record.unit) * 0.017453292519943295;
+      if (record.前方偏移距离 != null && record.前方偏移距离 > 0) {
+        x = x + Cos(面向弧度) * record.前方偏移距离;
+        y = y + Sin(面向弧度) * record.前方偏移距离;
+      }
+      EXEffectMatRotateZ(record.effect, 面向弧度);
+    }
     安全设置特效坐标(record.effect, x, y);
     EXSetEffectZ(record.effect, EC_GetPointZ(x, y) + record.height);
-    if (record.面向跟随 === true) {
-      EXEffectMatRotateZ(record.effect, GetUnitFacing(record.unit) * 0.017453292519943295);
-    }
   }
   if (单位坐标跟随特效数量 <= 0) {
     停止单位坐标跟随特效Tick();
@@ -693,7 +698,7 @@ function 确保单位坐标跟随特效Tick(this: void): void {
   单位坐标跟随特效回调ID = addPeriodicCallback(单位坐标跟随特效间隔毫秒, on单位坐标跟随特效Tick);
 }
 
-export function 创建单位坐标跟随特效(unit: any, modelPath: string, effectKey: string = "default", scale: number = 1, height: number = 单位坐标跟随特效默认高度, animSpeed?: number, 动画索引?: number, 面向弧度: number = 0, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }, 面向跟随单位?: boolean): any {
+export function 创建单位坐标跟随特效(unit: any, modelPath: string, effectKey: string = "default", scale: number = 1, height: number = 单位坐标跟随特效默认高度, animSpeed?: number, 动画索引?: number, 面向弧度: number = 0, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }, 面向跟随单位?: boolean, 前方偏移距离?: number): any {
   if (!单位可坐标跟随(unit) || modelPath === "") return null;
   const key = getUnitEffectKey(unit, effectKey);
   if (key === "") return null;
@@ -718,7 +723,7 @@ export function 创建单位坐标跟随特效(unit: any, modelPath: string, eff
   if (面向跟随单位 === true) {
     EXEffectMatRotateZ(effect, GetUnitFacing(unit) * 0.017453292519943295);
   }
-  单位坐标跟随特效表[key] = { unit, effect, scale, height, animSpeed, 面向跟随: 面向跟随单位 === true };
+  单位坐标跟随特效表[key] = { unit, effect, scale, height, animSpeed, 面向跟随: 面向跟随单位 === true, 前方偏移距离: 前方偏移距离 ?? 0 };
   单位坐标跟随特效数量 += 1;
   确保单位坐标跟随特效Tick();
   return effect;

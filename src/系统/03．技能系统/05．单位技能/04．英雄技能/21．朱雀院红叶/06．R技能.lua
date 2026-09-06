@@ -11,37 +11,49 @@ local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
-local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_1["注册单位技能壳监听"]
-local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
-local _____5F00_59CB_5145_80FD = ____require_result_2["开始充能"]
-local ____require_result_3 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_3["造成技能伤害"]
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_4["读取单位攻击力"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_4["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_4["两点角度"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
-local _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_5["获取扇形区域单位"]
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_6["创建点特效"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_7.Sound3DII_UnitPlayReuse
-local Sound3DII_CooPlayReuse = ____require_result_7.Sound3DII_CooPlayReuse
-local ____require_result_8 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
-local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_8["播放英雄技能喊话"]
-local ____require_result_9 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.02．被动效果")
-local _____65BD_52A0_6731_96C0_9662_7834_7EFD = ____require_result_9["施加朱雀院破绽"]
-local _____6D88_8D39_5168_90E8_5200_52BF = ____require_result_9["消费全部刀势"]
-local _____662F_6731_96C0_9662_7EA2_53F6 = ____require_result_9["是朱雀院红叶"]
-local _____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_9["播放红叶动作"]
-local ____require_result_10 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.05．E技能")
-local _____8BFB_53D6_6700_8FD1_5251_75D5_5E76_9501_5B9A = ____require_result_10["读取最近剑痕并锁定"]
-local ____require_result_11 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.07．D技能")
-local _____6D88_8D39_5168_90E8D_5F3A_5316 = ____require_result_11["消费全部D强化"]
-local _____7ED3_675FD_79D8_4F20 = ____require_result_11["结束D秘传"]
-local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_12.debugLogForce
+local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+local removePeriodicCallback = ____require_result_1.removePeriodicCallback
+local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
+local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统")
+local _____5F00_59CB_5145_80FD = ____require_result_3["开始充能"]
+local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_4["造成技能伤害"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_5["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_5["两点角度"]
+local _____8DDD_79BBXY = ____require_result_5["距离XY"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
+local _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_6["获取扇形区域单位"]
+local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_8["开始硬直"]
+local ____require_result_9 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_9.addDelayedCallback
+local ____require_result_10 = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI")
+local _____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_10["创建世界坐标进度UI"]
+local _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_10["销毁世界坐标进度UI"]
+local ____require_result_11 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_11.Sound3DII_UnitPlayReuse
+local Sound3DII_CooPlayReuse = ____require_result_11.Sound3DII_CooPlayReuse
+local ____require_result_12 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_12["播放英雄技能喊话"]
+local ____require_result_13 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.02．被动效果")
+local _____65BD_52A0_6731_96C0_9662_7834_7EFD = ____require_result_13["施加朱雀院破绽"]
+local _____76EE_6807_5E26_6709_7834_7EFD = ____require_result_13["目标带有破绽"]
+local _____6D88_8D39_5168_90E8_5200_52BF = ____require_result_13["消费全部刀势"]
+local _____662F_6731_96C0_9662_7EA2_53F6 = ____require_result_13["是朱雀院红叶"]
+local _____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_13["播放红叶动作"]
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.05．E技能")
+local _____8BFB_53D6_6700_8FD1_5251_75D5_5E76_9501_5B9A = ____require_result_14["读取最近剑痕并锁定"]
+local ____require_result_15 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.07．D技能")
+local _____6D88_8D39_5168_90E8D_5F3A_5316 = ____require_result_15["消费全部D强化"]
+local _____7ED3_675FD_79D8_4F20 = ____require_result_15["结束D秘传"]
+local ____require_result_16 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_16.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
 local ____R_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.R["技能ID"])
 local ____R_914D_7F6E = _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C.R
@@ -57,11 +69,46 @@ local GetSpellTargetY = jass.GetSpellTargetY
 local GetUnitName = jass.GetUnitName
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
-local function _____53D6_7A84_7EBF_654C_4EBA(_____65BD_6CD5_8005, _____65B9_5411_89D2)
+local GetRandomReal = jass.GetRandomReal
+--- 主斩命中星爆：每个被命中的敌人独立一条，逐层在该敌人当前位置创建（跟随位移），随机朝向；目标死亡提前停止
+local function _____521B_5EFAR_547D_4E2D_661F_7206(_____914D_7F6E, _____76EE_6807)
+    local _____5DF2_521B_5EFA_6B21_6570 = 0
+    local _____5468_671FID = 0
+    local function _____521B_5EFA_4E00_6B21()
+        if not _____5355_4F4D_5B58_6D3B(_____76EE_6807) then
+            if _____5468_671FID ~= 0 then
+                removePeriodicCallback(_____5468_671FID)
+                _____5468_671FID = 0
+            end
+            return
+        end
+        _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = _____914D_7F6E["模型路径"],
+            RGB = _____914D_7F6E.RGB,
+            X = GetUnitX(_____76EE_6807),
+            Y = GetUnitY(_____76EE_6807),
+            Z = _____914D_7F6E["高度"],
+            ["面向角度"] = GetRandomReal(0, 360),
+            ["缩放"] = _____914D_7F6E["缩放"],
+            ["持续秒"] = _____914D_7F6E["单次持续秒"]
+        })
+        _____5DF2_521B_5EFA_6B21_6570 = _____5DF2_521B_5EFA_6B21_6570 + 1
+        if _____5DF2_521B_5EFA_6B21_6570 >= _____914D_7F6E["创建次数"] and _____5468_671FID ~= 0 then
+            removePeriodicCallback(_____5468_671FID)
+            _____5468_671FID = 0
+        end
+    end
+    _____5468_671FID = addPeriodicCallback(_____914D_7F6E["创建间隔秒"] * 1000, _____521B_5EFA_4E00_6B21)
+    _____521B_5EFA_4E00_6B21()
+end
+local function _____53D6_7A84_7EBF_654C_4EBA(_____65BD_6CD5_8005, _____65B9_5411_89D2, _____76EE_6807X, _____76EE_6807Y)
+    local _____65BD_6CD5_8005X = GetUnitX(_____65BD_6CD5_8005)
+    local _____65BD_6CD5_8005Y = GetUnitY(_____65BD_6CD5_8005)
+    local _____76EE_6807_8DDD_79BB = _____8DDD_79BBXY(_____65BD_6CD5_8005X, _____65BD_6CD5_8005Y, _____76EE_6807X, _____76EE_6807Y)
     return _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D({
-        X = GetUnitX(_____65BD_6CD5_8005),
-        Y = GetUnitY(_____65BD_6CD5_8005),
-        ["半径"] = ____R_914D_7F6E["距离"],
+        X = _____65BD_6CD5_8005X,
+        Y = _____65BD_6CD5_8005Y,
+        ["半径"] = ____R_914D_7F6E["距离"] > _____76EE_6807_8DDD_79BB + 100 and ____R_914D_7F6E["距离"] or _____76EE_6807_8DDD_79BB + 100,
         ["方向角"] = _____65B9_5411_89D2,
         ["扇形角度"] = ____R_914D_7F6E["窄线角度"],
         ["单位筛选"] = function(_____5355_4F4D)
@@ -108,7 +155,7 @@ local function _____7ED3_7B97R_4F24_5BB3(_____65BD_6CD5_8005, _____76EE_6807, __
         ["参与技能伤害加成"] = true
     })
 end
-local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, ______76EE_6807X, _____76EE_6807Y, _____65B9_5411_89D2)
+local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____76EE_6807X, _____76EE_6807Y, _____65B9_5411_89D2)
     if not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         debugLogForce("红叶-R", "命中失败", "目标无效", "施法者已死亡")
         return
@@ -130,15 +177,34 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
         "方向角",
         _____65B9_5411_89D2
     )
-    _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["R释放"])
+    _____5F00_59CB_786C_76F4(_____65BD_6CD5_8005, 0.6)
+    local ____R_8FDB_5EA6UI = _____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI({
+        X = GetUnitX(_____65BD_6CD5_8005),
+        Y = GetUnitY(_____65BD_6CD5_8005),
+        Z = 0,
+        ["跟随单位"] = _____65BD_6CD5_8005,
+        ["跟随Z偏移"] = _____6731_96C0_9662_7EA2_53F6_8BFB_6761_914D_7F6E["跟随Z偏移"],
+        ["最大值"] = 600,
+        ["当前值"] = 0,
+        ["标题"] = "奥义·红叶一闪",
+        ["数值后缀"] = "",
+        ["类型"] = _____6731_96C0_9662_7EA2_53F6_8BFB_6761_914D_7F6E["UI类型"]
+    })
+    addDelayedCallback(
+        600,
+        function()
+            _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI(____R_8FDB_5EA6UI)
+        end
+    )
     local _____5200_52BF_5C42_6570 = _____6D88_8D39_5168_90E8_5200_52BF(_____65BD_6CD5_8005)
     local ____D_6B21_6570 = _____6D88_8D39_5168_90E8D_5F3A_5316(_____65BD_6CD5_8005)
     if ____D_6B21_6570 > 0 then
+        debugLogForce("红叶-R", "秘传消耗", "次数", ____D_6B21_6570)
         _____7ED3_675FD_79D8_4F20(_____65BD_6CD5_8005)
     end
     local _____653B_51FB_529B = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005)
     local _____4E3B_65A9_4F24_5BB3 = _____653B_51FB_529B * (____R_914D_7F6E["主斩攻击力倍率"] + ____D_6B21_6570 * ____R_914D_7F6E["D强化每次加成"])
-    local _____654C_4EBA = _____53D6_7A84_7EBF_654C_4EBA(_____65BD_6CD5_8005, _____65B9_5411_89D2)
+    local _____654C_4EBA = _____53D6_7A84_7EBF_654C_4EBA(_____65BD_6CD5_8005, _____65B9_5411_89D2, _____76EE_6807X, _____76EE_6807Y)
     do
         local i = 0
         while i < #_____654C_4EBA do
@@ -149,7 +215,36 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
                 _____4E3B_65A9_4F24_5BB3,
                 "朱雀院红叶-R主斩"
             )
+            if _____76EE_6807_5E26_6709_7834_7EFD(_____654C_4EBA[i + 1]) then
+                debugLogForce(
+                    "红叶-R",
+                    "破绽终式",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                    "目标",
+                    GetUnitName(_____654C_4EBA[i + 1]),
+                    "伤害",
+                    math.floor(_____653B_51FB_529B * ____R_914D_7F6E["破绽终式攻击力倍率"])
+                )
+                _____7ED3_7B97R_4F24_5BB3(
+                    _____65BD_6CD5_8005,
+                    _____654C_4EBA[i + 1],
+                    _____6280_80FD_5B9E_4F8BID,
+                    _____653B_51FB_529B * ____R_914D_7F6E["破绽终式攻击力倍率"],
+                    "朱雀院红叶-R破绽终式"
+                )
+            end
             _____65BD_52A0_6731_96C0_9662_7834_7EFD(_____65BD_6CD5_8005, _____654C_4EBA[i + 1])
+            _____521B_5EFA_70B9_7279_6548({
+                ["模型路径"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R命中收尾"]["模型路径"],
+                RGB = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R命中收尾"].RGB,
+                X = GetUnitX(_____654C_4EBA[i + 1]),
+                Y = GetUnitY(_____654C_4EBA[i + 1]),
+                Z = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R命中收尾"]["高度"],
+                ["缩放"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R命中收尾"]["缩放"],
+                ["持续秒"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R命中收尾"]["持续秒"]
+            })
+            _____521B_5EFAR_547D_4E2D_661F_7206(_____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R命中叠加"], _____654C_4EBA[i + 1])
             i = i + 1
         end
     end
@@ -158,13 +253,16 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
         _____521B_5EFA_70B9_7279_6548({
             ["模型路径"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R主斩"]["模型路径"],
             RGB = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R主斩"].RGB,
-            X = GetUnitX(_____65BD_6CD5_8005),
-            Y = GetUnitY(_____65BD_6CD5_8005),
+            X = _____76EE_6807X,
+            Y = _____76EE_6807Y,
             Z = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R主斩"]["高度"],
             ["面向角度"] = _____65B9_5411_89D2,
             ["缩放"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R主斩"]["缩放"],
             ["持续秒"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R主斩"]["持续秒"]
         })
+    end
+    if _____5200_52BF_5C42_6570 > 0 then
+        debugLogForce("红叶-R", "刀势回响", "层数", _____5200_52BF_5C42_6570)
     end
     do
         local _____5C42 = 0
@@ -187,6 +285,12 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
     end
     local _____5251_75D5 = _____8BFB_53D6_6700_8FD1_5251_75D5_5E76_9501_5B9A(_____65BD_6CD5_8005)
     if _____5251_75D5 ~= nil then
+        debugLogForce(
+            "红叶-R",
+            "剑痕回响",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+        )
         do
             local i = 0
             while i < #_____654C_4EBA do
@@ -200,7 +304,47 @@ local function ____R_521B_5EFA_7EC8_5F0F(_____65BD_6CD5_8005, _____6280_80FD_5B9
                 i = i + 1
             end
         end
-        local ____ = _____5251_75D5
+        local _____56DE_54CD_914D_7F6E = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["R剑痕回响"]
+        if _____56DE_54CD_914D_7F6E["模型路径"] ~= "" then
+            _____521B_5EFA_70B9_7279_6548({
+                ["模型路径"] = _____56DE_54CD_914D_7F6E["模型路径"],
+                RGB = _____56DE_54CD_914D_7F6E.RGB,
+                X = _____5251_75D5.X,
+                Y = _____5251_75D5.Y,
+                Z = _____56DE_54CD_914D_7F6E["高度"],
+                ["面向角度"] = _____5251_75D5["方向角"],
+                ["缩放"] = _____56DE_54CD_914D_7F6E["闪现缩放"],
+                ["持续秒"] = _____56DE_54CD_914D_7F6E["闪现持续秒"]
+            })
+            addDelayedCallback(
+                _____56DE_54CD_914D_7F6E["闪现提前毫秒"],
+                function()
+                    _____521B_5EFA_70B9_7279_6548({
+                        ["模型路径"] = _____56DE_54CD_914D_7F6E["模型路径"],
+                        RGB = _____56DE_54CD_914D_7F6E.RGB,
+                        X = _____5251_75D5.X,
+                        Y = _____5251_75D5.Y,
+                        Z = _____56DE_54CD_914D_7F6E["高度"],
+                        ["面向角度"] = _____5251_75D5["方向角"],
+                        ["缩放"] = _____56DE_54CD_914D_7F6E["缩放"],
+                        ["持续秒"] = _____56DE_54CD_914D_7F6E["持续秒"]
+                    })
+                    local _____53E0_52A0_8DEF_5F84 = _____56DE_54CD_914D_7F6E["叠加模型路径"]
+                    if _____53E0_52A0_8DEF_5F84 ~= "" then
+                        _____521B_5EFA_70B9_7279_6548({
+                            ["模型路径"] = _____53E0_52A0_8DEF_5F84,
+                            RGB = _____56DE_54CD_914D_7F6E.RGB,
+                            X = _____5251_75D5.X,
+                            Y = _____5251_75D5.Y,
+                            Z = _____56DE_54CD_914D_7F6E["叠加高度"],
+                            ["面向角度"] = _____5251_75D5["方向角"],
+                            ["缩放"] = _____56DE_54CD_914D_7F6E["叠加缩放"],
+                            ["持续秒"] = _____56DE_54CD_914D_7F6E["叠加持续秒"]
+                        })
+                    end
+                end
+            )
+        end
     end
 end
 local function _____91CA_653ER_5965_4E49(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)

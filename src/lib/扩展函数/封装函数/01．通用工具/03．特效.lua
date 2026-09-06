@@ -731,17 +731,19 @@ local function ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
             end
             local x = GetUnitX(record.unit)
             local y = GetUnitY(record.unit)
+            if record["面向跟随"] == true then
+                local _____9762_5411_5F27_5EA6 = GetUnitFacing(record.unit) * 0.017453292519943295
+                if record["前方偏移距离"] ~= nil and record["前方偏移距离"] > 0 then
+                    x = x + Cos(_____9762_5411_5F27_5EA6) * record["前方偏移距离"]
+                    y = y + Sin(_____9762_5411_5F27_5EA6) * record["前方偏移距离"]
+                end
+                EXEffectMatRotateZ(record.effect, _____9762_5411_5F27_5EA6)
+            end
             _____5B89_5168_8BBE_7F6E_7279_6548_5750_6807(record.effect, x, y)
             EXSetEffectZ(
                 record.effect,
                 EC_GetPointZ(x, y) + record.height
             )
-            if record["面向跟随"] == true then
-                EXEffectMatRotateZ(
-                    record.effect,
-                    GetUnitFacing(record.unit) * 0.017453292519943295
-                )
-            end
         end
         ::__continue147::
     end
@@ -755,7 +757,7 @@ local function _____786E_4FDD_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()
     end
     _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_56DE_8C03ID = addPeriodicCallback(_____5355_4F4D_5750_6807_8DDF_968F_7279_6548_95F4_9694_6BEB_79D2, ____on_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick)
 end
-____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effectKey, scale, height, animSpeed, _____52A8_753B_7D22_5F15, _____9762_5411_5F27_5EA6, RGB, _____9762_5411_8DDF_968F_5355_4F4D)
+____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effectKey, scale, height, animSpeed, _____52A8_753B_7D22_5F15, _____9762_5411_5F27_5EA6, RGB, _____9762_5411_8DDF_968F_5355_4F4D, _____524D_65B9_504F_79FB_8DDD_79BB)
     if effectKey == nil then
         effectKey = "default"
     end
@@ -820,7 +822,8 @@ ____exports["创建单位坐标跟随特效"] = function(unit, modelPath, effect
         scale = scale,
         height = height,
         animSpeed = animSpeed,
-        ["面向跟随"] = _____9762_5411_8DDF_968F_5355_4F4D == true
+        ["面向跟随"] = _____9762_5411_8DDF_968F_5355_4F4D == true,
+        ["前方偏移距离"] = _____524D_65B9_504F_79FB_8DDD_79BB or 0
     }
     _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF = _____5355_4F4D_5750_6807_8DDF_968F_7279_6548_6570_91CF + 1
     _____786E_4FDD_5355_4F4D_5750_6807_8DDF_968F_7279_6548Tick()

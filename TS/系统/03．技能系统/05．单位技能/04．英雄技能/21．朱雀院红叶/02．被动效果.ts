@@ -142,6 +142,14 @@ export function 目标有破绽(this: void, 目标: any): boolean {
 }
 
 /** 移除目标破绽（特效/Buff/回调/表项，幂等） */
+/** 查询目标当前是否带有（未过期的）破绽标记 */
+export function 目标带有破绽(this: void, 目标: any): boolean {
+  if (目标 == null || 目标 === 0) return false;
+  const 状态 = 破绽目标表[GetHandleId(目标)];
+  if (状态 == null) return false;
+  return getGameTime() < 状态.到期时间;
+}
+
 export function 移除目标破绽(this: void, 目标: any): void {
   if (目标 == null || 目标 === 0) return;
   const id = GetHandleId(目标);
@@ -235,6 +243,7 @@ export function 增加刀势(this: void, 英雄: any, 层数: number): void {
   if (新层数 === 原层数) return;
   状态.刀势层数 = 新层数;
   刷新刀势表现(英雄, 新层数);
+  debugLogForce("红叶-被动", "刀势", "操作", "获得", "层数", 新层数);
   if (新层数 >= 刀势上限 && 朱雀院红叶表现配置.满刀势提示.模型路径 !== "") {
     创建点特效({
       模型路径: 朱雀院红叶表现配置.满刀势提示.模型路径,
@@ -259,6 +268,7 @@ export function 尝试消费一层刀势(this: void, 英雄: any): boolean {
   if (状态.刀势层数 <= 0) return false;
   状态.刀势层数 = 状态.刀势层数 - 1;
   刷新刀势表现(英雄, 状态.刀势层数);
+  debugLogForce("红叶-被动", "刀势", "操作", "消费", "剩余", 状态.刀势层数);
   return true;
 }
 
@@ -270,6 +280,7 @@ export function 消费全部刀势(this: void, 英雄: any): number {
   if (层数 <= 0) return 0;
   状态.刀势层数 = 0;
   刷新刀势表现(英雄, 0);
+  debugLogForce("红叶-被动", "刀势", "操作", "消费全部", "层数", 层数);
   return 层数;
 }
 
@@ -322,9 +333,10 @@ function 处理红叶普攻破绽斩(this: void, target: any, attacker: any, app
     参与技能伤害加成: false,
   });
   // 破绽斩表现（候选未迁入则留空不播）
-  if (朱雀院红叶表现配置.破绽斩.模型路径 !== "") {
+  const 破绽斩模型路径 = 朱雀院红叶表现配置.破绽斩.模型路径 as string;
+  if (破绽斩模型路径 !== "") {
     创建点特效({
-      模型路径: 朱雀院红叶表现配置.破绽斩.模型路径,
+      模型路径: 破绽斩模型路径,
       RGB: 朱雀院红叶表现配置.破绽斩.RGB,
       X: jass.GetUnitX(target),
       Y: jass.GetUnitY(target),
@@ -390,15 +402,20 @@ export const 朱雀院红叶被动模块 = {
 // A8：动作表现辅助（动作索引由配置驱动；0 = 未实机确认不播放）
 //=============================================================================
 
-/** 播放红叶施法动作（接收动作槽，索引/持续秒全部配置驱动；0 跳过），持续后恢复 stand；随英雄清理移除恢复回调 */
-export function 播放红叶动作(this: void, 英雄: any, 槽: { 索引: number; 持续秒: number }): void {
+/** 播放红叶施法动作（接收动作槽，索引/持续秒/播放速度全部配置驱动；索引 0 跳过），持续后恢复 stand 并还原播放速度；随英雄清理移除恢复回调 */
+export function 播放红叶动作(this: void, 英雄: any, 槽: { 索引: number; 持续秒: number; 播放速度?: number }): void {
   const 动作索引 = 槽.索引;
   const 持续秒 = 槽.持续秒;
+  const 播放速度 = 槽.播放速度 ?? 1;
   if (英雄 == null || 英雄 === 0 || 动作索引 <= 0) return;
+  if (播放速度 !== 1) jass.SetUnitTimeScale(英雄, 播放速度);
   jass.SetUnitAnimationByIndex(英雄, 动作索引);
   if (持续秒 > 0) {
     const 恢复ID = addDelayedCallback(持续秒 * 1000, function 恢复站立动作(this: void): void {
-      if (单位存活(英雄)) jass.SetUnitAnimation(英雄, "stand");
+      if (单位存活(英雄)) {
+        jass.SetUnitTimeScale(英雄, 1);
+        jass.SetUnitAnimation(英雄, "stand");
+      }
     });
     登记朱雀院清理(英雄, "红叶动作-" + 动作索引, function 动作恢复清理(this: void): void {
       removeDelayedCallback(恢复ID);

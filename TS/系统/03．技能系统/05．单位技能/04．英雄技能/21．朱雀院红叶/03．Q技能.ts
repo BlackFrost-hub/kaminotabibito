@@ -2,6 +2,7 @@
 
 import {
   朱雀院红叶技能配置,
+  朱雀院红叶表现配置,
   朱雀院红叶音效配置,
   朱雀院红叶动作配置,
   朱雀院红叶动作槽,
@@ -33,6 +34,9 @@ const { 开始冲锋, 停止位移 } = require("系统.03．技能系统.00．�
   开始冲锋: (this: void, 单位: any, 参数: any) => number;
   停止位移: (this: void, 位移ID: number, 原因?: string) => boolean;
 };
+const { 发射弹道 } = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂") as {
+  发射弹道: (this: void, 参数: any) => any;
+};
 const platformAbilityApi = require("平台扩展API取值") as {
   技能_获取技能最大冷却时间: (this: void, 单位: any, 技能代码: number) => number;
 };
@@ -41,6 +45,9 @@ const platformAbilityAction = require("平台扩展API动作") as {
 };
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { 读取单位攻击力, 两点角度, 单位存活 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
@@ -88,6 +95,53 @@ const Q配置 = 朱雀院红叶待平衡数值.Q;
 const Q冲锋音效 = 朱雀院红叶音效配置.Q冲锋;
 const Q回身斩音效 = 朱雀院红叶音效配置.Q回身斩;
 
+function 创建Q终点特效(this: void, X: number, Y: number, 方向角: number): void {
+  const 路径列表 = 朱雀院红叶表现配置.Q终点.模型路径;
+  const 时长列表 = 朱雀院红叶表现配置.Q终点.持续秒;
+  const 缩放列表 = 朱雀院红叶表现配置.Q终点.缩放列表;
+  for (let i = 0; i < 路径列表.length; i++) {
+    创建点特效({
+      模型路径: 路径列表[i],
+      RGB: 朱雀院红叶表现配置.Q终点.RGB,
+      X,
+      Y,
+      Z: 朱雀院红叶表现配置.Q终点.高度,
+      面向角度: 方向角,
+      动画索引: 0,
+      缩放: 缩放列表?.[i] ?? 朱雀院红叶表现配置.Q终点.缩放,
+      持续秒: 时长列表[i],
+    });
+  }
+}
+
+function 创建派生刀光(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 方向角: number, 伤害值: number, 标签: string, 技能实例ID: number | undefined): void {
+  发射弹道({
+    名称: "朱雀院红叶-派生刀光表现",
+    所有者: 施法者,
+    发射X: GetUnitX(施法者),
+    发射Y: GetUnitY(施法者),
+    发射方向角: 方向角,
+    速度: 朱雀院红叶表现配置.派生刀光.冲锋速度,
+    轨迹: { 类型: "直线", 距离: 朱雀院红叶表现配置.派生刀光.冲锋距离 },
+    模型: 朱雀院红叶表现配置.派生刀光.模型路径,
+    RGB: 朱雀院红叶表现配置.派生刀光.RGB,
+    缩放: 朱雀院红叶表现配置.派生刀光.缩放,
+    飞行高度: 朱雀院红叶表现配置.派生刀光.高度,
+    命中半径: 朱雀院红叶表现配置.派生刀光.命中半径,
+    影响目标: "敌方",
+    碰撞消失: false,
+    每单位最大命中次数: 1,
+    目标筛选: function 红叶派生刀光目标筛选(this: void, 单位: any): boolean {
+      return 单位 !== 施法者 && 单位存活(单位) && jass.IsUnitEnemy(单位, GetOwningPlayer(施法者));
+    },
+    on命中: function 红叶派生刀光命中(this: void, 单位: any, _弹幕ID: number): void {
+      结算Q单体伤害(施法者, 单位, 技能实例ID, 伤害值, 标签);
+    },
+    伤害形态: "AOE",
+    实例控制器: 控制器,
+  });
+}
+
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -110,6 +164,7 @@ interface Q数据 {
   已延长窗口: boolean;
   Q2壳: any;
   Q2到期时间: number;
+  终点特效已创建: boolean;
 }
 
 //=============================================================================
@@ -192,7 +247,7 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
   const 起点X = GetUnitX(施法者);
   const 起点Y = GetUnitY(施法者);
   const 方向 = 两点角度(起点X, 起点Y, GetSpellTargetX(), GetSpellTargetY());
-  const 数据: Q数据 = { 位移ID: 0, 已命中: false, 已Q2: false, 强化已消费: false, 剑痕已读取: false, 已延长窗口: false, Q2壳: null, Q2到期时间: 0 };
+  const 数据: Q数据 = { 位移ID: 0, 已命中: false, 已Q2: false, 强化已消费: false, 剑痕已读取: false, 已延长窗口: false, Q2壳: null, Q2到期时间: 0, 终点特效已创建: false };
   const 控制器 = 创建战斗技能实例({
     技能键: "红叶Q",
     施法者,
@@ -222,18 +277,35 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
     暂停单位: true,
     命中半径: Q配置.命中半径,
     只命中敌人: true,
-    命中后结束: true,
+    // 命中不停车：穿过敌人继续突进，目标落在身后直接衔接 Q2 回身斩
+    命中后结束: false,
     允许重复命中: false,
+    位移特效: 朱雀院红叶表现配置.Q冲锋.模型路径[0],
+    附加位移特效: 朱雀院红叶表现配置.Q冲锋.模型路径[1],
+    位移特效缩放: 朱雀院红叶表现配置.Q冲锋.缩放,
+    位移特效高度: 朱雀院红叶表现配置.Q冲锋.高度,
+    位移特效持续秒: 朱雀院红叶表现配置.Q冲锋.持续秒,
+    位移特效面向角度: 方向,
+    附加位移特效缩放: 朱雀院红叶表现配置.Q冲锋.缩放,
+    附加位移特效高度: 朱雀院红叶表现配置.Q冲锋.高度,
+    附加位移特效持续秒: 朱雀院红叶表现配置.Q冲锋.持续秒,
+    附加位移特效面向角度: 方向,
+    附加位移特效偏移角度: 方向 + 180,
+    附加位移特效偏移距离: 300,
     命中回调: function Q1命中(this: void, _移动单位: any, 目标: any, _位移ID: number): void {
       debugLogForce("红叶-Q", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", Math.floor(读取单位攻击力(施法者) * Q配置.伤害攻击力倍率), "实例", 技能实例ID ?? "-");
       if (数据.已命中) return;
       数据.已命中 = true;
       播放红叶动作(施法者, 朱雀院红叶动作槽.Q命中斩);
+      if (!数据.终点特效已创建) {
+        数据.终点特效已创建 = true;
+        创建Q终点特效(GetUnitX(施法者), GetUnitY(施法者), 方向);
+      }
       结算Q单体伤害(施法者, 目标, 技能实例ID, 读取单位攻击力(施法者) * Q配置.伤害攻击力倍率, "朱雀院红叶-Q1");
       施加朱雀院破绽(施法者, 目标);
       // D 强化：Q1 命中追加一次短距离朱雀刀光（进入强化分支才消费）
       if (联动D.尝试消费D强化 != null && 联动D.尝试消费D强化(施法者)) {
-        结算Q单体伤害(施法者, 目标, 技能实例ID, 读取单位攻击力(施法者) * Q配置.D刀光攻击力倍率, "朱雀院红叶-Q1D刀光");
+        创建派生刀光(施法者, 控制器, 方向, 读取单位攻击力(施法者) * Q配置.D刀光攻击力倍率, "朱雀院红叶-Q1D刀光", 技能实例ID);
       }
       开启Q2窗口(施法者, 控制器, 数据);
     },
@@ -242,8 +314,12 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
       const 最大 = platformAbilityApi.技能_获取技能最大冷却时间(移动单位, Q技能ID);
       platformAbilityAction.技能_设置技能冷却时间(移动单位, Q技能ID, Q配置.短惩罚冷却秒, 最大);
     },
-    结束回调: function Q1位移结束(this: void, _移动单位: any, _原因: string, _位移ID: number): void {
+    结束回调: function Q1位移结束(this: void, 移动单位: any, 原因: string, _位移ID: number): void {
       数据.位移ID = 0;
+      if (!数据.已命中 && 原因 === "完成" && !数据.终点特效已创建) {
+        数据.终点特效已创建 = true;
+        创建Q终点特效(GetUnitX(移动单位), GetUnitY(移动单位), 方向);
+      }
       if (!数据.已命中) 控制器.完成();
     },
   });
@@ -262,16 +338,19 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
 
 function 执行Q2回身斩(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: Q数据): void {
   播放红叶动作(施法者, 朱雀院红叶动作槽.Q2回身斩);
-  const 方向 = GetUnitFacing(施法者); // 角度制（与扇形区域方向角一致）
+  const 方向 = GetUnitFacing(施法者); // 角度制
+  // 回身斩攻击身后扇形：以当前朝向的反方向为中心（穿越冲锋后目标在身后）
+  const 背向 = 方向 + 180;
   const X = GetUnitX(施法者);
   const Y = GetUnitY(施法者);
+  创建Q终点特效(X, Y, 背向);
   // 回身斩音（Q2 结算点；坐标=施法者位置，参数配置驱动）
   Sound3DII_CooPlayReuse(Q回身斩音效.路径, X, Y, Q回身斩音效.高度, Q回身斩音效.裁断距离);
   const 扇形敌人 = 获取扇形区域单位({
     X,
     Y,
     半径: Q配置.Q2扇形半径,
-    方向角: 方向,
+    方向角: 背向,
     扇形角度: Q配置.Q2扇形角度,
     单位筛选: function Q2筛选(this: void, 单位: any): boolean {
       return 单位 !== 施法者 && 单位存活(单位) && jass.IsUnitEnemy(单位, jass.GetOwningPlayer(施法者));
@@ -285,9 +364,7 @@ function 执行Q2回身斩(this: void, 施法者: any, 控制器: 战斗技能�
   if (!数据.强化已消费) {
     数据.强化已消费 = true;
     if (尝试消费一层刀势(施法者)) {
-      for (let i = 0; i < 扇形敌人.length; i++) {
-        结算Q单体伤害(施法者, 扇形敌人[i], 技能实例ID, 读取单位攻击力(施法者) * Q配置.刀势剑气攻击力倍率, "朱雀院红叶-Q2刀势剑气");
-      }
+      创建派生刀光(施法者, 控制器, 背向, 读取单位攻击力(施法者) * Q配置.刀势剑气攻击力倍率, "朱雀院红叶-Q2刀势剑气", 技能实例ID);
     }
   }
   // 剑痕读取：每次 Q 最多读取一条 E 剑痕，沿剑痕方向追加回响（读取即锁定）
@@ -295,6 +372,7 @@ function 执行Q2回身斩(this: void, 施法者: any, 控制器: 战斗技能�
     数据.剑痕已读取 = true;
     const 剑痕 = 联动E.读取最近剑痕并锁定 != null ? 联动E.读取最近剑痕并锁定(施法者) : null;
     if (剑痕 != null) {
+      debugLogForce("红叶-Q", "状态", "剑痕回响", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
       for (let i = 0; i < 扇形敌人.length; i++) {
         结算Q单体伤害(施法者, 扇形敌人[i], 技能实例ID, 读取单位攻击力(施法者) * Q配置.剑痕回响攻击力倍率, "朱雀院红叶-Q2剑痕回响");
       }
@@ -346,6 +424,7 @@ export function 延长Q2窗口(this: void, 施法者: any, 延长秒: number): v
     数据.Q2壳 = null;
     数据.Q2到期时间 = 0;
     开启Q2窗口(施法者, 控制器, 数据, 新窗口秒);
+    debugLogForce("红叶-Q", "状态", "Q2窗口延长", "新窗口秒", 新窗口秒);
     return;
   }
 }
@@ -384,3 +463,4 @@ export const 朱雀院红叶Q模块 = {
   二段窗口秒: Q配置.Q2窗口秒,
   注册: 注册朱雀院红叶Q,
 } as const;
+

@@ -26,9 +26,10 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
 };
-const { 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+const { 创建单位坐标跟随特效, 销毁单位坐标跟随特效, 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }) => any;
   销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
@@ -164,6 +165,18 @@ export function 尝试消费D强化(this: void, 英雄: any): boolean {
   if (状态 == null || 状态.剩余次数 <= 0) return false;
   状态.剩余次数 = 状态.剩余次数 - 1;
   刷新D显示(英雄, 状态);
+  const D收尾模型路径 = 朱雀院红叶表现配置.D收尾.模型路径 as string;
+  if (状态.剩余次数 <= 0 && D收尾模型路径 !== "") {
+    创建点特效({
+      模型路径: D收尾模型路径,
+      RGB: 朱雀院红叶表现配置.D收尾.RGB,
+      X: jass.GetUnitX(英雄),
+      Y: jass.GetUnitY(英雄),
+      Z: 朱雀院红叶表现配置.D收尾.高度,
+      缩放: 朱雀院红叶表现配置.D收尾.缩放,
+      持续秒: 朱雀院红叶表现配置.D收尾.持续秒,
+    });
+  }
   return true;
 }
 
@@ -207,6 +220,7 @@ function 破绽斩延长D(this: void, 红叶: any, _目标: any): void {
     移除D状态(红叶);
   });
   刷新D显示(红叶, 状态);
+  debugLogForce("红叶-D", "状态", "秘传延长", "延长次数", 状态.延长次数);
 }
 
 //=============================================================================

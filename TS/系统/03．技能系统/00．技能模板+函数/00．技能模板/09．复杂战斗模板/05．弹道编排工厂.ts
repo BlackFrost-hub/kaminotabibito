@@ -148,6 +148,7 @@ export interface 弹道编排参数 {
   最大总命中次数?: number;
   /** 命中即消失（默认 true）；false = 穿透 */
   碰撞消失?: boolean;
+  目标筛选?: 原生弹幕参数["目标筛选"];
   on命中?: (this: void, 目标: any, 弹幕ID: number) => void;
   /** 到达轨迹终点 / 最大距离终点 */
   on到达点?: (this: void, 弹幕ID: number, 原因: "完成" | "距离结束") => void;
@@ -312,6 +313,7 @@ export function 发射弹道(this: void, 参数: 弹道编排参数): 弹道编�
       每单位最大命中次数: 参数.每单位最大命中次数 ?? 1,
       最大总命中次数: 参数.最大总命中次数,
       碰撞消失: 参数.碰撞消失 ?? true,
+      目标筛选: 参数.目标筛选,
       on命中: 参数.on命中,
       on到达目标点: 参数.on到达点,
       onTick: 参数.onTick,

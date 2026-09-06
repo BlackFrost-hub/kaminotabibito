@@ -10,6 +10,7 @@ local _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E[
 local _____6731_96C0_9662_7EA2_53F6_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶音效配置"]
 local _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["朱雀院红叶动作槽"]
 local _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C = ____00_FF0E_914D_7F6E["朱雀院红叶待平衡数值"]
+local _____6731_96C0_9662_7EA2_53F6_8BFB_6761_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶读条配置"]
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
@@ -17,34 +18,42 @@ local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_1.addDelayedCallback
 local removeDelayedCallback = ____require_result_1.removeDelayedCallback
+local addPeriodicCallback = ____require_result_1.addPeriodicCallback
+local removePeriodicCallback = ____require_result_1.removePeriodicCallback
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
-local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
-local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["创建战斗技能实例"]
-local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["查询战斗技能实例"]
-local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_4["造成技能伤害"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_5["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_5["两点角度"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
-local _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_6["获取扇形区域单位"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
-local ____require_result_8 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_CooPlayReuse = ____require_result_8.Sound3DII_CooPlayReuse
-local ____require_result_9 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
-local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_9["播放英雄技能喊话"]
-local ____require_result_10 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.02．被动效果")
-local _____65BD_52A0_6731_96C0_9662_7834_7EFD = ____require_result_10["施加朱雀院破绽"]
-local _____5C1D_8BD5_6D88_8D39_4E00_5C42_5200_52BF = ____require_result_10["尝试消费一层刀势"]
-local _____662F_6731_96C0_9662_7EA2_53F6 = ____require_result_10["是朱雀院红叶"]
-local _____767B_8BB0_6731_96C0_9662_6E05_7406 = ____require_result_10["登记朱雀院清理"]
-local _____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_10["播放红叶动作"]
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_3["开始硬直"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
+local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_4["创建战斗技能实例"]
+local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_4["查询战斗技能实例"]
+local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_5["造成技能伤害"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_6["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_6["两点角度"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
+local _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_7["获取扇形区域单位"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local ____require_result_9 = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI")
+local _____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_9["创建世界坐标进度UI"]
+local _____66F4_65B0_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_9["更新世界坐标进度UI"]
+local _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_9["销毁世界坐标进度UI"]
+local ____require_result_10 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_10.Sound3DII_CooPlayReuse
+local ____require_result_11 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_11["播放英雄技能喊话"]
+local ____require_result_12 = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.02．被动效果")
+local _____65BD_52A0_6731_96C0_9662_7834_7EFD = ____require_result_12["施加朱雀院破绽"]
+local _____5C1D_8BD5_6D88_8D39_4E00_5C42_5200_52BF = ____require_result_12["尝试消费一层刀势"]
+local _____662F_6731_96C0_9662_7EA2_53F6 = ____require_result_12["是朱雀院红叶"]
+local _____767B_8BB0_6731_96C0_9662_6E05_7406 = ____require_result_12["登记朱雀院清理"]
+local _____64AD_653E_7EA2_53F6_52A8_4F5C = ____require_result_12["播放红叶动作"]
 local _____8054_52A8D = require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.07．D技能")
-local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_11.debugLogForce
+local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_13.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E["单位类型ID"])
 local ____E_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.E["技能ID"])
 local ____E_914D_7F6E = _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C.E
@@ -126,9 +135,10 @@ local function _____521B_5EFA_5251_75D5(_____6765_6E90_82F1_96C4, X, Y, _____65B
         _____82F1_96C4_5251_75D5_5217_8868[_____82F1_96C4ID] = _____5217_8868
     end
     _____5217_8868[#_____5217_8868 + 1] = _____5E8F_53F7
-    if _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E剑痕"]["模型路径"] ~= nil and _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E剑痕"]["模型路径"] ~= "" then
+    local ____E_5251_75D5_6A21_578B_8DEF_5F84 = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E剑痕"]["模型路径"]
+    if ____E_5251_75D5_6A21_578B_8DEF_5F84 ~= "" then
         _____5251_75D5["特效句柄"] = _____521B_5EFA_70B9_7279_6548({
-            ["模型路径"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E剑痕"]["模型路径"],
+            ["模型路径"] = ____E_5251_75D5_6A21_578B_8DEF_5F84,
             RGB = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E剑痕"].RGB,
             X = X,
             Y = Y,
@@ -242,8 +252,57 @@ local function _____53D6_6BB5_6247_5F62_654C_4EBA(_____65BD_6CD5_8005, _____6570
         end
     })
 end
+local function _____521B_5EFAE_53E0_52A0_65A9_5149(_____914D_7F6E, X, Y, _____65B9_5411_89D2)
+    local ____521B_5EFA_70B9_7279_6548_21 = _____521B_5EFA_70B9_7279_6548
+    local ____914D_7F6E__6A21_578B_8DEF_5F84_15 = _____914D_7F6E["模型路径"]
+    local ____914D_7F6E_RGB_16 = _____914D_7F6E.RGB
+    local ____X_17 = X
+    local ____Y_18 = Y
+    local ____914D_7F6E__9AD8_5EA6_19 = _____914D_7F6E["高度"]
+    local ____GetRandomInt_result_20 = GetRandomInt(0, 359)
+    local ____914D_7F6E__53E0_52A0_7F29_653E_14 = _____914D_7F6E["叠加缩放"]
+    if ____914D_7F6E__53E0_52A0_7F29_653E_14 == nil then
+        ____914D_7F6E__53E0_52A0_7F29_653E_14 = _____914D_7F6E["缩放"]
+    end
+    ____521B_5EFA_70B9_7279_6548_21({
+        ["模型路径"] = ____914D_7F6E__6A21_578B_8DEF_5F84_15,
+        RGB = ____914D_7F6E_RGB_16,
+        X = ____X_17,
+        Y = ____Y_18,
+        Z = ____914D_7F6E__9AD8_5EA6_19,
+        ["面向角度"] = ____GetRandomInt_result_20,
+        ["动画索引"] = 0,
+        ["缩放"] = ____914D_7F6E__53E0_52A0_7F29_653E_14,
+        ["持续秒"] = _____914D_7F6E["持续秒"]
+    })
+    if _____914D_7F6E["叠加模型路径"] ~= nil and _____914D_7F6E["叠加模型路径"] ~= "" then
+        local ____521B_5EFA_70B9_7279_6548_29 = _____521B_5EFA_70B9_7279_6548
+        local ____914D_7F6E__53E0_52A0_6A21_578B_8DEF_5F84_23 = _____914D_7F6E["叠加模型路径"]
+        local ____914D_7F6E_RGB_24 = _____914D_7F6E.RGB
+        local ____X_25 = X
+        local ____Y_26 = Y
+        local ____914D_7F6E__9AD8_5EA6_27 = _____914D_7F6E["高度"]
+        local ____GetRandomInt_result_28 = GetRandomInt(0, 359)
+        local ____914D_7F6E__53E0_52A0_7F29_653E_22 = _____914D_7F6E["叠加缩放"]
+        if ____914D_7F6E__53E0_52A0_7F29_653E_22 == nil then
+            ____914D_7F6E__53E0_52A0_7F29_653E_22 = _____914D_7F6E["缩放"]
+        end
+        ____521B_5EFA_70B9_7279_6548_29({
+            ["模型路径"] = ____914D_7F6E__53E0_52A0_6A21_578B_8DEF_5F84_23,
+            RGB = ____914D_7F6E_RGB_24,
+            X = ____X_25,
+            Y = ____Y_26,
+            Z = ____914D_7F6E__9AD8_5EA6_27,
+            ["面向角度"] = ____GetRandomInt_result_28,
+            ["动画索引"] = 0,
+            ["缩放"] = ____914D_7F6E__53E0_52A0_7F29_653E_22,
+            ["持续秒"] = _____914D_7F6E["持续秒"]
+        })
+    end
+end
 local function _____6267_884CE_4E00_6BB5(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
     _____6570_636E["已斩段数"] = 1
+    _____521B_5EFAE_53E0_52A0_65A9_5149(_____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E第一斩"], _____6570_636E["目标X"], _____6570_636E["目标Y"], _____6570_636E["方向角"])
     Sound3DII_CooPlayReuse(
         ____E_8F7B_65A9_97F3_6548["路径"],
         _____6570_636E["目标X"],
@@ -259,7 +318,7 @@ local function _____6267_884CE_4E00_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                 local id = jass.GetHandleId(_____654C_4EBA[i + 1])
                 local _____6B21_6570 = _____6570_636E["同目标次数"][id] or 0
                 if _____6B21_6570 >= ____E_914D_7F6E["同目标最大次数"] then
-                    goto __continue30
+                    goto __continue32
                 end
                 _____6570_636E["同目标次数"][id] = _____6B21_6570 + 1
                 _____7ED3_7B97E_6BB5_4F24_5BB3(
@@ -270,13 +329,14 @@ local function _____6267_884CE_4E00_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                     "朱雀院红叶-E第一斩"
                 )
             end
-            ::__continue30::
+            ::__continue32::
             i = i + 1
         end
     end
 end
 local function _____6267_884CE_4E8C_6BB5(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
     _____6570_636E["已斩段数"] = 2
+    _____521B_5EFAE_53E0_52A0_65A9_5149(_____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E第二斩"], _____6570_636E["目标X"], _____6570_636E["目标Y"], _____6570_636E["方向角"])
     Sound3DII_CooPlayReuse(
         ____E_8F7B_65A9_97F3_6548["路径"],
         _____6570_636E["目标X"],
@@ -292,7 +352,7 @@ local function _____6267_884CE_4E8C_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                 local id = jass.GetHandleId(_____654C_4EBA[i + 1])
                 local _____6B21_6570 = _____6570_636E["同目标次数"][id] or 0
                 if _____6B21_6570 >= ____E_914D_7F6E["同目标最大次数"] then
-                    goto __continue34
+                    goto __continue36
                 end
                 _____6570_636E["同目标次数"][id] = _____6B21_6570 + 1
                 _____7ED3_7B97E_6BB5_4F24_5BB3(
@@ -303,13 +363,14 @@ local function _____6267_884CE_4E8C_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                     "朱雀院红叶-E第二斩"
                 )
             end
-            ::__continue34::
+            ::__continue36::
             i = i + 1
         end
     end
 end
 local function _____6267_884CE_4E09_6BB5(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
     _____6570_636E["已斩段数"] = 3
+    _____521B_5EFAE_53E0_52A0_65A9_5149(_____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E第三斩"], _____6570_636E["目标X"], _____6570_636E["目标Y"], _____6570_636E["方向角"])
     local _____5019_9009 = ____E_7EC8_7ED3_97F3_6548["候选路径"]
     local _____7EC8_7ED3_8DEF_5F84 = _____5019_9009 ~= nil and #_____5019_9009 > 0 and _____5019_9009[GetRandomInt(1, #_____5019_9009)] or ____E_7EC8_7ED3_97F3_6548["路径"]
     Sound3DII_CooPlayReuse(
@@ -327,7 +388,7 @@ local function _____6267_884CE_4E09_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                 local id = jass.GetHandleId(_____654C_4EBA[i + 1])
                 local _____6B21_6570 = _____6570_636E["同目标次数"][id] or 0
                 if _____6B21_6570 >= ____E_914D_7F6E["同目标最大次数"] then
-                    goto __continue38
+                    goto __continue40
                 end
                 _____6570_636E["同目标次数"][id] = _____6B21_6570 + 1
                 _____7ED3_7B97E_6BB5_4F24_5BB3(
@@ -338,23 +399,25 @@ local function _____6267_884CE_4E09_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                     "朱雀院红叶-E第三斩"
                 )
             end
-            ::__continue38::
+            ::__continue40::
             i = i + 1
         end
     end
     local _____4E3B_5251_75D5 = _____521B_5EFA_5251_75D5(_____65BD_6CD5_8005, _____6570_636E["目标X"], _____6570_636E["目标Y"], _____6570_636E["方向角"])
-    local ____6570_636E__672CE_5251_75D5_12 = _____6570_636E["本E剑痕"]
-    ____6570_636E__672CE_5251_75D5_12[#____6570_636E__672CE_5251_75D5_12 + 1] = _____4E3B_5251_75D5
+    local ____6570_636E__672CE_5251_75D5_30 = _____6570_636E["本E剑痕"]
+    ____6570_636E__672CE_5251_75D5_30[#____6570_636E__672CE_5251_75D5_30 + 1] = _____4E3B_5251_75D5
     if ____E_914D_7F6E["刀势强化第二剑痕"] and _____5C1D_8BD5_6D88_8D39_4E00_5C42_5200_52BF(_____65BD_6CD5_8005) then
-        local ____6570_636E__672CE_5251_75D5_13 = _____6570_636E["本E剑痕"]
-        ____6570_636E__672CE_5251_75D5_13[#____6570_636E__672CE_5251_75D5_13 + 1] = _____521B_5EFA_5251_75D5(_____65BD_6CD5_8005, _____6570_636E["目标X"], _____6570_636E["目标Y"], _____6570_636E["方向角"] + 90)
+        local ____6570_636E__672CE_5251_75D5_31 = _____6570_636E["本E剑痕"]
+        ____6570_636E__672CE_5251_75D5_31[#____6570_636E__672CE_5251_75D5_31 + 1] = _____521B_5EFA_5251_75D5(_____65BD_6CD5_8005, _____6570_636E["目标X"], _____6570_636E["目标Y"], _____6570_636E["方向角"] + 90)
     elseif ____E_914D_7F6E["D强化第二剑痕"] and _____8054_52A8D["尝试消费D强化"] ~= nil and _____8054_52A8D["尝试消费D强化"](_____65BD_6CD5_8005) then
-        local ____6570_636E__672CE_5251_75D5_14 = _____6570_636E["本E剑痕"]
-        ____6570_636E__672CE_5251_75D5_14[#____6570_636E__672CE_5251_75D5_14 + 1] = _____521B_5EFA_5251_75D5(_____65BD_6CD5_8005, _____6570_636E["目标X"], _____6570_636E["目标Y"], _____6570_636E["方向角"] + 90)
+        local ____6570_636E__672CE_5251_75D5_32 = _____6570_636E["本E剑痕"]
+        ____6570_636E__672CE_5251_75D5_32[#____6570_636E__672CE_5251_75D5_32 + 1] = _____521B_5EFA_5251_75D5(_____65BD_6CD5_8005, _____6570_636E["目标X"], _____6570_636E["目标Y"], _____6570_636E["方向角"] + 90)
     end
     _____63A7_5236_5668["完成"]()
 end
 local function _____91CA_653EE_4E09_53F6_6563_534E(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
+    local _____76EE_6807X = GetSpellTargetX()
+    local _____76EE_6807Y = GetSpellTargetY()
     debugLogForce(
         "红叶-E",
         "释放",
@@ -371,9 +434,9 @@ local function _____91CA_653EE_4E09_53F6_6563_534E(_context, _____65BD_6CD5_8005
         "施法者Y",
         math.floor(GetUnitY(_____65BD_6CD5_8005)),
         "目标X",
-        math.floor(GetSpellTargetX()),
+        math.floor(_____76EE_6807X),
         "目标Y",
-        math.floor(GetSpellTargetY())
+        math.floor(_____76EE_6807Y)
     )
     if not _____662F_6731_96C0_9662_7EA2_53F6(_____65BD_6CD5_8005) then
         debugLogForce(
@@ -386,7 +449,6 @@ local function _____91CA_653EE_4E09_53F6_6563_534E(_context, _____65BD_6CD5_8005
         )
         return
     end
-    _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["E连续三斩"])
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "红叶E") > 0 then
         debugLogForce(
             "红叶-E",
@@ -398,9 +460,9 @@ local function _____91CA_653EE_4E09_53F6_6563_534E(_context, _____65BD_6CD5_8005
         )
         return
     end
+    _____5F00_59CB_786C_76F4(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["E连续三斩"]["持续秒"])
+    _____64AD_653E_7EA2_53F6_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["E连续三斩"])
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院红叶", _____6731_96C0_9662_7EA2_53F6_6280_80FD_914D_7F6E.E["技能ID"])
-    local _____76EE_6807X = GetSpellTargetX()
-    local _____76EE_6807Y = GetSpellTargetY()
     local _____65B9_5411_89D2 = _____4E24_70B9_89D2_5EA6(
         GetUnitX(_____65BD_6CD5_8005),
         GetUnitY(_____65BD_6CD5_8005),
@@ -416,6 +478,45 @@ local function _____91CA_653EE_4E09_53F6_6563_534E(_context, _____65BD_6CD5_8005
         ["同目标次数"] = {},
         ["本E剑痕"] = {}
     }
+    local ____E_8FDB_5EA6_6700_5927_503C = _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD["E连续三斩"]["持续秒"]
+    _____6570_636E["进度UI"] = _____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI({
+        X = GetUnitX(_____65BD_6CD5_8005),
+        Y = GetUnitY(_____65BD_6CD5_8005),
+        Z = 0,
+        ["跟随单位"] = _____65BD_6CD5_8005,
+        ["跟随Z偏移"] = _____6731_96C0_9662_7EA2_53F6_8BFB_6761_914D_7F6E["跟随Z偏移"],
+        ["最大值"] = ____E_8FDB_5EA6_6700_5927_503C,
+        ["当前值"] = 0,
+        ["标题"] = _____6731_96C0_9662_7EA2_53F6_8BFB_6761_914D_7F6E["标题"] or "三叶·散华",
+        ["数值后缀"] = _____6731_96C0_9662_7EA2_53F6_8BFB_6761_914D_7F6E["数值后缀"],
+        ["类型"] = _____6731_96C0_9662_7EA2_53F6_8BFB_6761_914D_7F6E["UI类型"]
+    })
+    local ____E_5DF2_6D41_901D_79D2 = 0
+    local ____E_8FDB_5EA6_5468_671FID
+    ____E_8FDB_5EA6_5468_671FID = addPeriodicCallback(
+        50,
+        function()
+            if _____6570_636E["进度UI"] == nil then
+                removePeriodicCallback(____E_8FDB_5EA6_5468_671FID)
+                return
+            end
+            ____E_5DF2_6D41_901D_79D2 = ____E_5DF2_6D41_901D_79D2 + 0.05
+            _____66F4_65B0_4E16_754C_5750_6807_8FDB_5EA6UI(_____6570_636E["进度UI"], ____E_5DF2_6D41_901D_79D2)
+            if ____E_5DF2_6D41_901D_79D2 >= ____E_8FDB_5EA6_6700_5927_503C then
+                removePeriodicCallback(____E_8FDB_5EA6_5468_671FID)
+            end
+        end
+    )
+    addDelayedCallback(
+        ____E_8FDB_5EA6_6700_5927_503C * 1000,
+        function()
+            if _____6570_636E["进度UI"] == nil then
+                return
+            end
+            _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI(_____6570_636E["进度UI"])
+            _____6570_636E["进度UI"] = nil
+        end
+    )
     local _____63A7_5236_5668 = _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B({
         ["技能键"] = "红叶E",
         ["施法者"] = _____65BD_6CD5_8005,
@@ -430,6 +531,10 @@ local function _____91CA_653EE_4E09_53F6_6563_534E(_context, _____65BD_6CD5_8005
                 "玩家",
                 GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
             )
+            if _____539F_56E0 ~= "完成" then
+                _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI(_____6570_636E["进度UI"])
+                _____6570_636E["进度UI"] = nil
+            end
             do
                 local i = 0
                 while i < #_____6570_636E["段回调ID"] do
@@ -466,8 +571,8 @@ local function _____91CA_653EE_4E09_53F6_6563_534E(_context, _____65BD_6CD5_8005
         while i < #_____6BB5_56DE_8C03 do
             local _____5EF6_8FDF = ____E_914D_7F6E["每段延迟毫秒"][i + 1] or 0
             local _____56DE_8C03ID = addDelayedCallback(_____5EF6_8FDF, _____6BB5_56DE_8C03[i + 1])
-            local ____6570_636E__6BB5_56DE_8C03ID_15 = _____6570_636E["段回调ID"]
-            ____6570_636E__6BB5_56DE_8C03ID_15[#____6570_636E__6BB5_56DE_8C03ID_15 + 1] = _____56DE_8C03ID
+            local ____6570_636E__6BB5_56DE_8C03ID_33 = _____6570_636E["段回调ID"]
+            ____6570_636E__6BB5_56DE_8C03ID_33[#____6570_636E__6BB5_56DE_8C03ID_33 + 1] = _____56DE_8C03ID
             _____63A7_5236_5668["登记延迟回调"](_____56DE_8C03ID)
             i = i + 1
         end
