@@ -11,6 +11,8 @@ export const 芙莉莲BuffID = {
   解析完成: "E022",
   /** 演算魔弹：下一次普攻强化窗口 */
   演算魔弹: "E023",
+  /** 高处飞行保护：E 位移期间降低受到的伤害 */
+  高处飞行保护: "E024",
 } as const;
 
 export const 芙莉莲Buff表: Record<string, BuffData> = {
@@ -85,5 +87,23 @@ export const 芙莉莲Buff表: Record<string, BuffData> = {
     priority: 73,
     canPurge: false,
     tooltip: "下一次普攻为演算魔弹：命中解析目标追加 35% 伤害（解析完成目标 50%），并减 Q/W 冷却 1 秒。",
+  },
+  [芙莉莲BuffID.高处飞行保护]: {
+    buffID: 芙莉莲BuffID.高处飞行保护,
+    buffName: "高处飞行保护",
+    icon: "BuffIcon\\Hero\\Frieren\\frieren_e_flight_guard.blp",
+    effect: "",
+    effectMode: "attach",
+    effectAttachPoint: "origin",
+    effectScale: 1,
+    type: "Buff:magic:defense",
+    interval: 0,
+    maxStack: 1,
+    stackRule: "highest",
+    stackRefresh: true,
+    dispelLevel: 3,
+    priority: 74,
+    canPurge: false,
+    tooltip: "飞行位移期间受到的伤害降低 40%；位移结束、被打断或死亡时立即结束。",
   },
 };

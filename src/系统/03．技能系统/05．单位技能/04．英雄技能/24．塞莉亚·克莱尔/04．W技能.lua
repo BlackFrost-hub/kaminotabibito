@@ -28,7 +28,7 @@ local getGameTime = ____require_result_1.getGameTime
 local ____require_result_2 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
 local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_3.registerDamageModifier
+local ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668 = ____require_result_3["register护盾前拦截修改器"]
 local unregisterDamageModifier = ____require_result_3.unregisterDamageModifier
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
 local _____5F00_59CB_62A4_76FE = ____require_result_4["开始护盾"]
@@ -198,89 +198,86 @@ local function _____91CA_653EW_89E3_6790_7ED3_754C(_context, _____65BD_6CD5_8005
         }
     )
     Sound3DII_UnitPlayReuse(_____585E_8389_4E9A_97F3_6548_914D_7F6E["W展开"]["路径"], _____65BD_6CD5_8005, _____585E_8389_4E9A_97F3_6548_914D_7F6E["W展开"]["裁断距离"])
-    _____6570_636E["修改器ID"] = registerDamageModifier(
-        function(context)
-            if _____6570_636E["已关闭"] or _____6570_636E["主要攻击已解析"] then
-                return context.currentDamage
-            end
-            if context.target ~= _____65BD_6CD5_8005 then
-                return context.currentDamage
-            end
-            if not (context.currentDamage > 0) then
-                return context.currentDamage
-            end
-            local _____653B_51FB_8005 = context.attacker
-            if _____653B_51FB_8005 == nil or _____653B_51FB_8005 == 0 or _____653B_51FB_8005 == _____65BD_6CD5_8005 then
-                return context.currentDamage
-            end
-            if not jass.IsUnitEnemy(
-                _____653B_51FB_8005,
-                jass.GetOwningPlayer(_____65BD_6CD5_8005)
-            ) then
-                return context.currentDamage
-            end
-            if getGameTime() >= _____6570_636E["窗口结束时间"] then
-                return context.currentDamage
-            end
-            _____6570_636E["主要攻击已解析"] = true
-            Sound3DII_UnitPlayReuse(_____585E_8389_4E9A_97F3_6548_914D_7F6E["W共鸣"]["路径"], _____65BD_6CD5_8005, _____585E_8389_4E9A_97F3_6548_914D_7F6E["W共鸣"]["裁断距离"])
-            addDelayedCallback(
-                10,
-                function()
-                    if _____6570_636E["已关闭"] then
-                        return
-                    end
-                    unregisterDamageModifier(_____6570_636E["修改器ID"])
-                    _____6570_636E["修改器ID"] = 0
-                    if _____5355_4F4D_5B58_6D3B(_____653B_51FB_8005) then
-                        debugLogForce(
-                            "塞莉亚-W",
-                            "命中",
-                            "玩家",
-                            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                            "四码",
-                            _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.W["技能ID"],
-                            "目标",
-                            GetUnitName(_____653B_51FB_8005),
-                            "handle",
-                            _____653B_51FB_8005,
-                            "X",
-                            math.floor(GetUnitX(_____653B_51FB_8005)),
-                            "Y",
-                            math.floor(GetUnitY(_____653B_51FB_8005)),
-                            "伤害",
-                            _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["反冲伤害攻击力倍率"]
-                        )
-                        _____9020_6210_6280_80FD_4F24_5BB3({
-                            ["来源"] = _____65BD_6CD5_8005,
-                            ["目标"] = _____653B_51FB_8005,
-                            ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["反冲伤害攻击力倍率"],
-                            ["伤害类型"] = DAMAGE_TYPE_MAGIC,
-                            ["攻击类型"] = ATTACK_TYPE_NORMAL,
-                            ["武器类型"] = WEAPON_TYPE_WHOKNOWS,
-                            ["来源类型"] = "单位技能",
-                            ["标签"] = "塞莉亚-解析反冲",
-                            ["伤害形态"] = "单体",
-                            ["参与技能伤害加成"] = true
-                        })
-                        _____65BD_52A0_6269_5C55_63A7_5236(_____65BD_6CD5_8005, _____653B_51FB_8005, "slow", _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["反冲减速秒"])
-                    end
-                    if _____6709_7ED3_754C_951A_5B9A_8FDE_63A5(_____65BD_6CD5_8005) and _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
-                        ____AOE_65BD_52A0_6269_5C55_63A7_5236(
-                            _____65BD_6CD5_8005,
-                            GetUnitX(_____65BD_6CD5_8005),
-                            GetUnitY(_____65BD_6CD5_8005),
-                            _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["结界锚定束缚半径"],
-                            "roots",
-                            _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["结界锚定束缚秒"]
-                        )
-                    end
+    _____6570_636E["修改器ID"] = ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668(function(context)
+        if _____6570_636E["已关闭"] or _____6570_636E["主要攻击已解析"] then
+            return context.currentDamage
+        end
+        if context.target ~= _____65BD_6CD5_8005 then
+            return context.currentDamage
+        end
+        if not (context.currentDamage > 0) then
+            return context.currentDamage
+        end
+        local _____653B_51FB_8005 = context.attacker
+        if _____653B_51FB_8005 == nil or _____653B_51FB_8005 == 0 or _____653B_51FB_8005 == _____65BD_6CD5_8005 then
+            return context.currentDamage
+        end
+        if not jass.IsUnitEnemy(
+            _____653B_51FB_8005,
+            jass.GetOwningPlayer(_____65BD_6CD5_8005)
+        ) then
+            return context.currentDamage
+        end
+        if getGameTime() >= _____6570_636E["窗口结束时间"] then
+            return context.currentDamage
+        end
+        _____6570_636E["主要攻击已解析"] = true
+        Sound3DII_UnitPlayReuse(_____585E_8389_4E9A_97F3_6548_914D_7F6E["W共鸣"]["路径"], _____65BD_6CD5_8005, _____585E_8389_4E9A_97F3_6548_914D_7F6E["W共鸣"]["裁断距离"])
+        addDelayedCallback(
+            10,
+            function()
+                if _____6570_636E["已关闭"] then
+                    return
                 end
-            )
-            return context.currentDamage * (1 - _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["解析减免比例"])
-        end,
-        50
-    )
+                unregisterDamageModifier(_____6570_636E["修改器ID"])
+                _____6570_636E["修改器ID"] = 0
+                if _____5355_4F4D_5B58_6D3B(_____653B_51FB_8005) then
+                    debugLogForce(
+                        "塞莉亚-W",
+                        "命中",
+                        "玩家",
+                        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                        "四码",
+                        _____585E_8389_4E9A_514B_83B1_5C14_6280_80FD_914D_7F6E.W["技能ID"],
+                        "目标",
+                        GetUnitName(_____653B_51FB_8005),
+                        "handle",
+                        _____653B_51FB_8005,
+                        "X",
+                        math.floor(GetUnitX(_____653B_51FB_8005)),
+                        "Y",
+                        math.floor(GetUnitY(_____653B_51FB_8005)),
+                        "伤害",
+                        _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["反冲伤害攻击力倍率"]
+                    )
+                    _____9020_6210_6280_80FD_4F24_5BB3({
+                        ["来源"] = _____65BD_6CD5_8005,
+                        ["目标"] = _____653B_51FB_8005,
+                        ["伤害"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["反冲伤害攻击力倍率"],
+                        ["伤害类型"] = DAMAGE_TYPE_MAGIC,
+                        ["攻击类型"] = ATTACK_TYPE_NORMAL,
+                        ["武器类型"] = WEAPON_TYPE_WHOKNOWS,
+                        ["来源类型"] = "单位技能",
+                        ["标签"] = "塞莉亚-解析反冲",
+                        ["伤害形态"] = "单体",
+                        ["参与技能伤害加成"] = true
+                    })
+                    _____65BD_52A0_6269_5C55_63A7_5236(_____65BD_6CD5_8005, _____653B_51FB_8005, "slow", _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["反冲减速秒"])
+                end
+                if _____6709_7ED3_754C_951A_5B9A_8FDE_63A5(_____65BD_6CD5_8005) and _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
+                    ____AOE_65BD_52A0_6269_5C55_63A7_5236(
+                        _____65BD_6CD5_8005,
+                        GetUnitX(_____65BD_6CD5_8005),
+                        GetUnitY(_____65BD_6CD5_8005),
+                        _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["结界锚定束缚半径"],
+                        "roots",
+                        _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["结界锚定束缚秒"]
+                    )
+                end
+            end
+        )
+        return context.currentDamage * (1 - _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["解析减免比例"])
+    end)
     addDelayedCallback(
         _____585E_8389_4E9A_514B_83B1_5C14W_914D_7F6E["保护窗口秒"] * 1000,
         function()

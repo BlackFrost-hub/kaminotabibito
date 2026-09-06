@@ -7,6 +7,7 @@ import {
   朱雀院红叶动作槽,
   朱雀院红叶待平衡数值,
 } from "./00．配置";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 
 const jass = require("jass.common") as any;
 const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -20,8 +21,8 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
-  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => any[];
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
+  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => 战斗技能实例控制器[];
 };
 const { 创建限时二段技能壳, 确认限时二段技能壳, 清理限时二段技能壳 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.25．限时二段技能壳") as {
   创建限时二段技能壳: (this: void, 参数: any) => any;
@@ -137,7 +138,7 @@ function 结算Q单体伤害(this: void, 施法者: any, 目标: any, 技能实�
 // Q1：突进斩击
 //=============================================================================
 
-function 开启Q2窗口(this: void, 施法者: any, 控制器: any, 数据: Q数据, 持续秒: number = Q配置.Q2窗口秒): void {
+function 开启Q2窗口(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 数据: Q数据, 持续秒: number = Q配置.Q2窗口秒): void {
   if (数据.Q2壳 != null) return;
   debugLogForce("红叶-Q", "状态", "开启Q2窗口", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "持续秒", 持续秒);
   const 壳 = 创建限时二段技能壳({
@@ -259,7 +260,7 @@ function 释放Q飞燕穿(this: void, _context: any, 施法者: any, 技能实�
 // Q2：回身斩（ASQ2 输入壳）
 //=============================================================================
 
-function 执行Q2回身斩(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: Q数据): void {
+function 执行Q2回身斩(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: Q数据): void {
   播放红叶动作(施法者, 朱雀院红叶动作槽.Q2回身斩);
   const 方向 = GetUnitFacing(施法者); // 角度制（与扇形区域方向角一致）
   const X = GetUnitX(施法者);

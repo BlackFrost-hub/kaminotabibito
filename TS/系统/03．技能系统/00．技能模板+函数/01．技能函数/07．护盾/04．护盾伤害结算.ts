@@ -17,7 +17,7 @@ const { RMinBJ } = require("lib.扩展函数.BJ函数.12．数学函数") as {
   RMinBJ: (this: void, a: number, b: number) => number;
 };
 
-const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+const { registerDamageModifier, 护盾吸收修改器优先级 } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: {
     target: any;
     attacker: any;
@@ -38,6 +38,7 @@ const { registerDamageModifier } = require("系统.04．伤害系统.00．伤害
     isSkillAttack: boolean;
     isSkillDamage: boolean;
   }) => number, priority?: number) => number;
+  护盾吸收修改器优先级: number;
 };
 
 let shieldModifierRegistered = false;
@@ -184,7 +185,7 @@ export function 吸收伤害(
 export function 注册护盾吸收钩子(): void {
   if (shieldModifierRegistered) return;
   shieldModifierRegistered = true;
-  registerDamageModifier(护盾吸收伤害修正, 100);
+  registerDamageModifier(护盾吸收伤害修正, 护盾吸收修改器优先级);
 }
 
 function 护盾吸收伤害修正(this: void, context: any): number {

@@ -117,6 +117,24 @@ export function unregisterDamageModifier(id: number): boolean {
   return false;
 }
 
+/** 护盾吸收修改器（物理/魔法护盾池）的结算优先级，修改器按优先级降序执行。 */
+export const 护盾吸收修改器优先级 = 100;
+
+/**
+ * 护盾前一次性拦截修改器的默认优先级。
+ * 偏折/招架/解析/化解这类"首次攻击防御"必须高于护盾吸收：
+ * 否则伤害先被护盾吃满，currentDamage 归零，拦截分支永不触发。
+ */
+export const 护盾前拦截修改器优先级 = 110;
+
+/**
+ * 注册护盾前一次性拦截修改器（偏折/招架/解析/化解这类"首次攻击防御"）。
+ * 固定使用护盾前拦截优先级，保证先于任何护盾吸收结算。
+ */
+export function register护盾前拦截修改器(callback: DamageModifier): number {
+  return registerDamageModifier(callback, 护盾前拦截修改器优先级);
+}
+
 export function applyDamageModifiers(context: DamageModifierContext): number {
   let currentDamage = context.currentDamage;
   for (let i = 0; i < damageModifiers.length; i++) {

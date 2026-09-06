@@ -9,8 +9,9 @@ import { 闪电效果代码 } from '../../../03．技能系统/00．技能模板
 const { debugLogForce } = require('lib.扩展函数.自定义扩展函数.03．调试输出') as {
     debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
-const { registerDamageModifier } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
+const { registerDamageModifier, 护盾前拦截修改器优先级 } = require('系统.04．伤害系统.00．伤害计算.06．伤害修正回调') as {
     registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
+    护盾前拦截修改器优先级: number;
 };
 import {
     施加黑翼守护契约Buff,
@@ -185,7 +186,7 @@ function on黑翼守护伤害转移(this: void, e: { 攻击者: any; 承受者: 
     });
 }
 
-registerDamageModifier(on黑翼守护护盾前伤害, 110);
+registerDamageModifier(on黑翼守护护盾前伤害, 护盾前拦截修改器优先级);
 registerDamageModifier(on黑翼守护转移后伤害, 34);
 
 创建友军范围承伤转移({

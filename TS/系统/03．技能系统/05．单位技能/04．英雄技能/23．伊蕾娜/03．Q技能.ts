@@ -25,6 +25,7 @@ import {
   读取伊蕾娜扫帚路线,
 } from "./02．被动效果";
 import { 查询伊蕾娜W折射可用, 消费伊蕾娜W折射 } from "./04．W技能";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 
 const jass = require("jass.common") as any;
 const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -51,10 +52,13 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
 };
 const { 发射弹道 } = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂") as {
   发射弹道: (this: void, 参数: any) => any;
+};
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
 };
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
@@ -140,7 +144,20 @@ function 处理Q命中(this: void, 施法者: any, 目标: any, 数据: any): vo
   记录伊蕾娜见闻(施法者, "风行", 数据.技能实例ID);
 
   if (数据.灰烬爆发 && 伊蕾娜变式效果配置.灰烬_爆发半径 > 0) {
-    const 敌人列表 = 获取坐标范围敌人(施法者, GetUnitX(目标), GetUnitY(目标), 伊蕾娜变式效果配置.灰烬_爆发半径);
+    const 爆发X = GetUnitX(目标);
+    const 爆发Y = GetUnitY(目标);
+    // 灰烬爆发视觉（dustwave 尘浪；目录限制"轮廓偏亮"，RGB 透明度已压低，仍刺眼再调）
+    const 爆发特效 = 创建点特效({
+      模型路径: 伊蕾娜表现配置.灰烬爆发.模型路径,
+      RGB: 伊蕾娜表现配置.灰烬爆发.RGB,
+      X: 爆发X,
+      Y: 爆发Y,
+      Z: 伊蕾娜表现配置.灰烬爆发.高度,
+      缩放: 伊蕾娜表现配置.灰烬爆发.缩放,
+      持续秒: 伊蕾娜表现配置.灰烬爆发.持续秒,
+    });
+    void 爆发特效;
+    const 敌人列表 = 获取坐标范围敌人(施法者, 爆发X, 爆发Y, 伊蕾娜变式效果配置.灰烬_爆发半径);
     const 爆发伤害 = 读取单位攻击力(施法者) * 伊蕾娜变式效果配置.灰烬_爆发伤害攻击力倍率;
     for (let i = 0; i < 敌人列表.length; i++) {
       const 敌人 = 敌人列表[i];
@@ -160,6 +177,7 @@ function 尝试W折射联动(this: void, 施法者: any, 数据: any): void {
   if (!查询伊蕾娜W折射可用(施法者)) return;
   if (!消费伊蕾娜W折射(施法者)) return; // 折射分支真正进入前不置位
   数据.已读W折射 = true;
+  debugLogForce("伊蕾娜-Q", "联动", "镜界折射弹", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
   发射弹道({
     名称: "伊蕾娜-旅风·折射",
     所有者: 施法者,
@@ -212,6 +230,7 @@ function 尝试E路线追加(this: void, 施法者: any, 数据: any, 当前X: n
   }
   if (!在路线上) return;
   数据.已读E路线 = true;
+  debugLogForce("伊蕾娜-Q", "联动", "远行风径魔弹", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
   发射弹道({
     名称: "伊蕾娜-旅风·风径",
     所有者: 施法者,
@@ -336,9 +355,10 @@ function 释放Q旅风追迹(this: void, _context: any, 施法者: any, 技能�
         : { 类型: "直线", 距离: 最终距离 },
       命中半径: 伊蕾娜Q配置.命中半径,
       影响目标: "敌方",
-      碰撞消失: true,
-      每单位最大命中次数: 1,
-      // 主弹不带伤害值：由 on命中 统一结算，避免弹道工厂重复扣血
+        碰撞消失: false,
+        每单位最大命中次数: 1,
+        最大总命中次数: 伊蕾娜Q配置.主弹最大命中数,
+        // 主弹不带伤害值：由 on命中 统一结算，避免弹道工厂重复扣血
       伤害类型: DAMAGE_TYPE_MAGIC,
       来源类型: "单位技能",
       技能ID: Q技能类型ID,

@@ -735,10 +735,7 @@ export function 检查英雄技能(this: void, hero: any): void {
   dynamicSkillData.刷新单位技能数据(hero);
   const abilityIds = 获取快照技能列表(hero);
   已处理技能缓存[生成英雄缓存键(hero)] = abilityIds;
-  // 丢弃可能在技能加入前读取的物编提示，避免后学技能继续沿用无色原文。
-  for (let i = 0; i < abilityIds.length; i++) {
-    delete 原始提示缓存[生成提示缓存键(hero, abilityIds[i])];
-  }
+  // 原始提示只在首次读取技能时缓存；周期刷新不能清掉它，否则 Alt 无法稳定回看原文。
   for (let i = 0; i < abilityIds.length; i++) {
     const level = GetUnitAbilityLevel(hero, abilityIds[i]);
     if (level > 0) {
@@ -768,6 +765,18 @@ export function 刷新单个英雄技能动态文本(this: void, hero: any, abil
   if (!isValidHandle(hero) || abilityId === 0) return;
   if (GetUnitAbilityLevel(hero, abilityId) <= 0) return;
   处理技能提示(hero, abilityId);
+}
+
+/** 返回技能首次读取到的原始说明，供自定义提示框的 Alt 原始模式使用。 */
+export function 获取技能原始提示(this: void, hero: any, abilityId: number): string {
+  if (!isValidHandle(hero) || abilityId === 0) return "";
+  const 缓存键 = 生成提示缓存键(hero, abilityId);
+  const 已缓存文本 = 原始提示缓存[缓存键];
+  if (已缓存文本 != null) return 已缓存文本;
+
+  const 当前文本 = DzGetUnitAbilityUberTip(hero, abilityId) || "";
+  if (当前文本 !== "") 原始提示缓存[缓存键] = 当前文本;
+  return 当前文本;
 }
 
 function 本地刷新指定英雄动态文本(this: void, hero: any): void {

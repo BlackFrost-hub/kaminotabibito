@@ -253,6 +253,7 @@ export function 记录伊蕾娜见闻(
       记录.来源实例ID = 来源实例ID;
       状态.见闻列表.push(记录);
       刷新见闻Buff(英雄, 状态);
+      debugLogForce("伊蕾娜-被动", "见闻", "操作", "同型刷新", "类型", 类型, "序号", 记录.序号, "当前数量", 状态.见闻列表.length);
       return 记录;
     }
   }
@@ -269,6 +270,7 @@ export function 记录伊蕾娜见闻(
     状态.见闻列表.shift();
   }
   刷新见闻Buff(英雄, 状态);
+  debugLogForce("伊蕾娜-被动", "见闻", "操作", "新增", "类型", 类型, "序号", 记录.序号, "当前数量", 状态.见闻列表.length);
   return 记录;
 }
 
@@ -310,6 +312,7 @@ export function 消费伊蕾娜见闻按序号(this: void, 英雄: any, 序号: 
     if (状态.见闻列表[i].序号 !== 序号) continue;
     const 记录 = 状态.见闻列表.splice(i, 1)[0];
     刷新见闻Buff(英雄, 状态);
+    debugLogForce("伊蕾娜-被动", "见闻", "操作", "消费", "类型", 记录.类型, "序号", 记录.序号, "剩余数量", 状态.见闻列表.length);
     return 记录;
   }
   return null;
@@ -320,12 +323,24 @@ export function 消费伊蕾娜见闻按序号(this: void, 英雄: any, 序号: 
 //=============================================================================
 
 function 同步变式Buff(this: void, 英雄: any, 状态: 伊蕾娜英雄状态): void {
+  const 变式Buff列表 = [
+    伊蕾娜BuffID.迅行变式,
+    伊蕾娜BuffID.镜界变式,
+    伊蕾娜BuffID.灰烬变式,
+  ];
+  for (let i = 0; i < 变式Buff列表.length; i++) {
+    移除单位指定Buff(英雄, 变式Buff列表[i]);
+  }
   if (状态.当前变式 == null) {
-    移除单位指定Buff(英雄, 伊蕾娜BuffID.魔法变式);
     return;
   }
+  let 当前BuffID: string | null = null;
+  if (状态.当前变式 === "迅行") 当前BuffID = 伊蕾娜BuffID.迅行变式;
+  else if (状态.当前变式 === "镜界") 当前BuffID = 伊蕾娜BuffID.镜界变式;
+  else if (状态.当前变式 === "灰烬") 当前BuffID = 伊蕾娜BuffID.灰烬变式;
+  if (当前BuffID == null) return;
   const 剩余秒 = (状态.变式到期时间 - getGameTime()) / 1000;
-  registerManualBuff(英雄, 伊蕾娜BuffID.魔法变式, 剩余秒 > 0 ? 剩余秒 : 0.1, 0);
+  registerManualBuff(英雄, 当前BuffID, 剩余秒 > 0 ? 剩余秒 : 0.1, 0);
 }
 
 /** 设置当前变式（D 切换调用；覆盖旧变式，不叠加多套）。 */
@@ -583,7 +598,9 @@ export function 清理伊蕾娜状态(this: void, 英雄: any, 原因: 伊蕾娜
   if (单位存活(英雄)) {
     移除单位指定Buff(英雄, 伊蕾娜BuffID.旅途见闻);
     移除单位指定Buff(英雄, 伊蕾娜BuffID.魔法弹强化);
-    移除单位指定Buff(英雄, 伊蕾娜BuffID.魔法变式);
+    移除单位指定Buff(英雄, 伊蕾娜BuffID.迅行变式);
+    移除单位指定Buff(英雄, 伊蕾娜BuffID.镜界变式);
+    移除单位指定Buff(英雄, 伊蕾娜BuffID.灰烬变式);
   }
   delete 伊蕾娜状态表[id];
   return true;
@@ -725,7 +742,7 @@ function 施加镜界回应(this: void, 英雄: any, 目标: any): void {
     类型: 0,
     持续时间: 伊蕾娜普攻联动配置.回响护盾秒,
     来源单位: 英雄,
-    显示护盾条: false,
+    显示护盾条: true,
   });
 }
 
@@ -734,6 +751,7 @@ function 回馈QWE冷却(this: void, 英雄: any, 状态: 伊蕾娜英雄状态)
   const now = getGameTime();
   if (now < 状态.回馈下次可用时间) return;
   状态.回馈下次可用时间 = now + 伊蕾娜普攻联动配置.冷却回馈内部冷却毫秒;
+  debugLogForce("伊蕾娜-被动", "回馈", "攻速冷却缩减", "各技能-1秒");
 
   const 技能表: { id: number; 当前: number }[] = [
     { id: Q技能类型ID, 当前: platformAbilityApi.技能_获取技能当前冷却时间(英雄, Q技能类型ID) },

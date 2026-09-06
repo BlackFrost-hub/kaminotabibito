@@ -15,6 +15,8 @@ import {
   芙莉莲表现配置,
   芙莉莲音效配置,
 } from "./00．配置";
+import { 芙莉莲BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/25．芙莉莲";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 const { Sound3DII_UnitPlayReuse, Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
@@ -39,8 +41,8 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
-  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => any[];
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
+  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => 战斗技能实例控制器[];
 };
 const { 开始冲锋, 停止位移 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口") as {
   开始冲锋: (this: void, 单位: any, 参数: any) => number;
@@ -49,6 +51,10 @@ const { 开始冲锋, 停止位移 } = require("系统.03．技能系统.00．�
 const { registerDamageModifier, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority: number) => number;
   unregisterDamageModifier: (this: void, id: number) => boolean;
+};
+const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+  移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
 };
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
@@ -216,6 +222,7 @@ function 完成E收尾(this: void, 施法者: any, 数据: E数据): void {
     unregisterDamageModifier(数据.减伤ID);
     数据.减伤ID = 0;
   }
+  移除单位指定Buff(施法者, 芙莉莲BuffID.高处飞行保护);
   // 观察 Tick 停止 + 闪电销毁
   if (数据.观察TickID !== 0) {
     removePeriodicCallback(数据.观察TickID);
@@ -264,7 +271,7 @@ function 结束E(this: void, 施法者: any, 技能实例ID: number | undefined,
 }
 
 /** 观察期纳入实例生命周期：观察截止回调统一收尾并完成实例（打断/死亡由实例收束清理） */
-function E安排观察期收尾(this: void, 施法者: any, 控制器: any, 数据: E数据): void {
+function E安排观察期收尾(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 数据: E数据): void {
   const 观察截止ID = addDelayedCallback(E配置.观察持续秒 * 1000, function E观察到期(this: void): void {
     // 已结束表示位移阶段已结束，观察期正是此时收尾；不能因此跳过实例完成。
     完成E收尾(施法者, 数据);
@@ -355,6 +362,10 @@ function 释放E(this: void, _context: any, 施法者: any, 技能实例ID: numb
     if (context.currentDamage <= 0) return context.currentDamage;
     return context.currentDamage * (1 - E配置.位移减伤比例);
   }, 45);
+  registerManualBuff(施法者, 芙莉莲BuffID.高处飞行保护, 9999, E配置.位移减伤比例, {
+    sourceName: "芙莉莲-E-高处飞行保护",
+    effectValue: E配置.位移减伤比例,
+  });
 
   // 观察 Tick（观察保持动作在位移到达/撞墙时启动，见 结束E；起飞限时动作自行恢复 stand）（0.25s）：可见合法敌人 → 闪电连接 + 位置解析（保守实现：项目无统一反隐接口，
   // 隐身/幻影/陷阱的专门检测登记为剩余项，不直接全图显隐）

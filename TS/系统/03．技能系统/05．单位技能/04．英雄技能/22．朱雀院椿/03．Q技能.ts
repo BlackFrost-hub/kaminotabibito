@@ -8,6 +8,7 @@ import {
   朱雀院椿Q配置,
   朱雀院椿音效配置,
 } from "./00．配置";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 
 const jass = require("jass.common") as any;
 const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -21,8 +22,8 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
-  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => any[];
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
+  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => 战斗技能实例控制器[];
 };
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
@@ -140,14 +141,14 @@ function 结算Q斩(this: void, 施法者: any, 技能实例ID: number | undefin
   }
 }
 
-function 执行基础居合(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: Q数据): void {
+function 执行基础居合(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: Q数据): void {
   结算Q斩(施法者, 技能实例ID, 数据.输入方向, Q配置.基础伤害倍率, "朱雀院椿-Q居合");
   // 居合斩音（基础居合结算点；坐标=施法者位置，参数配置驱动）
   Sound3DII_CooPlayReuse(朱雀院椿音效配置.Q居合.路径, GetUnitX(施法者), GetUnitY(施法者), 朱雀院椿音效配置.Q居合.高度, 朱雀院椿音效配置.Q居合.裁断距离);
   控制器.完成();
 }
 
-function 执行返刃第一段(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: Q数据): void {
+function 执行返刃第一段(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: Q数据): void {
   结算Q斩(施法者, 技能实例ID, 数据.输入方向, Q配置.返刃一段倍率, "朱雀院椿-Q返刃一段");
   // 第二段回身斩：沿防守方向（W 招架来源方向 / E 回锋方向）
   const 第二段ID = addDelayedCallback(Q配置.二段延迟毫秒, function Q返刃二段(this: void): void {

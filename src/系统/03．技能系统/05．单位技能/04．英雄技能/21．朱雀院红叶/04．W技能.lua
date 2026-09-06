@@ -89,7 +89,7 @@ local ____require_result_3 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["创建战斗技能实例"]
 local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["查询战斗技能实例"]
 local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_4.registerDamageModifier
+local ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668 = ____require_result_4["register护盾前拦截修改器"]
 local unregisterDamageModifier = ____require_result_4.unregisterDamageModifier
 local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口")
 local _____5F00_59CB_51FB_9000 = ____require_result_5["开始击退"]
@@ -167,7 +167,7 @@ local function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____63A7_5236_566
         "玩家",
         GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
     )
-    _____63A7_5236_5668["完成"](_____63A7_5236_5668)
+    _____63A7_5236_5668["完成"]()
 end
 local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
     local _____6765_6E90 = _____6570_636E["招架来源"]
@@ -327,67 +327,64 @@ local function _____91CA_653EW_6C34_955C_8FD4_5203(_context, _____65BD_6CD5_8005
         {stack = 1}
     )
     Sound3DII_UnitPlayReuse(____W_6C34_955C_5C55_5F00_97F3_6548["路径"], _____65BD_6CD5_8005, ____W_6C34_955C_5C55_5F00_97F3_6548["裁断距离"])
-    _____6570_636E["修饰ID"] = registerDamageModifier(
-        function(context)
-            if _____6570_636E["已招架"] or _____6570_636E["已结束"] then
-                return context.currentDamage
+    _____6570_636E["修饰ID"] = ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668(function(context)
+        if _____6570_636E["已招架"] or _____6570_636E["已结束"] then
+            return context.currentDamage
+        end
+        if context.target ~= _____65BD_6CD5_8005 then
+            return context.currentDamage
+        end
+        if context.attacker == nil or context.attacker == 0 then
+            return context.currentDamage
+        end
+        local _____6765_6E90_65B9_5411 = _____4E24_70B9_65B9_5411_89D2(
+            GetUnitX(_____65BD_6CD5_8005),
+            GetUnitY(_____65BD_6CD5_8005),
+            GetUnitX(context.attacker),
+            GetUnitY(context.attacker)
+        )
+        if _____89D2_5EA6_5DEE_7EDD_5BF9_503C(_____6570_636E["方向角"], _____6765_6E90_65B9_5411) > ____W_914D_7F6E["正面角度"] / 2 then
+            return context.currentDamage
+        end
+        debugLogForce(
+            "红叶-W",
+            "回调",
+            "类型",
+            "招架成功",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "目标",
+            GetUnitName(context.attacker),
+            "handle",
+            context.attacker,
+            "X",
+            math.floor(GetUnitX(context.attacker)),
+            "Y",
+            math.floor(GetUnitY(context.attacker))
+        )
+        _____6570_636E["已招架"] = true
+        _____6570_636E["招架来源"] = context.attacker
+        addDelayedCallback(
+            0,
+            function()
+                Sound3DII_UnitPlayReuse(____W_62DB_67B6_6210_529F_97F3_6548["路径"], _____65BD_6CD5_8005, ____W_62DB_67B6_6210_529F_97F3_6548["裁断距离"])
+                _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
             end
-            if context.target ~= _____65BD_6CD5_8005 then
-                return context.currentDamage
-            end
-            if context.attacker == nil or context.attacker == 0 then
-                return context.currentDamage
-            end
-            local _____6765_6E90_65B9_5411 = _____4E24_70B9_65B9_5411_89D2(
-                GetUnitX(_____65BD_6CD5_8005),
-                GetUnitY(_____65BD_6CD5_8005),
-                GetUnitX(context.attacker),
-                GetUnitY(context.attacker)
-            )
-            if _____89D2_5EA6_5DEE_7EDD_5BF9_503C(_____6570_636E["方向角"], _____6765_6E90_65B9_5411) > ____W_914D_7F6E["正面角度"] / 2 then
-                return context.currentDamage
-            end
-            debugLogForce(
-                "红叶-W",
-                "回调",
-                "类型",
-                "招架成功",
-                "玩家",
-                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                "目标",
-                GetUnitName(context.attacker),
-                "handle",
-                context.attacker,
-                "X",
-                math.floor(GetUnitX(context.attacker)),
-                "Y",
-                math.floor(GetUnitY(context.attacker))
-            )
-            _____6570_636E["已招架"] = true
-            _____6570_636E["招架来源"] = context.attacker
-            addDelayedCallback(
-                0,
-                function()
-                    Sound3DII_UnitPlayReuse(____W_62DB_67B6_6210_529F_97F3_6548["路径"], _____65BD_6CD5_8005, ____W_62DB_67B6_6210_529F_97F3_6548["裁断距离"])
-                    _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
-                end
-            )
-            return 0
-        end,
-        60
-    )
+        )
+        return 0
+    end)
     local _____5230_671FID = addDelayedCallback(
         ____W_914D_7F6E["招架窗口秒"] * 1000,
         function()
             _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
         end
     )
-    _____63A7_5236_5668["登记延迟回调"](_____63A7_5236_5668, _____5230_671FID)
+    _____63A7_5236_5668["登记延迟回调"](_____5230_671FID)
     _____767B_8BB0_6731_96C0_9662_6E05_7406(
         _____65BD_6CD5_8005,
         "红叶W招架",
         function()
-            _____63A7_5236_5668["中断"](_____63A7_5236_5668)
+            _____63A7_5236_5668["中断"]()
         end
     )
 end

@@ -15,6 +15,7 @@ import {
   芙莉莲表现配置,
   芙莉莲音效配置,
 } from "./00．配置";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 const { Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_CooPlayReuse: (this: void, path: string, x: number, y: number, z: number, cutoff: number) => any;
 };
@@ -42,8 +43,8 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
-  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => any[];
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
+  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => 战斗技能实例控制器[];
 };
 const { 创建区域效果 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.04．区域效果.区域效果") as {
   创建区域效果: (this: void, 参数: any) => any;

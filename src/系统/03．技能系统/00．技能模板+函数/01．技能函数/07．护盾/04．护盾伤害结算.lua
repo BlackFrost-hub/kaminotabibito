@@ -155,6 +155,7 @@ local ____require_result_0 = require("lib.扩展函数.BJ函数.12．数学函�
 RMinBJ = ____require_result_0.RMinBJ
 local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_1.registerDamageModifier
+local _____62A4_76FE_5438_6536_4FEE_6539_5668_4F18_5148_7EA7 = ____require_result_1["护盾吸收修改器优先级"]
 local shieldModifierRegistered = false
 --- 注册护盾吸收到伤害系统
 -- 
@@ -164,6 +165,6 @@ ____exports["注册护盾吸收钩子"] = function()
         return
     end
     shieldModifierRegistered = true
-    registerDamageModifier(_____62A4_76FE_5438_6536_4F24_5BB3_4FEE_6B63, 100)
+    registerDamageModifier(_____62A4_76FE_5438_6536_4F24_5BB3_4FEE_6B63, _____62A4_76FE_5438_6536_4FEE_6539_5668_4F18_5148_7EA7)
 end
 return ____exports

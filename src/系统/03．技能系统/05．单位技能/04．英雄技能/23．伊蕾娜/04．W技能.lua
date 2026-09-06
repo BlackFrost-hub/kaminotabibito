@@ -112,7 +112,7 @@ local getGameTime = ____require_result_3.getGameTime
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器")
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_4["注册单位技能壳监听"]
 local ____require_result_5 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_5.registerDamageModifier
+local ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668 = ____require_result_5["register护盾前拦截修改器"]
 unregisterDamageModifier = ____require_result_5.unregisterDamageModifier
 local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
 local _____5F00_59CB_62A4_76FE = ____require_result_6["开始护盾"]
@@ -271,112 +271,123 @@ local function _____91CA_653EW_955C_754C_62A4_7B26(_context, _____65BD_6CD5_8005
             ["显示护盾条"] = true
         }
     )
-    _____6570_636E["修改器ID"] = registerDamageModifier(
-        function(context)
-            if _____6570_636E["已关闭"] or _____6570_636E["主要攻击已处理"] then
-                return context.currentDamage
-            end
-            if context.target ~= _____65BD_6CD5_8005 then
-                return context.currentDamage
-            end
-            if not (context.currentDamage > 0) then
-                return context.currentDamage
-            end
-            local _____653B_51FB_8005 = context.attacker
-            if _____653B_51FB_8005 == nil or _____653B_51FB_8005 == 0 or _____653B_51FB_8005 == _____65BD_6CD5_8005 then
-                return context.currentDamage
-            end
-            if not IsUnitEnemy(
-                _____653B_51FB_8005,
-                GetOwningPlayer(_____65BD_6CD5_8005)
-            ) then
-                return context.currentDamage
-            end
-            if getGameTime() >= _____6570_636E["窗口结束时间"] then
-                return context.currentDamage
-            end
-            _____6570_636E["主要攻击已处理"] = true
-            debugLogForce(
-                "伊蕾娜-W",
-                "命中",
-                "玩家",
-                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                "四码",
-                fourCCToStringSafe(stringToFourCCSafe(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.W["技能ID"])),
-                "目标",
-                GetUnitName(_____653B_51FB_8005),
-                "handle",
-                _____653B_51FB_8005,
-                "X",
-                math.floor(GetUnitX(_____653B_51FB_8005)),
-                "Y",
-                math.floor(GetUnitY(_____653B_51FB_8005)),
-                "伤害",
-                math.floor(context.currentDamage),
-                "类型",
-                "主要攻击偏折"
-            )
-            local _____63A5_89E6_89D2 = _____4E24_70B9_89D2_5EA6(
-                GetUnitX(_____65BD_6CD5_8005),
-                GetUnitY(_____65BD_6CD5_8005),
-                GetUnitX(_____653B_51FB_8005),
-                GetUnitY(_____653B_51FB_8005)
-            )
-            local _____63A5_89E6X = _____6781_5750_6807X(
-                GetUnitX(_____65BD_6CD5_8005),
-                _____63A5_89E6_89D2,
-                _____4F0A_857E_5A1CW_914D_7F6E["结界接触半径"]
-            )
-            local _____63A5_89E6Y = _____6781_5750_6807Y(
-                GetUnitY(_____65BD_6CD5_8005),
-                _____63A5_89E6_89D2,
-                _____4F0A_857E_5A1CW_914D_7F6E["结界接触半径"]
-            )
-            local _____53CD_9988_7279_6548 = _____521B_5EFA_70B9_7279_6548({
-                ["模型路径"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["模型路径"],
-                RGB = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"].RGB,
-                X = _____63A5_89E6X,
-                Y = _____63A5_89E6Y,
-                Z = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["高度"],
-                ["面向角度"] = _____63A5_89E6_89D2,
-                ["缩放"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["缩放"],
-                ["持续秒"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["持续秒"]
-            })
-            local ____ = _____53CD_9988_7279_6548
-            Sound3DII_CooPlayReuse(
-                _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W偏折"]["路径"],
-                _____63A5_89E6X,
-                _____63A5_89E6Y,
-                _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W偏折"]["高度"],
-                _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W偏折"]["裁断距离"]
-            )
-            addDelayedCallback(
-                10,
-                function()
-                    if _____6570_636E["已关闭"] then
-                        return
-                    end
-                    _____8BB0_5F55_4F0A_857E_5A1C_89C1_95FB(_____65BD_6CD5_8005, "镜界", nil)
-                    _____5173_95EDW_955C_754C(_____6570_636E, false)
-                    if _____6570_636E["镜界变式待消费"] and _____6D88_8D39_4F0A_857E_5A1C_53D8_5F0F_7528_4E8E(_____65BD_6CD5_8005, "W") == "镜界" then
-                        _____5F00_59CB_62A4_76FE(
-                            _____65BD_6CD5_8005,
-                            {
-                                ["类型"] = 0,
-                                ["数值"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____4F0A_857E_5A1C_53D8_5F0F_6548_679C_914D_7F6E["镜界_W回响护盾攻击力倍率"],
-                                ["持续时间"] = _____4F0A_857E_5A1C_53D8_5F0F_6548_679C_914D_7F6E["镜界_W回响护盾秒"],
-                                ["来源单位"] = _____65BD_6CD5_8005,
-                                ["标签"] = "伊蕾娜-镜界变式回响",
-                                ["显示护盾条"] = false
-                            }
-                        )
-                    end
+    _____6570_636E["修改器ID"] = ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668(function(context)
+        if _____6570_636E["已关闭"] or _____6570_636E["主要攻击已处理"] then
+            return context.currentDamage
+        end
+        if context.target ~= _____65BD_6CD5_8005 then
+            return context.currentDamage
+        end
+        if not (context.currentDamage > 0) then
+            return context.currentDamage
+        end
+        local _____653B_51FB_8005 = context.attacker
+        if _____653B_51FB_8005 == nil or _____653B_51FB_8005 == 0 or _____653B_51FB_8005 == _____65BD_6CD5_8005 then
+            return context.currentDamage
+        end
+        if not IsUnitEnemy(
+            _____653B_51FB_8005,
+            GetOwningPlayer(_____65BD_6CD5_8005)
+        ) then
+            return context.currentDamage
+        end
+        if getGameTime() >= _____6570_636E["窗口结束时间"] then
+            return context.currentDamage
+        end
+        _____6570_636E["主要攻击已处理"] = true
+        debugLogForce(
+            "伊蕾娜-W",
+            "命中",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(stringToFourCCSafe(_____4F0A_857E_5A1C_6280_80FD_914D_7F6E.W["技能ID"])),
+            "目标",
+            GetUnitName(_____653B_51FB_8005),
+            "handle",
+            _____653B_51FB_8005,
+            "X",
+            math.floor(GetUnitX(_____653B_51FB_8005)),
+            "Y",
+            math.floor(GetUnitY(_____653B_51FB_8005)),
+            "伤害",
+            math.floor(context.currentDamage),
+            "类型",
+            "主要攻击偏折"
+        )
+        local _____63A5_89E6_89D2 = _____4E24_70B9_89D2_5EA6(
+            GetUnitX(_____65BD_6CD5_8005),
+            GetUnitY(_____65BD_6CD5_8005),
+            GetUnitX(_____653B_51FB_8005),
+            GetUnitY(_____653B_51FB_8005)
+        )
+        local _____63A5_89E6X = _____6781_5750_6807X(
+            GetUnitX(_____65BD_6CD5_8005),
+            _____63A5_89E6_89D2,
+            _____4F0A_857E_5A1CW_914D_7F6E["结界接触半径"]
+        )
+        local _____63A5_89E6Y = _____6781_5750_6807Y(
+            GetUnitY(_____65BD_6CD5_8005),
+            _____63A5_89E6_89D2,
+            _____4F0A_857E_5A1CW_914D_7F6E["结界接触半径"]
+        )
+        local _____53CD_9988_7279_6548 = _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["模型路径"],
+            RGB = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"].RGB,
+            X = _____63A5_89E6X,
+            Y = _____63A5_89E6Y,
+            Z = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["高度"],
+            ["面向角度"] = _____63A5_89E6_89D2,
+            ["缩放"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["缩放"],
+            ["持续秒"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["W偏折反馈"]["持续秒"]
+        })
+        local ____ = _____53CD_9988_7279_6548
+        Sound3DII_CooPlayReuse(
+            _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W偏折"]["路径"],
+            _____63A5_89E6X,
+            _____63A5_89E6Y,
+            _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W偏折"]["高度"],
+            _____4F0A_857E_5A1C_97F3_6548_914D_7F6E["W偏折"]["裁断距离"]
+        )
+        addDelayedCallback(
+            10,
+            function()
+                if _____6570_636E["已关闭"] then
+                    return
                 end
-            )
-            return context.currentDamage * (1 - _____4F0A_857E_5A1CW_914D_7F6E["偏折减免比例"])
-        end,
-        50
-    )
+                _____8BB0_5F55_4F0A_857E_5A1C_89C1_95FB(_____65BD_6CD5_8005, "镜界", nil)
+                debugLogForce(
+                    "伊蕾娜-W",
+                    "偏折成功",
+                    "记录镜界见闻",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+                )
+                _____5173_95EDW_955C_754C(_____6570_636E, false)
+                if _____6570_636E["镜界变式待消费"] and _____6D88_8D39_4F0A_857E_5A1C_53D8_5F0F_7528_4E8E(_____65BD_6CD5_8005, "W") == "镜界" then
+                    _____5F00_59CB_62A4_76FE(
+                        _____65BD_6CD5_8005,
+                        {
+                            ["类型"] = 0,
+                            ["数值"] = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____4F0A_857E_5A1C_53D8_5F0F_6548_679C_914D_7F6E["镜界_W回响护盾攻击力倍率"],
+                            ["持续时间"] = _____4F0A_857E_5A1C_53D8_5F0F_6548_679C_914D_7F6E["镜界_W回响护盾秒"],
+                            ["来源单位"] = _____65BD_6CD5_8005,
+                            ["标签"] = "伊蕾娜-镜界变式回响",
+                            ["显示护盾条"] = true
+                        }
+                    )
+                    debugLogForce(
+                        "伊蕾娜-W",
+                        "变式",
+                        "镜界回响护盾",
+                        "玩家",
+                        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
+                    )
+                end
+            end
+        )
+        return context.currentDamage * (1 - _____4F0A_857E_5A1CW_914D_7F6E["偏折减免比例"])
+    end)
     addDelayedCallback(
         _____4F0A_857E_5A1CW_914D_7F6E["保护窗口秒"] * 1000,
         function()

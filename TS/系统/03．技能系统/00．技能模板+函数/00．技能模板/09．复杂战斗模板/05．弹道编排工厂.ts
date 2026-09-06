@@ -55,6 +55,9 @@ const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
+const { round } = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算") as {
+  round: (this: void, value: number | undefined) => number;
+};
 const { 单位存活, 距离XY } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   单位存活: (this: void, unit: any) => boolean;
   距离XY: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
@@ -325,7 +328,7 @@ export function 发射弹道(this: void, 参数: 弹道编排参数): 弹道编�
 
     // 延迟改向 / 追踪保持：发射后定时锁定当前方向或改向
     if (改向配置 != null && 改向配置.延迟秒 > 0) {
-      改向回调ID = addDelayedCallback((改向配置.延迟秒 * 1000 + 0.5) | 0, function 弹道延迟改向(this: void): void {
+      改向回调ID = addDelayedCallback(round(改向配置.延迟秒 * 1000), function 弹道延迟改向(this: void): void {
         改向回调ID = 0;
         if (已中断 || 弹幕实例 == null) return;
         const 内部 = 获取原生弹幕(编排.弹幕ID);
@@ -369,7 +372,7 @@ export function 发射弹道(this: void, 参数: 弹道编排参数): 弹道编�
         参数.实例控制器.登记特效(预警特效);
       }
     }
-    延迟回调ID = addDelayedCallback((参数.预警.延迟秒 * 1000 + 0.5) | 0, function 弹道延迟发射(this: void): void {
+    延迟回调ID = addDelayedCallback(round(参数.预警.延迟秒 * 1000), function 弹道延迟发射(this: void): void {
       延迟回调ID = 0;
       执行发射();
     });

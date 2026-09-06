@@ -45,8 +45,8 @@ const { getGameTime } = require("系统.00．核心系统.05．中心计时器")
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
-const { registerDamageModifier, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number | undefined, priority?: number) => number;
+const { register护盾前拦截修改器, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+  register护盾前拦截修改器: (this: void, callback: (this: void, context: any) => number) => number;
   unregisterDamageModifier: (this: void, id: number) => boolean;
 };
 const { 开始护盾, 移除护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统") as {
@@ -200,7 +200,7 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
   Sound3DII_UnitPlayReuse(塞莉亚音效配置.W展开.路径, 施法者, 塞莉亚音效配置.W展开.裁断距离);
 
   // 主要攻击解析：注销推迟到遍历之外
-  数据.修改器ID = registerDamageModifier(function W解析修改器(this: void, context: any): number {
+  数据.修改器ID = register护盾前拦截修改器(function W解析修改器(this: void, context: any): number {
     if (数据.已关闭 || 数据.主要攻击已解析) return context.currentDamage;
     if (context.target !== 施法者) return context.currentDamage;
     if (!(context.currentDamage > 0)) return context.currentDamage;
@@ -242,7 +242,7 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
     });
 
     return context.currentDamage * (1 - 塞莉亚克莱尔W配置.解析减免比例);
-  }, 50);
+  });
 
   // 自然结束收口
   addDelayedCallback(塞莉亚克莱尔W配置.保护窗口秒 * 1000, function W窗口自然结束(this: void): void {

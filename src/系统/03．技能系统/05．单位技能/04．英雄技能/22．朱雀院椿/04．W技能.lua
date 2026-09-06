@@ -103,7 +103,7 @@ local ____require_result_3 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["创建战斗技能实例"]
 local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["查询战斗技能实例"]
 local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_4.registerDamageModifier
+local ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668 = ____require_result_4["register护盾前拦截修改器"]
 unregisterDamageModifier = ____require_result_4.unregisterDamageModifier
 local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
 _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_5["造成技能伤害"]
@@ -429,70 +429,67 @@ local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____628
         _____62DB_67B6_7279_6548_952E
     )
     _____8BBE_7F6E_7279_6548_7F29_653E(_____62DB_67B6_7A97_53E3_7279_6548, _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W招架窗口"]["缩放"])
-    _____6570_636E["修饰ID"] = registerDamageModifier(
-        function(context)
-            if _____6570_636E["已招架"] or _____6570_636E["已结束"] then
-                return context.currentDamage
+    _____6570_636E["修饰ID"] = ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668(function(context)
+        if _____6570_636E["已招架"] or _____6570_636E["已结束"] then
+            return context.currentDamage
+        end
+        if context.target ~= _____65BD_6CD5_8005 then
+            return context.currentDamage
+        end
+        if context.attacker == nil or context.attacker == 0 then
+            return context.currentDamage
+        end
+        if not _____5355_4F4D_662F_5426_5728_6765_6E90_6B63_9762_6247_533A(_____65BD_6CD5_8005, context.attacker, ____W_914D_7F6E["正面角度"]) then
+            return context.currentDamage
+        end
+        _____6570_636E["已招架"] = true
+        _____6570_636E["招架来源"] = context.attacker
+        local _____8FDB_5165_79D2 = getGameTime() - _____6570_636E["窗口开始"]
+        local _____6765_6E90_65B9_5411 = _____4E24_70B9_89D2_5EA6(
+            GetUnitX(_____65BD_6CD5_8005),
+            GetUnitY(_____65BD_6CD5_8005),
+            GetUnitX(context.attacker),
+            GetUnitY(context.attacker)
+        )
+        local _____5B8C_7F8E = _____8FDB_5165_79D2 <= ____W_914D_7F6E["完美时点秒"] and _____89D2_5EA6_5DEE_7EDD_5BF9_503C(_____6570_636E["方向角"], _____6765_6E90_65B9_5411) <= ____W_914D_7F6E["完美角度"]
+        debugLogForce(
+            "椿-W",
+            "招架成功",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____W_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-",
+            "完美",
+            _____5B8C_7F8E,
+            "进入秒",
+            _____8FDB_5165_79D2,
+            "来源",
+            GetUnitName(context.attacker),
+            "handle",
+            context.attacker
+        )
+        _____521B_5EFA_53CD_51FB_51C6_5907(_____65BD_6CD5_8005, _____6765_6E90_65B9_5411, context.attacker)
+        _____6062_590DVF(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_88AB_52A8_914D_7F6E["招架恢复VF"] + (_____5B8C_7F8E and _____6731_96C0_9662_693F_88AB_52A8_914D_7F6E["完美招架额外VF"] or 0))
+        addDelayedCallback(
+            0,
+            function()
+                _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E, _____5B8C_7F8E)
             end
-            if context.target ~= _____65BD_6CD5_8005 then
-                return context.currentDamage
-            end
-            if context.attacker == nil or context.attacker == 0 then
-                return context.currentDamage
-            end
-            if not _____5355_4F4D_662F_5426_5728_6765_6E90_6B63_9762_6247_533A(_____65BD_6CD5_8005, context.attacker, ____W_914D_7F6E["正面角度"]) then
-                return context.currentDamage
-            end
-            _____6570_636E["已招架"] = true
-            _____6570_636E["招架来源"] = context.attacker
-            local _____8FDB_5165_79D2 = getGameTime() - _____6570_636E["窗口开始"]
-            local _____6765_6E90_65B9_5411 = _____4E24_70B9_89D2_5EA6(
-                GetUnitX(_____65BD_6CD5_8005),
-                GetUnitY(_____65BD_6CD5_8005),
-                GetUnitX(context.attacker),
-                GetUnitY(context.attacker)
-            )
-            local _____5B8C_7F8E = _____8FDB_5165_79D2 <= ____W_914D_7F6E["完美时点秒"] and _____89D2_5EA6_5DEE_7EDD_5BF9_503C(_____6570_636E["方向角"], _____6765_6E90_65B9_5411) <= ____W_914D_7F6E["完美角度"]
-            debugLogForce(
-                "椿-W",
-                "招架成功",
-                "玩家",
-                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                "四码",
-                fourCCToStringSafe(____W_6280_80FDID),
-                "实例",
-                _____6280_80FD_5B9E_4F8BID or "-",
-                "完美",
-                _____5B8C_7F8E,
-                "进入秒",
-                _____8FDB_5165_79D2,
-                "来源",
-                GetUnitName(context.attacker),
-                "handle",
-                context.attacker
-            )
-            _____521B_5EFA_53CD_51FB_51C6_5907(_____65BD_6CD5_8005, _____6765_6E90_65B9_5411, context.attacker)
-            _____6062_590DVF(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_88AB_52A8_914D_7F6E["招架恢复VF"] + (_____5B8C_7F8E and _____6731_96C0_9662_693F_88AB_52A8_914D_7F6E["完美招架额外VF"] or 0))
-            addDelayedCallback(
-                0,
-                function()
-                    _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E, _____5B8C_7F8E)
-                end
-            )
-            return 0
-        end,
-        60
-    )
+        )
+        return 0
+    end)
     local _____5230_671FID = addDelayedCallback(
         ____W_914D_7F6E["招架窗口秒"] * 1000,
         function()
             _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
             if _____63A7_5236_5668 ~= nil then
-                _____63A7_5236_5668["完成"](_____63A7_5236_5668)
+                _____63A7_5236_5668["完成"]()
             end
         end
     )
-    _____63A7_5236_5668["登记延迟回调"](_____63A7_5236_5668, _____5230_671FID)
+    _____63A7_5236_5668["登记延迟回调"](_____5230_671FID)
     _____767B_8BB0_693F_6E05_7406(
         _____65BD_6CD5_8005,
         "椿W招架",

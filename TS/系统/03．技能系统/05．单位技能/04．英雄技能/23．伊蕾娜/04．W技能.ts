@@ -48,8 +48,8 @@ const { getGameTime } = require("系统.00．核心系统.05．中心计时器")
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
-const { registerDamageModifier, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number | undefined, priority?: number) => number;
+const { register护盾前拦截修改器, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+  register护盾前拦截修改器: (this: void, callback: (this: void, context: any) => number) => number;
   unregisterDamageModifier: (this: void, id: number) => boolean;
 };
 const { 开始护盾, 移除护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统") as {
@@ -253,7 +253,7 @@ function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能�
   });
 
   // 主要攻击偏折：注销延迟到当前遍历结束之后（下一 tick 回调中执行）
-  数据.修改器ID = registerDamageModifier(function W偏折修改器(this: void, context: any): number {
+  数据.修改器ID = register护盾前拦截修改器(function W偏折修改器(this: void, context: any): number {
     if (数据.已关闭 || 数据.主要攻击已处理) return context.currentDamage;
     if (context.target !== 施法者) return context.currentDamage;
     if (!(context.currentDamage > 0)) return context.currentDamage;
@@ -289,6 +289,7 @@ function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能�
       if (数据.已关闭) return;
       // 成功触发：记录镜界见闻（A4）
       记录伊蕾娜见闻(施法者, "镜界", undefined);
+      debugLogForce("伊蕾娜-W", "偏折成功", "记录镜界见闻", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
       关闭W镜界(数据, false);
       if (数据.镜界变式待消费 && 消费伊蕾娜变式用于(施法者, "W") === "镜界") {
         开始护盾(施法者, {
@@ -297,13 +298,14 @@ function 释放W镜界护符(this: void, _context: any, 施法者: any, _技能�
           持续时间: 伊蕾娜变式效果配置.镜界_W回响护盾秒,
           来源单位: 施法者,
           标签: "伊蕾娜-镜界变式回响",
-          显示护盾条: false,
+          显示护盾条: true,
         });
+        debugLogForce("伊蕾娜-W", "变式", "镜界回响护盾", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
       }
     });
 
     return context.currentDamage * (1 - 伊蕾娜W配置.偏折减免比例);
-  }, 50);
+  });
 
   // 自然结束路径：窗口到点 → 有脉冲资格的统一收口
   addDelayedCallback(伊蕾娜W配置.保护窗口秒 * 1000, function W窗口自然结束(this: void): void {

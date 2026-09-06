@@ -8,6 +8,8 @@ local jass = require("jass.common")
 local japi = require("jass.japi")
 local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
 local dynamicTextCore = require("系统.03．技能系统.07．动态技能文本.03．核心逻辑")
+local ____require_result_0 = require("系统.03．技能系统.02．技能消耗.04．原生魔法消耗同步")
+local _____83B7_53D6_5DF2_540C_6B65_6280_80FD_9B54_6CD5_6D88_8017 = ____require_result_0["获取已同步技能魔法消耗"]
 local DzGetGameUI = japi.DzGetGameUI
 local DzLoadToc = japi.DzLoadToc
 local DzCreateFrame = japi.DzCreateFrame
@@ -25,8 +27,6 @@ local DzFrameSetEnable = japi.DzFrameSetEnable
 local DzFrameShow = japi.DzFrameShow
 local DzGetUnitAbilityTip = japi.DzGetUnitAbilityTip
 local DzGetUnitAbilityUberTip = japi.DzGetUnitAbilityUberTip
-local DzGetUnitAbilityCost = japi.DzGetUnitAbilityCost
-local GetHandleId = jass.GetHandleId
 local TOC_PATH = "UI\\BuffTestTooltip.toc"
 local FDF_NAME = "AbilityTooltipNativePanel"
 local FRAME_CONTEXT = 9401
@@ -53,6 +53,9 @@ local BODY_WIDTH = 42
 local _____5DF2_521D_59CB_5316 = false
 local ____fdf_5DF2_52A0_8F7D = false
 local _____63D0_793A_5E27 = nil
+local _____5F53_524D_60AC_505C_82F1_96C4 = nil
+local _____5F53_524D_60AC_505C_6280_80FDID = 0
+local _____539F_59CB_6587_672C_6A21_5F0F = false
 local function _____6709_6548_5E27(frame)
     return frame ~= nil and frame ~= 0
 end
@@ -231,7 +234,7 @@ local function _____683C_5F0F_5316_9B54_8017(value)
     if not (value > 0) then
         return ""
     end
-    return jass.I2S(jass.R2I(value + 0.5))
+    return ("|cffffcc00" .. tostring(jass.I2S(jass.R2I(value + 0.5)))) .. "|r"
 end
 local function _____951A_5B9A_6839_6846(root)
     if not _____6709_6548_5E27(root) then
@@ -255,13 +258,24 @@ local function _____66F4_65B0_63D0_793A(hero, abilityId)
     if _____63D0_793A_5E27 == nil or not _____6709_6548_5E27(hero) or abilityId == 0 then
         return
     end
-    dynamicTextCore["刷新单个英雄技能动态文本"](hero, abilityId)
+    _____5F53_524D_60AC_505C_82F1_96C4 = hero
+    _____5F53_524D_60AC_505C_6280_80FDID = abilityId
+    if not _____539F_59CB_6587_672C_6A21_5F0F then
+        dynamicTextCore["刷新单个英雄技能动态文本"](hero, abilityId)
+    end
     local title = DzGetUnitAbilityTip(hero, abilityId) or ""
-    local body = DzGetUnitAbilityUberTip(hero, abilityId) or ""
-    local cost = DzGetUnitAbilityCost(hero, abilityId) or 0
+    local body = _____539F_59CB_6587_672C_6A21_5F0F and dynamicTextCore["获取技能原始提示"](hero, abilityId) or (DzGetUnitAbilityUberTip(hero, abilityId) or "")
+    local cost = _____83B7_53D6_5DF2_540C_6B65_6280_80FD_9B54_6CD5_6D88_8017(hero, abilityId)
     _____5B89_5168_6587_672C(_____63D0_793A_5E27.name, title)
     local costText = _____683C_5F0F_5316_9B54_8017(cost)
     _____5B89_5168_6587_672C(_____63D0_793A_5E27.manaText, costText)
+    DzFrameSetTextColor(
+        _____63D0_793A_5E27.manaText,
+        255,
+        204,
+        0,
+        255
+    )
     _____5B89_5168_663E_793A(_____63D0_793A_5E27.manaIcon, costText ~= "")
     _____5B89_5168_663E_793A(_____63D0_793A_5E27.manaText, costText ~= "")
     local lineIndex = costText ~= "" and 2 or 1
@@ -325,10 +339,19 @@ local function _____6280_80FD_6309_94AE_8FDB_5165()
     end
     _____66F4_65B0_63D0_793A(hero, abilityId)
 end
+--- Alt 按住时仍使用自定义框，只切换到首次缓存的原始技能说明。
+____exports["设置技能提示原始模式"] = function(_____539F_59CB_6A21_5F0F)
+    _____539F_59CB_6587_672C_6A21_5F0F = _____539F_59CB_6A21_5F0F
+    if _____5F53_524D_60AC_505C_82F1_96C4 ~= nil and _____5F53_524D_60AC_505C_82F1_96C4 ~= 0 and _____5F53_524D_60AC_505C_6280_80FDID ~= 0 then
+        _____66F4_65B0_63D0_793A(_____5F53_524D_60AC_505C_82F1_96C4, _____5F53_524D_60AC_505C_6280_80FDID)
+    end
+end
 local function _____6280_80FD_6309_94AE_79BB_5F00()
     if _____63D0_793A_5E27 ~= nil then
         DzFrameShow(_____63D0_793A_5E27.root, false)
     end
+    _____5F53_524D_60AC_505C_82F1_96C4 = nil
+    _____5F53_524D_60AC_505C_6280_80FDID = 0
     _____6062_590D_539F_751F_63D0_793A()
 end
 local function _____6CE8_518C_6280_80FD_6309_94AE()
@@ -348,12 +371,12 @@ local function _____6CE8_518C_6280_80FD_6309_94AE()
             do
                 local button = DzFrameGetCommandBarButton(positions[i + 1][2], positions[i + 1][1])
                 if not _____6709_6548_5E27(button) then
-                    goto __continue57
+                    goto __continue60
                 end
                 DzFrameSetScriptByCode(button, MOUSE_ENTER, _____6280_80FD_6309_94AE_8FDB_5165, false)
                 DzFrameSetScriptByCode(button, MOUSE_LEAVE, _____6280_80FD_6309_94AE_79BB_5F00, false)
             end
-            ::__continue57::
+            ::__continue60::
             i = i + 1
         end
     end

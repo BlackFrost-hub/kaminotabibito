@@ -19,7 +19,7 @@ local HERO_LEVELS = 15
 createPlayerHeroChannelAbility('AIQ1', '伊蕾娜-旅风·追迹（Q）', {
   editorSuffix = 'IrenaQ', heroAbility = true, levels = HERO_LEVELS,
   targetType = 3, castRange = 900, orderId = 'frostnova',
-  tooltip = '旅风·追迹（Q）', tooltipExtended = '技能说明：向目标方向发射追踪魔弹，命中后记录旅途见闻；已有镜界或远行路线时会追加联动魔法。|n伤害：主弹造成攻击力100%的魔法伤害。|n施法距离：900|n伤害范围：命中半径100|n减速：20%，持续1.2秒|n冷却时间：5秒|n魔法消耗：最大魔法值的5%',
+  tooltip = '旅风·追迹（Q）', tooltipExtended = '技能说明：向目标方向发射追踪魔弹，命中后记录旅途见闻；已有镜界或远行路线时会追加联动魔法。|n伤害：主弹造成攻击力180%的魔法伤害，最多命中3个敌人。|n施法距离：900|n伤害范围：命中半径100|n减速：20%，持续1.2秒|n冷却时间：5秒|n魔法消耗：最大魔法值的5%',
   icon = ICONS.Q, iconTurnOff = DISABLED_ICONS.Q, hotkey = 'Q', buttonX = 0, buttonY = 2, cooldown = 5, manaCost = 50, percentManaCost = 0.05,
 })
 
@@ -47,6 +47,6 @@ createPlayerHeroChannelAbility('AIR1', '伊蕾娜-灰之魔女·万法回廊（R
 createPlayerHeroActiveDChannelAbility('AID1', '伊蕾娜-旅途魔法变式（D）', {
   editorSuffix = 'IrenaD', levels = 1,
   targetType = 0, castRange = 0, targetsAllowed = '', orderId = 'berserk',
-  tooltip = '旅途魔法变式（D）', tooltipExtended = '技能说明：切换下一次Q、W、E或R使用的魔法变式，按固定顺序选择迅行、镜界与灰烬。|n伤害：本技能不直接造成伤害。|n技能类型：天赋技能，初始获得|n变式保留时间：最多30秒|n冷却时间：4秒|n魔法消耗：最大魔法值的2%',
-  icon = ICONS.D, iconTurnOff = DISABLED_ICONS.D, hotkey = 'D', buttonX = 0, buttonY = 1, cooldown = 4, manaCost = 30, percentManaCost = 0.02,
+  tooltip = '旅途魔法变式（D）', tooltipExtended = '技能说明：切换下一次Q、W、E或R使用的魔法变式，按固定顺序选择迅行、镜界与灰烬。|n伤害：本技能不直接造成伤害。|n技能类型：天赋技能，初始获得|n变式保留时间：最多30秒|n冷却时间：1秒|n魔法消耗：最大魔法值的2%',
+  icon = ICONS.D, iconTurnOff = DISABLED_ICONS.D, hotkey = 'D', buttonX = 0, buttonY = 1, cooldown = 1, manaCost = 30, percentManaCost = 0.02,
 })

@@ -22,6 +22,7 @@ import {
 } from "./00．配置";
 import { 塞莉亚BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/24．塞莉亚·克莱尔";
 import type { 塞莉亚节点类型 } from "./02．被动效果";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 import {
   查询塞莉亚节点,
   查询塞莉亚有效连接,
@@ -59,8 +60,8 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
-  查询战斗技能实例: (this: void, 单位: any, 技能键?: string) => any[];
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
+  查询战斗技能实例: (this: void, 单位: any, 技能键?: string) => 战斗技能实例控制器[];
 };
 const { 开始充能, 停止充能 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统") as {
   开始充能: (this: void, 单位: any, 参数: any) => number;
@@ -118,6 +119,17 @@ const 英雄单位类型ID = 塞莉亚克莱尔技能配置.单位类型ID;
 const R技能类型ID = stringToFourCCSafe(塞莉亚克莱尔技能配置.R.技能ID) as number;
 const R技能键 = "R高阶术式闭锁";
 
+/** R 实例数据（t0 快照）。必须用真实类型：any 上的 .length 会编译成原始字段访问，[i] 也不会做 1-based 偏移。 */
+interface R领域数据 {
+  技能实例ID: number | undefined;
+  中心X: number;
+  中心Y: number;
+  方向角: number;
+  节点快照: { 序号: number; 类型: 塞莉亚节点类型 }[];
+  连接快照: { A序号: number; B序号: number } | null;
+  有连接快照: boolean;
+}
+
 //=============================================================================
 // 结算辅助
 //=============================================================================
@@ -127,7 +139,7 @@ function R技能伤害(
   施法者: any,
   目标: any,
   伤害值: number,
-  数据: any,
+  数据: R领域数据,
   标签: string,
 ): boolean {
   return 造成技能伤害({
@@ -146,7 +158,7 @@ function R技能伤害(
   });
 }
 
-function 范围爆发(this: void, 施法者: any, X: number, Y: number, 半径: number, 倍率: number, 数据: any, 标签: string): void {
+function 范围爆发(this: void, 施法者: any, X: number, Y: number, 半径: number, 倍率: number, 数据: R领域数据, 标签: string): void {
   const 列表 = 获取坐标范围敌人(施法者, X, Y, 半径);
   const 伤害 = 读取单位攻击力(施法者) * 倍率;
   for (let i = 0; i < 列表.length; i++) {
@@ -160,7 +172,7 @@ function 范围爆发(this: void, 施法者: any, X: number, Y: number, 半径: 
 function 发射R魔弹(
   this: void,
   施法者: any,
-  数据: any,
+  数据: R领域数据,
   参数: { 名称: string; 标签: string; 发射X: number; 发射Y: number; 方向角: number; 形态: "单体" | "AOE"; 穿透: boolean; 最大命中数: number; 倍率: number; 距离: number; 追踪目标?: any },
 ): void {
   发射弹道({
@@ -202,8 +214,8 @@ function 发射R魔弹(
 function 执行连接分支(
   this: void,
   施法者: any,
-  实例: any,
-  数据: any,
+  实例: 战斗技能实例控制器,
+  数据: R领域数据,
   已消费连接: { A序号: number; B序号: number; A类型: 塞莉亚节点类型; B类型: 塞莉亚节点类型 },
 ): void {
   const 有棱晶 = 已消费连接.A类型 === "棱晶" || 已消费连接.B类型 === "棱晶";
@@ -289,7 +301,7 @@ function 取阵内最近敌人(this: void, 来源: any, X: number, Y: number, �
 }
 
 /** 无连接时的单节点单独强化（取快照中仍存活的第一个节点类型）。 */
-function 执行单节点强化(this: void, 施法者: any, 实例: any, 数据: any, 节点类型: 塞莉亚节点类型): void {
+function 执行单节点强化(this: void, 施法者: any, 实例: 战斗技能实例控制器, 数据: R领域数据, 节点类型: 塞莉亚节点类型): void {
   if (节点类型 === "棱晶") {
     发射R魔弹(施法者, 数据, {
       名称: "塞莉亚-单体棱晶折射",
@@ -329,7 +341,7 @@ function 执行单节点强化(this: void, 施法者: any, 实例: any, 数据: 
 // 主结算（只在充能完成回调执行）
 //=============================================================================
 
-function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: any): void {
+function 执行R完成结算(this: void, 施法者: any, 实例: 战斗技能实例控制器, 数据: R领域数据): void {
   // 阵心核心表现
   const 核心 = 创建点特效({
     模型路径: 塞莉亚克莱尔表现配置.R闭锁核心.模型路径,
@@ -442,7 +454,7 @@ function 释放R高阶术式(this: void, _context: any, 施法者: any, 技能�
 
   锁定塞莉亚R(施法者);
 
-  const 数据: any = {
+  const 数据: R领域数据 = {
     技能实例ID,
     中心X,
     中心Y,

@@ -819,16 +819,6 @@ ____exports["检查英雄技能"] = function(hero)
     do
         local i = 0
         while i < #abilityIds do
-            __TS__Delete(
-                _____539F_59CB_63D0_793A_7F13_5B58,
-                _____751F_6210_63D0_793A_7F13_5B58_952E(hero, abilityIds[i + 1])
-            )
-            i = i + 1
-        end
-    end
-    do
-        local i = 0
-        while i < #abilityIds do
             local level = GetUnitAbilityLevel(hero, abilityIds[i + 1])
             if level > 0 then
                 _____5904_7406_6280_80FD_63D0_793A(hero, abilityIds[i + 1])
@@ -867,6 +857,22 @@ ____exports["刷新单个英雄技能动态文本"] = function(hero, abilityId)
         return
     end
     _____5904_7406_6280_80FD_63D0_793A(hero, abilityId)
+end
+--- 返回技能首次读取到的原始说明，供自定义提示框的 Alt 原始模式使用。
+____exports["获取技能原始提示"] = function(hero, abilityId)
+    if not isValidHandle(hero) or abilityId == 0 then
+        return ""
+    end
+    local _____7F13_5B58_952E = _____751F_6210_63D0_793A_7F13_5B58_952E(hero, abilityId)
+    local _____5DF2_7F13_5B58_6587_672C = _____539F_59CB_63D0_793A_7F13_5B58[_____7F13_5B58_952E]
+    if _____5DF2_7F13_5B58_6587_672C ~= nil then
+        return _____5DF2_7F13_5B58_6587_672C
+    end
+    local _____5F53_524D_6587_672C = DzGetUnitAbilityUberTip(hero, abilityId) or ""
+    if _____5F53_524D_6587_672C ~= "" then
+        _____539F_59CB_63D0_793A_7F13_5B58[_____7F13_5B58_952E] = _____5F53_524D_6587_672C
+    end
+    return _____5F53_524D_6587_672C
 end
 local function _____672C_5730_5237_65B0_6307_5B9A_82F1_96C4_52A8_6001_6587_672C(hero)
     local _____5FEB_7167 = selectionSnapshotSystem["获取本地选中技能快照"]()

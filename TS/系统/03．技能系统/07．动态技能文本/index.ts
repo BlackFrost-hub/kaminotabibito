@@ -12,15 +12,7 @@ const jass = require("jass.common") as any;
 const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
 };
-const syncHardwareInput = require("lib.扩展函数.封装函数.04．硬件输入.08．同步硬件输入中心") as {
-  registerSyncHardwareKey: (this: void, key: number | string, status: number, callback: (this: void, event: any) => void) => any;
-};
-const { KEY_STATE } = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义") as {
-  KEY_STATE: { DOWN: number; UP: number };
-};
-const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
-  getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
-};
+import { KEY_STATE, registerKeyEventByCode } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 const selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照") as {
   初始化本地选中技能快照: (this: void) => void;
   获取本地选中技能快照: (this: void) => {
@@ -43,9 +35,8 @@ import {
   恢复英雄技能原始文本,
   检查英雄技能,
   同步刷新英雄技能界面,
-  同步刷新英雄技能原始界面,
 } from "./03．核心逻辑";
-import { 初始化技能提示UI } from "./05．技能提示UI";
+import { 初始化技能提示UI, 设置技能提示原始模式 } from "./05．技能提示UI";
 
 const MODULE_NAME = "动态技能文本";
 const REFRESH_MS = 300;
@@ -99,23 +90,21 @@ function 恢复当前生效英雄(this: void): void {
   当前快照签名 = "";
 }
 
-function 处理同步Alt按下(this: void, event: any): void {
+function 处理Alt按下(this: void): void {
   if (Alt同步按下) return;
-  const player = event != null ? event.player : null;
-  const hero = getRegisteredPlayerHero(player);
+  const hero = 获取本地当前选中英雄();
   if (!isValidHandle(hero)) return;
-
   Alt同步按下 = true;
-  同步刷新英雄技能原始界面(hero);
+  设置技能提示原始模式(true);
 }
 
-function 处理同步Alt松开(this: void, event: any): void {
+function 处理Alt松开(this: void): void {
   if (!Alt同步按下) return;
-  const player = event != null ? event.player : null;
-  const hero = getRegisteredPlayerHero(player);
-  if (!isValidHandle(hero)) return;
-
   Alt同步按下 = false;
+  // 无论松开时是否仍选中英雄，都要退出自定义框的原始文本模式。
+  设置技能提示原始模式(false);
+  const hero = 获取本地当前选中英雄();
+  if (!isValidHandle(hero)) return;
   同步刷新英雄技能界面(hero);
 }
 
@@ -135,6 +124,8 @@ function onTick(this: void): void {
   if (!已开启) {
     return;
   }
+  // Alt 按住期间由自定义框显示原始缓存，禁止 300ms 动态刷新改写技能文本。
+  if (Alt同步按下) return;
 
   const nextSignature = 构建动态文本快照签名(当前生效英雄);
   if (nextSignature !== 当前快照签名) {
@@ -156,8 +147,9 @@ export function initDynamicSkillTextSystem(this: void): void {
   // 技能提示帧在初始化时同步创建并注册悬停事件，不使用延迟回调。
   初始化技能提示UI();
   addPeriodicCallback(REFRESH_MS, onTick);
-  syncHardwareInput.registerSyncHardwareKey(ALT_KEY_CODE, KEY_STATE.DOWN, 处理同步Alt按下);
-  syncHardwareInput.registerSyncHardwareKey(ALT_KEY_CODE, KEY_STATE.UP, 处理同步Alt松开);
+  // Alt 只切换本地 UI；不应通过全端同步回调修改其他玩家的提示状态。
+  registerKeyEventByCode(ALT_KEY_CODE, KEY_STATE.DOWN, false, 处理Alt按下 as any);
+  registerKeyEventByCode(ALT_KEY_CODE, KEY_STATE.UP, false, 处理Alt松开 as any);
   debugLog(MODULE_NAME, "初始化动态技能文本系统");
 }
 

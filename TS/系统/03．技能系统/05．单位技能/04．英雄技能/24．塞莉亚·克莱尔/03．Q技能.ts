@@ -11,6 +11,7 @@
  */
 
 import { 塞莉亚克莱尔技能配置, 塞莉亚克莱尔Q配置, 塞莉亚克莱尔表现配置, 塞莉亚音效配置 } from "./00．配置";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 import {
   授予塞莉亚演算窗口,
   创建塞莉亚节点,
@@ -48,7 +49,7 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
 };
 const { 发射弹道 } = require("系统.03．技能系统.00．技能模板+函数.00．技能模板.09．复杂战斗模板.05．弹道编排工厂") as {
   发射弹道: (this: void, 参数: any) => any;
@@ -128,7 +129,7 @@ function 处理Q命中(this: void, 施法者: any, 目标: any, 数据: any): vo
   const X = GetUnitX(目标);
   const Y = GetUnitY(目标);
   const 伤害 = 读取单位攻击力(施法者) * 塞莉亚克莱尔Q配置.主伤害攻击力倍率;
-  debugLogForce("塞莉亚-Q", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能类型ID), "实例", 数据.技能实例ID ?? "-", "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(X), "Y", Math.floor(Y), "伤害", 伤害);
+  debugLogForce("塞莉亚-Q", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能类型ID), "实例", 数据.技能实例ID ?? "-", "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(X), "Y", Math.floor(Y), "伤害", 伤害, "全程最近棱晶距", 数据.接近最小距平方 != null ? Math.floor(SquareRoot(数据.接近最小距平方)) : -1);
   造成Q伤害(施法者, 目标, 伤害, 数据.技能实例ID, "塞莉亚-棱晶魔弹", "单体");
   // 命中即视为到达真实终点
   尝试建立终点节点(施法者, 数据, X, Y);
@@ -141,24 +142,42 @@ function 处理Q命中(this: void, 施法者: any, 目标: any, 数据: any): vo
 function 尝试棱晶折射(this: void, 施法者: any, 数据: any, 当前X: number, 当前Y: number): void {
   if (数据.已读折射 || !数据.有方向向量) return;
   const 节点列表 = 查询塞莉亚节点(施法者);
+  if (!数据.已记录折射采样) {
+    // 一次性诊断：飞行首帧的节点可见性采样（定位"有节点却不折射"）
+    数据.已记录折射采样 = true;
+    let 棱晶数 = 0;
+    for (let i = 0; i < 节点列表.length; i++) {
+      if (节点列表[i].类型 === "棱晶") 棱晶数 += 1;
+    }
+    debugLogForce("塞莉亚-Q", "折射采样", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "节点数", 节点列表.length, "棱晶数", 棱晶数, "有方向", 数据.有方向向量, "当前X", Math.floor(当前X), "当前Y", Math.floor(当前Y));
+  }
   for (let i = 0; i < 节点列表.length; i++) {
     const 节点 = 节点列表[i];
     if (节点.类型 !== "棱晶") continue;
-    if (距离平方XY(当前X, 当前Y, 节点.X, 节点.Y) > 塞莉亚克莱尔Q配置.折射触发半径 * 塞莉亚克莱尔Q配置.折射触发半径) continue;
+    const 节点距离平方 = 距离平方XY(当前X, 当前Y, 节点.X, 节点.Y);
+    // 接近轨迹探针：距任一棱晶创新低（<400）时输出一次，用于定位折射未触发
+    if (节点距离平方 < (数据.接近最小距平方 ?? 1e18)) {
+      数据.接近最小距平方 = 节点距离平方;
+      if (节点距离平方 < 400 * 400) {
+        debugLogForce("塞莉亚-Q", "接近棱晶", "距离", Math.floor(SquareRoot(节点距离平方)), "节点", 节点.序号, "当前X", Math.floor(当前X), "当前Y", Math.floor(当前Y));
+      }
+    }
+    if (节点距离平方 > 塞莉亚克莱尔Q配置.折射触发半径 * 塞莉亚克莱尔Q配置.折射触发半径) continue;
 
     // 分支真正进入后再置位并开火
     数据.已读折射 = true;
+    debugLogForce("塞莉亚-Q", "联动", "棱晶折射", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "节点", 节点.序号, "阶段", "进入分支");
     let nx = 当前X - 节点.X;
     let ny = 当前Y - 节点.Y;
     const nl = SquareRoot(nx * nx + ny * ny);
-    if (nl <= 1) return;
+    if (nl <= 0.0001) return;
     nx /= nl;
     ny /= nl;
     const dot = 数据.dirX * nx + 数据.dirY * ny;
     let rx = 数据.dirX - 2 * dot * nx;
     let ry = 数据.dirY - 2 * dot * ny;
     const rl = SquareRoot(rx * rx + ry * ry);
-    if (rl <= 1) return;
+    if (rl <= 0.0001) return;
     rx /= rl;
     ry /= rl;
 
@@ -191,6 +210,7 @@ function 尝试棱晶折射(this: void, 施法者: any, 数据: any, 当前X: nu
     });
     // 折射清响（折射弹真正发出时一次；坐标=节点位置，参数配置驱动）
     Sound3DII_CooPlayReuse(塞莉亚音效配置.Q折射.路径, 节点.X, 节点.Y, 塞莉亚音效配置.Q折射.高度, 塞莉亚音效配置.Q折射.裁断距离);
+    debugLogForce("塞莉亚-Q", "联动", "棱晶折射", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "节点", 节点.序号, "阶段", "发射完成");
     return;
   }
 }
@@ -298,7 +318,7 @@ function 释放Q棱晶魔弹(this: void, _context: any, 施法者: any, 技能�
     目标Y = GetUnitY(目标单位);
   }
 
-  debugLogForce("塞莉亚-Q", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能类型ID), "实例", 技能实例ID ?? "-", "目标", 有目标 ? GetUnitName(目标单位) : "点施放", "X", Math.floor(目标X), "Y", Math.floor(目标Y));
+  debugLogForce("塞莉亚-Q", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能类型ID), "实例", 技能实例ID ?? "-", "目标", 有目标 ? GetUnitName(目标单位) : "点施放", "X", Math.floor(目标X), "Y", Math.floor(目标Y), "节点数", 查询塞莉亚节点(施法者).length);
 
   const 数据: any = {
     技能实例ID,

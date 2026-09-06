@@ -16,6 +16,10 @@ const selectionSnapshotSystem = require("系统.03．技能系统.00．本地选
 };
 const dynamicTextCore = require("系统.03．技能系统.07．动态技能文本.03．核心逻辑") as {
   刷新单个英雄技能动态文本: (this: void, hero: any, abilityId: number) => void;
+  获取技能原始提示: (this: void, hero: any, abilityId: number) => string;
+};
+const { 获取已同步技能魔法消耗 } = require("系统.03．技能系统.02．技能消耗.04．原生魔法消耗同步") as {
+  获取已同步技能魔法消耗: (this: void, unit: any, abilityId: number) => number;
 };
 
 const DzGetGameUI = japi.DzGetGameUI as () => number;
@@ -35,8 +39,6 @@ const DzFrameSetEnable = japi.DzFrameSetEnable as (frame: number, enable: boolea
 const DzFrameShow = japi.DzFrameShow as (frame: number, visible: boolean) => void;
 const DzGetUnitAbilityTip = japi.DzGetUnitAbilityTip as (unit: any, abilityId: number) => string;
 const DzGetUnitAbilityUberTip = japi.DzGetUnitAbilityUberTip as (unit: any, abilityId: number) => string;
-const DzGetUnitAbilityCost = japi.DzGetUnitAbilityCost as (unit: any, abilityId: number) => number;
-const GetHandleId = jass.GetHandleId as (handle: any) => number;
 
 const TOC_PATH = "UI\\BuffTestTooltip.toc";
 const FDF_NAME = "AbilityTooltipNativePanel";
@@ -69,6 +71,9 @@ type 技能提示帧 = { root: number; name: number; manaIcon: number; manaText:
 let 已初始化 = false;
 let fdf已加载 = false;
 let 提示帧: 技能提示帧 | null = null;
+let 当前悬停英雄: any | null = null;
+let 当前悬停技能ID = 0;
+let 原始文本模式 = false;
 
 function 有效帧(this: void, frame: number): boolean { return frame != null && frame !== 0; }
 function 安全显示(this: void, frame: number, visible: boolean): void { if (有效帧(frame)) DzFrameShow(frame, visible); }
@@ -120,6 +125,7 @@ function 创建提示帧(this: void): 技能提示帧 | null {
   const manaText = 创建文本帧("AbilityTooltipNativeManaText", root, TEXT_CONTEXT + 3);
   const body = 创建文本帧("AbilityTooltipNativeBodyText", root, TEXT_CONTEXT + 4);
   if (!有效帧(name) || !有效帧(manaIcon) || !有效帧(manaText) || !有效帧(body)) return null;
+  // 按技能提示的统一视觉规范，魔耗数值使用金色。
   DzFrameSetTextColor(manaText, 255, 204, 0, 255);
   DzFrameShow(root, false);
   DzFrameSetPriority(root, 8700);
@@ -162,7 +168,8 @@ function 正文行数(this: void, text: string): number {
 
 function 格式化魔耗(this: void, value: number): string {
   if (!(value > 0)) return "";
-  return jass.I2S(jass.R2I(value + 0.5));
+  // 直接使用行内颜色码，避免游戏模板或父帧颜色覆盖金色设置。
+  return "|cffffcc00" + jass.I2S(jass.R2I(value + 0.5)) + "|r";
 }
 
 function 锚定根框(this: void, root: number): void {
@@ -175,13 +182,20 @@ function 锚定根框(this: void, root: number): void {
 
 function 更新提示(this: void, hero: any, abilityId: number): void {
   if (提示帧 == null || !有效帧(hero) || abilityId === 0) return;
-  dynamicTextCore.刷新单个英雄技能动态文本(hero, abilityId);
+  当前悬停英雄 = hero;
+  当前悬停技能ID = abilityId;
+  if (!原始文本模式) dynamicTextCore.刷新单个英雄技能动态文本(hero, abilityId);
   const title = DzGetUnitAbilityTip(hero, abilityId) || "";
-  const body = DzGetUnitAbilityUberTip(hero, abilityId) || "";
-  const cost = DzGetUnitAbilityCost(hero, abilityId) || 0;
+  const body = 原始文本模式
+    ? dynamicTextCore.获取技能原始提示(hero, abilityId)
+    : DzGetUnitAbilityUberTip(hero, abilityId) || "";
+  // 蓝耗由技能消耗系统统一计算并同步；提示框只读取结果，不在 UI 层重复计算。
+  const cost = 获取已同步技能魔法消耗(hero, abilityId);
   安全文本(提示帧.name, title);
   const costText = 格式化魔耗(cost);
   安全文本(提示帧.manaText, costText);
+  // FDF 已设为金色；每次写入后再次指定，避免父帧或文本更新重置颜色。
+  DzFrameSetTextColor(提示帧.manaText, 255, 204, 0, 255);
   安全显示(提示帧.manaIcon, costText !== "");
   安全显示(提示帧.manaText, costText !== "");
   const lineIndex = costText !== "" ? 2 : 1;
@@ -227,8 +241,18 @@ function 技能按钮进入(this: void): void {
   更新提示(hero, abilityId);
 }
 
+/** Alt 按住时仍使用自定义框，只切换到首次缓存的原始技能说明。 */
+export function 设置技能提示原始模式(this: void, 原始模式: boolean): void {
+  原始文本模式 = 原始模式;
+  if (当前悬停英雄 != null && 当前悬停英雄 !== 0 && 当前悬停技能ID !== 0) {
+    更新提示(当前悬停英雄, 当前悬停技能ID);
+  }
+}
+
 function 技能按钮离开(this: void): void {
   if (提示帧 != null) DzFrameShow(提示帧.root, false);
+  当前悬停英雄 = null;
+  当前悬停技能ID = 0;
   恢复原生提示();
 }
 

@@ -13,6 +13,7 @@ import {
   芙莉莲表现配置,
   芙莉莲音效配置,
 } from "./00．配置";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
@@ -38,11 +39,11 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
-  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => any[];
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
+  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => 战斗技能实例控制器[];
 };
-const { registerDamageModifier, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority: number) => number;
+const { register护盾前拦截修改器, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+  register护盾前拦截修改器: (this: void, callback: (this: void, context: any) => number) => number;
   unregisterDamageModifier: (this: void, id: number) => boolean;
 };
 const { 开始护盾 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统") as {
@@ -190,7 +191,7 @@ function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: numb
   Sound3DII_UnitPlayReuse(芙莉莲音效配置.W展开.路径, 施法者, 芙莉莲音效配置.W展开.裁断距离);
 
   // 一次主要攻击防御：来源在快照正面扇区内 → 化解一次（非 360° 无敌）
-  数据.修饰ID = registerDamageModifier(function W防御修正(this: void, context: any): number {
+  数据.修饰ID = register护盾前拦截修改器(function W防御修正(this: void, context: any): number {
     if (数据.已防御 || 数据.已结束) return context.currentDamage;
     if (context.target !== 施法者) return context.currentDamage;
     if (context.attacker == null || context.attacker === 0) return context.currentDamage;
@@ -227,7 +228,7 @@ function 释放W(this: void, _context: any, 施法者: any, 技能实例ID: numb
     });
     // 化解本次伤害（防御化解比例 1 = 完全阻挡一次主要攻击）
     return context.currentDamage * (1 - W配置.防御化解比例);
-  }, 60);
+  });
 
   // 自然结束（无攻击进入）
   数据.到期ID = addDelayedCallback(窗口秒 * 1000, function W窗口到期(this: void): void {

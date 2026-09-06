@@ -30,7 +30,7 @@ local ____require_result_6 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_6["创建战斗技能实例"]
 local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_6["查询战斗技能实例"]
 local ____require_result_7 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
-local registerDamageModifier = ____require_result_7.registerDamageModifier
+local ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668 = ____require_result_7["register护盾前拦截修改器"]
 local unregisterDamageModifier = ____require_result_7.unregisterDamageModifier
 local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.07．护盾.07．护盾系统")
 local _____5F00_59CB_62A4_76FE = ____require_result_8["开始护盾"]
@@ -201,76 +201,73 @@ local function _____91CA_653EW(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
     )
     local ____ = _____516C_5F0F_5C42_53E5_67C4
     Sound3DII_UnitPlayReuse(_____8299_8389_83B2_97F3_6548_914D_7F6E["W展开"]["路径"], _____65BD_6CD5_8005, _____8299_8389_83B2_97F3_6548_914D_7F6E["W展开"]["裁断距离"])
-    _____6570_636E["修饰ID"] = registerDamageModifier(
-        function(context)
-            if _____6570_636E["已防御"] or _____6570_636E["已结束"] then
-                return context.currentDamage
+    _____6570_636E["修饰ID"] = ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668(function(context)
+        if _____6570_636E["已防御"] or _____6570_636E["已结束"] then
+            return context.currentDamage
+        end
+        if context.target ~= _____65BD_6CD5_8005 then
+            return context.currentDamage
+        end
+        if context.attacker == nil or context.attacker == 0 then
+            return context.currentDamage
+        end
+        local _____6765_6E90_89D2 = _____4E24_70B9_89D2_5EA6(
+            GetUnitX(_____65BD_6CD5_8005),
+            GetUnitY(_____65BD_6CD5_8005),
+            GetUnitX(context.attacker),
+            GetUnitY(context.attacker)
+        )
+        if _____89D2_5EA6_5DEE_7EDD_5BF9_503C(_____6570_636E["方向角"], _____6765_6E90_89D2) > ____W_914D_7F6E["正面角度"] / 2 then
+            return context.currentDamage
+        end
+        if context.currentDamage <= 0 then
+            return context.currentDamage
+        end
+        _____6570_636E["已防御"] = true
+        local _____6765_6E90 = context.attacker
+        debugLogForce(
+            "芙莉莲-W",
+            "命中",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____W_6280_80FDID),
+            "实例",
+            _____6280_80FD_5B9E_4F8BID or "-",
+            "目标",
+            GetUnitName(_____6765_6E90),
+            "handle",
+            _____6765_6E90,
+            "X",
+            math.floor(GetUnitX(_____6765_6E90)),
+            "Y",
+            math.floor(GetUnitY(_____6765_6E90)),
+            "伤害",
+            context.currentDamage
+        )
+        addDelayedCallback(
+            0,
+            function()
+                _____521B_5EFA_70B9_7279_6548({
+                    ["模型路径"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["模型路径"],
+                    X = GetUnitX(_____65BD_6CD5_8005),
+                    Y = GetUnitY(_____65BD_6CD5_8005),
+                    Z = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["高度"],
+                    ["面向角度"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["面向角度"],
+                    ["动画索引"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["动画索引"],
+                    ["缩放"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["缩放"],
+                    ["持续秒"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["持续秒"],
+                    RGB = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"].RGB
+                })
+                Sound3DII_UnitPlayReuse(_____8299_8389_83B2_97F3_6548_914D_7F6E["W抵挡"]["路径"], _____65BD_6CD5_8005, _____8299_8389_83B2_97F3_6548_914D_7F6E["W抵挡"]["裁断距离"])
+                _____65BD_52A0_89E3_6790(_____65BD_6CD5_8005, _____6765_6E90, "防御")
+                _____63D0_4F9B_6F14_7B97_666E_653B(_____65BD_6CD5_8005)
+                _____7ED3_675FW_62A4_58C1(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E, false)
+                _____63A7_5236_5668["完成"]()
             end
-            if context.target ~= _____65BD_6CD5_8005 then
-                return context.currentDamage
-            end
-            if context.attacker == nil or context.attacker == 0 then
-                return context.currentDamage
-            end
-            local _____6765_6E90_89D2 = _____4E24_70B9_89D2_5EA6(
-                GetUnitX(_____65BD_6CD5_8005),
-                GetUnitY(_____65BD_6CD5_8005),
-                GetUnitX(context.attacker),
-                GetUnitY(context.attacker)
-            )
-            if _____89D2_5EA6_5DEE_7EDD_5BF9_503C(_____6570_636E["方向角"], _____6765_6E90_89D2) > ____W_914D_7F6E["正面角度"] / 2 then
-                return context.currentDamage
-            end
-            if context.currentDamage <= 0 then
-                return context.currentDamage
-            end
-            _____6570_636E["已防御"] = true
-            local _____6765_6E90 = context.attacker
-            debugLogForce(
-                "芙莉莲-W",
-                "命中",
-                "玩家",
-                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                "四码",
-                fourCCToStringSafe(____W_6280_80FDID),
-                "实例",
-                _____6280_80FD_5B9E_4F8BID or "-",
-                "目标",
-                GetUnitName(_____6765_6E90),
-                "handle",
-                _____6765_6E90,
-                "X",
-                math.floor(GetUnitX(_____6765_6E90)),
-                "Y",
-                math.floor(GetUnitY(_____6765_6E90)),
-                "伤害",
-                context.currentDamage
-            )
-            addDelayedCallback(
-                0,
-                function()
-                    _____521B_5EFA_70B9_7279_6548({
-                        ["模型路径"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["模型路径"],
-                        X = GetUnitX(_____65BD_6CD5_8005),
-                        Y = GetUnitY(_____65BD_6CD5_8005),
-                        Z = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["高度"],
-                        ["面向角度"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["面向角度"],
-                        ["动画索引"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["动画索引"],
-                        ["缩放"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["缩放"],
-                        ["持续秒"] = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"]["持续秒"],
-                        RGB = _____8299_8389_83B2_8868_73B0_914D_7F6E["W受击反馈"].RGB
-                    })
-                    Sound3DII_UnitPlayReuse(_____8299_8389_83B2_97F3_6548_914D_7F6E["W抵挡"]["路径"], _____65BD_6CD5_8005, _____8299_8389_83B2_97F3_6548_914D_7F6E["W抵挡"]["裁断距离"])
-                    _____65BD_52A0_89E3_6790(_____65BD_6CD5_8005, _____6765_6E90, "防御")
-                    _____63D0_4F9B_6F14_7B97_666E_653B(_____65BD_6CD5_8005)
-                    _____7ED3_675FW_62A4_58C1(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E, false)
-                    _____63A7_5236_5668["完成"](_____63A7_5236_5668)
-                end
-            )
-            return context.currentDamage * (1 - ____W_914D_7F6E["防御化解比例"])
-        end,
-        60
-    )
+        )
+        return context.currentDamage * (1 - ____W_914D_7F6E["防御化解比例"])
+    end)
     _____6570_636E["到期ID"] = addDelayedCallback(
         _____7A97_53E3_79D2 * 1000,
         function()
@@ -278,10 +275,10 @@ local function _____91CA_653EW(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
                 return
             end
             _____7ED3_675FW_62A4_58C1(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E, true)
-            _____63A7_5236_5668["完成"](_____63A7_5236_5668)
+            _____63A7_5236_5668["完成"]()
         end
     )
-    _____63A7_5236_5668["登记延迟回调"](_____63A7_5236_5668, _____6570_636E["到期ID"])
+    _____63A7_5236_5668["登记延迟回调"](_____6570_636E["到期ID"])
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册芙莉莲W"] = function()

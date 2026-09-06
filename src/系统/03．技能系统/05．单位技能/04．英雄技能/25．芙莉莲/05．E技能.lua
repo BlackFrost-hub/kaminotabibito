@@ -7,6 +7,8 @@ local _____8299_8389_83B2_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲
 local _____8299_8389_83B2E_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲E配置"]
 local _____8299_8389_83B2_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲表现配置"]
 local _____8299_8389_83B2_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲音效配置"]
+local ____25_FF0E_8299_8389_83B2 = require("系统.05．Buff系统.03．Buff表.02．英雄.25．芙莉莲")
+local _____8299_8389_83B2BuffID = ____25_FF0E_8299_8389_83B2["芙莉莲BuffID"]
 local ____require_result_0 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 local Sound3DII_UnitPlayReuse = ____require_result_0.Sound3DII_UnitPlayReuse
 local Sound3DII_CooPlayReuse = ____require_result_0.Sound3DII_CooPlayReuse
@@ -33,30 +35,33 @@ local _____505C_6B62_4F4D_79FB = ____require_result_6["停止位移"]
 local ____require_result_7 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_7.registerDamageModifier
 local unregisterDamageModifier = ____require_result_7.unregisterDamageModifier
-local ____require_result_8 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_8["造成技能伤害"]
-local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_9["读取单位攻击力"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_9["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_9["两点角度"]
-local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
-local ____require_result_11 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.01A．动作表现")
-local _____64AD_653E_9650_65F6_52A8_4F5C = ____require_result_11["播放限时动作"]
-local _____5F00_59CB_5FAA_73AF_5B88_62A4 = ____require_result_11["开始循环守护"]
-local _____505C_6B62_5FAA_73AF_5B88_62A4 = ____require_result_11["停止循环守护"]
-local _____8299_8389_83B2_52A8_4F5C_69FD = ____require_result_11["芙莉莲动作槽"]
-local ____require_result_12 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.02．被动效果")
-local _____662F_8299_8389_83B2 = ____require_result_12["是芙莉莲"]
-local _____8BB0_5F55_8299_8389_83B2_6D3B_52A8 = ____require_result_12["记录芙莉莲活动"]
-local _____65BD_52A0_89E3_6790 = ____require_result_12["施加解析"]
-local _____63D0_4F9B_6F14_7B97_666E_653B = ____require_result_12["提供演算普攻"]
-local _____767B_8BB0_8299_8389_83B2_6E05_7406 = ____require_result_12["登记芙莉莲清理"]
+local ____require_result_8 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_8.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_8["移除单位指定Buff"]
+local ____require_result_9 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_9["造成技能伤害"]
+local ____require_result_10 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_10["读取单位攻击力"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_10["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_10["两点角度"]
+local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
+local ____require_result_12 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.01A．动作表现")
+local _____64AD_653E_9650_65F6_52A8_4F5C = ____require_result_12["播放限时动作"]
+local _____5F00_59CB_5FAA_73AF_5B88_62A4 = ____require_result_12["开始循环守护"]
+local _____505C_6B62_5FAA_73AF_5B88_62A4 = ____require_result_12["停止循环守护"]
+local _____8299_8389_83B2_52A8_4F5C_69FD = ____require_result_12["芙莉莲动作槽"]
+local ____require_result_13 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.02．被动效果")
+local _____662F_8299_8389_83B2 = ____require_result_13["是芙莉莲"]
+local _____8BB0_5F55_8299_8389_83B2_6D3B_52A8 = ____require_result_13["记录芙莉莲活动"]
+local _____65BD_52A0_89E3_6790 = ____require_result_13["施加解析"]
+local _____63D0_4F9B_6F14_7B97_666E_653B = ____require_result_13["提供演算普攻"]
+local _____767B_8BB0_8299_8389_83B2_6E05_7406 = ____require_result_13["登记芙莉莲清理"]
 local _____82B1_7530_8054_52A8 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.07．D技能")
-local ____require_result_13 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
-local _____8299_8389_83B2D_914D_7F6E = ____require_result_13["芙莉莲D配置"]
-local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_14.debugLogForce
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
+local _____8299_8389_83B2D_914D_7F6E = ____require_result_14["芙莉莲D配置"]
+local ____require_result_15 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_15.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
 local ____E_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.E["技能ID"])
 local ____E_914D_7F6E = _____8299_8389_83B2E_914D_7F6E
@@ -68,8 +73,8 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitName = jass.GetUnitName
 local GetUnitZ = jass.GetUnitFlyHeight
-local ____require_result_15 = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位基础与生命周期函数")
-local SU_SetUnitFlyHeight = ____require_result_15.SU_SetUnitFlyHeight
+local ____require_result_16 = require("lib.扩展函数.Star扩展函数.Star扩展库.09．单位基础与生命周期函数")
+local SU_SetUnitFlyHeight = ____require_result_16.SU_SetUnitFlyHeight
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetOwningPlayer = jass.GetOwningPlayer
@@ -188,6 +193,7 @@ local function _____5B8C_6210E_6536_5C3E(_____65BD_6CD5_8005, _____6570_636E)
         unregisterDamageModifier(_____6570_636E["减伤ID"])
         _____6570_636E["减伤ID"] = 0
     end
+    _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____65BD_6CD5_8005, _____8299_8389_83B2BuffID["高处飞行保护"])
     if _____6570_636E["观察TickID"] ~= 0 then
         removePeriodicCallback(_____6570_636E["观察TickID"])
         _____6570_636E["观察TickID"] = 0
@@ -232,10 +238,10 @@ local function ____E_5B89_6392_89C2_5BDF_671F_6536_5C3E(_____65BD_6CD5_8005, ___
         ____E_914D_7F6E["观察持续秒"] * 1000,
         function()
             _____5B8C_6210E_6536_5C3E(_____65BD_6CD5_8005, _____6570_636E)
-            _____63A7_5236_5668["完成"](_____63A7_5236_5668)
+            _____63A7_5236_5668["完成"]()
         end
     )
-    _____63A7_5236_5668["登记延迟回调"](_____63A7_5236_5668, _____89C2_5BDF_622A_6B62ID)
+    _____63A7_5236_5668["登记延迟回调"](_____89C2_5BDF_622A_6B62ID)
 end
 local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
     if not _____662F_8299_8389_83B2(_____65BD_6CD5_8005) then
@@ -277,13 +283,13 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
         return
     end
     _____8BB0_5F55_8299_8389_83B2_6D3B_52A8(_____65BD_6CD5_8005)
-    local ____temp_16
+    local ____temp_17
     if _____82B1_7530_8054_52A8["尝试消费花田修正"] ~= nil and _____82B1_7530_8054_52A8["在花田内"] ~= nil then
-        ____temp_16 = _____82B1_7530_8054_52A8["在花田内"](_____65BD_6CD5_8005)
+        ____temp_17 = _____82B1_7530_8054_52A8["在花田内"](_____65BD_6CD5_8005)
     else
-        ____temp_16 = false
+        ____temp_17 = false
     end
-    local _____82B1_7530_4FEE_6B63 = ____temp_16
+    local _____82B1_7530_4FEE_6B63 = ____temp_17
     _____64AD_653E_9650_65F6_52A8_4F5C(_____65BD_6CD5_8005, _____8299_8389_83B2_52A8_4F5C_69FD["E起飞"], "芙莉莲E起飞")
     local _____8D77_70B9X = GetUnitX(_____65BD_6CD5_8005)
     local _____8D77_70B9Y = GetUnitY(_____65BD_6CD5_8005)
@@ -371,6 +377,13 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
             return context.currentDamage * (1 - ____E_914D_7F6E["位移减伤比例"])
         end,
         45
+    )
+    registerManualBuff(
+        _____65BD_6CD5_8005,
+        _____8299_8389_83B2BuffID["高处飞行保护"],
+        9999,
+        ____E_914D_7F6E["位移减伤比例"],
+        {sourceName = "芙莉莲-E-高处飞行保护", effectValue = ____E_914D_7F6E["位移减伤比例"]}
     )
     local _____8D77_70B9_504F_79FB = _____8299_8389_83B2_8868_73B0_914D_7F6E["E闪电"]["起点高度偏移"]
     local _____7EC8_70B9_9AD8_5EA6 = _____8299_8389_83B2_8868_73B0_914D_7F6E["E闪电"]["终点高度"]
@@ -471,8 +484,8 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
                         if _____53E5_67C4 == nil or _____53E5_67C4 == 0 then
                             goto __continue48
                         end
-                        local ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_17 = _____6570_636E["观察闪电列表"]
-                        ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_17[#____6570_636E__89C2_5BDF_95EA_7535_5217_8868_17 + 1] = {["目标"] = u, ["句柄"] = _____53E5_67C4}
+                        local ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_18 = _____6570_636E["观察闪电列表"]
+                        ____6570_636E__89C2_5BDF_95EA_7535_5217_8868_18[#____6570_636E__89C2_5BDF_95EA_7535_5217_8868_18 + 1] = {["目标"] = u, ["句柄"] = _____53E5_67C4}
                         Sound3DII_CooPlayReuse(
                             _____8299_8389_83B2_97F3_6548_914D_7F6E["E观察"]["路径"],
                             GetUnitX(u),
@@ -543,14 +556,14 @@ local function _____91CA_653EE(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9
                     ____E_5B89_6392_89C2_5BDF_671F_6536_5C3E(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6570_636E)
                 else
                     _____7ED3_675FE(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E, false)
-                    _____63A7_5236_5668["完成"](_____63A7_5236_5668)
+                    _____63A7_5236_5668["完成"]()
                 end
             end
         }
     )
     if _____6570_636E["位移ID"] == 0 then
         _____5B8C_6210E_6536_5C3E(_____65BD_6CD5_8005, _____6570_636E)
-        _____63A7_5236_5668["完成"](_____63A7_5236_5668)
+        _____63A7_5236_5668["完成"]()
     end
 end
 local _____5DF2_6CE8_518C = false

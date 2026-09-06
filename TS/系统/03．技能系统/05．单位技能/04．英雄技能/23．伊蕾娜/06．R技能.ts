@@ -22,6 +22,7 @@ import {
 } from "./00．配置";
 import { 播放伊蕾娜阶段动作 } from "./01A．动作表现";
 import type { 伊蕾娜见闻 } from "./02．被动效果";
+import type { 伊蕾娜变式类型 } from "./02．被动效果";
 import {
   查询伊蕾娜见闻,
   锁定伊蕾娜R变式,
@@ -29,6 +30,7 @@ import {
   还原伊蕾娜R锁定变式,
   登记伊蕾娜技能清理,
 } from "./02．被动效果";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 
 const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
   播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string, 伊蕾娜变式?: string) => boolean;
@@ -52,15 +54,16 @@ const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
-const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+const { addDelayedCallback, addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
 };
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
-  查询战斗技能实例: (this: void, 单位: any, 技能键?: string) => any[];
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
+  查询战斗技能实例: (this: void, 单位: any, 技能键?: string) => 战斗技能实例控制器[];
 };
 const { 开始充能, 停止充能 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统") as {
   开始充能: (this: void, 单位: any, 参数: any) => number;
@@ -112,6 +115,17 @@ const 英雄单位类型ID = 伊蕾娜技能配置.单位类型ID;
 const R技能类型ID = stringToFourCCSafe(伊蕾娜技能配置.R.技能ID) as number;
 const R技能键 = "R万法回廊";
 
+/** R 实例数据（t0 快照 + 领域收束状态）。必须用真实类型：any 上的 .length 会编译成原始字段访问。 */
+interface R领域数据 {
+  技能实例ID: number | undefined;
+  中心X: number;
+  中心Y: number;
+  方向角: number;
+  见闻快照: 伊蕾娜见闻[];
+  变式快照: 伊蕾娜变式类型 | null;
+  领域已手动销毁: boolean;
+}
+
 function 计算范围表现缩放(this: void, 半径: number, 表现: { readonly 基准半径: number; readonly 基准缩放: number }): number {
   return 半径 / 表现.基准半径 * 表现.基准缩放;
 }
@@ -125,7 +139,7 @@ function R技能伤害(
   施法者: any,
   目标: any,
   伤害值: number,
-  数据: any,
+  数据: R领域数据,
   标签: string,
 ): boolean {
   return 造成技能伤害({
@@ -151,7 +165,7 @@ function 范围爆发(
   Y: number,
   半径: number,
   倍率: number,
-  数据: any,
+  数据: R领域数据,
   标签: string,
 ): void {
   const 敌人列表 = 获取坐标范围敌人(施法者, X, Y, 半径);
@@ -171,47 +185,60 @@ function 范围爆发(
 // 见闻追加阶段（快照顺序，每类最多一次）
 //=============================================================================
 
-function 执行见闻追加(this: void, 施法者: any, 实例: any, 数据: any): void {
+function 执行见闻追加(this: void, 施法者: any, 实例: 战斗技能实例控制器, 数据: R领域数据): void {
   const 已用类型: Record<string, boolean | undefined> = {};
   for (let i = 0; i < 数据.见闻快照.length; i++) {
     const 记录: 伊蕾娜见闻 = 数据.见闻快照[i];
     if (已用类型[记录.类型]) continue; // 同类型只强化一次
     已用类型[记录.类型] = true;
+    debugLogForce("伊蕾娜-R", "见闻追加", "类型", 记录.类型, "序号", 记录.序号, "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1);
 
     if (记录.类型 === "风行") {
-      // 贯穿魔弹：沿快照方向穿透
-      // 追加弹发射音（坐标=发射点=阵心；完成回调直线贯穿弹一次发射，只播一次，参数配置驱动）
-      Sound3DII_CooPlayReuse(伊蕾娜音效配置.R追加弹.路径, 数据.中心X, 数据.中心Y, 伊蕾娜音效配置.R追加弹.高度, 伊蕾娜音效配置.R追加弹.裁断距离);
-      发射弹道({
-        名称: "伊蕾娜-万法回廊·追迹",
-        所有者: 施法者,
-        发射X: 数据.中心X,
-        发射Y: 数据.中心Y,
-        发射方向角: 数据.方向角,
-        速度: 伊蕾娜R配置.追加魔弹速度,
-        轨迹: { 类型: "直线", 距离: 伊蕾娜R配置.追加魔弹穿透距离 },
-        命中半径: 120,
-        影响目标: "敌方",
-        碰撞消失: false,
-        每单位最大命中次数: 1,
-        最大总命中次数: 伊蕾娜R配置.追加魔弹最大命中数,
-        伤害值: 读取单位攻击力(施法者) * 伊蕾娜R配置.追加魔弹伤害攻击力倍率,
-        伤害类型: DAMAGE_TYPE_MAGIC,
-        攻击类型: ATTACK_TYPE_NORMAL,
-        武器类型: WEAPON_TYPE_WHOKNOWS,
-        来源类型: "单位技能",
-        技能ID: R技能类型ID,
-        技能实例ID: 数据.技能实例ID,
-        技能标签: "伊蕾娜-万法回廊·追迹",
-        伤害形态: "AOE",
-        参与技能伤害加成: false,
-        模型: 伊蕾娜表现配置.R追加魔弹.模型路径,
-        RGB: 伊蕾娜表现配置.R追加魔弹.RGB,
-        缩放: 伊蕾娜表现配置.R追加魔弹.缩放,
-        飞行高度: 伊蕾娜表现配置.R追加魔弹.高度,
-        生命周期: 伊蕾娜R配置.追加魔弹穿透距离 / 伊蕾娜R配置.追加魔弹速度 + 0.5,
-        实例控制器: 实例,
-      });
+      // 风行追加：领域期间每 tick 从阵心向 4 方向（90° 间隔，起始角逐轮旋转）发射贯穿魔弹
+      const 发射一轮风行弹幕 = function R风行弹幕(this: void, 轮次: number): void {
+        // 追加弹发射音（坐标=发射点=阵心；每轮弹幕各播一次，参数配置驱动）
+        Sound3DII_CooPlayReuse(伊蕾娜音效配置.R追加弹.路径, 数据.中心X, 数据.中心Y, 伊蕾娜音效配置.R追加弹.高度, 伊蕾娜音效配置.R追加弹.裁断距离);
+        for (let 方向序号 = 0; 方向序号 < 4; 方向序号++) {
+          发射弹道({
+            名称: "伊蕾娜-万法回廊·追迹",
+            所有者: 施法者,
+            发射X: 数据.中心X,
+            发射Y: 数据.中心Y,
+            发射方向角: 数据.方向角 + 轮次 * 伊蕾娜R配置.追加弹幕旋转角步长 + 方向序号 * 90,
+            速度: 伊蕾娜R配置.追加魔弹速度,
+            轨迹: { 类型: "直线", 距离: 伊蕾娜R配置.追加魔弹穿透距离 },
+            命中半径: 120,
+            影响目标: "敌方",
+            碰撞消失: false,
+            每单位最大命中次数: 1,
+            最大总命中次数: 伊蕾娜R配置.追加魔弹最大命中数,
+            伤害值: 读取单位攻击力(施法者) * 伊蕾娜R配置.追加魔弹伤害攻击力倍率,
+            伤害类型: DAMAGE_TYPE_MAGIC,
+            攻击类型: ATTACK_TYPE_NORMAL,
+            武器类型: WEAPON_TYPE_WHOKNOWS,
+            来源类型: "单位技能",
+            技能ID: R技能类型ID,
+            技能实例ID: 数据.技能实例ID,
+            技能标签: "伊蕾娜-万法回廊·追迹",
+            伤害形态: "AOE",
+            参与技能伤害加成: false,
+            模型: 伊蕾娜表现配置.R追加魔弹.模型路径,
+            RGB: 伊蕾娜表现配置.R追加魔弹.RGB,
+            缩放: 伊蕾娜表现配置.R追加魔弹.缩放,
+            飞行高度: 伊蕾娜表现配置.R追加魔弹.高度,
+            生命周期: 伊蕾娜R配置.追加魔弹穿透距离 / 伊蕾娜R配置.追加魔弹速度 + 0.5,
+            实例控制器: 实例,
+          });
+        }
+      };
+      发射一轮风行弹幕(0);
+      let 弹幕轮次 = 1;
+      // 弹幕轮次与领域同生命周期：领域持续秒内每秒一轮，实例收束时随篮子一并注销
+      实例.登记周期回调(addPeriodicCallback(伊蕾娜R配置.领域脉冲间隔秒 * 1000, function R风行弹幕Tick(this: void): void {
+        if (!实例.仍有效() || 弹幕轮次 >= 伊蕾娜R配置.领域持续秒) return;
+        发射一轮风行弹幕(弹幕轮次);
+        弹幕轮次 = 弹幕轮次 + 1;
+      }));
     } else if (记录.类型 === "镜界") {
       // 回响冲击 + 自身短护盾（不叠加完整 W）
       范围爆发(施法者, 数据.中心X, 数据.中心Y, 伊蕾娜R配置.镜界回响冲击半径, 伊蕾娜R配置.镜界回响伤害攻击力倍率, 数据, "伊蕾娜-万法回廊·镜界");
@@ -221,7 +248,7 @@ function 执行见闻追加(this: void, 施法者: any, 实例: any, 数据: any
         持续时间: 伊蕾娜R配置.镜界回响护盾秒,
         来源单位: 施法者,
         标签: "伊蕾娜-万法回廊镜界",
-        显示护盾条: false,
+        显示护盾条: true,
       });
     } else {
       // 远行：领域边缘延迟冲击（延迟窗口属于本实例，收束即取消）
@@ -262,7 +289,7 @@ function 执行见闻追加(this: void, 施法者: any, 实例: any, 数据: any
 // 主结算与领域
 //=============================================================================
 
-function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: any): void {
+function 执行R完成结算(this: void, 施法者: any, 实例: 战斗技能实例控制器, 数据: R领域数据): void {
   debugLogForce("伊蕾娜-R", "结束", "原因", "完成", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "实例", 数据.技能实例ID ?? "-", "X", Math.floor(数据.中心X), "Y", Math.floor(数据.中心Y));
   // 主范围结算（AOE + 真实减速）
   const 敌人列表 = 获取坐标范围敌人(施法者, 数据.中心X, 数据.中心Y, 伊蕾娜R配置.领域半径);
@@ -303,6 +330,17 @@ function 执行R完成结算(this: void, 施法者: any, 实例: any, 数据: an
 
   // 变式分支：灰烬快照 → 阵心小范围额外爆发；镜界快照在下方见闻阶段已有回响时不重复
   if (数据.变式快照 === "灰烬") {
+    // 灰烬余烬视觉（dustwave 尘浪；与 Q/E 灰烬爆发共用同一表现条目）
+    const 余烬特效 = 创建点特效({
+      模型路径: 伊蕾娜表现配置.灰烬爆发.模型路径,
+      RGB: 伊蕾娜表现配置.灰烬爆发.RGB,
+      X: 数据.中心X,
+      Y: 数据.中心Y,
+      Z: 伊蕾娜表现配置.灰烬爆发.高度,
+      缩放: 伊蕾娜表现配置.灰烬爆发.缩放,
+      持续秒: 伊蕾娜表现配置.灰烬爆发.持续秒,
+    });
+    void 余烬特效;
     范围爆发(施法者, 数据.中心X, 数据.中心Y, 伊蕾娜R配置.领域半径 * 0.4, 伊蕾娜R配置.主伤害攻击力倍率 * 0.3, 数据, "伊蕾娜-灰烬余烬");
   }
   // 只有灰烬对 R 受益并消费；迅行/镜界完成 R 后还原，避免无收益白扣。
@@ -386,7 +424,7 @@ function 释放R万法回廊(this: void, _context: any, 施法者: any, 技能�
   const 变式快照 = 锁定伊蕾娜R变式(施法者);
   debugLogForce("伊蕾娜-R", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能类型ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(中心X), "Y", Math.floor(中心Y), "见闻", 见闻快照.length, "变式", 变式快照 ?? "无");
 
-  const 数据: any = {
+  const 数据: R领域数据 = {
     技能实例ID,
     中心X,
     中心Y,

@@ -9,6 +9,7 @@ import {
   朱雀院红叶动作槽,
   朱雀院红叶待平衡数值,
 } from "./00．配置";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 
 const jass = require("jass.common") as any;
 const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -22,11 +23,11 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
-  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => any[];
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
+  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => 战斗技能实例控制器[];
 };
-const { registerDamageModifier, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
-  registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
+const { register护盾前拦截修改器, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
+  register护盾前拦截修改器: (this: void, callback: (this: void, context: any) => number) => number;
   unregisterDamageModifier: (this: void, id: number) => boolean;
 };
 const { 开始击退 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口") as {
@@ -143,7 +144,7 @@ function 结算W单体伤害(this: void, 施法者: any, 目标: any, 技能实�
 // 招架窗口
 //=============================================================================
 
-function 结束W招架(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: W数据): void {
+function 结束W招架(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: W数据): void {
   if (数据.已结束) return;
   数据.已结束 = true;
   if (数据.修饰ID !== 0) {
@@ -181,7 +182,7 @@ function 释放失败前斩(this: void, 施法者: any, 技能实例ID: number |
   }
 }
 
-function 结算W反击(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: W数据): void {
+function 结算W反击(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: W数据): void {
   const 来源 = 数据.招架来源;
   // 来源失效：安全收尾（已招架成功，不释放失败前斩）
   if (来源 == null || 来源 === 0 || !单位存活(来源)) {
@@ -266,7 +267,7 @@ function 释放W水镜返刃(this: void, _context: any, 施法者: any, 技能�
   Sound3DII_UnitPlayReuse(W水镜展开音效.路径, 施法者, W水镜展开音效.裁断距离);
 
   // 正面招架伤害修改器：攻击来源在红叶正面（快照朝向）时化解该次伤害
-  数据.修饰ID = registerDamageModifier(function W招架伤害修正(this: void, context: any): number {
+  数据.修饰ID = register护盾前拦截修改器(function W招架伤害修正(this: void, context: any): number {
     if (数据.已招架 || 数据.已结束) return context.currentDamage;
     if (context.target !== 施法者) return context.currentDamage;
     if (context.attacker == null || context.attacker === 0) return context.currentDamage;
@@ -282,7 +283,7 @@ function 释放W水镜返刃(this: void, _context: any, 施法者: any, 技能�
       结算W反击(施法者, 控制器, 技能实例ID, 数据);
     });
     return 0; // 化解本次伤害
-  }, 60);
+  });
 
   // 窗口到期：未招架成功则释放失败前斩
   const 到期ID = addDelayedCallback(W配置.招架窗口秒 * 1000, function W窗口到期(this: void): void {

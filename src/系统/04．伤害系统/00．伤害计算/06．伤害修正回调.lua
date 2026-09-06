@@ -53,6 +53,17 @@ function ____exports.unregisterDamageModifier(id)
     end
     return false
 end
+--- 护盾吸收修改器（物理/魔法护盾池）的结算优先级，修改器按优先级降序执行。
+____exports["护盾吸收修改器优先级"] = 100
+--- 护盾前一次性拦截修改器的默认优先级。
+-- 偏折/招架/解析/化解这类"首次攻击防御"必须高于护盾吸收：
+-- 否则伤害先被护盾吃满，currentDamage 归零，拦截分支永不触发。
+____exports["护盾前拦截修改器优先级"] = 110
+--- 注册护盾前一次性拦截修改器（偏折/招架/解析/化解这类"首次攻击防御"）。
+-- 固定使用护盾前拦截优先级，保证先于任何护盾吸收结算。
+____exports["register护盾前拦截修改器"] = function(callback)
+    return ____exports.registerDamageModifier(callback, ____exports["护盾前拦截修改器优先级"])
+end
 function ____exports.applyDamageModifiers(context)
     local currentDamage = context.currentDamage
     do
@@ -61,7 +72,7 @@ function ____exports.applyDamageModifiers(context)
             do
                 local entry = damageModifiers[i + 1]
                 if entry == nil or entry.callback == nil then
-                    goto __continue13
+                    goto __continue14
                 end
                 context.currentDamage = currentDamage
                 local nextDamage = entry.callback(context)
@@ -69,7 +80,7 @@ function ____exports.applyDamageModifiers(context)
                     currentDamage = nextDamage
                 end
             end
-            ::__continue13::
+            ::__continue14::
             i = i + 1
         end
     end
@@ -105,12 +116,12 @@ function ____exports.unregisterDamageBaseModifier(id)
         while i < #damageBaseModifiers do
             do
                 if damageBaseModifiers[i + 1].id ~= id then
-                    goto __continue23
+                    goto __continue24
                 end
                 __TS__ArraySplice(damageBaseModifiers, i, 1)
                 return true
             end
-            ::__continue23::
+            ::__continue24::
             i = i + 1
         end
     end
@@ -124,7 +135,7 @@ function ____exports.applyDamageBaseModifiers(context)
             do
                 local entry = damageBaseModifiers[i + 1]
                 if entry == nil or entry.callback == nil then
-                    goto __continue27
+                    goto __continue28
                 end
                 context.currentDamage = currentDamage
                 local nextDamage = entry.callback(context)
@@ -132,7 +143,7 @@ function ____exports.applyDamageBaseModifiers(context)
                     currentDamage = nextDamage
                 end
             end
-            ::__continue27::
+            ::__continue28::
             i = i + 1
         end
     end

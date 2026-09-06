@@ -8,6 +8,7 @@ import {
   朱雀院红叶动作槽,
   朱雀院红叶待平衡数值,
 } from "./00．配置";
+import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 
 const jass = require("jass.common") as any;
 const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
@@ -22,8 +23,8 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂") as {
-  创建战斗技能实例: (this: void, 参数: any) => any;
-  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => any[];
+  创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
+  查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => 战斗技能实例控制器[];
 };
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
@@ -238,7 +239,7 @@ function 取段扇形敌人(this: void, 施法者: any, 数据: E数据, 半径:
   });
 }
 
-function 执行E一段(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: E数据): void {
+function 执行E一段(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: E数据): void {
   数据.已斩段数 = 1;
   // 第一斩轻斩音（段回调结算点一次；坐标=斩击点，参数配置驱动）
   Sound3DII_CooPlayReuse(E轻斩音效.路径, 数据.目标X, 数据.目标Y, E轻斩音效.高度, E轻斩音效.裁断距离);
@@ -252,7 +253,7 @@ function 执行E一段(this: void, 施法者: any, 控制器: any, 技能实例I
   }
 }
 
-function 执行E二段(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: E数据): void {
+function 执行E二段(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: E数据): void {
   数据.已斩段数 = 2;
   // 第二斩轻斩音（段回调结算点一次；坐标=斩击点，参数配置驱动）
   Sound3DII_CooPlayReuse(E轻斩音效.路径, 数据.目标X, 数据.目标Y, E轻斩音效.高度, E轻斩音效.裁断距离);
@@ -266,7 +267,7 @@ function 执行E二段(this: void, 施法者: any, 控制器: any, 技能实例I
   }
 }
 
-function 执行E三段(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 数据: E数据): void {
+function 执行E三段(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: E数据): void {
   数据.已斩段数 = 3;
   // 第三斩终结音（确认的二选一随机槽：运行时从 槽.候选路径 随机取一；坐标=第三斩结算点，参数配置驱动）
   const 候选 = E终结音效.候选路径;

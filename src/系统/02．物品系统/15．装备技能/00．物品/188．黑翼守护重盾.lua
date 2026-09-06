@@ -26,6 +26,7 @@ local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03�
 local debugLogForce = ____require_result_0.debugLogForce
 local ____require_result_1 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local registerDamageModifier = ____require_result_1.registerDamageModifier
+local _____62A4_76FE_524D_62E6_622A_4FEE_6539_5668_4F18_5148_7EA7 = ____require_result_1["护盾前拦截修改器优先级"]
 local jass = require("jass.common")
 local DAMAGE_TYPE_UNIVERSAL = jass.DAMAGE_TYPE_UNIVERSAL
 local GetUnitX = jass.GetUnitX
@@ -249,7 +250,7 @@ local function ____on_9ED1_7FFC_5B88_62A4_4F24_5BB3_8F6C_79FB(e)
         }
     )
 end
-registerDamageModifier(____on_9ED1_7FFC_5B88_62A4_62A4_76FE_524D_4F24_5BB3, 110)
+registerDamageModifier(____on_9ED1_7FFC_5B88_62A4_62A4_76FE_524D_4F24_5BB3, _____62A4_76FE_524D_62E6_622A_4FEE_6539_5668_4F18_5148_7EA7)
 registerDamageModifier(____on_9ED1_7FFC_5B88_62A4_8F6C_79FB_540E_4F24_5BB3, 34)
 _____521B_5EFA_53CB_519B_8303_56F4_627F_4F24_8F6C_79FB({
     ["名称"] = "黑翼守护重盾-守护者之职责",
