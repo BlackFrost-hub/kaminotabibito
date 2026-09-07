@@ -2,6 +2,7 @@
 
 import {
   朱雀院椿技能配置,
+  朱雀院椿表现配置,
   朱雀院椿动作配置,
   朱雀院椿动作槽,
   朱雀院椿D配置,
@@ -27,8 +28,14 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
 const { Sound3DII_UnitPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
 };
+const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  创建点特效: (this: void, 参数: any) => any;
+};
 const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话") as {
   播放英雄技能喊话: (this: void, 施法者: any, 英雄名: string, 技能ID: string) => boolean;
+};
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, 单位: any, 持续时间: number, 读条参数?: { 标题?: string; Z偏移?: number; UI类型?: any; 数值后缀?: string }) => void;
 };
 const {
   是朱雀院椿,
@@ -83,6 +90,7 @@ function 进入二刀攻势(this: void, 施法者: any): void {
   const 状态: 二刀状态 = { 到期回调ID: 0, 消耗周期ID: 0 };
   // 到期自动回一刀
   状态.到期回调ID = addDelayedCallback(D配置.二刀持续秒 * 1000, function D二刀到期(this: void): void {
+    debugLogForce("椿-D", "状态", "二刀到期回一刀", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 朱雀院椿技能配置.D.技能ID);
     停止二刀消耗(施法者);
     设置姿态(施法者, "一刀");
   });
@@ -94,6 +102,7 @@ function 进入二刀攻势(this: void, 施法者: any): void {
     }
     const 剩余 = 扣除VF(施法者, D配置.二刀每秒VF消耗);
     if (D配置.VF归零强制回一刀 && 剩余 <= 0) {
+      debugLogForce("椿-D", "状态", "VF归零强制回一刀", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 朱雀院椿技能配置.D.技能ID);
       停止二刀消耗(施法者);
       设置姿态(施法者, "一刀");
     }
@@ -115,6 +124,8 @@ function 释放D姿态切换(this: void, _context: any, 施法者: any, _技能�
     debugLogForce("椿-D", "释放被拒", "原因", "姿态锁定(R蓄力)", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", 朱雀院椿技能配置.D.技能ID, "实例", _技能实例ID ?? "-");
     return;
   }
+  // 硬直同步先于动作建立（规划 t0：校验可切换后添加短切换硬直）
+  开始硬直(施法者, D配置.切换硬直秒, { 标题: "二刀解放" });
   播放椿动作(施法者, 朱雀院椿动作槽.D切换);
   const 当前 = 获取姿态(施法者);
   if (当前 === "一刀") {
@@ -128,6 +139,25 @@ function 释放D姿态切换(this: void, _context: any, 施法者: any, _技能�
   }
   // 姿态切换音（切换实际成功后播；8s CD 反复切换均播；单位=施法者，参数配置驱动）
   Sound3DII_UnitPlayReuse(朱雀院椿音效配置.D切换.路径, 施法者, 朱雀院椿音效配置.D切换.裁断距离);
+  // D 切换爆发：每次切换成功在英雄位置播放一次（配置驱动，候选未迁入则留空不播）
+  if ((朱雀院椿表现配置.D切换特效.模型路径 as string) !== "") {
+    创建点特效({
+      模型路径: 朱雀院椿表现配置.D切换特效.模型路径,
+      RGB: 朱雀院椿表现配置.D切换特效.RGB,
+      X: jass.GetUnitX(施法者),
+      Y: jass.GetUnitY(施法者),
+      Z: 朱雀院椿表现配置.D切换特效.高度,
+      缩放: 朱雀院椿表现配置.D切换特效.缩放,
+      持续秒: 朱雀院椿表现配置.D切换特效.持续秒,
+    });
+  }
+  const 叠加 = 朱雀院椿表现配置.D切换叠加;
+  创建点特效({
+    模型路径: 叠加.模型路径, RGB: 叠加.RGB,
+    X: jass.GetUnitX(施法者), Y: jass.GetUnitY(施法者), Z: 叠加.高度,
+    面向角度: jass.GetUnitFacing(施法者), 动画索引: 叠加.动画索引,
+    缩放: 叠加.缩放, 持续秒: 叠加.持续秒,
+  });
   // 技能喊话：姿态切换成功起点（全局 3D；随机二选一由喊话系统驱动）
   播放英雄技能喊话(施法者, "朱雀院椿", 朱雀院椿技能配置.D.技能ID);
 }

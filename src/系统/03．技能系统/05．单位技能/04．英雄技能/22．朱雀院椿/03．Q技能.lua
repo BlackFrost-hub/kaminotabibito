@@ -17,30 +17,32 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["
 local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.27．战斗技能实例生命周期工厂")
 local _____521B_5EFA_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["创建战斗技能实例"]
 local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["查询战斗技能实例"]
-local ____require_result_4 = require("系统.04．伤害系统.08．技能伤害系统")
-local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_4["造成技能伤害"]
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_5["读取单位攻击力"]
-local _____5355_4F4D_5B58_6D3B = ____require_result_5["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_5["两点角度"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
-local _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_6["获取扇形区域单位"]
-local ____require_result_7 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_7["创建点特效"]
-local ____require_result_8 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_CooPlayReuse = ____require_result_8.Sound3DII_CooPlayReuse
-local ____require_result_9 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
-local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_9["播放英雄技能喊话"]
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_4["开始硬直"]
+local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
+local _____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_5["造成技能伤害"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
+local _____5355_4F4D_5B58_6D3B = ____require_result_6["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_6["两点角度"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
+local _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_7["获取扇形区域单位"]
+local ____require_result_8 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_8["创建点特效"]
+local ____require_result_9 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_CooPlayReuse = ____require_result_9.Sound3DII_CooPlayReuse
+local ____require_result_10 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_10["播放英雄技能喊话"]
 local ____E_8054_52A8 = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.05．E技能")
-local ____require_result_10 = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.02．被动效果")
-local _____662F_6731_96C0_9662_693F = ____require_result_10["是朱雀院椿"]
-local _____6D88_8D39_53CD_51FB_51C6_5907 = ____require_result_10["消费反击准备"]
-local _____6062_590DVF = ____require_result_10["恢复VF"]
-local _____83B7_53D6_59FF_6001 = ____require_result_10["获取姿态"]
-local _____767B_8BB0_693F_6E05_7406 = ____require_result_10["登记椿清理"]
-local _____64AD_653E_693F_52A8_4F5C = ____require_result_10["播放椿动作"]
-local ____require_result_11 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_11.debugLogForce
+local ____require_result_11 = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.02．被动效果")
+local _____662F_6731_96C0_9662_693F = ____require_result_11["是朱雀院椿"]
+local _____6D88_8D39_53CD_51FB_51C6_5907 = ____require_result_11["消费反击准备"]
+local _____6062_590DVF = ____require_result_11["恢复VF"]
+local _____83B7_53D6_59FF_6001 = ____require_result_11["获取姿态"]
+local _____767B_8BB0_693F_6E05_7406 = ____require_result_11["登记椿清理"]
+local _____64AD_653E_693F_52A8_4F5C = ____require_result_11["播放椿动作"]
+local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_12.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E.Q["技能ID"])
 local ____Q_914D_7F6E = _____6731_96C0_9662_693FQ_914D_7F6E
@@ -49,12 +51,13 @@ local DAMAGE_TYPE_NORMAL = jass.DAMAGE_TYPE_NORMAL
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
+local GetRandomReal = jass.GetRandomReal
 local GetUnitName = jass.GetUnitName
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetPlayerId = jass.GetPlayerId
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
-local function _____7ED3_7B97Q_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____65B9_5411_89D2, _____4F24_5BB3_500D_7387, _____6807_7B7E)
+local function _____7ED3_7B97Q_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____951A_70B9X, _____951A_70B9Y, _____65B9_5411_89D2, _____4F24_5BB3_500D_7387, _____6807_7B7E)
     local _____73A9_5BB6ID = GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
     debugLogForce(
         "椿-Q",
@@ -67,23 +70,15 @@ local function _____7ED3_7B97Q_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8
         _____6280_80FD_5B9E_4F8BID or "-",
         "标签",
         _____6807_7B7E,
+        "锚点X",
+        math.floor(_____951A_70B9X),
+        "锚点Y",
+        math.floor(_____951A_70B9Y),
         "伤害",
         _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____4F24_5BB3_500D_7387
     )
-    local X = GetUnitX(_____65BD_6CD5_8005)
-    local Y = GetUnitY(_____65BD_6CD5_8005)
-    debugLogForce("椿-Q", "特效", "路径", _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q主斩"]["模型路径"])
-    _____521B_5EFA_70B9_7279_6548({
-        ["模型路径"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q主斩"]["模型路径"],
-        RGB = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q主斩"].RGB,
-        X = X,
-        Y = Y,
-        Z = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q主斩"]["高度"],
-        ["面向角度"] = _____65B9_5411_89D2,
-        ["动画索引"] = 0,
-        ["缩放"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q主斩"]["缩放"],
-        ["持续秒"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q主斩"]["持续秒"]
-    })
+    local X = _____951A_70B9X
+    local Y = _____951A_70B9Y
     local _____654C_4EBA = _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D({
         X = X,
         Y = Y,
@@ -154,6 +149,30 @@ local function _____7ED3_7B97Q_65A9(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8
                 ["伤害形态"] = "AOE",
                 ["参与技能伤害加成"] = true
             })
+            local ____Q_547D_4E2D_914D_7F6E = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q命中叠加"]
+            _____521B_5EFA_70B9_7279_6548({
+                ["模型路径"] = ____Q_547D_4E2D_914D_7F6E["模型路径"],
+                RGB = ____Q_547D_4E2D_914D_7F6E.RGB,
+                X = GetUnitX(_____654C_4EBA[i + 1]),
+                Y = GetUnitY(_____654C_4EBA[i + 1]),
+                Z = ____Q_547D_4E2D_914D_7F6E["高度"],
+                ["面向角度"] = GetRandomReal(0, 360),
+                ["缩放"] = ____Q_547D_4E2D_914D_7F6E["缩放"],
+                ["持续秒"] = ____Q_547D_4E2D_914D_7F6E["持续秒"]
+            })
+            local ____Q_7206_53D1_8DEF_5F84 = ____Q_547D_4E2D_914D_7F6E["叠加模型路径"]
+            if ____Q_7206_53D1_8DEF_5F84 ~= "" then
+                _____521B_5EFA_70B9_7279_6548({
+                    ["模型路径"] = ____Q_7206_53D1_8DEF_5F84,
+                    RGB = ____Q_547D_4E2D_914D_7F6E.RGB,
+                    X = GetUnitX(_____654C_4EBA[i + 1]),
+                    Y = GetUnitY(_____654C_4EBA[i + 1]),
+                    Z = ____Q_547D_4E2D_914D_7F6E["叠加高度"],
+                    ["面向角度"] = GetRandomReal(0, 360),
+                    ["缩放"] = ____Q_547D_4E2D_914D_7F6E["叠加缩放"],
+                    ["持续秒"] = ____Q_547D_4E2D_914D_7F6E["叠加持续秒"]
+                })
+            end
             i = i + 1
         end
     end
@@ -162,14 +181,16 @@ local function _____6267_884C_57FA_7840_5C45_5408(_____65BD_6CD5_8005, _____63A7
     _____7ED3_7B97Q_65A9(
         _____65BD_6CD5_8005,
         _____6280_80FD_5B9E_4F8BID,
+        _____6570_636E["目标X"],
+        _____6570_636E["目标Y"],
         _____6570_636E["输入方向"],
         ____Q_914D_7F6E["基础伤害倍率"],
         "朱雀院椿-Q居合"
     )
     Sound3DII_CooPlayReuse(
         _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["Q居合"]["路径"],
-        GetUnitX(_____65BD_6CD5_8005),
-        GetUnitY(_____65BD_6CD5_8005),
+        _____6570_636E["目标X"],
+        _____6570_636E["目标Y"],
         _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["Q居合"]["高度"],
         _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["Q居合"]["裁断距离"]
     )
@@ -179,6 +200,8 @@ local function _____6267_884C_8FD4_5203_7B2C_4E00_6BB5(_____65BD_6CD5_8005, ____
     _____7ED3_7B97Q_65A9(
         _____65BD_6CD5_8005,
         _____6280_80FD_5B9E_4F8BID,
+        _____6570_636E["目标X"],
+        _____6570_636E["目标Y"],
         _____6570_636E["输入方向"],
         ____Q_914D_7F6E["返刃一段倍率"],
         "朱雀院椿-Q返刃一段"
@@ -186,11 +209,12 @@ local function _____6267_884C_8FD4_5203_7B2C_4E00_6BB5(_____65BD_6CD5_8005, ____
     local _____7B2C_4E8C_6BB5ID = addDelayedCallback(
         ____Q_914D_7F6E["二段延迟毫秒"],
         function()
+            _____5F00_59CB_786C_76F4(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["Q返刃二段"]["持续秒"], {["标题"] = "居合·返"})
             _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["Q返刃二段"])
             Sound3DII_CooPlayReuse(
                 _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["Q返刃"]["路径"],
-                GetUnitX(_____65BD_6CD5_8005),
-                GetUnitY(_____65BD_6CD5_8005),
+                _____6570_636E["目标X"],
+                _____6570_636E["目标Y"],
                 _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["Q返刃"]["高度"],
                 _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["Q返刃"]["裁断距离"]
             )
@@ -199,6 +223,8 @@ local function _____6267_884C_8FD4_5203_7B2C_4E00_6BB5(_____65BD_6CD5_8005, ____
                 _____7ED3_7B97Q_65A9(
                     _____65BD_6CD5_8005,
                     _____6280_80FD_5B9E_4F8BID,
+                    _____6570_636E["目标X"],
+                    _____6570_636E["目标Y"],
                     _____6570_636E["反击方向"],
                     ____Q_914D_7F6E["返刃二段倍率"],
                     "朱雀院椿-Q返刃二段"
@@ -208,6 +234,8 @@ local function _____6267_884C_8FD4_5203_7B2C_4E00_6BB5(_____65BD_6CD5_8005, ____
                 _____7ED3_7B97Q_65A9(
                     _____65BD_6CD5_8005,
                     _____6280_80FD_5B9E_4F8BID,
+                    _____6570_636E["目标X"],
+                    _____6570_636E["目标Y"],
                     _____6570_636E["反击方向"],
                     ____Q_914D_7F6E["返刃二段倍率"],
                     "朱雀院椿-Q返刃二段"
@@ -215,6 +243,8 @@ local function _____6267_884C_8FD4_5203_7B2C_4E00_6BB5(_____65BD_6CD5_8005, ____
                 _____7ED3_7B97Q_65A9(
                     _____65BD_6CD5_8005,
                     _____6280_80FD_5B9E_4F8BID,
+                    _____6570_636E["目标X"],
+                    _____6570_636E["目标Y"],
                     _____6570_636E["反击方向"] + 90,
                     ____Q_914D_7F6E["二刀交叉倍率"],
                     "朱雀院椿-Q交叉斩"
@@ -230,8 +260,8 @@ local function _____6267_884C_8FD4_5203_7B2C_4E00_6BB5(_____65BD_6CD5_8005, ____
             _____63A7_5236_5668["完成"]()
         end
     )
-    local ____6570_636E__6BB5_56DE_8C03ID_12 = _____6570_636E["段回调ID"]
-    ____6570_636E__6BB5_56DE_8C03ID_12[#____6570_636E__6BB5_56DE_8C03ID_12 + 1] = _____7B2C_4E8C_6BB5ID
+    local ____6570_636E__6BB5_56DE_8C03ID_13 = _____6570_636E["段回调ID"]
+    ____6570_636E__6BB5_56DE_8C03ID_13[#____6570_636E__6BB5_56DE_8C03ID_13 + 1] = _____7B2C_4E8C_6BB5ID
     _____63A7_5236_5668["登记延迟回调"](_____7B2C_4E8C_6BB5ID)
 end
 local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
@@ -250,6 +280,8 @@ local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____628
         )
         return
     end
+    local _____65BD_6CD5_76EE_6807X = GetSpellTargetX()
+    local _____65BD_6CD5_76EE_6807Y = GetSpellTargetY()
     debugLogForce(
         "椿-Q",
         "释放",
@@ -262,9 +294,9 @@ local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____628
         "目标",
         "点施放",
         "X",
-        math.floor(GetSpellTargetX()),
+        math.floor(_____65BD_6CD5_76EE_6807X),
         "Y",
-        math.floor(GetSpellTargetY())
+        math.floor(_____65BD_6CD5_76EE_6807Y)
     )
     if #_____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "椿Q") > 0 then
         debugLogForce(
@@ -282,22 +314,30 @@ local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____628
         return
     end
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院椿", _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.Q["技能ID"])
+    _____5F00_59CB_786C_76F4(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["Q居合"]["持续秒"], {["标题"] = "居合·返"})
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["Q居合"])
     local _____8F93_5165_65B9_5411 = _____4E24_70B9_89D2_5EA6(
         GetUnitX(_____65BD_6CD5_8005),
         GetUnitY(_____65BD_6CD5_8005),
-        GetSpellTargetX(),
-        GetSpellTargetY()
+        _____65BD_6CD5_76EE_6807X,
+        _____65BD_6CD5_76EE_6807Y
     )
     local _____53CD_51FB = _____6D88_8D39_53CD_51FB_51C6_5907(_____65BD_6CD5_8005)
-    local ____temp_13
+    local ____temp_14
     if ____E_8054_52A8["获取椿回锋方向"] ~= nil then
-        ____temp_13 = ____E_8054_52A8["获取椿回锋方向"](_____65BD_6CD5_8005)
+        ____temp_14 = ____E_8054_52A8["获取椿回锋方向"](_____65BD_6CD5_8005)
     else
-        ____temp_13 = nil
+        ____temp_14 = nil
     end
-    local _____56DE_950B_65B9_5411 = ____temp_13
-    local _____6570_636E = {["输入方向"] = _____8F93_5165_65B9_5411, ["反击方向"] = _____56DE_950B_65B9_5411 ~= nil and _____56DE_950B_65B9_5411 or (_____53CD_51FB ~= nil and _____53CD_51FB["方向"] or _____8F93_5165_65B9_5411), ["已消费反击"] = _____53CD_51FB ~= nil or _____56DE_950B_65B9_5411 ~= nil, ["段回调ID"] = {}}
+    local _____56DE_950B_65B9_5411 = ____temp_14
+    local _____6570_636E = {
+        ["输入方向"] = _____8F93_5165_65B9_5411,
+        ["反击方向"] = _____56DE_950B_65B9_5411 ~= nil and _____56DE_950B_65B9_5411 or (_____53CD_51FB ~= nil and _____53CD_51FB["方向"] or _____8F93_5165_65B9_5411),
+        ["已消费反击"] = _____53CD_51FB ~= nil or _____56DE_950B_65B9_5411 ~= nil,
+        ["段回调ID"] = {},
+        ["目标X"] = _____65BD_6CD5_76EE_6807X,
+        ["目标Y"] = _____65BD_6CD5_76EE_6807Y
+    }
     debugLogForce(
         "椿-Q",
         "状态",
@@ -339,6 +379,30 @@ local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____628
     local _____7B2C_4E00_6BB5ID = addDelayedCallback(
         ____Q_914D_7F6E["前摇毫秒"],
         function()
+            debugLogForce(
+                "椿-Q",
+                "状态",
+                "分支",
+                _____6570_636E["已消费反击"] and "返刃" or "基础居合",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                fourCCToStringSafe(____Q_6280_80FDID),
+                "实例",
+                _____6280_80FD_5B9E_4F8BID or "-"
+            )
+            if _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q剑气"]["模型路径"] ~= "" then
+                _____521B_5EFA_70B9_7279_6548({
+                    ["模型路径"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q剑气"]["模型路径"],
+                    RGB = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q剑气"].RGB,
+                    X = _____6570_636E["目标X"],
+                    Y = _____6570_636E["目标Y"],
+                    Z = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q剑气"]["高度"],
+                    ["面向角度"] = _____6570_636E["输入方向"],
+                    ["缩放"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q剑气"]["缩放"],
+                    ["持续秒"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["Q剑气"]["持续秒"]
+                })
+            end
             if _____6570_636E["已消费反击"] then
                 _____6267_884C_8FD4_5203_7B2C_4E00_6BB5(_____65BD_6CD5_8005, _____63A7_5236_5668, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
             else
@@ -346,8 +410,8 @@ local function _____91CA_653EQ_5C45_5408(_context, _____65BD_6CD5_8005, _____628
             end
         end
     )
-    local ____6570_636E__6BB5_56DE_8C03ID_14 = _____6570_636E["段回调ID"]
-    ____6570_636E__6BB5_56DE_8C03ID_14[#____6570_636E__6BB5_56DE_8C03ID_14 + 1] = _____7B2C_4E00_6BB5ID
+    local ____6570_636E__6BB5_56DE_8C03ID_15 = _____6570_636E["段回调ID"]
+    ____6570_636E__6BB5_56DE_8C03ID_15[#____6570_636E__6BB5_56DE_8C03ID_15 + 1] = _____7B2C_4E00_6BB5ID
     _____63A7_5236_5668["登记延迟回调"](_____7B2C_4E00_6BB5ID)
     _____767B_8BB0_693F_6E05_7406(
         _____65BD_6CD5_8005,

@@ -98,6 +98,7 @@ export interface 充能参数 {
   世界坐标进度UI标题?: string;
   世界坐标进度UI数值后缀?: string;
   世界坐标进度UI高度偏移?: number;
+  世界坐标进度UI屏幕Y偏移?: number;
 
   过程特效?: string;
   过程特效播放次数?: number;
@@ -439,6 +440,7 @@ export function 开始充能(单位: any, 参数: 充能参数): number {
       类型: 参数.世界坐标进度UI类型 ?? "通用",
       跟随单位: 单位,
       跟随Z偏移: 高度偏移,
+      屏幕Y偏移: 参数.世界坐标进度UI屏幕Y偏移 ?? 0,
       初始显示: true,
     });
   }

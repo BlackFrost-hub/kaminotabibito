@@ -113,13 +113,33 @@ function 创建R命中星爆(this: void, 配置: any, 目标: any): void {
     }
     创建点特效({ 模型路径: 配置.模型路径, RGB: 配置.RGB, X: GetUnitX(目标), Y: GetUnitY(目标), Z: 配置.高度, 面向角度: GetRandomReal(0, 360), 缩放: 配置.缩放, 持续秒: 配置.单次持续秒 });
     已创建次数 += 1;
+    if (已创建次数 >= 配置.创建次数) {
+      if (周期ID !== 0) {
+        removePeriodicCallback(周期ID);
+        周期ID = 0;
+      }
+    }
+  };
+  创建一次();
+  if (已创建次数 < 配置.创建次数) {
+    周期ID = addPeriodicCallback(配置.创建间隔秒 * 1000, 创建一次);
+  }
+}
+
+/** R 主斩叠加刀光：固定在终式目标点生成，每次使用独立随机朝向。 */
+function 创建R主斩叠加(this: void, 配置: any, X: number, Y: number): void {
+  let 已创建次数 = 0;
+  let 周期ID = 0;
+  const 创建一次 = function R主斩叠加Tick(this: void): void {
+    创建点特效({ 模型路径: 配置.模型路径, RGB: 配置.RGB, X, Y, Z: 配置.高度, 面向角度: GetRandomReal(0, 360), 缩放: 配置.缩放, 持续秒: 配置.单次持续秒 });
+    已创建次数 += 1;
     if (已创建次数 >= 配置.创建次数 && 周期ID !== 0) {
       removePeriodicCallback(周期ID);
       周期ID = 0;
     }
   };
-  周期ID = addPeriodicCallback(配置.创建间隔秒 * 1000, 创建一次);
   创建一次();
+  if (已创建次数 < 配置.创建次数) 周期ID = addPeriodicCallback(配置.创建间隔秒 * 1000, 创建一次);
 }
 
 
@@ -229,6 +249,7 @@ function R创建终式(this: void, 施法者: any, 技能实例ID: number | unde
       持续秒: 朱雀院红叶表现配置.R主斩.持续秒,
     });
   }
+  创建R主斩叠加(朱雀院红叶表现配置.R主斩叠加, 目标X, 目标Y);
   // 刀势回响：层数与回响数量一一对应（最多 3 道；全部归属本次 R 实例）
   if (刀势层数 > 0) debugLogForce("红叶-R", "刀势回响", "层数", 刀势层数);
   for (let 层 = 0; 层 < 刀势层数 && 层 < 3; 层++) {

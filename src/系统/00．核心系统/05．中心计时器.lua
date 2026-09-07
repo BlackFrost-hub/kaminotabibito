@@ -322,6 +322,7 @@ end
 local function onTick()
     _millisCounter = _millisCounter + 1
     _gameElapsedTime = _gameElapsedTime + 0.01
+    _____8C03_8BD5_8F93_51FA.setDebugGameTime(_gameElapsedTime)
     if jassGlobals.udg_Elapsed ~= nil then
         jassGlobals.udg_Elapsed = _gameElapsedTime
     end

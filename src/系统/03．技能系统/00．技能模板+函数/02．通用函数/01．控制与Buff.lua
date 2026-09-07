@@ -142,9 +142,15 @@ local ____require_result_0 = require("系统.00．核心系统.05．中心计时
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 removePeriodicCallback = ____require_result_0.removePeriodicCallback
 getServerTime = ____require_result_0.getServerTime
+local ____require_result_1 = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI")
+local _____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_1["创建世界坐标进度UI"]
+local _____66F4_65B0_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_1["更新世界坐标进度UI"]
+local _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI = ____require_result_1["销毁世界坐标进度UI"]
+local GetUnitX = jass.GetUnitX
+local GetUnitY = jass.GetUnitY
 local buffTableMod = require("系统.05．Buff系统.01．Buff表")
-local ____require_result_1 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_1.registerManualBuff
+local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_2.registerManualBuff
 do
     local ____02_FF0Edot_4F24_5BB3 = require("系统.04．伤害系统.02．dot伤害")
     ____exports.getUnitBurn = ____02_FF0Edot_4F24_5BB3.getUnitBurn
@@ -224,9 +230,71 @@ local function _____5237_65B0_65BD_6CD5_786C_76F4_663E_793ABuff(_____5355_4F4D, 
     )
     _____542F_52A8_65BD_6CD5_786C_76F4_663E_793ABuff_6E05_7406_9A71_52A8()
 end
-____exports["开始硬直"] = function(_____5355_4F4D, _____6301_7EED_65F6_95F4)
+local _____786C_76F4_8BFB_6761_8868 = {}
+local function _____9500_6BC1_786C_76F4_8BFB_6761(_____5355_4F4D_53E5_67C4)
+    local _____8BB0_5F55 = _____786C_76F4_8BFB_6761_8868[_____5355_4F4D_53E5_67C4]
+    if _____8BB0_5F55 == nil then
+        return
+    end
+    if _____8BB0_5F55["周期ID"] ~= 0 then
+        removePeriodicCallback(_____8BB0_5F55["周期ID"])
+    end
+    _____9500_6BC1_4E16_754C_5750_6807_8FDB_5EA6UI(_____8BB0_5F55.UI)
+    __TS__Delete(_____786C_76F4_8BFB_6761_8868, _____5355_4F4D_53E5_67C4)
+end
+local function _____5237_65B0_786C_76F4_8BFB_6761(_____5355_4F4D, _____6301_7EED_65F6_95F4, _____53C2_6570)
+    if _____5355_4F4D == nil or _____5355_4F4D == 0 or not (_____6301_7EED_65F6_95F4 > 0) then
+        return
+    end
+    local _____5355_4F4D_53E5_67C4 = GetHandleId(_____5355_4F4D) or 0
+    if _____5355_4F4D_53E5_67C4 == 0 then
+        return
+    end
+    _____9500_6BC1_786C_76F4_8BFB_6761(_____5355_4F4D_53E5_67C4)
+    local _____6700_5927_79D2 = _____6301_7EED_65F6_95F4
+    local _____5269_4F59_79D2 = _____6700_5927_79D2
+    local ____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI_10 = _____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI
+    local ____GetUnitX_result_4 = GetUnitX(_____5355_4F4D)
+    local ____GetUnitY_result_5 = GetUnitY(_____5355_4F4D)
+    local ____5355_4F4D_6 = _____5355_4F4D
+    local ____temp_7 = _____53C2_6570["Z偏移"] or 220
+    local ____temp_8 = _____53C2_6570["标题"] or "硬直"
+    local ____temp_9 = _____53C2_6570["数值后缀"] or ""
+    local ____53C2_6570_UI_7C7B_578B_3 = _____53C2_6570["UI类型"]
+    if ____53C2_6570_UI_7C7B_578B_3 == nil then
+        ____53C2_6570_UI_7C7B_578B_3 = "自然"
+    end
+    local UI = ____521B_5EFA_4E16_754C_5750_6807_8FDB_5EA6UI_10({
+        X = ____GetUnitX_result_4,
+        Y = ____GetUnitY_result_5,
+        Z = 0,
+        ["跟随单位"] = ____5355_4F4D_6,
+        ["跟随Z偏移"] = ____temp_7,
+        ["最大值"] = _____6700_5927_79D2,
+        ["当前值"] = _____6700_5927_79D2,
+        ["标题"] = ____temp_8,
+        ["数值后缀"] = ____temp_9,
+        ["类型"] = ____53C2_6570_UI_7C7B_578B_3
+    })
+    local _____5468_671FID = addPeriodicCallback(
+        50,
+        function()
+            _____5269_4F59_79D2 = _____5269_4F59_79D2 - 0.05
+            if _____5269_4F59_79D2 <= 0 then
+                _____9500_6BC1_786C_76F4_8BFB_6761(_____5355_4F4D_53E5_67C4)
+                return
+            end
+            _____66F4_65B0_4E16_754C_5750_6807_8FDB_5EA6UI(UI, _____5269_4F59_79D2)
+        end
+    )
+    _____786C_76F4_8BFB_6761_8868[_____5355_4F4D_53E5_67C4] = {UI = UI, ["周期ID"] = _____5468_671FID}
+end
+____exports["开始硬直"] = function(_____5355_4F4D, _____6301_7EED_65F6_95F4, _____8BFB_6761_53C2_6570)
     GS_Suspend(_____5355_4F4D, _____6301_7EED_65F6_95F4)
     _____5237_65B0_65BD_6CD5_786C_76F4_663E_793ABuff(_____5355_4F4D, _____6301_7EED_65F6_95F4)
+    if _____8BFB_6761_53C2_6570 ~= nil then
+        _____5237_65B0_786C_76F4_8BFB_6761(_____5355_4F4D, _____6301_7EED_65F6_95F4, _____8BFB_6761_53C2_6570)
+    end
 end
 ____exports["单位是否硬直中"] = GS_IsUnitSuspending
 ____exports["获取单位硬直剩余时间"] = GS_LoadSuspend
@@ -356,19 +424,19 @@ local _____786C_63A7_5236Buff_5408_96C6 = {
 local _____8F6F_63A7_5236Buff_5408_96C6 = {_____8F6F_63A7_5236Buff__51CF_901F, _____8F6F_63A7_5236Buff__6B8B_5E9F, _____8F6F_63A7_5236Buff__8BC5_5492}
 local _____51CF_901FBuff_5408_96C6 = {_____8F6F_63A7_5236Buff__51CF_901F}
 local _____539F_751F_6301_7EED_4F24_5BB3Buff_5408_96C6 = {_____6301_7EED_4F24_5BB3Buff__5BC4_751F}
-local ____array_2 = __TS__SparseArrayNew(table.unpack(_____786C_63A7_5236Buff_5408_96C6))
+local ____array_11 = __TS__SparseArrayNew(table.unpack(_____786C_63A7_5236Buff_5408_96C6))
 __TS__SparseArrayPush(
-    ____array_2,
+    ____array_11,
     table.unpack(_____8F6F_63A7_5236Buff_5408_96C6)
 )
-local _____539F_751F_63A7_5236Buff_5408_96C6 = {__TS__SparseArraySpread(____array_2)}
-local ____array_3 = __TS__SparseArrayNew(table.unpack(_____539F_751F_63A7_5236Buff_5408_96C6))
+local _____539F_751F_63A7_5236Buff_5408_96C6 = {__TS__SparseArraySpread(____array_11)}
+local ____array_12 = __TS__SparseArrayNew(table.unpack(_____539F_751F_63A7_5236Buff_5408_96C6))
 __TS__SparseArrayPush(
-    ____array_3,
+    ____array_12,
     _____524A_5F31Buff__7CBE_7075_4E4B_706B,
     table.unpack(_____539F_751F_6301_7EED_4F24_5BB3Buff_5408_96C6)
 )
-local _____539F_751F_8D1F_9762Buff_5408_96C6 = {__TS__SparseArraySpread(____array_3)}
+local _____539F_751F_8D1F_9762Buff_5408_96C6 = {__TS__SparseArraySpread(____array_12)}
 local function _____5355_4F4D_62E5_6709_4EFB_610FBuff_6548_679C_5408_96C6(_____5355_4F4D, ____Buff_5217_8868)
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return false
@@ -410,21 +478,21 @@ local function _____5355_4F4D_62E5_6709_5339_914DBuff_6C60_6761_76EE(_____5355_4
         while i < #ids do
             do
                 local meta = buffTableMod.buffs[ids[i + 1]]
-                local ____temp_4
+                local ____temp_13
                 if meta ~= nil then
-                    ____temp_4 = meta.type
+                    ____temp_13 = meta.type
                 else
-                    ____temp_4 = nil
+                    ____temp_13 = nil
                 end
-                local typeName = ____temp_4
+                local typeName = ____temp_13
                 if type(typeName) ~= "string" then
-                    goto __continue50
+                    goto __continue59
                 end
                 if _____5339_914D_51FD_6570(typeName) then
                     return true
                 end
             end
-            ::__continue50::
+            ::__continue59::
             i = i + 1
         end
     end
@@ -445,24 +513,24 @@ local function _____6E05_9664_5355_4F4D_5339_914DBuff_6C60_6761_76EE(_____5355_4
             do
                 local buffID = ids[i + 1]
                 local meta = buffTableMod.buffs[buffID]
-                local ____temp_5
+                local ____temp_14
                 if meta ~= nil then
-                    ____temp_5 = meta.type
+                    ____temp_14 = meta.type
                 else
-                    ____temp_5 = nil
+                    ____temp_14 = nil
                 end
-                local typeName = ____temp_5
+                local typeName = ____temp_14
                 if type(typeName) ~= "string" then
-                    goto __continue57
+                    goto __continue66
                 end
                 if not _____5339_914D_51FD_6570(typeName) then
-                    goto __continue57
+                    goto __continue66
                 end
                 if _____79FB_9664_5355_4F4D_6307_5B9ABuff(_____5355_4F4D, buffID) then
                     removed = removed + 1
                 end
             end
-            ::__continue57::
+            ::__continue66::
             i = i + 1
         end
     end

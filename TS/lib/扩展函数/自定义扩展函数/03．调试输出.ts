@@ -42,6 +42,7 @@ const 运行时错误提示持续时间 = 20;
 const 运行时错误屏幕最大行数 = 6;
 const 运行时错误屏幕最大字符数 = 900;
 const 当前运行时错误堆栈栈: string[] = [];
+let 当前调试游戏时间秒 = 0;
 
 function toMessagePart(value: any): string {
   if (value == null) return "nil";
@@ -51,6 +52,29 @@ function toMessagePart(value: any): string {
 function normalizeModuleName(module: any): string {
   if (module == null || module === "") return "未标记模块";
   return tostring(module);
+}
+
+function padTimePart(value: number, width: number): string {
+  let text = tostring(value);
+  while (text.length < width) text = "0" + text;
+  return text;
+}
+
+/** 由中心计时器在既有同步 tick 中更新；日志读取时不创建计时器或异步回调。 */
+function getDebugTimePrefix(this: void): string {
+  const elapsed = 当前调试游戏时间秒;
+  const totalMs = Math.floor(elapsed * 1000 + 0.5);
+  const totalSeconds = Math.floor(totalMs / 1000);
+  const milliseconds = totalMs - totalSeconds * 1000;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds - minutes * 60;
+  const hours = Math.floor(minutes / 60);
+  const displayMinutes = minutes - hours * 60;
+  return "[" + padTimePart(hours, 2) + ":" + padTimePart(displayMinutes, 2) + ":" + padTimePart(seconds, 2) + "." + padTimePart(milliseconds, 3) + "]";
+}
+
+export function setDebugGameTime(this: void, elapsedSeconds: number): void {
+  if (typeof elapsedSeconds === "number" && elapsedSeconds >= 0) 当前调试游戏时间秒 = elapsedSeconds;
 }
 
 function joinMessageParts(args: any[]): string {
@@ -119,14 +143,14 @@ export function debugLog(module: string, ...args: any[]): void {
   const moduleName = normalizeModuleName(module);
   if (!isDebug(moduleName)) return;
   if (!_print) return;
-  const prefix = "[" + moduleName + "] ";
+  const prefix = getDebugTimePrefix() + "[" + moduleName + "] ";
   _print(prefix, ...args);
 }
 
 export function debugLogForce(module: string, ...args: any[]): void {
   const moduleName = normalizeModuleName(module);
   if (!_print) return;
-  const prefix = "[" + moduleName + "] ";
+  const prefix = getDebugTimePrefix() + "[" + moduleName + "] ";
   _print(prefix, ...args);
 }
 

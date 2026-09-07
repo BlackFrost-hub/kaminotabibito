@@ -25,6 +25,9 @@ const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.0
   创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
   查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => 战斗技能实例控制器[];
 };
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, 单位: any, 持续时间: number, 读条参数?: { 标题?: string; Z偏移?: number; UI类型?: any; 数值后缀?: string }) => void;
+};
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
 };
@@ -78,6 +81,7 @@ const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
+const GetRandomReal = jass.GetRandomReal as (this: void, min: number, max: number) => number;
 const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
@@ -89,26 +93,16 @@ interface Q数据 {
   反击方向: number;
   已消费反击: boolean;
   段回调ID: number[];
+  目标X: number;
+  目标Y: number;
 }
 
-function 结算Q斩(this: void, 施法者: any, 技能实例ID: number | undefined, 方向角: number, 伤害倍率: number, 标签: string): void {
+function 结算Q斩(this: void, 施法者: any, 技能实例ID: number | undefined, 锚点X: number, 锚点Y: number, 方向角: number, 伤害倍率: number, 标签: string): void {
   const 玩家ID = GetPlayerId(GetOwningPlayer(施法者)) + 1;
-  debugLogForce("椿-Q", "结算", "玩家", 玩家ID, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "标签", 标签, "伤害", 读取单位攻击力(施法者) * 伤害倍率);
-  const X = GetUnitX(施法者);
-  const Y = GetUnitY(施法者);
-  // 居合/返刃斩击表现（正式主版本；备份版本按候选规则切换；按斩击方向旋转，时长覆盖 Stand 1000-1755ms）
-  debugLogForce("椿-Q", "特效", "路径", 朱雀院椿表现配置.Q主斩.模型路径);
-  创建点特效({
-    模型路径: 朱雀院椿表现配置.Q主斩.模型路径,
-    RGB: 朱雀院椿表现配置.Q主斩.RGB,
-    X,
-    Y,
-    Z: 朱雀院椿表现配置.Q主斩.高度,
-    面向角度: 方向角,
-    动画索引: 0,
-    缩放: 朱雀院椿表现配置.Q主斩.缩放,
-    持续秒: 朱雀院椿表现配置.Q主斩.持续秒,
-  });
+  debugLogForce("椿-Q", "结算", "玩家", 玩家ID, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "标签", 标签, "锚点X", Math.floor(锚点X), "锚点Y", Math.floor(锚点Y), "伤害", 读取单位攻击力(施法者) * 伤害倍率);
+  const X = 锚点X;
+  const Y = 锚点Y;
+  // 斩击表现统一由 Q剑气（前摇完成/蓄力完成）承担，不再重复叠加旧居合主斩模型
   const 敌人 = 获取扇形区域单位({
     X,
     Y,
@@ -138,32 +132,58 @@ function 结算Q斩(this: void, 施法者: any, 技能实例ID: number | undefin
       伤害形态: "AOE",
       参与技能伤害加成: true,
     });
+    // Q 命中表现：每个命中的敌人在其当前坐标创建（主层 0.3 随机角度 + 叠加爆发 1.0，配置驱动）
+    const Q命中配置 = 朱雀院椿表现配置.Q命中叠加;
+    创建点特效({
+      模型路径: Q命中配置.模型路径,
+      RGB: Q命中配置.RGB,
+      X: GetUnitX(敌人[i]),
+      Y: GetUnitY(敌人[i]),
+      Z: Q命中配置.高度,
+      面向角度: GetRandomReal(0, 360),
+      缩放: Q命中配置.缩放,
+      持续秒: Q命中配置.持续秒,
+    });
+    const Q爆发路径 = Q命中配置.叠加模型路径 as string;
+    if (Q爆发路径 !== "") {
+      创建点特效({
+        模型路径: Q爆发路径,
+        RGB: Q命中配置.RGB,
+        X: GetUnitX(敌人[i]),
+        Y: GetUnitY(敌人[i]),
+        Z: Q命中配置.叠加高度,
+        面向角度: GetRandomReal(0, 360),
+        缩放: Q命中配置.叠加缩放,
+        持续秒: Q命中配置.叠加持续秒,
+      });
+    }
   }
 }
 
 function 执行基础居合(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: Q数据): void {
-  结算Q斩(施法者, 技能实例ID, 数据.输入方向, Q配置.基础伤害倍率, "朱雀院椿-Q居合");
-  // 居合斩音（基础居合结算点；坐标=施法者位置，参数配置驱动）
-  Sound3DII_CooPlayReuse(朱雀院椿音效配置.Q居合.路径, GetUnitX(施法者), GetUnitY(施法者), 朱雀院椿音效配置.Q居合.高度, 朱雀院椿音效配置.Q居合.裁断距离);
+  结算Q斩(施法者, 技能实例ID, 数据.目标X, 数据.目标Y, 数据.输入方向, Q配置.基础伤害倍率, "朱雀院椿-Q居合");
+  // 居合斩音（基础居合结算点；坐标=斩击锚点，参数配置驱动）
+  Sound3DII_CooPlayReuse(朱雀院椿音效配置.Q居合.路径, 数据.目标X, 数据.目标Y, 朱雀院椿音效配置.Q居合.高度, 朱雀院椿音效配置.Q居合.裁断距离);
   控制器.完成();
 }
 
 function 执行返刃第一段(this: void, 施法者: any, 控制器: 战斗技能实例控制器, 技能实例ID: number | undefined, 数据: Q数据): void {
-  结算Q斩(施法者, 技能实例ID, 数据.输入方向, Q配置.返刃一段倍率, "朱雀院椿-Q返刃一段");
+  结算Q斩(施法者, 技能实例ID, 数据.目标X, 数据.目标Y, 数据.输入方向, Q配置.返刃一段倍率, "朱雀院椿-Q返刃一段");
   // 第二段回身斩：沿防守方向（W 招架来源方向 / E 回锋方向）
   const 第二段ID = addDelayedCallback(Q配置.二段延迟毫秒, function Q返刃二段(this: void): void {
+    开始硬直(施法者, 朱雀院椿动作槽.Q返刃二段.持续秒, { 标题: "居合·返" });
     播放椿动作(施法者, 朱雀院椿动作槽.Q返刃二段);
-    // 返刃回身斩音（返刃二段结算点；坐标=施法者位置，参数配置驱动）
-    Sound3DII_CooPlayReuse(朱雀院椿音效配置.Q返刃.路径, GetUnitX(施法者), GetUnitY(施法者), 朱雀院椿音效配置.Q返刃.高度, 朱雀院椿音效配置.Q返刃.裁断距离);
+    // 返刃回身斩音（返刃二段结算点；坐标=斩击锚点，参数配置驱动）
+    Sound3DII_CooPlayReuse(朱雀院椿音效配置.Q返刃.路径, 数据.目标X, 数据.目标Y, 朱雀院椿音效配置.Q返刃.高度, 朱雀院椿音效配置.Q返刃.裁断距离);
     const 姿态 = 获取姿态(施法者);
     if (姿态 === "一刀") {
       // 一刀守势：第二段结束后恢复少量 VF
-      结算Q斩(施法者, 技能实例ID, 数据.反击方向, Q配置.返刃二段倍率, "朱雀院椿-Q返刃二段");
+      结算Q斩(施法者, 技能实例ID, 数据.目标X, 数据.目标Y, 数据.反击方向, Q配置.返刃二段倍率, "朱雀院椿-Q返刃二段");
       恢复VF(施法者, 25);
     } else {
       // 二刀攻势：第二段改为交叉双刀斩并向前推进小段（追加一道交叉伤害）
-      结算Q斩(施法者, 技能实例ID, 数据.反击方向, Q配置.返刃二段倍率, "朱雀院椿-Q返刃二段");
-      结算Q斩(施法者, 技能实例ID, 数据.反击方向 + 90, Q配置.二刀交叉倍率, "朱雀院椿-Q交叉斩");
+      结算Q斩(施法者, 技能实例ID, 数据.目标X, 数据.目标Y, 数据.反击方向, Q配置.返刃二段倍率, "朱雀院椿-Q返刃二段");
+      结算Q斩(施法者, 技能实例ID, 数据.目标X, 数据.目标Y, 数据.反击方向 + 90, Q配置.二刀交叉倍率, "朱雀院椿-Q交叉斩");
       // 二刀交错斩音（Q 二刀交叉分支成立时；坐标=施法者位置，参数配置驱动）
       Sound3DII_CooPlayReuse(朱雀院椿音效配置.二刀交错.路径, GetUnitX(施法者), GetUnitY(施法者), 朱雀院椿音效配置.二刀交错.高度, 朱雀院椿音效配置.二刀交错.裁断距离);
     }
@@ -178,7 +198,10 @@ function 释放Q居合(this: void, _context: any, 施法者: any, 技能实例ID
     debugLogForce("椿-Q", "释放被拒", "原因", "非朱雀院椿", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-");
     return;
   }
-  debugLogForce("椿-Q", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(GetSpellTargetX()), "Y", Math.floor(GetSpellTargetY()));
+  // 本次施法目标点必须在释放开头一次性快照：后续 喊话/硬直/动作 等调用会清空 SpellTarget 全局
+  const 施法目标X = GetSpellTargetX();
+  const 施法目标Y = GetSpellTargetY();
+  debugLogForce("椿-Q", "释放", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-", "目标", "点施放", "X", Math.floor(施法目标X), "Y", Math.floor(施法目标Y));
   // 重复 Q：已有活跃 Q 实例时忽略
   if (查询战斗技能实例(施法者, "椿Q").length > 0) {
     debugLogForce("椿-Q", "释放被拒", "原因", "已有活跃Q实例", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-");
@@ -186,8 +209,10 @@ function 释放Q居合(this: void, _context: any, 施法者: any, 技能实例ID
   }
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
   播放英雄技能喊话(施法者, "朱雀院椿", 朱雀院椿技能配置.Q.技能ID);
+  // 硬直同步先于动作建立（规划 t0：硬直成功后播放居合动作；先播再暂停会把动作冻结在起始帧）
+  开始硬直(施法者, 朱雀院椿动作槽.Q居合.持续秒, { 标题: "居合·返" });
   播放椿动作(施法者, 朱雀院椿动作槽.Q居合);
-  const 输入方向 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), GetSpellTargetX(), GetSpellTargetY());
+  const 输入方向 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), 施法目标X, 施法目标Y);
   // 消费反击准备（有则返刃，无则基础居合）；反击方向优先取 E 精确回锋方向（读取即消费，每次 Q 最多一次）
   // E 提前消费反击准备后 反击 为 null，但回锋方向存在同样进入返刃分支；null=无回锋，0° 是合法方向
   const 反击 = 消费反击准备(施法者);
@@ -197,6 +222,8 @@ function 释放Q居合(this: void, _context: any, 施法者: any, 技能实例ID
     反击方向: 回锋方向 != null ? 回锋方向 : 反击 != null ? 反击.方向 : 输入方向,
     已消费反击: 反击 != null || 回锋方向 != null,
     段回调ID: [],
+    目标X: 施法目标X,
+    目标Y: 施法目标Y,
   };
   debugLogForce("椿-Q", "状态", "创建战斗技能实例", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-");
   const 控制器 = 创建战斗技能实例({
@@ -213,6 +240,20 @@ function 释放Q居合(this: void, _context: any, 施法者: any, 技能实例ID
     },
   });
   const 第一段ID = addDelayedCallback(Q配置.前摇毫秒, function Q第一段(this: void): void {
+    debugLogForce("椿-Q", "状态", "分支", 数据.已消费反击 ? "返刃" : "基础居合", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(Q技能ID), "实例", 技能实例ID ?? "-");
+    // 剑气/刀光：前摇完成（蓄力完成）时在施法目标坐标点按施法角度播放（缩放/时长配置驱动，候选未迁入则留空不播）
+    if ((朱雀院椿表现配置.Q剑气.模型路径 as string) !== "") {
+      创建点特效({
+        模型路径: 朱雀院椿表现配置.Q剑气.模型路径,
+        RGB: 朱雀院椿表现配置.Q剑气.RGB,
+        X: 数据.目标X,
+        Y: 数据.目标Y,
+        Z: 朱雀院椿表现配置.Q剑气.高度,
+        面向角度: 数据.输入方向,
+        缩放: 朱雀院椿表现配置.Q剑气.缩放,
+        持续秒: 朱雀院椿表现配置.Q剑气.持续秒,
+      });
+    }
     if (数据.已消费反击) {
       执行返刃第一段(施法者, 控制器, 技能实例ID, 数据);
     } else {

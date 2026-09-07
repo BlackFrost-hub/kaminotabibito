@@ -12,6 +12,19 @@ local _____6731_96C0_9662_7EA2_53F6_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["朱�
 local _____6731_96C0_9662_7EA2_53F6_5F85_5E73_8861_6570_503C = ____00_FF0E_914D_7F6E["朱雀院红叶待平衡数值"]
 local _____6731_96C0_9662_7EA2_53F6_8BFB_6761_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院红叶读条配置"]
 local jass = require("jass.common")
+local japi = nil
+do
+    local function ____catch(e)
+        japi = nil
+    end
+    local ____try, ____hasReturned = pcall(function()
+        japi = require("jass.japi")
+    end)
+    if not ____try then
+        ____catch(____hasReturned)
+    end
+end
+local EXSetEffectSpeed = japi ~= nil and type(japi.EXSetEffectSpeed) == "function" and japi.EXSetEffectSpeed or nil
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
@@ -79,6 +92,9 @@ local function _____79FB_9664_5251_75D5(_____5251_75D5)
         _____5251_75D5["到期回调ID"] = 0
     end
     if _____5251_75D5["特效句柄"] ~= nil and _____5251_75D5["特效句柄"] ~= 0 then
+        if EXSetEffectSpeed ~= nil then
+            EXSetEffectSpeed(_____5251_75D5["特效句柄"], 1)
+        end
         jass.DestroyEffect(_____5251_75D5["特效句柄"])
         _____5251_75D5["特效句柄"] = nil
     end
@@ -146,6 +162,14 @@ local function _____521B_5EFA_5251_75D5(_____6765_6E90_82F1_96C4, X, Y, _____65B
             ["缩放"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E剑痕"]["缩放"],
             ["持续秒"] = _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E剑痕"]["持续秒"]
         })
+        addDelayedCallback(
+            _____6731_96C0_9662_7EA2_53F6_8868_73B0_914D_7F6E["E剑痕"]["冻结延迟毫秒"],
+            function()
+                if _____5251_75D5["特效句柄"] ~= nil and _____5251_75D5["特效句柄"] ~= 0 and EXSetEffectSpeed ~= nil then
+                    EXSetEffectSpeed(_____5251_75D5["特效句柄"], 0)
+                end
+            end
+        )
     end
     return _____5251_75D5
 end
@@ -165,15 +189,15 @@ ____exports["读取最近剑痕并锁定"] = function(_____82F1_96C4)
                 local _____5251_75D5 = _____5251_75D5_8868[_____5217_8868[i + 1]]
                 if _____5251_75D5 == nil then
                     __TS__ArraySplice(_____5217_8868, i, 1)
-                    goto __continue16
+                    goto __continue21
                 end
                 if _____5251_75D5["已读取"] then
-                    goto __continue16
+                    goto __continue21
                 end
                 _____5251_75D5["已读取"] = true
                 return _____5251_75D5
             end
-            ::__continue16::
+            ::__continue21::
             i = i - 1
         end
     end
@@ -318,7 +342,7 @@ local function _____6267_884CE_4E00_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                 local id = jass.GetHandleId(_____654C_4EBA[i + 1])
                 local _____6B21_6570 = _____6570_636E["同目标次数"][id] or 0
                 if _____6B21_6570 >= ____E_914D_7F6E["同目标最大次数"] then
-                    goto __continue32
+                    goto __continue37
                 end
                 _____6570_636E["同目标次数"][id] = _____6B21_6570 + 1
                 _____7ED3_7B97E_6BB5_4F24_5BB3(
@@ -329,7 +353,7 @@ local function _____6267_884CE_4E00_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                     "朱雀院红叶-E第一斩"
                 )
             end
-            ::__continue32::
+            ::__continue37::
             i = i + 1
         end
     end
@@ -352,7 +376,7 @@ local function _____6267_884CE_4E8C_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                 local id = jass.GetHandleId(_____654C_4EBA[i + 1])
                 local _____6B21_6570 = _____6570_636E["同目标次数"][id] or 0
                 if _____6B21_6570 >= ____E_914D_7F6E["同目标最大次数"] then
-                    goto __continue36
+                    goto __continue41
                 end
                 _____6570_636E["同目标次数"][id] = _____6B21_6570 + 1
                 _____7ED3_7B97E_6BB5_4F24_5BB3(
@@ -363,7 +387,7 @@ local function _____6267_884CE_4E8C_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                     "朱雀院红叶-E第二斩"
                 )
             end
-            ::__continue36::
+            ::__continue41::
             i = i + 1
         end
     end
@@ -388,7 +412,7 @@ local function _____6267_884CE_4E09_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                 local id = jass.GetHandleId(_____654C_4EBA[i + 1])
                 local _____6B21_6570 = _____6570_636E["同目标次数"][id] or 0
                 if _____6B21_6570 >= ____E_914D_7F6E["同目标最大次数"] then
-                    goto __continue40
+                    goto __continue45
                 end
                 _____6570_636E["同目标次数"][id] = _____6B21_6570 + 1
                 _____7ED3_7B97E_6BB5_4F24_5BB3(
@@ -399,7 +423,7 @@ local function _____6267_884CE_4E09_6BB5(_____65BD_6CD5_8005, _____63A7_5236_566
                     "朱雀院红叶-E第三斩"
                 )
             end
-            ::__continue40::
+            ::__continue45::
             i = i + 1
         end
     end

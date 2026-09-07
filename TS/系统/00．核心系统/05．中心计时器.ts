@@ -47,6 +47,7 @@ const 调试输出 = require("lib.扩展函数.自定义扩展函数.03．调试
   safeExecute: (this: void, module: string, callback: (this: void) => void) => boolean;
   getCallbackDebugLabel: (this: void, callback: any) => string;
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
+  setDebugGameTime: (this: void, elapsedSeconds: number) => void;
 };
 
 const NORMAL_MON_DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -270,6 +271,7 @@ function runDelayedCallbacks(): void {
 function onTick(): void {
   _millisCounter++;
   _gameElapsedTime += 0.01;
+  调试输出.setDebugGameTime(_gameElapsedTime);
 
   if (jassGlobals.udg_Elapsed != null) {
     jassGlobals.udg_Elapsed = _gameElapsedTime;

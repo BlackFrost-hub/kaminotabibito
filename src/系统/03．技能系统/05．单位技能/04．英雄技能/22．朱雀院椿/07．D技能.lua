@@ -3,6 +3,7 @@ local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.00．配置")
 local _____6731_96C0_9662_693F_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿技能配置"]
+local _____6731_96C0_9662_693F_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿表现配置"]
 local _____6731_96C0_9662_693F_52A8_4F5C_69FD = ____00_FF0E_914D_7F6E["朱雀院椿动作槽"]
 local _____6731_96C0_9662_693FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿D配置"]
 local _____6731_96C0_9662_693F_97F3_6548_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿音效配置"]
@@ -20,19 +21,23 @@ local ____require_result_2 = require("系统.03．技能系统.00．技能模板
 local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_2["注册单位技能壳监听"]
 local ____require_result_3 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 local Sound3DII_UnitPlayReuse = ____require_result_3.Sound3DII_UnitPlayReuse
-local ____require_result_4 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
-local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_4["播放英雄技能喊话"]
-local ____require_result_5 = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.02．被动效果")
-local _____662F_6731_96C0_9662_693F = ____require_result_5["是朱雀院椿"]
-local _____83B7_53D6_59FF_6001 = ____require_result_5["获取姿态"]
-local _____8BBE_7F6E_59FF_6001 = ____require_result_5["设置姿态"]
-local _____59FF_6001_662F_5426_9501_5B9A = ____require_result_5["姿态是否锁定"]
-local _____6263_9664VF = ____require_result_5["扣除VF"]
-local _____6062_590DVF = ____require_result_5["恢复VF"]
-local _____767B_8BB0_693F_6E05_7406 = ____require_result_5["登记椿清理"]
-local _____64AD_653E_693F_52A8_4F5C = ____require_result_5["播放椿动作"]
-local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_6.debugLogForce
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local _____521B_5EFA_70B9_7279_6548 = ____require_result_4["创建点特效"]
+local ____require_result_5 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_5["播放英雄技能喊话"]
+local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_6["开始硬直"]
+local ____require_result_7 = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.02．被动效果")
+local _____662F_6731_96C0_9662_693F = ____require_result_7["是朱雀院椿"]
+local _____83B7_53D6_59FF_6001 = ____require_result_7["获取姿态"]
+local _____8BBE_7F6E_59FF_6001 = ____require_result_7["设置姿态"]
+local _____59FF_6001_662F_5426_9501_5B9A = ____require_result_7["姿态是否锁定"]
+local _____6263_9664VF = ____require_result_7["扣除VF"]
+local _____6062_590DVF = ____require_result_7["恢复VF"]
+local _____767B_8BB0_693F_6E05_7406 = ____require_result_7["登记椿清理"]
+local _____64AD_653E_693F_52A8_4F5C = ____require_result_7["播放椿动作"]
+local ____require_result_8 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_8.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 local ____D_914D_7F6E = _____6731_96C0_9662_693FD_914D_7F6E
 local _____4E8C_5200_72B6_6001_8868 = {}
@@ -68,6 +73,15 @@ local function _____8FDB_5165_4E8C_5200_653B_52BF(_____65BD_6CD5_8005)
     _____72B6_6001["到期回调ID"] = addDelayedCallback(
         ____D_914D_7F6E["二刀持续秒"] * 1000,
         function()
+            debugLogForce(
+                "椿-D",
+                "状态",
+                "二刀到期回一刀",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.D["技能ID"]
+            )
             _____505C_6B62_4E8C_5200_6D88_8017(_____65BD_6CD5_8005)
             _____8BBE_7F6E_59FF_6001(_____65BD_6CD5_8005, "一刀")
         end
@@ -81,6 +95,15 @@ local function _____8FDB_5165_4E8C_5200_653B_52BF(_____65BD_6CD5_8005)
             end
             local _____5269_4F59 = _____6263_9664VF(_____65BD_6CD5_8005, ____D_914D_7F6E["二刀每秒VF消耗"])
             if ____D_914D_7F6E["VF归零强制回一刀"] and _____5269_4F59 <= 0 then
+                debugLogForce(
+                    "椿-D",
+                    "状态",
+                    "VF归零强制回一刀",
+                    "玩家",
+                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                    "四码",
+                    _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.D["技能ID"]
+                )
                 _____505C_6B62_4E8C_5200_6D88_8017(_____65BD_6CD5_8005)
                 _____8BBE_7F6E_59FF_6001(_____65BD_6CD5_8005, "一刀")
             end
@@ -138,6 +161,7 @@ local function _____91CA_653ED_59FF_6001_5207_6362(_context, _____65BD_6CD5_8005
         )
         return
     end
+    _____5F00_59CB_786C_76F4(_____65BD_6CD5_8005, ____D_914D_7F6E["切换硬直秒"], {["标题"] = "二刀解放"})
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["D切换"])
     local _____5F53_524D = _____83B7_53D6_59FF_6001(_____65BD_6CD5_8005)
     if _____5F53_524D == "一刀" then
@@ -157,6 +181,29 @@ local function _____91CA_653ED_59FF_6001_5207_6362(_context, _____65BD_6CD5_8005
         _____6062_590DVF(_____65BD_6CD5_8005, ____D_914D_7F6E["切回一刀恢复VF"])
     end
     Sound3DII_UnitPlayReuse(_____6731_96C0_9662_693F_97F3_6548_914D_7F6E["D切换"]["路径"], _____65BD_6CD5_8005, _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["D切换"]["裁断距离"])
+    if _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["D切换特效"]["模型路径"] ~= "" then
+        _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["D切换特效"]["模型路径"],
+            RGB = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["D切换特效"].RGB,
+            X = jass.GetUnitX(_____65BD_6CD5_8005),
+            Y = jass.GetUnitY(_____65BD_6CD5_8005),
+            Z = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["D切换特效"]["高度"],
+            ["缩放"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["D切换特效"]["缩放"],
+            ["持续秒"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["D切换特效"]["持续秒"]
+        })
+    end
+    local _____53E0_52A0 = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["D切换叠加"]
+    _____521B_5EFA_70B9_7279_6548({
+        ["模型路径"] = _____53E0_52A0["模型路径"],
+        RGB = _____53E0_52A0.RGB,
+        X = jass.GetUnitX(_____65BD_6CD5_8005),
+        Y = jass.GetUnitY(_____65BD_6CD5_8005),
+        Z = _____53E0_52A0["高度"],
+        ["面向角度"] = jass.GetUnitFacing(_____65BD_6CD5_8005),
+        ["动画索引"] = _____53E0_52A0["动画索引"],
+        ["缩放"] = _____53E0_52A0["缩放"],
+        ["持续秒"] = _____53E0_52A0["持续秒"]
+    })
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院椿", _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.D["技能ID"])
 end
 local _____5DF2_6CE8_518C = false

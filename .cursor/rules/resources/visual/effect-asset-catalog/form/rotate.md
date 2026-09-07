@@ -2,6 +2,7 @@
 
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
+| `Common\Effect\Form\Rotate\TsubakiGatherWind.mdx` | 蓝白多股弯曲光带，围绕中心交汇，细长尾端渐隐；外观依据用户截图。 | 单序列 `Birth 0–1000ms`，索引 0；D 按英雄朝向，R 按施法方向。 | 椿 D 成功切换叠加一次，1.0 倍、高度 30、存活 1 秒；R 蓄力在英雄位置叠加，动画适配蓄力时长，结束或中断销毁。 | 保留原 D/R 表现。4 张原生 `Textures\Flare.blp`、`Shockwave10.blp`、`Tornado2b.blp`、`RibbonNE1_blue.blp` 只去除桌面前缀，不复制贴图。源 `file_001320.mdx`；待实机确认。 | 56764 | `28520F3BD7FA6682` |
 | `Common\Effect\Form\Rotate\ShalltearBloodMoonHorizontalSlash.mdx` | 深红水平环斩，刀光体系统一、方向清楚。 | 水平绕身切割；迁移版补齐安全 `Death`。 | 夏提雅血月轮舞水平环斩。 | 不能代替直线反刺或地面范围预警。 | 8092 | `855946F1D6776EFF` |
 | `Common\Effect\Form\Rotate\ShalltearBloodMoonDiagonalSlash.mdx` | 深红斜向环斩，与水平环斩形成同体系变体。 | 斜向绕身切割；迁移版补齐安全 `Death`。 | 夏提雅血月轮舞斜斩变化。 | 与水平版错峰使用，避免同帧过亮。 | 14292 | `6DEAA7E7D67FA8C6` |
 | `Common\Effect\Form\Rotate\youmu_w_eff1.mdx` | 蓝黑回旋剑势包裹中心黑雾，带亡冥魂力感。 | 围绕剑刃或施法者回旋。 | 亚伦柯斯亡冥英斩蓄势、命中辅助。 | 形状偏圆，只作蓄势层，不代替路径预警。 | 16788 | `DD1422D88A9BAFFD` |
@@ -15,3 +16,5 @@
 | `Common\Effect\Form\Rotate\TsubakiIchiGuard.mdx` | 银白单刀光沿人物周围缓慢环绕，姿态克制。 | `Birth / Stand / Death`；绑定椿并随一刀守势持续。 | 朱雀院椿 D 一刀守势提示。 | 与二刀攻势互斥，切换、死亡和场景清理时先销毁旧姿态。 | 4672 | `712FA0E3DE39D706` |
 | `Common\Effect\Form\Rotate\TsubakiNitoAssault.mdx` | 红蓝两道刀光在人物周围交错环绕，攻势辨识明确。 | `Birth / Stand / Death`；绑定椿并随二刀状态持续。 | 朱雀院椿 D 二刀攻势提示。 | 与一刀守势互斥；只使用红/蓝两张正式贴图，不迁入旧单贴图版本。 | 5036 | `E372AC226B35B71E` |
 | `Common\Effect\Form\Rotate\IrenaFlightWindBackup.mdx` | 蓝白水风旋流围绕中心高速旋转，体量较大。 | `Birth / Stand / Death`；跟随飞行状态。 | 伊蕾娜 E 飞行风压整套备份。 | 水龙卷语义较强，只在主轨迹组合不合适时整套替换，不与主组合满亮叠加。 | 20482 | `42BF966A4E4EBD10` |
+| `Common\Effect\Form\Rotate\TsubakiDSwitchVortex.mdx` | 黑灰烟雾旋涡：深黑核心与外圈多道暗色涡流弧组成环形气旋，层次内聚力强。 | 单 `Birth 1` 序列（一次性）；在姿态切换成功点创建并按 `持续秒` 销毁。 | 朱雀院椿 D 姿态切换释放爆发（英雄位置一次）。 | 1 张私有贴图 `DustWind.blp` 已改名 `TsubakiDSwitchVortex_DustWind.blp` 迁入本分类 `Texture`（源自 AZ200 包 `JNTX (381)`，与 WindCirclefaster 副本同 SHA）；较暗，勿与姿态光环叠时长拉长，按一次循环播放；原始名 `JNTX (9)\JNTX (9).mdx` 已登记《特效模型命名与去重备忘录》。 | 38474 | `09D856969BF9EEBA` |
+| `Common\Effect\Form\Rotate\IrenaCorridorVortex.mdx` | 蓝色多尾涡旋：中心绿黄星芒向外旋出多条蓝色彗尾弧线，伴全屏彩色星点，万法回廊的持续演算语言。 | `Stand / death`；`Stand` 循环旋转，R 持续期跟随回廊中心创建。 | 伊蕾娜 R 万法回廊持续涡旋层（`2.0` 缩放）。 | 7 张私有贴图 `MH-*` 改名 `IrenaCorridorVortex_*` 迁入本分类 `Texture` 并改写模型路径（源目录未导出，取自同批 `file_001125\war3mapimported`）；原始名 `MapTest\file_001126\file_001126.mdx` 已登记《特效模型命名与去重备忘录》。 | 78021 | `070C26A2E3A2A2CB` |

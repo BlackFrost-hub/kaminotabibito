@@ -25,6 +25,9 @@ const { 创建战斗技能实例, 查询战斗技能实例 } = require("系统.0
   创建战斗技能实例: (this: void, 参数: any) => 战斗技能实例控制器;
   查询战斗技能实例: (this: void, 施法者: any, 技能键: string) => 战斗技能实例控制器[];
 };
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, 单位: any, 持续时间: number, 读条参数?: { 标题?: string; Z偏移?: number; UI类型?: any; 数值后缀?: string }) => void;
+};
 const { 开始冲锋, 停止位移 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.02．冲锋·击退.01．击退系统.03．对外接口") as {
   开始冲锋: (this: void, 单位: any, 参数: any) => number;
   停止位移: (this: void, 位移ID: number, 原因?: string) => boolean;
@@ -65,7 +68,7 @@ const {
   恢复VF: (this: void, 英雄: any, 量: number) => boolean;
   扣除VF: (this: void, 英雄: any, 量: number) => number;
   获取姿态: (this: void, 英雄: any) => string;
-  设置决斗距离: (this: void, 英雄: any, 方向: number, 持续秒: number) => void;
+  设置决斗距离: (this: void, 英雄: any, 方向: number, 持续秒: number, 目标单位?: any, 兜底X?: number, 兜底Y?: number) => void;
   登记椿清理: (this: void, 英雄: any, 名称: string, 清理: () => void) => void;
   播放椿动作: (this: void, 英雄: any, 槽: { 索引: number; 持续秒: number }) => void;
 };
@@ -111,7 +114,10 @@ export function 获取椿回锋方向(this: void, 英雄: any): number | null {
 
 function 设置回锋方向(this: void, 英雄: any, 方向: number): void {
   if (英雄 == null || 英雄 === 0) return;
-  回锋表[jass.GetHandleId(英雄)] = { 到期: getGameTime() + E配置.回锋方向有效秒 * 1000, 方向 };
+  // 回锋窗口从 E 终点横斩硬直结束起算：玩家被 0.9s 硬直按住，若从落定瞬间计时，窗口只剩 0.3s、Q 永远来不及
+  const 硬直秒 = 朱雀院椿动作槽.E终点横斩.持续秒;
+  回锋表[jass.GetHandleId(英雄)] = { 到期: getGameTime() + (硬直秒 + E配置.回锋方向有效秒) * 1000, 方向 };
+  debugLogForce("椿-E", "状态", "设置回锋方向", "玩家", GetPlayerId(GetOwningPlayer(英雄)) + 1, "方向", 方向, "有效秒", E配置.回锋方向有效秒, "硬直秒", 硬直秒);
 }
 
 //=============================================================================
@@ -125,12 +131,19 @@ interface E数据 {
   终点X: number;
   终点Y: number;
   方向角: number;
+  /** E 释放时的施法目标点快照（精确回锋时方向改冲来源侧，目标点仍用快照传给决斗距离/R 锁定的特效锚点） */
+  目标X: number;
+  目标Y: number;
+  /** E 冲锋路径命中的第一个敌人（决斗距离的目标单位；R 锁定时特效锚点＝该单位脚下） */
+  命中目标: any;
   精确回锋: boolean;
 }
 
 function 结算E终点横斩(this: void, 施法者: any, 技能实例ID: number | undefined, 数据: E数据): void {
   const 玩家ID = GetPlayerId(GetOwningPlayer(施法者)) + 1;
   debugLogForce("椿-E", "结算", "玩家", 玩家ID, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "标签", "朱雀院椿-E横斩", "伤害", 读取单位攻击力(施法者) * E配置.横斩倍率, "方向", 数据.方向角, "落点X", Math.floor(数据.终点X), "落点Y", Math.floor(数据.终点Y));
+  // 硬直同步先于动作建立（位移自身暂停已由冲锋系统管理，此处为终点横斩施法硬直）
+  开始硬直(施法者, 朱雀院椿动作槽.E终点横斩.持续秒, { 标题: "刃道·间合" });
   播放椿动作(施法者, 朱雀院椿动作槽.E终点横斩);
   if (数据.已结算) return;
   数据.已结算 = true;
@@ -186,7 +199,18 @@ function 结算E终点横斩(this: void, 施法者: any, 技能实例ID: number 
   if (获取姿态(施法者) === "一刀") {
     恢复VF(施法者, E配置.一刀VF恢复);
   } else {
-    扣除VF(施法者, E配置.二刀VF代价);
+    const 剩余VF = 扣除VF(施法者, E配置.二刀VF代价);
+    debugLogForce("椿-E", "状态", "二刀横斩扣VF", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "量", E配置.二刀VF代价, "剩余VF", 剩余VF);
+    创建点特效({
+      模型路径: 朱雀院椿表现配置.E二刀第二斩.模型路径,
+      RGB: 朱雀院椿表现配置.E二刀第二斩.RGB,
+      X: 数据.终点X,
+      Y: 数据.终点Y,
+      Z: 朱雀院椿表现配置.E二刀第二斩.高度,
+      面向角度: 数据.方向角,
+      缩放: 朱雀院椿表现配置.E二刀第二斩.缩放,
+      持续秒: 朱雀院椿表现配置.E二刀第二斩.持续秒,
+    });
     for (let i = 0; i < 敌人.length; i++) {
       debugLogForce("椿-E", "命中", "玩家", 玩家ID, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "标签", "朱雀院椿-E二刀横斩", "目标", GetUnitName(敌人[i]), "handle", 敌人[i], "X", Math.floor(GetUnitX(敌人[i])), "Y", Math.floor(GetUnitY(敌人[i])), "伤害", 读取单位攻击力(施法者) * E配置.二刀追加倍率);
       造成技能伤害({
@@ -203,10 +227,20 @@ function 结算E终点横斩(this: void, 施法者: any, 技能实例ID: number 
         伤害形态: "AOE",
         参与技能伤害加成: true,
       });
+      创建点特效({
+        模型路径: 朱雀院椿表现配置.命中星爆.模型路径,
+        RGB: 朱雀院椿表现配置.命中星爆.RGB,
+        X: GetUnitX(敌人[i]),
+        Y: GetUnitY(敌人[i]),
+        Z: 朱雀院椿表现配置.命中星爆.高度,
+        面向角度: 数据.方向角,
+        缩放: 朱雀院椿表现配置.命中星爆.缩放,
+        持续秒: 朱雀院椿表现配置.命中星爆.持续秒,
+      });
     }
   }
-  // 建立决斗距离（供 R 读取）
-  设置决斗距离(施法者, 数据.方向角, E配置.决斗距离持续秒);
+  // 建立决斗距离（供 R 读取）：方向 = 位移方向；决斗目标单位 = 冲锋命中的第一个敌人（R 锁定时特效锚点＝该单位脚下，死亡退到 E 目标点快照）
+  设置决斗距离(施法者, 数据.方向角, E配置.决斗距离持续秒, 数据.命中目标, 数据.目标X, 数据.目标Y);
 }
 
 function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
@@ -233,6 +267,9 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
     // W 招架后使用 E：位移起点取攻击来源方向（冲向来源侧）
     方向 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), GetUnitX(反击.来源), GetUnitY(反击.来源));
   }
+  if (精确回锋) {
+    debugLogForce("椿-E", "状态", "精确回锋", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "位移方向", 方向);
+  }
   const 终点X = GetUnitX(施法者) + (目标X - GetUnitX(施法者));
   const 终点Y = GetUnitY(施法者) + (目标Y - GetUnitY(施法者));
   const 数据: E数据 = {
@@ -242,6 +279,9 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
     终点X,
     终点Y,
     方向角: 方向,
+    目标X,
+    目标Y,
+    命中目标: null,
     精确回锋,
   };
   debugLogForce("椿-E", "状态", "创建战斗技能实例", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-");
@@ -263,11 +303,40 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
   });
   debugLogForce("椿-E", "位移", "类型", "冲锋", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "距离", E配置.位移距离);
   数据.位移ID = 开始冲锋(施法者, {
+    角度: 方向,
     距离: E配置.位移距离,
     每秒速度: E配置.位移速度,
     检查地形: true,
     朝向跟随位移: true,
     暂停单位: true,
+    // 冲锋路径命中：穿透式（命中不停车），被越过的敌人在行进中立即结算冲锋命中伤害
+    命中半径: E配置.冲锋命中半径,
+    只命中敌人: true,
+    命中后结束: false,
+    允许重复命中: false,
+    命中回调: function E冲锋命中(this: void, _移动单位: any, 目标: any, _位移ID: number): void {
+      // 决斗目标只认第一个命中的敌人（后续穿透命中属于附带结算，不更换"决斗对象"）
+      if (数据.命中目标 == null) {
+        数据.命中目标 = 目标;
+        debugLogForce("椿-E", "状态", "决斗目标记录", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)));
+      }
+      const 命中伤害 = 读取单位攻击力(施法者) * E配置.冲锋命中倍率;
+      debugLogForce("椿-E", "冲锋命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能ID), "实例", 技能实例ID ?? "-", "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", 命中伤害);
+      造成技能伤害({
+        来源: 施法者,
+        目标,
+        伤害: 命中伤害,
+        伤害类型: DAMAGE_TYPE_NORMAL,
+        攻击类型: ATTACK_TYPE_NORMAL,
+        武器类型: WEAPON_TYPE_WHOKNOWS,
+        来源类型: "单位技能",
+        技能ID: E技能ID,
+        技能实例ID,
+        标签: "朱雀院椿-E冲锋命中",
+        伤害形态: "AOE",
+        参与技能伤害加成: true,
+      });
+    },
     位移特效: 朱雀院椿表现配置.E冲锋主层.模型路径[0],
     附加位移特效: 朱雀院椿表现配置.E冲锋主层.模型路径[1],
     位移特效缩放: 朱雀院椿表现配置.E冲锋主层.缩放,
@@ -278,6 +347,9 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
     附加位移特效持续秒: 朱雀院椿表现配置.E冲锋主层.持续秒,
     位移特效面向角度: 方向,
     附加位移特效面向角度: 方向,
+    // az_yin_q1 附加特效：创建在冲锋反方向 300 距离处，面向角度保持冲锋方向
+    附加位移特效偏移角度: 方向 + 180,
+    附加位移特效偏移距离: 300,
     撞墙回调: function E撞墙(this: void, 移动单位: any, _位移ID: number): void {
       // 撞墙：终点更新为英雄实际停靠位置（否则横斩在未达的目标点结算）
       数据.终点X = GetUnitX(移动单位);
@@ -337,4 +409,3 @@ export const 朱雀院椿E模块 = {
   技能ID: 朱雀院椿技能配置.E.技能ID,
   注册: 注册朱雀院椿E,
 } as const;
-

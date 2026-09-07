@@ -273,7 +273,7 @@ export const 塞莉亚克莱尔表现配置 = {
   公式节点结界: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\CeliaFormulaNode.mdx", 缩放: 1, 高度: 6, 持续秒: -1, RGB: { 红: 210, 绿: 235, 蓝: 255, 透明度: 255 } },
   /** 公式节点（E 锚定·紫蓝） */
   公式节点锚定: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\CeliaFormulaNode.mdx", 缩放: 1, 高度: 6, 持续秒: -1, RGB: { 红: 185, 绿: 130, 蓝: 255, 透明度: 255 } },
-  Q弹道: { 模型路径: "Common\\Effect\\Projectile\\CeliaPrismBolt.mdx", 缩放: 1, 高度: 80, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  Q弹道: { 模型路径: "Common\\Effect\\Projectile\\FrierenZoltraakSpiritArrowOverlay.mdx", 缩放: 1.6, 高度: 130, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
   W结界主体: { 模型路径: "Common\\Effect\\Form\\Shield\\CeliaAnalysisBarrier.mdx", 缩放: 1, 高度: 90, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
   E锚定阵: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\CeliaAnchorCircle.mdx", 缩放: 3, 高度: 6, 持续秒: -1, 基准半径: 300, 基准缩放: 3, 预警缩放系数: 0.4, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
   R高阶法阵: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\CeliaHighFormulaCircle.mdx", 缩放: 3, 高度: 6, 持续秒: -1, 基准半径: 400, 基准缩放: 3, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },

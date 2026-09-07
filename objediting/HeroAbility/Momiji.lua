@@ -59,5 +59,5 @@ createPlayerHeroActiveDChannelAbility('AMD1', '朱雀院红叶-朱雀流·秘传
   tooltip = '朱雀流·秘传三式（D）',
   tooltipExtended = '技能说明：进入秘传状态，强化接下来的斩击、招架或终式。|n伤害：本技能不直接造成伤害，强化效果由后续技能触发。|n技能类型：天赋技能，初始获得|n强化次数：最多3次|n状态持续时间：8秒|n冷却时间：18秒|n魔法消耗：最大魔法值的5%',
   icon = ICONS.D, iconTurnOff = DISABLED_ICONS.D, hotkey = 'D', buttonX = 0, buttonY = 1,
-  cooldown = 18, manaCost = 30, percentManaCost = 0.05,
+  cooldown = 3, manaCost = 30, percentManaCost = 0.05,
 })

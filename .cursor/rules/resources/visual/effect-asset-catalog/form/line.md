@@ -4,6 +4,8 @@
 
 | 模型与游戏内路径 | 文字外观 | 动画与方向 | 适用场景 | 限制／叠加关系 | 字节数 | SHA-256 |
 | --- | --- | --- | --- | --- | ---: | --- |
+| `Common\Effect\Form\Line\TsubakiPerfectCounterSlash.mdx` | 蓝白细长直线刀光，中心高亮，两端尖细并带蓝色外沿。 | `Birth 0-800ms`；椿至攻击来源方向左右各偏 45 度交叉创建，动画索引 0。 | 朱雀院椿 W 二刀完美招架反击，0.6 倍、高度 30、存活 0.8 秒。 | 两道刀光叠加在攻击来源坐标；保留原完美招架反馈，不新增伤害。源 `file_001384.mdx`；两张私有 `Effect_AZ_Knife_light1o/2j.blp` 原名迁入本分类 Texture，无原生贴图。 | 2844 | `85629251AB94F5C0` |
+| `Common\Effect\Form\Line\TsubakiFireSlashWB.mdx` | 灰白弧形火焰刀光，弧面宽、轮廓清晰，适合强化攻击的瞬时斩击。 | 保留源模型默认 `Stand`；运行时按实际伤害方向设置面向角度。 | 朱雀院椿普攻反击斩、E 二刀姿态独立第二道横斩，缩放 5.0、高度 30、存活 0.8 秒。 | 只作强化斩击表现，不改变伤害判定；每个命中目标在其当前坐标叠加 `Common\\Effect\\Form\\Explosion\\file_001202.mdx`。源 `fireslash_wb.mdx`；私有贴图迁入 `Line\\Texture`。 | 11302 | `9AAB2E36D102C37C` |
 | `Common\Effect\Form\Line\ShalltearBloodMoonArcSlash.mdx` | 红色弯月形斩光，外沿散落细小红色粒子，作为横扫枪势的短促弧形补层。 | 保留源模型默认 `Birth` 动作；在横扫结算点与主枪势同坐标叠加。 | 夏提雅·血月轮舞正面横扫弧光补层。 | 只作 `ShalltearWideBloodSweep.mdx` 的叠加层；正面横扫与反向反刺各创建一次，不承担伤害或预警判定。模型及两张私有贴图均重新导入自 `导出特效\\file_001307`，不补 `Stand / Death`。 | 6557 | `24E1638F55EB50C0` |
 | `Common\Effect\Form\Line\DemonicRoarWave.mdx` | 金白色细长锥形冲击波，前缘尖锐，后方分出多道高速拖影。 | 单一 `stand` 序列；运行时以 Z 轴对准目标方向，可叠加俯仰和横滚，适合从高处嘴部斜向喷出。 | 巴尔扎罗斯恶魔咆哮波，也可作为火焰、圣光或能量类的短促直线吐息主体。 | 不是自动移动弹幕；需由弹幕系统驱动位移，或在发射点短时播放。高亮度较强，不与白色直线预警重叠。 | 2328 | `B82DCD3F00D10250` |
 | `Common\Effect\Form\Line\AinzRealityFractureMovingSlash.mdx` | 高饱和洋红宽弧斩光，带多道细长拖尾。 | `Birth / Stand / Death`；运行时沿固定起终点路径移动，模型视觉朝向相对移动方向偏移 `180°`。 | 安兹·现实断裂路径主体。 | 不代替机制预警；运行时 RGB `255 / 8 / 255`；表现顺序为图 1 路径主体后叠加图 2 命中层。 | 5932 | `CBC8FC760F568285` |
@@ -36,3 +38,4 @@
 | `Common\Effect\Form\Line\TsubakiCrossSlashBackup.mdx` | 两道红色刃光交叉，中心熔亮，颜色更偏炎式。 | `Stand / Birth / Death`；一次性分支显式选序列。 | 朱雀院椿 R 二刀交错斩备份。 | 与主版本二选一；仅引用原生贴图，源代号 `[TX] (932).mdx`。 | 7555 | `0300C02125A98C57` |
 | `Common\Effect\Form\Line\FrierenPiercingBeam.mdx` | 蓝白窄幅直线激光，中心亮核稳定，炮体边缘有环形能量。 | `Birth 333-833 / Stand 1667-2167 / Death 3333-3667`；沿 R 快照方向放置。 | 芙莉莲 R 贯穿射杀主炮。 | 模型宽度不扩大真实窄线判定；释放、打断、死亡时进入 Death/清理。 | 21874 | `ED2F0EE02BC84AA0` |
 | `Common\Effect\Form\Line\FrierenPiercingBeamBackup.mdx` | 紫白细长光束带短粒子尾迹，比主版本更轻。 | `Stand / Birth / Death`；按 R 锁定方向创建。 | 芙莉莲 R 贯穿射杀备份。 | 与主炮二选一；源代号 `[TX] (929).mdx`，仅引用原生贴图。 | 7188 | `AC904B8C8F47E768` |
+| `Common\Effect\Form\Line\TsubakiQBladeArc.mdx` | 冰白半透剑气/刀光弧：月牙形弧形拖尾配星点碎光，路径挥砍感强。 | `[0] Birth` 单序列；在 Q 前摇完成（蓄力完成）时于施法者位置按施法角度创建，运行时按 `持续秒` 销毁。 | 朱雀院椿 Q 居合/返刃剑气层（`2.86` 缩放）。 | 3 张私有贴图：`SB`、`StarFlash_Grey` 迁入本分类 `Texture`，`star5tga` 复用 `Element\Fantasy\Texture` 同 SHA 版（源包缺此贴图）；只作表现，不承担伤害判定；原始名 `MapTest\file_001303\file_001303.mdx` 已登记《特效模型命名与去重备忘录》 | 6405 | `60FC59F0936627E7` |

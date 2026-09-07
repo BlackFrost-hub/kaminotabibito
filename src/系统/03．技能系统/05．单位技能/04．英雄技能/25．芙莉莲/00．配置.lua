@@ -242,9 +242,9 @@ ____exports["芙莉莲表现配置"] = {
         ["跟随轨迹俯仰"] = true
     },
     ["Q命中反馈"] = {
-        ["模型路径"] = "Common\\Effect\\Form\\Explosion\\ChargingUp.mdx",
-        ["缩放"] = 0.7,
-        ["高度"] = 40,
+        ["模型路径"] = "Common\\Effect\\Form\\Explosion\\FrierenQHitBurst.mdx",
+        ["缩放"] = 1.1,
+        ["高度"] = 30,
         ["持续秒"] = 0.4,
         RGB = {["红"] = 255, ["绿"] = 255, ["蓝"] = 255, ["透明度"] = 255},
         ["面向角度"] = 0,

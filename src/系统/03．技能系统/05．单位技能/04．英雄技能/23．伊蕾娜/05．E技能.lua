@@ -96,6 +96,19 @@ local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, 
         math.floor(Y)
     )
     _____64AD_653E_4F0A_857E_5A1C_9636_6BB5_52A8_4F5C(_____65BD_6CD5_8005, _____4F0A_857E_5A1C_6A21_578B_52A8_4F5C_914D_7F6E["技能动作"]["E落地"])
+    if _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地星柱"]["模型路径"] ~= "" then
+        _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地星柱"]["模型路径"],
+            RGB = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地星柱"].RGB,
+            X = X,
+            Y = Y,
+            Z = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地星柱"]["高度"],
+            ["面向角度"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地星柱"]["面向角度"],
+            ["动画索引"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地星柱"]["动画索引"],
+            ["缩放"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地星柱"]["缩放"],
+            ["持续秒"] = _____4F0A_857E_5A1C_8868_73B0_914D_7F6E["E落地星柱"]["持续秒"]
+        })
+    end
     local _____654C_4EBA_5217_8868 = _____83B7_53D6_5750_6807_8303_56F4_654C_4EBA(_____65BD_6CD5_8005, X, Y, _____4F0A_857E_5A1CE_914D_7F6E["冲击半径"])
     local _____51B2_51FB_4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____4F0A_857E_5A1CE_914D_7F6E["冲击伤害攻击力倍率"]
     do
@@ -116,7 +129,7 @@ local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, 
                         "handle",
                         _____654C_4EBA
                     )
-                    goto __continue4
+                    goto __continue5
                 end
                 debugLogForce(
                     "伊蕾娜-E",
@@ -162,7 +175,7 @@ local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, 
                     "技能"
                 )
             end
-            ::__continue4::
+            ::__continue5::
             i = i + 1
         end
     end
@@ -197,7 +210,7 @@ local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, 
                             "handle",
                             _____654C_4EBA
                         )
-                        goto __continue8
+                        goto __continue9
                     end
                     debugLogForce(
                         "伊蕾娜-E",
@@ -234,7 +247,7 @@ local function _____7ED3_7B97E_5230_8FBE(_____65BD_6CD5_8005, _____5B9E_4F8BID, 
                         ["参与技能伤害加成"] = true
                     })
                 end
-                ::__continue8::
+                ::__continue9::
                 i = i + 1
             end
         end

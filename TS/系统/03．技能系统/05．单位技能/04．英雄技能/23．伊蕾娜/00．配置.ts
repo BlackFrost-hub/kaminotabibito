@@ -267,6 +267,10 @@ export const 伊蕾娜模型动作配置 = {
  * 范围模型额外配置基准半径/基准缩放，运行时按真实判定半径换算。
  */
 export const 伊蕾娜表现配置 = {
+  E落地星柱: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaELandingPillar.mdx", 缩放: 1.5, 高度: 30, 持续秒: 0.6, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }, 面向角度: 0, 动画索引: 0 },
+  Q命中星柱: { 模型路径: "Common\\Effect\\Form\\Explosion\\IrenaELandingPillar.mdx", 缩放: 1.0, 高度: 30, 持续秒: 0.5, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }, 面向角度: 0, 动画索引: 0 },
+  R持续涡旋: { 模型路径: "Common\\Effect\\Form\\Rotate\\IrenaCorridorVortex.mdx", 缩放: 2.0, 高度: 0, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  R持续星尘: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\IrenaCorridorStardust.mdx", 缩放: 1.2, 高度: 0, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
   D变式提示: { 模型路径: "Common\\Effect\\Form\\MagicCircle\\feastaura.mdx", 缩放: 0.6, 高度: 20, 持续秒: 1.2, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},
   D变式浮字: { 文本高度: 40, 字体尺寸: 11, 上浮速度: 0.03, 持续秒: 1.2, 颜色: { 红: 255, 绿: 220, 蓝: 80, 透明度: 255 }},
   Q主弹道: { 模型路径: "Common\\Effect\\Projectile\\IrenaTrackingBolt.mdx", 缩放: 1.365, 高度: 115, 持续秒: -1, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 }},

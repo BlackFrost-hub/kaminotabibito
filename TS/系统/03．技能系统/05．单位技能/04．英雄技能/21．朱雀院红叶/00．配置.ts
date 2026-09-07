@@ -57,7 +57,7 @@ export const 朱雀院红叶技能配置 = {
     + 机制("冷却时间") + 数值("65秒") + "|n"
     + 机制("魔法消耗") + "最大魔法值的" + 数值("13%")
   },
-  D: { 技能ID: "AMD1", 名称: "朱雀流·秘传三式（D）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiD.blp", 快捷键: "D", 冷却秒: 18, 魔耗百分比: 0.05, 说明:
+  D: { 技能ID: "AMD1", 名称: "朱雀流·秘传三式（D）", 图标: "ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiD.blp", 快捷键: "D", 冷却秒: 3, 魔耗百分比: 0.05, 说明:
     标题("技能说明") + "进入秘传状态，强化接下来的斩击、招架或终式；持续期间再次按 D 刷新持续时间，强化次数不叠加。|n"
     + 标题("被动") + "常驻被动（无需开启 D）：Q/W/E/R 命中敌人均施加「破绽」标记，持续" + 数值("4秒") + "；红叶的普通攻击命中带破绽的目标会触发「破绽斩」，追加本次普攻实际伤害" + 数值("60%") + "的" + 伤害("物理伤害") + "，随后移除目标破绽并获得" + 数值("1层刀势") + "（同一目标" + 数值("1.2秒") + "内不重复触发）。刀势最多" + 数值("3层") + "，由 Q/W/E/R 的强化效果消耗。|n"
     + 标题("强化Q") + "Q 一段命中时消耗 1 次强化，追加一段短距离朱雀刀光，造成攻击力" + 数值("75%") + "的" + 伤害("物理伤害") + "。|n"
@@ -69,7 +69,7 @@ export const 朱雀院红叶技能配置 = {
     + 机制("技能类型") + "天赋技能，初始获得|n"
     + 机制("强化次数") + "最多" + 数值("3次") + "|n"
     + 机制("状态持续时间") + 数值("8秒") + "|n"
-    + 机制("冷却时间") + 数值("18秒") + "|n"
+    + 机制("冷却时间") + 数值("3秒") + "|n"
     + 机制("魔法消耗") + "最大魔法值的" + 数值("5%")
   },
   Q2技能ID: "ASQ2",
@@ -132,7 +132,7 @@ export const 朱雀院红叶表现配置 = {
   水镜主体: { 模型路径: "Common\\Effect\\Form\\Shield\\MomijiWaterMirrorV5.mdx", 缩放: 1.5, 高度: 0, 持续秒: 0.6, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
   破绽斩: { 模型路径: "Common\\Effect\\Form\\Line\\MomijiSecretCrimsonSlash.mdx", 缩放: 1, 高度: 30, 持续秒: 0.85, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
   满刀势提示: { 模型路径: "", 缩放: 1, 高度: 30, 持续秒: 0.5, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
-  E剑痕: { 模型路径: "Common\\Effect\\Form\\Line\\MomijiSecretCrimsonSlash.mdx", 缩放: 0.65, 高度: 8, 持续秒: 2.5, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 210 } },
+  E剑痕: { 模型路径: "Common\\Effect\\Form\\Line\\MomijiSecretCrimsonSlash.mdx", 缩放: 0.65, 高度: 8, 持续秒: 2.5, 冻结延迟毫秒: 200, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 210 } },
   E第一斩: { 模型路径: "Common\\Effect\\Form\\Line\\MomijiCrimsonBladeSlashBackup.mdx", 叠加模型路径: "Common\\Effect\\Form\\Line\\file_001300.mdx", 缩放: 1.6, 叠加缩放: 1.6, 高度: 35, 持续秒: 0.55, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 235 } },
   E第二斩: { 模型路径: "Common\\Effect\\Form\\Line\\MomijiCrimsonBladeSlashBackup.mdx", 叠加模型路径: "Common\\Effect\\Form\\Line\\file_001300.mdx", 缩放: 1.9, 叠加缩放: 1.9, 高度: 50, 持续秒: 0.65, RGB: { 红: 255, 绿: 120, 蓝: 120, 透明度: 245 } },
   Q冲锋: {
@@ -171,7 +171,7 @@ export const 朱雀院红叶表现配置 = {
     RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 },
   },
   R主斩: { 模型路径: "Common\\Effect\\Form\\Line\\MomijiFinalSlash.mdx", 备份模型路径: "Common\\Effect\\Form\\Line\\MomijiFinalSlashBackup.mdx", 缩放: 2, 高度: 30, 持续秒: 0.6, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
-  R主斩叠加: { 模型路径: "Common\\Effect\\Form\\Line\\MomijiFinalSlashBackup.mdx", 缩放: 2.5, 高度: 30, 单次持续秒: 0.3, 创建间隔秒: 0.03, 创建次数: 10, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
+  R主斩叠加: { 模型路径: "Common\\Effect\\Form\\Line\\MomijiFinalSlashBackup.mdx", 缩放: 2.5, 高度: 30, 单次持续秒: 0.5, 创建间隔秒: 0.03, 创建次数: 10, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
   R命中收尾: { 模型路径: "Common\\Effect\\Form\\Explosion\\MomijiFinalImpact.mdx", 备份模型路径: "Common\\Effect\\Form\\Explosion\\MomijiFinalImpactBackup.mdx", 缩放: 1, 高度: 30, 持续秒: 1.0, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
   R命中叠加: { 模型路径: "Common\\Effect\\Form\\Explosion\\file_001202.mdx", 缩放: 2, 高度: 30, 单次持续秒: 1.0, 创建间隔秒: 0.03, 创建次数: 34, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
   R剑痕回响: { 模型路径: "Common\\Effect\\Form\\Line\\MomijiSecretCrimsonSlash.mdx", 缩放: 1.4, 高度: 8, 持续秒: 0.5, 闪现缩放: 1.1, 闪现持续秒: 0.15, 闪现提前毫秒: 150, 叠加模型路径: "Common\\Effect\\Form\\Explosion\\MomijiEchoBurst.mdx", 叠加缩放: 2, 叠加高度: 8, 叠加持续秒: 0.8, RGB: { 红: 255, 绿: 255, 蓝: 255, 透明度: 255 } },
@@ -280,7 +280,7 @@ export const 朱雀院红叶待平衡数值 = {
     D强化每次加成: 0.4,
   },
   D: {
-    冷却秒: 18, 魔耗百分比: 0.05, 持续秒: 8, 强化次数: 3,
+    冷却秒: 3, 魔耗百分比: 0.05, 持续秒: 8, 强化次数: 3,
     延长秒: 2, 最大延长次数: 2,
   },
 } as const;

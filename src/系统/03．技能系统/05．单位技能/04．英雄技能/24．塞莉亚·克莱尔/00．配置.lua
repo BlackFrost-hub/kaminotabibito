@@ -247,9 +247,9 @@ ____exports["塞莉亚克莱尔表现配置"] = {
         RGB = {["红"] = 185, ["绿"] = 130, ["蓝"] = 255, ["透明度"] = 255}
     },
     ["Q弹道"] = {
-        ["模型路径"] = "Common\\Effect\\Projectile\\CeliaPrismBolt.mdx",
-        ["缩放"] = 1,
-        ["高度"] = 80,
+        ["模型路径"] = "Common\\Effect\\Projectile\\FrierenZoltraakSpiritArrowOverlay.mdx",
+        ["缩放"] = 1.6,
+        ["高度"] = 130,
         ["持续秒"] = -1,
         RGB = {["红"] = 255, ["绿"] = 255, ["蓝"] = 255, ["透明度"] = 255}
     },

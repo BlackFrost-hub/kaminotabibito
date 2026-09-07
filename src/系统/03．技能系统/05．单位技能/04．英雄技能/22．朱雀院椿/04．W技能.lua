@@ -3,7 +3,7 @@ local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
 local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
-local _____7ED3_675FW_62DB_67B6, jass, fourCCToStringSafe, unregisterDamageModifier, _____9020_6210_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D, destroyUnitEffect, Sound3DII_CooPlayReuse, _____6062_590DVF, debugLogForce, ____W_6280_80FDID, ____W_914D_7F6E, _____62DB_67B6_7279_6548_952E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitX, GetUnitY, GetUnitName, GetOwningPlayer, GetPlayerId
+local _____7ED3_675FW_62DB_67B6, jass, fourCCToStringSafe, unregisterDamageModifier, _____9020_6210_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D, destroyUnitEffect, _____521B_5EFA_70B9_7279_6548, Sound3DII_CooPlayReuse, _____6062_590DVF, debugLogForce, ____W_6280_80FDID, ____W_914D_7F6E, _____62DB_67B6_7279_6548_952E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitX, GetUnitY, GetUnitName, GetOwningPlayer, GetPlayerId
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.00．配置")
 local _____6731_96C0_9662_693F_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿技能配置"]
 local _____6731_96C0_9662_693F_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿表现配置"]
@@ -22,6 +22,17 @@ function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8
     end
     destroyUnitEffect(_____65BD_6CD5_8005, _____62DB_67B6_7279_6548_952E)
     if not _____6570_636E["已招架"] then
+        debugLogForce(
+            "椿-W",
+            "状态",
+            "未受击收刀",
+            "玩家",
+            GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+            "四码",
+            fourCCToStringSafe(____W_6280_80FDID),
+            "实例",
+            ______6280_80FD_5B9E_4F8BID or "-"
+        )
         _____6062_590DVF(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_88AB_52A8_914D_7F6E["收刀恢复VF"])
         local _____65B9_5411 = _____6570_636E["方向角"]
         local X = GetUnitX(_____65BD_6CD5_8005)
@@ -33,6 +44,16 @@ function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8
             _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["W收刀斩"]["高度"],
             _____6731_96C0_9662_693F_97F3_6548_914D_7F6E["W收刀斩"]["裁断距离"]
         )
+        _____521B_5EFA_70B9_7279_6548({
+            ["模型路径"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W收刀斩"]["模型路径"],
+            RGB = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W收刀斩"].RGB,
+            X = X,
+            Y = Y,
+            Z = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W收刀斩"]["高度"],
+            ["面向角度"] = _____65B9_5411,
+            ["缩放"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W收刀斩"]["缩放"],
+            ["持续秒"] = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W收刀斩"]["持续秒"]
+        })
         local _____654C_4EBA = _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D({
             X = X,
             Y = Y,
@@ -46,6 +67,22 @@ function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8
                 )
             end
         })
+        if #_____654C_4EBA == 0 then
+            debugLogForce(
+                "椿-W",
+                "命中失败",
+                "原因",
+                "无目标",
+                "玩家",
+                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
+                "四码",
+                fourCCToStringSafe(____W_6280_80FDID),
+                "标签",
+                "朱雀院椿-W收刀斩",
+                "方向",
+                _____6570_636E["方向角"]
+            )
+        end
         do
             local i = 0
             while i < #_____654C_4EBA do
@@ -85,6 +122,17 @@ function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8
                     ["伤害形态"] = "AOE",
                     ["参与技能伤害加成"] = true
                 })
+                local _____53E0_52A0_914D_7F6E = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W收刀斩叠加"]
+                _____521B_5EFA_70B9_7279_6548({
+                    ["模型路径"] = _____53E0_52A0_914D_7F6E["模型路径"],
+                    RGB = _____53E0_52A0_914D_7F6E.RGB,
+                    X = GetUnitX(_____654C_4EBA[i + 1]),
+                    Y = GetUnitY(_____654C_4EBA[i + 1]),
+                    Z = _____53E0_52A0_914D_7F6E["高度"],
+                    ["面向角度"] = _____6570_636E["方向角"],
+                    ["缩放"] = _____53E0_52A0_914D_7F6E["缩放"],
+                    ["持续秒"] = _____53E0_52A0_914D_7F6E["持续秒"]
+                })
                 i = i + 1
             end
         end
@@ -105,40 +153,42 @@ local _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B = ____require_result_3["查�
 local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调")
 local ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668 = ____require_result_4["register护盾前拦截修改器"]
 unregisterDamageModifier = ____require_result_4.unregisterDamageModifier
-local ____require_result_5 = require("系统.04．伤害系统.08．技能伤害系统")
-_____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_5["造成技能伤害"]
-local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
-_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
-_____5355_4F4D_5B58_6D3B = ____require_result_6["单位存活"]
-local _____4E24_70B9_89D2_5EA6 = ____require_result_6["两点角度"]
-local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
-_____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_7["获取扇形区域单位"]
-local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.08．方位判定工具")
-local _____5355_4F4D_662F_5426_5728_6765_6E90_6B63_9762_6247_533A = ____require_result_8["单位是否在来源正面扇区"]
-local _____89D2_5EA6_5DEE_7EDD_5BF9_503C = ____require_result_8["角度差绝对值"]
-local ____require_result_9 = require("系统.05．Buff系统.00．Buff系统")
-local registerManualBuff = ____require_result_9.registerManualBuff
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_9["移除单位指定Buff"]
-local ____require_result_10 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_10.createUnitEffect
-destroyUnitEffect = ____require_result_10.destroyUnitEffect
-local _____521B_5EFA_70B9_7279_6548 = ____require_result_10["创建点特效"]
-local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_10["设置特效缩放"]
-local ____require_result_11 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
-local Sound3DII_UnitPlayReuse = ____require_result_11.Sound3DII_UnitPlayReuse
-Sound3DII_CooPlayReuse = ____require_result_11.Sound3DII_CooPlayReuse
-local ____require_result_12 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
-local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_12["播放英雄技能喊话"]
-local ____require_result_13 = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.02．被动效果")
-local _____662F_6731_96C0_9662_693F = ____require_result_13["是朱雀院椿"]
-local _____521B_5EFA_53CD_51FB_51C6_5907 = ____require_result_13["创建反击准备"]
-_____6062_590DVF = ____require_result_13["恢复VF"]
-local _____83B7_53D6_59FF_6001 = ____require_result_13["获取姿态"]
-local _____767B_8BB0_693F_6E05_7406 = ____require_result_13["登记椿清理"]
-local _____64AD_653E_693F_52A8_4F5C = ____require_result_13["播放椿动作"]
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff")
+local _____5F00_59CB_786C_76F4 = ____require_result_5["开始硬直"]
+local ____require_result_6 = require("系统.04．伤害系统.08．技能伤害系统")
+_____9020_6210_6280_80FD_4F24_5BB3 = ____require_result_6["造成技能伤害"]
+local ____require_result_7 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
+_____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_7["读取单位攻击力"]
+_____5355_4F4D_5B58_6D3B = ____require_result_7["单位存活"]
+local _____4E24_70B9_89D2_5EA6 = ____require_result_7["两点角度"]
+local ____require_result_8 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.09．形状区域.扇形区域")
+_____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D = ____require_result_8["获取扇形区域单位"]
+local ____require_result_9 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.08．方位判定工具")
+local _____5355_4F4D_662F_5426_5728_6765_6E90_6B63_9762_6247_533A = ____require_result_9["单位是否在来源正面扇区"]
+local _____89D2_5EA6_5DEE_7EDD_5BF9_503C = ____require_result_9["角度差绝对值"]
+local ____require_result_10 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_10.registerManualBuff
+local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_10["移除单位指定Buff"]
+local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
+local createUnitEffect = ____require_result_11.createUnitEffect
+destroyUnitEffect = ____require_result_11.destroyUnitEffect
+_____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
+local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_11["设置特效缩放"]
+local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
+local Sound3DII_UnitPlayReuse = ____require_result_12.Sound3DII_UnitPlayReuse
+Sound3DII_CooPlayReuse = ____require_result_12.Sound3DII_CooPlayReuse
+local ____require_result_13 = require("系统.09．表现系统.10．英雄语音.10．技能喊话.01．英雄技能喊话")
+local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_13["播放英雄技能喊话"]
+local ____require_result_14 = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.02．被动效果")
+local _____662F_6731_96C0_9662_693F = ____require_result_14["是朱雀院椿"]
+local _____521B_5EFA_53CD_51FB_51C6_5907 = ____require_result_14["创建反击准备"]
+_____6062_590DVF = ____require_result_14["恢复VF"]
+local _____83B7_53D6_59FF_6001 = ____require_result_14["获取姿态"]
+local _____767B_8BB0_693F_6E05_7406 = ____require_result_14["登记椿清理"]
+local _____64AD_653E_693F_52A8_4F5C = ____require_result_14["播放椿动作"]
 local _____8054_52A8R = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.06．R技能")
-local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_14.debugLogForce
+local ____require_result_15 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_15.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E["单位类型ID"])
 ____W_6280_80FDID = stringToFourCCSafe(_____6731_96C0_9662_693F_6280_80FD_914D_7F6E.W["技能ID"])
 ____W_914D_7F6E = _____6731_96C0_9662_693FW_914D_7F6E
@@ -154,8 +204,8 @@ GetOwningPlayer = jass.GetOwningPlayer
 GetPlayerId = jass.GetPlayerId
 local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E, _____5B8C_7F8E)
     local _____73A9_5BB6ID = GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1
-    local ____debugLogForce_17 = debugLogForce
-    local ____array_16 = __TS__SparseArrayNew(
+    local ____debugLogForce_18 = debugLogForce
+    local ____array_17 = __TS__SparseArrayNew(
         "椿-W",
         "反击",
         "玩家",
@@ -170,28 +220,29 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9
         _____6570_636E["招架来源"] ~= nil and _____6570_636E["招架来源"] ~= 0 and GetUnitName(_____6570_636E["招架来源"]) or "-",
         "handle"
     )
-    local ____6570_636E__62DB_67B6_6765_6E90_15 = _____6570_636E["招架来源"]
-    if ____6570_636E__62DB_67B6_6765_6E90_15 == nil then
-        ____6570_636E__62DB_67B6_6765_6E90_15 = "-"
+    local ____6570_636E__62DB_67B6_6765_6E90_16 = _____6570_636E["招架来源"]
+    if ____6570_636E__62DB_67B6_6765_6E90_16 == nil then
+        ____6570_636E__62DB_67B6_6765_6E90_16 = "-"
     end
     __TS__SparseArrayPush(
-        ____array_16,
-        ____6570_636E__62DB_67B6_6765_6E90_15,
+        ____array_17,
+        ____6570_636E__62DB_67B6_6765_6E90_16,
         "伤害",
         _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * ____W_914D_7F6E["反击伤害倍率"]
     )
-    ____debugLogForce_17(__TS__SparseArraySpread(____array_16))
+    ____debugLogForce_18(__TS__SparseArraySpread(____array_17))
+    _____5F00_59CB_786C_76F4(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["W成功反击"]["持续秒"], {["标题"] = "后之先"})
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["W成功反击"])
     local _____6765_6E90 = _____6570_636E["招架来源"]
     if _____6765_6E90 == nil or _____6765_6E90 == 0 or not _____5355_4F4D_5B58_6D3B(_____6765_6E90) then
-        local ____debugLogForce_21 = debugLogForce
-        local ____fourCCToStringSafe_result_19 = fourCCToStringSafe(____W_6280_80FDID)
-        local ____temp_20 = _____6280_80FD_5B9E_4F8BID or "-"
-        local ____6765_6E90_18 = _____6765_6E90
-        if ____6765_6E90_18 == nil then
-            ____6765_6E90_18 = "-"
+        local ____debugLogForce_22 = debugLogForce
+        local ____fourCCToStringSafe_result_20 = fourCCToStringSafe(____W_6280_80FDID)
+        local ____temp_21 = _____6280_80FD_5B9E_4F8BID or "-"
+        local ____6765_6E90_19 = _____6765_6E90
+        if ____6765_6E90_19 == nil then
+            ____6765_6E90_19 = "-"
         end
-        ____debugLogForce_21(
+        ____debugLogForce_22(
             "椿-W",
             "命中失败",
             "原因",
@@ -199,11 +250,11 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9
             "玩家",
             _____73A9_5BB6ID,
             "四码",
-            ____fourCCToStringSafe_result_19,
+            ____fourCCToStringSafe_result_20,
             "实例",
-            ____temp_20,
+            ____temp_21,
             "目标",
-            ____6765_6E90_18
+            ____6765_6E90_19
         )
         _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____6570_636E)
         return
@@ -246,6 +297,30 @@ local function _____7ED3_7B97W_53CD_51FB(_____65BD_6CD5_8005, _____6280_80FD_5B9
         ["参与技能伤害加成"] = true
     })
     if _____5B8C_7F8E and _____83B7_53D6_59FF_6001(_____65BD_6CD5_8005) == "二刀" then
+        local _____5200_5149_914D_7F6E = _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W二刀反击"]
+        local _____53CD_51FB_65B9_5411 = _____4E24_70B9_89D2_5EA6(
+            GetUnitX(_____65BD_6CD5_8005),
+            GetUnitY(_____65BD_6CD5_8005),
+            GetUnitX(_____6765_6E90),
+            GetUnitY(_____6765_6E90)
+        )
+        do
+            local _____4FA7 = -1
+            while _____4FA7 <= 1 do
+                _____521B_5EFA_70B9_7279_6548({
+                    ["模型路径"] = _____5200_5149_914D_7F6E["模型路径"],
+                    RGB = _____5200_5149_914D_7F6E.RGB,
+                    X = GetUnitX(_____6765_6E90),
+                    Y = GetUnitY(_____6765_6E90),
+                    Z = _____5200_5149_914D_7F6E["高度"],
+                    ["面向角度"] = _____53CD_51FB_65B9_5411 + _____4FA7 * _____5200_5149_914D_7F6E["交叉角度"],
+                    ["动画索引"] = 0,
+                    ["缩放"] = _____5200_5149_914D_7F6E["缩放"],
+                    ["持续秒"] = _____5200_5149_914D_7F6E["持续秒"]
+                })
+                _____4FA7 = _____4FA7 + 2
+            end
+        end
         debugLogForce(
             "椿-W",
             "命中",
@@ -373,6 +448,7 @@ local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____628
         return
     end
     _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "朱雀院椿", _____6731_96C0_9662_693F_6280_80FD_914D_7F6E.W["技能ID"])
+    _____5F00_59CB_786C_76F4(_____65BD_6CD5_8005, ____W_914D_7F6E["招架窗口秒"], {["标题"] = "后之先"})
     _____64AD_653E_693F_52A8_4F5C(_____65BD_6CD5_8005, _____6731_96C0_9662_693F_52A8_4F5C_69FD["W开窗"])
     local _____6570_636E = {
         ["窗口开始"] = getGameTime(),
@@ -444,7 +520,7 @@ local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____628
         end
         _____6570_636E["已招架"] = true
         _____6570_636E["招架来源"] = context.attacker
-        local _____8FDB_5165_79D2 = getGameTime() - _____6570_636E["窗口开始"]
+        local _____8FDB_5165_79D2 = (getGameTime() - _____6570_636E["窗口开始"]) / 1000
         local _____6765_6E90_65B9_5411 = _____4E24_70B9_89D2_5EA6(
             GetUnitX(_____65BD_6CD5_8005),
             GetUnitY(_____65BD_6CD5_8005),

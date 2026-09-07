@@ -31,6 +31,9 @@ const { register护盾前拦截修改器, unregisterDamageModifier } = require("
   register护盾前拦截修改器: (this: void, callback: (this: void, context: any) => number) => number;
   unregisterDamageModifier: (this: void, id: number) => boolean;
 };
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, 单位: any, 持续时间: number, 读条参数?: { 标题?: string; Z偏移?: number; UI类型?: any; 数值后缀?: string }) => void;
+};
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
 };
@@ -113,6 +116,8 @@ interface W数据 {
 function 结算W反击(this: void, 施法者: any, 技能实例ID: number | undefined, 数据: W数据, 完美: boolean): void {
   const 玩家ID = GetPlayerId(GetOwningPlayer(施法者)) + 1;
   debugLogForce("椿-W", "反击", "玩家", 玩家ID, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "完美", 完美, "目标", 数据.招架来源 != null && 数据.招架来源 !== 0 ? GetUnitName(数据.招架来源) : "-", "handle", 数据.招架来源 ?? "-", "伤害", 读取单位攻击力(施法者) * W配置.反击伤害倍率);
+  // 硬直同步先于动作建立（反击动作 0.8s 承诺）
+  开始硬直(施法者, 朱雀院椿动作槽.W成功反击.持续秒, { 标题: "后之先" });
   播放椿动作(施法者, 朱雀院椿动作槽.W成功反击);
   const 来源 = 数据.招架来源;
   if (来源 == null || 来源 === 0 || !单位存活(来源)) {
@@ -138,6 +143,21 @@ function 结算W反击(this: void, 施法者: any, 技能实例ID: number | unde
   });
   // 二刀攻势完美招架：来源两侧各一道短刀光
   if (完美 && 获取姿态(施法者) === "二刀") {
+    const 刀光配置 = 朱雀院椿表现配置.W二刀反击;
+    const 反击方向 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), GetUnitX(来源), GetUnitY(来源));
+    for (let 侧 = -1; 侧 <= 1; 侧 += 2) {
+      创建点特效({
+        模型路径: 刀光配置.模型路径,
+        RGB: 刀光配置.RGB,
+        X: GetUnitX(来源),
+        Y: GetUnitY(来源),
+        Z: 刀光配置.高度,
+        面向角度: 反击方向 + 侧 * 刀光配置.交叉角度,
+        动画索引: 0,
+        缩放: 刀光配置.缩放,
+        持续秒: 刀光配置.持续秒,
+      });
+    }
     debugLogForce("椿-W", "命中", "玩家", 玩家ID, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "标签", "朱雀院椿-W两侧刀光", "目标", GetUnitName(来源), "handle", 来源, "X", Math.floor(GetUnitX(来源)), "Y", Math.floor(GetUnitY(来源)), "伤害", 攻击力 * W配置.二刀两侧刀光倍率);
     造成技能伤害({
       来源: 施法者,
@@ -194,12 +214,24 @@ function 结束W招架(this: void, 施法者: any, _技能实例ID: number | und
   destroyUnitEffect(施法者, 招架特效键);
   // 未受击自然结束：基础收尾（恢复少量 VF + 收刀斩）
   if (!数据.已招架) {
+    debugLogForce("椿-W", "状态", "未受击收刀", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", _技能实例ID ?? "-");
     恢复VF(施法者, 朱雀院椿被动配置.收刀恢复VF);
     const 方向 = 数据.方向角;
     const X = GetUnitX(施法者);
     const Y = GetUnitY(施法者);
     // 收刀斩音（未受击收刀分支结算点；坐标=施法者位置，参数配置驱动）
     Sound3DII_CooPlayReuse(朱雀院椿音效配置.W收刀斩.路径, X, Y, 朱雀院椿音效配置.W收刀斩.高度, 朱雀院椿音效配置.W收刀斩.裁断距离);
+    // 收刀斩特效（未受击收刀分支；施法者位置、面向当前朝向，沿 Windows 失败收刀方向）
+    创建点特效({
+      模型路径: 朱雀院椿表现配置.W收刀斩.模型路径,
+      RGB: 朱雀院椿表现配置.W收刀斩.RGB,
+      X,
+      Y,
+      Z: 朱雀院椿表现配置.W收刀斩.高度,
+      面向角度: 方向,
+      缩放: 朱雀院椿表现配置.W收刀斩.缩放,
+      持续秒: 朱雀院椿表现配置.W收刀斩.持续秒,
+    });
     const 敌人 = 获取扇形区域单位({
       X,
       Y,
@@ -210,6 +242,9 @@ function 结束W招架(this: void, 施法者: any, _技能实例ID: number | und
         return 单位 !== 施法者 && 单位存活(单位) && jass.IsUnitEnemy(单位, jass.GetOwningPlayer(施法者));
       },
     });
+    if (敌人.length === 0) {
+      debugLogForce("椿-W", "命中失败", "原因", "无目标", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "标签", "朱雀院椿-W收刀斩", "方向", 数据.方向角);
+    }
     for (let i = 0; i < 敌人.length; i++) {
       debugLogForce("椿-W", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", "收刀斩", "标签", "朱雀院椿-W收刀斩", "目标", GetUnitName(敌人[i]), "handle", 敌人[i], "X", Math.floor(GetUnitX(敌人[i])), "Y", Math.floor(GetUnitY(敌人[i])), "伤害", 读取单位攻击力(施法者) * W配置.收刀斩倍率);
       造成技能伤害({
@@ -225,6 +260,18 @@ function 结束W招架(this: void, 施法者: any, _技能实例ID: number | und
         标签: "朱雀院椿-W收刀斩",
         伤害形态: "AOE",
         参与技能伤害加成: true,
+      });
+      // 收刀斩叠加爆发：每个命中目标坐标创建一次（叠于主刀光之上，配置驱动）
+      const 叠加配置 = 朱雀院椿表现配置.W收刀斩叠加;
+      创建点特效({
+        模型路径: 叠加配置.模型路径,
+        RGB: 叠加配置.RGB,
+        X: GetUnitX(敌人[i]),
+        Y: GetUnitY(敌人[i]),
+        Z: 叠加配置.高度,
+        面向角度: 数据.方向角,
+        缩放: 叠加配置.缩放,
+        持续秒: 叠加配置.持续秒,
       });
     }
   }
@@ -247,6 +294,8 @@ function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID
   }
   // 技能喊话：施法成功起点（全局 3D；随机二选一由喊话系统驱动）
   播放英雄技能喊话(施法者, "朱雀院椿", 朱雀院椿技能配置.W.技能ID);
+  // 硬直同步先于动作建立（规划 t0：添加硬直来源并锁定正面方向）
+  开始硬直(施法者, W配置.招架窗口秒, { 标题: "后之先" });
   播放椿动作(施法者, 朱雀院椿动作槽.W开窗);
   const 数据: W数据 = {
     窗口开始: getGameTime(),
@@ -285,8 +334,8 @@ function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID
     if (!单位是否在来源正面扇区(施法者, context.attacker, W配置.正面角度)) return context.currentDamage;
     数据.已招架 = true;
     数据.招架来源 = context.attacker;
-    // 完美招架：攻击进入时点早于阈值 且 方向差更窄
-    const 进入秒 = getGameTime() - 数据.窗口开始;
+    // 完美招架：攻击进入时点早于阈值 且 方向差更窄（getGameTime 为毫秒，换算成秒再比较）
+    const 进入秒 = (getGameTime() - 数据.窗口开始) / 1000;
     const 来源方向 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), GetUnitX(context.attacker), GetUnitY(context.attacker));
     const 完美 = 进入秒 <= W配置.完美时点秒 && 角度差绝对值(数据.方向角, 来源方向) <= W配置.完美角度;
     debugLogForce("椿-W", "招架成功", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", 技能实例ID ?? "-", "完美", 完美, "进入秒", 进入秒, "来源", GetUnitName(context.attacker), "handle", context.attacker);

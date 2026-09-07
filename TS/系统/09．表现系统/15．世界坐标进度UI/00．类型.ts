@@ -46,6 +46,8 @@ export interface 世界坐标进度UI {
   文本刷新Tick: number;
   已显示: boolean;
   已销毁: boolean;
+  屏幕X偏移: number;
+  屏幕Y偏移: number;
   跟随单位: any | null;
   跟随X偏移: number;
   跟随Y偏移: number;

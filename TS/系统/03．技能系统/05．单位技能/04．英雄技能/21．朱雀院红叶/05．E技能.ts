@@ -12,6 +12,15 @@ import {
 import type { 战斗技能实例控制器 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/27．战斗技能实例生命周期工厂";
 
 const jass = require("jass.common") as any;
+let japi: any = null;
+try {
+  japi = require("jass.japi") as any;
+} catch (e) {
+  japi = null;
+}
+const EXSetEffectSpeed = japi != null && typeof japi.EXSetEffectSpeed === "function"
+  ? (japi.EXSetEffectSpeed as (effect: any, speed: number) => void)
+  : null;
 const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, id: string) => number;
   fourCCToStringSafe: (this: void, fourcc: number) => string;
@@ -121,6 +130,7 @@ function 移除剑痕(this: void, 剑痕: 红叶剑痕): void {
     剑痕.到期回调ID = 0;
   }
   if (剑痕.特效句柄 != null && 剑痕.特效句柄 !== 0) {
+    if (EXSetEffectSpeed != null) EXSetEffectSpeed(剑痕.特效句柄, 1); // 恢复 1 倍速后再销毁
     jass.DestroyEffect(剑痕.特效句柄);
     剑痕.特效句柄 = null;
   }
@@ -169,6 +179,12 @@ function 创建剑痕(this: void, 来源英雄: any, X: number, Y: number, 方�
       Z: 朱雀院红叶表现配置.E剑痕.高度,
       缩放: 朱雀院红叶表现配置.E剑痕.缩放,
       持续秒: 朱雀院红叶表现配置.E剑痕.持续秒,
+    });
+    // 斩痕动画 1.0 倍速播放，到冻结时刻定格为 0 速（否则剩余时间看不见）；到期/移除时先恢复 1 倍速再销毁
+    addDelayedCallback(朱雀院红叶表现配置.E剑痕.冻结延迟毫秒, function 冻结剑痕动画(this: void): void {
+      if (剑痕.特效句柄 != null && 剑痕.特效句柄 !== 0 && EXSetEffectSpeed != null) {
+        EXSetEffectSpeed(剑痕.特效句柄, 0);
+      }
     });
   }
   return 剑痕;
@@ -344,7 +360,8 @@ function 释放E三叶散华(this: void, _context: any, 施法者: any, 技能�
   播放英雄技能喊话(施法者, "朱雀院红叶", 朱雀院红叶技能配置.E.技能ID);
   const 方向角 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), 目标X, 目标Y);
   const 数据: E数据 = { 方向角, 目标X, 目标Y, 已斩段数: 0, 段回调ID: [], 同目标次数: {}, 本E剑痕: [] };
-  // E 三段连斩硬直期间世界坐标进度条（跟随施法者）：正常走满硬直时长自毁；打断/死亡由结束回调立即销毁
+  // E 三段连斩硬直期间世界坐标进度条（跟随施法者；正常走满硬直时长自毁；打断/死亡由结束回调立即销毁）
+  // 读条数值统一用秒（一位小数显示，如 0.0 → 1.0），不传毫秒
   const E进度最大值 = 朱雀院红叶动作槽.E连续三斩.持续秒;
   数据.进度UI = 创建世界坐标进度UI({
     X: GetUnitX(施法者),

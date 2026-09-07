@@ -30,6 +30,13 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
   removePeriodicCallback: (this: void, id: number) => void;
   getServerTime: (this: void) => number;
 };
+const { 创建世界坐标进度UI, 更新世界坐标进度UI, 销毁世界坐标进度UI } = require("系统.09．表现系统.15．世界坐标进度UI.01．世界坐标进度UI") as {
+  创建世界坐标进度UI: (this: void, 参数: any) => any;
+  更新世界坐标进度UI: (this: void, ui: any, 当前值: number, 立即更新?: boolean) => void;
+  销毁世界坐标进度UI: (this: void, ui: any) => void;
+};
+const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
+const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 
 const buffTableMod = require("系统.05．Buff系统.01．Buff表") as {
   buffs: Record<string, { type?: string } | undefined>;
@@ -187,9 +194,70 @@ function 刷新施法硬直显示Buff(this: void, 单位: any, 持续时间: num
   启动施法硬直显示Buff清理驱动();
 }
 
-export function 开始硬直(this: void, 单位: any, 持续时间: number): void {
+//=============================================================================
+// 硬直读条（可选）：开始硬直 传读条参数时创建跟随单位的世界坐标倒计时条
+//=============================================================================
+
+interface 硬直读条记录 {
+  UI: any;
+  周期ID: number;
+}
+
+const 硬直读条表: Record<number, 硬直读条记录 | undefined> = {};
+
+function 销毁硬直读条(this: void, 单位句柄: number): void {
+  const 记录 = 硬直读条表[单位句柄];
+  if (记录 == null) return;
+  if (记录.周期ID !== 0) removePeriodicCallback(记录.周期ID);
+  销毁世界坐标进度UI(记录.UI);
+  delete 硬直读条表[单位句柄];
+}
+
+function 刷新硬直读条(this: void, 单位: any, 持续时间: number, 参数: {
+  标题?: string;
+  Z偏移?: number;
+  UI类型?: any;
+  数值后缀?: string;
+}): void {
+  if (单位 == null || 单位 === 0 || !(持续时间 > 0)) return;
+  const 单位句柄 = GetHandleId(单位) || 0;
+  if (单位句柄 === 0) return;
+  销毁硬直读条(单位句柄);
+  // 读条数值统一用秒（一位小数显示，如 0.8 → 0.0），不传毫秒
+  const 最大秒 = 持续时间;
+  let 剩余秒 = 最大秒;
+  const UI = 创建世界坐标进度UI({
+    X: GetUnitX(单位),
+    Y: GetUnitY(单位),
+    Z: 0,
+    跟随单位: 单位,
+    跟随Z偏移: 参数.Z偏移 ?? 220,
+    最大值: 最大秒,
+    当前值: 最大秒,
+    标题: 参数.标题 ?? "硬直",
+    数值后缀: 参数.数值后缀 ?? "",
+    类型: 参数.UI类型 ?? "自然",
+  });
+  const 周期ID = addPeriodicCallback(50, function 硬直读条推进(this: void): void {
+    剩余秒 -= 0.05;
+    if (剩余秒 <= 0) {
+      销毁硬直读条(单位句柄);
+      return;
+    }
+    更新世界坐标进度UI(UI, 剩余秒);
+  });
+  硬直读条表[单位句柄] = { UI, 周期ID };
+}
+
+export function 开始硬直(this: void, 单位: any, 持续时间: number, 读条参数?: {
+  标题?: string;
+  Z偏移?: number;
+  UI类型?: any;
+  数值后缀?: string;
+}): void {
   GS_Suspend(单位, 持续时间);
   刷新施法硬直显示Buff(单位, 持续时间);
+  if (读条参数 != null) 刷新硬直读条(单位, 持续时间, 读条参数);
 }
 
 export const 单位是否硬直中 = GS_IsUnitSuspending;

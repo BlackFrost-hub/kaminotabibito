@@ -47,8 +47,8 @@ function _____5237_65B0_4E16_754C_5750_6807_8FDB_5EA6UI_8DDF_968F(ui)
         GetUnitX(ui["跟随单位"]) + ui["跟随X偏移"],
         GetUnitY(ui["跟随单位"]) + ui["跟随Y偏移"],
         GetUnitFlyHeight(ui["跟随单位"]) + ui["跟随Z偏移"],
-        0,
-        0,
+        ui["屏幕X偏移"],
+        ui["屏幕Y偏移"],
         false
     )
     return true
@@ -270,6 +270,8 @@ ____exports["创建世界坐标进度UI"] = function(_____53C2_6570)
     local ____temp_4 = _____53C2_6570["标题"] or "进度"
     local ____temp_5 = _____53C2_6570["数值后缀"] or ""
     local ____typeVisual__989C_8272_6 = typeVisual["颜色"]
+    local ____temp_7 = _____53C2_6570["屏幕X偏移"] or 0
+    local ____temp_8 = _____53C2_6570["屏幕Y偏移"] or 0
     local ____53C2_6570__8DDF_968F_5355_4F4D_2 = _____53C2_6570["跟随单位"]
     if ____53C2_6570__8DDF_968F_5355_4F4D_2 == nil then
         ____53C2_6570__8DDF_968F_5355_4F4D_2 = nil
@@ -294,17 +296,19 @@ ____exports["创建世界坐标进度UI"] = function(_____53C2_6570)
         ["文本刷新Tick"] = 0,
         ["已显示"] = visible,
         ["已销毁"] = false,
+        ["屏幕X偏移"] = ____temp_7,
+        ["屏幕Y偏移"] = ____temp_8,
         ["跟随单位"] = ____53C2_6570__8DDF_968F_5355_4F4D_2,
         ["跟随X偏移"] = _____53C2_6570["跟随X偏移"] or 0,
         ["跟随Y偏移"] = _____53C2_6570["跟随Y偏移"] or 0,
         ["跟随Z偏移"] = _____53C2_6570["跟随Z偏移"] or 0
     }
     local z = _____53C2_6570.Z or 180
-    local ____53C2_6570__96FE_4E2D_53EF_89C1_7 = _____53C2_6570["雾中可见"]
-    if ____53C2_6570__96FE_4E2D_53EF_89C1_7 == nil then
-        ____53C2_6570__96FE_4E2D_53EF_89C1_7 = false
+    local ____53C2_6570__96FE_4E2D_53EF_89C1_9 = _____53C2_6570["雾中可见"]
+    if ____53C2_6570__96FE_4E2D_53EF_89C1_9 == nil then
+        ____53C2_6570__96FE_4E2D_53EF_89C1_9 = false
     end
-    local fogVisible = ____53C2_6570__96FE_4E2D_53EF_89C1_7
+    local fogVisible = ____53C2_6570__96FE_4E2D_53EF_89C1_9
     DzFrameBindWorldPos(
         root,
         _____53C2_6570.X,

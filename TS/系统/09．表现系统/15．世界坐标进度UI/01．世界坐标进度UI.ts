@@ -127,8 +127,8 @@ function 刷新世界坐标进度UI跟随(this: void, ui: 世界坐标进度UI):
     GetUnitX(ui.跟随单位) + ui.跟随X偏移,
     GetUnitY(ui.跟随单位) + ui.跟随Y偏移,
     GetUnitFlyHeight(ui.跟随单位) + ui.跟随Z偏移,
-    0,
-    0,
+    ui.屏幕X偏移,
+    ui.屏幕Y偏移,
     false,
   );
   return true;
@@ -216,6 +216,8 @@ export function 创建世界坐标进度UI(this: void, 参数: 世界坐标进�
     文本刷新Tick: 0,
     已显示: visible,
     已销毁: false,
+    屏幕X偏移: 参数.屏幕X偏移 ?? 0,
+    屏幕Y偏移: 参数.屏幕Y偏移 ?? 0,
     跟随单位: 参数.跟随单位 ?? null,
     跟随X偏移: 参数.跟随X偏移 ?? 0,
     跟随Y偏移: 参数.跟随Y偏移 ?? 0,

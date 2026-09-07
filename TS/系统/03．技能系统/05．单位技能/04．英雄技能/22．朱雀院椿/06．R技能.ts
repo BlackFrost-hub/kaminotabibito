@@ -15,11 +15,20 @@ const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封
   stringToFourCCSafe: (this: void, id: string) => number;
   fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
+const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
+  addPeriodicCallback: (this: void, intervalMs: number, callback: (this: void) => void) => number;
+  removePeriodicCallback: (this: void, id: number) => void;
+};
+const GetRandomReal = jass.GetRandomReal as (this: void, min: number, max: number) => number;
 const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.16．单位技能壳监听注册器") as {
   注册单位技能壳监听: (this: void, 参数: any) => void;
 };
 const { 开始充能 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.充能系统") as {
   开始充能: (this: void, 单位: any, 参数: any) => number;
+};
+const { 开始硬直 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.01．控制与Buff") as {
+  开始硬直: (this: void, 单位: any, 持续时间: number) => void;
 };
 const { registerDamageModifier, unregisterDamageModifier } = require("系统.04．伤害系统.00．伤害计算.06．伤害修正回调") as {
   registerDamageModifier: (this: void, callback: (this: void, context: any) => number, priority?: number) => number;
@@ -55,6 +64,7 @@ const {
   播放椿动作,
   有决斗距离,
   获取决斗距离方向,
+  获取决斗距离锚点,
   清除决斗距离,
 } = require("./02．被动效果") as {
   是朱雀院椿: (this: void, unit: any) => boolean;
@@ -65,6 +75,7 @@ const {
   播放椿动作: (this: void, 英雄: any, 槽: { 索引: number; 持续秒: number }) => void;
   有决斗距离: (this: void, 英雄: any) => boolean;
   获取决斗距离方向: (this: void, 英雄: any) => number;
+  获取决斗距离锚点: (this: void, 英雄: any) => { X: number; Y: number } | null;
   清除决斗距离: (this: void, 英雄: any) => void;
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
@@ -103,6 +114,57 @@ export function 椿R蓄力中(this: void, 英雄: any): boolean {
 // 终式（仅充能完成回调创建；中断/死亡不结算，资源不白扣）
 //=============================================================================
 
+/** 主斩目标点叠加：固定间隔在 R 目标点以随机角度逐层创建（主层 + 叠加层 + 附加层三张同播），单个存活 单次持续秒 */
+function 创建R目标叠加(this: void, 配置: any, X: number, Y: number): void {
+  let 已创建次数 = 0;
+  let 周期ID = 0;
+  const 创建一次 = function R目标叠加Tick(this: void): void {
+    创建点特效({
+      模型路径: 配置.模型路径,
+      RGB: 配置.RGB,
+      X,
+      Y,
+      Z: 配置.高度,
+      面向角度: GetRandomReal(0, 360),
+      缩放: 配置.缩放,
+      持续秒: 配置.单次持续秒,
+    });
+    const 叠加路径 = 配置.叠加模型路径 as string;
+    if (叠加路径 !== "") {
+      创建点特效({
+        模型路径: 叠加路径,
+        RGB: 配置.RGB,
+        X,
+        Y,
+        Z: 配置.高度,
+        面向角度: GetRandomReal(0, 360),
+        缩放: 配置.缩放,
+        持续秒: 配置.单次持续秒,
+      });
+    }
+    const 附加路径 = 配置.附加模型路径 as string;
+    if (附加路径 !== "") {
+      创建点特效({
+        模型路径: 附加路径,
+        RGB: 配置.RGB,
+        X,
+        Y,
+        Z: 配置.高度,
+        面向角度: GetRandomReal(0, 360),
+        缩放: 配置.缩放,
+        持续秒: 配置.单次持续秒,
+      });
+    }
+    已创建次数 += 1;
+    if (已创建次数 >= 配置.创建次数 && 周期ID !== 0) {
+      removePeriodicCallback(周期ID);
+      周期ID = 0;
+    }
+  };
+  周期ID = addPeriodicCallback(配置.创建间隔秒 * 1000, 创建一次);
+  创建一次();
+}
+
 function 结算R伤害(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 伤害值: number, 标签: string): void {
   debugLogForce("椿-R", "命中", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "标签", 标签, "目标", GetUnitName(目标), "handle", 目标, "X", Math.floor(GetUnitX(目标)), "Y", Math.floor(GetUnitY(目标)), "伤害", 伤害值);
   造成技能伤害({
@@ -127,6 +189,8 @@ function R创建终式(
   技能实例ID: number | undefined,
   方向角: number,
   受击记录: boolean,
+  目标X: number,
+  目标Y: number,
 ): void {
   if (!单位存活(施法者)) {
     debugLogForce("椿-R", "命中失败", "原因", "施法者已死亡", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-");
@@ -136,6 +200,7 @@ function R创建终式(
   debugLogForce("椿-R", "结算", "玩家", 玩家ID, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-", "标签", "朱雀院椿-R终式", "姿态", 获取姿态(施法者), "方向", 方向角, "受击记录", 受击记录, "伤害", 读取单位攻击力(施法者) * R配置.主斩倍率);
   const 攻击力 = 读取单位攻击力(施法者);
   const 姿态 = 获取姿态(施法者);
+  // 特效/判定同锚：锚点 = 传入 目标X/目标Y（普通 R 为 R 施法目标点；决斗距离锁定时为 E 释放目标点快照，已在调用处替换）
   播放椿动作(施法者, 姿态 === "二刀" ? 朱雀院椿动作槽.R二刀释放 : 朱雀院椿动作槽.R一刀释放);
   const 敌人 = 获取扇形区域单位({
     X: GetUnitX(施法者),
@@ -158,8 +223,8 @@ function R创建终式(
     创建点特效({
       模型路径: 朱雀院椿表现配置.R主斩.模型路径,
       RGB: 朱雀院椿表现配置.R主斩.RGB,
-      X: GetUnitX(施法者),
-      Y: GetUnitY(施法者),
+      X: 目标X,
+      Y: 目标Y,
       Z: 朱雀院椿表现配置.R主斩.高度,
       面向角度: 方向角,
       动画索引: 0,
@@ -167,6 +232,10 @@ function R创建终式(
       // death 1000-3000（2s）：必须覆盖完整 Death，否则严重截断
       持续秒: 朱雀院椿表现配置.R主斩.持续秒,
     });
+  }
+  // 主斩目标点叠加（0.03s 间隔 ×10 次，随机角度，单个存活 0.6s；配置驱动，候选未迁入则留空不播）
+  if ((朱雀院椿表现配置.R主斩叠加.模型路径 as string) !== "") {
+    创建R目标叠加(朱雀院椿表现配置.R主斩叠加, 目标X, 目标Y);
   }
   // 一刀守势受击分支：主斩前/同时追加反击斩并恢复 VF（蓄势期间承受过一次攻击）
   if (姿态 === "一刀" && 受击记录) {
@@ -177,26 +246,36 @@ function R创建终式(
   }
   // 二刀攻势分支：交错斩追加 + VF 代价
   if (姿态 === "二刀") {
-    扣除VF(施法者, R配置.二刀VF代价);
+    const 剩余VF = 扣除VF(施法者, R配置.二刀VF代价);
+    debugLogForce("椿-R", "状态", "二刀终式扣VF", "玩家", 玩家ID, "量", R配置.二刀VF代价, "剩余VF", 剩余VF);
     for (let i = 0; i < 敌人.length; i++) {
       结算R伤害(施法者, 敌人[i], 技能实例ID, 攻击力 * R配置.二刀交错倍率, "朱雀院椿-R交错斩");
     }
     if ((朱雀院椿表现配置.R交错斩.模型路径 as string) !== "") {
-      创建点特效({
-        模型路径: 朱雀院椿表现配置.R交错斩.模型路径,
-        RGB: 朱雀院椿表现配置.R交错斩.RGB,
-        X: GetUnitX(施法者),
-        Y: GetUnitY(施法者),
-        Z: 朱雀院椿表现配置.R交错斩.高度,
-        面向角度: 方向角,
-        动画索引: 0,
-        缩放: 朱雀院椿表现配置.R交错斩.缩放,
-        // death 0-333ms，短促播放
-        持续秒: 朱雀院椿表现配置.R交错斩.持续秒,
+      // 双刀横斩交叉：整体角度每次 R 随机倾斜（两刀互相垂直才能交叉成×），第二刀延迟 0.15s 出现
+      const 交叉随机角 = GetRandomReal(0, 360);
+      const 创建交错刀 = function R交错刀(this: void, 角度: number): void {
+        创建点特效({
+          模型路径: 朱雀院椿表现配置.R交错斩.模型路径,
+          RGB: 朱雀院椿表现配置.R交错斩.RGB,
+          X: 目标X,
+          Y: 目标Y,
+          Z: 朱雀院椿表现配置.R交错斩.高度,
+          面向角度: 角度,
+          动画索引: 0,
+          缩放: 朱雀院椿表现配置.R交错斩.缩放,
+          // death 0-333ms，短促播放
+          持续秒: 朱雀院椿表现配置.R交错斩.持续秒,
+        });
+      };
+      创建交错刀(交叉随机角);
+      addDelayedCallback(150, function R交错第二刀(this: void): void {
+        if (!单位存活(施法者)) return;
+        创建交错刀(交叉随机角 + 90);
       });
     }
-    // 二刀交错斩音（R 二刀交错分支成立时；坐标=施法者位置，参数配置驱动）
-    Sound3DII_CooPlayReuse(朱雀院椿音效配置.二刀交错.路径, GetUnitX(施法者), GetUnitY(施法者), 朱雀院椿音效配置.二刀交错.高度, 朱雀院椿音效配置.二刀交错.裁断距离);
+    // 二刀交错斩音（R 二刀交错分支成立时；坐标=终式锚点，参数配置驱动）
+    Sound3DII_CooPlayReuse(朱雀院椿音效配置.二刀交错.路径, 目标X, 目标Y, 朱雀院椿音效配置.二刀交错.高度, 朱雀院椿音效配置.二刀交错.裁断距离);
   }
 }
 
@@ -215,10 +294,11 @@ function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID
     debugLogForce("椿-R", "释放被拒", "原因", "已有蓄力/终式", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "实例", 技能实例ID ?? "-");
     return;
   }
-  播放椿动作(施法者, 朱雀院椿动作槽.R蓄力);
   const 目标X = GetSpellTargetX();
   const 目标Y = GetSpellTargetY();
   const 方向角 = 两点角度(GetUnitX(施法者), GetUnitY(施法者), 目标X, 目标Y);
+  开始硬直(施法者, 朱雀院椿R配置.施法硬直秒);
+  播放椿动作(施法者, 朱雀院椿动作槽.R蓄力);
   // R 蓄力期间锁定姿态（D 不得中途改写本次 R 分支）
   锁定姿态(施法者, true);
   蓄力中表[jass.GetHandleId(施法者)] = true;
@@ -237,11 +317,13 @@ function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID
       if (!jass.IsUnitEnemy(context.attacker, jass.GetOwningPlayer(施法者))) return context.currentDamage;
       if (受击记录) return context.currentDamage;
       受击记录 = true;
+      debugLogForce("椿-R", "状态", "后之先受击记录", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "来源", GetUnitName(context.attacker), "handle", context.attacker);
       return context.currentDamage; // 只记录，不化解（VF 正常吸收）
     }, 50);
   }
     // 蓄力预警（候选未迁入则留空；常驻句柄由充能结束回调统一销毁）
     let 预警特效: any = null;
+    let 蓄力叠加特效: any = null;
     const 充能ID = 开始充能(施法者, {
       持续时间: R配置.蓄力秒,
       指令中断: true,
@@ -250,11 +332,20 @@ function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID
       世界坐标进度UI标题: "炎姬·黄泉凤凰",
       世界坐标进度UI数值后缀: "",
       世界坐标进度UI高度偏移: 朱雀院椿读条配置.跟随Z偏移,
+      世界坐标进度UI屏幕Y偏移: 朱雀院椿读条配置.蓄力条.屏幕Y偏移,
       显示进度条特效: false,
       开始回调: function R蓄力开始(this: void, _单位: any, _充能ID: number): void {
+        const 叠加 = 朱雀院椿表现配置.R蓄力叠加;
+        蓄力叠加特效 = 创建点特效({
+          模型路径: 叠加.模型路径, RGB: 叠加.RGB,
+          X: GetUnitX(施法者), Y: GetUnitY(施法者), Z: 叠加.高度,
+          面向角度: 方向角, 动画索引: 叠加.动画索引,
+          缩放: 叠加.缩放, 持续秒: 叠加.持续秒,
+          动画速度: 1 / R配置.蓄力秒,
+        });
         // 蓄力建立音（充能真正建立时一次；单位绑定，参数配置驱动）
         Sound3DII_UnitPlayReuse(朱雀院椿音效配置.R蓄力.路径, 施法者, 朱雀院椿音效配置.R蓄力.裁断距离);
-        if (朱雀院椿表现配置.R蓄力提示.模型路径 != null && 朱雀院椿表现配置.R蓄力提示.模型路径 !== "") {
+        if ((朱雀院椿表现配置.R蓄力提示.模型路径 as string) !== "") {
           预警特效 = 创建点特效({
             模型路径: 朱雀院椿表现配置.R蓄力提示.模型路径,
             RGB: 朱雀院椿表现配置.R蓄力提示.RGB,
@@ -272,8 +363,20 @@ function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID
       Sound3DII_CooPlayReuse(朱雀院椿音效配置.R终式.路径, GetUnitX(施法者), GetUnitY(施法者), 朱雀院椿音效配置.R终式.高度, 朱雀院椿音效配置.R终式.裁断距离);
       // 决斗距离优先：E 建立的短时距离窗口提供精确方向（按释放前快照消费）
       const 终式方向 = 决斗距离快照.有效 ? 决斗距离快照.方向 : 方向角;
-      if (决斗距离快照.有效) 清除决斗距离(施法者);
-      R创建终式(施法者, 技能实例ID, 终式方向, 受击记录);
+      let 终式锚点X = 目标X;
+      let 终式锚点Y = 目标Y;
+      if (决斗距离快照.有效) {
+        debugLogForce("椿-R", "状态", "决斗距离锁定", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(R技能ID), "方向", 决斗距离快照.方向);
+        // 特效/判定同锚：锁定后锚点取 E 决斗目标单位脚下（存活优先，死亡用 E 目标点快照兜底）
+        const 决斗锚点 = 获取决斗距离锚点(施法者);
+        if (决斗锚点 != null) {
+          终式锚点X = 决斗锚点.X;
+          终式锚点Y = 决斗锚点.Y;
+          debugLogForce("椿-R", "状态", "决斗距离锚点", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "X", Math.floor(决斗锚点.X), "Y", Math.floor(决斗锚点.Y));
+        }
+        清除决斗距离(施法者);
+      }
+      R创建终式(施法者, 技能实例ID, 终式方向, 受击记录, 终式锚点X, 终式锚点Y);
     },
     // 蓄力结束（完成/指令中断/硬控/死亡/单位失效统一收尾）
     结束回调: function R蓄力结束(this: void, _单位: any, _原因: string, _充能ID: number): void {
@@ -281,6 +384,10 @@ function 释放R炎姬(this: void, _context: any, 施法者: any, 技能实例ID
       if (预警特效 != null && 预警特效 !== 0) {
         jass.DestroyEffect(预警特效);
         预警特效 = null;
+      }
+      if (蓄力叠加特效 != null && 蓄力叠加特效 !== 0) {
+        jass.DestroyEffect(蓄力叠加特效);
+        蓄力叠加特效 = null;
       }
       if (受击修改器ID !== 0) {
         unregisterDamageModifier(受击修改器ID);
