@@ -9,7 +9,7 @@ createPlayerHeroUnit('E0L4', '塞莉亚·克莱尔', {
   description = '连锁演算与区域控制型远程智力英雄。',
   modelFile = 'Unit\\Hero\\Celia\\Celia.mdx',
   scale = 0.9,
-  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNCeliaPortrait.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero\\Portrait\\BTNCeliaPortrait.blp',
   normalAbilities = 'A014,AInv,AKD1',
   heroAbilities = '',
   upgradesUsed = '',

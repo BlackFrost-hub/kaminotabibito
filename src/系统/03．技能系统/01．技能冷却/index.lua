@@ -51,6 +51,7 @@ local _____8BFB_53D6_51B7_5374_7F29_51CF = ____require_result_1.getCooldownReduc
 local _____8BFB_53D6_51B7_5374_7F29_51CF_4E0A_9650 = ____require_result_1.getCooldownReductionCapIncrease
 local _____5E94_7528_51B7_5374_4E0A_9650 = ____require_result_1.applyCooldownCap
 local _____8BA1_7B97_5B9E_9645_51B7_5374 = ____require_result_1.calcActualCooldown
+local _____8BA1_7B97_88AB_52A8_51B7_5374 = ____require_result_1.calcPassiveCooldown
 local _____8BBE_7F6E_6280_80FD_51B7_5374 = ____require_result_1.setAbilityCooldown
 local _____8BFB_53D6_57FA_7840_51B7_5374 = ____require_result_1.getBaseCooldown
 local ____require_result_2 = require("系统.03．技能系统.01．技能冷却.02．特殊技能处理")
@@ -78,6 +79,9 @@ local function applyCooldownCap(reduction, abilityId, capIncrease)
 end
 local function calcActualCooldown(baseCooldown, reduction)
     return _____8BA1_7B97_5B9E_9645_51B7_5374(baseCooldown, reduction)
+end
+local function calcPassiveCooldown(unit, baseSeconds, abilityId)
+    return _____8BA1_7B97_88AB_52A8_51B7_5374(unit, baseSeconds, abilityId)
 end
 local function setAbilityCooldown(unit, abilityId, level, cooldown)
     _____8BBE_7F6E_6280_80FD_51B7_5374(unit, abilityId, level, cooldown)

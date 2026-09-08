@@ -60,23 +60,18 @@ function hasListener(list: Listener[], trigger: any): boolean {
 }
 
 function dispatchListeners(list: Listener[]): void {
-  let writeIndex = 0;
-  for (let i = 0; i < list.length; i++) {
-    const listener = list[i];
+  // 回调注销会立即压缩原数组；快照只固定本轮顺序，仍以 active 判断是否已注销。
+  const snapshot = list.slice();
+  for (let i = 0; i < snapshot.length; i++) {
+    const listener = snapshot[i];
     if (!listener || !listener.active || !listener.trigger) continue;
 
     const passed = jass.TriggerEvaluate(listener.trigger);
-    if (passed) jass.TriggerExecute(listener.trigger);
+    if (passed && listener.active) jass.TriggerExecute(listener.trigger);
 
     if (listener.once) listener.active = false;
-    if (listener.active) {
-      list[writeIndex] = listener;
-      writeIndex++;
-    }
   }
-  for (let i = list.length - 1; i >= writeIndex; i--) {
-    list.pop();
-  }
+  compactListeners(list);
 }
 
 function compactListeners(list: Listener[]): number {

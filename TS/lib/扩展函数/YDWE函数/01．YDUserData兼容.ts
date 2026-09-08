@@ -314,11 +314,11 @@ export function YDUserDataClear(
   const h = hashHandle();
   const p = tableId(tableTypeName, tableKey);
   const c = sh(attr);
-  const rmInt = jass.RemoveSavedInteger;
-  const rmReal = jass.RemoveSavedReal;
-  const rmBool = jass.RemoveSavedBoolean;
-  const rmStr = jass.RemoveSavedString;
-  const rmHandle = (jass as any).RemoveSavedHandle;
+  const rmInt = jass.RemoveSavedInteger as (this: void, h: any, p: number, c: number) => void;
+  const rmReal = jass.RemoveSavedReal as (this: void, h: any, p: number, c: number) => void;
+  const rmBool = jass.RemoveSavedBoolean as (this: void, h: any, p: number, c: number) => void;
+  const rmStr = jass.RemoveSavedString as (this: void, h: any, p: number, c: number) => void;
+  const rmHandle = (jass as any).RemoveSavedHandle as (this: void, h: any, p: number, c: number) => void;
 
   switch (valueTypeName) {
     case "integer":

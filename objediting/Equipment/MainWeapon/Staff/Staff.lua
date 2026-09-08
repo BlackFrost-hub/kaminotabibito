@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0ED', '腐化核心法杖', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Staff\\corrupted_core_staff.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Staff\\BTNcorrupted_core_staff.blp',
   model = 'war3mapImported\\SylvanEdge.mdl',
   abilities = ' ',
   classification = 'Campaign',
@@ -14,7 +14,7 @@ createEquipmentItem('I0ED', '腐化核心法杖', {
 
 createEquipmentItem('I0EP', '永恒轮回法典', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Staff\\eternal_reincarnation_codex.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Staff\\BTNeternal_reincarnation_codex.blp',
   model = 'war3mapImported\\TomeOfRetraining.mdl',
   abilities = ' ',
   classification = 'Campaign',
@@ -26,7 +26,7 @@ createEquipmentItem('I0EP', '永恒轮回法典', {
 
 createEquipmentItem('I0EX', '克林姆德风纹法杖', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Staff\\klimder_windrune_staff.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Staff\\BTNklimder_windrune_staff.blp',
   model = 'war3mapImported\\SylvanEdge.mdl',
   abilities = ' ',
   classification = 'Campaign',
@@ -38,7 +38,7 @@ createEquipmentItem('I0EX', '克林姆德风纹法杖', {
 
 createEquipmentItem('I0F4', '高压水脊法杖', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Staff\\high_pressure_water_spine_staff.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Staff\\BTNhigh_pressure_water_spine_staff.blp',
   model = 'war3mapImported\\SylvanEdge.mdl',
   abilities = ' ',
   classification = 'Campaign',
@@ -50,7 +50,7 @@ createEquipmentItem('I0F4', '高压水脊法杖', {
 
 createEquipmentItem('I0F6', '腐败根须法杖', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Staff\\corrupted_root_staff.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Staff\\BTNcorrupted_root_staff.blp',
   model = 'war3mapImported\\SylvanEdge.mdl',
   abilities = ' ',
   classification = 'Campaign',
@@ -62,7 +62,7 @@ createEquipmentItem('I0F6', '腐败根须法杖', {
 
 createEquipmentItem('I0H2', '浊潮祭杖', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Staff\\mia_turbid_tide_staff.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Staff\\BTNmia_turbid_tide_staff.blp',
   model = 'war3mapImported\\SylvanEdge.mdl',
   abilities = ' ',
   classification = 'Campaign',

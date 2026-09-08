@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0J4', '蟹甲缝合胸甲', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\crab_shell_stitched_cuirass.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNcrab_shell_stitched_cuirass.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -14,7 +14,7 @@ createEquipmentItem('I0J4', '蟹甲缝合胸甲', {
 
 createEquipmentItem('I0JC', '王城誓卫胸甲', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\royal_city_oathguard_cuirass.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNroyal_city_oathguard_cuirass.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -26,7 +26,7 @@ createEquipmentItem('I0JC', '王城誓卫胸甲', {
 
 createEquipmentItem('I0JO', '黑曜熔铠', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\obsidian_molten_armor.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNobsidian_molten_armor.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',

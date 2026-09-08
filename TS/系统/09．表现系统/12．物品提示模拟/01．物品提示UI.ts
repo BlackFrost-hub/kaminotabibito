@@ -4,6 +4,11 @@ import type { 物品提示内容 } from "./03．物品提示内容";
 
 const japi = require("jass.japi") as any;
 
+const { round, ceil } = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算") as {
+  round: (this: void, value: number) => number;
+  ceil: (this: void, value: number) => number;
+};
+
 const DzGetGameUI = japi.DzGetGameUI as () => number;
 const DzLoadToc = japi.DzLoadToc as (path: string) => void;
 const DzCreateFrame = japi.DzCreateFrame as (name: string, parent: number, id: number) => number;
@@ -107,7 +112,7 @@ function 创建Fdf图标帧(this: void, name: string, parent: number, contextId:
 }
 
 function 格式化整数(this: void, value: number): string {
-  return tostring(Math.floor(value + 0.5));
+  return tostring(round(value));
 }
 
 function 格式化金色整数(this: void, value: number): string {
@@ -157,7 +162,7 @@ function 计算提示正文行数(this: void, text: string): number {
     const nextIndex = text.indexOf("|n", searchIndex);
     const lineText = nextIndex < 0 ? text.substring(searchIndex) : text.substring(searchIndex, nextIndex);
     const visibleWidth = 计算可见文本宽度(lineText);
-    count += 取较大数(1, Math.ceil(visibleWidth / BODY_WRAP_VISIBLE_WIDTH));
+    count += 取较大数(1, ceil(visibleWidth / BODY_WRAP_VISIBLE_WIDTH));
     if (nextIndex < 0) break;
     searchIndex = nextIndex + 2;
   }

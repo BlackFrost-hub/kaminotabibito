@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0EC', '灵猫步伐之靴', {
   baseId = 'bspd',
-  icon = 'Equipment\\Icon\\Shoes\\spirit_cat_steps_boots.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Shoes\\BTNspirit_cat_steps_boots.blp',
   model = 'war3mapImported\\PVP_Rune_Speed_Icon.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -14,7 +14,7 @@ createEquipmentItem('I0EC', '灵猫步伐之靴', {
 
 createEquipmentItem('I0EH', '熔岩行者胫甲', {
   baseId = 'bspd',
-  icon = 'Equipment\\Icon\\Shoes\\lavawalker_greaves.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Shoes\\BTNlavawalker_greaves.blp',
   model = 'war3mapImported\\PVP_Rune_Speed_Icon.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -26,7 +26,7 @@ createEquipmentItem('I0EH', '熔岩行者胫甲', {
 
 createEquipmentItem('I0FX', '灵印折步靴', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Shoes\\ancestral_twin_spirit_step_boots.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Shoes\\BTNancestral_twin_spirit_step_boots.blp',
   model = 'war3mapImported\\PVP_Rune_Speed_Icon.mdl',
   abilities = ' ',
   classification = 'Permanent',

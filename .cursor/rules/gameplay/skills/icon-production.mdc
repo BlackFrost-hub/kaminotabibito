@@ -1,0 +1,32 @@
+---
+description: 英雄技能、英雄头像与装备图标的正常/暗图标配对生产规则
+globs: TS/系统/03．技能系统/**/*.ts, TS/系统/02．物品系统/**/*.ts, objediting/**/*.lua, imports/ReplaceableTextures/**/*.blp
+alwaysApply: false
+---
+
+# 图标配对规则
+
+制作或迁移英雄技能、英雄头像、装备图标时，必须同时提供正常图标和暗图标。
+
+## 目录约定
+
+- 英雄头像正常图标：`ReplaceableTextures\\CommandButtons\\Hero\\Portrait\\BTN...Portrait.blp`
+- 英雄头像暗图标：`ReplaceableTextures\\CommandButtonsDisabled\\Hero\\Portrait\\DISBTN...Portrait.blp`
+- 为兼容单位物编的路径推导，头像暗图标同时保留在 `CommandButtonsDisabled\\Hero` 根目录。
+- 英雄技能正常图标：`ReplaceableTextures\\CommandButtons\\HeroSkill\\BTN...blp`
+- 英雄技能暗图标：`ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTN...blp`
+- 装备正常图标：`Equipment\\Icon\\<分类>\\<name>.blp`
+- 装备暗图标：`ReplaceableTextures\\CommandButtonsDisabled\\Equipment\\Icon\\<分类>\\DISBTN<name>.blp`
+
+## 命名与接入
+
+- 暗图标文件名必须在正常文件名前加 `DISBTN`，保持其余名称一致。
+- 物编或 TS 引用迁移后，必须全仓库扫描旧路径；不得只移动资源而不更新引用。
+- 新增装备图标时，必须同步生成暗图标并确认装备物编的暗图标字段或运行时推导能命中该路径。
+
+## 验收
+
+- 正常与暗图标都必须实际存在，不能依赖游戏自动生成。
+- BLP 必须为 Warcraft 兼容格式：`BLP1`、`compression=0`、`alphaBits=8`、`pictureType=3/4`。
+- 暗图标必须回读检查，确认不是绿色缺失纹理、黑底或完全透明。
+- 资源迁移后重开地图，在英雄头像、技能禁用状态和装备界面分别进行实机验证。

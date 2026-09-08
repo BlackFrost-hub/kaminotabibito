@@ -9,7 +9,7 @@ createPlayerHeroUnit('E0L1', '朱雀院红叶', {
   description = '朱雀院流近战技巧型剑士。',
   modelFile = 'Unit\\Hero\\Momiji\\Momiji.mdx',
   scale = 1.2,
-  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNMomijiPortrait.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero\\Portrait\\BTNMomijiPortrait.blp',
   normalAbilities = 'A014,AInv,AMD1',
   heroAbilities = '',
   upgradesUsed = '',

@@ -1,18 +1,18 @@
 -- 塞莉亚·克莱尔 Q/W/E/R/D 通魔物编壳；通魔持续字段承载动态百分比蓝耗。
 
 local ICONS = {
-  Q = 'ReplaceableTextures\\CommandButtons\\Celia\\BTNCeliaQ.blp',
-  W = 'ReplaceableTextures\\CommandButtons\\Celia\\BTNCeliaW.blp',
-  E = 'ReplaceableTextures\\CommandButtons\\Celia\\BTNCeliaE.blp',
-  R = 'ReplaceableTextures\\CommandButtons\\Celia\\BTNCeliaR.blp',
-  D = 'ReplaceableTextures\\CommandButtons\\Celia\\BTNCeliaD.blp',
+  Q = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNCeliaQ.blp',
+  W = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNCeliaW.blp',
+  E = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNCeliaE.blp',
+  R = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNCeliaR.blp',
+  D = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNCeliaD.blp',
 }
 local DISABLED_ICONS = {
-  Q = 'ReplaceableTextures\\CommandButtonsDisabled\\Celia\\DISBTNCeliaQ.blp',
-  W = 'ReplaceableTextures\\CommandButtonsDisabled\\Celia\\DISBTNCeliaW.blp',
-  E = 'ReplaceableTextures\\CommandButtonsDisabled\\Celia\\DISBTNCeliaE.blp',
-  R = 'ReplaceableTextures\\CommandButtonsDisabled\\Celia\\DISBTNCeliaR.blp',
-  D = 'ReplaceableTextures\\CommandButtonsDisabled\\Celia\\DISBTNCeliaD.blp',
+  Q = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNCeliaQ.blp',
+  W = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNCeliaW.blp',
+  E = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNCeliaE.blp',
+  R = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNCeliaR.blp',
+  D = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNCeliaD.blp',
 }
 local HERO_LEVELS = 15
 

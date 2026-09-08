@@ -4,30 +4,12 @@ local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local _____53D6_82F1_96C4_72B6_6001, _____542F_52A8_9690_533F_8BA1_65F6, addDelayedCallbackSafe, removeDelayedCallbackSafe, fourCCToStringSafe, getGameTime, registerManualBuff, _____5355_4F4D_5B58_6D3B, debugLogForce, _____82F1_96C4_5355_4F4D_7C7B_578BID, _____9690_533FBuffID, _____88AB_52A8_914D_7F6E, GetHandleId, GetOwningPlayer, GetPlayerId, _____82F1_96C4_72B6_6001_8868, _____9690_533F_8BA1_65F6_56DE_8C03_8868, addDelayedCallback, removeDelayedCallback
+local _____542F_52A8_9690_533F_8BA1_65F6, addDelayedCallbackSafe, removeDelayedCallbackSafe, fourCCToStringSafe, getGameTime, registerManualBuff, _____5355_4F4D_5B58_6D3B, _____8BA1_7B97_88AB_52A8_51B7_5374, debugLogForce, _____82F1_96C4_5355_4F4D_7C7B_578BID, _____9690_533FBuffID, _____88AB_52A8_914D_7F6E, GetHandleId, GetOwningPlayer, GetPlayerId, _____82F1_96C4_72B6_6001_8868, _____9690_533F_8BA1_65F6_56DE_8C03_8868, addDelayedCallback, removeDelayedCallback
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")
 local _____8299_8389_83B2_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲技能配置"]
 local _____8299_8389_83B2Buff_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲Buff配置"]
 local _____8299_8389_83B2_88AB_52A8_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲被动配置"]
 local _____8299_8389_83B2_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["芙莉莲表现配置"]
-function _____53D6_82F1_96C4_72B6_6001(_____82F1_96C4)
-    local id = GetHandleId(_____82F1_96C4)
-    local _____72B6_6001 = _____82F1_96C4_72B6_6001_8868[id]
-    if _____72B6_6001 == nil then
-        _____72B6_6001 = {
-            ["芙莉莲"] = _____82F1_96C4,
-            ["隐匿"] = false,
-            ["最后活动时间"] = getGameTime(),
-            ["重点目标"] = nil,
-            ["解析到期"] = {["攻击"] = 0, ["防御"] = 0, ["位置"] = 0},
-            ["解析完成"] = false,
-            ["演算普攻到期"] = 0,
-            ["技能清理表"] = {}
-        }
-        _____82F1_96C4_72B6_6001_8868[id] = _____72B6_6001
-    end
-    return _____72B6_6001
-end
 function _____542F_52A8_9690_533F_8BA1_65F6(_____82F1_96C4)
     if _____82F1_96C4 == nil or _____82F1_96C4 == 0 then
         return
@@ -37,9 +19,12 @@ function _____542F_52A8_9690_533F_8BA1_65F6(_____82F1_96C4)
     if _____65E7ID ~= nil then
         removeDelayedCallbackSafe(_____65E7ID)
     end
-    local _____72B6_6001 = _____53D6_82F1_96C4_72B6_6001(_____82F1_96C4)
     local _____9759_6B62_500D_7387 = ____exports["花田判定接口"]["在花田内静止"](_____82F1_96C4) and _____88AB_52A8_914D_7F6E["花田隐匿恢复倍率"] or 1
-    local _____9700_8981_6BEB_79D2 = _____88AB_52A8_914D_7F6E["隐匿静默秒"] / (_____9759_6B62_500D_7387 > 0 and _____9759_6B62_500D_7387 or 1) * 1000
+    local _____57FA_7840_9759_9ED8_79D2 = _____8BA1_7B97_88AB_52A8_51B7_5374(_____82F1_96C4, _____88AB_52A8_914D_7F6E["隐匿静默秒"])
+    if _____9759_6B62_500D_7387 > 0 and _____9759_6B62_500D_7387 ~= 1 then
+        _____57FA_7840_9759_9ED8_79D2 = _____57FA_7840_9759_9ED8_79D2 / _____9759_6B62_500D_7387
+    end
+    local _____9700_8981_6BEB_79D2 = _____57FA_7840_9759_9ED8_79D2 * 1000
     local _____56DE_8C03ID = addDelayedCallbackSafe(
         _____9700_8981_6BEB_79D2,
         function()
@@ -94,7 +79,6 @@ function _____542F_52A8_9690_533F_8BA1_65F6(_____82F1_96C4)
         end
     )
     _____9690_533F_8BA1_65F6_56DE_8C03_8868[id] = _____56DE_8C03ID
-    local ____ = _____72B6_6001
 end
 function addDelayedCallbackSafe(delayMs, callback)
     return addDelayedCallback(delayMs, callback)
@@ -128,8 +112,10 @@ _____5355_4F4D_5B58_6D3B = ____require_result_8["单位存活"]
 local _____53D6_5355_4F4DID = ____require_result_8["取单位ID"]
 local platformAbilityApi = require("平台扩展API取值")
 local platformAbilityAction = require("平台扩展API动作")
-local ____require_result_9 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_9.debugLogForce
+local ____require_result_9 = require("系统.03．技能系统.01．技能冷却.01．冷却缩减计算")
+_____8BA1_7B97_88AB_52A8_51B7_5374 = ____require_result_9.calcPassiveCooldown
+local ____require_result_10 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_10.debugLogForce
 _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.Q["技能ID"])
 local ____W_6280_80FDID = stringToFourCCSafe(_____8299_8389_83B2_6280_80FD_914D_7F6E.W["技能ID"])
@@ -159,6 +145,24 @@ ____exports["花田判定接口"] = {
 }
 ____exports["是芙莉莲"] = function(unit)
     return unit ~= nil and unit ~= 0 and jass.GetUnitTypeId(unit) == _____82F1_96C4_5355_4F4D_7C7B_578BID
+end
+local function _____53D6_82F1_96C4_72B6_6001(_____82F1_96C4)
+    local id = GetHandleId(_____82F1_96C4)
+    local _____72B6_6001 = _____82F1_96C4_72B6_6001_8868[id]
+    if _____72B6_6001 == nil then
+        _____72B6_6001 = {
+            ["芙莉莲"] = _____82F1_96C4,
+            ["隐匿"] = false,
+            ["最后活动时间"] = getGameTime(),
+            ["重点目标"] = nil,
+            ["解析到期"] = {["攻击"] = 0, ["防御"] = 0, ["位置"] = 0},
+            ["解析完成"] = false,
+            ["演算普攻到期"] = 0,
+            ["技能清理表"] = {}
+        }
+        _____82F1_96C4_72B6_6001_8868[id] = _____72B6_6001
+    end
+    return _____72B6_6001
 end
 ____exports["登记芙莉莲清理"] = function(_____82F1_96C4, _____540D_79F0, _____6E05_7406)
     if _____82F1_96C4 == nil or _____82F1_96C4 == 0 then
@@ -207,9 +211,9 @@ ____exports["快照隐匿"] = function(_____82F1_96C4)
     return _____72B6_6001 ~= nil and _____72B6_6001["隐匿"]
 end
 _____9690_533F_8BA1_65F6_56DE_8C03_8868 = {}
-local ____require_result_10 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_10.addDelayedCallback
-removeDelayedCallback = ____require_result_10.removeDelayedCallback
+local ____require_result_11 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_11.addDelayedCallback
+removeDelayedCallback = ____require_result_11.removeDelayedCallback
 --- 解析标记特效键（挂重点目标；目标切换/清理销毁）
 local function _____89E3_6790_6807_8BB0_952E(_____8299_8389_83B2)
     return "芙莉莲解析标记-" .. tostring(GetHandleId(_____8299_8389_83B2))
@@ -506,8 +510,8 @@ local function _____5904_7406_8299_8389_83B2_666E_653B(target, attacker, applied
     if snapshot == nil then
         return
     end
-    local ____debugLogForce_13 = debugLogForce
-    local ____array_12 = __TS__SparseArrayNew(
+    local ____debugLogForce_14 = debugLogForce
+    local ____array_13 = __TS__SparseArrayNew(
         "芙莉莲-被动",
         "普攻收到",
         "玩家",
@@ -524,12 +528,12 @@ local function _____5904_7406_8299_8389_83B2_666E_653B(target, attacker, applied
         snapshot.isWrappedSkillDamage,
         "originalAttacker"
     )
-    local ____snapshot_originalAttacker_11 = snapshot.originalAttacker
-    if ____snapshot_originalAttacker_11 == nil then
-        ____snapshot_originalAttacker_11 = "-"
+    local ____snapshot_originalAttacker_12 = snapshot.originalAttacker
+    if ____snapshot_originalAttacker_12 == nil then
+        ____snapshot_originalAttacker_12 = "-"
     end
-    __TS__SparseArrayPush(____array_12, ____snapshot_originalAttacker_11)
-    ____debugLogForce_13(__TS__SparseArraySpread(____array_12))
+    __TS__SparseArrayPush(____array_13, ____snapshot_originalAttacker_12)
+    ____debugLogForce_14(__TS__SparseArraySpread(____array_13))
     if snapshot.isNormalAttack ~= true then
         debugLogForce(
             "芙莉莲-被动",
@@ -561,18 +565,18 @@ local function _____5904_7406_8299_8389_83B2_666E_653B(target, attacker, applied
         return
     end
     if _____72B6_6001["重点目标"] == nil or _____72B6_6001["重点目标"] ~= target then
-        local ____debugLogForce_15 = debugLogForce
-        local ____72B6_6001__91CD_70B9_76EE_6807_14 = _____72B6_6001["重点目标"]
-        if ____72B6_6001__91CD_70B9_76EE_6807_14 == nil then
-            ____72B6_6001__91CD_70B9_76EE_6807_14 = "-"
+        local ____debugLogForce_16 = debugLogForce
+        local ____72B6_6001__91CD_70B9_76EE_6807_15 = _____72B6_6001["重点目标"]
+        if ____72B6_6001__91CD_70B9_76EE_6807_15 == nil then
+            ____72B6_6001__91CD_70B9_76EE_6807_15 = "-"
         end
-        ____debugLogForce_15(
+        ____debugLogForce_16(
             "芙莉莲-被动",
             "普攻拦截",
             "原因",
             "非重点目标",
             "重点",
-            ____72B6_6001__91CD_70B9_76EE_6807_14,
+            ____72B6_6001__91CD_70B9_76EE_6807_15,
             "本次",
             target
         )
@@ -688,7 +692,7 @@ ____exports["注册芙莉莲被动"] = function()
             do
                 local _____72B6_6001 = _____82F1_96C4_72B6_6001_8868[id]
                 if _____72B6_6001 == nil or _____72B6_6001["重点目标"] == nil then
-                    goto __continue76
+                    goto __continue77
                 end
                 if _____72B6_6001["重点目标"] == dyingUnit or _____53D6_5355_4F4DID(_____72B6_6001["重点目标"]) == _____53D6_5355_4F4DID(dyingUnit) then
                     if _____72B6_6001["芙莉莲"] ~= nil then
@@ -696,7 +700,7 @@ ____exports["注册芙莉莲被动"] = function()
                     end
                 end
             end
-            ::__continue76::
+            ::__continue77::
         end
     end)
     registerPlayerHeroListener(function(_player, hero)

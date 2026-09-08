@@ -127,6 +127,34 @@ function ____exports.calcActualCooldown(baseCooldown, reduction)
     end
     return baseCooldown * (1 - reduction)
 end
+--- 计算被动/非技能冷却的缩减后时长
+-- 
+-- 被动冷却（隐匿静默、形态持续等）不存在技能对象，不能走技能冷却设置，
+-- 但数值上应与技能冷却缩减同源：读取单位冷却缩减 → 读取额外上限上线 → 应用通用/独立上限 → 乘算。
+-- 
+-- @param unit 冷却来源单位（读取 unit/player 冷却属性）
+-- @param baseSeconds 被动基础时长（秒）
+-- @param abilityId 可选技能 ID：命中 SKILL_COOLDOWN_CAPS 独立上限时使用该上限，否则用通用上限
+-- @returns 缩减后的时长（秒）
+function ____exports.calcPassiveCooldown(unit, baseSeconds, abilityId)
+    if unit == nil or unit == 0 or not (baseSeconds > 0) then
+        return baseSeconds
+    end
+    local reduction = ____exports.getCooldownReduction(unit)
+    if reduction < 0 then
+        reduction = 0
+    end
+    local capIncrease = ____exports.getCooldownReductionCapIncrease(unit)
+    if abilityId ~= nil and abilityId > 0 then
+        reduction = ____exports.applyCooldownCap(reduction, abilityId, capIncrease)
+    else
+        local cap = COOLDOWN_REDUCTION_CAP + capIncrease
+        if reduction > cap then
+            reduction = cap
+        end
+    end
+    return ____exports.calcActualCooldown(baseSeconds, reduction)
+end
 --- 设置技能冷却时间
 function ____exports.setAbilityCooldown(unit, abilityId, level, cooldown)
     ____YD_8BBE_7F6E_6280_80FD_51B7_5374_6570_636E(

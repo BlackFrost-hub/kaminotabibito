@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local invokeUiAttrOnPlayerHeroRegistered, invokeSelectionCenterInit, invokeSelectionCenterSeed, _____505C_6B62_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65, ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick, _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65, jass, centerTimer, registerMoveSpeedTornadoHero, petItemHandoff, chestSystem, debugLog, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2, uiRegisteredPlayers, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID, dialogSystem, buffUISystem, threatPanelSystem, initPlayerSelectionCenter, seedSoleSelectedUnitForPlayer
+local invokeUiAttrOnPlayerHeroRegistered, invokeSelectionCenterInit, invokeSelectionCenterSeed, _____505C_6B62_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65, ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick, _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65, jass, centerTimer, YDUserDataGetSafe, registerMoveSpeedTornadoHero, petItemHandoff, chestSystem, debugLog, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2, uiRegisteredPlayers, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID, dialogSystem, buffUISystem, threatPanelSystem, initPlayerSelectionCenter, seedSoleSelectedUnitForPlayer
 function invokeUiAttrOnPlayerHeroRegistered(whichPlayer, whichHero)
     local mod = require("系统.09．表现系统.03．UI属性系统.02．面板渲染")
     local cb = mod.onPlayerHeroRegistered
@@ -136,14 +136,19 @@ function _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65(_
     end
     _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID = centerTimer.addDelayedCallback(_____5EF6_8FDF_6BEB_79D2, ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick)
 end
+____exports["获取玩家英雄单位组"] = function()
+    return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
+end
 jass = require("jass.common")
+local CreateGroup = jass.CreateGroup
+local GroupAddUnit = jass.GroupAddUnit
 centerTimer = require("系统.00．核心系统.05．中心计时器")
 local C = require("系统.00．核心系统.00．玩家系统.00．常量")
 local ____require_result_0 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
 local YDUserDataGet = ____require_result_0.YDUserDataGet
 local YDUserDataSet = ____require_result_0.YDUserDataSet
 local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
+YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
 local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.01．移速龙卷特效")
 registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero
 petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
@@ -238,6 +243,23 @@ local function registerPlayerHero(whichPlayer, whichHero)
     if whichPlayer == nil or whichPlayer == 0 or whichHero == nil or whichHero == 0 then
         return
     end
+    local heroGroup = ____exports["获取玩家英雄单位组"]()
+    if heroGroup == nil or heroGroup == 0 then
+        heroGroup = CreateGroup()
+        if heroGroup ~= nil and heroGroup ~= 0 then
+            YDUserDataSet(
+                nil,
+                "string",
+                "玩家英雄",
+                "单位组",
+                "group",
+                heroGroup
+            )
+        end
+    end
+    if heroGroup ~= nil and heroGroup ~= 0 then
+        GroupAddUnit(heroGroup, whichHero)
+    end
     YDUserDataSet(
         nil,
         "player",
@@ -263,9 +285,6 @@ function ____exports.getRegisteredPlayerHero(whichPlayer)
         C.YD_ATTR_PLAYER_HERO_UNIT,
         "unit"
     )
-end
-____exports["获取玩家英雄单位组"] = function()
-    return YDUserDataGetSafe("string", "玩家英雄", "单位组", "group")
 end
 ____exports["是玩家英雄组单位"] = function(unit)
     if unit == nil or unit == 0 then

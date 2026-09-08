@@ -80,7 +80,9 @@ export function 确保注册击败地精返回长老入口(this: void): void {
 }
 
 function on主线进度变更(this: void, 新进度: number): void {
-  if (新进度 === 4) 确保注册击败地精返回长老入口();
+  if (新进度 === 4) {
+    确保注册击败地精返回长老入口();
+  }
 }
 
 export function 执行击败地精回村前置(this: void, 参数: 剧情动作参数表): void {

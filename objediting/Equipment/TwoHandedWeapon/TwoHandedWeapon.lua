@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0FN', '亡冥归魂巨剑', {
   baseId = 'ratc',
-  icon = 'Equipment\\Icon\\TwoHandedWeapon\\aronkos_soul_return_greatsword.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\TwoHandedWeapon\\BTNaronkos_soul_return_greatsword.blp',
   model = 'Common\\Model\\wepon\\zb12.mdx',
   abilities = ' ',
   classification = 'Permanent',
@@ -14,7 +14,7 @@ createEquipmentItem('I0FN', '亡冥归魂巨剑', {
 
 createEquipmentItem('I0G3', '滴管长枪投影', {
   baseId = 'ratc',
-  icon = 'Equipment\\Icon\\TwoHandedWeapon\\shalltear_spuit_lance_projection.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\TwoHandedWeapon\\BTNshalltear_spuit_lance_projection.blp',
   model = 'Common\\Model\\wepon\\zb23.mdx',
   abilities = ' ',
   classification = 'Permanent',

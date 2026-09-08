@@ -49,8 +49,8 @@ export function applyEquipStatsTS(this: void, unit: any, stats: EquipStatEntry[]
   const heroGroup = getHeroGroup();
   const isHeroByGroup = !!(heroGroup && jass.IsUnitInGroup(unit, heroGroup));
   const isHeroByType = !!(jass.IsUnitType(unit, jass.UNIT_TYPE_HERO));
-  // 与 JASS 逻辑保持一致：优先用“玩家英雄”分组判断；分组缺失时回退到英雄类型判断。
-  const isHero = isHeroByGroup || (!heroGroup && isHeroByType);
+  // 只认“玩家英雄”组，避免把分身等英雄类型单位当作玩家英雄写入玩家属性。
+  const isHero = isHeroByGroup;
 
   for (const s of stats) {
     const name = s.name;

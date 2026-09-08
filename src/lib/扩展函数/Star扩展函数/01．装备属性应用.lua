@@ -69,7 +69,7 @@ function ____exports.applyEquipStatsTS(unit, stats)
     local heroGroup = getHeroGroup()
     local isHeroByGroup = not not (heroGroup and jass.IsUnitInGroup(unit, heroGroup))
     local isHeroByType = not not jass.IsUnitType(unit, jass.UNIT_TYPE_HERO)
-    local isHero = isHeroByGroup or not heroGroup and isHeroByType
+    local isHero = isHeroByGroup
     for ____, s in ipairs(stats) do
         do
             local name = s.name

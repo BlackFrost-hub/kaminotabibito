@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0E3', '精灵执法披风', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\elven_enforcer_cloak.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNelven_enforcer_cloak.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -14,7 +14,7 @@ createEquipmentItem('I0E3', '精灵执法披风', {
 
 createEquipmentItem('I0EO', '骸骨烈焰之翼', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\skeletal_flame_wings.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNskeletal_flame_wings.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -26,7 +26,7 @@ createEquipmentItem('I0EO', '骸骨烈焰之翼', {
 
 createEquipmentItem('I0EY', '神风护体披风', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\divine_wind_cloak.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNdivine_wind_cloak.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -38,7 +38,7 @@ createEquipmentItem('I0EY', '神风护体披风', {
 
 createEquipmentItem('I0F3', '墨潮行者长袍', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\ink_tide_robe.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNink_tide_robe.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -50,7 +50,7 @@ createEquipmentItem('I0F3', '墨潮行者长袍', {
 
 createEquipmentItem('I0F8', '荆棘行者披风', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\thornwalker_cloak.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNthornwalker_cloak.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -62,7 +62,7 @@ createEquipmentItem('I0F8', '荆棘行者披风', {
 
 createEquipmentItem('I0FF', '影骨披风', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\shadowbone_cloak.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNshadowbone_cloak.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = 'IN01',
   cooldownGroup = 'IN01',
@@ -76,7 +76,7 @@ createEquipmentItem('I0FF', '影骨披风', {
 
 createEquipmentItem('I0FO', '最后阵地重铠', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\aronkos_last_stand_heavy_armor.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNaronkos_last_stand_heavy_armor.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -88,7 +88,7 @@ createEquipmentItem('I0FO', '最后阵地重铠', {
 
 createEquipmentItem('I0FU', '裂誓战躯重铠', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\ancestral_twin_broken_oath_heavy_armor.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNancestral_twin_broken_oath_heavy_armor.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -100,7 +100,7 @@ createEquipmentItem('I0FU', '裂誓战躯重铠', {
 
 createEquipmentItem('I0G4', '真祖女武神血铠', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\shalltear_true_vampire_valkyrie_blood_armor.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNshalltear_true_vampire_valkyrie_blood_armor.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -112,7 +112,7 @@ createEquipmentItem('I0G4', '真祖女武神血铠', {
 
 createEquipmentItem('I0H1', '沉淤守卫胸甲', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\mia_sediment_guard_armor.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNmia_sediment_guard_armor.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -124,7 +124,7 @@ createEquipmentItem('I0H1', '沉淤守卫胸甲', {
 
 createEquipmentItem('I0KF', '守誓圣铠', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Clothes\\oath_vigil_plate_armor.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNoath_vigil_plate_armor.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',

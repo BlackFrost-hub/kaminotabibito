@@ -7,7 +7,7 @@ export const 米亚装备Buff表: Record<string, BuffData> = {
   [常规BuffID.灵猫步伐之靴_灵猫跃步]: {
     buffID: 常规BuffID.灵猫步伐之靴_灵猫跃步,
     buffName: "灵猫跃步",
-    icon: "Equipment\\Icon\\Shoes\\spirit_cat_steps_boots.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Shoes\\BTNspirit_cat_steps_boots.blp",
     effect: "",
     type: "Buff:equipment:attribute",
     interval: 0,

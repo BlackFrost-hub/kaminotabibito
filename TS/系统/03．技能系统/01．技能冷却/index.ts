@@ -22,6 +22,7 @@ const {
   getCooldownReductionCapIncrease: 读取冷却缩减上限,
   applyCooldownCap: 应用冷却上限,
   calcActualCooldown: 计算实际冷却,
+  calcPassiveCooldown: 计算被动冷却,
   setAbilityCooldown: 设置技能冷却,
   getBaseCooldown: 读取基础冷却,
 } = require("系统.03．技能系统.01．技能冷却.01．冷却缩减计算") as {
@@ -31,6 +32,7 @@ const {
   getCooldownReductionCapIncrease: (this: void, unit: any) => number;
   applyCooldownCap: (this: void, reduction: number, abilityId: number, bonus: number) => number;
   calcActualCooldown: (this: void, baseCooldown: number, reduction: number) => number;
+  calcPassiveCooldown: (this: void, unit: any, baseSeconds: number, abilityId?: number) => number;
   setAbilityCooldown: (this: void, unit: any, abilityId: number, level: number, cooldown: number) => void;
   getBaseCooldown: (this: void, abilityId: number, level: number) => number;
 };
@@ -75,6 +77,10 @@ function applyCooldownCap(this: void, reduction: number, abilityId: number, capI
 
 function calcActualCooldown(this: void, baseCooldown: number, reduction: number): number {
   return 计算实际冷却(baseCooldown, reduction);
+}
+
+function calcPassiveCooldown(this: void, unit: any, baseSeconds: number, abilityId?: number): number {
+  return 计算被动冷却(unit, baseSeconds, abilityId);
 }
 
 function setAbilityCooldown(this: void, unit: any, abilityId: number, level: number, cooldown: number): void {

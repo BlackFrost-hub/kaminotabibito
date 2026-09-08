@@ -14,7 +14,7 @@ function on菲利斯的统御纹章触发(this: void, event: any): void {
       sourceUnit: attacker,
       effectSourceName: "菲利斯的统御纹章",
       effectSourceType: "装备",
-      iconOverride: "Equipment\\Icon\\Item\\phyllis_command_emblem.blp",
+      iconOverride: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNphyllis_command_emblem.blp",
     });
     播放单位特效(装备小特效.护盾闪光, allies[i], "origin", 0.8);
   }

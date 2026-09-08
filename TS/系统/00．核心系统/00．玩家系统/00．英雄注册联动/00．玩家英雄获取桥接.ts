@@ -13,6 +13,8 @@
  */
 
 const jass = require("jass.common") as any;
+const CreateGroup = jass.CreateGroup as (this: void) => any;
+const GroupAddUnit = jass.GroupAddUnit as (this: void, group: any, unit: any) => void;
 const centerTimer = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
   removeDelayedCallback: (this: void, id: number) => void;
@@ -264,6 +266,14 @@ function notifyPlayerHeroListeners(this: void, whichPlayer: any, whichHero: any)
 
 function registerPlayerHero(whichPlayer: any, whichHero: any): void {
   if (whichPlayer == null || whichPlayer === 0 || whichHero == null || whichHero === 0) return;
+  let heroGroup = 获取玩家英雄单位组();
+  if (heroGroup == null || heroGroup === 0) {
+    heroGroup = CreateGroup();
+    if (heroGroup != null && heroGroup !== 0) {
+      YDUserDataSet("string", "玩家英雄", "单位组", "group", heroGroup);
+    }
+  }
+  if (heroGroup != null && heroGroup !== 0) GroupAddUnit(heroGroup, whichHero);
   YDUserDataSet("player", whichPlayer, C.YD_ATTR_PLAYER_HERO_UNIT, "unit", whichHero);
   notifyPlayerHeroListeners(whichPlayer, whichHero);
   registerHeroDependents(whichHero);

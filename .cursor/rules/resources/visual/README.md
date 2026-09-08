@@ -6,6 +6,7 @@
 
 | 文件 | 内容 |
 |------|------|
+| [`button-icon-rules.mdc`](button-icon-rules.mdc) | 按钮图标（技能/头像/装备）64×64 格式硬规则、BTN/DISBTN 路径推导、暗图标生成边界与验收 |
 | [`effect-resource-folder-layout.mdc`](effect-resource-folder-layout.mdc) | 特效资源目录布局、路径约定、导入组织 |
 | [`model-texture-asset-rules.mdc`](model-texture-asset-rules.mdc) | 模型、贴图、导入路径、资源踩坑经验 |
 | [`effect-model-production-rules.mdc`](effect-model-production-rules.mdc) | 特效模型选型、2D/3D、动画、贴图、缓存、迁移、性能与验收规则 |
@@ -17,6 +18,7 @@
 ## 使用原则
 
 1. 改模型、贴图、特效路径前，先确认 `imports/` 中的真实路径。
+2. 生成或修复英雄技能、英雄头像、装备图标（正常/暗版）前，先读 `button-icon-rules.mdc`；Buff 图标与野怪/Boss 头像不适用该规则。
 2. 新增或迁入特效前，先搜索 `effect-asset-catalog.md` 和 `effect-asset-catalog/`；新增或迁入动态装饰物前，先搜索 `decoration-asset-catalog.md`，再检查文件 SHA-256，避免重复导入。
 3. 代码配置里的路径必须和导入资源路径完全一致。
 4. 不要把音频规则放到这里；音频统一进入 `resources/audio/`。

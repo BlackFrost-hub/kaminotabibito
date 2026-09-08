@@ -33,6 +33,7 @@
 | ObjEditing 敌方技能或对象数据 | [ObjEditing 索引](gameplay/objediting/README.md) |
 | 剧情迁移、对白时长、动作挂点 | [剧情规则](gameplay/story/README.md) |
 | 音效、配音、MIX、模型、贴图、特效 | [资源规则](resources/README.md) |
+| 技能/头像/装备图标、暗图标 DISBTN、图标绿块 | [按钮图标规则](resources/visual/button-icon-rules.mdc) |
 | 构建、打包、中文文件安全修改 | [工具规则](tooling/README.md) |
 | Run Map 进入游戏后完全没有 Lua 功能 | [Run Map 无 Lua 功能诊断](tooling/runtime/run-map-no-lua-diagnosis.mdc) |
 | 维护规则目录或同步 Codex 技能 | [规则系统维护](core/codex-reference.mdc) |

@@ -193,6 +193,35 @@ export function calcActualCooldown(baseCooldown: number, reduction: number): num
 }
 
 //=============================================================================
+// 五、被动冷却封装（通用）
+//=============================================================================
+
+/**
+ * 计算被动/非技能冷却的缩减后时长
+ *
+ * 被动冷却（隐匿静默、形态持续等）不存在技能对象，不能走技能冷却设置，
+ * 但数值上应与技能冷却缩减同源：读取单位冷却缩减 → 读取额外上限上线 → 应用通用/独立上限 → 乘算。
+ *
+ * @param unit 冷却来源单位（读取 unit/player 冷却属性）
+ * @param baseSeconds 被动基础时长（秒）
+ * @param abilityId 可选技能 ID：命中 SKILL_COOLDOWN_CAPS 独立上限时使用该上限，否则用通用上限
+ * @returns 缩减后的时长（秒）
+ */
+export function calcPassiveCooldown(unit: any, baseSeconds: number, abilityId?: number): number {
+  if (unit == null || unit === 0 || !(baseSeconds > 0)) return baseSeconds;
+  let reduction = getCooldownReduction(unit);
+  if (reduction < 0) reduction = 0;
+  const capIncrease = getCooldownReductionCapIncrease(unit);
+  if (abilityId != null && abilityId > 0) {
+    reduction = applyCooldownCap(reduction, abilityId, capIncrease);
+  } else {
+    const cap = COOLDOWN_REDUCTION_CAP + capIncrease;
+    if (reduction > cap) reduction = cap;
+  }
+  return calcActualCooldown(baseSeconds, reduction);
+}
+
+//=============================================================================
 // 五、冷却设置
 //=============================================================================
 

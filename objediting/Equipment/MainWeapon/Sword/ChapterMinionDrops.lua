@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0J0', '野狼磨牙刃', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Sword\\wild_wolf_fang_blade.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Sword\\BTNwild_wolf_fang_blade.blp',
   model = 'war3mapImported\\Sword.mdl',
   abilities = ' ',
   classification = 'Campaign',
@@ -14,7 +14,7 @@ createEquipmentItem('I0J0', '野狼磨牙刃', {
 
 createEquipmentItem('I0JD', '战火汲血长刃', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Sword\\warfire_blooddrinker_blade.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Sword\\BTNwarfire_blooddrinker_blade.blp',
   model = 'war3mapImported\\Sword.mdl',
   abilities = ' ',
   classification = 'Campaign',

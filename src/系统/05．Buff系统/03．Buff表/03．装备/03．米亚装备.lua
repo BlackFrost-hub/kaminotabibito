@@ -5,7 +5,7 @@ local _____5E38_89C4BuffID = ____00_FF0EBuff_767B_8BB0["常规BuffID"]
 ____exports["米亚装备Buff表"] = {[_____5E38_89C4BuffID["灵猫步伐之靴_灵猫跃步"]] = {
     buffID = _____5E38_89C4BuffID["灵猫步伐之靴_灵猫跃步"],
     buffName = "灵猫跃步",
-    icon = "Equipment\\Icon\\Shoes\\spirit_cat_steps_boots.blp",
+    icon = "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Shoes\\BTNspirit_cat_steps_boots.blp",
     effect = "",
     type = "Buff:equipment:attribute",
     interval = 0,

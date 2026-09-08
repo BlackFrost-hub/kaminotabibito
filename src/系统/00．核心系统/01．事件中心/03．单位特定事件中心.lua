@@ -1,6 +1,30 @@
 local ____lualib = require("lualib_bundle")
+local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
+local compactListeners
+function compactListeners(list)
+    local writeIndex = 0
+    do
+        local i = 0
+        while i < #list do
+            local listener = list[i + 1]
+            if listener and listener.active and listener.trigger then
+                list[writeIndex + 1] = listener
+                writeIndex = writeIndex + 1
+            end
+            i = i + 1
+        end
+    end
+    do
+        local i = #list - 1
+        while i >= writeIndex do
+            table.remove(list)
+            i = i - 1
+        end
+    end
+    return writeIndex
+end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
@@ -49,60 +73,28 @@ local function hasListener(list, trigger)
     return false
 end
 local function dispatchListeners(list)
-    local writeIndex = 0
+    local snapshot = __TS__ArraySlice(list)
     do
         local i = 0
-        while i < #list do
+        while i < #snapshot do
             do
-                local listener = list[i + 1]
+                local listener = snapshot[i + 1]
                 if not listener or not listener.active or not listener.trigger then
                     goto __continue13
                 end
                 local passed = jass.TriggerEvaluate(listener.trigger)
-                if passed then
+                if passed and listener.active then
                     jass.TriggerExecute(listener.trigger)
                 end
                 if listener.once then
                     listener.active = false
-                end
-                if listener.active then
-                    list[writeIndex + 1] = listener
-                    writeIndex = writeIndex + 1
                 end
             end
             ::__continue13::
             i = i + 1
         end
     end
-    do
-        local i = #list - 1
-        while i >= writeIndex do
-            table.remove(list)
-            i = i - 1
-        end
-    end
-end
-local function compactListeners(list)
-    local writeIndex = 0
-    do
-        local i = 0
-        while i < #list do
-            local listener = list[i + 1]
-            if listener and listener.active and listener.trigger then
-                list[writeIndex + 1] = listener
-                writeIndex = writeIndex + 1
-            end
-            i = i + 1
-        end
-    end
-    do
-        local i = #list - 1
-        while i >= writeIndex do
-            table.remove(list)
-            i = i - 1
-        end
-    end
-    return writeIndex
+    compactListeners(list)
 end
 local function cleanupUnitEventMaster(key)
     local list = unitEventListeners[key]

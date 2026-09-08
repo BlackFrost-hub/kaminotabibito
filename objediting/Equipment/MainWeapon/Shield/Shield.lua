@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0FA', '莫尔特斯树皮盾', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Shield\\mortes_bark_shield.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Shield\\BTNmortes_bark_shield.blp',
   model = 'war3mapImported\\ItemRoundShield.mdl',
   abilities = ' ',
   classification = 'Campaign',

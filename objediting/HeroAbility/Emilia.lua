@@ -1,18 +1,18 @@
 -- 爱蜜莉雅 Q/W/E/R/D 物编壳。
 -- 技能效果由运行时实现；通魔持续字段承载动态百分比蓝耗，固定基础蓝耗与百分比蓝耗由运行时叠加计算。
 local ICONS = {
-  Q = 'ReplaceableTextures\\CommandButtons\\Emilia\\BTNEmiliaQ.blp',
-  W = 'ReplaceableTextures\\CommandButtons\\Emilia\\BTNEmiliaW.blp',
-  E = 'ReplaceableTextures\\CommandButtons\\Emilia\\BTNEmiliaE.blp',
-  R = 'ReplaceableTextures\\CommandButtons\\Emilia\\BTNEmiliaR.blp',
-  D = 'ReplaceableTextures\\CommandButtons\\Emilia\\BTNEmiliaD.blp',
+  Q = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNEmiliaQ.blp',
+  W = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNEmiliaW.blp',
+  E = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNEmiliaE.blp',
+  R = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNEmiliaR.blp',
+  D = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNEmiliaD.blp',
 }
 local DISABLED_ICONS = {
-  Q = 'ReplaceableTextures\\CommandButtonsDisabled\\Emilia\\DISBTNEmiliaQ.blp',
-  W = 'ReplaceableTextures\\CommandButtonsDisabled\\Emilia\\DISBTNEmiliaW.blp',
-  E = 'ReplaceableTextures\\CommandButtonsDisabled\\Emilia\\DISBTNEmiliaE.blp',
-  R = 'ReplaceableTextures\\CommandButtonsDisabled\\Emilia\\DISBTNEmiliaR.blp',
-  D = 'ReplaceableTextures\\CommandButtonsDisabled\\Emilia\\DISBTNEmiliaD.blp',
+  Q = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNEmiliaQ.blp',
+  W = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNEmiliaW.blp',
+  E = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNEmiliaE.blp',
+  R = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNEmiliaR.blp',
+  D = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNEmiliaD.blp',
 }
 local HERO_LEVELS = 15
 

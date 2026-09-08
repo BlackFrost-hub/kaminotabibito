@@ -9,7 +9,7 @@ createPlayerHeroUnit('E0L2', '朱雀院椿', {
   description = '朱雀院流防守反击型剑士。',
   modelFile = 'Unit\\Hero\\Tsubaki\\Tsubaki.mdx',
   scale = 1.2,
-  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNTsubakiPortrait.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero\\Portrait\\BTNTsubakiPortrait.blp',
   normalAbilities = 'A014,AInv,ATD1',
   heroAbilities = '',
   upgradesUsed = '',

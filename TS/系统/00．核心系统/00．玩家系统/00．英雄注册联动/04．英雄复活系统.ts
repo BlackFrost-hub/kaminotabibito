@@ -17,6 +17,9 @@ const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩�
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 const { 开始无敌帧 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.08．无敌帧") as {
   开始无敌帧: (this: void, unit: any, duration: number) => number;
 };
@@ -96,6 +99,7 @@ const Cos = jass.Cos as (radians: number) => number;
 const Sin = jass.Sin as (radians: number) => number;
 const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
+const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetPlayerId = jass.GetPlayerId as (player: any) => number;
 const Location = jass.Location as (x: number, y: number) => any;
 const RemoveLocation = jass.RemoveLocation as (loc: any) => void;
@@ -146,6 +150,11 @@ const 英雄栏倒计时剩余秒表: number[] = [0, 0, 0, 0, 0];
 
 function 是否有效(this: void, handle: any): boolean {
   return handle != null && handle !== 0;
+}
+
+function 单位是否死亡(this: void, unit: any): boolean {
+  if (!是否有效(unit)) return true;
+  return IsUnitType(unit, jass.UNIT_TYPE_DEAD);
 }
 
 function 取英雄栏槽位(this: void, unit: any): number {
@@ -353,8 +362,23 @@ function 寻找可通行复活点(this: void, boss: any, 检测单位: any): { x
 
 function 读取当前复活Boss(this: void): any {
   const battleBoss = YDUserDataGetSafe("string", Boss战表, Boss战单位属性, "unit");
-  if (是否有效(battleBoss)) return battleBoss;
-  return g.udg_Boss;
+  if (是否有效(battleBoss) && !单位是否死亡(battleBoss)) {
+    debugLogForce("英雄复活", "读取当前复活Boss", "来源=Boss战单位字段", "存活句柄", GetHandleId(battleBoss));
+    return battleBoss;
+  }
+  if (是否有效(battleBoss)) {
+    debugLogForce("英雄复活", "读取当前复活Boss", "Boss战单位字段残留死亡句柄,跳过", GetHandleId(battleBoss));
+  }
+  const 全局Boss = g.udg_Boss;
+  if (是否有效(全局Boss) && !单位是否死亡(全局Boss)) {
+    debugLogForce("英雄复活", "读取当前复活Boss", "来源=udg_Boss", "存活句柄", GetHandleId(全局Boss));
+    return 全局Boss;
+  }
+  if (是否有效(全局Boss)) {
+    debugLogForce("英雄复活", "读取当前复活Boss", "udg_Boss残留死亡句柄,跳过", GetHandleId(全局Boss));
+  }
+  debugLogForce("英雄复活", "读取当前复活Boss", "无有效Boss,回退剧情复活点");
+  return null;
 }
 
 function on复活镜头移动(this: void, variable?: any): void {
@@ -384,7 +408,10 @@ function 复活玩家英雄(this: void, dyingUnit: any, 消耗复活次数: bool
   const 剩余次数 = 消耗复活次数
     ? (YDUserDataGetSafe("string", 复活次数表, 复活次数属性, "integer") as number | undefined)
     : undefined;
-  if (剩余次数 != null && 剩余次数 <= 0) return false;
+  if (剩余次数 != null && 剩余次数 <= 0) {
+    debugLogForce("英雄复活", "复活点判定", "团队复活次数耗尽,不复活", "英雄", GetHandleId(dyingUnit));
+    return false;
+  }
   if (剩余次数 != null) {
     YDUserDataSetSafe("string", 复活次数表, 复活次数属性, "integer", 剩余次数 - 1);
   }
@@ -397,11 +424,15 @@ function 复活玩家英雄(this: void, dyingUnit: any, 消耗复活次数: bool
     SetUnitY(dyingUnit, 原地Y);
     施加复活无敌(dyingUnit);
     addDelayedCallback(0, on复活镜头移动, { 玩家: GetOwningPlayer(dyingUnit), x: 原地X, y: 原地Y });
+    debugLogForce("英雄复活", "复活点判定", "原地复活", "英雄", GetHandleId(dyingUnit), "落点", 原地X, 原地Y);
   } else {
     const boss = 读取当前复活Boss();
     if (是否有效(boss)) {
       const pos = 寻找可通行复活点(boss, dyingUnit);
-      if (pos == null) return false;
+      if (pos == null) {
+        debugLogForce("英雄复活", "复活点判定", "Boss复活点不可通行,放弃复活", "Boss", GetHandleId(boss));
+        return false;
+      }
 
       const loc = Location(GetUnitX(boss), GetUnitY(boss));
       ReviveHeroLoc(dyingUnit, loc, true);
@@ -410,12 +441,17 @@ function 复活玩家英雄(this: void, dyingUnit: any, 消耗复活次数: bool
       SetUnitY(dyingUnit, pos.y);
       施加复活无敌(dyingUnit);
       addDelayedCallback(0, on复活镜头移动, { 玩家: GetOwningPlayer(dyingUnit), x: pos.x, y: pos.y });
+      debugLogForce("英雄复活", "复活点判定", "Boss附近复活", "英雄", GetHandleId(dyingUnit), "Boss", GetHandleId(boss), "落点", pos.x, pos.y);
     } else {
       const 复活点 = g.udg_FHD;
-      if (!是否有效(复活点)) return false;
+      if (!是否有效(复活点)) {
+        debugLogForce("英雄复活", "复活点判定", "剧情复活点无效,放弃复活");
+        return false;
+      }
       ReviveHeroLoc(dyingUnit, 复活点, true);
       施加复活无敌(dyingUnit);
       addDelayedCallback(0, on复活镜头移动, { 玩家: GetOwningPlayer(dyingUnit), x: GetUnitX(dyingUnit), y: GetUnitY(dyingUnit) });
+      debugLogForce("英雄复活", "复活点判定", "剧情复活点复活", "英雄", GetHandleId(dyingUnit), "复活点句柄", GetHandleId(复活点));
     }
   }
 

@@ -7,7 +7,7 @@ export const 菲利斯装备Buff表: Record<string, BuffData> = {
   [常规BuffID.菲利斯的统御纹章_统御号令]: {
     buffID: 常规BuffID.菲利斯的统御纹章_统御号令,
     buffName: "统御号令",
-    icon: "Equipment\\Icon\\Item\\phyllis_command_emblem.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNphyllis_command_emblem.blp",
     effect: "",
     type: "Buff:equipment:attribute",
     interval: 0,
@@ -22,7 +22,7 @@ export const 菲利斯装备Buff表: Record<string, BuffData> = {
   [常规BuffID.攻城号令圣印_攻城号令]: {
     buffID: 常规BuffID.攻城号令圣印_攻城号令,
     buffName: "攻城号令",
-    icon: "Equipment\\Icon\\Item\\siege_command_signet.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNsiege_command_signet.blp",
     effect: "",
     type: "Buff:equipment:attribute",
     interval: 0,
@@ -37,7 +37,7 @@ export const 菲利斯装备Buff表: Record<string, BuffData> = {
   [常规BuffID.净化者手套_净化增幅]: {
     buffID: 常规BuffID.净化者手套_净化增幅,
     buffName: "净化增幅",
-    icon: "Equipment\\Icon\\Gloves\\purifier_gloves.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Gloves\\BTNpurifier_gloves.blp",
     effect: "",
     type: "Buff:equipment:attribute",
     interval: 0,

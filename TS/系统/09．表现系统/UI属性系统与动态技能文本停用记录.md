@@ -84,7 +84,7 @@ npm run build:files -- "TS/系统/09．表现系统/03．UI属性系统/index.ts
 2. 再停用本地物品提示缓存的全端周期清理，移除物品实例 `GetHandleId` 缓存键。
 3. 最后检查本地回调中对原生 Tooltip 执行 `DzFrameClearAllPoints`、`DzFrameSetPoint` 的高频布局修改。
 
-补充：`01．物品提示UI.ts` 当前使用 `Math.floor` / `Math.ceil`，违反项目“不使用 Lua 数学库”的规则；本轮只记录，不修改。
+补充：`01．物品提示UI.ts` 曾使用 `Math.floor` / `Math.ceil`，违反项目“不使用 Lua 数学库”的规则。2026-09-07 已修复：两处改用 `lib.扩展函数.封装函数.01．通用工具.07．数学运算` 的 `round`（格式化整数）与 `ceil`（正文行数计算）。
 
 ## 英雄语音系统（当前已停用）
 

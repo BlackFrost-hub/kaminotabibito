@@ -3,18 +3,18 @@
 
 local HERO_LEVELS = 15
 local ICONS = {
-  Q = 'ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiQ.blp',
-  W = 'ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiW.blp',
-  E = 'ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiE.blp',
-  R = 'ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiR.blp',
-  D = 'ReplaceableTextures\\CommandButtons\\Momiji\\BTNMomijiD.blp',
+  Q = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNMomijiQ.blp',
+  W = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNMomijiW.blp',
+  E = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNMomijiE.blp',
+  R = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNMomijiR.blp',
+  D = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNMomijiD.blp',
 }
 local DISABLED_ICONS = {
-  Q = 'ReplaceableTextures\\CommandButtonsDisabled\\Momiji\\DISBTNMomijiQ.blp',
-  W = 'ReplaceableTextures\\CommandButtonsDisabled\\Momiji\\DISBTNMomijiW.blp',
-  E = 'ReplaceableTextures\\CommandButtonsDisabled\\Momiji\\DISBTNMomijiE.blp',
-  R = 'ReplaceableTextures\\CommandButtonsDisabled\\Momiji\\DISBTNMomijiR.blp',
-  D = 'ReplaceableTextures\\CommandButtonsDisabled\\Momiji\\DISBTNMomijiD.blp',
+  Q = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNMomijiQ.blp',
+  W = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNMomijiW.blp',
+  E = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNMomijiE.blp',
+  R = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNMomijiR.blp',
+  D = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNMomijiD.blp',
 }
 
 createPlayerHeroChannelAbility('AMQ1', '朱雀院红叶-飞燕·穿（Q）', {

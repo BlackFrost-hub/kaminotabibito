@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0EG', '巴尔扎罗斯的角冠', {
   baseId = 'ckng',
-  icon = 'Equipment\\Icon\\Helmet\\balzaroth_horned_crown.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Helmet\\BTNbalzaroth_horned_crown.blp',
   model = 'war3mapImported\\equipment_helmet.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -14,7 +14,7 @@ createEquipmentItem('I0EG', '巴尔扎罗斯的角冠', {
 
 createEquipmentItem('I0FP', '亡者凝视面甲', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Helmet\\aronkos_dead_gaze_faceplate.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Helmet\\BTNaronkos_dead_gaze_faceplate.blp',
   model = 'war3mapImported\\ItemNerzhulMask.mdx',
   abilities = ' ',
   classification = 'Permanent',
@@ -26,7 +26,7 @@ createEquipmentItem('I0FP', '亡者凝视面甲', {
 
 createEquipmentItem('I0FW', '无面记忆面纱', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Helmet\\ancestral_twin_faceless_memory_veil.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Helmet\\BTNancestral_twin_faceless_memory_veil.blp',
   model = 'war3mapImported\\ItemNerzhulMask.mdx',
   abilities = ' ',
   classification = 'Permanent',

@@ -22,7 +22,7 @@ local function ____on_7075_732B_6B65_4F10_4E4B_9774_6700_7EC8_4F24_5BB3(event)
         BuffID = _____5E38_89C4BuffID["灵猫步伐之靴_灵猫跃步"],
         ["持续时间"] = _____7075_732B_8DC3_6B65_6301_7EED_79D2_6570,
         ["基础移速百分比"] = _____7075_732B_8DC3_6B65_79FB_901F_6BD4_4F8B,
-        ["图标路径"] = "Equipment\\Icon\\Shoes\\spirit_cat_steps_boots.blp",
+        ["图标路径"] = "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Shoes\\BTNspirit_cat_steps_boots.blp",
         ["效果来源名称"] = "灵猫步伐之靴",
         ["效果来源类型"] = "装备"
     })

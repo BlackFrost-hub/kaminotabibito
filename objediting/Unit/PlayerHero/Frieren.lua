@@ -9,7 +9,7 @@ createPlayerHeroUnit('E0L5', '芙莉莲', {
   description = '解析与远程贯穿型智力英雄。',
   modelFile = 'Unit\\Hero\\Frieren\\Frieren.mdx',
   scale = 2.2,
-  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNFrierenPortrait.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero\\Portrait\\BTNFrierenPortrait.blp',
   normalAbilities = 'A014,AInv,AFD1',
   heroAbilities = '',
   upgradesUsed = '',

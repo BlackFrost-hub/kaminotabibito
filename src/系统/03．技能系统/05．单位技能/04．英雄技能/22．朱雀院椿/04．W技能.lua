@@ -3,7 +3,7 @@ local __TS__SparseArrayNew = ____lualib.__TS__SparseArrayNew
 local __TS__SparseArrayPush = ____lualib.__TS__SparseArrayPush
 local __TS__SparseArraySpread = ____lualib.__TS__SparseArraySpread
 local ____exports = {}
-local _____7ED3_675FW_62DB_67B6, jass, fourCCToStringSafe, unregisterDamageModifier, _____9020_6210_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D, destroyUnitEffect, _____521B_5EFA_70B9_7279_6548, Sound3DII_CooPlayReuse, _____6062_590DVF, debugLogForce, ____W_6280_80FDID, ____W_914D_7F6E, _____62DB_67B6_7279_6548_952E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitX, GetUnitY, GetUnitName, GetOwningPlayer, GetPlayerId
+local _____7ED3_675FW_62DB_67B6, jass, fourCCToStringSafe, unregisterDamageModifier, _____9020_6210_6280_80FD_4F24_5BB3, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____5355_4F4D_5B58_6D3B, _____83B7_53D6_6247_5F62_533A_57DF_5355_4F4D, _____521B_5EFA_70B9_7279_6548, _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548, Sound3DII_CooPlayReuse, _____6062_590DVF, debugLogForce, ____W_6280_80FDID, ____W_914D_7F6E, _____62DB_67B6_7279_6548_952E, ATTACK_TYPE_NORMAL, DAMAGE_TYPE_NORMAL, WEAPON_TYPE_WHOKNOWS, GetUnitX, GetUnitY, GetUnitName, GetOwningPlayer, GetPlayerId
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.00．配置")
 local _____6731_96C0_9662_693F_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿技能配置"]
 local _____6731_96C0_9662_693F_8868_73B0_914D_7F6E = ____00_FF0E_914D_7F6E["朱雀院椿表现配置"]
@@ -20,7 +20,7 @@ function _____7ED3_675FW_62DB_67B6(_____65BD_6CD5_8005, ______6280_80FD_5B9E_4F8
         unregisterDamageModifier(_____6570_636E["修饰ID"])
         _____6570_636E["修饰ID"] = 0
     end
-    destroyUnitEffect(_____65BD_6CD5_8005, _____62DB_67B6_7279_6548_952E)
+    _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(_____65BD_6CD5_8005, _____62DB_67B6_7279_6548_952E)
     if not _____6570_636E["已招架"] then
         debugLogForce(
             "椿-W",
@@ -170,10 +170,9 @@ local ____require_result_10 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_10.registerManualBuff
 local _____79FB_9664_5355_4F4D_6307_5B9ABuff = ____require_result_10["移除单位指定Buff"]
 local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.03．特效")
-local createUnitEffect = ____require_result_11.createUnitEffect
-destroyUnitEffect = ____require_result_11.destroyUnitEffect
 _____521B_5EFA_70B9_7279_6548 = ____require_result_11["创建点特效"]
-local _____8BBE_7F6E_7279_6548_7F29_653E = ____require_result_11["设置特效缩放"]
+local _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_11["创建单位坐标跟随特效"]
+_____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548 = ____require_result_11["销毁单位坐标跟随特效"]
 local ____require_result_12 = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放")
 local Sound3DII_UnitPlayReuse = ____require_result_12.Sound3DII_UnitPlayReuse
 Sound3DII_CooPlayReuse = ____require_result_12.Sound3DII_CooPlayReuse
@@ -494,17 +493,22 @@ local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____628
             if _____6570_636E["修饰ID"] ~= 0 then
                 unregisterDamageModifier(_____6570_636E["修饰ID"])
             end
-            destroyUnitEffect(_____65BD_6CD5_8005, _____62DB_67B6_7279_6548_952E)
+            _____9500_6BC1_5355_4F4D_5750_6807_8DDF_968F_7279_6548(_____65BD_6CD5_8005, _____62DB_67B6_7279_6548_952E)
         end
     })
-    local _____62DB_67B6_7A97_53E3_7279_6548 = createUnitEffect(
+    _____521B_5EFA_5355_4F4D_5750_6807_8DDF_968F_7279_6548(
         _____65BD_6CD5_8005,
-        "origin",
         _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W招架窗口"]["模型路径"],
-        _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W招架窗口"]["持续秒"],
-        _____62DB_67B6_7279_6548_952E
+        _____62DB_67B6_7279_6548_952E,
+        _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W招架窗口"]["缩放"],
+        _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W招架窗口"]["高度"],
+        1,
+        nil,
+        0,
+        _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W招架窗口"].RGB,
+        true,
+        75
     )
-    _____8BBE_7F6E_7279_6548_7F29_653E(_____62DB_67B6_7A97_53E3_7279_6548, _____6731_96C0_9662_693F_8868_73B0_914D_7F6E["W招架窗口"]["缩放"])
     _____6570_636E["修饰ID"] = ____register_62A4_76FE_524D_62E6_622A_4FEE_6539_5668(function(context)
         if _____6570_636E["已招架"] or _____6570_636E["已结束"] then
             return context.currentDamage

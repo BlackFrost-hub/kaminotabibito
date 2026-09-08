@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0FG', '幽影匕首', {
   baseId = 'ratc',
-  icon = 'Equipment\\Icon\\MainWeapon\\Dagger\\umbral_dagger.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Dagger\\BTNumbral_dagger.blp',
   model = 'Common\\Model\\wepon\\zb5.mdx',
   abilities = ' ',
   classification = 'Campaign',

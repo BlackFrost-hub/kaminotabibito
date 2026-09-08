@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0J2', '史莱姆微光法杖', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Staff\\slime_glimmer_staff.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Staff\\BTNslime_glimmer_staff.blp',
   model = 'war3mapImported\\SylvanEdge.mdl',
   abilities = ' ',
   classification = 'Campaign',
@@ -14,7 +14,7 @@ createEquipmentItem('I0J2', '史莱姆微光法杖', {
 
 createEquipmentItem('I0JB', '银叶秘法杖', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Staff\\silverleaf_arcane_staff.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Staff\\BTNsilverleaf_arcane_staff.blp',
   model = 'war3mapImported\\SylvanEdge.mdl',
   abilities = ' ',
   classification = 'Campaign',

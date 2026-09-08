@@ -1,0 +1,34 @@
+---
+description: 按钮图标硬规则：英雄技能/英雄头像/装备图标统一 64×64 comp=0、BTN/DISBTN 路径推导、暗图标生成边界与验收
+globs: imports/ReplaceableTextures/**/*.blp, scripts/*.js, TS/系统/02．物品系统/**/*.ts
+alwaysApply: false
+---
+
+# 按钮图标规范（英雄技能 / 英雄头像 / 装备）
+
+## 执行摘要
+
+1. 英雄技能、英雄头像、装备三类图标：正常版与暗版统一 **64×64、BLP1、comp=0（JPEG 型）、alpha=8**。调色板（comp=1）或非 64×64 尺寸（100×100 实测）在经典引擎下显示为绿块。
+2. 物编与代码**只填正常版路径**；禁用态由引擎按路径推导，不单独指定暗版字段。
+3. Buff 图标（HeroBuff、BuffIcon）与野怪/Boss 头像是自定义展示贴图，不参与按钮推导：**不做暗版、保持原尺寸**。
+
+## 路径推导
+
+| 正常（物编引用） | 暗（引擎自动查找） |
+|------------------|--------------------|
+| `ReplaceableTextures\CommandButtons\<子目录>\BTN名.blp` | `ReplaceableTextures\CommandButtonsDisabled\<子目录>\DISBTN名.blp` |
+
+- 子目录镜像保留，文件名前缀 `BTN` → `DISBTN`；图标不在 `CommandButtons` 树下或文件名不带 BTN 前缀时推导失效，禁用态显示绿块。
+- 现行目录：技能 `CommandButtons\HeroSkill\`、头像 `CommandButtons\Hero\Portrait\`、装备 `CommandButtons\Equipment\Icon\<类别>\`；装备暗版在 `CommandButtonsDisabled\Equipment\Icon\<类别>\` 镜像。
+- 物编（objediting）与 TS 配置（首领奖励、装备 Buff 表等）引用正常路径时必须与 imports 实际文件一一对应。
+
+## 生成管线
+
+- 用 war3icon / war3-texture-preview VSCode 插件（参照既有 `scripts/generate-hero20-25-disabled-portraits.js`、`scripts/migrate-hero20-25-skill-icons.js`）：解码 BLP → `resize(64,64)` → PNG → `blp2Image(..., 'blp')`。
+- 暗版：正常图叠加插件 `images/bm_dis.png` 蒙版后转 BLP。
+- 覆盖前把原文件备份到临时目录；产物按头字段校验（magic=BLP1、comp=0、alpha=8、宽高 64）并回读解码确认，任一异常即中止。
+
+## 验收
+
+- 解包测试图核对：`tools/mpqcli/mpqcli.exe list` 确认图标进包；提取 `war3map.w3t` 检查 icon 字段路径与 mpq 文件一一对应。
+- 路径替换只动图标路径段；替换后必须证明文件其余内容逐行未变（中文文件遵守 `tooling/patch/encoding-and-patch-safety.mdc`）。

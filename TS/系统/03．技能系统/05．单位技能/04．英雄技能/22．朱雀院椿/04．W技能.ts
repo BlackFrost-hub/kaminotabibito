@@ -53,11 +53,10 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
 };
-const { createUnitEffect, destroyUnitEffect, 创建点特效, 设置特效缩放 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
-  createUnitEffect: (this: void, unit: any, attachPoint: string, modelPath: string, duration?: number, effectKey?: string) => any;
-  destroyUnitEffect: (this: void, unit: any, effectKey?: string) => void;
+const { 创建点特效, 创建单位坐标跟随特效, 销毁单位坐标跟随特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: any) => any;
-  设置特效缩放: (this: void, effect: any, scale: number) => void;
+  创建单位坐标跟随特效: (this: void, unit: any, modelPath: string, effectKey?: string, scale?: number, height?: number, animSpeed?: number, 动画索引?: number, 面向弧度?: number, RGB?: { 红: number; 绿: number; 蓝: number; 透明度?: number }, 面向跟随单位?: boolean, 前方偏移距离?: number) => any;
+  销毁单位坐标跟随特效: (this: void, unit: any, effectKey?: string) => void;
 };
 const { Sound3DII_UnitPlayReuse, Sound3DII_CooPlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.03．3D音效播放") as {
   Sound3DII_UnitPlayReuse: (this: void, path: string, unit: any, cutoff: number) => any;
@@ -211,7 +210,7 @@ function 结束W招架(this: void, 施法者: any, _技能实例ID: number | und
     unregisterDamageModifier(数据.修饰ID);
     数据.修饰ID = 0;
   }
-  destroyUnitEffect(施法者, 招架特效键);
+  销毁单位坐标跟随特效(施法者, 招架特效键);
   // 未受击自然结束：基础收尾（恢复少量 VF + 收刀斩）
   if (!数据.已招架) {
     debugLogForce("椿-W", "状态", "未受击收刀", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能ID), "实例", _技能实例ID ?? "-");
@@ -317,14 +316,26 @@ function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID
       if (数据.已结束) return;
       数据.已结束 = true;
       if (数据.修饰ID !== 0) unregisterDamageModifier(数据.修饰ID);
-      destroyUnitEffect(施法者, 招架特效键);
+      销毁单位坐标跟随特效(施法者, 招架特效键);
     },
   });
 
   // 招架窗口表现：独立招架弧（借用 W普通招架 白金半圆闪光模型——项目无独立招架窗口模型；不叠加 VF 常驻特效，VF 为 0 时窗口仍可见）
-  // 窗口结束（结束W招架）/成功（结算W反击 内结束W招架）/死亡/中断（W结束回调）统一 destroyUnitEffect(招架特效键) 销毁
-  const 招架窗口特效 = createUnitEffect(施法者, "origin", 朱雀院椿表现配置.W招架窗口.模型路径, 朱雀院椿表现配置.W招架窗口.持续秒, 招架特效键);
-  设置特效缩放(招架窗口特效, 朱雀院椿表现配置.W招架窗口.缩放);
+  // 窗口结束（结束W招架）/成功（结算W反击 内结束W招架）/死亡/中断（W结束回调）统一 销毁单位坐标跟随特效(招架特效键) 销毁
+  // 面前式：特效始终位于施法者面向正前方 75 距离处，面向跟随单位实时朝向
+  创建单位坐标跟随特效(
+    施法者,
+    朱雀院椿表现配置.W招架窗口.模型路径,
+    招架特效键,
+    朱雀院椿表现配置.W招架窗口.缩放,
+    朱雀院椿表现配置.W招架窗口.高度,
+    1,
+    undefined,
+    0,
+    朱雀院椿表现配置.W招架窗口.RGB,
+    true,
+    75,
+  );
 
   // 正面招架伤害修改器：攻击来源在正面 → 按方向与时点区分普通/完美招架
   数据.修饰ID = register护盾前拦截修改器(function W招架伤害修正(this: void, context: any): number {

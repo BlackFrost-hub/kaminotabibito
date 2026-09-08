@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0JK', '熔脉断罪斧', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\AxeHammer\\molten_vein_judgement_axe.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\AxeHammer\\BTNmolten_vein_judgement_axe.blp',
   model = 'Common\\Model\\wepon\\zb10.mdx',
   abilities = ' ',
   classification = 'Campaign',

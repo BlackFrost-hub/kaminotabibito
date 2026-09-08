@@ -9,7 +9,7 @@ createPlayerHeroUnit('E0L0', '爱蜜莉雅', {
   description = '冰之精灵术士爱蜜莉雅。',
   modelFile = 'Unit\\Hero\\Emilia\\[Hero]-Emilia_2.mdx',
   scale = 1.75,
-  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNEmiliaPortrait.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero\\Portrait\\BTNEmiliaPortrait.blp',
   normalAbilities = 'A014,AInv,AED1',
   heroAbilities = '',
   upgradesUsed = '',

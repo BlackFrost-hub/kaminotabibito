@@ -20,7 +20,7 @@ function on净化者手套触发(this: void, event: any): void {
     sourceUnit: attacker,
     effectSourceName: "净化者手套",
     effectSourceType: "装备",
-    iconOverride: "Equipment\\Icon\\Gloves\\purifier_gloves.blp",
+    iconOverride: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Gloves\\BTNpurifier_gloves.blp",
   });
   播放单位特效(装备小特效.护盾闪光, attacker, "origin", 0.8);
 }

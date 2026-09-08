@@ -9,7 +9,7 @@ createPlayerHeroUnit('E0L3', '伊蕾娜', {
   description = '灰之魔女，远程魔法与机动型英雄。',
   modelFile = 'Unit\\Hero\\Irena\\Irena.mdx',
   scale = 1.05,
-  icon = 'ReplaceableTextures\\CommandButtons\\Hero20-25\\BTNIrenaPortrait.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Hero\\Portrait\\BTNIrenaPortrait.blp',
   normalAbilities = 'A014,AInv,AID1',
   heroAbilities = '',
   upgradesUsed = '',

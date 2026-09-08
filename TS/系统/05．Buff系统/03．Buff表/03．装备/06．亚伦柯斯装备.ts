@@ -7,7 +7,7 @@ export const 亚伦柯斯装备Buff表: Record<string, BuffData> = {
   [常规BuffID.最后阵地重铠_守阵]: {
     buffID: 常规BuffID.最后阵地重铠_守阵,
     buffName: "守阵",
-    icon: "Equipment\\Icon\\Clothes\\aronkos_last_stand_heavy_armor.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNaronkos_last_stand_heavy_armor.blp",
     effect: "",
     type: "Buff:equipment:attribute",
     interval: 0,
@@ -23,7 +23,7 @@ export const 亚伦柯斯装备Buff表: Record<string, BuffData> = {
   [常规BuffID.亡者凝视面甲_亡者反击]: {
     buffID: 常规BuffID.亡者凝视面甲_亡者反击,
     buffName: "亡者反击",
-    icon: "Equipment\\Icon\\Helmet\\aronkos_dead_gaze_faceplate.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Helmet\\BTNaronkos_dead_gaze_faceplate.blp",
     effect: "",
     type: "Buff:equipment:attribute",
     interval: 0,
@@ -38,7 +38,7 @@ export const 亚伦柯斯装备Buff表: Record<string, BuffData> = {
   [常规BuffID.安魂守墓灯_安魂余光]: {
     buffID: 常规BuffID.安魂守墓灯_安魂余光,
     buffName: "安魂余光",
-    icon: "Equipment\\Icon\\Item\\aronkos_soul_rest_grave_lantern.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNaronkos_soul_rest_grave_lantern.blp",
     effect: "",
     type: "Buff:equipment:heal",
     interval: 0,
@@ -53,7 +53,7 @@ export const 亚伦柯斯装备Buff表: Record<string, BuffData> = {
   [常规BuffID.安魂守墓灯_安魂庇护]: {
     buffID: 常规BuffID.安魂守墓灯_安魂庇护,
     buffName: "安魂庇护",
-    icon: "Equipment\\Icon\\Item\\aronkos_soul_rest_grave_lantern.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNaronkos_soul_rest_grave_lantern.blp",
     effect: "",
     type: "Buff:equipment:attribute",
     interval: 0,
@@ -69,7 +69,7 @@ export const 亚伦柯斯装备Buff表: Record<string, BuffData> = {
   [常规BuffID.裂誓战躯重铠_残誓不退]: {
     buffID: 常规BuffID.裂誓战躯重铠_残誓不退,
     buffName: "残誓不退",
-    icon: "Equipment\\Icon\\Clothes\\ancestral_twin_broken_oath_heavy_armor.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNancestral_twin_broken_oath_heavy_armor.blp",
     effect: "Common\\Effect\\Form\\Shield\\AlbedoDarkGoldBarrier.mdx",
     effectMode: "attach",
     effectAttachPoint: "origin",

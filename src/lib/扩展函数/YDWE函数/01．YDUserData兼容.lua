@@ -538,26 +538,26 @@ function ____exports.YDUserDataClear(self, tableTypeName, tableKey, attr, valueT
         local ____switch26 = valueTypeName
         local ____cond26 = ____switch26 == "integer" or ____switch26 == "unitcode" or ____switch26 == "itemcode" or ____switch26 == "abilcode" or ____switch26 == "frame" or ____switch26 == "hashtable" or ____switch26 == "effectGroup" or ____switch26 == "lightningGroup" or ____switch26 == "StarStrPool" or ____switch26 == "starCircle" or ____switch26 == "Srrounder" or ____switch26 == "StarIntPool" or ____switch26 == "terraintype" or ____switch26 == "doodad"
         if ____cond26 then
-            rmInt(nil, h, p, c)
+            rmInt(h, p, c)
             return
         end
         ____cond26 = ____cond26 or (____switch26 == "real" or ____switch26 == "radian" or ____switch26 == "degree")
         if ____cond26 then
-            rmReal(nil, h, p, c)
+            rmReal(h, p, c)
             return
         end
         ____cond26 = ____cond26 or ____switch26 == "boolean"
         if ____cond26 then
-            rmBool(nil, h, p, c)
+            rmBool(h, p, c)
             return
         end
         ____cond26 = ____cond26 or (____switch26 == "string" or ____switch26 == "imagefile" or ____switch26 == "modelfile")
         if ____cond26 then
-            rmStr(nil, h, p, c)
+            rmStr(h, p, c)
             return
         end
         do
-            rmHandle(nil, h, p, c)
+            rmHandle(h, p, c)
         end
     until true
 end

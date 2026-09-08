@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0EA', '腐化猫爪手套', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Gloves\\corrupted_cat_claw_gloves.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Gloves\\BTNcorrupted_cat_claw_gloves.blp',
   model = 'war3mapImported\\Gloves.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -14,7 +14,7 @@ createEquipmentItem('I0EA', '腐化猫爪手套', {
 
 createEquipmentItem('I0EB', '纯净水源吊坠', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\pure_water_source_pendant.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNpure_water_source_pendant.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -26,7 +26,7 @@ createEquipmentItem('I0EB', '纯净水源吊坠', {
 
 createEquipmentItem('I0HF', '王城荣誉徽记', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\wangcheng_honor_badge.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNwangcheng_honor_badge.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -38,7 +38,7 @@ createEquipmentItem('I0HF', '王城荣誉徽记', {
 
 createEquipmentItem('I0HG', '王城先行者徽印', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\wangcheng_pioneer_seal.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNwangcheng_pioneer_seal.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -50,7 +50,7 @@ createEquipmentItem('I0HG', '王城先行者徽印', {
 
 createEquipmentItem('I0HI', '花灵祝福', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\flower_spirit_blessing.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNflower_spirit_blessing.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -62,7 +62,7 @@ createEquipmentItem('I0HI', '花灵祝福', {
 
 createEquipmentItem('I0E0', '执法者徽记', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\enforcer_badge.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNenforcer_badge.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -74,7 +74,7 @@ createEquipmentItem('I0E0', '执法者徽记', {
 
 createEquipmentItem('I0E1', '月光锁链护腕', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Item\\moonlight_chain_bracer.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNmoonlight_chain_bracer.blp',
   model = 'war3mapImported\\Gloves.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -86,7 +86,7 @@ createEquipmentItem('I0E1', '月光锁链护腕', {
 
 createEquipmentItem('I0EF', '地核熔炉之心', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\geocore_furnace_heart.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNgeocore_furnace_heart.blp',
   model = 'war3mapImported\\Urn.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -98,7 +98,7 @@ createEquipmentItem('I0EF', '地核熔炉之心', {
 
 createEquipmentItem('I0EI', '锻造者手套', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Gloves\\forgemaster_gauntlets.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Gloves\\BTNforgemaster_gauntlets.blp',
   model = 'war3mapImported\\Gloves.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -110,7 +110,7 @@ createEquipmentItem('I0EI', '锻造者手套', {
 
 createEquipmentItem('I0EJ', '冰焰宝珠', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\iceflame_orb.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNiceflame_orb.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -122,7 +122,7 @@ createEquipmentItem('I0EJ', '冰焰宝珠', {
 
 createEquipmentItem('I0EK', '双卫之誓', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\oath_of_twin_guards.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNoath_of_twin_guards.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -134,7 +134,7 @@ createEquipmentItem('I0EK', '双卫之誓', {
 
 createEquipmentItem('I0EL', '炽凰尾羽', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\blazing_phoenix_tail_feather.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNblazing_phoenix_tail_feather.blp',
   model = 'Objects\\InventoryItems\\runicobject\\runicobject.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -146,7 +146,7 @@ createEquipmentItem('I0EL', '炽凰尾羽', {
 
 createEquipmentItem('I0EM', '熔岩结晶护符', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\lava_crystal_amulet.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNlava_crystal_amulet.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -158,7 +158,7 @@ createEquipmentItem('I0EM', '熔岩结晶护符', {
 
 createEquipmentItem('I0EN', '怨火核心碎片', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\vengeful_fire_core_shard.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNvengeful_fire_core_shard.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -170,7 +170,7 @@ createEquipmentItem('I0EN', '怨火核心碎片', {
 
 createEquipmentItem('I0EQ', '菲尼克斯尔的宠物蛋', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\phoenix_pet_egg.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNphoenix_pet_egg.blp',
   model = 'Objects\\InventoryItems\\runicobject\\runicobject.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -182,7 +182,7 @@ createEquipmentItem('I0EQ', '菲尼克斯尔的宠物蛋', {
 
 createEquipmentItem('I0FD', '菲利斯的统御纹章', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\phyllis_command_emblem.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNphyllis_command_emblem.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -194,7 +194,7 @@ createEquipmentItem('I0FD', '菲利斯的统御纹章', {
 
 createEquipmentItem('I0FE', '剑魂狼牙坠', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\sword_soul_wolf_fang_pendant.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNsword_soul_wolf_fang_pendant.blp',
   model = 'war3mapImported\\SpiderRingItem.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -206,7 +206,7 @@ createEquipmentItem('I0FE', '剑魂狼牙坠', {
 
 createEquipmentItem('I0ET', '封印斩护腕', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Gloves\\seal_slash_bracer.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Gloves\\BTNseal_slash_bracer.blp',
   model = 'war3mapImported\\Gloves.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -218,7 +218,7 @@ createEquipmentItem('I0ET', '封印斩护腕', {
 
 createEquipmentItem('I0EV', '攻城号令圣印', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\siege_command_signet.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNsiege_command_signet.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -230,7 +230,7 @@ createEquipmentItem('I0EV', '攻城号令圣印', {
 
 createEquipmentItem('I0EW', '灵心之碎片', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\spirit_heart_shard.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNspirit_heart_shard.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -242,7 +242,7 @@ createEquipmentItem('I0EW', '灵心之碎片', {
 
 createEquipmentItem('I0EZ', '湮灭之风戒指', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\annihilation_wind_ring.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNannihilation_wind_ring.blp',
   model = 'war3mapImported\\SpiderRingItem.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -254,7 +254,7 @@ createEquipmentItem('I0EZ', '湮灭之风戒指', {
 
 createEquipmentItem('I0F0', '卡瑟拉深渊法典', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\kasera_abyss_codex.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNkasera_abyss_codex.blp',
   model = 'war3mapImported\\TomeOfRetraining.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -266,7 +266,7 @@ createEquipmentItem('I0F0', '卡瑟拉深渊法典', {
 
 createEquipmentItem('I0F1', '电鳗共生指环', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\electric_eel_symbiosis_ring.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNelectric_eel_symbiosis_ring.blp',
   model = 'war3mapImported\\SpiderRingItem.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -278,7 +278,7 @@ createEquipmentItem('I0F1', '电鳗共生指环', {
 
 createEquipmentItem('I0F2', '触手残片护符', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\tentacle_fragment_amulet.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNtentacle_fragment_amulet.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -290,7 +290,7 @@ createEquipmentItem('I0F2', '触手残片护符', {
 
 createEquipmentItem('I0F5', '绝缘珊瑚圣瓶', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\insulating_coral_sacred_bottle.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNinsulating_coral_sacred_bottle.blp',
   model = 'war3mapImported\\Urn.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -302,7 +302,7 @@ createEquipmentItem('I0F5', '绝缘珊瑚圣瓶', {
 
 createEquipmentItem('I0F7', '古树之心护符', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\ancient_tree_heart_amulet.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNancient_tree_heart_amulet.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -314,7 +314,7 @@ createEquipmentItem('I0F7', '古树之心护符', {
 
 createEquipmentItem('I0F9', '净化者手套', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Gloves\\purifier_gloves.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Gloves\\BTNpurifier_gloves.blp',
   model = 'war3mapImported\\Gloves.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -326,7 +326,7 @@ createEquipmentItem('I0F9', '净化者手套', {
 
 createEquipmentItem('I0FB', '腐朽孢子秘瓶', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\decayed_spore_secret_vial.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNdecayed_spore_secret_vial.blp',
   model = 'war3mapImported\\Urn.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -338,7 +338,7 @@ createEquipmentItem('I0FB', '腐朽孢子秘瓶', {
 
 createEquipmentItem('I0FC', '净土萌芽圣铃', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\pureland_sprout_bell.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNpureland_sprout_bell.blp',
   model = 'Objects\\InventoryItems\\runicobject\\runicobject.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -350,7 +350,7 @@ createEquipmentItem('I0FC', '净土萌芽圣铃', {
 
 createEquipmentItem('I0FH', '盗贼首领徽记', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\rogue_leader_emblem.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNrogue_leader_emblem.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -362,7 +362,7 @@ createEquipmentItem('I0FH', '盗贼首领徽记', {
 
 createEquipmentItem('I0FI', '阴影陷阱装置', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\shadow_trap_device.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNshadow_trap_device.blp',
   model = 'war3mapImported\\Urn.mdl',
   abilities = 'IP00',
   cooldownGroup = 'IP00',
@@ -376,7 +376,7 @@ createEquipmentItem('I0FI', '阴影陷阱装置', {
 
 createEquipmentItem('I0FS', '安魂守墓灯', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\aronkos_soul_rest_grave_lantern.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNaronkos_soul_rest_grave_lantern.blp',
   model = 'war3mapImported\\Urn.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -388,7 +388,7 @@ createEquipmentItem('I0FS', '安魂守墓灯', {
 
 createEquipmentItem('I0FY', '双钥归一棱镜', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\ancestral_twin_dual_key_prism.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNancestral_twin_dual_key_prism.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -400,7 +400,7 @@ createEquipmentItem('I0FY', '双钥归一棱镜', {
 
 createEquipmentItem('I0FZ', '月白归静圣铃', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\ancestral_twin_moonwhite_rest_bell.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNancestral_twin_moonwhite_rest_bell.blp',
   model = 'Objects\\InventoryItems\\runicobject\\runicobject.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -412,7 +412,7 @@ createEquipmentItem('I0FZ', '月白归静圣铃', {
 
 createEquipmentItem('I0G1', '光辉翠绿宝石', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\ainz_radiant_green_gemstone.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNainz_radiant_green_gemstone.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -424,7 +424,7 @@ createEquipmentItem('I0G1', '光辉翠绿宝石', {
 
 createEquipmentItem('I0G6', '菲利斯的战阵徽章', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\felice_battleline_emblem.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNfelice_battleline_emblem.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -436,7 +436,7 @@ createEquipmentItem('I0G6', '菲利斯的战阵徽章', {
 
 createEquipmentItem('I0G7', '第二军团攻城秘戒', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\second_legion_siege_arcane_ring.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNsecond_legion_siege_arcane_ring.blp',
   model = 'war3mapImported\\SpiderRingItem.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -448,7 +448,7 @@ createEquipmentItem('I0G7', '第二军团攻城秘戒', {
 
 createEquipmentItem('I0H0', '淤泥猎手腕甲', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Gloves\\mia_sludge_hunter_bracers.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Gloves\\BTNmia_sludge_hunter_bracers.blp',
   model = 'war3mapImported\\Gloves.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -460,7 +460,7 @@ createEquipmentItem('I0H0', '淤泥猎手腕甲', {
 
 createEquipmentItem('I0H3', '净水核心护符', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\mia_purified_water_core_amulet.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNmia_purified_water_core_amulet.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -472,7 +472,7 @@ createEquipmentItem('I0H3', '净水核心护符', {
 
 createEquipmentItem('I0H4', '星露花', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\starlit_flower.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNstarlit_flower.blp',
   model = 'war3mapImported\\AnimatedFlowerAv343.mdx',
   abilities = ' ',
   classification = 'Charged',
@@ -491,7 +491,7 @@ createEquipmentItem('I0H4', '星露花', {
 
 createEquipmentItem('I0H5', '晨曦花', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\dawn_flower.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNdawn_flower.blp',
   model = 'war3mapImported\\AnimatedFlowerDv014.mdx',
   abilities = ' ',
   classification = 'Charged',
@@ -510,7 +510,7 @@ createEquipmentItem('I0H5', '晨曦花', {
 
 createEquipmentItem('I0H6', '月影花', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\moonshadow_flower.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNmoonshadow_flower.blp',
   model = 'war3mapImported\\AnimatedFlowerEv017.mdx',
   abilities = ' ',
   classification = 'Charged',
@@ -529,7 +529,7 @@ createEquipmentItem('I0H6', '月影花', {
 
 createEquipmentItem('I0HJ', '月纹熊革', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\moonmarked_bear_leather.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNmoonmarked_bear_leather.blp',
   model = 'Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -548,7 +548,7 @@ createEquipmentItem('I0HJ', '月纹熊革', {
 
 createEquipmentItem('I0HK', '古树韧藤', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\ancient_tree_tough_vine.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNancient_tree_tough_vine.blp',
   model = 'Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -567,7 +567,7 @@ createEquipmentItem('I0HK', '古树韧藤', {
 
 createEquipmentItem('I0HL', '食人花灵纤', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\devouring_flower_spirit_fiber.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNdevouring_flower_spirit_fiber.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -586,7 +586,7 @@ createEquipmentItem('I0HL', '食人花灵纤', {
 
 createEquipmentItem('I0HM', '熔痕犬牙', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\scorched_hellhound_fang.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNscorched_hellhound_fang.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -605,7 +605,7 @@ createEquipmentItem('I0HM', '熔痕犬牙', {
 
 createEquipmentItem('I0HN', '恶魔锻火结晶', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\demon_forgefire_crystal.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNdemon_forgefire_crystal.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -624,7 +624,7 @@ createEquipmentItem('I0HN', '恶魔锻火结晶', {
 
 createEquipmentItem('I0JU', '王墓守誓徽章', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\royal_tomb_oathkeeper_medallion.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroyal_tomb_oathkeeper_medallion.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -636,7 +636,7 @@ createEquipmentItem('I0JU', '王墓守誓徽章', {
 
 createEquipmentItem('I0JV', '恒燃余焰核心', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\eternal_ember_forge_core.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNeternal_ember_forge_core.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -648,7 +648,7 @@ createEquipmentItem('I0JV', '恒燃余焰核心', {
 
 createEquipmentItem('I0JW', '余烬寻路灯', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\ember_wayfinder_lantern.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNember_wayfinder_lantern.blp',
   model = 'war3mapImported\\Lightforged Lantern.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -660,7 +660,7 @@ createEquipmentItem('I0JW', '余烬寻路灯', {
 
 createEquipmentItem('I0K2', '恶契饮血护腕', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Item\\demonic_blood_pact_bracer.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNdemonic_blood_pact_bracer.blp',
   model = 'war3mapImported\\Gloves.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -672,7 +672,7 @@ createEquipmentItem('I0K2', '恶契饮血护腕', {
 
 createEquipmentItem('I0K3', '裂境黑曜护符', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\rift_obsidian_amulet.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNrift_obsidian_amulet.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -684,7 +684,7 @@ createEquipmentItem('I0K3', '裂境黑曜护符', {
 
 createEquipmentItem('I0K4', '魔焰统御法印', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\demonflame_dominion_sigil.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNdemonflame_dominion_sigil.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -696,7 +696,7 @@ createEquipmentItem('I0K4', '魔焰统御法印', {
 
 createEquipmentItem('I0G8', '祭血之皿', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\blood_pact_bowl.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNblood_pact_bowl.blp',
   model = 'Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -708,7 +708,7 @@ createEquipmentItem('I0G8', '祭血之皿', {
 
 createEquipmentItem('I0HH', '祖地纹章徽记', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\elven_herald_crest.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNelven_herald_crest.blp',
   model = 'Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -720,7 +720,7 @@ createEquipmentItem('I0HH', '祖地纹章徽记', {
 
 createEquipmentItem('I0K6', '封印旧档书签', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\sealed_archive_bookmark.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNsealed_archive_bookmark.blp',
   model = 'war3mapImported\\TomeOfRetraining.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -732,7 +732,7 @@ createEquipmentItem('I0K6', '封印旧档书签', {
 
 createEquipmentItem('I0K7', '王庭旧誓徽章', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\royal_oath_badge.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroyal_oath_badge.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -744,7 +744,7 @@ createEquipmentItem('I0K7', '王庭旧誓徽章', {
 
 createEquipmentItem('I0K8', '影旗追猎徽记', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\shadow_oath_hunt_signet.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNshadow_oath_hunt_signet.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -756,7 +756,7 @@ createEquipmentItem('I0K8', '影旗追猎徽记', {
 
 createEquipmentItem('I0K9', '夜行教团坠饰', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\night_cult_pendant.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNnight_cult_pendant.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -768,7 +768,7 @@ createEquipmentItem('I0K9', '夜行教团坠饰', {
 
 createEquipmentItem('I0KA', '深井活水囊', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\deepwell_water_flask.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNdeepwell_water_flask.blp',
   model = 'war3mapImported\\Urn.mdl',
   abilities = 'IN02',
   cooldownGroup = 'IN02',
@@ -782,7 +782,7 @@ createEquipmentItem('I0KA', '深井活水囊', {
 
 createEquipmentItem('I0KI', '焚羽余烬晶核', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\phoenix_ember_core_postbattle.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNphoenix_ember_core_postbattle.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -794,7 +794,7 @@ createEquipmentItem('I0KI', '焚羽余烬晶核', {
 
 createEquipmentItem('I0KC', '七晶封印棱章', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\seven_crystal_seal_prism.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNseven_crystal_seal_prism.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -806,7 +806,7 @@ createEquipmentItem('I0KC', '七晶封印棱章', {
 
 createEquipmentItem('I0KD', '英魂归寂长灯', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\soul_rest_lantern.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNsoul_rest_lantern.blp',
   model = 'war3mapImported\\Lightforged Lantern.mdl',
   abilities = ' ',
   classification = 'PowerUp',
@@ -818,7 +818,7 @@ createEquipmentItem('I0KD', '英魂归寂长灯', {
 
 createEquipmentItem('I0KH', '熔渊坠饰', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Item\\abyss_cult_pendant_charm.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNabyss_cult_pendant_charm.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'PowerUp',

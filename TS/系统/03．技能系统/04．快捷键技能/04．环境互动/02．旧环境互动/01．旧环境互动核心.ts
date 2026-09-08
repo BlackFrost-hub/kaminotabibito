@@ -35,6 +35,9 @@ const { 启动Boss战运行 } = require("系统.03．技能系统.06．AI自动�
 const { SFB_setBuff } = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口") as {
   SFB_setBuff: (this: void, 来源单位: any, 目标单位: any, BuffID: number, 持续秒: number) => void;
 };
+const { 应用Boss战启动属性配置 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用") as {
+  应用Boss战启动属性配置: (this: void, 单位: any) => void;
+};
 
 import {
   旧环境互动Boss单位ID,
@@ -100,6 +103,8 @@ function 处理Boss入口(this: void, _玩家ID: number, 施法单位: any, 调�
   YDUserDataSetSafe("string", "Boss战", "绑定单位", "unit", Boss单位);
   YDUserDataSetSafe("string", "Boss战", "触发玩家", "unit", 施法单位);
   YDUserDataSetSafe("unit", Boss单位, "闪避率", "real", 0.2);
+  // 传送/音乐/弱点/护盾全部由战斗启动属性配置表驱动（见 16．史莱姆.ts）
+  应用Boss战启动属性配置(Boss单位);
   const 旧Boss随从 = jglobals.gg_unit_n05Q_0003;
   if (旧Boss随从 != null && 旧Boss随从 !== 0) SetUnitOwner(旧Boss随从, Player(5), true);
   addDelayedCallback(3000, 启动旧Boss战, { Boss单位, 触发单位: 施法单位 });

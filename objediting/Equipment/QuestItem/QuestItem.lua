@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0ES', '残缺的魔法信件', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\QuestItem\\broken_magic_letter.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\QuestItem\\BTNbroken_magic_letter.blp',
   model = 'Objects\\InventoryItems\\tome\\tome.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -18,7 +18,7 @@ createEquipmentItem('I0ES', '残缺的魔法信件', {
 
 createEquipmentItem('I0G9', '火灵核心', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\Item\\vengeful_fire_core_shard.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNvengeful_fire_core_shard.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -34,7 +34,7 @@ createEquipmentItem('I0G9', '火灵核心', {
 
 createEquipmentItem('I0JX', '迟到的熔火酒', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\QuestItem\\late_molten_wine.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\QuestItem\\BTNlate_molten_wine.blp',
   model = 'Equipment\\Model\\QuestItem\\BrownCup.mdx',
   abilities = ' ',
   classification = 'Charged',
@@ -51,7 +51,7 @@ createEquipmentItem('I0JX', '迟到的熔火酒', {
 
 createEquipmentItem('I0JY', '遗失的仪式角饰', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\QuestItem\\lost_ritual_horn.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\QuestItem\\BTNlost_ritual_horn.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -68,7 +68,7 @@ createEquipmentItem('I0JY', '遗失的仪式角饰', {
 
 createEquipmentItem('I0JZ', '王族旧誓印', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\QuestItem\\royal_old_oath_seal.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\QuestItem\\BTNroyal_old_oath_seal.blp',
   model = 'Objects\\InventoryItems\\tome\\tome.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -85,7 +85,7 @@ createEquipmentItem('I0JZ', '王族旧誓印', {
 
 createEquipmentItem('I0K0', '余焰采样器', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\QuestItem\\ember_sampling_vessel.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\QuestItem\\BTNember_sampling_vessel.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -102,7 +102,7 @@ createEquipmentItem('I0K0', '余焰采样器', {
 
 createEquipmentItem('I0K1', '稳定余焰样本', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\QuestItem\\stable_ember_sample.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\QuestItem\\BTNstable_ember_sample.blp',
   model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -119,7 +119,7 @@ createEquipmentItem('I0K1', '稳定余焰样本', {
 
 createEquipmentItem('I0KE', '守誓圣铠合成书', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\QuestItem\\oath_armor_recipe_book.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\QuestItem\\BTNoath_armor_recipe_book.blp',
   model = 'war3mapImported\\SpellBook.mdl',
   abilities = ' ',
   classification = 'Charged',
@@ -136,7 +136,7 @@ createEquipmentItem('I0KE', '守誓圣铠合成书', {
 
 createEquipmentItem('I0KG', '熔渊坠饰合成书', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\QuestItem\\abyss_pendant_recipe_book.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\QuestItem\\BTNabyss_pendant_recipe_book.blp',
   model = 'war3mapImported\\SpellBook.mdl',
   abilities = ' ',
   classification = 'Charged',

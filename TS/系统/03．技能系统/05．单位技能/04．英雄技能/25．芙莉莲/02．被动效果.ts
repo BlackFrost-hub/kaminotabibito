@@ -56,6 +56,9 @@ const platformAbilityApi = require("平台扩展API取值") as {
 const platformAbilityAction = require("平台扩展API动作") as {
   技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
 };
+const { calcPassiveCooldown: 计算被动冷却 } = require("系统.03．技能系统.01．技能冷却.01．冷却缩减计算") as {
+  calcPassiveCooldown: (this: void, unit: any, baseSeconds: number, abilityId?: number) => number;
+};
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
@@ -194,10 +197,12 @@ function 启动隐匿计时(this: void, 英雄: any): void {
   const id = GetHandleId(英雄);
   const 旧ID = 隐匿计时回调表[id];
   if (旧ID != null) removeDelayedCallbackSafe(旧ID);
-  const 状态 = 取英雄状态(英雄);
   // 花田内静止时恢复倍率由 D 模块通过 花田判定接口 提供；此处按当前位置判定一次
   const 静止倍率 = 花田判定接口.在花田内静止(英雄) ? 被动配置.花田隐匿恢复倍率 : 1;
-  const 需要毫秒 = (被动配置.隐匿静默秒 / (静止倍率 > 0 ? 静止倍率 : 1)) * 1000;
+  // 隐匿静默受冷却缩减影响（读单位冷却缩减→应用通用/独立上限→乘算）；花田倍率在缩减后仍生效
+  let 基础静默秒 = 计算被动冷却(英雄, 被动配置.隐匿静默秒);
+  if (静止倍率 > 0 && 静止倍率 !== 1) 基础静默秒 = 基础静默秒 / 静止倍率;
+  const 需要毫秒 = 基础静默秒 * 1000;
   const 回调ID = addDelayedCallbackSafe(需要毫秒, function 进入隐匿(this: void): void {
     隐匿计时回调表[id] = undefined;
     const s = 英雄状态表[id];
@@ -211,7 +216,6 @@ function 启动隐匿计时(this: void, 英雄: any): void {
     registerManualBuff(英雄, 隐匿BuffID, 9999, 1, { stack: 1 });
   });
   隐匿计时回调表[id] = 回调ID;
-  void 状态;
 }
 
 // 延迟回调安全封装（避免直接依赖两个计时器导出名）

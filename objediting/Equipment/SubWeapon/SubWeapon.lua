@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0FQ', '英灵送葬法典', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\SubWeapon\\aronkos_heroic_funeral_codex.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNaronkos_heroic_funeral_codex.blp',
   model = 'war3mapImported\\TomeOfRetraining.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -14,7 +14,7 @@ createEquipmentItem('I0FQ', '英灵送葬法典', {
 
 createEquipmentItem('I0FV', '苍影校魂法典', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\SubWeapon\\ancestral_twin_blue_shadow_soul_codex.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNancestral_twin_blue_shadow_soul_codex.blp',
   model = 'war3mapImported\\TomeOfRetraining.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -26,7 +26,7 @@ createEquipmentItem('I0FV', '苍影校魂法典', {
 
 createEquipmentItem('I0G0', '超位魔法残章·天空坠落', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\SubWeapon\\ainz_super_tier_fragment_fallen_down.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNainz_super_tier_fragment_fallen_down.blp',
   model = 'war3mapImported\\TomeOfRetraining.mdl',
   abilities = 'IP02',
   cooldownGroup = 'IP02',
@@ -40,7 +40,7 @@ createEquipmentItem('I0G0', '超位魔法残章·天空坠落', {
 
 createEquipmentItem('I0G2', '黑翼守护重盾', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\SubWeapon\\ainz_black_wing_guard_heavy_shield.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNainz_black_wing_guard_heavy_shield.blp',
   model = 'war3mapImported\\ItemRoundShield.mdl',
   abilities = 'IU00',
   cooldownGroup = 'IU00',

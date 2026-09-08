@@ -1,18 +1,18 @@
 -- 伊蕾娜 Q/W/E/R/D 通魔物编壳；通魔持续字段承载动态百分比蓝耗。
 
 local ICONS = {
-  Q = 'ReplaceableTextures\\CommandButtons\\Irena\\BTNIrenaQ.blp',
-  W = 'ReplaceableTextures\\CommandButtons\\Irena\\BTNIrenaW.blp',
-  E = 'ReplaceableTextures\\CommandButtons\\Irena\\BTNIrenaE.blp',
-  R = 'ReplaceableTextures\\CommandButtons\\Irena\\BTNIrenaR.blp',
-  D = 'ReplaceableTextures\\CommandButtons\\Irena\\BTNIrenaD.blp',
+  Q = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNIrenaQ.blp',
+  W = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNIrenaW.blp',
+  E = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNIrenaE.blp',
+  R = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNIrenaR.blp',
+  D = 'ReplaceableTextures\\CommandButtons\\HeroSkill\\BTNIrenaD.blp',
 }
 local DISABLED_ICONS = {
-  Q = 'ReplaceableTextures\\CommandButtonsDisabled\\Irena\\DISBTNIrenaQ.blp',
-  W = 'ReplaceableTextures\\CommandButtonsDisabled\\Irena\\DISBTNIrenaW.blp',
-  E = 'ReplaceableTextures\\CommandButtonsDisabled\\Irena\\DISBTNIrenaE.blp',
-  R = 'ReplaceableTextures\\CommandButtonsDisabled\\Irena\\DISBTNIrenaR.blp',
-  D = 'ReplaceableTextures\\CommandButtonsDisabled\\Irena\\DISBTNIrenaD.blp',
+  Q = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNIrenaQ.blp',
+  W = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNIrenaW.blp',
+  E = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNIrenaE.blp',
+  R = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNIrenaR.blp',
+  D = 'ReplaceableTextures\\CommandButtonsDisabled\\HeroSkill\\DISBTNIrenaD.blp',
 }
 local HERO_LEVELS = 15
 

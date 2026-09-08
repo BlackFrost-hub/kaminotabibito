@@ -15,7 +15,7 @@ function on攻城号令圣印触发(this: void, event: any): void {
       sourceUnit: attacker,
       effectSourceName: "攻城号令圣印",
       effectSourceType: "装备",
-      iconOverride: "Equipment\\Icon\\Item\\siege_command_signet.blp",
+      iconOverride: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNsiege_command_signet.blp",
     });
     if (取当前生命(unit) < 取最大生命(unit) * 0.5) 开始通用护盾(attacker, unit, 850, 5, "攻城号令圣印");
   }

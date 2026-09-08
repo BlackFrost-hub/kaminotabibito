@@ -7,7 +7,7 @@ export const 瑟兰迪尔装备Buff表: Record<string, BuffData> = {
   [常规BuffID.精灵执法披风_秩序领域]: {
     buffID: 常规BuffID.精灵执法披风_秩序领域,
     buffName: "秩序领域",
-    icon: "Equipment\\Icon\\Clothes\\elven_enforcer_cloak.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNelven_enforcer_cloak.blp",
     effect: "",
     type: "Debuff:equipment:aura",
     interval: 0,

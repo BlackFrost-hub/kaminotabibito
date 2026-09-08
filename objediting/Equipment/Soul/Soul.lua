@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0EE', '米亚的项圈', {
   baseId = 'evtl',
-  icon = 'Equipment\\Icon\\Item\\mia_collar.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNmia_collar.blp',
   model = 'war3mapImported\\ItemNerzhulMask.mdx',
   abilities = ' ',
   classification = 'Miscellaneous',
@@ -14,7 +14,7 @@ createEquipmentItem('I0EE', '米亚的项圈', {
 
 createEquipmentItem('I0E4', '瑟兰迪尔的决心', {
   baseId = 'evtl',
-  icon = 'Equipment\\Icon\\Soul\\thranduil_resolve.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Soul\\BTNthranduil_resolve.blp',
   model = 'war3mapImported\\ItemNerzhulMask.mdx',
   abilities = 'IN00',
   cooldownGroup = 'IN00',
@@ -28,7 +28,7 @@ createEquipmentItem('I0E4', '瑟兰迪尔的决心', {
 
 createEquipmentItem('I0FR', '旧誓残响徽记', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Soul\\aronkos_old_oath_echo_emblem.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Soul\\BTNaronkos_old_oath_echo_emblem.blp',
   model = 'war3mapImported\\RingOfProtection.mdl',
   abilities = ' ',
   classification = 'Miscellaneous',
@@ -40,7 +40,7 @@ createEquipmentItem('I0FR', '旧誓残响徽记', {
 
 createEquipmentItem('I0G5', '英灵战乙女蔷薇镜', {
   baseId = 'azhr',
-  icon = 'Equipment\\Icon\\Soul\\shalltear_valkyrie_rose_mirror.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Soul\\BTNshalltear_valkyrie_rose_mirror.blp',
   model = 'war3mapImported\\SpiderRingItem.mdl',
   abilities = ' ',
   classification = 'Miscellaneous',

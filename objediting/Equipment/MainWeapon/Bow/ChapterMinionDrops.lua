@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0J1', '地精拼装短弓', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Bow\\goblin_scrap_shortbow.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Bow\\BTNgoblin_scrap_shortbow.blp',
   model = 'Common\\Model\\wepon\\zb16.mdx',
   abilities = ' ',
   classification = 'Campaign',
@@ -14,7 +14,7 @@ createEquipmentItem('I0J1', '地精拼装短弓', {
 
 createEquipmentItem('I0JA', '精灵巡林长弓', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Bow\\elven_ranger_longbow.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Bow\\BTNelven_ranger_longbow.blp',
   model = 'Common\\Model\\wepon\\zb16.mdx',
   abilities = ' ',
   classification = 'Campaign',
@@ -26,7 +26,7 @@ createEquipmentItem('I0JA', '精灵巡林长弓', {
 
 createEquipmentItem('I0JL', '灰烬追猎弓', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\MainWeapon\\Bow\\ash_hunter_bow.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Bow\\BTNash_hunter_bow.blp',
   model = 'Common\\Model\\wepon\\zb16.mdx',
   abilities = ' ',
   classification = 'Campaign',

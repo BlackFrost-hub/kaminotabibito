@@ -7,6 +7,9 @@ function _____53D6_8F83_5927_6570(a, b)
     return a > b and a or b
 end
 local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算")
+local round = ____require_result_0.round
+local ceil = ____require_result_0.ceil
 local DzGetGameUI = japi.DzGetGameUI
 local DzLoadToc = japi.DzLoadToc
 local DzCreateFrame = japi.DzCreateFrame
@@ -114,7 +117,7 @@ local function _____521B_5EFAFdf_56FE_6807_5E27(name, parent, contextId)
     return DzCreateFrame(name, parent, contextId)
 end
 local function _____683C_5F0F_5316_6574_6570(value)
-    return tostring(math.floor(value + 0.5)
+    return tostring(round(value)
     )
 end
 local function _____683C_5F0F_5316_91D1_8272_6574_6570(value)
@@ -177,7 +180,7 @@ local function _____8BA1_7B97_63D0_793A_6B63_6587_884C_6570(text)
         local visibleWidth = _____8BA1_7B97_53EF_89C1_6587_672C_5BBD_5EA6(lineText)
         count = count + _____53D6_8F83_5927_6570(
             1,
-            math.ceil(visibleWidth / BODY_WRAP_VISIBLE_WIDTH)
+            ceil(visibleWidth / BODY_WRAP_VISIBLE_WIDTH)
         )
         if nextIndex < 0 then
             break

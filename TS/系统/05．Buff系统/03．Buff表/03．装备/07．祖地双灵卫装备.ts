@@ -7,7 +7,7 @@ export const 祖地双灵卫装备Buff表: Record<string, BuffData> = {
   [常规BuffID.赤誓断界剑_誓锋壁进]: {
     buffID: 常规BuffID.赤誓断界剑_誓锋壁进,
     buffName: "誓锋壁进",
-    icon: "Equipment\\Icon\\MainWeapon\\Sword\\ancestral_twin_red_oath_boundary_sword.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Sword\\BTNancestral_twin_red_oath_boundary_sword.blp",
     effect: "",
     type: "Buff:equipment:attack-enhance",
     interval: 0,
@@ -23,7 +23,7 @@ export const 祖地双灵卫装备Buff表: Record<string, BuffData> = {
   [常规BuffID.苍影校魂法典_灵识校准]: {
     buffID: 常规BuffID.苍影校魂法典_灵识校准,
     buffName: "灵识校准",
-    icon: "Equipment\\Icon\\SubWeapon\\ancestral_twin_blue_shadow_soul_codex.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNancestral_twin_blue_shadow_soul_codex.blp",
     effect: "",
     type: "Debuff:equipment:attribute:magic",
     interval: 0,
@@ -38,7 +38,7 @@ export const 祖地双灵卫装备Buff表: Record<string, BuffData> = {
   [常规BuffID.灵印折步靴_折步回身]: {
     buffID: 常规BuffID.灵印折步靴_折步回身,
     buffName: "折步回身",
-    icon: "Equipment\\Icon\\Shoes\\ancestral_twin_spirit_step_boots.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Shoes\\BTNancestral_twin_spirit_step_boots.blp",
     effect: "",
     type: "Buff:equipment:attribute",
     interval: 0,
@@ -55,7 +55,7 @@ export const 祖地双灵卫装备Buff表: Record<string, BuffData> = {
   [常规BuffID.月白归静圣铃_净誓余辉]: {
     buffID: 常规BuffID.月白归静圣铃_净誓余辉,
     buffName: "净誓余辉",
-    icon: "Equipment\\Icon\\Item\\ancestral_twin_moonwhite_rest_bell.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNancestral_twin_moonwhite_rest_bell.blp",
     effect: "Common\\Effect\\Form\\Debuff\\SpiritGuardPurificationRecoil.mdx",
     effectMode: "attach",
     effectAttachPoint: "origin",

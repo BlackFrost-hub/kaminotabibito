@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0J8', '沙蝎硬尾腰甲', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\Pants\\sand_scorpion_tail_waistguard.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Pants\\BTNsand_scorpion_tail_waistguard.blp',
   model = 'war3mapImported\\Item Jerkin.mdl',
   abilities = ' ',
   classification = 'Permanent',

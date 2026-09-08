@@ -7,7 +7,7 @@ export const 异界装备Buff表: Record<string, BuffData> = {
   [常规BuffID.光辉翠绿宝石_翠绿防护]: {
     buffID: 常规BuffID.光辉翠绿宝石_翠绿防护,
     buffName: "翠绿防护",
-    icon: "Equipment\\Icon\\Item\\ainz_radiant_green_gemstone.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNainz_radiant_green_gemstone.blp",
     effect: "",
     type: "Buff:equipment:immunity",
     interval: 0,
@@ -23,7 +23,7 @@ export const 异界装备Buff表: Record<string, BuffData> = {
   [常规BuffID.黑翼守护重盾_守护者契约]: {
     buffID: 常规BuffID.黑翼守护重盾_守护者契约,
     buffName: "黑翼守誓",
-    icon: "Equipment\\Icon\\SubWeapon\\ainz_black_wing_guard_heavy_shield.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNainz_black_wing_guard_heavy_shield.blp",
     effect: "",
     type: "Buff:equipment:guardian-link",
     interval: 0,
@@ -38,7 +38,7 @@ export const 异界装备Buff表: Record<string, BuffData> = {
   [常规BuffID.黑翼守护重盾_受护者契约]: {
     buffID: 常规BuffID.黑翼守护重盾_受护者契约,
     buffName: "黑翼受护",
-    icon: "Equipment\\Icon\\SubWeapon\\ainz_black_wing_guard_heavy_shield.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNainz_black_wing_guard_heavy_shield.blp",
     effect: "",
     type: "Buff:equipment:guardian-link",
     interval: 0,
@@ -71,7 +71,7 @@ export const 异界装备Buff表: Record<string, BuffData> = {
   [常规BuffID.真祖女武神血铠_血晶]: {
     buffID: 常规BuffID.真祖女武神血铠_血晶,
     buffName: "血晶",
-    icon: "Equipment\\Icon\\Clothes\\shalltear_true_vampire_valkyrie_blood_armor.blp",
+    icon: "ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNshalltear_true_vampire_valkyrie_blood_armor.blp",
     effect: "",
     type: "Buff:equipment:resource:stack",
     interval: 0,

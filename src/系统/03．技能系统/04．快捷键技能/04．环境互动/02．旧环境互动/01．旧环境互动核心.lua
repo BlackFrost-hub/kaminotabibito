@@ -45,8 +45,10 @@ local ____require_result_8 = require("系统.03．技能系统.06．AI自动使�
 _____542F_52A8Boss_6218_8FD0_884C = ____require_result_8["启动Boss战运行"]
 local ____require_result_9 = require("lib.扩展函数.Star扩展函数.Star扩展库.04B．快速Buff接口")
 local SFB_setBuff = ____require_result_9.SFB_setBuff
-local ____require_result_10 = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具")
-local _____89E3_6790_914D_7F6E_5185_90E8ID = ____require_result_10["解析配置内部ID"]
+local ____require_result_10 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.00．战斗启动属性.04．战斗启动属性应用")
+local _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E = ____require_result_10["应用Boss战启动属性配置"]
+local ____require_result_11 = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具")
+local _____89E3_6790_914D_7F6E_5185_90E8ID = ____require_result_11["解析配置内部ID"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHeroLevel = jass.GetHeroLevel
@@ -128,6 +130,7 @@ local function _____5904_7406Boss_5165_53E3(______73A9_5BB6ID, _____65BD_6CD5_53
         "real",
         0.2
     )
+    _____5E94_7528Boss_6218_542F_52A8_5C5E_6027_914D_7F6E(____Boss_5355_4F4D)
     local _____65E7Boss_968F_4ECE = jglobals.gg_unit_n05Q_0003
     if _____65E7Boss_968F_4ECE ~= nil and _____65E7Boss_968F_4ECE ~= 0 then
         SetUnitOwner(

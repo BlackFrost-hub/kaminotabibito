@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0JJ', '旧怨回声法典', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\SubWeapon\\old_grudge_echo_codex.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNold_grudge_echo_codex.blp',
   model = 'war3mapImported\\TomeOfRetraining.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -14,7 +14,7 @@ createEquipmentItem('I0JJ', '旧怨回声法典', {
 
 createEquipmentItem('I0JM', '炽魂祷典', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\SubWeapon\\blazing_soul_prayer_codex.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNblazing_soul_prayer_codex.blp',
   model = 'war3mapImported\\TomeOfRetraining.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -26,7 +26,7 @@ createEquipmentItem('I0JM', '炽魂祷典', {
 
 createEquipmentItem('I0JN', '封印余烬法典', {
   baseId = 'ratf',
-  icon = 'Equipment\\Icon\\SubWeapon\\seal_ember_codex.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNseal_ember_codex.blp',
   model = 'war3mapImported\\TomeOfRetraining.mdl',
   abilities = ' ',
   classification = 'Permanent',
@@ -38,7 +38,7 @@ createEquipmentItem('I0JN', '封印余烬法典', {
 
 createEquipmentItem('I0JP', '冥火守门盾', {
   baseId = 'rde1',
-  icon = 'Equipment\\Icon\\SubWeapon\\netherfire_gatekeeper_shield.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNnetherfire_gatekeeper_shield.blp',
   model = 'war3mapImported\\ItemRoundShield.mdl',
   abilities = ' ',
   classification = 'Permanent',

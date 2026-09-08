@@ -2,7 +2,7 @@
 
 createEquipmentItem('I0E2', '审判之锋长剑', {
   baseId = 'ratc',
-  icon = 'Equipment\\Icon\\MainWeapon\\Sword\\judgement_edge_longsword.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Sword\\BTNjudgement_edge_longsword.blp',
   model = 'war3mapImported\\ysj.mdx',
   abilities = ' ',
   classification = 'Campaign',
@@ -14,7 +14,7 @@ createEquipmentItem('I0E2', '审判之锋长剑', {
 
 createEquipmentItem('I0EU', '异形化残刃', {
   baseId = 'ratc',
-  icon = 'Equipment\\Icon\\MainWeapon\\Sword\\aberrant_residual_blade.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Sword\\BTNaberrant_residual_blade.blp',
   model = 'Common\\Model\\wepon\\zb12.mdx',
   abilities = ' ',
   classification = 'Campaign',
@@ -26,7 +26,7 @@ createEquipmentItem('I0EU', '异形化残刃', {
 
 createEquipmentItem('I0FT', '赤誓断界剑', {
   baseId = 'ratc',
-  icon = 'Equipment\\Icon\\MainWeapon\\Sword\\ancestral_twin_red_oath_boundary_sword.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Sword\\BTNancestral_twin_red_oath_boundary_sword.blp',
   model = 'war3mapImported\\ysj.mdx',
   abilities = ' ',
   classification = 'Campaign',
@@ -38,7 +38,7 @@ createEquipmentItem('I0FT', '赤誓断界剑', {
 
 createEquipmentItem('I0K5', '赤契噬魂刃', {
   baseId = 'ratc',
-  icon = 'Equipment\\Icon\\MainWeapon\\Sword\\crimson_soul_devouring_blade.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Sword\\BTNcrimson_soul_devouring_blade.blp',
   model = 'Common\\Model\\wepon\\zb12.mdx',
   abilities = ' ',
   classification = 'Campaign',
@@ -51,7 +51,7 @@ createEquipmentItem('I0K5', '赤契噬魂刃', {
 
 createEquipmentItem('I0KB', '王庭礼剑', {
   baseId = 'ratc',
-  icon = 'Equipment\\Icon\\MainWeapon\\Sword\\royal_court_ceremonial_sword.blp',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Sword\\BTNroyal_court_ceremonial_sword.blp',
   model = 'war3mapImported\\ysj.mdx',
   abilities = ' ',
   classification = 'Campaign',
