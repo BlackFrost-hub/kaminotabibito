@@ -14,15 +14,11 @@ function tostringCompat(value)
     return "" .. tostring(value)
 end
 local _____6570_5B66_8FD0_7B97 = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算")
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_0.debugLog
-local setDebug = ____require_result_0.setDebug
-local ____require_result_1 = require("lib.扩展函数.物品相关函数.装备数据查询")
-local _____662F_5426_767E_5206_6BD4_88C5_5907_5C5E_6027_540D = ____require_result_1["是否百分比装备属性名"]
+local ____require_result_0 = require("lib.扩展函数.物品相关函数.装备数据查询")
+local _____662F_5426_767E_5206_6BD4_88C5_5907_5C5E_6027_540D = ____require_result_0["是否百分比装备属性名"]
 local MAX_SLOTS = 20
 local jass = require("jass.common")
 local round = _____6570_5B66_8FD0_7B97.round
-setDebug(nil, "BuffUI.VM", false)
 local TIP_COLOR_BODY = "|cfffff2d9"
 local TIP_COLOR_SOURCE = "|cffffd700"
 local function clampMin(value, min)
@@ -145,34 +141,13 @@ function ____exports.buildBuffBarViewModel(unit)
         end
     end
     if not unit or not isUnitValid(unit) then
-        debugLog(
-            nil,
-            "BuffUI.VM",
-            "return-empty",
-            "reason=invalid-unit",
-            "unit=" .. tostringCompat(unit)
-        )
         return {slots = slots}
     end
     local inBuffPool = buffPoolMod.isUnitInBuffPool(unit)
     if not inBuffPool then
-        debugLog(
-            nil,
-            "BuffUI.VM",
-            "return-empty",
-            "reason=not-in-buff-pool",
-            "unit=" .. tostringCompat(unit)
-        )
         return {slots = slots}
     end
     local ids = buffPoolMod.getBuffIdsOnUnit(unit)
-    debugLog(
-        nil,
-        "BuffUI.VM",
-        "unit=" .. tostringCompat(unit),
-        "inPool=" .. tostringCompat(inBuffPool),
-        "idsLen=" .. tostring(#ids)
-    )
     local rows = {}
     do
         local i = 0
@@ -203,10 +178,10 @@ function ____exports.buildBuffBarViewModel(unit)
     __TS__ArraySort(
         rows,
         function(____, a, b)
-            local ____opt_2 = buffs[a.id]
-            local pa = ____opt_2 and ____opt_2.priority or 0
-            local ____opt_4 = buffs[b.id]
-            local pb = ____opt_4 and ____opt_4.priority or 0
+            local ____opt_1 = buffs[a.id]
+            local pa = ____opt_1 and ____opt_1.priority or 0
+            local ____opt_3 = buffs[b.id]
+            local pb = ____opt_3 and ____opt_3.priority or 0
             if pa ~= pb then
                 return pb - pa
             end
@@ -228,23 +203,23 @@ function ____exports.buildBuffBarViewModel(unit)
                 local tooltipBodyText = ""
                 local tooltipSourceText = ""
                 if meta ~= nil then
-                    local ____formatDotTooltip_12 = formatDotTooltip
-                    local ____meta_tooltip_10 = meta.tooltip
-                    local ____row_state_effect_11 = row.state.effect
-                    local ____row_state_effect2_8 = row.state.effect2
-                    if ____row_state_effect2_8 == nil then
-                        ____row_state_effect2_8 = 0
+                    local ____formatDotTooltip_11 = formatDotTooltip
+                    local ____meta_tooltip_9 = meta.tooltip
+                    local ____row_state_effect_10 = row.state.effect
+                    local ____row_state_effect2_7 = row.state.effect2
+                    if ____row_state_effect2_7 == nil then
+                        ____row_state_effect2_7 = 0
                     end
-                    local ____row_state_stack_9 = row.state.stack
-                    if ____row_state_stack_9 == nil then
-                        ____row_state_stack_9 = 1
+                    local ____row_state_stack_8 = row.state.stack
+                    if ____row_state_stack_8 == nil then
+                        ____row_state_stack_8 = 1
                     end
-                    local tooltipParts = ____formatDotTooltip_12(
-                        ____meta_tooltip_10,
+                    local tooltipParts = ____formatDotTooltip_11(
+                        ____meta_tooltip_9,
                         durationForTip,
-                        ____row_state_effect_11,
-                        ____row_state_effect2_8,
-                        ____row_state_stack_9,
+                        ____row_state_effect_10,
+                        ____row_state_effect2_7,
+                        ____row_state_stack_8,
                         row.state.sourceName,
                         row.state.effectSourceName,
                         row.state.effectSourceType,
@@ -255,25 +230,25 @@ function ____exports.buildBuffBarViewModel(unit)
                     tooltipBodyText = tooltipParts.bodyText
                     tooltipSourceText = tooltipParts.sourceText
                 else
-                    local ____temp_15 = (((((TIP_COLOR_BODY .. row.id) .. " 剩余 ") .. formatOneDecimal(row.state.remaining)) .. " 秒，效果1 ") .. formatOneDecimal(row.state.effect)) .. "，效果2 "
-                    local ____formatOneDecimal_14 = formatOneDecimal
-                    local ____row_state_effect2_13 = row.state.effect2
-                    if ____row_state_effect2_13 == nil then
-                        ____row_state_effect2_13 = 0
+                    local ____temp_14 = (((((TIP_COLOR_BODY .. row.id) .. " 剩余 ") .. formatOneDecimal(row.state.remaining)) .. " 秒，效果1 ") .. formatOneDecimal(row.state.effect)) .. "，效果2 "
+                    local ____formatOneDecimal_13 = formatOneDecimal
+                    local ____row_state_effect2_12 = row.state.effect2
+                    if ____row_state_effect2_12 == nil then
+                        ____row_state_effect2_12 = 0
                     end
-                    tooltipBodyText = (____temp_15 .. ____formatOneDecimal_14(____row_state_effect2_13)) .. "|r"
+                    tooltipBodyText = (____temp_14 .. ____formatOneDecimal_13(____row_state_effect2_12)) .. "|r"
                     tooltipSourceText = formatBuffSourceText(row.state.sourceName, row.state.effectSourceName, row.state.effectSourceType)
                 end
                 local remainStr = formatBuffRemainOneDecimal(row.state.iconRemaining)
                 local remainText = ("|cffffffff" .. remainStr) .. "|r"
                 local _____663E_793A_5C42_6570_89D2_6807 = meta ~= nil and meta.maxStack > 1
-                local ____temp_16
+                local ____temp_15
                 if type(row.state.stack) == "number" and row.state.stack >= 0 then
-                    ____temp_16 = row.state.stack
+                    ____temp_15 = row.state.stack
                 else
-                    ____temp_16 = 1
+                    ____temp_15 = 1
                 end
-                local stack = ____temp_16
+                local stack = ____temp_15
                 local stackText = _____663E_793A_5C42_6570_89D2_6807 and ("|cfffff2d9" .. tostringCompat(stack)) .. "|r" or ""
                 slots[i + 1] = {
                     visible = true,
@@ -288,23 +263,6 @@ function ____exports.buildBuffBarViewModel(unit)
             i = i + 1
         end
     end
-    local visibleCount = 0
-    do
-        local i = 0
-        while i < #slots do
-            if slots[i + 1].visible == true then
-                visibleCount = visibleCount + 1
-            end
-            i = i + 1
-        end
-    end
-    debugLog(
-        nil,
-        "BuffUI.VM",
-        "unit=" .. tostringCompat(unit),
-        "rowsLen=" .. tostring(#rows),
-        "visible=" .. tostring(visibleCount)
-    )
     return {slots = slots}
 end
 function ____exports.getMaxSlots()

@@ -12,6 +12,8 @@ local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCC = ____require_result_2.stringToFourCC
 local ____require_result_3 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLogForce = ____require_result_3.debugLogForce
+local ____require_result_4 = require("lib.扩展函数.物品相关函数.index")
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_4["给予单位物品"]
 local _____6A21_5757_540D = "装备死亡事件测试"
 local _____6D4B_8BD5_547D_4EE4 = "1039"
 local _____6D4B_8BD5_88C5_5907_540D_5217_8868 = {"小颅盾（唯一）", "斯尔能量之心", "德鲁伊指引灯笼（魔猎）", "德鲁伊指引灯笼（智识）"}
@@ -32,7 +34,7 @@ local function _____521B_5EFA_5E76_7ED9_4E88_88C5_5907(_____5355_4F4D, _____88C5
         debugLogForce(_____6A21_5757_540D, "创建物品失败", _____88C5_5907_540D, _____7269_54C1ID)
         return
     end
-    jass.UnitAddItem(_____5355_4F4D, item)
+    _____7ED9_4E88_5355_4F4D_7269_54C1(_____5355_4F4D, item)
 end
 local function ____on_804A_59291039_6D4B_8BD5()
     local _____5927_6CD5_5E08 = g.gg_unit_Hamg_0002

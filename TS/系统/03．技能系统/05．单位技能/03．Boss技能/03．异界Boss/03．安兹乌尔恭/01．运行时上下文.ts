@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import { 注册Boss阶段状态 } from "../../../../../00．核心系统/03．脱战系统/01．Boss阶段状态";
+
 import { 单位未标记死亡 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 安兹乌尔恭单位技能配置 } from './00．配置';
 import { 创建雅儿贝德运行状态, type 雅儿贝德运行状态 } from './01．护卫雅儿贝德/00．状态';
@@ -93,6 +95,7 @@ function 创建安兹上下文(
       清理.登记延迟回调('安兹-守护者命令台词', guardianId);
     }
   }
+  注册Boss阶段状态(boss, 安兹乌尔恭单位技能配置.阶段阈值, 读取阶段序号, context, 清理);
   return context;
 }
 
@@ -174,7 +177,7 @@ function 刷新安兹阶段(this: void, context: 安兹运行时上下文): void
   let nextStage = context.阶段;
   if (ratio <= 安兹乌尔恭单位技能配置.阶段阈值.P3生命比例) {
     nextStage = 'P3死亡是众生的终点';
-  } else if (ratio <= 安兹乌尔恭单位技能配置.阶段阈值.P2生命比例) {
+  } else if (context.阶段 === 'P1至尊的审视' && ratio <= 安兹乌尔恭单位技能配置.阶段阈值.P2生命比例) {
     nextStage = 'P2死亡支配者';
   }
   if (nextStage !== context.阶段) {
@@ -201,4 +204,10 @@ export function 注册安兹运行时(this: void): void {
     取上下文列表: 获取全部安兹运行时上下文,
     执行: 推进安兹运行时,
   });
+}
+
+function 读取阶段序号(this: void, context: 安兹运行时上下文): number {
+  if (context.阶段 === 'P3死亡是众生的终点') return 3;
+  if (context.阶段 === 'P2死亡支配者') return 2;
+  return 1;
 }

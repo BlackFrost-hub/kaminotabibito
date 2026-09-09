@@ -1,6 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____79FB_9664_5355_4F4D_6307_5B9ABuff
+local _____8BFB_53D6_9636_6BB5_5E8F_53F7, _____79FB_9664_5355_4F4D_6307_5B9ABuff
+local ____01_FF0EBoss_9636_6BB5_72B6_6001 = require("系统.00．核心系统.03．脱战系统.01．Boss阶段状态")
+local _____6CE8_518CBoss_9636_6BB5_72B6_6001 = ____01_FF0EBoss_9636_6BB5_72B6_6001["注册Boss阶段状态"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.04．夏提雅.00．配置")
@@ -29,6 +31,15 @@ ____exports["重置夏提雅猎血连击"] = function(context)
     context["当前猎血段数"] = 0
     context["猎血段数过期时间Ms"] = 0
     context["待结算强化穿刺目标"] = nil
+end
+function _____8BFB_53D6_9636_6BB5_5E8F_53F7(context)
+    if context["阶段"] == "P3真祖血宴" or context["阶段"] == "复生仪式" then
+        return 3
+    end
+    if context["阶段"] == "P2英灵战乙女" then
+        return 2
+    end
+    return 1
 end
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_0.addDelayedCallback
@@ -112,6 +123,13 @@ local function _____521B_5EFA_4E0A_4E0B_6587(boss, _____6E05_7406)
         )
         _____6E05_7406["登记延迟回调"](_____6E05_7406, "夏提雅-战斗开始台词", battleStartId)
     end
+    _____6CE8_518CBoss_9636_6BB5_72B6_6001(
+        boss,
+        _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"],
+        _____8BFB_53D6_9636_6BB5_5E8F_53F7,
+        context,
+        _____6E05_7406
+    )
     return context
 end
 --- 独立测试可显式创建；正式战斗使用上下文工厂。
@@ -180,7 +198,7 @@ local function _____5237_65B0_9636_6BB5(context)
     local next = context["阶段"]
     if ratio <= _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P3生命比例"] then
         next = "P3真祖血宴"
-    elseif ratio <= _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P2生命比例"] then
+    elseif context["阶段"] == "P1鲜血女武神" and ratio <= _____590F_63D0_96C5_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P2生命比例"] then
         next = "P2英灵战乙女"
     end
     if next == context["阶段"] then

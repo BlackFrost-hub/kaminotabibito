@@ -8,8 +8,9 @@ const { 注册环境互动调查点 } = require("系统.03．技能系统.04．�
 const { 解析配置内部ID } = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具") as {
   解析配置内部ID: (this: void, 配置值: string | undefined | null) => number;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
   创建物品并注册排泄监听: (this: void, 物品类型ID: number, X: number, Y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, 表名: string, 键: any, 属性名: string, 类型: string) => any;
@@ -21,7 +22,6 @@ const { 广播单位提示 } = require("系统.09．表现系统.06．广播提�
 
 const GetUnitX = jass.GetUnitX as (this: void, 单位: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, 单位: any) => number;
-const UnitAddItem = jass.UnitAddItem as (this: void, 单位: any, 物品: any) => boolean;
 
 const 果子物品ID = "伊达之果#I03W";
 const 精灵小屋提示文本 = "意外发现了某处能进入的精灵小屋，命中率+1%。";
@@ -30,7 +30,7 @@ const 树上物品提示文本 = "意外发现了藏在树上的果子。";
 
 function 创建并给予物品(this: void, 施法单位: any, 物品ID: string): void {
   const 物品 = 创建物品并注册排泄监听(解析配置内部ID(物品ID), GetUnitX(施法单位), GetUnitY(施法单位));
-  if (物品 != null && 物品 !== 0) UnitAddItem(施法单位, 物品);
+  if (物品 != null && 物品 !== 0) 给予单位物品(施法单位, 物品);
 }
 
 function 处理精灵小屋调查(this: void, _玩家ID: number, 施法单位: any, 调查点: any): boolean {

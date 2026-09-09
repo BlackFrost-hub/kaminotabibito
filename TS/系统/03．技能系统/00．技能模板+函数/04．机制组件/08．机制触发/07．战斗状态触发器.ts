@@ -51,6 +51,8 @@ export interface 战斗状态触发控制器 {
   是否战斗中(): boolean;
   刷新战斗(对方单位?: any): void;
   停止(): void;
+  暂停脱战计时(): void;
+  恢复脱战计时(): void;
 }
 
 const 战斗状态控制器表: Record<number, 战斗状态触发实现> = {};
@@ -88,6 +90,7 @@ class 战斗状态触发实现 implements 战斗状态触发控制器 {
   private 已触发持续满足 = false;
   private 最近对方单位: any = null;
   private Tick回调ID = 0;
+  private 脱战计时已暂停 = false;
 
   constructor(名称: string, 参数: 战斗状态触发参数) {
     this.名称 = 名称;
@@ -116,6 +119,18 @@ class 战斗状态触发实现 implements 战斗状态触发控制器 {
     }
   }
 
+  暂停脱战计时(): void {
+    if (this.已停止) return;
+    this.脱战计时已暂停 = true;
+    this.上次战斗毫秒 = getServerTime();
+  }
+
+  恢复脱战计时(): void {
+    if (this.已停止) return;
+    this.脱战计时已暂停 = false;
+    this.上次战斗毫秒 = getServerTime();
+  }
+
   处理伤害(target: any, attacker: any, applied: number, snapshot: any): void {
     if (this.已停止 || applied <= 0) return;
     const 单位ID = 取单位ID(this.参数.单位);
@@ -139,7 +154,7 @@ class 战斗状态触发实现 implements 战斗状态触发控制器 {
       this.停止();
       return;
     }
-    if (!this.战斗中) return;
+    if (!this.战斗中 || this.脱战计时已暂停) return;
     const now = getServerTime();
     const 保持秒 = this.参数.战斗保持秒 ?? 取单位默认脱战时间秒(this.参数.单位, this.参数.主体类型);
     const 保持毫秒 = 保持秒 * 1000;
@@ -191,6 +206,20 @@ class 战斗状态触发实现 implements 战斗状态触发控制器 {
 
 export function 创建战斗状态触发器(this: void, 参数: 战斗状态触发参数): 战斗状态触发控制器 {
   return new 战斗状态触发实现(参数.名称 ?? "战斗状态触发器", 参数);
+}
+
+export function 暂停单位脱战计时(this: void, unit: any): void {
+  for (const key in 战斗状态控制器表) {
+    const 控制器 = 战斗状态控制器表[key];
+    if (控制器 != null && (控制器 as any).参数?.单位 === unit) 控制器.暂停脱战计时();
+  }
+}
+
+export function 恢复单位脱战计时(this: void, unit: any): void {
+  for (const key in 战斗状态控制器表) {
+    const 控制器 = 战斗状态控制器表[key];
+    if (控制器 != null && (控制器 as any).参数?.单位 === unit) 控制器.恢复脱战计时();
+  }
 }
 
 function on战斗状态Tick(this: void, variable?: any): void {

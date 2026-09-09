@@ -1,7 +1,8 @@
 /** @noSelfInFile */
 
-export const 莫尔特斯任务ID = 10022;
-export const 莫尔特斯解锁剧情进度 = 34;
+export const 莫尔特斯任务ID = 11022;
+// 36 在“王城战后与第三章启程”对白结束后写入；赫克提尔此时已从密室受伤位退场，方可归位并解锁任务。
+export const 莫尔特斯解锁剧情进度 = 36;
 
 export const 赫克提尔语义引用 = "ZX.赫克提尔";
 export const 赫克提尔归位X = 14599.8;
@@ -9,6 +10,7 @@ export const 赫克提尔归位Y = -23001.6;
 export const 赫克提尔归位朝向 = 270;
 
 export const 莫尔特斯传送门特效路径 = "war3mapImported\\Effect_RiftPurple.mdl";
+export const 莫尔特斯传送门特效缩放 = 3;
 export const 莫尔特斯传送门X = 14699.8;
 export const 莫尔特斯传送门Y = -23001.6;
 export const 莫尔特斯传送门半径 = 96;

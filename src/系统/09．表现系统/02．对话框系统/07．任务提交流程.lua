@@ -43,7 +43,6 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local UnitRemoveItem = jass.UnitRemoveItem
 local RemoveItem = jass.RemoveItem
-local UnitAddItem = jass.UnitAddItem
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local fourCCToString = ____require_result_0.fourCCToString
 local ____require_result_1 = require("系统.08．任务系统.00．配置表.04．NPC生成器")
@@ -52,6 +51,7 @@ local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCC = ____require_result_2.stringToFourCC
 local ____require_result_3 = require("lib.扩展函数.物品相关函数.index")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_3["创建物品并注册排泄监听"]
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_3["给予单位物品"]
 local ____require_result_4 = require("系统.09．表现系统.02．对话框系统.14．任务物品发放")
 local _____53D1_653E_4EFB_52A1_7269_54C1 = ____require_result_4["发放任务物品"]
 local GetRandomInt = jass.GetRandomInt
@@ -101,7 +101,7 @@ local function _____6267_884C_4EFB_52A1_7269_54C1_5347_7EA7(_____82F1_96C4, ____
     end
     UnitRemoveItem(_____82F1_96C4, _____5339_914D["原物品"])
     RemoveItem(_____5339_914D["原物品"])
-    UnitAddItem(_____82F1_96C4, _____65B0_7269_54C1)
+    _____7ED9_4E88_5355_4F4D_7269_54C1(_____82F1_96C4, _____65B0_7269_54C1)
     return true
 end
 local function tryConsumeRequiredResources(self, player, requiredResources, requireCount)

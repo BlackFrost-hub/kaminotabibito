@@ -13,8 +13,9 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, 玩家: any, 单位类型ID: number, X: number, Y: number, 面向: number) => any;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
   创建物品并注册排泄监听: (this: void, 物品类型ID: number, X: number, Y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, 表名: string, 键: any, 属性名: string, 类型: string) => any;
@@ -55,7 +56,6 @@ const GetHeroLevel = jass.GetHeroLevel as (this: void, 单位: any) => number;
 const GetRandomInt = jass.GetRandomInt as (this: void, 最小值: number, 最大值: number) => number;
 const Player = jass.Player as (this: void, 玩家ID: number) => any;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, 单位: any, 玩家: any, 改变颜色: boolean) => void;
-const UnitAddItem = jass.UnitAddItem as (this: void, 单位: any, 物品: any) => boolean;
 const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const Boss入口特效路径 = "Objects\\Spawnmodels\\Naga\\NagaDeath\\NagaDeath.mdl";
 
@@ -70,7 +70,7 @@ function 创建并给予物品(this: void, 施法单位: any, 物品ID: string):
     GetUnitX(施法单位),
     GetUnitY(施法单位),
   );
-  if (物品 != null && 物品 !== 0) UnitAddItem(施法单位, 物品);
+  if (物品 != null && 物品 !== 0) 给予单位物品(施法单位, 物品);
 }
 
 function 处理隐藏木桩(this: void, _玩家ID: number, 施法单位: any, 调查点: 旧环境互动配置): boolean {

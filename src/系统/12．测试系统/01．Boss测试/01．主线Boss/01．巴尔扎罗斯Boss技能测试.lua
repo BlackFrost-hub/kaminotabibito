@@ -57,7 +57,6 @@ local _____5DF4_5C14_624E_7F57_65AF_6218_6597_533A_57DF_914D_7F6E = ____require_
 local _____5DF4_5C14_624E_7F57_65AF_56FA_5B9A_5B89_5168_533A_914D_7F6E_8868 = ____require_result_17["巴尔扎罗斯固定安全区配置表"]
 local ____require_result_18 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
 local _____5DF4_5C14_624E_7F57_65AF_62A4_536B_914D_7F6E = ____require_result_18["巴尔扎罗斯护卫配置"]
-local _____5DF4_5C14_624E_7F57_65AF_9636_6BB5_9608_503C = ____require_result_18["巴尔扎罗斯阶段阈值"]
 local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____require_result_18["巴尔扎罗斯技能数值配置"]
 local ____require_result_19 = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置")
 local _____5DF4_5C14_624E_7F57_65AF_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_19["巴尔扎罗斯单位技能配置"]
@@ -270,7 +269,7 @@ local function ____on_5DF4_5C14_624E_7F57_65AF_6280_80FD2P3_6D4B_8BD5_547D_4EE4(
     SetUnitState(
         boss,
         UNIT_STATE_LIFE,
-        GetUnitState(boss, UNIT_STATE_MAX_LIFE) * _____5DF4_5C14_624E_7F57_65AF_9636_6BB5_9608_503C["第三阶段生命比例"] * 0.5
+        GetUnitState(boss, UNIT_STATE_MAX_LIFE) * _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["阶段阈值"]["P3生命比例"] * 0.5
     )
     context["阶段"] = 3
     _____91CA_653E_5DF4_5C14_624E_7F57_65AF_738B_8005_5929_7F5A(context)

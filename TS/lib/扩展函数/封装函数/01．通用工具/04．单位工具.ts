@@ -9,6 +9,10 @@ const g = require("jass.globals") as { [key: string]: any };
 const groupScratchPool: any[] = [];
 const GetUnitStateJass = jass.GetUnitState as (this: void, unit: any, state: any) => number;
 const SetUnitStateJass = jass.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
+// 扩展状态位（0x12+）必须走 japi 变体：jass 原生 Get/SetUnitState 对扩展状态静默失败（读恒 0、写丢弃）
+const japi = require("jass.japi") as any;
+const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
+const SetUnitStateJapi = japi.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
 const ConvertUnitState = jass.ConvertUnitState as (this: void, stateId: number) => any;
 const R2I = jass.R2I as (this: void, value: number) => number;
 
@@ -119,14 +123,14 @@ export function forEachUnitInGroup(group: any, action: (unit: any) => void): voi
 
 /**
  * 获取单位的攻击类型（Attack Type）
- * 单位状态0x23对应攻击类型，使用ConvertUnitState转换
+ * 单位状态0x23对应攻击类型；扩展状态位必须走 japi 变体（jass 原生读扩展状态恒为0）
  */
 export function Ir_GetUnitAttackType(this: void, u: any): number {
-  return R2I(GetUnitStateJass(u, ConvertUnitState(0x23)));
+  return R2I(GetUnitStateJapi(u, ConvertUnitState(0x23)));
 }
 
 export function Ir_SetUnitAttackType(this: void, u: any, atp: number): void {
-  SetUnitStateJass(u, ConvertUnitState(0x23), atp);
+  SetUnitStateJapi(u, ConvertUnitState(0x23), atp);
 }
 
 /**

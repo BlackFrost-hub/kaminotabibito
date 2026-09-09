@@ -1,7 +1,15 @@
 /** @noSelfInFile */
 
+import { 读取Boss当前阶段阈值 } from "../../03．脱战系统/01．Boss阶段状态";
+import { 计算Boss脱战目标生命比例 } from "../../03．脱战系统/02．Boss脱战回血规则";
+
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const SetUnitState = jass.SetUnitState as (this: void, unit: any, state: any, value: number) => void;
+const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
+const IsUnitType = jass.IsUnitType as (this: void, unit: any, type: any) => boolean;
+const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
+const R2SW = jass.R2SW as (this: void, value: number, width: number, precision: number) => string;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
 const g = require("jass.globals") as { udg_Boss?: any; [key: string]: any };
 const { GetPlayersAll } = require("lib.扩展函数.BJ函数.07．杂项") as {
@@ -13,11 +21,11 @@ const { QuestMessageBJ } = require("lib.扩展函数.BJ函数.06．任务消息"
 
 function 设置生命百分比(this: void, unit: any, pct: number): void {
   const maxLife = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_LIFE);
-  jass.SetUnitState(unit, jass.UNIT_STATE_LIFE, maxLife * (pct > 0 ? pct : 0) * 0.01);
+  SetUnitState(unit, jass.UNIT_STATE_LIFE, maxLife * (pct > 0 ? pct : 0) * 0.01);
 }
 function 设置魔法百分比(this: void, unit: any, pct: number): void {
   const maxMana = GetUnitStateJapi(unit, jass.UNIT_STATE_MAX_MANA);
-  jass.SetUnitState(unit, jass.UNIT_STATE_MANA, maxMana * (pct > 0 ? pct : 0) * 0.01);
+  SetUnitState(unit, jass.UNIT_STATE_MANA, maxMana * (pct > 0 ? pct : 0) * 0.01);
 }
 function 拥有Buff(this: void, unit: any, buffId: number): boolean {
   if (unit == null || unit === 0) return false;
@@ -49,12 +57,18 @@ const {
   脱战伤害阈值比例: number;
 };
 const centerTimer = globalThis as unknown as {
-  addDelayedCallback: (this: void, delayMs: number, callback: () => void) => number;
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
   removeDelayedCallback: (this: void, id: number) => void;
 };
 
 const 英雄脱战计时器ID: number[] = [0, 0, 0, 0, 0];
 let Boss脱战计时器ID = 0;
+let Boss脱战计时暂停深度 = 0;
+let 当前计时Boss: any = null;
+
+function Boss仍有效(this: void, boss: any): boolean {
+  return boss != null && boss !== 0 && GetUnitTypeId(boss) !== 0 && !IsUnitType(boss, jass.UNIT_TYPE_DEAD);
+}
 
 function 是玩家英雄(this: void, unit: any): boolean {
   if (unit == null) return false;
@@ -99,29 +113,65 @@ function 英雄脱战完成(this: void, 玩家编号: number): void {
 }
 
 function 启动Boss脱战计时(this: void): void {
+  const boss = g.udg_Boss;
+  if (!Boss仍有效(boss)) return;
+  if (当前计时Boss !== boss) {
+    当前计时Boss = boss;
+    Boss脱战计时暂停深度 = 0;
+  }
+  if (Boss脱战计时暂停深度 > 0) return;
   if (Boss脱战计时器ID !== 0) {
     centerTimer.removeDelayedCallback(Boss脱战计时器ID);
   }
-  Boss脱战计时器ID = centerTimer.addDelayedCallback(Boss脱战时间秒 * 1000, () => {
-    if (Boss脱战计时器ID === 0) return;
-    Boss脱战计时器ID = 0;
-    Boss脱战完成();
-  });
+  Boss脱战计时器ID = centerTimer.addDelayedCallback(Boss脱战时间秒 * 1000, onBoss脱战计时完成, boss);
 }
 
-function Boss脱战完成(this: void): void {
-  const boss = g.udg_Boss;
-  if (boss == null || boss === 0) return;
-  if (jass.IsUnitType(boss, jass.UNIT_TYPE_DEAD)) return;
+/** 长时间 Boss 机制期间暂停脱战回血计时；支持嵌套调用。 */
+export function 暂停Boss脱战计时(this: void): void {
+  if (!Boss仍有效(g.udg_Boss)) return;
+  if (当前计时Boss !== g.udg_Boss) {
+    当前计时Boss = g.udg_Boss;
+    Boss脱战计时暂停深度 = 0;
+  }
+  Boss脱战计时暂停深度 = Boss脱战计时暂停深度 + 1;
+  if (Boss脱战计时器ID !== 0) {
+    centerTimer.removeDelayedCallback(Boss脱战计时器ID);
+    Boss脱战计时器ID = 0;
+  }
+}
 
-  设置生命百分比(boss, 100);
+/** Boss 机制完成或 Boss 死亡后恢复脱战计时。恢复从 0 秒重新计时。 */
+export function 恢复Boss脱战计时(this: void): void {
+  if (Boss脱战计时暂停深度 <= 0) return;
+  Boss脱战计时暂停深度 = Boss脱战计时暂停深度 - 1;
+  if (Boss脱战计时暂停深度 === 0) 启动Boss脱战计时();
+}
+
+function onBoss脱战计时完成(this: void, variable?: any): void {
+  const boss = variable;
+  if (Boss脱战计时器ID === 0 || 当前计时Boss !== boss) return;
+  Boss脱战计时器ID = 0;
+  if (boss !== g.udg_Boss || !Boss仍有效(boss) || Boss脱战计时暂停深度 > 0) return;
+
+  const 最大生命 = GetUnitStateJapi(boss, jass.UNIT_STATE_MAX_LIFE);
+  if (!(最大生命 > 0)) return;
+  const 当前生命 = GetUnitStateJapi(boss, jass.UNIT_STATE_LIFE);
+  const 当前比例 = 当前生命 / 最大生命;
+  const 阶段阈值 = 读取Boss当前阶段阈值(boss);
+  const 目标比例 = 计算Boss脱战目标生命比例(当前比例, 阶段阈值);
+  if (目标比例 > 当前比例) SetUnitState(boss, jass.UNIT_STATE_LIFE, 最大生命 * 目标比例);
   设置魔法百分比(boss, 100);
+  启动Boss脱战计时();
 
-  const bossName = jass.GetUnitName(boss);
+  if (目标比例 <= 当前比例) return;
   QuestMessageBJ(
     GetPlayersAll(),
     jass.bj_QUESTMESSAGE_WARNING,
-    "|cffffff00『系统消息』|r：|cffff0000Boss|r|cffff6600『" + bossName + "』|r由于太久没受到玩家伤害脱战回血了。"
+    "|cffffff00『脱战恢复』|r |cffff6600" + GetUnitName(boss) + "|r\n"
+    + "|cffcccccc生命：|r |cff66ccff" + R2SW(当前比例 * 100, 1, 2) + "%|r"
+    + " |cffcccccc→|r |cff99ff99" + R2SW(目标比例 * 100, 1, 2) + "%|r"
+    + " |cff99ff99（+" + R2SW((目标比例 - 当前比例) * 100, 1, 2) + "%）|r\n"
+    + "|cffcccccc若持续未受伤，|r|cffffff00" + Boss脱战时间秒 + "秒|r|cffcccccc后再次恢复。|r"
   );
 }
 

@@ -11,8 +11,9 @@ const { 环境互动装备奖励概率 } = require("系统.03．技能系统.04�
 const { 解析配置内部ID } = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具") as {
   解析配置内部ID: (this: void, 配置值: string | undefined | null) => number;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
   创建物品并注册排泄监听: (this: void, 物品类型ID: number, X: number, Y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 const { YDUserDataGetSafe, YDUserDataSetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDUserDataGetSafe: (this: void, 表名: string, 键: any, 属性名: string, 类型: string) => any;
@@ -24,7 +25,6 @@ const { 发送单位提示给玩家 } = require("系统.09．表现系统.06．�
 
 const GetUnitState = jass.GetUnitState as (this: void, 单位: any, 状态: number) => number;
 const SetUnitState = jass.SetUnitState as (this: void, 单位: any, 状态: number, 值: number) => void;
-const UnitAddItem = jass.UnitAddItem as (this: void, 单位: any, 物品: any) => boolean;
 const Player = jass.Player as (this: void, 玩家ID: number) => any;
 const GetUnitX = jass.GetUnitX as (this: void, 单位: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, 单位: any) => number;
@@ -73,7 +73,7 @@ function 恢复单位生命与魔法(this: void, 单位: any, 恢复量: number)
 
 function 给予探索奖励物品(this: void, 单位: any, 物品ID: string): void {
   const 物品 = 创建物品并注册排泄监听(解析配置内部ID(物品ID), GetUnitX(单位), GetUnitY(单位));
-  if (物品 != null && 物品 !== 0) UnitAddItem(单位, 物品);
+  if (物品 != null && 物品 !== 0) 给予单位物品(单位, 物品);
 }
 
 function 处理血坛调查(this: void, 玩家ID: number, 施法单位: any, 调查点: any): boolean {

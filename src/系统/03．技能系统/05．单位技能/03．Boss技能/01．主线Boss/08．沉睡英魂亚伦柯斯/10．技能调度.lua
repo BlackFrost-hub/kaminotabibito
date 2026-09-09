@@ -61,7 +61,7 @@ local function _____53D6_4EA1_8005_51DD_89C6_51B7_5374(context)
 end
 local function _____5230_8FBE_6700_7EC8_5F3A_5316_9608_503C(context)
     local maxLife = GetUnitStateJapi(context["Boss单位"], UNIT_STATE_MAX_LIFE)
-    return maxLife > 0 and GetUnitState(context["Boss单位"], UNIT_STATE_LIFE) / maxLife <= _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段阈值"]["最终强化生命比例"]
+    return maxLife > 0 and GetUnitState(context["Boss单位"], UNIT_STATE_LIFE) / maxLife <= _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段阈值"]["P4生命比例"]
 end
 ____exports["注册亚伦柯斯技能调度"] = function()
     if _____4E9A_4F26_67EF_65AF_8C03_5EA6_5668 ~= nil then

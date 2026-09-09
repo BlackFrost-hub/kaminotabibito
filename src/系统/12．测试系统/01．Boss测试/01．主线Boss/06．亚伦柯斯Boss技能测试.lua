@@ -196,7 +196,7 @@ local function _____51C6_5907_4E9A_4F26_67EF_65AFP3(context)
     SetUnitState(
         context["Boss单位"],
         UNIT_STATE_LIFE,
-        GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE) * (thresholds["P3生命比例"] + thresholds["最终强化生命比例"]) * 0.5
+        GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE) * (thresholds["P3生命比例"] + thresholds["P4生命比例"]) * 0.5
     )
     _____8FDB_5165_4E9A_4F26_67EF_65AFP3(context["运行时"])
 end
@@ -282,7 +282,7 @@ local function _____6D4B_8BD5_4E9A_4F26_67EF_65AF_6700_7EC8_5F3A_5316(_player, c
     SetUnitState(
         context["Boss单位"],
         UNIT_STATE_LIFE,
-        GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE) * _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段阈值"]["最终强化生命比例"] * 0.5
+        GetUnitState(context["Boss单位"], UNIT_STATE_MAX_LIFE) * _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段阈值"]["P4生命比例"] * 0.5
     )
     _____89E6_53D1_4E9A_4F26_67EF_65AF_6700_7EC8_5F3A_5316(context["运行时"])
 end

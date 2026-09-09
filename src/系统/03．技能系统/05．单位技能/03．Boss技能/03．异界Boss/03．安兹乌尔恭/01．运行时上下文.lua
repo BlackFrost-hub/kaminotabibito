@@ -1,5 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local _____8BFB_53D6_9636_6BB5_5E8F_53F7
+local ____01_FF0EBoss_9636_6BB5_72B6_6001 = require("系统.00．核心系统.03．脱战系统.01．Boss阶段状态")
+local _____6CE8_518CBoss_9636_6BB5_72B6_6001 = ____01_FF0EBoss_9636_6BB5_72B6_6001["注册Boss阶段状态"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.00．配置")
@@ -14,6 +17,15 @@ local ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668 = require("系统.03．技�
 local _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668 = ____17_FF0E_5468_671F_673A_5236_8C03_5EA6_5668["创建周期机制调度器"]
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.03．异界Boss.03．安兹乌尔恭.12．台词播放")
 local _____64AD_653E_5B89_5179_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放安兹台词"]
+function _____8BFB_53D6_9636_6BB5_5E8F_53F7(context)
+    if context["阶段"] == "P3死亡是众生的终点" then
+        return 3
+    end
+    if context["阶段"] == "P2死亡支配者" then
+        return 2
+    end
+    return 1
+end
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
@@ -71,6 +83,13 @@ local function _____521B_5EFA_5B89_5179_4E0A_4E0B_6587(boss, _____6E05_7406, ___
             _____6E05_7406["登记延迟回调"](_____6E05_7406, "安兹-守护者命令台词", guardianId)
         end
     end
+    _____6CE8_518CBoss_9636_6BB5_72B6_6001(
+        boss,
+        _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"],
+        _____8BFB_53D6_9636_6BB5_5E8F_53F7,
+        context,
+        _____6E05_7406
+    )
     return context
 end
 ____exports["创建安兹运行时上下文"] = function(_____6A21_5F0F, boss)
@@ -150,7 +169,7 @@ local function _____5237_65B0_5B89_5179_9636_6BB5(context)
     local nextStage = context["阶段"]
     if ratio <= _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P3生命比例"] then
         nextStage = "P3死亡是众生的终点"
-    elseif ratio <= _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P2生命比例"] then
+    elseif context["阶段"] == "P1至尊的审视" and ratio <= _____5B89_5179_4E4C_5C14_606D_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P2生命比例"] then
         nextStage = "P2死亡支配者"
     end
     if nextStage ~= context["阶段"] then

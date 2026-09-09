@@ -68,7 +68,9 @@ const SetUnitAcquireRange = jass.SetUnitAcquireRange as (unit: any, range: numbe
 const IssueImmediateOrder = jass.IssueImmediateOrder as (unit: any, order: string) => boolean;
 const UnitDamageTarget = jass.UnitDamageTarget as (source: any, target: any, amount: number, attack: boolean, ranged: boolean, attackType: any, damageType: any, weaponType: any) => boolean;
 const UnitItemInSlot = jass.UnitItemInSlot as (unit: any, slot: number) => any;
-const UnitAddItem = jass.UnitAddItem as (unit: any, item: any) => boolean;
+const { 给予单位物品 } = require("lib.扩展函数.物品相关函数.index") as {
+  给予单位物品: (this: void, unit: any, item: any) => boolean;
+};
 const UnitRemoveItem = jass.UnitRemoveItem as (unit: any, item: any) => void;
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
 const RemoveItem = jass.RemoveItem as (item: any) => void;
@@ -156,7 +158,7 @@ function 确保山丘之王拥有测试装备(this: void, playerId: number, 山�
   const 已有装备 = 查找山丘之王可识别装备(山丘之王);
   if (已有装备 != null && 已有装备 !== 0) return 已有装备;
   const item = 创建物品并注册排泄监听(测试装备ID, GetUnitX(山丘之王), GetUnitY(山丘之王));
-  if (!物品有效(item) || getItemDataEntry(item) == null || !UnitAddItem(山丘之王, item)) {
+  if (!物品有效(item) || getItemDataEntry(item) == null || !给予单位物品(山丘之王, item)) {
     if (物品有效(item)) RemoveItem(item);
     return null;
   }

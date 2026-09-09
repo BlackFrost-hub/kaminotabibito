@@ -82,6 +82,7 @@ const {
 // 花田联动（D 模块运行时 require 防循环依赖；接口可缺省）
 const 花田联动 = require("./07．D技能") as {
   尝试消费花田修正?: (this: void, 芙莉莲: any) => boolean;
+  在花田内?: (this: void, 芙莉莲: any) => boolean;
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -108,11 +109,13 @@ const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 // Q 命中结算：基础伤害 + 攻击解析 + 穿透/破防分支（伤害全部归属本次 Q 实例）
 //=============================================================================
 
-function 结算Q命中(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 隐匿强化: boolean): void {
+function 结算Q命中(this: void, 施法者: any, 目标: any, 技能实例ID: number | undefined, 隐匿强化: boolean, 花田内释放: boolean): void {
   const 攻击力 = 读取单位攻击力(施法者);
   const 基础倍率 = Q配置.伤害倍率 + (隐匿强化 ? 被动配置.隐匿首击加成倍率 : 0);
   let 倍率 = 基础倍率;
   let 标签 = "芙莉莲-QZoltraak";
+  // 花田内释放的 Q：额外伤害倍率（独立于花田增强锁，释放时快照判定）
+  if (花田内释放) 倍率 += 芙莉莲D数值引用.修正Q伤害倍率加成;
 
   // 解析完成分支：原子消费一次（消费成功才执行破防强化；否则不清除解析）
   if (目标解析完成(施法者, 目标)) {
@@ -205,6 +208,8 @@ function 释放Q(this: void, _context: any, 施法者: any, 技能实例ID: numb
   if (花田联动.尝试消费花田修正 != null && 花田联动.尝试消费花田修正(施法者)) {
     射程 += 芙莉莲D数值引用.修正Q射程加成;
   }
+  // 花田内释放快照（独立于增强锁）：命中结算时额外伤害倍率
+  const 花田内释放 = 花田联动.在花田内 != null ? 花田联动.在花田内(施法者) : false;
 
   const 控制器 = 创建战斗技能实例({
     技能键: "芙莉莲Q",
@@ -252,7 +257,7 @@ function 释放Q(this: void, _context: any, 施法者: any, 技能实例ID: numb
         透明度: 芙莉莲表现配置.Q弹道附加特效.RGB.透明度,
       },
       on命中: function Q命中(this: void, 目标: any, _弹道: any): void {
-        结算Q命中(施法者, 目标, 技能实例ID, 隐匿强化);
+        结算Q命中(施法者, 目标, 技能实例ID, 隐匿强化, 花田内释放);
       },
     });
     控制器.完成();
@@ -262,7 +267,7 @@ function 释放Q(this: void, _context: any, 施法者: any, 技能实例ID: numb
 
 // 花田修正数值引用（避免直接 import D 配置造成编译期循环；数值以 00．配置 为准）
 const { 芙莉莲D配置: 芙莉莲D数值引用 } = require("./00．配置") as {
-  芙莉莲D配置: { 修正Q射程加成: number; 修正W持续加成秒: number; 半径: number; 持续秒: number; 静止判定半径: number };
+  芙莉莲D配置: { 修正Q射程加成: number; 修正W持续加成秒: number; 修正E落点倍率加成: number; 修正Q伤害倍率加成: number; 半径: number; 持续秒: number; 静止判定半径: number };
 };
 
 //=============================================================================

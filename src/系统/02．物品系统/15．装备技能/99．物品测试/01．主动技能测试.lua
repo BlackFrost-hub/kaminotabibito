@@ -75,7 +75,8 @@ local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_
 IssueTargetOrder = jass.IssueTargetOrder
 CreateItem = jass.CreateItem
 local UnitRemoveItem = jass.UnitRemoveItem
-local UnitAddItem = jass.UnitAddItem
+local ____require_result_6 = require("lib.扩展函数.物品相关函数.index")
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_6["给予单位物品"]
 GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 local GetItemTypeId = jass.GetItemTypeId
@@ -104,15 +105,15 @@ local _____6D4B_8BD5_7269_54C1_4E3B_52A8_6700_5927_51B7_5374_79D2_8868 = {}
 _____76D7_8D3C_795E_7B26_8FDC_8DDD_6D4B_8BD5_8DDD_79BB = 700
 local _____5DF2_521D_59CB_5316_6D4B_8BD5_7269_54C1_6280_80FDID_8868 = false
 local function _____83B7_53D6_6D4B_8BD5_5355_4F4D()
-    local ____g_gg_unit_Hamg_0002_6 = g.gg_unit_Hamg_0002
-    if ____g_gg_unit_Hamg_0002_6 == nil then
-        ____g_gg_unit_Hamg_0002_6 = _G.bj_lastCreatedUnit
+    local ____g_gg_unit_Hamg_0002_7 = g.gg_unit_Hamg_0002
+    if ____g_gg_unit_Hamg_0002_7 == nil then
+        ____g_gg_unit_Hamg_0002_7 = _G.bj_lastCreatedUnit
     end
-    local ____g_gg_unit_Hamg_0002_6_7 = ____g_gg_unit_Hamg_0002_6
-    if ____g_gg_unit_Hamg_0002_6_7 == nil then
-        ____g_gg_unit_Hamg_0002_6_7 = nil
+    local ____g_gg_unit_Hamg_0002_7_8 = ____g_gg_unit_Hamg_0002_7
+    if ____g_gg_unit_Hamg_0002_7_8 == nil then
+        ____g_gg_unit_Hamg_0002_7_8 = nil
     end
-    return ____g_gg_unit_Hamg_0002_6_7
+    return ____g_gg_unit_Hamg_0002_7_8
 end
 local SetItemPosition = jass.SetItemPosition
 local function _____4E22_5F03_6D4B_8BD5_88C5_5907(unit)
@@ -422,7 +423,7 @@ local function _____53D1_653E_5355_4E2A_88C5_5907(unit, _____5E8F_53F7)
                         )
                         goto __continue72
                     end
-                    UnitAddItem(unit, item)
+                    _____7ED9_4E88_5355_4F4D_7269_54C1(unit, item)
                     _____521B_5EFA_6570_91CF = _____521B_5EFA_6570_91CF + 1
                 end
                 ::__continue72::

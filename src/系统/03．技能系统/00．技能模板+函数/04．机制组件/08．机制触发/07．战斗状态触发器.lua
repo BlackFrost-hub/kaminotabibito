@@ -65,6 +65,7 @@ function _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype.____constructor(
     self["已触发持续满足"] = false
     self["最近对方单位"] = nil
     self["Tick回调ID"] = 0
+    self["脱战计时已暂停"] = false
     self["名称"] = _____540D_79F0
     self["参数"] = _____53C2_6570
     _____6218_6597_72B6_6001_63A7_5236_5668_8BA1_6570 = _____6218_6597_72B6_6001_63A7_5236_5668_8BA1_6570 + 1
@@ -92,6 +93,20 @@ _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype["刷新战斗"] = functio
             self["参数"]["on进入战斗"](self["创建事件"](self, now))
         end
     end
+end
+_____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype["暂停脱战计时"] = function(self)
+    if self["已停止"] then
+        return
+    end
+    self["脱战计时已暂停"] = true
+    self["上次战斗毫秒"] = getServerTime()
+end
+_____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype["恢复脱战计时"] = function(self)
+    if self["已停止"] then
+        return
+    end
+    self["脱战计时已暂停"] = false
+    self["上次战斗毫秒"] = getServerTime()
 end
 _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype["处理伤害"] = function(self, target, attacker, applied, snapshot)
     if self["已停止"] or applied <= 0 then
@@ -127,7 +142,7 @@ function _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype.Tick(self)
         self["停止"](self)
         return
     end
-    if not self["战斗中"] then
+    if not self["战斗中"] or self["脱战计时已暂停"] then
         return
     end
     local now = getServerTime()
@@ -179,6 +194,38 @@ _____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0.prototype["取周期触发毫秒"] 
 end
 ____exports["创建战斗状态触发器"] = function(_____53C2_6570)
     return __TS__New(_____6218_6597_72B6_6001_89E6_53D1_5B9E_73B0, _____53C2_6570["名称"] or "战斗状态触发器", _____53C2_6570)
+end
+____exports["暂停单位脱战计时"] = function(unit)
+    for key in pairs(_____6218_6597_72B6_6001_63A7_5236_5668_8868) do
+        local _____63A7_5236_5668 = _____6218_6597_72B6_6001_63A7_5236_5668_8868[key]
+        local ____temp_5 = _____63A7_5236_5668 ~= nil
+        if ____temp_5 then
+            local ____opt_3 = _____63A7_5236_5668["参数"]
+            if ____opt_3 ~= nil then
+                ____opt_3 = ____opt_3["单位"]
+            end
+            ____temp_5 = ____opt_3 == unit
+        end
+        if ____temp_5 then
+            _____63A7_5236_5668["暂停脱战计时"](_____63A7_5236_5668)
+        end
+    end
+end
+____exports["恢复单位脱战计时"] = function(unit)
+    for key in pairs(_____6218_6597_72B6_6001_63A7_5236_5668_8868) do
+        local _____63A7_5236_5668 = _____6218_6597_72B6_6001_63A7_5236_5668_8868[key]
+        local ____temp_8 = _____63A7_5236_5668 ~= nil
+        if ____temp_8 then
+            local ____opt_6 = _____63A7_5236_5668["参数"]
+            if ____opt_6 ~= nil then
+                ____opt_6 = ____opt_6["单位"]
+            end
+            ____temp_8 = ____opt_6 == unit
+        end
+        if ____temp_8 then
+            _____63A7_5236_5668["恢复脱战计时"](_____63A7_5236_5668)
+        end
+    end
 end
 local function ____on_6218_6597_72B6_6001_4F24_5BB3_4E8B_4EF6(target, attacker, applied, snapshot)
     for key in pairs(_____6218_6597_72B6_6001_63A7_5236_5668_8868) do

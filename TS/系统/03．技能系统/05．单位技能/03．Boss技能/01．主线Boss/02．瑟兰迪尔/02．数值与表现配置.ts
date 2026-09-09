@@ -15,9 +15,9 @@ export const 瑟兰迪尔模型动画配置 = {
   攻击二: { 动画编号: 11, 原始时长秒: 1.0, 循环: false },
 } as const;
 
-export const 瑟兰迪尔阶段阈值 = {
-  第二阶段生命比例: 0.7,
-  第三阶段生命比例: 0.4,
+const 阶段阈值 = {
+  P2生命比例: 0.7,
+  P3生命比例: 0.4,
 } as const;
 
 export const 瑟兰迪尔运行时配置 = {
@@ -25,6 +25,7 @@ export const 瑟兰迪尔运行时配置 = {
 } as const;
 
 export const 瑟兰迪尔数值与表现配置 = {
+  阶段阈值,
   执法印记: {
     BuffID: "BTH3",
     周期秒: 30,

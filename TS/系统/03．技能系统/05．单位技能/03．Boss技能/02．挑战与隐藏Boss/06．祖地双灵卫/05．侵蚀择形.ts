@@ -95,23 +95,23 @@ export function 更新祖地双灵卫侵蚀阶段(this: void, context: 祖地双
   const redRatio = 生命比例(context.赤誓灵卫单位);
   const azureRatio = 生命比例(context.苍影灵卫单位);
   if (context.阶段 === 'P1双灵守门') {
-    const threshold = 祖地双灵卫单位技能配置.阶段阈值.首次变异生命比例;
+    const threshold = 祖地双灵卫单位技能配置.阶段阈值.P2生命比例;
     if (redRatio <= threshold || azureRatio <= threshold) 进入P2(context, redRatio <= azureRatio ? '赤誓灵卫' : '苍影灵卫', now);
     return;
   }
   if (context.阶段 !== 'P2侵蚀失衡' || context.首次变异守卫 == null) return;
   const firstRatio = context.首次变异守卫 === '赤誓灵卫' ? redRatio : azureRatio;
-  if (now >= context.P2开始时间Ms + 祖地双灵卫数值与表现配置.公共.P2最短持续秒 * 1000 || firstRatio <= 祖地双灵卫数值与表现配置.公共.P2首名变异者推进P3生命比例) {
+  if (now >= context.P2开始时间Ms + 祖地双灵卫数值与表现配置.公共.P2最短持续秒 * 1000 || firstRatio <= 祖地双灵卫单位技能配置.阶段阈值.P3生命比例) {
     进入P3(context, now);
   }
 }
 
 function 取侵蚀阶段生命下限比例(this: void, context: 祖地双灵卫运行时上下文, unit: any): number {
-  if (context.阶段 === 'P1双灵守门') return 祖地双灵卫单位技能配置.阶段阈值.首次变异生命比例;
+  if (context.阶段 === 'P1双灵守门') return 祖地双灵卫单位技能配置.阶段阈值.P2生命比例;
   if (context.阶段 !== 'P2侵蚀失衡' || context.首次变异守卫 == null) return 0;
   const first = context.首次变异守卫 === '赤誓灵卫' ? context.赤誓灵卫单位 : context.苍影灵卫单位;
   return unit === first
-    ? 祖地双灵卫数值与表现配置.公共.P2首名变异者推进P3生命比例
+    ? 祖地双灵卫单位技能配置.阶段阈值.P3生命比例
     : 祖地双灵卫单位技能配置.阶段阈值.混合阶段第二守卫最低生命比例;
 }
 

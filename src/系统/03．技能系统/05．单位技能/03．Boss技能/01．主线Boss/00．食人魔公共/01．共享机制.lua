@@ -408,7 +408,8 @@ local function ____on_96F7_9706_9707_6012_786C_76F4_7ED3_675F(variable)
         return
     end
     if data["牵引控制器"] ~= nil then
-        data["牵引控制器"]["停止"]()
+        local ____self_13 = data["牵引控制器"]
+        ____self_13["停止"](____self_13)
     end
     data["牵引控制器"] = nil
     if data["无敌尚未恢复"] then

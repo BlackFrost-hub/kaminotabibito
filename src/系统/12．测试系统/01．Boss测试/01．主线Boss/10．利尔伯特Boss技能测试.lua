@@ -51,7 +51,8 @@ local SetUnitAcquireRange = jass.SetUnitAcquireRange
 local IssueImmediateOrder = jass.IssueImmediateOrder
 local UnitDamageTarget = jass.UnitDamageTarget
 local UnitItemInSlot = jass.UnitItemInSlot
-local UnitAddItem = jass.UnitAddItem
+local ____require_result_14 = require("lib.扩展函数.物品相关函数.index")
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_14["给予单位物品"]
 local UnitRemoveItem = jass.UnitRemoveItem
 local GetItemTypeId = jass.GetItemTypeId
 local RemoveItem = jass.RemoveItem
@@ -152,7 +153,7 @@ local function _____786E_4FDD_5C71_4E18_4E4B_738B_62E5_6709_6D4B_8BD5_88C5_5907(
         GetUnitX(_____5C71_4E18_4E4B_738B),
         GetUnitY(_____5C71_4E18_4E4B_738B)
     )
-    if not _____7269_54C1_6709_6548(item) or getItemDataEntry(item) == nil or not UnitAddItem(_____5C71_4E18_4E4B_738B, item) then
+    if not _____7269_54C1_6709_6548(item) or getItemDataEntry(item) == nil or not _____7ED9_4E88_5355_4F4D_7269_54C1(_____5C71_4E18_4E4B_738B, item) then
         if _____7269_54C1_6709_6548(item) then
             RemoveItem(item)
         end
@@ -300,16 +301,16 @@ local function _____6D4B_8BD5_6B63_4E49_5BA1_5224_88AB_52A8(_player, context)
     _____6DFB_52A0_5355_4F4D_6682_505C(context["山丘之王"], _____671D_5411_9501_5B9A_6765_6E90)
     _____8BBE_7F6E_5229_5C14_6D4B_8BD5_9776_671D_5411(context["山丘之王"], 0)
     local callbackId = addDelayedCallback(1000, ____on_5229_5C14_4F2F_7279_6B63_4E49_5BA1_5224_5EF6_8FDF_4F24_5BB3, {["上下文"] = context, ["暂停来源"] = _____671D_5411_9501_5B9A_6765_6E90, ["朝向"] = 0, ["是否攻击"] = false})
-    local ____opt_24 = context["运行时"]
-    if ____opt_24 ~= nil then
-        ____opt_24 = ____opt_24["清理"]
+    local ____opt_25 = context["运行时"]
+    if ____opt_25 ~= nil then
+        ____opt_25 = ____opt_25["清理"]
     end
-    local ____opt_result_26
-    if ____opt_24 ~= nil then
-        ____opt_result_26 = ____opt_24["登记延迟回调"]
+    local ____opt_result_27
+    if ____opt_25 ~= nil then
+        ____opt_result_27 = ____opt_25["登记延迟回调"]
     end
-    if ____opt_result_26 ~= nil then
-        ____opt_result_26(____opt_24, "利尔伯特测试-正义审判背对伤害", callbackId)
+    if ____opt_result_27 ~= nil then
+        ____opt_result_27(____opt_25, "利尔伯特测试-正义审判背对伤害", callbackId)
     end
 end
 local function _____6D4B_8BD5_6B63_4E49_5BA1_5224_9762_5411_5B89_5168(_player, context)
@@ -318,16 +319,16 @@ local function _____6D4B_8BD5_6B63_4E49_5BA1_5224_9762_5411_5B89_5168(_player, c
     _____6DFB_52A0_5355_4F4D_6682_505C(context["山丘之王"], _____671D_5411_9501_5B9A_6765_6E90)
     _____8BBE_7F6E_5229_5C14_6D4B_8BD5_9776_671D_5411(context["山丘之王"], 180)
     local callbackId = addDelayedCallback(1000, ____on_5229_5C14_4F2F_7279_6B63_4E49_5BA1_5224_5EF6_8FDF_4F24_5BB3, {["上下文"] = context, ["暂停来源"] = _____671D_5411_9501_5B9A_6765_6E90, ["朝向"] = 180, ["是否攻击"] = true})
-    local ____opt_31 = context["运行时"]
-    if ____opt_31 ~= nil then
-        ____opt_31 = ____opt_31["清理"]
+    local ____opt_32 = context["运行时"]
+    if ____opt_32 ~= nil then
+        ____opt_32 = ____opt_32["清理"]
     end
-    local ____opt_result_33
-    if ____opt_31 ~= nil then
-        ____opt_result_33 = ____opt_31["登记延迟回调"]
+    local ____opt_result_34
+    if ____opt_32 ~= nil then
+        ____opt_result_34 = ____opt_32["登记延迟回调"]
     end
-    if ____opt_result_33 ~= nil then
-        ____opt_result_33(____opt_31, "利尔伯特测试-正义审判面向安全", callbackId)
+    if ____opt_result_34 ~= nil then
+        ____opt_result_34(____opt_32, "利尔伯特测试-正义审判面向安全", callbackId)
     end
 end
 local function _____6D4B_8BD5_88C2_5730_65A9(_player, context)

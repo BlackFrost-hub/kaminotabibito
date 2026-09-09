@@ -21,6 +21,9 @@ import { 创建首领奖励底部操作按钮 } from "./12．底部操作按钮"
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
+  addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
+};
 
 const 首领奖励面板贴图 = "UI\\BossReward\\boss_reward_panel_v2.tga";
 const 选中边框贴图 = "UI\\BossReward\\reward_selected_border.tga";
@@ -63,10 +66,21 @@ const 暂不选择命中宽度 = 确认领取命中宽度;
 const 暂不选择命中高度 = 确认领取命中高度;
 const 首领奖励界面调试模块 = "首领奖励界面诊断";
 
+interface 延迟首领奖励参数 {
+  奖励池ID: string;
+  玩家: any;
+}
+
 const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (玩家: any, x: number, y: number, 持续时间: number, 文本: string) => void;
 const GetPlayerId = jass.GetPlayerId as (玩家: any) => number;
 const GetLocalPlayer = jass.GetLocalPlayer as () => any;
 const Player = jass.Player as (玩家ID: number) => any;
+
+function 执行延迟打开首领奖励选择界面(this: void, variable?: any): void {
+  const 参数 = variable as 延迟首领奖励参数 | undefined;
+  if (参数 == null || 参数.奖励池ID === "" || 参数.玩家 == null || 参数.玩家 === 0) return;
+  打开首领奖励选择界面(参数.奖励池ID, 参数.玩家);
+}
 
 interface 首领奖励槽位状态 {
   槽位ID: number;
@@ -521,6 +535,16 @@ export function 打开首领奖励选择界面(this: void, 奖励池ID: string, 
   刷新选项显示(状态);
   刷新详情内容(状态);
   显示槽位界面(状态);
+}
+
+/**
+ * 任务对白完成回调专用入口：先离开 Dz 对话框回调栈，再创建首领奖励界面。
+ * 其它已经处于独立同步事件中的领奖流程继续使用“打开首领奖励选择界面”。
+ */
+export function 延迟打开首领奖励选择界面(this: void, 奖励池ID: string, 玩家: any, 延迟毫秒: number = 100): void {
+  if (奖励池ID === "" || 玩家 == null || 玩家 === 0) return;
+  const 参数: 延迟首领奖励参数 = { 奖励池ID, 玩家 };
+  addDelayedCallback(延迟毫秒, 执行延迟打开首领奖励选择界面, 参数);
 }
 
 export function 显示首领奖励选择界面(this: void): void {

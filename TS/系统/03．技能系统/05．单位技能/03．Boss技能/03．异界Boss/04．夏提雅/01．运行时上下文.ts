@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import { 注册Boss阶段状态 } from "../../../../../00．核心系统/03．脱战系统/01．Boss阶段状态";
+
 import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 夏提雅单位技能配置 } from './00．配置';
 import { 创建机制清理篮子, type 机制清理篮子 } from '../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子';
@@ -137,6 +139,7 @@ function 创建上下文(this: void, boss: any, 清理: 机制清理篮子): 夏
     });
     清理.登记延迟回调('夏提雅-战斗开始台词', battleStartId);
   }
+  注册Boss阶段状态(boss, 夏提雅单位技能配置.阶段阈值, 读取阶段序号, context, 清理);
   return context;
 }
 
@@ -208,7 +211,7 @@ function 刷新阶段(this: void, context: 夏提雅运行时上下文): void {
   const ratio = GetUnitState(context.Boss单位, UNIT_STATE_LIFE) / maxLife;
   let next = context.阶段;
   if (ratio <= 夏提雅单位技能配置.阶段阈值.P3生命比例) next = 'P3真祖血宴';
-  else if (ratio <= 夏提雅单位技能配置.阶段阈值.P2生命比例) next = 'P2英灵战乙女';
+  else if (context.阶段 === 'P1鲜血女武神' && ratio <= 夏提雅单位技能配置.阶段阈值.P2生命比例) next = 'P2英灵战乙女';
   if (next === context.阶段) return;
   context.阶段 = next;
   设置夏提雅阶段模型(context);
@@ -239,4 +242,10 @@ export function 注册夏提雅运行时(this: void): void {
     取上下文列表: 获取全部夏提雅运行时上下文,
     执行: 推进夏提雅运行时,
   });
+}
+
+function 读取阶段序号(this: void, context: 夏提雅运行时上下文): number {
+  if (context.阶段 === 'P3真祖血宴' || context.阶段 === '复生仪式') return 3;
+  if (context.阶段 === 'P2英灵战乙女') return 2;
+  return 1;
 }

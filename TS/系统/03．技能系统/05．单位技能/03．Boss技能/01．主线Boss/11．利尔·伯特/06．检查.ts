@@ -50,7 +50,9 @@ const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const SetUnitAnimationByIndex = jass.SetUnitAnimationByIndex as (unit: any, index: number) => void;
 const UnitItemInSlot = jass.UnitItemInSlot as (unit: any, slot: number) => any;
-const UnitAddItem = jass.UnitAddItem as (unit: any, item: any) => boolean;
+const { 给予单位物品 } = require("lib.扩展函数.物品相关函数.index") as {
+  给予单位物品: (this: void, unit: any, item: any) => boolean;
+};
 const UnitRemoveItem = jass.UnitRemoveItem as (unit: any, item: any) => void;
 const SetItemPosition = jass.SetItemPosition as (item: any, x: number, y: number) => void;
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
@@ -217,7 +219,7 @@ export function 释放利尔伯特检查(this: void, 上下文: 利尔伯特运�
     return false;
   }
   const item = 装备列表[GetRandomInt(0, 装备列表.length - 1)];
-  if (!检查物品有效(item) || !UnitAddItem(boss, item)) {
+  if (!检查物品有效(item) || !给予单位物品(boss, item)) {
     return false;
   }
 

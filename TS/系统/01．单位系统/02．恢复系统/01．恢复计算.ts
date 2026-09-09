@@ -86,7 +86,7 @@ function getPlayerAttr(this: void, unit: any, attrName: string): number {
  * 获取百分比生命恢复（应用上限）
  */
 export function getPercentLifeRegen(this: void, unit: any): number {
-  let value = getPlayerAttr(unit, "百分比生命回复");
+  let value = getPlayerAttr(unit, "生命恢复%");
   return value < LIFE_REGEN_PERCENT_CAP ? value : LIFE_REGEN_PERCENT_CAP;
 }
 
@@ -94,7 +94,7 @@ export function getPercentLifeRegen(this: void, unit: any): number {
  * 获取百分比魔法恢复（应用上限）
  */
 export function getPercentManaRegen(this: void, unit: any): number {
-  let value = getPlayerAttr(unit, "百分比魔法回复");
+  let value = getPlayerAttr(unit, "魔法恢复%");
   return value < MANA_REGEN_PERCENT_CAP ? value : MANA_REGEN_PERCENT_CAP;
 }
 

@@ -9,6 +9,7 @@ local ____require_result_1 = require("系统.03．技能系统.00．技能模板
 local _____521B_5EFA_53EC_5524_7269 = ____require_result_1["创建召唤物"]
 local ____require_result_2 = require("lib.扩展函数.物品相关函数.创建物品函数")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_2["创建物品并注册排泄监听"]
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_2["给予单位物品"]
 local ____require_result_3 = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具")
 local _____89E3_6790_914D_7F6E_5185_90E8ID = ____require_result_3["解析配置内部ID"]
 local ____require_result_4 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.49．封印守卫战")
@@ -53,7 +54,7 @@ local function _____5904_7406_5C01_5370_5C0FBoss_6B7B_4EA1(_____6B7B_4EA1_5355_4
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return
     end
-    jass.UnitAddItem(_____82F1_96C4, _____7269_54C1)
+    _____7ED9_4E88_5355_4F4D_7269_54C1(_____82F1_96C4, _____7269_54C1)
     _____53D1_9001_5355_4F4D_63D0_793A_7ED9_73A9_5BB6(
         jass.Player(_____73A9_5BB6ID),
         _____82F1_96C4,

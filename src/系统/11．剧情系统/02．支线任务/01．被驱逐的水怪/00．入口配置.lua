@@ -46,7 +46,7 @@ local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_4["是�
 local ____require_result_5 = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index")
 local _____5361_745F_62C9_5956_52B1_6C60ID = ____require_result_5["卡瑟拉奖励池ID"]
 local ____require_result_6 = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面")
-local _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_6["打开首领奖励选择界面"]
+local _____5EF6_8FDF_6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_6["延迟打开首领奖励选择界面"]
 local _____5361_745F_62C9_5DF2_521B_5EFA = false
 _____5F53_524D_5361_745F_62C9_5355_4F4D = nil
 local _____5361_745F_62C9_5165_53E3_5DF2_89E6_53D1 = false
@@ -127,7 +127,7 @@ local function _____5B8C_6210_88AB_9A71_9010_7684_6C34_602A_4EFB_52A1_540E_6253_
         while _____73A9_5BB6ID < _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 do
             local _____73A9_5BB6 = Player(_____73A9_5BB6ID)
             if _____73A9_5BB6 ~= nil and jass.GetPlayerController(_____73A9_5BB6) == jass.MAP_CONTROL_USER then
-                _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____5361_745F_62C9_5956_52B1_6C60ID, _____73A9_5BB6)
+                _____5EF6_8FDF_6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____5361_745F_62C9_5956_52B1_6C60ID, _____73A9_5BB6)
             end
             _____73A9_5BB6ID = _____73A9_5BB6ID + 1
         end

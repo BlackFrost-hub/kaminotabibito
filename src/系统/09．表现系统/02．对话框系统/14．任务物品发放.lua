@@ -7,9 +7,10 @@ local ____exports = {}
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local UnitAddItemById = jass.UnitAddItemById
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local ____require_result_0 = require("lib.扩展函数.物品相关函数.index")
+local _____521B_5EFA_7269_54C1_5E76_7ED9_4E88_5355_4F4D = ____require_result_0["创建物品并给予单位"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
 ____exports["发放任务物品"] = function(unit, itemConfig)
     if unit == nil or unit == 0 or not itemConfig or itemConfig == "" then
         return 0
@@ -40,7 +41,7 @@ ____exports["发放任务物品"] = function(unit, itemConfig)
                 do
                     local j = 0
                     while j < _____6570_91CF do
-                        local _____7269_54C1 = UnitAddItemById(unit, _____7269_54C1_7C7B_578BID)
+                        local _____7269_54C1 = _____521B_5EFA_7269_54C1_5E76_7ED9_4E88_5355_4F4D(unit, _____7269_54C1_7C7B_578BID)
                         if _____7269_54C1 ~= nil and _____7269_54C1 ~= 0 then
                             _____53D1_653E_6570_91CF = _____53D1_653E_6570_91CF + 1
                         end

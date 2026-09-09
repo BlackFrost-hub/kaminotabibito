@@ -56,6 +56,19 @@ const { registerManualBuff, 移除单位指定Buff } = require("系统.05．Buff
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
   移除单位指定Buff: (this: void, target: any, buffID: string) => boolean;
 };
+const { 施加移速提升Buff } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.19．拓展效果.02．buff.04．移速提升") as {
+  施加移速提升Buff: (this: void, 来源单位: any, 目标单位: any, 参数: {
+    BuffID?: string;
+    持续时间: number;
+    固定移速?: number;
+    基础移速百分比?: number;
+    当前移速百分比?: number;
+    图标路径?: string;
+    特效路径?: string;
+    效果来源名称?: string;
+    效果来源类型?: "装备" | "技能";
+  }) => boolean;
+};
 const { 造成技能伤害 } = require("系统.04．伤害系统.08．技能伤害系统") as {
   造成技能伤害: (this: void, 参数: any) => boolean;
 };
@@ -107,6 +120,8 @@ const DAMAGE_TYPE_MAGIC = jass.DAMAGE_TYPE_MAGIC as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
 
 const GetHandleId = jass.GetHandleId as (this: void, h: any) => number;
+// 落地疾行期间暂时无视单位碰撞（false 关闭碰撞，true 恢复；与 Saber W/铃仙 R 同款惯例）
+const SetUnitPathing = jass.SetUnitPathing as (this: void, whichUnit: any, flag: boolean) => void;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
@@ -223,6 +238,10 @@ function 完成E收尾(this: void, 施法者: any, 数据: E数据): void {
     数据.减伤ID = 0;
   }
   移除单位指定Buff(施法者, 芙莉莲BuffID.高处飞行保护);
+  // 落地疾行提前收尾（观察期死亡/中断兜底；自然到期时此处移除为幂等空操作）
+  移除单位指定Buff(施法者, 芙莉莲BuffID.落地疾行);
+  // 恢复单位碰撞（落地疾行期间关闭；未经历落地疾行时恢复为无害空操作）
+  SetUnitPathing(施法者, true);
   // 观察 Tick 停止 + 闪电销毁
   if (数据.观察TickID !== 0) {
     removePeriodicCallback(数据.观察TickID);
@@ -249,6 +268,17 @@ function 结束E(this: void, 施法者: any, 技能实例ID: number | undefined,
   }
   if (自然到达) {
     结算E落点(施法者, 技能实例ID, 数据);
+    // 落地疾行：落地后移速提升（持续与观察期一致；独立于高处飞行保护，不共用 Buff）
+    施加移速提升Buff(施法者, 施法者, {
+      BuffID: 芙莉莲BuffID.落地疾行,
+      持续时间: E配置.观察持续秒,
+      基础移速百分比: E配置.落地移速提升比例,
+      效果来源名称: "芙莉莲-E-落地疾行",
+      效果来源类型: "技能",
+    });
+    // 落地疾行期间无视单位碰撞（Buff 到期或完成E收尾时统一恢复）
+    SetUnitPathing(施法者, false);
+    debugLogForce("芙莉莲-E", "落地疾行", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "实例", 技能实例ID ?? "-", "英雄", 施法者, "handle", 施法者, "持续时间", E配置.观察持续秒, "比例", E配置.落地移速提升比例);
     // 位移期减伤结束（观察期不再减免）
     if (数据.减伤ID !== 0) {
       unregisterDamageModifier(数据.减伤ID);

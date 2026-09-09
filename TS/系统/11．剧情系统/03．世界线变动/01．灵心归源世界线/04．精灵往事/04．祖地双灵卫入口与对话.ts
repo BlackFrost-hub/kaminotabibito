@@ -144,7 +144,7 @@ function on接受本思雅任务(this: void): void {
 
 function 打开本思雅已接受对话(this: void, player: any, hero: any): void {
   const UI函数 = require("系统.00．核心系统.03．UI函数") as {
-    openNpcDialog: (this: void, player: any, data: any) => boolean;
+    openNpcDialog: (player: any, data: any) => boolean;
   };
   UI函数.openNpcDialog(player, {
     lines: [
@@ -164,7 +164,7 @@ function 打开本思雅任务对话(this: void, player: any, hero: any): void {
   本思雅待对话玩家 = player;
   本思雅待对话英雄 = hero;
   const UI函数 = require("系统.00．核心系统.03．UI函数") as {
-    openNpcDialog: (this: void, player: any, data: any) => boolean;
+    openNpcDialog: (player: any, data: any) => boolean;
   };
   const opened = UI函数.openNpcDialog(player, {
     lines: [
@@ -206,7 +206,7 @@ function 打开埃德里安试炼对话(this: void, player: any, hero: any): voi
     + "爆发伤害：单次伤害超过 10000（" + 取试炼进度文本(trial.单次伤害.已完成) + "）\n"
     + "限时治疗：10 秒内将 1/5000 生命的目标治满（" + 取试炼进度文本(trial.治疗.已完成) + "）";
   const UI函数 = require("系统.00．核心系统.03．UI函数") as {
-    openNpcDialog: (this: void, player: any, data: any) => boolean;
+    openNpcDialog: (player: any, data: any) => boolean;
   };
   UI函数.openNpcDialog(player, {
     lines: [{ title: "埃德里安", text, duration: 9000 }],

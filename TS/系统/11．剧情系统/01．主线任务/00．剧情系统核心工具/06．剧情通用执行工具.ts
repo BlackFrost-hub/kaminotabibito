@@ -113,7 +113,9 @@ const SetItemPosition = jass.SetItemPosition as (this: void, whichItem: any, x: 
 const SetUnitFacing = jass.SetUnitFacing as (this: void, whichUnit: any, facing: number) => void;
 const SetUnitOwner = jass.SetUnitOwner as (this: void, whichUnit: any, whichPlayer: any, changeColor: boolean) => void;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, whichUnit: any, x: number, y: number) => void;
-const UnitAddItem = jass.UnitAddItem as (this: void, whichUnit: any, whichItem: any) => boolean;
+const { 给予单位物品 } = require("lib.扩展函数.物品相关函数.index") as {
+  给予单位物品: (this: void, whichUnit: any, whichItem: any) => boolean;
+};
 const ShowDestructable = jass.ShowDestructable as (this: void, whichDestructable: any, flag: boolean) => void;
 
 const FOG_OF_WAR_VISIBLE = jass.FOG_OF_WAR_VISIBLE as number;
@@ -407,9 +409,11 @@ export function 按名字给触发单位物品(this: void, 物品名: string): v
   if (unit == null || unit === 0) return;
   const itemTypeId = stringToFourCCSafe(按名字反查物品ID(物品名));
   if (!(itemTypeId > 0)) return;
-  const item = CreateItem(itemTypeId, 0, 0);
+  const x = GetUnitX(unit);
+  const y = GetUnitY(unit);
+  const item = CreateItem(itemTypeId, x, y);
   if (item == null || item === 0) return;
-  UnitAddItem(unit, item);
+  if (!给予单位物品(unit, item)) SetItemPosition(item, x, y);
 }
 
 /** 需要区分同名物品时，按明确 raw ID 发放；背包满时把物品落在触发单位脚下。 */
@@ -422,7 +426,7 @@ export function 按原始ID给触发单位物品(this: void, rawId: string): voi
   const y = GetUnitY(unit);
   const item = CreateItem(itemTypeId, x, y);
   if (item == null || item === 0) return;
-  const added = (UnitAddItem as any)(unit, item);
+  const added = 给予单位物品(unit, item);
   if (!added) SetItemPosition(item, x, y);
 }
 

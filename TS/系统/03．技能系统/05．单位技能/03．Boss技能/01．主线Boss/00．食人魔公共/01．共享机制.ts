@@ -4,6 +4,7 @@ import { 开始硬直, 单位是否处于硬控制效果合集 } from '../../../
 import { 播放限时单位动画 } from '../../../../00．技能模板+函数/02．通用函数/00．单位动画等待';
 import { 执行BossAOE技能伤害 } from '../../../../00．技能模板+函数/02．通用函数/22．Boss技能伤害执行器';
 import { 播放食人魔公共台词 } from './03．台词播放';
+import type { 方向抵抗牵引控制器 } from '../../../../00．技能模板+函数/01．技能函数/05．吸附·牵引/方向抵抗牵引';
 
 const { stringToFourCCSafe } = require('lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版') as {
   stringToFourCCSafe: (this: void, text: string) => number;
@@ -40,7 +41,7 @@ const { 创建单位绑定闪电, 销毁单位绑定闪电 } = require('系统.0
   销毁单位绑定闪电: (this: void, 闪电句柄: any) => void;
 };
 const { 开始方向抵抗牵引 } = require('系统.03．技能系统.00．技能模板+函数.01．技能函数.05．吸附·牵引.方向抵抗牵引') as {
-  开始方向抵抗牵引: (this: void, 参数: any) => { 停止: (this: void) => void };
+  开始方向抵抗牵引: (this: void, 参数: any) => 方向抵抗牵引控制器;
 };
 const { 显示大招吟唱条, 关闭吟唱条 } = require('系统.09．表现系统.08．吟唱条.06．对外接口') as {
   显示大招吟唱条: (this: void, 参数: any) => void;
@@ -115,7 +116,7 @@ export interface 食人魔雷霆震怒配置 {
 interface 雷霆震怒数据 {
   Boss单位: any;
   配置: 食人魔雷霆震怒配置;
-  牵引控制器?: { 停止: (this: void) => void };
+  牵引控制器?: 方向抵抗牵引控制器;
   无敌尚未恢复: boolean;
   起手闪电句柄列表: any[];
 }

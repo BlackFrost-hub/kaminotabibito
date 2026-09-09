@@ -24,11 +24,11 @@ function _____8BFB_53D6_5168_5C40_53E5_67C4(_____53D8_91CF_540D)
     if _____53D8_91CF_540D == "" then
         return nil
     end
-    local ____jglobals______53D8_91CF_540D_22 = jglobals[_____53D8_91CF_540D]
-    if ____jglobals______53D8_91CF_540D_22 == nil then
-        ____jglobals______53D8_91CF_540D_22 = nil
+    local ____jglobals______53D8_91CF_540D_23 = jglobals[_____53D8_91CF_540D]
+    if ____jglobals______53D8_91CF_540D_23 == nil then
+        ____jglobals______53D8_91CF_540D_23 = nil
     end
-    return ____jglobals______53D8_91CF_540D_22
+    return ____jglobals______53D8_91CF_540D_23
 end
 function _____5207_6362_533A_57DF_97F3_4E50_8868_8FBE_5F0F(expr, add)
     _____5207_6362_533A_57DF_80CC_666F_97F3_4E50_8868_8FBE_5F0F(expr, add)
@@ -41,15 +41,15 @@ function _____64AD_653E_97F3_6548_8868_8FBE_5F0F(expr)
             do
                 local soundVarName = __TS__StringTrim(list[i + 1])
                 if #soundVarName == 0 then
-                    goto __continue157
+                    goto __continue158
                 end
                 local soundHandle = _____8BFB_53D6_5168_5C40_53E5_67C4(soundVarName)
                 if soundHandle == nil or soundHandle == 0 then
-                    goto __continue157
+                    goto __continue158
                 end
                 PlaySoundBJ(soundHandle)
             end
-            ::__continue157::
+            ::__continue158::
             i = i + 1
         end
     end
@@ -131,7 +131,8 @@ local SetItemPosition = jass.SetItemPosition
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitOwner = jass.SetUnitOwner
 local SetUnitPosition = jass.SetUnitPosition
-local UnitAddItem = jass.UnitAddItem
+local ____require_result_22 = require("lib.扩展函数.物品相关函数.index")
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_22["给予单位物品"]
 local ShowDestructable = jass.ShowDestructable
 local FOG_OF_WAR_VISIBLE = jass.FOG_OF_WAR_VISIBLE
 local bj_GATEOPERATION_CLOSE = jglobals.bj_GATEOPERATION_CLOSE
@@ -454,15 +455,15 @@ ____exports["更新主线任务UI"] = function(_____4EFB_52A1_63CF_8FF0, _____63
         })
         questDB:acceptQuest(0, _____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
     end
-    local ____opt_25 = questDB.globalData
-    if ____opt_25 ~= nil then
-        ____opt_25 = ____opt_25.quests
+    local ____opt_26 = questDB.globalData
+    if ____opt_26 ~= nil then
+        ____opt_26 = ____opt_26.quests
     end
-    local ____opt_result_27
-    if ____opt_25 ~= nil then
-        ____opt_result_27 = ____opt_25:get(_____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
+    local ____opt_result_28
+    if ____opt_26 ~= nil then
+        ____opt_result_28 = ____opt_26:get(_____4E3B_7EBF_8FD0_884C_65F6_4EFB_52A1ID)
     end
-    local _____4EFB_52A1 = ____opt_result_27
+    local _____4EFB_52A1 = ____opt_result_28
     if _____4EFB_52A1 ~= nil and _____4EFB_52A1_63CF_8FF0 ~= "" then
         _____4EFB_52A1.description = _____4EFB_52A1_63CF_8FF0
         _____4EFB_52A1.updatedAt = os.time()
@@ -499,11 +500,15 @@ ____exports["按名字给触发单位物品"] = function(_____7269_54C1_540D)
     if not (itemTypeId > 0) then
         return
     end
-    local item = CreateItem(itemTypeId, 0, 0)
+    local x = GetUnitX(unit)
+    local y = GetUnitY(unit)
+    local item = CreateItem(itemTypeId, x, y)
     if item == nil or item == 0 then
         return
     end
-    UnitAddItem(unit, item)
+    if not _____7ED9_4E88_5355_4F4D_7269_54C1(unit, item) then
+        SetItemPosition(item, x, y)
+    end
 end
 --- 需要区分同名物品时，按明确 raw ID 发放；背包满时把物品落在触发单位脚下。
 ____exports["按原始ID给触发单位物品"] = function(rawId)
@@ -521,7 +526,7 @@ ____exports["按原始ID给触发单位物品"] = function(rawId)
     if item == nil or item == 0 then
         return
     end
-    local added = UnitAddItem(nil, unit, item)
+    local added = _____7ED9_4E88_5355_4F4D_7269_54C1(unit, item)
     if not added then
         SetItemPosition(item, x, y)
     end
@@ -598,13 +603,13 @@ ____exports["执行通用剧情动作"] = function(_____53C2_6570)
         ____exports["给玩家组添加区域视野"](_____53EF_89C1_533A_57DF2)
     end
     local ____NPC_5F15_7528 = _____53D6_53C2_6570_6587_672C(_____53C2_6570, "NPC") or _____53D6_53C2_6570_6587_672C(_____53C2_6570, "长老单位")
-    local ____temp_28
+    local ____temp_29
     if ____NPC_5F15_7528 ~= "" then
-        ____temp_28 = ____exports["读取语义单位引用"](____NPC_5F15_7528)
+        ____temp_29 = ____exports["读取语义单位引用"](____NPC_5F15_7528)
     else
-        ____temp_28 = nil
+        ____temp_29 = nil
     end
-    local npcUnit = ____temp_28
+    local npcUnit = ____temp_29
     local _____89E6_53D1_5355_4F4D = ____exports["读取触发单位"]()
     if npcUnit ~= nil and npcUnit ~= 0 then
         if _____89E6_53D1_5355_4F4D ~= nil and _____89E6_53D1_5355_4F4D ~= 0 then

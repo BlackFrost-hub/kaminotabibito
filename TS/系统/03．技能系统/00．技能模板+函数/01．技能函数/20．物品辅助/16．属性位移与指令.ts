@@ -99,6 +99,25 @@ const 火把单位类型ID = stringToFourCCSafe("e0FT");
 const 限时生命BuffID = stringToFourCCSafe("BHwe");
 const 属性浮点归零阈值 = 0.000001;
 
+/**
+ * 旧属性名 → 统一数据键的归一化映射。
+ * 装备系统/恢复系统/多面板统一使用新键（如"魔法恢复%"、"生命恢复%"）；
+ * 历史代码以旧名写入的键必须归一化，否则会被恢复计算读到 0 后覆盖写回。
+ */
+const 属性名归一化表: Record<string, string> = {
+  "百分比魔法回复": "魔法恢复%",
+  "百分比生命回复": "生命恢复%",
+  "魔法消耗减少": "魔法消耗",
+  "生命恢复属性增幅": "生命恢复效率",
+  "技能治疗加成": "技能治疗率",
+  "受到的治疗加成": "受到的治疗率",
+};
+
+function 归一化属性名(this: void, 属性名: string): string {
+  const normalized = 属性名归一化表[属性名];
+  return normalized != null ? normalized : 属性名;
+}
+
 export function 临时调整攻击(this: void, 单位: any, 数值: number): void {
   SGSS_SetState(单位, 1, 数值);
 }
@@ -118,28 +137,30 @@ export function 调整状态ID属性(this: void, 单位: any, 属性ID: number, 
 export function 调整玩家属性(this: void, 单位: any, 属性名: string, 增量: number): void {
   if (单位 == null || 单位 === 0) return;
   const owner = GetOwningPlayer(单位);
-  const oldValue = Number(YDUserDataGetSafe("player", owner, 属性名, "real")) || 0;
+  const 数据键 = 归一化属性名(属性名);
+  const oldValue = Number(YDUserDataGetSafe("player", owner, 数据键, "real")) || 0;
   let newValue = oldValue + 增量;
   if (newValue < 属性浮点归零阈值 && newValue > -属性浮点归零阈值) newValue = 0;
-  YDUserDataSetSafe("player", owner, 属性名, "real", newValue);
+  YDUserDataSetSafe("player", owner, 数据键, "real", newValue);
 }
 
 export function 调整单位属性(this: void, 单位: any, 属性名: string, 增量: number): void {
   if (单位 == null || 单位 === 0) return;
-  const oldValue = Number(YDUserDataGetSafe("unit", 单位, 属性名, "real")) || 0;
+  const 数据键 = 归一化属性名(属性名);
+  const oldValue = Number(YDUserDataGetSafe("unit", 单位, 数据键, "real")) || 0;
   let newValue = oldValue + 增量;
   if (newValue < 属性浮点归零阈值 && newValue > -属性浮点归零阈值) newValue = 0;
-  YDUserDataSetSafe("unit", 单位, 属性名, "real", newValue);
+  YDUserDataSetSafe("unit", 单位, 数据键, "real", newValue);
 }
 
 export function 读取玩家属性(this: void, 单位: any, 属性名: string): number {
   if (单位 == null || 单位 === 0) return 0;
-  return Number(YDUserDataGetSafe("player", GetOwningPlayer(单位), 属性名, "real")) || 0;
+  return Number(YDUserDataGetSafe("player", GetOwningPlayer(单位), 归一化属性名(属性名), "real")) || 0;
 }
 
 export function 读取单位属性(this: void, 单位: any, 属性名: string): number {
   if (单位 == null || 单位 === 0) return 0;
-  return Number(YDUserDataGetSafe("unit", 单位, 属性名, "real")) || 0;
+  return Number(YDUserDataGetSafe("unit", 单位, 归一化属性名(属性名), "real")) || 0;
 }
 
 export function 英雄主属性是智力(this: void, 英雄: any): boolean {

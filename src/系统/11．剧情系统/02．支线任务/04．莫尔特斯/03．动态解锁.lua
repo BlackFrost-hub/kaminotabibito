@@ -43,6 +43,17 @@ local function _____542F_7528_83AB_5C14_7279_65AFNPC_914D_7F6E()
     end
     return ____NPC_914D_7F6E
 end
+local function _____6302_83AB_5C14_7279_65AF_4EFB_52A1_6807_8BB0_5E76_5EF6_65F6_8865_6302(_____8D6B_514B_63D0_5C14, ____NPC_914D_7F6E)
+    tryAttachQuestMarkerForConfigNpc(_____8D6B_514B_63D0_5C14, ____NPC_914D_7F6E)
+    addDelayedCallback(
+        100,
+        function()
+            if _____83AB_5C14_7279_65AF_4EFB_52A1_5DF2_89E3_9501 then
+                tryAttachQuestMarkerForConfigNpc(_____8D6B_514B_63D0_5C14, ____NPC_914D_7F6E)
+            end
+        end
+    )
+end
 local function _____5C1D_8BD5_89E3_9501_5E76_5F52_4F4D_8D6B_514B_63D0_5C14()
     if _____8BFB_53D6_5267_60C5_8FDB_5EA6() < _____83AB_5C14_7279_65AF_89E3_9501_5267_60C5_8FDB_5EA6 then
         return false
@@ -55,7 +66,7 @@ local function _____5C1D_8BD5_89E3_9501_5E76_5F52_4F4D_8D6B_514B_63D0_5C14()
     IssueImmediateOrder(_____8D6B_514B_63D0_5C14, "stop")
     SetUnitPosition(_____8D6B_514B_63D0_5C14, _____8D6B_514B_63D0_5C14_5F52_4F4DX, _____8D6B_514B_63D0_5C14_5F52_4F4DY)
     SetUnitFacing(_____8D6B_514B_63D0_5C14, _____8D6B_514B_63D0_5C14_5F52_4F4D_671D_5411)
-    tryAttachQuestMarkerForConfigNpc(_____8D6B_514B_63D0_5C14, ____NPC_914D_7F6E)
+    _____6302_83AB_5C14_7279_65AF_4EFB_52A1_6807_8BB0_5E76_5EF6_65F6_8865_6302(_____8D6B_514B_63D0_5C14, ____NPC_914D_7F6E)
     _____83AB_5C14_7279_65AF_4EFB_52A1_5DF2_89E3_9501 = true
     return true
 end

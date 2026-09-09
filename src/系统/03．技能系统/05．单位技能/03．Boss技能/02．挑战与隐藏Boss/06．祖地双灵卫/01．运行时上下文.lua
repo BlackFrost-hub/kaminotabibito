@@ -1,5 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+local _____8BFB_53D6_9636_6BB5_5E8F_53F7
+local ____01_FF0EBoss_9636_6BB5_72B6_6001 = require("系统.00．核心系统.03．脱战系统.01．Boss阶段状态")
+local _____6CE8_518CBoss_9636_6BB5_72B6_6001 = ____01_FF0EBoss_9636_6BB5_72B6_6001["注册Boss阶段状态"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.00．配置")
 local _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["祖地双灵卫单位技能配置"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.02．数值与表现配置")
@@ -15,6 +18,15 @@ local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单�
 local ____12_FF0E_53F0_8BCD_64AD_653E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.06．祖地双灵卫.12．台词播放")
 local _____64AD_653E_8D64_8A93_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放赤誓灵卫台词"]
 local _____64AD_653E_82CD_5F71_7075_536B_53F0_8BCD = ____12_FF0E_53F0_8BCD_64AD_653E["播放苍影灵卫台词"]
+function _____8BFB_53D6_9636_6BB5_5E8F_53F7(context)
+    if context["阶段"] == "P3双蚀共鸣" or context["阶段"] == "净化收束" then
+        return 3
+    end
+    if context["阶段"] == "P2侵蚀失衡" then
+        return 2
+    end
+    return 1
+end
 local ____require_result_0 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.01．Boss战运行上下文")
 local _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587 = ____require_result_0["读取Boss战运行上下文"]
 local ____require_result_1 = require("系统.00．核心系统.05．中心计时器")
@@ -203,6 +215,20 @@ ____exports["创建祖地双灵卫运行时上下文"] = function(_____8D64_8A93
         ["清理"] = _____6E05_7406,
         ["已初始化"] = _____8D64_8A93_7075_536B_5355_4F4D ~= nil and _____82CD_5F71_7075_536B_5355_4F4D ~= nil
     }
+    _____6CE8_518CBoss_9636_6BB5_72B6_6001(
+        _____8D64_8A93_7075_536B_5355_4F4D,
+        _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"],
+        _____8BFB_53D6_9636_6BB5_5E8F_53F7,
+        context,
+        _____6E05_7406
+    )
+    _____6CE8_518CBoss_9636_6BB5_72B6_6001(
+        _____82CD_5F71_7075_536B_5355_4F4D,
+        _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"],
+        _____8BFB_53D6_9636_6BB5_5E8F_53F7,
+        context,
+        _____6E05_7406
+    )
     return context
 end
 ____exports["获取祖地双灵卫运行时上下文"] = function(unit)

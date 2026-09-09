@@ -11,8 +11,9 @@ const { 环境互动装备奖励概率 } = require("系统.03．技能系统.04�
 const { 解析配置内部ID } = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具") as {
   解析配置内部ID: (this: void, 配置值: string | undefined | null) => number;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
   创建物品并注册排泄监听: (this: void, 物品类型ID: number, X: number, Y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
   创建召唤物: (this: void, 参数: any) => any;
@@ -37,7 +38,6 @@ const GetHeroStr = jass.GetHeroStr as (this: void, 英雄: any, 包含加成: bo
 const SetHeroStr = jass.SetHeroStr as (this: void, 英雄: any, 数值: number, 永久: boolean) => void;
 const GetUnitState = jass.GetUnitState as (this: void, 单位: any, 状态: number) => number;
 const SetUnitState = jass.SetUnitState as (this: void, 单位: any, 状态: number, 数值: number) => void;
-const UnitAddItem = jass.UnitAddItem as (this: void, 单位: any, 物品: any) => boolean;
 const SGSS_SetState = (require("lib.扩展函数.Star扩展函数.00．SGSS") as {
   SGSS_SetState: (this: void, 单位: any, 属性ID: number, 数值: number) => void;
 }).SGSS_SetState;
@@ -69,7 +69,7 @@ function 给予物品(this: void, 单位: any, 名称: string): boolean {
   if (配置ID == null) return false;
   const 物品 = 创建物品并注册排泄监听(解析配置内部ID(配置ID), GetUnitX(单位), GetUnitY(单位));
   if (物品 == null || 物品 === 0) return false;
-  return UnitAddItem(单位, 物品);
+  return 给予单位物品(单位, 物品);
 }
 
 function 完全恢复生命与魔法(this: void, 单位: any): void {

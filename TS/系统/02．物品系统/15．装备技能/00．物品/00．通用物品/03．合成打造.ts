@@ -8,8 +8,9 @@ const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, name: string) => string | undefined;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.index") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.index") as {
   创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 const { createTimedEffect } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   createTimedEffect: (this: void, modelPath: string, x: number, y: number, z?: number, duration?: number) => any;
@@ -30,7 +31,6 @@ const GetItemCharges = jass.GetItemCharges as (item: any) => number;
 const SetItemCharges = jass.SetItemCharges as (item: any, charges: number) => void;
 const RemoveItem = jass.RemoveItem as (item: any) => void;
 const UnitItemInSlot = jass.UnitItemInSlot as (unit: any, slot: number) => any;
-const UnitAddItem = jass.UnitAddItem as (unit: any, item: any) => boolean | number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
 const GetUnitY = jass.GetUnitY as (unit: any) => number;
 
@@ -285,7 +285,7 @@ function 创建并加入合成产物(this: void, 单位: any, 产物类型ID: nu
 
   const charges = GetItemCharges(产物);
   if (charges > 0) SetItemCharges(产物, 1);
-  UnitAddItem(单位, 产物);
+  给予单位物品(单位, 产物);
   输出合成调试日志("创建产物成功", "product", fourCCToStringSafe(产物类型ID));
   return 产物;
 }

@@ -63,7 +63,7 @@ function 取亡者凝视冷却(this: void, context: 亚伦柯斯运行时上下�
 
 function 到达最终强化阈值(this: void, context: 亚伦柯斯运行时上下文): boolean {
   const maxLife = GetUnitStateJapi(context.Boss单位, UNIT_STATE_MAX_LIFE);
-  return maxLife > 0 && GetUnitState(context.Boss单位, UNIT_STATE_LIFE) / maxLife <= 亚伦柯斯正式设计配置.阶段阈值.最终强化生命比例;
+  return maxLife > 0 && GetUnitState(context.Boss单位, UNIT_STATE_LIFE) / maxLife <= 亚伦柯斯正式设计配置.阶段阈值.P4生命比例;
 }
 
 export function 注册亚伦柯斯技能调度(this: void): void {

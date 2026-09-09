@@ -12,13 +12,13 @@ const { 按名字反查物品ID } = require("系统.02．物品系统.13．物�
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, 内容: string | undefined | null) => number;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
   创建物品并注册排泄监听: (this: void, 物品类型ID: number, x: number, y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 
 const GetUnitX = jass.GetUnitX as (单位: any) => number;
 const GetUnitY = jass.GetUnitY as (单位: any) => number;
-const UnitAddItem = jass.UnitAddItem as (单位: any, 物品: any) => boolean | number;
 
 export function 获取首领奖励接收英雄(this: void, 玩家: any): any {
   const 注册英雄 = YDUserDataGetSafe("player", 玩家, "英雄", "unit");
@@ -37,6 +37,5 @@ export function 发放首领奖励装备(this: void, 玩家: any, 装备名: str
   const 物品 = 创建物品并注册排泄监听(物品类型ID, GetUnitX(英雄), GetUnitY(英雄));
   if (物品 == null || 物品 === 0) return false;
 
-  UnitAddItem(英雄, 物品);
-  return true;
+  return 给予单位物品(英雄, 物品);
 }

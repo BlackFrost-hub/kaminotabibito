@@ -18,20 +18,28 @@ local ____require_result_2 = require("系统.00．核心系统.00．玩家系统
 local getRegisteredPlayerHero = ____require_result_2.getRegisteredPlayerHero
 local ____require_result_3 = require("lib.扩展函数.物品相关函数.index")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_3["创建物品并注册排泄监听"]
+local _____521B_5EFA_7269_54C1_5E76_7ED9_4E88_5355_4F4D = ____require_result_3["创建物品并给予单位"]
 local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_4.stringToFourCCSafe
-local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_5.debugLogForce
+local ____require_result_5 = require("系统.02．物品系统.13．物品名反查")
+local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_5["按名字反查物品ID"]
+local ____require_result_6 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_6.debugLogForce
 local _____88C5_5907_6570_636E_6A21_5757 = require("系统.02．物品系统.01．装备数据")
 local _____88C5_5907_6570_636E = _____88C5_5907_6570_636E_6A21_5757.default or _____88C5_5907_6570_636E_6A21_5757.items or ({})
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetRandomInt = jass.GetRandomInt
+local UnitItemInSlot = jass.UnitItemInSlot
+local GetItemName = jass.GetItemName
+local RemoveItem = jass.RemoveItem
 local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
 local _____6A21_5757_540D = "物品评分测试"
 local _____7269_54C1_8BC4_5206_547D_4EE4_524D_7F00 = "物品+"
+local _____7269_54C1_540D_547D_4EE4_524D_7F00 = "创建+"
 local _____7269_54C1_5185_90E8ID_547D_4EE4_524D_7F00 = "WP"
 local _____968F_673A6000_5206_88C5_5907_547D_4EE4 = "djcs"
+local _____5220_9664_7B2C_4E00_683C_7269_54C1_547D_4EE4 = "del1"
 local _____9ED8_8BA4_968F_673A_76EE_6807_8BC4_5206 = 6000
 local _____8BC4_5206_6D6E_52A8_8303_56F4 = 500
 local _____6279_91CF_521B_5EFA_6570_91CF = 10
@@ -299,7 +307,80 @@ local function ____on_7269_54C1_5185_90E8ID_547D_4EE4(player, command)
     )
     debugLogForce(_____6A21_5757_540D, "按内部ID创建物品", "itemId", itemId)
 end
+local function ____on_7269_54C1_540D_547D_4EE4(player, command)
+    if not _____662F_5141_8BB8_6D4B_8BD5_73A9_5BB6(player) then
+        return
+    end
+    local _____7269_54C1_540D = __TS__StringTrim(__TS__StringSubstring(command, #_____7269_54C1_540D_547D_4EE4_524D_7F00))
+    if _____7269_54C1_540D == "" then
+        _____53D1_9001_5931_8D25_63D0_793A(player, "命令格式：创建+完整物品名，例如 创建+湮灭之风戒指。")
+        return
+    end
+    local itemId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____7269_54C1_540D)
+    if itemId == nil then
+        _____53D1_9001_5931_8D25_63D0_793A(player, ("没有找到名字完全匹配「" .. _____7269_54C1_540D) .. "」的物品，请输入完整物品名。")
+        return
+    end
+    local hero = _____83B7_53D6_6D4B_8BD5_82F1_96C4(player)
+    if not _____662F_6709_6548_53E5_67C4(hero) then
+        _____53D1_9001_5931_8D25_63D0_793A(player, "未找到该玩家的注册英雄。")
+        return
+    end
+    local _____7269_54C1_7C7B_578BID = stringToFourCCSafe(itemId)
+    if _____7269_54C1_7C7B_578BID == 0 then
+        _____53D1_9001_5931_8D25_63D0_793A(player, ("物品ID转换失败：" .. itemId) .. "。")
+        return
+    end
+    local item = _____521B_5EFA_7269_54C1_5E76_7ED9_4E88_5355_4F4D(hero, _____7269_54C1_7C7B_578BID)
+    if not _____662F_6709_6548_53E5_67C4(item) then
+        _____53D1_9001_5931_8D25_63D0_793A(player, ("创建物品失败：" .. itemId) .. "（背包已满？）。")
+        return
+    end
+    local data = _____88C5_5907_6570_636E[itemId]
+    DisplayTimedTextToPlayer(
+        player,
+        0,
+        0,
+        6,
+        ((("[物品测试] 已发放到英雄背包 " .. (data and data.name or _____7269_54C1_540D)) .. "（") .. itemId) .. "）。"
+    )
+    debugLogForce(
+        _____6A21_5757_540D,
+        "按名字发放物品",
+        "name",
+        _____7269_54C1_540D,
+        "itemId",
+        itemId
+    )
+end
+local function ____on_5220_9664_7B2C_4E00_683C_7269_54C1_547D_4EE4(player, _command)
+    if not _____662F_5141_8BB8_6D4B_8BD5_73A9_5BB6(player) then
+        return
+    end
+    local hero = _____83B7_53D6_6D4B_8BD5_82F1_96C4(player)
+    if not _____662F_6709_6548_53E5_67C4(hero) then
+        _____53D1_9001_5931_8D25_63D0_793A(player, "未找到该玩家的注册英雄。")
+        return
+    end
+    local item = UnitItemInSlot(hero, 0)
+    if not _____662F_6709_6548_53E5_67C4(item) then
+        _____53D1_9001_5931_8D25_63D0_793A(player, "英雄第一格没有物品。")
+        return
+    end
+    local name = GetItemName(item)
+    RemoveItem(item)
+    DisplayTimedTextToPlayer(
+        player,
+        0,
+        0,
+        10,
+        (("[物品测试] 已直接 RemoveItem 删除第一格：" .. name) .. "。") .. "若随后出现『系统消息：当前装备加成』说明原生检测到了丢弃；若没有任何系统消息且属性面板数值未回落，说明裸删除检测不到。"
+    )
+    debugLogForce(_____6A21_5757_540D, "直接删除第一格物品（RemoveItem 实验）", "name", name)
+end
 _____6CE8_518C_804A_5929_547D_4EE4_524D_7F00_76D1_542C(_____7269_54C1_8BC4_5206_547D_4EE4_524D_7F00, ____on_7269_54C1_8BC4_5206_547D_4EE4)
 _____6CE8_518C_804A_5929_547D_4EE4_524D_7F00_76D1_542C(_____7269_54C1_5185_90E8ID_547D_4EE4_524D_7F00, ____on_7269_54C1_5185_90E8ID_547D_4EE4)
+_____6CE8_518C_804A_5929_547D_4EE4_524D_7F00_76D1_542C(_____7269_54C1_540D_547D_4EE4_524D_7F00, ____on_7269_54C1_540D_547D_4EE4)
 _____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____968F_673A6000_5206_88C5_5907_547D_4EE4, ____on_968F_673A6000_5206_88C5_5907_547D_4EE4)
+_____6CE8_518C_804A_5929_547D_4EE4_76D1_542C(_____5220_9664_7B2C_4E00_683C_7269_54C1_547D_4EE4, ____on_5220_9664_7B2C_4E00_683C_7269_54C1_547D_4EE4)
 return ____exports

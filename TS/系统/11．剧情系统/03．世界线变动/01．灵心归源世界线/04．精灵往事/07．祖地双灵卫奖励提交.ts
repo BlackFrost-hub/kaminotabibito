@@ -14,8 +14,8 @@ const { addSelectionListener } = require("系统.00．核心系统.01．事件�
 const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, player: any) => any;
 };
-const { 打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
-  打开首领奖励选择界面: (this: void, rewardPoolId: string, player: any) => void;
+const { 延迟打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
+  延迟打开首领奖励选择界面: (this: void, rewardPoolId: string, player: any) => void;
 };
 const { 祖地双灵卫奖励池ID } = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index") as {
   祖地双灵卫奖励池ID: string;
@@ -50,7 +50,7 @@ function 发放祖地双灵卫全队奖励(this: void): void {
     if (!是在局用户(player)) continue;
     const current = GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_LUMBER);
     SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_LUMBER, current + 1);
-    打开首领奖励选择界面(祖地双灵卫奖励池ID, player);
+    延迟打开首领奖励选择界面(祖地双灵卫奖励池ID, player);
   }
 }
 
@@ -73,7 +73,7 @@ function on接受祖地双灵卫奖励提交(this: void): void {
 
 function 打开已提交对话(this: void, player: any): void {
   const UI函数 = require("系统.00．核心系统.03．UI函数") as {
-    openNpcDialog: (this: void, player: any, data: any) => boolean;
+    openNpcDialog: (player: any, data: any) => boolean;
   };
   UI函数.openNpcDialog(player, {
     lines: [
@@ -91,7 +91,7 @@ function 打开已提交对话(this: void, player: any): void {
 
 function 打开奖励提交对话(this: void, player: any): void {
   const UI函数 = require("系统.00．核心系统.03．UI函数") as {
-    openNpcDialog: (this: void, player: any, data: any) => boolean;
+    openNpcDialog: (player: any, data: any) => boolean;
   };
   UI函数.openNpcDialog(player, {
     lines: [
@@ -132,4 +132,3 @@ export function init祖地双灵卫奖励提交(this: void): void {
   奖励提交模块已初始化 = true;
   addSelectionListener(on祖地双灵卫奖励NPC选择);
 }
-

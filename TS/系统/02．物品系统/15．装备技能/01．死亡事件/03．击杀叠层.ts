@@ -5,6 +5,7 @@ const jass = require("jass.common") as any;
 const itemJudgeFns = require("lib.扩展函数.物品相关函数.index") as {
   GetItemOfTypeFromUnitBJ: (this: void, whichUnit: any, itemId: number) => any | null;
   创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 
 import { 获取死亡事件配置, 取物品四字码 } from "./01．死亡事件配置表";
@@ -18,7 +19,7 @@ function 给予升级装备(this: void, 单位: any, 升级到装备ID: string |
   const y = jass.GetUnitY(单位) as number;
   const item = itemJudgeFns.创建物品并注册排泄监听(升级四字码, x, y);
   if (item == null || item === 0) return;
-  jass.UnitAddItem(单位, item);
+  itemJudgeFns.给予单位物品(单位, item);
 }
 
 function 处理单个击杀叠层(this: void, 击杀者: any, 配置: 已解析击杀叠层配置): void {

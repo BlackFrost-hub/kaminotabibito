@@ -21,6 +21,7 @@ ____exports["蛇人族卫队长血线承接配置"] = {
     ["清理Boss语义键"] = "蛇人族卫队长",
     ["清理目标YD表"] = true,
     ["移除目标单位"] = true,
+    ["结束Boss战"] = true,
     ["支线任务发现"] = {["任务数组索引"] = 7, ["任务名"] = "至强者的传承", ["图标路径"] = "ReplaceableTextures\\CommandButtons\\BTNGMExchange.blp", ["发现提示"] = "|cffffff00『系统提示』|r：发现支线任务|cffff00ff『至强者的传承』|r"},
     ["延迟显示"] = {
         ["延迟秒数"] = 5,

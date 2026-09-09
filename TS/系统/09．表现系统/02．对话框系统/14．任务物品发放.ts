@@ -1,7 +1,9 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
-const UnitAddItemById = jass.UnitAddItemById as (this: void, unit: any, itemId: number) => any;
+const { 创建物品并给予单位 } = require("lib.扩展函数.物品相关函数.index") as {
+  创建物品并给予单位: (this: void, unit: any, itemId: number) => any;
+};
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, rawId: string | undefined | null) => number;
 };
@@ -20,7 +22,7 @@ export function 发放任务物品(this: void, unit: any, itemConfig: string | u
     const 物品类型ID = stringToFourCCSafe(物品代码);
     if (物品类型ID === 0) continue;
     for (let j = 0; j < 数量; j++) {
-      const 物品 = UnitAddItemById(unit, 物品类型ID);
+      const 物品 = 创建物品并给予单位(unit, 物品类型ID);
       if (物品 != null && 物品 !== 0) 发放数量 += 1;
     }
   }

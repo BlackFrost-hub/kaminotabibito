@@ -13,6 +13,7 @@ local ____require_result_1 = require("系统.02．物品系统.13．物品名反
 local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_1["按名字反查物品ID"]
 local ____require_result_2 = require("lib.扩展函数.物品相关函数.index")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_2["创建物品并注册排泄监听"]
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_2["给予单位物品"]
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local createTimedEffect = ____require_result_3.createTimedEffect
 local ____require_result_4 = require("系统.02．物品系统.11．装备系统")
@@ -28,7 +29,6 @@ local GetItemCharges = jass.GetItemCharges
 local SetItemCharges = jass.SetItemCharges
 local RemoveItem = jass.RemoveItem
 local UnitItemInSlot = jass.UnitItemInSlot
-local UnitAddItem = jass.UnitAddItem
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local _____5408_6210_8C03_8BD5_6A21_5757 = "装备合成"
@@ -396,7 +396,7 @@ local function _____521B_5EFA_5E76_52A0_5165_5408_6210_4EA7_7269(_____5355_4F4D,
     if charges > 0 then
         SetItemCharges(_____4EA7_7269, 1)
     end
-    UnitAddItem(_____5355_4F4D, _____4EA7_7269)
+    _____7ED9_4E88_5355_4F4D_7269_54C1(_____5355_4F4D, _____4EA7_7269)
     _____8F93_51FA_5408_6210_8C03_8BD5_65E5_5FD7(
         "创建产物成功",
         "product",

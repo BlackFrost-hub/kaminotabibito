@@ -35,13 +35,15 @@ local _____542F_52A8_57FA_7840_65BD_6CD5_65F6_95F4_7EBF = ____require_result_1["
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local GetUnitStateJapi = japi.GetUnitState
+local EXSetUnitMoveType = japi.EXSetUnitMoveType
 local GetUnitTypeId = jass.GetUnitTypeId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetHandleId = jass.GetHandleId
 local GetOwningPlayer = jass.GetOwningPlayer
 local GetRandomReal = jass.GetRandomReal
-local IssuePointOrder = jass.IssuePointOrder
+local SetUnitX = jass.SetUnitX
+local SetUnitY = jass.SetUnitY
 local GetUnitState = jass.GetUnitState
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT
@@ -53,6 +55,7 @@ local ____require_result_3 = require("系统.01．单位系统.06．仇恨系统
 local _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868 = ____require_result_3["获取Boss技能敌对英雄列表"]
 local _____83AB_5C14_7279_65AF_5355_4F4D_7C7B_578BID = stringToFourCC(_____83AB_5C14_7279_65AF_5355_4F4D_6280_80FD_914D_7F6E["单位ID"])
 local _____8150_8D25_5B62_5B50_4E91_6280_80FDID = stringToFourCC(_____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败孢子云"]["技能槽位"])
+local _____5B62_5B50_4E91_79FB_52A8Tick_95F4_9694_79D2 = 0.03
 local _____5DF2_6CE8_518C = false
 local function _____9500_6BC1_5B62_5B50_4E91(data)
     local _____533A_57DF_5B9E_4F8B = data["区域实例"]
@@ -80,6 +83,7 @@ local function _____5B62_5B50_4E91Tick(data, _____533A_57DF_5185_5355_4F4D)
         return
     end
     data["剩余跳数"] = data["剩余跳数"] - 1
+    data["伤害计时"] = data["伤害计时"] + _____5B62_5B50_4E91_79FB_52A8Tick_95F4_9694_79D2
     local currentX = GetUnitX(spore)
     local currentY = GetUnitY(spore)
     local heroes = _____83B7_53D6Boss_6280_80FD_654C_5BF9_82F1_96C4_5217_8868(boss)
@@ -94,44 +98,54 @@ local function _____5B62_5B50_4E91Tick(data, _____533A_57DF_5185_5355_4F4D)
             i = i + 1
         end
     end
-    do
-        local i = 0
-        while i < #heroes do
-            do
-                local hero = heroes[i + 1]
-                if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue11
+    if data["伤害计时"] >= 1 then
+        do
+            local i = 0
+            while i < #heroes do
+                do
+                    local hero = heroes[i + 1]
+                    if not _____5355_4F4D_6709_6548(hero) then
+                        goto __continue12
+                    end
+                    if not _____533A_57DF_5355_4F4D_8868[GetHandleId(hero)] then
+                        goto __continue12
+                    end
+                    _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
+                        ["技能ID"] = _____8150_8D25_5B62_5B50_4E91_6280_80FDID,
+                        ["来源"] = boss,
+                        ["目标"] = hero,
+                        ["伤害公式"] = {["目标最大生命比例"] = cfg["每秒目标最大生命比例"]},
+                        attack = false,
+                        ranged = false,
+                        attackType = ATTACK_TYPE_NORMAL,
+                        ["伤害类型"] = DAMAGE_TYPE_PLANT,
+                        weaponType = WEAPON_TYPE_WHOKNOWS
+                    })
+                    _____521B_5EFA_70B9_7279_6548({
+                        ["模型路径"] = cfg["命中特效路径"],
+                        X = GetUnitX(hero),
+                        Y = GetUnitY(hero),
+                        ["持续秒"] = cfg["瞬时特效持续秒"]
+                    })
+                    _____5E94_7528_83AB_5C14_7279_65AF_8150_8D25_503C(data.context, hero, cfg["每秒腐败值"])
                 end
-                if not _____533A_57DF_5355_4F4D_8868[GetHandleId(hero)] then
-                    goto __continue11
-                end
-                _____6267_884CBossAOE_6280_80FD_4F24_5BB3({
-                    ["技能ID"] = _____8150_8D25_5B62_5B50_4E91_6280_80FDID,
-                    ["来源"] = boss,
-                    ["目标"] = hero,
-                    ["伤害公式"] = {["目标最大生命比例"] = cfg["每秒目标最大生命比例"]},
-                    attack = false,
-                    ranged = false,
-                    attackType = ATTACK_TYPE_NORMAL,
-                    ["伤害类型"] = DAMAGE_TYPE_PLANT,
-                    weaponType = WEAPON_TYPE_WHOKNOWS
-                })
-                _____521B_5EFA_70B9_7279_6548({
-                    ["模型路径"] = cfg["命中特效路径"],
-                    X = GetUnitX(hero),
-                    Y = GetUnitY(hero),
-                    ["持续秒"] = cfg["瞬时特效持续秒"]
-                })
-                _____5E94_7528_83AB_5C14_7279_65AF_8150_8D25_503C(data.context, hero, cfg["每秒腐败值"])
+                ::__continue12::
+                i = i + 1
             end
-            ::__continue11::
-            i = i + 1
         end
     end
-    local angle = GetRandomReal(0, 360)
-    local destinationX = _____6781_5750_6807X(currentX, angle, cfg["移动距离"])
-    local destinationY = _____6781_5750_6807Y(currentY, angle, cfg["移动距离"])
-    IssuePointOrder(spore, "move", destinationX, destinationY)
+    if data["伤害计时"] >= 1 then
+        data["伤害计时"] = 0
+    end
+    local step = cfg["移动距离"] * _____5B62_5B50_4E91_79FB_52A8Tick_95F4_9694_79D2
+    SetUnitX(
+        spore,
+        _____6781_5750_6807X(currentX, data["移动角度"], step)
+    )
+    SetUnitY(
+        spore,
+        _____6781_5750_6807Y(currentY, data["移动角度"], step)
+    )
     if data["剩余跳数"] <= 0 then
         _____9500_6BC1_5B62_5B50_4E91(data)
     end
@@ -141,7 +155,14 @@ local function _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
     local cfg = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["腐败孢子云"]
     local bossMaxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE)
     local sporeCloudMaxLife = cfg["基础生命值"] + bossMaxLife * cfg["Boss最大生命比例"]
-    local data = {context = context, ["孢子单位"] = nil, ["机制单位实例"] = nil, ["剩余跳数"] = cfg["持续秒"]}
+    local data = {
+        context = context,
+        ["孢子单位"] = nil,
+        ["机制单位实例"] = nil,
+        ["剩余跳数"] = cfg["持续秒"] / _____5B62_5B50_4E91_79FB_52A8Tick_95F4_9694_79D2,
+        ["移动角度"] = GetRandomReal(0, 360),
+        ["伤害计时"] = 1
+    }
     local instance = _____521B_5EFA_53EF_653B_51FB_673A_5236_5355_4F4D({
         ["清理"] = context["清理"],
         ["名称"] = "莫尔特斯-腐败孢子云",
@@ -165,6 +186,7 @@ local function _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
     end
     data["机制单位实例"] = instance
     data["孢子单位"] = instance["单位"]
+    EXSetUnitMoveType(data["孢子单位"], 4)
     _____64AD_653EBoss_5750_6807_97F3_6548(
         _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E["腐败孢子云"]["成形"],
         GetUnitX(instance["单位"]),
@@ -177,7 +199,7 @@ local function _____521B_5EFA_5355_56E2_5B62_5B50_4E91(context)
         ["锚点单位"] = instance["单位"],
         ["半径"] = cfg["半径"],
         ["持续时间"] = cfg["持续秒"] + cfg["Tick间隔毫秒"] / 1000,
-        ["检测间隔"] = cfg["Tick间隔毫秒"] / 1000,
+        ["检测间隔"] = _____5B62_5B50_4E91_79FB_52A8Tick_95F4_9694_79D2,
         ["所有者"] = boss,
         ["影响目标"] = "敌方",
         ["提示圈"] = {

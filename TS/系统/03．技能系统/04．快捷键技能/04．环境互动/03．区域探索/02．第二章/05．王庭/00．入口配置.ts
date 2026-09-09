@@ -12,8 +12,9 @@ const { 环境互动装备奖励概率 } = require("系统.03．技能系统.04�
 const { 解析配置内部ID } = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具") as {
   解析配置内部ID: (this: void, 配置值: string | undefined | null) => number;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
   创建物品并注册排泄监听: (this: void, 物品类型ID: number, X: number, Y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, 物品名: string) => string | undefined;
@@ -24,7 +25,6 @@ const { 发送单位提示给玩家 } = require("系统.09．表现系统.06．�
 
 const GetUnitX = jass.GetUnitX as (this: void, 单位: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, 单位: any) => number;
-const UnitAddItem = jass.UnitAddItem as (this: void, 单位: any, 物品: any) => boolean;
 
 const 提示持续毫秒 = 5200;
 
@@ -38,7 +38,7 @@ function 给予物品(this: void, 单位: any, 名称: string): boolean {
   if (配置ID == null) return false;
   const 物品 = 创建物品并注册排泄监听(解析配置内部ID(配置ID), GetUnitX(单位), GetUnitY(单位));
   if (物品 == null || 物品 === 0) return false;
-  return UnitAddItem(单位, 物品);
+  return 给予单位物品(单位, 物品);
 }
 
 function 获得当前升级经验百分比(this: void, 单位: any, 比例: number): void {

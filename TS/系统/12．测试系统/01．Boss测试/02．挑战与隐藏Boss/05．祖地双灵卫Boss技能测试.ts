@@ -227,7 +227,7 @@ function 记录双灵卫被动测试结果(
     '保护特效', runtime.同誓保护特效 != null && runtime.同誓保护特效 !== 0,
     '暗金连线', runtime.同誓暗金连线 != null,
     '冷蓝连线', runtime.同誓冷蓝连线 != null,
-    '侵蚀目标下限比例', 祖地双灵卫单位技能配置.阶段阈值.首次变异生命比例,
+    '侵蚀目标下限比例', 祖地双灵卫单位技能配置.阶段阈值.P2生命比例,
     '同息目标下限比例', 祖地双灵卫单位技能配置.阶段阈值.灵魂崩解生命比例,
     '侵蚀锁血-赤誓', redErosionController?.是否生效(), '已触底', redErosionController?.是否已触底(), '下限', redErosionController?.读取生命下限(),
     '侵蚀锁血-苍影', azureErosionController?.是否生效(), '已触底', azureErosionController?.是否已触底(), '下限', azureErosionController?.读取生命下限(),

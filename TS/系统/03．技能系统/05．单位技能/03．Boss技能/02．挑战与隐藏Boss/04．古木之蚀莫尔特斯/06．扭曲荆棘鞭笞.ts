@@ -120,7 +120,6 @@ function 清理莫尔特斯扭曲荆棘鞭笞特效(this: void, context: 莫尔�
     const effect = effects[i];
     if (effect != null && effect !== 0) {
       if (typeof DzSetEffectVertexAlpha === "function") DzSetEffectVertexAlpha(effect, 0);
-      if (typeof EXSetEffectSize === "function") EXSetEffectSize(effect, 0.01);
       DestroyEffect(effect);
     }
   }
@@ -133,7 +132,6 @@ function 延迟清理莫尔特斯扭曲荆棘鞭笞特效(this: void, effects: a
     const effect = effects[i];
     if (effect != null && effect !== 0) {
       if (typeof DzSetEffectVertexAlpha === "function") DzSetEffectVertexAlpha(effect, 0);
-      if (typeof EXSetEffectSize === "function") EXSetEffectSize(effect, 0.01);
       DestroyEffect(effect);
     }
   }

@@ -25,7 +25,8 @@ local GetTriggerUnit = jass.GetTriggerUnit
 local GetTriggeringRegion = jass.GetTriggeringRegion
 local GetHandleId = jass.GetHandleId
 local GetUnitTypeId = jass.GetUnitTypeId
-local UnitAddItemById = jass.UnitAddItemById
+local ____require_result_0 = require("lib.扩展函数.物品相关函数.index")
+local _____521B_5EFA_7269_54C1_5E76_7ED9_4E88_5355_4F4D = ____require_result_0["创建物品并给予单位"]
 local _____83B7_53D6_77E9_5F62_533A_57DF = _____7EDF_4E00_77E9_5F62_533A_57DF_8BFB_53D6["获取矩形区域"]
 local _____4E16_754C_5730_56FE_533A_57DF_914D_7F6EBy_77E9_5F62_533A_57DF_540D_79F0 = {}
 local _____4E16_754C_5730_56FE_533A_57DF_914D_7F6EBy_53E5_67C4ID = {}
@@ -87,7 +88,7 @@ local function _____5904_7406_65C5_884C_5956_52B1(unit, _____914D_7F6E_7D22_5F15
         "boolean",
         true
     )
-    UnitAddItemById(
+    _____521B_5EFA_7269_54C1_5E76_7ED9_4E88_5355_4F4D(
         unit,
         ____FourCC_5B89_5168_7248.stringToFourCCSafe("I0DN")
     )

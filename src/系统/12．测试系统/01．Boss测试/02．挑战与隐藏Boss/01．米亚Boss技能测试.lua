@@ -21,7 +21,7 @@ local _____83B7_53D6_6216_521B_5EFA_7C73_4E9A_4E0A_4E0B_6587 = ____require_resul
 local _____6E05_7406_7C73_4E9A_4E0A_4E0B_6587 = ____require_result_4["清理米亚上下文"]
 local _____6CE8_518C_7C73_4E9A_8FD0_884C_65F6 = ____require_result_4["注册米亚运行时"]
 local ____require_result_5 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.02．数值与表现配置")
-local _____7C73_4E9A_9636_6BB5_9608_503C = ____require_result_5["米亚阶段阈值"]
+local _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E = ____require_result_5["米亚技能数值配置"]
 local ____require_result_6 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.00．配置")
 local _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_6["米亚单位技能配置"]
 local ____require_result_7 = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.02．污染之猫米亚.03．运行时上下文")
@@ -175,7 +175,7 @@ local function _____8BBE_7F6E_7C73_4E9A_6D4B_8BD5_9636_6BB5(context, _____9636_6
     if not (_____6700_5927_751F_547D_503C > 0) then
         return false
     end
-    local _____751F_547D_6BD4_4F8B = _____9636_6BB5 == 1 and 1 or (_____9636_6BB5 == 2 and (_____7C73_4E9A_9636_6BB5_9608_503C["第二阶段生命比例"] + _____7C73_4E9A_9636_6BB5_9608_503C["第三阶段生命比例"]) * 0.5 or _____7C73_4E9A_9636_6BB5_9608_503C["第三阶段生命比例"] * 0.5)
+    local _____751F_547D_6BD4_4F8B = _____9636_6BB5 == 1 and 1 or (_____9636_6BB5 == 2 and (_____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["阶段阈值"]["P2生命比例"] + _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["阶段阈值"]["P3生命比例"]) * 0.5 or _____7C73_4E9A_6280_80FD_6570_503C_914D_7F6E["阶段阈值"]["P3生命比例"] * 0.5)
     SetUnitState(boss, UNIT_STATE_LIFE, _____6700_5927_751F_547D_503C * _____751F_547D_6BD4_4F8B)
     local _____9636_6BB5ID = _____9636_6BB5 == 1 and "P1" or (_____9636_6BB5 == 2 and "P2" or "P3")
     local _____9636_6BB5_4E0A_4E0B_6587 = context["阶段上下文"]

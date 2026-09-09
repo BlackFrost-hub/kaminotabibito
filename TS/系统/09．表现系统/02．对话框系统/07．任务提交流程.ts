@@ -4,7 +4,6 @@ const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const UnitRemoveItem = jass.UnitRemoveItem as (this: void, unit: any, item: any) => boolean;
 const RemoveItem = jass.RemoveItem as (this: void, item: any) => void;
-const UnitAddItem = jass.UnitAddItem as (this: void, unit: any, item: any) => boolean;
 const { fourCCToString } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   fourCCToString: (this: void, four: number) => string;
 };
@@ -28,8 +27,9 @@ import { showLocalHint } from "./02．对话框业务逻辑";
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   stringToFourCC: (this: void, s: string) => number;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.index") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.index") as {
   创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
+  给予单位物品: (this: void, unit: any, item: any) => boolean;
 };
 const { 发放任务物品 } = require("系统.09．表现系统.02．对话框系统.14．任务物品发放") as {
   发放任务物品: (this: void, unit: any, itemConfig: string | undefined) => number;
@@ -78,7 +78,7 @@ function 执行任务物品升级(this: void, 英雄: any, 匹配: 任务物品�
 
   UnitRemoveItem(英雄, 匹配.原物品);
   RemoveItem(匹配.原物品);
-  UnitAddItem(英雄, 新物品);
+  给予单位物品(英雄, 新物品);
   return true;
 }
 

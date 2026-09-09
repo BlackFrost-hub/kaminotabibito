@@ -1,6 +1,8 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____on_4E9A_4F26_67EF_65AF_6B7B_4EA1, addDelayedCallback, YDWETimerDestroyEffectSafe, GetUnitX, GetUnitY, AddSpecialEffect, SetUnitVertexColor, _____4E9A_4F26_67EF_65AF_4E0A_4E0B_6587_5DE5_5382
+local ____on_4E9A_4F26_67EF_65AF_6B7B_4EA1, _____8BFB_53D6_9636_6BB5_5E8F_53F7, addDelayedCallback, YDWETimerDestroyEffectSafe, GetUnitX, GetUnitY, AddSpecialEffect, SetUnitVertexColor, _____4E9A_4F26_67EF_65AF_4E0A_4E0B_6587_5DE5_5382
+local ____01_FF0EBoss_9636_6BB5_72B6_6001 = require("系统.00．核心系统.03．脱战系统.01．Boss阶段状态")
+local _____6CE8_518CBoss_9636_6BB5_72B6_6001 = ____01_FF0EBoss_9636_6BB5_72B6_6001["注册Boss阶段状态"]
 local ____19_FF0E_6218_6597_516C_5171_5DE5_5177 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____5355_4F4D_6709_6548 = ____19_FF0E_6218_6597_516C_5171_5DE5_5177["单位未标记死亡"]
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.08．沉睡英魂亚伦柯斯.00．配置")
@@ -63,6 +65,18 @@ function ____on_4E9A_4F26_67EF_65AF_6B7B_4EA1(context, dyingUnit, _killingUnit)
     )
     local ____self_5 = context["清理"]
     ____self_5["登记延迟回调"](____self_5, "亚伦柯斯-战败归静", delayedId)
+end
+function _____8BFB_53D6_9636_6BB5_5E8F_53F7(context)
+    if context["已触发最终强化"] then
+        return 4
+    end
+    if context["阶段"] == "P3最后的誓约" then
+        return 3
+    end
+    if context["阶段"] == "P2旧誓回响" then
+        return 2
+    end
+    return 1
 end
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local getServerTime = ____require_result_0.getServerTime
@@ -131,6 +145,13 @@ local function _____521B_5EFA_4E0A_4E0B_6587(boss, _____6E05_7406)
         end
     })
     _____64AD_653E_4E9A_4F26_67EF_65AF_53F0_8BCD(boss, "开场")
+    _____6CE8_518CBoss_9636_6BB5_72B6_6001(
+        boss,
+        _____4E9A_4F26_67EF_65AF_6B63_5F0F_8BBE_8BA1_914D_7F6E["阶段阈值"],
+        _____8BFB_53D6_9636_6BB5_5E8F_53F7,
+        context,
+        _____6E05_7406
+    )
     return context
 end
 --- 独立测试可显式创建；正式战斗使用上下文工厂。

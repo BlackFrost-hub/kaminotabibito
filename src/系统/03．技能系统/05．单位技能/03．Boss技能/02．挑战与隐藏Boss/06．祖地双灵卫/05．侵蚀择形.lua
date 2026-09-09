@@ -149,7 +149,7 @@ ____exports["更新祖地双灵卫侵蚀阶段"] = function(context, now)
     local redRatio = _____751F_547D_6BD4_4F8B(context["赤誓灵卫单位"])
     local azureRatio = _____751F_547D_6BD4_4F8B(context["苍影灵卫单位"])
     if context["阶段"] == "P1双灵守门" then
-        local threshold = _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["首次变异生命比例"]
+        local threshold = _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P2生命比例"]
         if redRatio <= threshold or azureRatio <= threshold then
             _____8FDB_5165P2(context, redRatio <= azureRatio and "赤誓灵卫" or "苍影灵卫", now)
         end
@@ -159,13 +159,13 @@ ____exports["更新祖地双灵卫侵蚀阶段"] = function(context, now)
         return
     end
     local firstRatio = context["首次变异守卫"] == "赤誓灵卫" and redRatio or azureRatio
-    if now >= context["P2开始时间Ms"] + _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["公共"]["P2最短持续秒"] * 1000 or firstRatio <= _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["公共"]["P2首名变异者推进P3生命比例"] then
+    if now >= context["P2开始时间Ms"] + _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["公共"]["P2最短持续秒"] * 1000 or firstRatio <= _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P3生命比例"] then
         _____8FDB_5165P3(context, now)
     end
 end
 local function _____53D6_4FB5_8680_9636_6BB5_751F_547D_4E0B_9650_6BD4_4F8B(context, unit)
     if context["阶段"] == "P1双灵守门" then
-        return _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["首次变异生命比例"]
+        return _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P2生命比例"]
     end
     if context["阶段"] ~= "P2侵蚀失衡" or context["首次变异守卫"] == nil then
         return 0
@@ -177,7 +177,7 @@ local function _____53D6_4FB5_8680_9636_6BB5_751F_547D_4E0B_9650_6BD4_4F8B(conte
         ____temp_4 = context["苍影灵卫单位"]
     end
     local first = ____temp_4
-    return unit == first and _____7956_5730_53CC_7075_536B_6570_503C_4E0E_8868_73B0_914D_7F6E["公共"]["P2首名变异者推进P3生命比例"] or _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["混合阶段第二守卫最低生命比例"]
+    return unit == first and _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["P3生命比例"] or _____7956_5730_53CC_7075_536B_5355_4F4D_6280_80FD_914D_7F6E["阶段阈值"]["混合阶段第二守卫最低生命比例"]
 end
 ____exports["绑定祖地双灵卫侵蚀生命下限"] = function(context)
     if #context["侵蚀生命下限保护列表"] > 0 then

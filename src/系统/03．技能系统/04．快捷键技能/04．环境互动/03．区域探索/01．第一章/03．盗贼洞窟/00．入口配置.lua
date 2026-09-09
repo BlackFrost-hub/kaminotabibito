@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__ArraySetLength = ____lualib.__TS__ArraySetLength
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local _____53E5_67C4_6709_6548, _____589E_52A0_73A9_5BB6_8D44_6E90, _____7ED9_4E88_63A2_7D22_7269_54C1, _____7ED3_7B97_67D3_8840_901A_884C_724C_906D_9047, _____5904_7406_67D3_8840_901A_884C_724C_906D_9047_6B7B_4EA1, _____6CE8_9500_73AF_5883_4E92_52A8_8C03_67E5_70B9, _____89E3_6790_914D_7F6E_5185_90E8ID, _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C, _____6309_540D_5B57_53CD_67E5_7269_54C1ID, unregisterDeathListener, _____53D1_9001_5355_4F4D_63D0_793A_7ED9_73A9_5BB6, Player, GetUnitX, GetUnitY, GetPlayerState, SetPlayerState, UnitAddItem, PLAYER_STATE_RESOURCE_GOLD, _____63D0_793A_6301_7EED_6BEB_79D2, _____67D3_8840_901A_884C_724C_70B9_4F4DID, _____67D3_8840_901A_884C_724C_906D_9047_5DF2_521B_5EFA, _____67D3_8840_901A_884C_724C_5DF2_7ED3_7B97, _____67D3_8840_901A_884C_724C_906D_9047_82F1_96C4, _____67D3_8840_901A_884C_724C_906D_9047_73A9_5BB6ID, _____67D3_8840_901A_884C_724C_906D_9047_5355_4F4D_5217_8868
+local _____53E5_67C4_6709_6548, _____589E_52A0_73A9_5BB6_8D44_6E90, _____7ED9_4E88_63A2_7D22_7269_54C1, _____7ED3_7B97_67D3_8840_901A_884C_724C_906D_9047, _____5904_7406_67D3_8840_901A_884C_724C_906D_9047_6B7B_4EA1, _____6CE8_9500_73AF_5883_4E92_52A8_8C03_67E5_70B9, _____89E3_6790_914D_7F6E_5185_90E8ID, _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C, _____7ED9_4E88_5355_4F4D_7269_54C1, _____6309_540D_5B57_53CD_67E5_7269_54C1ID, unregisterDeathListener, _____53D1_9001_5355_4F4D_63D0_793A_7ED9_73A9_5BB6, Player, GetUnitX, GetUnitY, GetPlayerState, SetPlayerState, PLAYER_STATE_RESOURCE_GOLD, _____63D0_793A_6301_7EED_6BEB_79D2, _____67D3_8840_901A_884C_724C_70B9_4F4DID, _____67D3_8840_901A_884C_724C_906D_9047_5DF2_521B_5EFA, _____67D3_8840_901A_884C_724C_5DF2_7ED3_7B97, _____67D3_8840_901A_884C_724C_906D_9047_82F1_96C4, _____67D3_8840_901A_884C_724C_906D_9047_73A9_5BB6ID, _____67D3_8840_901A_884C_724C_906D_9047_5355_4F4D_5217_8868
 function _____53E5_67C4_6709_6548(_____53E5_67C4)
     return _____53E5_67C4 ~= nil and _____53E5_67C4 ~= 0
 end
@@ -27,7 +27,7 @@ function _____7ED9_4E88_63A2_7D22_7269_54C1(_____5355_4F4D, _____7269_54C1_540D)
     if not _____53E5_67C4_6709_6548(_____7269_54C1) then
         return false
     end
-    UnitAddItem(_____5355_4F4D, _____7269_54C1)
+    _____7ED9_4E88_5355_4F4D_7269_54C1(_____5355_4F4D, _____7269_54C1)
     return true
 end
 function _____7ED3_7B97_67D3_8840_901A_884C_724C_906D_9047()
@@ -90,6 +90,7 @@ local ____require_result_3 = require("系统.00．核心系统.01．事件中心
 local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_3["立即移除单位并取消排泄登记"]
 local ____require_result_4 = require("lib.扩展函数.物品相关函数.创建物品函数")
 _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_4["创建物品并注册排泄监听"]
+_____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_4["给予单位物品"]
 local ____require_result_5 = require("系统.02．物品系统.13．物品名反查")
 _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_5["按名字反查物品ID"]
 local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
@@ -108,7 +109,6 @@ GetUnitX = jass.GetUnitX
 GetUnitY = jass.GetUnitY
 GetPlayerState = jass.GetPlayerState
 SetPlayerState = jass.SetPlayerState
-UnitAddItem = jass.UnitAddItem
 local _____73A9_5BB6_4E2D_7ACB_654C_5BF9 = Player(jass.PLAYER_NEUTRAL_AGGRESSIVE)
 PLAYER_STATE_RESOURCE_GOLD = jass.PLAYER_STATE_RESOURCE_GOLD
 local PLAYER_STATE_RESOURCE_LUMBER = jass.PLAYER_STATE_RESOURCE_LUMBER

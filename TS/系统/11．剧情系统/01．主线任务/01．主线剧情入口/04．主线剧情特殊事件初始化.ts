@@ -15,6 +15,9 @@ const 剧情特殊事件暂停来源 = "剧情系统:特殊事件";
 const { registerSpellChannelListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSpellChannelListener: (this: void, callback: (this: void, castingUnit: any, spellAbilityId: number) => void) => void;
 };
+const { 主动结束Boss战运行 } = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动") as {
+  主动结束Boss战运行: (this: void, bossUnit: any, 选项?: { 跳过死亡音效?: boolean; 跳过死亡剧情?: boolean }) => boolean;
+};
 const { registerAppliedFinalDamageListener } = require("系统.04．伤害系统.00．伤害计算.04．主计算流程") as {
   registerAppliedFinalDamageListener: (this: void, cb: (this: void, target: any, attacker: any, applied: number, snapshot: any) => void) => void;
 };
@@ -226,6 +229,11 @@ function 执行最终伤害推进剧情(this: void, 配置: 主线剧情最终�
 
   执行区域音乐切换(配置);
   播放最终伤害对白列表(配置, attacker);
+
+  // 认输型战斗：战斗上下文只能由这里主动收尾，周期扫描等不到单位死亡（单位会被移除/保底存活）。
+  if (配置.结束Boss战 === true) {
+    主动结束Boss战运行(target, { 跳过死亡音效: true, 跳过死亡剧情: true });
+  }
 
   if (配置.移除目标单位 === true) {
     立即移除单位并取消排泄登记(target);

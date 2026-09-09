@@ -67,7 +67,6 @@ local _____64AD_653E_5E7F_64AD_5BF9_767D_5E8F_5217 = ____require_result_0["播�
 local ____require_result_1 = require("系统.09．表现系统.06．广播提示消息.00．常量定义")
 local _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 = ____require_result_1["广播提示玩家槽数"]
 local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addDelayedCallback = ____require_result_2.addDelayedCallback
 local addPeriodicCallback = ____require_result_2.addPeriodicCallback
 local removePeriodicCallback = ____require_result_2.removePeriodicCallback
 local ____require_result_3 = require("系统.00．核心系统.01．事件中心.02．区域事件中心")
@@ -97,7 +96,7 @@ local _____7C73_4E9A_5355_4F4D_6280_80FD_914D_7F6E = ____require_result_13["米�
 local ____require_result_14 = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index")
 local _____7C73_4E9A_5956_52B1_6C60ID = ____require_result_14["米亚奖励池ID"]
 local ____require_result_15 = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面")
-local _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_15["打开首领奖励选择界面"]
+local _____5EF6_8FDF_6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_15["延迟打开首领奖励选择界面"]
 local ____require_result_16 = require("系统.07．地形系统.09．动态矩形区域注册表.02．动态矩形区域动作")
 local _____6309_914D_7F6E_952E_6CE8_518C_52A8_6001_77E9_5F62_533A_57DF = ____require_result_16["按配置键注册动态矩形区域"]
 local _____6CE8_9500_52A8_6001_77E9_5F62_533A_57DF = ____require_result_16["注销动态矩形区域"]
@@ -359,7 +358,7 @@ ____exports["完成污染之猫米亚任务后打开首领奖励"] = function(__
         while _____73A9_5BB6ID < _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 do
             local _____73A9_5BB6 = Player(_____73A9_5BB6ID)
             if _____73A9_5BB6 ~= nil and jass.GetPlayerController(_____73A9_5BB6) == jass.MAP_CONTROL_USER then
-                _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____7C73_4E9A_5956_52B1_6C60ID, _____73A9_5BB6)
+                _____5EF6_8FDF_6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____7C73_4E9A_5956_52B1_6C60ID, _____73A9_5BB6)
             end
             _____73A9_5BB6ID = _____73A9_5BB6ID + 1
         end

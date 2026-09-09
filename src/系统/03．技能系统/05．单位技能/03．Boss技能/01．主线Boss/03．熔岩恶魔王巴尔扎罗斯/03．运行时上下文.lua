@@ -1,6 +1,11 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____on_5DF4_5C14_624E_7F57_65AF_6B7B_4EA1_53F0_8BCD, _____521B_5EFA_5408_6CD5_51B3_6597_573A_666F_5355_4F4D
+local ____01_FF0EBoss_9636_6BB5_72B6_6001 = require("系统.00．核心系统.03．脱战系统.01．Boss阶段状态")
+local _____6CE8_518CBoss_9636_6BB5_72B6_6001 = ____01_FF0EBoss_9636_6BB5_72B6_6001["注册Boss阶段状态"]
+local _____8BFB_53D6Boss_9636_6BB5_5E8F_53F7 = ____01_FF0EBoss_9636_6BB5_72B6_6001["读取Boss阶段序号"]
+local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置")
+local _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["巴尔扎罗斯技能数值配置"]
 local ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = require("系统.03．技能系统.00．技能模板+函数.04．机制组件.10．复杂战斗通用机制.15．单位运行时上下文工厂")
 local _____521B_5EFA_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382 = ____15_FF0E_5355_4F4D_8FD0_884C_65F6_4E0A_4E0B_6587_5DE5_5382["创建单位运行时上下文工厂"]
 local ____01_FF0E_573A_5730_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.01．场地配置")
@@ -45,6 +50,13 @@ local function _____521B_5EFA_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587(boss, ____
         ["阶段3台词最早Ms"] = 0
     }
     _____64AD_653E_5DF4_5C14_624E_7F57_65AF_53F0_8BCD(boss, "开场", 0)
+    _____6CE8_518CBoss_9636_6BB5_72B6_6001(
+        boss,
+        _____5DF4_5C14_624E_7F57_65AF_6280_80FD_6570_503C_914D_7F6E["阶段阈值"],
+        _____8BFB_53D6Boss_9636_6BB5_5E8F_53F7,
+        context,
+        _____6E05_7406
+    )
     return context
 end
 local function _____6E05_7406_5DF4_5C14_624E_7F57_65AF_4E0A_4E0B_6587_673A_5236(context)

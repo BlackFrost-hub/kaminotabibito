@@ -9,6 +9,7 @@ local ____require_result_1 = require("系统.03．技能系统.04．快捷键技
 local _____73AF_5883_4E92_52A8_88C5_5907_5956_52B1_6982_7387 = ____require_result_1["环境互动装备奖励概率"]
 local ____require_result_2 = require("lib.扩展函数.物品相关函数.创建物品函数")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_2["创建物品并注册排泄监听"]
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_2["给予单位物品"]
 local ____require_result_3 = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具")
 local _____89E3_6790_914D_7F6E_5185_90E8ID = ____require_result_3["解析配置内部ID"]
 local ____require_result_4 = require("系统.11．剧情系统.01．主线任务.02．剧情步骤.00．主线剧情.43．菲尼克斯尔现身")
@@ -33,7 +34,7 @@ local function _____5904_7406_83F2_5C3C_514B_65AF_5C14_6218_540E_6676_6838(_____
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
     end
-    jass.UnitAddItem(_____82F1_96C4, _____7269_54C1)
+    _____7ED9_4E88_5355_4F4D_7269_54C1(_____82F1_96C4, _____7269_54C1)
     _____53D1_9001_5355_4F4D_63D0_793A_7ED9_73A9_5BB6(
         jass.Player(_____73A9_5BB6ID),
         _____82F1_96C4,

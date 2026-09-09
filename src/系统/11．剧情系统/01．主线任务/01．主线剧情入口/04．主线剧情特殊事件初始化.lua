@@ -26,34 +26,36 @@ local _____6DFB_52A0_5355_4F4D_6682_505C = ____require_result_1["添加单位暂
 local _____5267_60C5_7279_6B8A_4E8B_4EF6_6682_505C_6765_6E90 = "剧情系统:特殊事件"
 local ____require_result_2 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
 local registerSpellChannelListener = ____require_result_2.registerSpellChannelListener
-local ____require_result_3 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
-local registerAppliedFinalDamageListener = ____require_result_3.registerAppliedFinalDamageListener
-local ____require_result_4 = require("lib.扩展函数.封装函数.06．伤害函数.index")
-local YDWESetEventDamage = ____require_result_4.YDWESetEventDamage
-local ____require_result_5 = require("系统.00．核心系统.05．中心计时器")
-local _____521B_5EFA_53EF_53D6_6D88_4EFB_52A1_7EC4 = ____require_result_5["创建可取消任务组"]
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-local YDUserDataClearSafe = ____require_result_6.YDUserDataClearSafe
-local YDUserDataClearTableSafe = ____require_result_6.YDUserDataClearTableSafe
-local ____require_result_7 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
-local _____6302_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____require_result_7["挂载区域背景音乐句柄"]
-local ____require_result_8 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_8.GetPlayersAll
-local ____require_result_9 = require("lib.扩展函数.BJ函数.05A．电影函数")
-local TransmissionFromUnitWithNameBJ = ____require_result_9.TransmissionFromUnitWithNameBJ
-local ____require_result_10 = require("lib.扩展函数.BJ函数.06．任务消息")
-local CreateQuestBJ = ____require_result_10.CreateQuestBJ
-local GetLastCreatedQuestBJ = ____require_result_10.GetLastCreatedQuestBJ
-local QuestMessageBJ = ____require_result_10.QuestMessageBJ
-local ____require_result_11 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_11.stringToFourCCSafe
+local ____require_result_3 = require("系统.03．技能系统.06．AI自动使用技能.03．Boss战启动桥接.01．Boss战运行.03．Boss战运行驱动")
+local _____4E3B_52A8_7ED3_675FBoss_6218_8FD0_884C = ____require_result_3["主动结束Boss战运行"]
+local ____require_result_4 = require("系统.04．伤害系统.00．伤害计算.04．主计算流程")
+local registerAppliedFinalDamageListener = ____require_result_4.registerAppliedFinalDamageListener
+local ____require_result_5 = require("lib.扩展函数.封装函数.06．伤害函数.index")
+local YDWESetEventDamage = ____require_result_5.YDWESetEventDamage
+local ____require_result_6 = require("系统.00．核心系统.05．中心计时器")
+local _____521B_5EFA_53EF_53D6_6D88_4EFB_52A1_7EC4 = ____require_result_6["创建可取消任务组"]
+local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+local YDUserDataClearSafe = ____require_result_7.YDUserDataClearSafe
+local YDUserDataClearTableSafe = ____require_result_7.YDUserDataClearTableSafe
+local ____require_result_8 = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时")
+local _____6302_8F7D_533A_57DF_80CC_666F_97F3_4E50_53E5_67C4 = ____require_result_8["挂载区域背景音乐句柄"]
+local ____require_result_9 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_9.GetPlayersAll
+local ____require_result_10 = require("lib.扩展函数.BJ函数.05A．电影函数")
+local TransmissionFromUnitWithNameBJ = ____require_result_10.TransmissionFromUnitWithNameBJ
+local ____require_result_11 = require("lib.扩展函数.BJ函数.06．任务消息")
+local CreateQuestBJ = ____require_result_11.CreateQuestBJ
+local GetLastCreatedQuestBJ = ____require_result_11.GetLastCreatedQuestBJ
+local QuestMessageBJ = ____require_result_11.QuestMessageBJ
+local ____require_result_12 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_12.stringToFourCCSafe
 local GetUnitName = jass.GetUnitName
 local GetUnitState = jass.GetUnitState
 local GetUnitTypeId = jass.GetUnitTypeId
 local IsUnitInRangeXY = jass.IsUnitInRangeXY
 local Player = jass.Player
-local ____require_result_12 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
-local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_12["立即移除单位并取消排泄登记"]
+local ____require_result_13 = require("系统.00．核心系统.01．事件中心.07A．单位排泄")
+local _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0 = ____require_result_13["立即移除单位并取消排泄登记"]
 local SetUnitFacing = jass.SetUnitFacing
 local SetUnitInvulnerable = jass.SetUnitInvulnerable
 local SetUnitOwner = jass.SetUnitOwner
@@ -129,24 +131,24 @@ local function _____64AD_653E_6700_7EC8_4F24_5BB3_5BF9_767D_5217_8868(_____914D_
         while i < #_____914D_7F6E["对白列表"] do
             local _____5BF9_767D = _____914D_7F6E["对白列表"][i + 1]
             local _____8BF4_8BDD_8005 = _____5BF9_767D["使用攻击者名"] == true and _____653B_51FB_8005_540D or _____5BF9_767D["说话者"]
-            local ____temp_13
-            if _____5BF9_767D["说话者引用"] ~= nil then
-                ____temp_13 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528(_____5BF9_767D["说话者引用"])
-            else
-                ____temp_13 = nil
-            end
-            local _____8BF4_8BDD_8005_5355_4F4D = ____temp_13
-            local ____TransmissionFromUnitWithNameBJ_16 = TransmissionFromUnitWithNameBJ
-            local ____GetPlayersAll_result_15 = GetPlayersAll()
             local ____temp_14
-            if _____8BF4_8BDD_8005_5355_4F4D ~= nil and _____8BF4_8BDD_8005_5355_4F4D ~= 0 then
-                ____temp_14 = _____8BF4_8BDD_8005_5355_4F4D
+            if _____5BF9_767D["说话者引用"] ~= nil then
+                ____temp_14 = _____8BFB_53D6_8BED_4E49_5355_4F4D_5F15_7528(_____5BF9_767D["说话者引用"])
             else
                 ____temp_14 = nil
             end
-            ____TransmissionFromUnitWithNameBJ_16(
-                ____GetPlayersAll_result_15,
-                ____temp_14,
+            local _____8BF4_8BDD_8005_5355_4F4D = ____temp_14
+            local ____TransmissionFromUnitWithNameBJ_17 = TransmissionFromUnitWithNameBJ
+            local ____GetPlayersAll_result_16 = GetPlayersAll()
+            local ____temp_15
+            if _____8BF4_8BDD_8005_5355_4F4D ~= nil and _____8BF4_8BDD_8005_5355_4F4D ~= 0 then
+                ____temp_15 = _____8BF4_8BDD_8005_5355_4F4D
+            else
+                ____temp_15 = nil
+            end
+            ____TransmissionFromUnitWithNameBJ_17(
+                ____GetPlayersAll_result_16,
+                ____temp_15,
                 _____8BF4_8BDD_8005,
                 nil,
                 _____5BF9_767D["文本"],
@@ -236,6 +238,9 @@ local function _____6267_884C_6700_7EC8_4F24_5BB3_63A8_8FDB_5267_60C5(_____914D_
     end
     _____6267_884C_533A_57DF_97F3_4E50_5207_6362(_____914D_7F6E)
     _____64AD_653E_6700_7EC8_4F24_5BB3_5BF9_767D_5217_8868(_____914D_7F6E, attacker)
+    if _____914D_7F6E["结束Boss战"] == true then
+        _____4E3B_52A8_7ED3_675FBoss_6218_8FD0_884C(target, {["跳过死亡音效"] = true, ["跳过死亡剧情"] = true})
+    end
     if _____914D_7F6E["移除目标单位"] == true then
         _____7ACB_5373_79FB_9664_5355_4F4D_5E76_53D6_6D88_6392_6CC4_767B_8BB0(target)
     end
@@ -258,12 +263,12 @@ local function ____on_4E3B_7EBF_6280_80FD_901A_9053_63A8_8FDB(castingUnit, spell
             do
                 local _____914D_7F6E = _____4E3B_7EBF_5267_60C5_6280_80FD_901A_9053_4E8B_4EF6_914D_7F6E_8868[i + 1]
                 if not _____547D_4E2D_6280_80FD_901A_9053_4E8B_4EF6_914D_7F6E(_____914D_7F6E, castingUnit, spellAbilityId) then
-                    goto __continue46
+                    goto __continue47
                 end
                 _____6267_884C_6280_80FD_63A8_8FDB_5267_60C5(_____914D_7F6E, castingUnit)
                 return
             end
-            ::__continue46::
+            ::__continue47::
             i = i + 1
         end
     end

@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import { 注册Boss阶段状态 } from "../../../../../00．核心系统/03．脱战系统/01．Boss阶段状态";
+
 import type { 祖地双灵卫名称 } from './00．配置';
 import type { 赤誓灵卫形态 } from './01．赤誓灵卫/00．状态';
 import type { 苍影灵卫形态 } from './02．苍影灵卫/00．状态';
@@ -231,6 +233,8 @@ export function 创建祖地双灵卫运行时上下文(this: void, 赤誓灵卫
     清理,
     已初始化: 赤誓灵卫单位 != null && 苍影灵卫单位 != null,
   };
+  注册Boss阶段状态(赤誓灵卫单位, 祖地双灵卫单位技能配置.阶段阈值, 读取阶段序号, context, 清理);
+  注册Boss阶段状态(苍影灵卫单位, 祖地双灵卫单位技能配置.阶段阈值, 读取阶段序号, context, 清理);
   return context;
 }
 
@@ -270,4 +274,10 @@ export function 清理祖地双灵卫运行时上下文(this: void, context: 祖
   单位上下文表[取单位ID(context.赤誓灵卫单位)] = undefined;
   单位上下文表[取单位ID(context.苍影灵卫单位)] = undefined;
   context.清理.清理全部();
+}
+
+function 读取阶段序号(this: void, context: 祖地双灵卫运行时上下文): number {
+  if (context.阶段 === 'P3双蚀共鸣' || context.阶段 === '净化收束') return 3;
+  if (context.阶段 === 'P2侵蚀失衡') return 2;
+  return 1;
 }

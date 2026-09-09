@@ -85,6 +85,21 @@ local stringToFourCCSafe = require("lib.扩展函数.封装函数.01．通用工
 local _____706B_628A_5355_4F4D_7C7B_578BID = stringToFourCCSafe("e0FT")
 local _____9650_65F6_751F_547DBuffID = stringToFourCCSafe("BHwe")
 local _____5C5E_6027_6D6E_70B9_5F52_96F6_9608_503C = 0.000001
+--- 旧属性名 → 统一数据键的归一化映射。
+-- 装备系统/恢复系统/多面板统一使用新键（如"魔法恢复%"、"生命恢复%"）；
+-- 历史代码以旧名写入的键必须归一化，否则会被恢复计算读到 0 后覆盖写回。
+local _____5C5E_6027_540D_5F52_4E00_5316_8868 = {
+    ["百分比魔法回复"] = "魔法恢复%",
+    ["百分比生命回复"] = "生命恢复%",
+    ["魔法消耗减少"] = "魔法消耗",
+    ["生命恢复属性增幅"] = "生命恢复效率",
+    ["技能治疗加成"] = "技能治疗率",
+    ["受到的治疗加成"] = "受到的治疗率"
+}
+local function _____5F52_4E00_5316_5C5E_6027_540D(_____5C5E_6027_540D)
+    local normalized = _____5C5E_6027_540D_5F52_4E00_5316_8868[_____5C5E_6027_540D]
+    return normalized ~= nil and normalized or _____5C5E_6027_540D
+end
 ____exports["临时调整攻击"] = function(_____5355_4F4D, _____6570_503C)
     SGSS_SetState(_____5355_4F4D, 1, _____6570_503C)
 end
@@ -102,7 +117,8 @@ ____exports["调整玩家属性"] = function(_____5355_4F4D, _____5C5E_6027_540D
         return
     end
     local owner = GetOwningPlayer(_____5355_4F4D)
-    local oldValue = __TS__Number(YDUserDataGetSafe("player", owner, _____5C5E_6027_540D, "real")) or 0
+    local _____6570_636E_952E = _____5F52_4E00_5316_5C5E_6027_540D(_____5C5E_6027_540D)
+    local oldValue = __TS__Number(YDUserDataGetSafe("player", owner, _____6570_636E_952E, "real")) or 0
     local newValue = oldValue + _____589E_91CF
     if newValue < _____5C5E_6027_6D6E_70B9_5F52_96F6_9608_503C and newValue > -_____5C5E_6027_6D6E_70B9_5F52_96F6_9608_503C then
         newValue = 0
@@ -110,7 +126,7 @@ ____exports["调整玩家属性"] = function(_____5355_4F4D, _____5C5E_6027_540D
     YDUserDataSetSafe(
         "player",
         owner,
-        _____5C5E_6027_540D,
+        _____6570_636E_952E,
         "real",
         newValue
     )
@@ -119,7 +135,8 @@ ____exports["调整单位属性"] = function(_____5355_4F4D, _____5C5E_6027_540D
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return
     end
-    local oldValue = __TS__Number(YDUserDataGetSafe("unit", _____5355_4F4D, _____5C5E_6027_540D, "real")) or 0
+    local _____6570_636E_952E = _____5F52_4E00_5316_5C5E_6027_540D(_____5C5E_6027_540D)
+    local oldValue = __TS__Number(YDUserDataGetSafe("unit", _____5355_4F4D, _____6570_636E_952E, "real")) or 0
     local newValue = oldValue + _____589E_91CF
     if newValue < _____5C5E_6027_6D6E_70B9_5F52_96F6_9608_503C and newValue > -_____5C5E_6027_6D6E_70B9_5F52_96F6_9608_503C then
         newValue = 0
@@ -127,7 +144,7 @@ ____exports["调整单位属性"] = function(_____5355_4F4D, _____5C5E_6027_540D
     YDUserDataSetSafe(
         "unit",
         _____5355_4F4D,
-        _____5C5E_6027_540D,
+        _____6570_636E_952E,
         "real",
         newValue
     )
@@ -139,7 +156,7 @@ ____exports["读取玩家属性"] = function(_____5355_4F4D, _____5C5E_6027_540D
     return __TS__Number(YDUserDataGetSafe(
         "player",
         GetOwningPlayer(_____5355_4F4D),
-        _____5C5E_6027_540D,
+        _____5F52_4E00_5316_5C5E_6027_540D(_____5C5E_6027_540D),
         "real"
     )) or 0
 end
@@ -147,7 +164,12 @@ ____exports["读取单位属性"] = function(_____5355_4F4D, _____5C5E_6027_540D
     if _____5355_4F4D == nil or _____5355_4F4D == 0 then
         return 0
     end
-    return __TS__Number(YDUserDataGetSafe("unit", _____5355_4F4D, _____5C5E_6027_540D, "real")) or 0
+    return __TS__Number(YDUserDataGetSafe(
+        "unit",
+        _____5355_4F4D,
+        _____5F52_4E00_5316_5C5E_6027_540D(_____5C5E_6027_540D),
+        "real"
+    )) or 0
 end
 ____exports["英雄主属性是智力"] = function(_____82F1_96C4)
     if not _____5355_4F4D_662F_82F1_96C4(_____82F1_96C4) then

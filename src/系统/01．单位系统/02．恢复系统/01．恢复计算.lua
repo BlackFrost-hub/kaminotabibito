@@ -69,12 +69,12 @@ local function getPlayerAttr(unit, attrName)
 end
 --- 获取百分比生命恢复（应用上限）
 function ____exports.getPercentLifeRegen(unit)
-    local value = getPlayerAttr(unit, "百分比生命回复")
+    local value = getPlayerAttr(unit, "生命恢复%")
     return value < LIFE_REGEN_PERCENT_CAP and value or LIFE_REGEN_PERCENT_CAP
 end
 --- 获取百分比魔法恢复（应用上限）
 function ____exports.getPercentManaRegen(unit)
-    local value = getPlayerAttr(unit, "百分比魔法回复")
+    local value = getPlayerAttr(unit, "魔法恢复%")
     return value < MANA_REGEN_PERCENT_CAP and value or MANA_REGEN_PERCENT_CAP
 end
 --- 计算总生命恢复

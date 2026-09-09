@@ -15,6 +15,9 @@ const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
+const { 给予单位物品 } = require("lib.扩展函数.物品相关函数.index") as {
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
+};
 
 const 模块名 = "装备死亡事件测试";
 const 测试命令 = "1039";
@@ -40,7 +43,7 @@ function 创建并给予装备(this: void, 单位: any, 装备名: string): void
     return;
   }
 
-  jass.UnitAddItem(单位, item);
+  给予单位物品(单位, item);
 }
 
 function on聊天1039测试(this: void): void {

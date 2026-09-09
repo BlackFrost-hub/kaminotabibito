@@ -6,6 +6,7 @@ import {
   取玩家腐败值,
   增加玩家腐败值,
   清除玩家腐败值,
+  设置玩家腐败值,
   type 莫尔特斯运行时上下文,
 } from "./01．运行时上下文";
 import { 莫尔特斯数值与表现配置, 莫尔特斯音效配置 } from "./02．数值与表现配置";
@@ -32,6 +33,12 @@ const { 施加禁锢 } = require("系统.03．技能系统.00．技能模板+函
 };
 const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
   registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+};
+const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
+  是玩家英雄组单位: (this: void, 单位: any) => boolean;
+};
+const { registerDeathListener } = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心") as {
+  registerDeathListener: (this: void, 回调: (this: void, 死亡单位: any, 击杀单位: any) => void) => void;
 };
 const { 莫尔特斯BuffID } = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯") as {
   莫尔特斯BuffID: { 根须缠绕: string; 净化庇护: string; 腐败虫尸净化: string };
@@ -154,9 +161,23 @@ function on莫尔特斯运行时维护(this: void, context: 莫尔特斯运行�
   注册莫尔特斯腐败传输节点(context);
 }
 
+function on莫尔特斯玩家英雄死亡(this: void, 死亡单位: any, _击杀者: any): void {
+  if (!是玩家英雄组单位(死亡单位)) return;
+  const id = 取单位ID(死亡单位);
+  if (id === 0) return;
+  const 上下文列表 = 获取全部莫尔特斯上下文();
+  for (let i = 0; i < 上下文列表.length; i++) {
+    const context = 上下文列表[i];
+    if (context == null) continue;
+    if ((context.玩家腐败值表[id] ?? 0) <= 0) continue;
+    设置玩家腐败值(context, 死亡单位, 0);
+  }
+}
+
 export function 注册莫尔特斯腐败值与根须领域(this: void): void {
   if (已注册) return;
   已注册 = true;
+  registerDeathListener(on莫尔特斯玩家英雄死亡);
   创建周期机制调度器({
     名称: '莫尔特斯-运行时维护',
     间隔毫秒: 莫尔特斯数值与表现配置.运行时.推进间隔毫秒,

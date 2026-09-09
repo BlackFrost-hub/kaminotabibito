@@ -7,8 +7,9 @@ const { 注册环境互动调查点 } = require("系统.03．技能系统.04．�
 const { 创建召唤物 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口") as {
   创建召唤物: (this: void, 参数: any) => any;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
   创建物品并注册排泄监听: (this: void, 物品类型ID: number, X: number, Y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 const { 解析配置内部ID } = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具") as {
   解析配置内部ID: (this: void, 配置值: string | undefined | null) => number;
@@ -49,7 +50,7 @@ function 处理封印小Boss死亡(this: void, 死亡单位: any, _击杀单位:
   if (配置ID == null) return;
   const 物品 = 创建物品并注册排泄监听(解析配置内部ID(配置ID), jass.GetUnitX(英雄), jass.GetUnitY(英雄));
   if (物品 == null || 物品 === 0) return;
-  jass.UnitAddItem(英雄, 物品);
+  给予单位物品(英雄, 物品);
   发送单位提示给玩家(jass.Player(玩家ID), 英雄, "|cff66ccff『七晶封印棱章』：|r封印枪卫倒下，七颗晶石重新稳定下来，棱面上凝出一枚完整的守护徽章。|n|cffffff00获得装备：七晶封印棱章。|r", 5200);
 }
 

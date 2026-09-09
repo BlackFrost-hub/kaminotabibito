@@ -7,10 +7,6 @@ import * as buffTableMod from "./01．Buff表";
 const 数学运算 = require("lib.扩展函数.封装函数.01．通用工具.07．数学运算") as {
   round: (this: void, value: number) => number;
 };
-const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLog: (module: string, ...args: any[]) => void;
-  setDebug: (module: string, on: boolean) => void;
-};
 const { 是否百分比装备属性名 } = require("lib.扩展函数.物品相关函数.装备数据查询") as {
   是否百分比装备属性名: (this: void, 属性名: string) => boolean;
 };
@@ -18,7 +14,6 @@ const { 是否百分比装备属性名 } = require("lib.扩展函数.物品相�
 const MAX_SLOTS = 20;
 const jass = require("jass.common") as any;
 const round = 数学运算.round;
-setDebug("BuffUI.VM", false);
 
 export interface BuffSlotViewModel {
   visible: boolean;
@@ -142,18 +137,15 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
   }
 
   if (!unit || !isUnitValid(unit)) {
-    debugLog("BuffUI.VM", "return-empty", "reason=invalid-unit", "unit=" + tostringCompat(unit));
     return { slots };
   }
 
   const inBuffPool = buffPoolMod.isUnitInBuffPool(unit);
   if (!inBuffPool) {
-    debugLog("BuffUI.VM", "return-empty", "reason=not-in-buff-pool", "unit=" + tostringCompat(unit));
     return { slots };
   }
 
   const ids = buffPoolMod.getBuffIdsOnUnit(unit);
-  debugLog("BuffUI.VM", "unit=" + tostringCompat(unit), "inPool=" + tostringCompat(inBuffPool), "idsLen=" + ids.length);
   const rows: Array<{
     id: string;
     state: any;
@@ -246,12 +238,6 @@ export function buildBuffBarViewModel(unit: any | null): BuffBarViewModel {
       tooltipSourceText,
     };
   }
-
-  let visibleCount = 0;
-  for (let i = 0; i < slots.length; i++) {
-    if (slots[i].visible === true) visibleCount++;
-  }
-  debugLog("BuffUI.VM", "unit=" + tostringCompat(unit), "rowsLen=" + rows.length, "visible=" + visibleCount);
 
   return { slots };
 }

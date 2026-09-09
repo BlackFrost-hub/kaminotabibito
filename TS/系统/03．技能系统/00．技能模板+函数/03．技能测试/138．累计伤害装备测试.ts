@@ -23,11 +23,13 @@ const { 按名字反查物品ID } = require("系统.02．物品系统.13．物�
 const { stringToFourCC } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换") as {
   stringToFourCC: (this: void, s: string | undefined | null) => number;
 };
+const { 给予单位物品 } = require("lib.扩展函数.物品相关函数.index") as {
+  给予单位物品: (this: void, unit: any, item: any) => boolean;
+};
 
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const CreateItem = jass.CreateItem as (id: number, x: number, y: number) => any;
-const UnitAddItem = jass.UnitAddItem as (unit: any, item: any) => boolean;
 
 const 模块名 = "累计伤害装备测试";
 const 测试命令 = "1040";
@@ -50,7 +52,7 @@ function 给单位发装备(this: void, unit: any, 装备名: string): void {
     return;
   }
 
-  UnitAddItem(unit, item);
+  给予单位物品(unit, item);
   debugLogForce(模块名, "已发放装备", 装备名, 物品ID);
 }
 

@@ -5,7 +5,8 @@ ____exports["芙莉莲BuffID"] = {
     ["解析中"] = "E021",
     ["解析完成"] = "E022",
     ["演算魔弹"] = "E023",
-    ["高处飞行保护"] = "E024"
+    ["高处飞行保护"] = "E024",
+    ["落地疾行"] = "E028"
 }
 ____exports["芙莉莲Buff表"] = {
     [____exports["芙莉莲BuffID"]["魔力隐匿"]] = {
@@ -97,6 +98,24 @@ ____exports["芙莉莲Buff表"] = {
         priority = 74,
         canPurge = false,
         tooltip = "飞行位移期间受到的伤害降低 40%；位移结束、被打断或死亡时立即结束。"
+    },
+    [____exports["芙莉莲BuffID"]["落地疾行"]] = {
+        buffID = ____exports["芙莉莲BuffID"]["落地疾行"],
+        buffName = "落地疾行",
+        icon = "BuffIcon\\Hero\\Frieren\\frieren_e_landing_swift.blp",
+        effect = "",
+        effectMode = "attach",
+        effectAttachPoint = "origin",
+        effectScale = 1,
+        type = "Buff:magic:combat",
+        interval = 0,
+        maxStack = 1,
+        stackRule = "highest",
+        stackRefresh = true,
+        dispelLevel = 3,
+        priority = 74,
+        canPurge = false,
+        tooltip = "落地疾行：移速提升 50%（基于基础移速），并暂时无视单位碰撞，持续 2 秒（与高空观察一致）。"
     }
 }
 return ____exports

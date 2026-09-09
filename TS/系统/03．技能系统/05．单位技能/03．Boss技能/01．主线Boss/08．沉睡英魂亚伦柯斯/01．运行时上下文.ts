@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import { 注册Boss阶段状态 } from "../../../../../00．核心系统/03．脱战系统/01．Boss阶段状态";
+
 import { 单位未标记死亡 as 单位有效 } from '../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具';
 import { 亚伦柯斯单位技能配置 } from './00．配置';
 import { 亚伦柯斯正式设计配置 } from './02．数值与表现配置';
@@ -101,6 +103,7 @@ function 创建上下文(this: void, boss: any, 清理: 机制清理篮子): 亚
     },
   });
   播放亚伦柯斯台词(boss, '开场');
+  注册Boss阶段状态(boss, 亚伦柯斯正式设计配置.阶段阈值, 读取阶段序号, context, 清理);
   return context;
 }
 
@@ -207,4 +210,11 @@ export function 注册亚伦柯斯运行时(this: void): void {
     取上下文列表: 获取全部亚伦柯斯运行时上下文,
     执行: 推进亚伦柯斯运行时,
   });
+}
+
+function 读取阶段序号(this: void, context: 亚伦柯斯运行时上下文): number {
+  if (context.已触发最终强化) return 4;
+  if (context.阶段 === 'P3最后的誓约') return 3;
+  if (context.阶段 === 'P2旧誓回响') return 2;
+  return 1;
 }

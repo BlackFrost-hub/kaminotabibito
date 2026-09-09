@@ -9,13 +9,13 @@ local ____require_result_1 = require("系统.03．技能系统.04．快捷键技
 local _____89E3_6790_914D_7F6E_5185_90E8ID = ____require_result_1["解析配置内部ID"]
 local ____require_result_2 = require("lib.扩展函数.物品相关函数.创建物品函数")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_2["创建物品并注册排泄监听"]
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_2["给予单位物品"]
 local ____require_result_3 = require("系统.02．物品系统.13．物品名反查")
 local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_3["按名字反查物品ID"]
 local ____require_result_4 = require("系统.09．表现系统.06．广播提示消息.index")
 local _____53D1_9001_5355_4F4D_63D0_793A_7ED9_73A9_5BB6 = ____require_result_4["发送单位提示给玩家"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local UnitAddItem = jass.UnitAddItem
 local _____63D0_793A_6301_7EED_6BEB_79D2 = 5200
 local function _____589E_52A0_8D44_6E90(_____73A9_5BB6ID, _____72B6_6001, _____6570_91CF)
     local _____73A9_5BB6 = jass.Player(_____73A9_5BB6ID)
@@ -38,7 +38,7 @@ local function _____7ED9_4E88_7269_54C1(_____5355_4F4D, _____540D_79F0)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
     end
-    return UnitAddItem(_____5355_4F4D, _____7269_54C1)
+    return _____7ED9_4E88_5355_4F4D_7269_54C1(_____5355_4F4D, _____7269_54C1)
 end
 local function _____5904_7406_5723_94A5_796D_575B(_____73A9_5BB6ID, _____65BD_6CD5_5355_4F4D, ______8C03_67E5_70B9)
     if not _____7ED9_4E88_7269_54C1(_____65BD_6CD5_5355_4F4D, "守誓圣铠合成书") then

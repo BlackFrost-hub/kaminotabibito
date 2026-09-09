@@ -16,19 +16,20 @@ local ____require_result_2 = require("系统.02．物品系统.13．物品名反
 local _____6309_540D_5B57_53CD_67E5_7269_54C1ID = ____require_result_2["按名字反查物品ID"]
 local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换")
 local stringToFourCC = ____require_result_3.stringToFourCC
+local ____require_result_4 = require("lib.扩展函数.物品相关函数.index")
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_4["给予单位物品"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local CreateItem = jass.CreateItem
-local UnitAddItem = jass.UnitAddItem
 local _____6A21_5757_540D = "累计伤害装备测试"
 local _____6D4B_8BD5_547D_4EE4 = "1040"
 local _____6D4B_8BD5_88C5_5907_5217_8868 = {"回沙之书", "女妖头饰"}
 local function _____83B7_53D6_6D4B_8BD5_5355_4F4D()
-    local ____g_gg_unit_Hamg_0002_4 = g.gg_unit_Hamg_0002
-    if ____g_gg_unit_Hamg_0002_4 == nil then
-        ____g_gg_unit_Hamg_0002_4 = _G.bj_lastCreatedUnit
+    local ____g_gg_unit_Hamg_0002_5 = g.gg_unit_Hamg_0002
+    if ____g_gg_unit_Hamg_0002_5 == nil then
+        ____g_gg_unit_Hamg_0002_5 = _G.bj_lastCreatedUnit
     end
-    return ____g_gg_unit_Hamg_0002_4
+    return ____g_gg_unit_Hamg_0002_5
 end
 local function _____7ED9_5355_4F4D_53D1_88C5_5907(unit, _____88C5_5907_540D)
     local _____7269_54C1ID = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____88C5_5907_540D)
@@ -45,7 +46,7 @@ local function _____7ED9_5355_4F4D_53D1_88C5_5907(unit, _____88C5_5907_540D)
         debugLogForce(_____6A21_5757_540D, "创建装备失败", _____88C5_5907_540D, _____7269_54C1ID)
         return
     end
-    UnitAddItem(unit, item)
+    _____7ED9_4E88_5355_4F4D_7269_54C1(unit, item)
     debugLogForce(_____6A21_5757_540D, "已发放装备", _____88C5_5907_540D, _____7269_54C1ID)
 end
 local function ____on_804A_59291040_6D4B_8BD5()

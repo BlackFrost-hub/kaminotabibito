@@ -30,8 +30,8 @@ const { 是玩家英雄组单位 } = require("系统.00．核心系统.00．玩�
 const { 卡瑟拉奖励池ID } = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index") as {
   卡瑟拉奖励池ID: string;
 };
-const { 打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
-  打开首领奖励选择界面: (this: void, 奖励池ID: string, 玩家: any) => void;
+const { 延迟打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
+  延迟打开首领奖励选择界面: (this: void, 奖励池ID: string, 玩家: any) => void;
 };
 import { 创建剧情NPC单位 } from "../../00．公共/02．剧情NPC创建";
 
@@ -151,7 +151,7 @@ function 完成被驱逐的水怪任务后打开首领奖励(_任务配置?: any
   for (let 玩家ID = 0; 玩家ID < 广播提示玩家槽数; 玩家ID++) {
     const 玩家 = Player(玩家ID);
     if (玩家 != null && jass.GetPlayerController(玩家) === jass.MAP_CONTROL_USER) {
-      打开首领奖励选择界面(卡瑟拉奖励池ID, 玩家);
+      延迟打开首领奖励选择界面(卡瑟拉奖励池ID, 玩家);
     }
   }
 }

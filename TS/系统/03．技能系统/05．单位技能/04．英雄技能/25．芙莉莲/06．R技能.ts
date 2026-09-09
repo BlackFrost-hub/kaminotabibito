@@ -142,9 +142,7 @@ function R结算主炮(this: void, 施法者: any, 技能实例ID: number | unde
   }
   jass.DestroyGroup(组);
   // 按投影距离排序（最近的先结算；隐匿首击只给第一个）
-  命中列表.sort(function 按投影排序(this: void, a: { 投影: number }, b: { 投影: number }): number {
-    return a.投影 - b.投影;
-  });
+  命中列表.sort((a: { 投影: number }, b: { 投影: number }): number => a.投影 - b.投影);
 
   // 主炮表现（窄幅贯穿；按快照方向旋转；参数配置驱动）
   创建点特效({
@@ -296,6 +294,8 @@ function 释放R(this: void, _context: any, 施法者: any, 技能实例ID: numb
   const 充能ID = 开始充能(施法者, {
     持续时间: R配置.蓄力秒,
     指令中断: true,
+    // 花田内释放：蓄力不被眩晕/沉默等硬控打断（玩家自行移动等指令仍可中断，死亡/主单位死亡照常）
+    硬控中断: !快照.花田内释放,
     世界坐标进度UI: true,
     世界坐标进度UI类型: 芙莉莲读条配置.UI类型,
     世界坐标进度UI标题: "贯穿射杀",

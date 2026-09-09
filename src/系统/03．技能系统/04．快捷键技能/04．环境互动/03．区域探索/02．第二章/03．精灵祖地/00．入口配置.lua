@@ -12,6 +12,7 @@ local ____require_result_2 = require("系统.03．技能系统.04．快捷键技
 local _____89E3_6790_914D_7F6E_5185_90E8ID = ____require_result_2["解析配置内部ID"]
 local ____require_result_3 = require("lib.扩展函数.物品相关函数.创建物品函数")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_3["创建物品并注册排泄监听"]
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_3["给予单位物品"]
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_4.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_4.YDUserDataSetSafe
@@ -19,7 +20,6 @@ local ____require_result_5 = require("系统.09．表现系统.06．广播提示
 local _____53D1_9001_5355_4F4D_63D0_793A_7ED9_73A9_5BB6 = ____require_result_5["发送单位提示给玩家"]
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
-local UnitAddItem = jass.UnitAddItem
 local Player = jass.Player
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -65,7 +65,7 @@ local function _____7ED9_4E88_63A2_7D22_5956_52B1_7269_54C1(_____5355_4F4D, ____
         GetUnitY(_____5355_4F4D)
     )
     if _____7269_54C1 ~= nil and _____7269_54C1 ~= 0 then
-        UnitAddItem(_____5355_4F4D, _____7269_54C1)
+        _____7ED9_4E88_5355_4F4D_7269_54C1(_____5355_4F4D, _____7269_54C1)
     end
 end
 local function _____5904_7406_8840_575B_8C03_67E5(_____73A9_5BB6ID, _____65BD_6CD5_5355_4F4D, _____8C03_67E5_70B9)

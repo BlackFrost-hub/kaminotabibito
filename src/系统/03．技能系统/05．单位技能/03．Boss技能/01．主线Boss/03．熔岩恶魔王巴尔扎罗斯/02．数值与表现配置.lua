@@ -52,7 +52,7 @@ ____exports["巴尔扎罗斯护卫配置"] = {["格鲁姆"] = {
     Y = 1836,
     ["面向"] = 270
 }}
-____exports["巴尔扎罗斯阶段阈值"] = {["第二阶段生命比例"] = 0.7, ["第三阶段生命比例"] = 0.35}
+local _____9636_6BB5_9608_503C = {["P2生命比例"] = 0.7, ["P3生命比例"] = 0.4}
 ____exports["巴尔扎罗斯音效配置"] = {
     ["默认裁断距离"] = 2800,
     ["转阶段2"] = {["封印破碎"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_phase2_seal_break_01_80k.mp3"},
@@ -72,6 +72,7 @@ ____exports["巴尔扎罗斯音效配置"] = {
     ["塞拉"] = {["冰焰双星发射"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_sera_icefire_twinstar_cast_03.mp3", ["冰转火"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_sera_element_shift_ice_to_fire_combo_03.mp3", ["火转冰"] = "Sound\\Boss\\Balzaroth\\SFX\\balzaroth_sera_element_shift_fire_to_ice_combo_03.mp3"}
 }
 ____exports["巴尔扎罗斯技能数值配置"] = {
+    ["阶段阈值"] = _____9636_6BB5_9608_503C,
     ["熔核封印"] = {
         ["特效路径"] = "Common\\Effect\\Form\\Debuff\\AlbedoWingBindChains.mdx",
         ["特效键"] = "巴尔扎罗斯-熔核封印",
@@ -396,7 +397,7 @@ ____exports["巴尔扎罗斯技能数值配置"] = {
         ["连接终点高度"] = 180
     },
     ["末日熔爆"] = {
-        ["第三阶段触发生命比例"] = 0.4,
+        ["第三阶段触发生命比例"] = _____9636_6BB5_9608_503C["P3生命比例"],
         ["低血量额外触发生命比例"] = 0.15,
         ["周期冷却秒"] = 55,
         ["低血量触发后冷却秒"] = 45,

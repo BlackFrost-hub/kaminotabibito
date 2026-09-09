@@ -35,7 +35,9 @@ import {
 const IssueTargetOrder = jass.IssueTargetOrder as (unit: any, order: string, target: any) => boolean;
 const CreateItem = jass.CreateItem as (itemId: number, x: number, y: number) => any;
 const UnitRemoveItem = jass.UnitRemoveItem as (unit: any, item: any) => boolean;
-const UnitAddItem = jass.UnitAddItem as (unit: any, item: any) => boolean;
+const { 给予单位物品 } = require("lib.扩展函数.物品相关函数.index") as {
+  给予单位物品: (this: void, unit: any, item: any) => boolean;
+};
 const GetUnitX = jass.GetUnitX as (u: any) => number;
 const GetUnitY = jass.GetUnitY as (u: any) => number;
 const GetItemTypeId = jass.GetItemTypeId as (item: any) => number;
@@ -291,7 +293,7 @@ function 发放单个装备(this: void, unit: any, 序号: number): void {
         debugLogForce(模块名, "创建精灵药水失败", 装备名, rawId, itemTypeId);
         continue;
       }
-      UnitAddItem(unit, item);
+      给予单位物品(unit, item);
       创建数量 += 1;
     }
     debugLogForce(模块名, "已发放全部精灵药水", "创建数量", 创建数量);

@@ -10,6 +10,7 @@ local ____require_result_1 = require("系统.03．技能系统.04．快捷键技
 local _____89E3_6790_914D_7F6E_5185_90E8ID = ____require_result_1["解析配置内部ID"]
 local ____require_result_2 = require("lib.扩展函数.物品相关函数.创建物品函数")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_2["创建物品并注册排泄监听"]
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_2["给予单位物品"]
 local ____require_result_3 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_3.YDUserDataGetSafe
 local YDUserDataSetSafe = ____require_result_3.YDUserDataSetSafe
@@ -17,7 +18,6 @@ local ____require_result_4 = require("系统.09．表现系统.06．广播提示
 local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_4["广播单位提示"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local UnitAddItem = jass.UnitAddItem
 local _____679C_5B50_7269_54C1ID = "伊达之果#I03W"
 local _____7CBE_7075_5C0F_5C4B_63D0_793A_6587_672C = "意外发现了某处能进入的精灵小屋，命中率+1%。"
 local _____7A7A_6728_6869_63D0_793A_6587_672C = "意外发现了藏在空木桩里的果子。"
@@ -29,7 +29,7 @@ local function _____521B_5EFA_5E76_7ED9_4E88_7269_54C1(_____65BD_6CD5_5355_4F4D,
         GetUnitY(_____65BD_6CD5_5355_4F4D)
     )
     if _____7269_54C1 ~= nil and _____7269_54C1 ~= 0 then
-        UnitAddItem(_____65BD_6CD5_5355_4F4D, _____7269_54C1)
+        _____7ED9_4E88_5355_4F4D_7269_54C1(_____65BD_6CD5_5355_4F4D, _____7269_54C1)
     end
 end
 local function _____5904_7406_7CBE_7075_5C0F_5C4B_8C03_67E5(______73A9_5BB6ID, _____65BD_6CD5_5355_4F4D, _____8C03_67E5_70B9)

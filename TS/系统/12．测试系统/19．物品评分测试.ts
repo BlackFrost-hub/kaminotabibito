@@ -11,11 +11,15 @@ const { 注册聊天命令监听, 注册聊天命令前缀监听 } = require("�
 const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.index") as {
+const { 创建物品并注册排泄监听, 创建物品并给予单位 } = require("lib.扩展函数.物品相关函数.index") as {
   创建物品并注册排泄监听: (this: void, itemId: number, x: number, y: number) => any;
+  创建物品并给予单位: (this: void, unit: any, itemId: number) => any;
 };
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
+};
+const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
+  按名字反查物品ID: (this: void, name: string) => string | undefined;
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -37,6 +41,9 @@ const 装备数据: Record<string, 物品数据> = 装备数据模块.default ??
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetRandomInt = jass.GetRandomInt as (this: void, lowBound: number, highBound: number) => number;
+const UnitItemInSlot = jass.UnitItemInSlot as (this: void, unit: any, slot: number) => any;
+const GetItemName = jass.GetItemName as (this: void, item: any) => string;
+const RemoveItem = jass.RemoveItem as (this: void, item: any) => void;
 const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (
   this: void,
   player: any,
@@ -48,8 +55,10 @@ const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (
 
 const 模块名 = "物品评分测试";
 const 物品评分命令前缀 = "物品+";
+const 物品名命令前缀 = "创建+";
 const 物品内部ID命令前缀 = "WP";
 const 随机6000分装备命令 = "djcs";
+const 删除第一格物品命令 = "del1";
 const 默认随机目标评分 = 6000;
 const 评分浮动范围 = 500;
 const 批量创建数量 = 10;
@@ -241,8 +250,74 @@ function on物品内部ID命令(this: void, player: any, command: string): void 
   debugLogForce(模块名, "按内部ID创建物品", "itemId", itemId);
 }
 
+function on物品名命令(this: void, player: any, command: string): void {
+  if (!是允许测试玩家(player)) return;
+
+  const 物品名 = command.substring(物品名命令前缀.length).trim();
+  if (物品名 === "") {
+    发送失败提示(player, "命令格式：创建+完整物品名，例如 创建+湮灭之风戒指。");
+    return;
+  }
+
+  const itemId = 按名字反查物品ID(物品名);
+  if (itemId == null) {
+    发送失败提示(player, "没有找到名字完全匹配「" + 物品名 + "」的物品，请输入完整物品名。");
+    return;
+  }
+
+  const hero = 获取测试英雄(player);
+  if (!是有效句柄(hero)) {
+    发送失败提示(player, "未找到该玩家的注册英雄。");
+    return;
+  }
+
+  const 物品类型ID = stringToFourCCSafe(itemId);
+  if (物品类型ID === 0) {
+    发送失败提示(player, "物品ID转换失败：" + itemId + "。");
+    return;
+  }
+
+  // 通过封装发放（封装仅入包；拾取结算由雪月引擎原生拾取事件完成，勿手动再分发）
+  const item = 创建物品并给予单位(hero, 物品类型ID);
+  if (!是有效句柄(item)) {
+    发送失败提示(player, "创建物品失败：" + itemId + "（背包已满？）。");
+    return;
+  }
+
+  const data = 装备数据[itemId];
+  DisplayTimedTextToPlayer(player, 0, 0, 6, "[物品测试] 已发放到英雄背包 " + (data?.name ?? 物品名) + "（" + itemId + "）。");
+  debugLogForce(模块名, "按名字发放物品", "name", 物品名, "itemId", itemId);
+}
+
+function on删除第一格物品命令(this: void, player: any, _command: string): void {
+  if (!是允许测试玩家(player)) return;
+  const hero = 获取测试英雄(player);
+  if (!是有效句柄(hero)) {
+    发送失败提示(player, "未找到该玩家的注册英雄。");
+    return;
+  }
+  const item = UnitItemInSlot(hero, 0); // 原生 UnitItemInSlot 为 0-5，0 即第一格
+  if (!是有效句柄(item)) {
+    发送失败提示(player, "英雄第一格没有物品。");
+    return;
+  }
+  const name = GetItemName(item);
+  RemoveItem(item);
+  DisplayTimedTextToPlayer(
+    player,
+    0,
+    0,
+    10,
+    "[物品测试] 已直接 RemoveItem 删除第一格：" + name + "。" +
+    "若随后出现『系统消息：当前装备加成』说明原生检测到了丢弃；若没有任何系统消息且属性面板数值未回落，说明裸删除检测不到。",
+  );
+  debugLogForce(模块名, "直接删除第一格物品（RemoveItem 实验）", "name", name);
+}
+
 注册聊天命令前缀监听(物品评分命令前缀, on物品评分命令);
 注册聊天命令前缀监听(物品内部ID命令前缀, on物品内部ID命令);
+注册聊天命令前缀监听(物品名命令前缀, on物品名命令);
 注册聊天命令监听(随机6000分装备命令, on随机6000分装备命令);
+注册聊天命令监听(删除第一格物品命令, on删除第一格物品命令);
 
 export {};

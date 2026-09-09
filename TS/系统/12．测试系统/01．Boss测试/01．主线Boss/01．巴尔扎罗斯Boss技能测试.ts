@@ -72,9 +72,8 @@ const { 巴尔扎罗斯战斗区域配置, 巴尔扎罗斯固定安全区配置�
   巴尔扎罗斯战斗区域配置: any;
   巴尔扎罗斯固定安全区配置表: any[];
 };
-const { 巴尔扎罗斯护卫配置, 巴尔扎罗斯阶段阈值, 巴尔扎罗斯技能数值配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置") as {
+const { 巴尔扎罗斯护卫配置, 巴尔扎罗斯技能数值配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.02．数值与表现配置") as {
   巴尔扎罗斯护卫配置: any;
-  巴尔扎罗斯阶段阈值: { 第三阶段生命比例: number };
   巴尔扎罗斯技能数值配置: any;
 };
 const { 巴尔扎罗斯单位技能配置 } = require("系统.03．技能系统.05．单位技能.03．Boss技能.01．主线Boss.03．熔岩恶魔王巴尔扎罗斯.00．配置") as {
@@ -291,7 +290,7 @@ function on巴尔扎罗斯技能2测试命令(this: void, _player: any, context:
 function on巴尔扎罗斯技能2P3测试命令(this: void, _player: any, context: any): void {
   const boss = context.Boss单位;
   if (!Boss测试单位存活(boss)) return;
-  SetUnitState(boss, UNIT_STATE_LIFE, GetUnitState(boss, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯阶段阈值.第三阶段生命比例 * 0.5);
+  SetUnitState(boss, UNIT_STATE_LIFE, GetUnitState(boss, UNIT_STATE_MAX_LIFE) * 巴尔扎罗斯技能数值配置.阶段阈值.P3生命比例 * 0.5);
   context.阶段 = 3;
   释放巴尔扎罗斯王者天罚(context);
 }

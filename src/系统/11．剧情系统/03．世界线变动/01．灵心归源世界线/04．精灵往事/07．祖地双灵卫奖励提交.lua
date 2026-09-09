@@ -10,7 +10,7 @@ local addSelectionListener = ____require_result_0.addSelectionListener
 local ____require_result_1 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local getRegisteredPlayerHero = ____require_result_1.getRegisteredPlayerHero
 local ____require_result_2 = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面")
-local _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_2["打开首领奖励选择界面"]
+local _____5EF6_8FDF_6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_2["延迟打开首领奖励选择界面"]
 local ____require_result_3 = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index")
 local _____7956_5730_53CC_7075_536B_5956_52B1_6C60ID = ____require_result_3["祖地双灵卫奖励池ID"]
 local ____require_result_4 = require("系统.09．表现系统.06．广播提示消息.index")
@@ -40,7 +40,7 @@ local function _____53D1_653E_7956_5730_53CC_7075_536B_5168_961F_5956_52B1()
                 end
                 local current = GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_LUMBER)
                 SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_LUMBER, current + 1)
-                _____6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____7956_5730_53CC_7075_536B_5956_52B1_6C60ID, player)
+                _____5EF6_8FDF_6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____7956_5730_53CC_7075_536B_5956_52B1_6C60ID, player)
             end
             ::__continue6::
             playerId = playerId + 1
@@ -61,7 +61,7 @@ local function ____on_63A5_53D7_7956_5730_53CC_7075_536B_5956_52B1_63D0_4EA4()
 end
 local function _____6253_5F00_5DF2_63D0_4EA4_5BF9_8BDD(player)
     local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
-    ____UI_51FD_6570.openNpcDialog(
+    ____UI_51FD_6570:openNpcDialog(
         player,
         {
             lines = {{title = "埃德里安", text = "双灵的回响已经归于平静。祖地会记住你们做过的事。", duration = 4600}},
@@ -73,7 +73,7 @@ local function _____6253_5F00_5DF2_63D0_4EA4_5BF9_8BDD(player)
 end
 local function _____6253_5F00_5956_52B1_63D0_4EA4_5BF9_8BDD(player)
     local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
-    ____UI_51FD_6570.openNpcDialog(
+    ____UI_51FD_6570:openNpcDialog(
         player,
         {
             lines = {{title = "埃德里安", text = "你们身上还带着赤誓与苍影的灵息。看来守在深处的，果然是他们。", duration = 4600}, {title = "埃德里安", text = "他们曾共同守过祖地，后来却把彼此都当成背誓者。你们终结的，是一场拖得太久的争执。", duration = 5200}},

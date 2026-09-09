@@ -1,8 +1,10 @@
 /** @noSelfInFile */
 
+import { 注册Boss阶段状态, 读取Boss阶段序号 } from "../../../../../00．核心系统/03．脱战系统/01．Boss阶段状态";
+
 import { 单位存活 as 单位有效 } from "../../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
 import { 瑟兰迪尔单位技能配置 } from "./00．配置";
-import { 瑟兰迪尔阶段阈值, 瑟兰迪尔数值与表现配置, 瑟兰迪尔运行时配置 } from "./02．数值与表现配置";
+import { 瑟兰迪尔数值与表现配置, 瑟兰迪尔运行时配置 } from "./02．数值与表现配置";
 import { 刷新瑟兰迪尔秩序领域, 清理瑟兰迪尔秩序领域 } from "./07．秩序领域";
 import { 释放瑟兰迪尔审判之环, 停止瑟兰迪尔审判之环 } from "./08．审判之环";
 import { 释放瑟兰迪尔月光灌注, 清理瑟兰迪尔月光灌注 } from "./11．月光灌注";
@@ -52,6 +54,7 @@ function 创建瑟兰迪尔上下文(this: void, boss: any, 清理: 机制清理
     已触发月光灌注: false,
   };
   context.阶段上下文 = 创建瑟兰迪尔阶段上下文(context);
+  注册Boss阶段状态(boss, 瑟兰迪尔数值与表现配置.阶段阈值, 读取Boss阶段序号, context, 清理);
   return context;
 }
 
@@ -66,7 +69,7 @@ function 创建瑟兰迪尔阶段上下文(this: void, context: 瑟兰迪尔运�
       ID: "P1",
     }, {
       ID: "P2",
-      血量百分比: 瑟兰迪尔阶段阈值.第二阶段生命比例,
+      血量百分比: 瑟兰迪尔数值与表现配置.阶段阈值.P2生命比例,
       on进入: function 瑟兰迪尔进入P2(this: void): void {
         context.阶段 = 2;
         播放瑟兰迪尔台词(context.Boss单位, "转阶段70");
@@ -74,7 +77,7 @@ function 创建瑟兰迪尔阶段上下文(this: void, context: 瑟兰迪尔运�
       },
     }, {
       ID: "P3",
-      血量百分比: 瑟兰迪尔阶段阈值.第三阶段生命比例,
+      血量百分比: 瑟兰迪尔数值与表现配置.阶段阈值.P3生命比例,
       on进入: function 瑟兰迪尔进入P3(this: void): void {
         context.阶段 = 3;
         播放瑟兰迪尔台词(context.Boss单位, "转阶段40");

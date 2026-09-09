@@ -7,8 +7,9 @@ const { 注册环境互动调查点 } = require("系统.03．技能系统.04．�
 const { 环境互动装备奖励概率 } = require("系统.03．技能系统.04．快捷键技能.04．环境互动.00．通用.00．环境互动配置") as {
   环境互动装备奖励概率: number;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
   创建物品并注册排泄监听: (this: void, 物品类型ID: number, X: number, Y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 const { 解析配置内部ID } = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具") as {
   解析配置内部ID: (this: void, 配置值: string | undefined | null) => number;
@@ -29,7 +30,7 @@ function 处理菲尼克斯尔战后晶核(this: void, 玩家ID: number, 英雄:
   if (配置ID == null) return false;
   const 物品 = 创建物品并注册排泄监听(解析配置内部ID(配置ID), jass.GetUnitX(英雄), jass.GetUnitY(英雄));
   if (物品 == null || 物品 === 0) return false;
-  jass.UnitAddItem(英雄, 物品);
+  给予单位物品(英雄, 物品);
   发送单位提示给玩家(jass.Player(玩家ID), 英雄, "|cffff6800『焚羽余烬晶核』：|r凤凰消散后的晶体仍在冷热之间缓慢脉动，像是把最后的火焰与冰霜都压进了同一枚核心。|n|cffffff00获得装备：焚羽余烬晶核。|r", 5200);
   return true;
 }

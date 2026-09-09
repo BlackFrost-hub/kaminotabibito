@@ -1,5 +1,7 @@
 /** @noSelfInFile */
 
+import { 注册Boss阶段状态, 读取Boss阶段序号 } from "../../../../../00．核心系统/03．脱战系统/01．Boss阶段状态";
+
 import type { 机制清理篮子 } from "../../../../00．技能模板+函数/04．机制组件/06．机制清理/01．机制清理篮子";
 import { 创建单位运行时上下文工厂 } from "../../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/15．单位运行时上下文工厂";
 import { 里科特单位技能配置 } from "./00．配置";
@@ -42,7 +44,7 @@ function 创建里科特上下文(this: void, boss: any, 清理: 机制清理篮
     优先级: 80,
     清理篮子: 清理,
   });
-  return {
+  const context: 里科特运行时上下文 = {
     Boss单位: boss,
     阶段: 取里科特当前阶段(boss),
     已初始化: false,
@@ -52,6 +54,8 @@ function 创建里科特上下文(this: void, boss: any, 清理: 机制清理篮
     神风印记单位表: {},
     破魔反击中: false,
   };
+  注册Boss阶段状态(boss, 里科特数值与表现配置.阶段阈值, 刷新里科特阶段, context, 清理);
+  return context;
 }
 
 function on里科特单位死亡(this: void, _context: 里科特运行时上下文, dyingUnit: any, _killingUnit: any): void {
@@ -87,9 +91,12 @@ export function 取里科特当前阶段(this: void, boss: any): 里科特阶段
   const maxLife = GetUnitStateJapi(boss, UNIT_STATE_MAX_LIFE);
   if (!(maxLife > 0)) return 1;
   const ratio = GetUnitState(boss, UNIT_STATE_LIFE) / maxLife;
-  if (ratio <= 里科特数值与表现配置.阶段阈值.P3生命比例) return 3;
-  if (ratio <= 里科特数值与表现配置.阶段阈值.P2生命比例) return 2;
-  return 1;
+  const context = 获取里科特上下文(boss);
+  let 阶段: 里科特阶段 = context?.阶段 ?? 1;
+  if (ratio <= 里科特数值与表现配置.阶段阈值.P3生命比例) 阶段 = 3;
+  else if (阶段 < 2 && ratio <= 里科特数值与表现配置.阶段阈值.P2生命比例) 阶段 = 2;
+  if (context != null) context.阶段 = 阶段;
+  return 阶段;
 }
 
 export function 刷新里科特阶段(this: void, context: 里科特运行时上下文): 里科特阶段 {

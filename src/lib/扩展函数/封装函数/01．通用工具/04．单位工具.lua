@@ -7,6 +7,9 @@ local g = require("jass.globals")
 local groupScratchPool = {}
 local GetUnitStateJass = jass.GetUnitState
 local SetUnitStateJass = jass.SetUnitState
+local japi = require("jass.japi")
+local GetUnitStateJapi = japi.GetUnitState
+local SetUnitStateJapi = japi.SetUnitState
 local ConvertUnitState = jass.ConvertUnitState
 local R2I = jass.R2I
 local function acquireScratchGroup(self)
@@ -138,15 +141,15 @@ function ____exports.forEachUnitInGroup(self, group, action)
     end
 end
 --- 获取单位的攻击类型（Attack Type）
--- 单位状态0x23对应攻击类型，使用ConvertUnitState转换
+-- 单位状态0x23对应攻击类型；扩展状态位必须走 japi 变体（jass 原生读扩展状态恒为0）
 function ____exports.Ir_GetUnitAttackType(u)
-    return R2I(GetUnitStateJass(
+    return R2I(GetUnitStateJapi(
         u,
         ConvertUnitState(35)
     ))
 end
 function ____exports.Ir_SetUnitAttackType(u, atp)
-    SetUnitStateJass(
+    SetUnitStateJapi(
         u,
         ConvertUnitState(35),
         atp

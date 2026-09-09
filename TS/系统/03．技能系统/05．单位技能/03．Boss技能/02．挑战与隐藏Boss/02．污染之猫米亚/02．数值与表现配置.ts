@@ -12,9 +12,9 @@ export const 米亚模型动画配置 = {
   普攻变体二: { 动画编号: 8, 原始时长秒: 1.5, 循环: false },
 } as const;
 
-export const 米亚阶段阈值 = {
-  第二阶段生命比例: 0.7,
-  第三阶段生命比例: 0.4,
+const 阶段阈值 = {
+  P2生命比例: 0.7,
+  P3生命比例: 0.4,
 } as const;
 
 export const 米亚运行时配置 = {
@@ -71,6 +71,7 @@ export const 米亚音效配置 = {
 } as const;
 
 export const 米亚技能数值配置 = {
+  阶段阈值,
   腐化爪击: {
     冷却Ms: 12000,
     前摇秒: 1,

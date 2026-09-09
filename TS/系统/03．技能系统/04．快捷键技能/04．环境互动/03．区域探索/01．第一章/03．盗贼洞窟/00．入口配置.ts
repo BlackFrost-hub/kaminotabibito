@@ -15,8 +15,9 @@ const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定�
 const { 立即移除单位并取消排泄登记 } = require("系统.00．核心系统.01．事件中心.07A．单位排泄") as {
   立即移除单位并取消排泄登记: (this: void, 单位: any) => void;
 };
-const { 创建物品并注册排泄监听 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
+const { 创建物品并注册排泄监听, 给予单位物品 } = require("lib.扩展函数.物品相关函数.创建物品函数") as {
   创建物品并注册排泄监听: (this: void, 物品类型ID: number, X: number, Y: number) => any;
+  给予单位物品: (this: void, 单位: any, 物品: any) => boolean;
 };
 const { 按名字反查物品ID } = require("系统.02．物品系统.13．物品名反查") as {
   按名字反查物品ID: (this: void, 物品名: string) => string | undefined;
@@ -42,7 +43,6 @@ const GetUnitX = jass.GetUnitX as (this: void, 单位: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, 单位: any) => number;
 const GetPlayerState = jass.GetPlayerState as (this: void, 玩家: any, 状态: number) => number;
 const SetPlayerState = jass.SetPlayerState as (this: void, 玩家: any, 状态: number, 数值: number) => void;
-const UnitAddItem = jass.UnitAddItem as (this: void, 单位: any, 物品: any) => boolean;
 
 const 玩家中立敌对 = Player(jass.PLAYER_NEUTRAL_AGGRESSIVE as number);
 const PLAYER_STATE_RESOURCE_GOLD = jass.PLAYER_STATE_RESOURCE_GOLD as number;
@@ -85,7 +85,7 @@ function 给予探索物品(this: void, 单位: any, 物品名: string): boolean
   if (物品ID == null) return false;
   const 物品 = 创建物品并注册排泄监听(解析配置内部ID(物品ID), GetUnitX(单位), GetUnitY(单位));
   if (!句柄有效(物品)) return false;
-  UnitAddItem(单位, 物品);
+  给予单位物品(单位, 物品);
   return true;
 }
 

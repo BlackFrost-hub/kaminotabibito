@@ -156,6 +156,8 @@ export interface 主线剧情最终伤害事件配置 {
   清理Boss语义键?: string;
   清理目标YD表?: boolean;
   移除目标单位?: boolean;
+  /** 认输型战斗：触发后主动结束 Boss 战运行上下文（停战斗 BGM、清单位字段），不等 Boss 死亡。 */
+  结束Boss战?: boolean;
   支线任务发现?: 主线剧情支线任务发现配置;
   延迟显示?: 主线剧情延迟显隐配置;
   旧JASS来源?: string;

@@ -48,6 +48,14 @@ function 启用莫尔特斯NPC配置(this: void): any {
   return NPC配置;
 }
 
+function 挂莫尔特斯任务标记并延时补挂(this: void, 赫克提尔: any, NPC配置: any): void {
+  tryAttachQuestMarkerForConfigNpc(赫克提尔, NPC配置);
+  // 解锁在剧情进度回调同帧触发，初始挂标可能随片段收尾一起被清；延时补挂一次保证玩家可见。
+  addDelayedCallback(100, function on莫尔特斯任务标记延时补挂(this: void): void {
+    if (莫尔特斯任务已解锁) tryAttachQuestMarkerForConfigNpc(赫克提尔, NPC配置);
+  });
+}
+
 function 尝试解锁并归位赫克提尔(this: void): boolean {
   if (读取剧情进度() < 莫尔特斯解锁剧情进度) return false;
 
@@ -58,7 +66,7 @@ function 尝试解锁并归位赫克提尔(this: void): boolean {
   IssueImmediateOrder(赫克提尔, "stop");
   SetUnitPosition(赫克提尔, 赫克提尔归位X, 赫克提尔归位Y);
   SetUnitFacing(赫克提尔, 赫克提尔归位朝向);
-  tryAttachQuestMarkerForConfigNpc(赫克提尔, NPC配置);
+  挂莫尔特斯任务标记并延时补挂(赫克提尔, NPC配置);
   莫尔特斯任务已解锁 = true;
   return true;
 }

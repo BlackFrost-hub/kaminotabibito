@@ -133,13 +133,13 @@ local function ____on_63A5_53D7_672C_601D_96C5_4EFB_52A1()
 end
 local function _____6253_5F00_672C_601D_96C5_5DF2_63A5_53D7_5BF9_8BDD(player, hero)
     local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
-    ____UI_51FD_6570.openNpcDialog(player, {lines = {{title = "本·思雅", text = "信物已经交给你们。守门者认得上面的灵印，埃德里安会在祖地入口等候。", duration = 4800}}, npcUnit = _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["本思雅单位"], ["对话目标单位"] = hero, ["NPC配置朝向"] = _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["本思雅"]["朝向"]})
+    ____UI_51FD_6570:openNpcDialog(player, {lines = {{title = "本·思雅", text = "信物已经交给你们。守门者认得上面的灵印，埃德里安会在祖地入口等候。", duration = 4800}}, npcUnit = _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["本思雅单位"], ["对话目标单位"] = hero, ["NPC配置朝向"] = _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["本思雅"]["朝向"]})
 end
 local function _____6253_5F00_672C_601D_96C5_4EFB_52A1_5BF9_8BDD(player, hero)
     _____672C_601D_96C5_5F85_5BF9_8BDD_73A9_5BB6 = player
     _____672C_601D_96C5_5F85_5BF9_8BDD_82F1_96C4 = hero
     local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
-    local opened = ____UI_51FD_6570.openNpcDialog(player, {
+    local opened = ____UI_51FD_6570:openNpcDialog(player, {
         lines = {{title = "本·思雅", text = "祖地深处的灵流近来反复震荡。那不是自然的回响，而是两道旧誓正在彼此撕扯。", duration = 4600}, {title = "本·思雅", text = "祖地从不轻易向外人开放。但若任由那股力量继续冲撞，沉睡的旧灵迟早会波及外界。", duration = 4800}},
         quest = {
             title = "精灵往事",
@@ -165,7 +165,7 @@ local function _____6253_5F00_57C3_5FB7_91CC_5B89_8BD5_70BC_5BF9_8BDD(player, he
     local trial = _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["试炼"]
     local text = (((((((("祖地认可的不是一时侥幸，而是足以承担后果的力量。\n\n" .. "持续输出：20 秒保持 2000 DPS（") .. _____53D6_8BD5_70BC_8FDB_5EA6_6587_672C(trial["持续伤害"]["已完成"])) .. "）\n") .. "爆发伤害：单次伤害超过 10000（") .. _____53D6_8BD5_70BC_8FDB_5EA6_6587_672C(trial["单次伤害"]["已完成"])) .. "）\n") .. "限时治疗：10 秒内将 1/5000 生命的目标治满（") .. _____53D6_8BD5_70BC_8FDB_5EA6_6587_672C(trial["治疗"]["已完成"])) .. "）"
     local ____UI_51FD_6570 = require("系统.00．核心系统.03．UI函数")
-    ____UI_51FD_6570.openNpcDialog(player, {lines = {{title = "埃德里安", text = text, duration = 9000}}, npcUnit = _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["埃德里安单位"], ["对话目标单位"] = hero, ["NPC配置朝向"] = _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["埃德里安"]["朝向"]})
+    ____UI_51FD_6570:openNpcDialog(player, {lines = {{title = "埃德里安", text = text, duration = 9000}}, npcUnit = _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["埃德里安单位"], ["对话目标单位"] = hero, ["NPC配置朝向"] = _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["埃德里安"]["朝向"]})
 end
 local function ____on_7956_5730_53CC_7075_536BNPC_9009_62E9(player, playerId, unit, isSelected)
     if not isSelected or not _____662F_73A9_5BB6_69FD_4F4D(playerId) or not _____53E5_67C4_6709_6548(unit) then

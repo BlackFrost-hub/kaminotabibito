@@ -187,9 +187,6 @@ local function _____6E05_7406_83AB_5C14_7279_65AF_626D_66F2_8346_68D8_97AD_7B1E_
                 if type(DzSetEffectVertexAlpha) == "function" then
                     DzSetEffectVertexAlpha(effect, 0)
                 end
-                if type(EXSetEffectSize) == "function" then
-                    EXSetEffectSize(effect, 0.01)
-                end
                 DestroyEffect(effect)
             end
             i = i + 1
@@ -208,9 +205,6 @@ local function _____5EF6_8FDF_6E05_7406_83AB_5C14_7279_65AF_626D_66F2_8346_68D8_
             if effect ~= nil and effect ~= 0 then
                 if type(DzSetEffectVertexAlpha) == "function" then
                     DzSetEffectVertexAlpha(effect, 0)
-                end
-                if type(EXSetEffectSize) == "function" then
-                    EXSetEffectSize(effect, 0.01)
                 end
                 DestroyEffect(effect)
             end
@@ -290,7 +284,7 @@ local function _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, channel, _____54
             do
                 local hero = heroes[i + 1]
                 if not _____5355_4F4D_6709_6548(hero) then
-                    goto __continue46
+                    goto __continue44
                 end
                 local dist2 = _____70B9_5230_7EBF_6BB5_8DDD_79BB_5E73_65B9(
                     GetUnitX(hero),
@@ -301,7 +295,7 @@ local function _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, channel, _____54
                     endY
                 )
                 if dist2 > cfg["矩形宽度"] * cfg["矩形宽度"] / 4 then
-                    goto __continue46
+                    goto __continue44
                 end
                 local hid = GetHandleId(hero) or 0
                 local oldHits = _____547D_4E2D_6B21_6570_8868[hid] or 0
@@ -335,7 +329,7 @@ local function _____5355_901A_9053_97AD_7B1E_547D_4E2D(context, channel, _____54
                     {sourceName = "莫尔特斯-荆棘寄生"}
                 )
             end
-            ::__continue46::
+            ::__continue44::
             i = i + 1
         end
     end

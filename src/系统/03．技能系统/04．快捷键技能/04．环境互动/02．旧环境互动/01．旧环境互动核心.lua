@@ -32,6 +32,7 @@ local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.05�
 local _____521B_5EFA_5355_4F4D_5E76_767B_8BB0_6392_6CC4_5B89_5168 = ____require_result_2["创建单位并登记排泄安全"]
 local ____require_result_3 = require("lib.扩展函数.物品相关函数.创建物品函数")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_3["创建物品并注册排泄监听"]
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_3["给予单位物品"]
 local ____require_result_4 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
 local YDUserDataGetSafe = ____require_result_4.YDUserDataGetSafe
 YDUserDataSetSafe = ____require_result_4.YDUserDataSetSafe
@@ -55,7 +56,6 @@ local GetHeroLevel = jass.GetHeroLevel
 local GetRandomInt = jass.GetRandomInt
 local Player = jass.Player
 local SetUnitOwner = jass.SetUnitOwner
-local UnitAddItem = jass.UnitAddItem
 local PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE
 local ____Boss_5165_53E3_7279_6548_8DEF_5F84 = "Objects\\Spawnmodels\\Naga\\NagaDeath\\NagaDeath.mdl"
 local function _____521B_5EFA_5E76_7ED9_4E88_7269_54C1(_____65BD_6CD5_5355_4F4D, _____7269_54C1ID)
@@ -65,7 +65,7 @@ local function _____521B_5EFA_5E76_7ED9_4E88_7269_54C1(_____65BD_6CD5_5355_4F4D,
         GetUnitY(_____65BD_6CD5_5355_4F4D)
     )
     if _____7269_54C1 ~= nil and _____7269_54C1 ~= 0 then
-        UnitAddItem(_____65BD_6CD5_5355_4F4D, _____7269_54C1)
+        _____7ED9_4E88_5355_4F4D_7269_54C1(_____65BD_6CD5_5355_4F4D, _____7269_54C1)
     end
 end
 local function _____5904_7406_9690_85CF_6728_6869(______73A9_5BB6ID, _____65BD_6CD5_5355_4F4D, _____8C03_67E5_70B9)

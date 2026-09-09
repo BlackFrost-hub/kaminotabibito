@@ -18,7 +18,7 @@ local function _____7ED9_4E88_5347_7EA7_88C5_5907(_____5355_4F4D, _____5347_7EA7
     if item == nil or item == 0 then
         return
     end
-    jass.UnitAddItem(_____5355_4F4D, item)
+    itemJudgeFns["给予单位物品"](_____5355_4F4D, item)
 end
 local function _____5904_7406_5355_4E2A_51FB_6740_53E0_5C42(_____51FB_6740_8005, _____914D_7F6E)
     local _____7269_54C1_56DB_5B57_7801 = _____53D6_7269_54C1_56DB_5B57_7801(_____914D_7F6E["装备ID"])

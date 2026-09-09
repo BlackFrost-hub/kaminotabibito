@@ -212,7 +212,7 @@ function 准备亚伦柯斯P3(this: void, context: 亚伦柯斯测试上下文):
   context.运行时.阶段 = 'P2旧誓回响';
   context.运行时.未安魂墓碑数量 = 0;
   context.运行时.当前大型技能 = undefined;
-  SetUnitState(context.Boss单位, UNIT_STATE_LIFE, GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE) * (thresholds.P3生命比例 + thresholds.最终强化生命比例) * 0.5);
+  SetUnitState(context.Boss单位, UNIT_STATE_LIFE, GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE) * (thresholds.P3生命比例 + thresholds.P4生命比例) * 0.5);
   进入亚伦柯斯P3(context.运行时);
 }
 
@@ -282,7 +282,7 @@ function 测试亚伦柯斯不灭军魂(this: void, _player: any, context: 亚�
 }
 function 测试亚伦柯斯最终强化(this: void, _player: any, context: 亚伦柯斯测试上下文): void {
   准备亚伦柯斯P3(context);
-  SetUnitState(context.Boss单位, UNIT_STATE_LIFE, GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE) * 亚伦柯斯正式设计配置.阶段阈值.最终强化生命比例 * 0.5);
+  SetUnitState(context.Boss单位, UNIT_STATE_LIFE, GetUnitState(context.Boss单位, UNIT_STATE_MAX_LIFE) * 亚伦柯斯正式设计配置.阶段阈值.P4生命比例 * 0.5);
   触发亚伦柯斯最终强化(context.运行时);
 }
 

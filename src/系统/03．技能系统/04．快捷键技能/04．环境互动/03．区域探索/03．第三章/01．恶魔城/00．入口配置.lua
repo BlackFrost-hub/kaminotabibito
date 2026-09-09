@@ -12,6 +12,7 @@ local ____require_result_2 = require("系统.03．技能系统.04．快捷键技
 local _____89E3_6790_914D_7F6E_5185_90E8ID = ____require_result_2["解析配置内部ID"]
 local ____require_result_3 = require("lib.扩展函数.物品相关函数.创建物品函数")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_3["创建物品并注册排泄监听"]
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_3["给予单位物品"]
 local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.11．召唤物.04．对外接口")
 local _____521B_5EFA_53EC_5524_7269 = ____require_result_4["创建召唤物"]
 local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
@@ -29,7 +30,6 @@ local GetHeroStr = jass.GetHeroStr
 local SetHeroStr = jass.SetHeroStr
 local GetUnitState = jass.GetUnitState
 local SetUnitState = jass.SetUnitState
-local UnitAddItem = jass.UnitAddItem
 local SGSS_SetState = require("lib.扩展函数.Star扩展函数.00．SGSS").SGSS_SetState
 local _____63D0_793A_6301_7EED_6BEB_79D2 = 5200
 local _____8718_86DB_70B9_4F4DX = 24222.4
@@ -68,7 +68,7 @@ local function _____7ED9_4E88_7269_54C1(_____5355_4F4D, _____540D_79F0)
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
     end
-    return UnitAddItem(_____5355_4F4D, _____7269_54C1)
+    return _____7ED9_4E88_5355_4F4D_7269_54C1(_____5355_4F4D, _____7269_54C1)
 end
 local function _____5B8C_5168_6062_590D_751F_547D_4E0E_9B54_6CD5(_____5355_4F4D)
     SetUnitState(

@@ -12,9 +12,9 @@ local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用�
 local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
 local ____require_result_3 = require("lib.扩展函数.物品相关函数.创建物品函数")
 local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_result_3["创建物品并注册排泄监听"]
+local _____7ED9_4E88_5355_4F4D_7269_54C1 = ____require_result_3["给予单位物品"]
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local UnitAddItem = jass.UnitAddItem
 ____exports["获取首领奖励接收英雄"] = function(_____73A9_5BB6)
     local _____6CE8_518C_82F1_96C4 = YDUserDataGetSafe("player", _____73A9_5BB6, "英雄", "unit")
     if _____6CE8_518C_82F1_96C4 ~= nil and _____6CE8_518C_82F1_96C4 ~= 0 then
@@ -40,7 +40,6 @@ ____exports["发放首领奖励装备"] = function(_____73A9_5BB6, _____88C5_590
     if _____7269_54C1 == nil or _____7269_54C1 == 0 then
         return false
     end
-    UnitAddItem(_____82F1_96C4, _____7269_54C1)
-    return true
+    return _____7ED9_4E88_5355_4F4D_7269_54C1(_____82F1_96C4, _____7269_54C1)
 end
 return ____exports

@@ -9,8 +9,7 @@ const { 广播单位提示, 播放广播对白序列 } = require("系统.09．�
 const { 广播提示玩家槽数 } = require("系统.09．表现系统.06．广播提示消息.00．常量定义") as {
   广播提示玩家槽数: number;
 };
-const { addDelayedCallback, addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
-  addDelayedCallback: (this: void, 延迟毫秒: number, 回调: (this: void) => void) => number;
+const { addPeriodicCallback, removePeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, 间隔毫秒: number, 回调: (this: void) => void) => number;
   removePeriodicCallback: (this: void, 回调ID: number) => void;
 };
@@ -61,8 +60,8 @@ const { 米亚单位技能配置 } = require("系统.03．技能系统.05．单�
 const { 米亚奖励池ID } = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index") as {
   米亚奖励池ID: string;
 };
-const { 打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
-  打开首领奖励选择界面: (this: void, 奖励池ID: string, 玩家: any) => void;
+const { 延迟打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
+  延迟打开首领奖励选择界面: (this: void, 奖励池ID: string, 玩家: any) => void;
 };
 const { 按配置键注册动态矩形区域, 注销动态矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.02．动态矩形区域动作") as {
   按配置键注册动态矩形区域: (this: void, 键: string) => any;
@@ -391,7 +390,7 @@ export function 完成污染之猫米亚任务后打开首领奖励(_任务配�
   for (let 玩家ID = 0; 玩家ID < 广播提示玩家槽数; 玩家ID++) {
     const 玩家 = Player(玩家ID);
     if (玩家 != null && jass.GetPlayerController(玩家) === jass.MAP_CONTROL_USER) {
-      打开首领奖励选择界面(米亚奖励池ID, 玩家);
+      延迟打开首领奖励选择界面(米亚奖励池ID, 玩家);
     }
   }
 }

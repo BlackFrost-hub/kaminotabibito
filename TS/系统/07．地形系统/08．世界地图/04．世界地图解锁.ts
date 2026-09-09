@@ -58,7 +58,9 @@ const GetTriggerUnit = jass.GetTriggerUnit as (this: void) => any;
 const GetTriggeringRegion = jass.GetTriggeringRegion as (this: void) => any;
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
-const UnitAddItemById = jass.UnitAddItemById as (this: void, unit: any, itemId: number) => any;
+const { 创建物品并给予单位 } = require("lib.扩展函数.物品相关函数.index") as {
+  创建物品并给予单位: (this: void, unit: any, itemId: number) => any;
+};
 const 获取矩形区域 = 统一矩形区域读取.获取矩形区域;
 
 const 世界地图区域配置By矩形区域名称: Record<string, 世界地图区域运行配置 | undefined> = {};
@@ -101,7 +103,7 @@ function 处理旅行奖励(this: void, unit: any, 配置索引: number | undefi
   const 字段 = "旅行" + tostring(配置.旅行编号);
   if (YD安全版.YDUserDataGetSafe("unit", unit, 字段, "boolean") === true) return;
   YD安全版.YDUserDataSetSafe("unit", unit, 字段, "boolean", true);
-  UnitAddItemById(unit, FourCC安全版.stringToFourCCSafe("I0DN"));
+  创建物品并给予单位(unit, FourCC安全版.stringToFourCCSafe("I0DN"));
 }
 
 function 应用地点解锁(this: void, 配置索引: number): void {

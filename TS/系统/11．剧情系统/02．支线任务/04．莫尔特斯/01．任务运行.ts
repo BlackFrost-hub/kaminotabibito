@@ -43,16 +43,20 @@ const { 触发任务UI刷新 } = require("系统.08．任务系统.02．任务�
 const { 莫尔特斯奖励池ID } = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index") as {
   莫尔特斯奖励池ID: string;
 };
-const { 打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
-  打开首领奖励选择界面: (this: void, 奖励池ID: string, 玩家: any) => void;
+const { 延迟打开首领奖励选择界面 } = require("系统.02．物品系统.18．首领奖励选择.05．奖励选择界面") as {
+  延迟打开首领奖励选择界面: (this: void, 奖励池ID: string, 玩家: any) => void;
 };
 const { 广播提示玩家槽数 } = require("系统.09．表现系统.06．广播提示消息.00．常量定义") as {
   广播提示玩家槽数: number;
+};
+const { 设置特效缩放 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
+  设置特效缩放: (this: void, effect: any, scale: number) => void;
 };
 
 import {
   莫尔特斯任务ID,
   莫尔特斯传送门特效路径,
+  莫尔特斯传送门特效缩放,
   莫尔特斯传送门X,
   莫尔特斯传送门Y,
   莫尔特斯传送门半径,
@@ -129,6 +133,7 @@ function 确保创建永久传送门(this: void): void {
   if (传送门已初始化) return;
 
   传送门特效 = AddSpecialEffect(莫尔特斯传送门特效路径, 莫尔特斯传送门X, 莫尔特斯传送门Y);
+  设置特效缩放(传送门特效, 莫尔特斯传送门特效缩放);
   传送门矩形 = Rect(
     莫尔特斯传送门X - 莫尔特斯传送门半径,
     莫尔特斯传送门Y - 莫尔特斯传送门半径,
@@ -271,7 +276,7 @@ export function 完成莫尔特斯任务后打开首领奖励(_任务配置?: an
   for (let 玩家ID = 0; 玩家ID < 广播提示玩家槽数; 玩家ID++) {
     const 玩家 = Player(玩家ID);
     if (玩家 != null && jass.GetPlayerController(玩家) === jass.MAP_CONTROL_USER) {
-      打开首领奖励选择界面(莫尔特斯奖励池ID, 玩家);
+      延迟打开首领奖励选择界面(莫尔特斯奖励池ID, 玩家);
     }
   }
 }

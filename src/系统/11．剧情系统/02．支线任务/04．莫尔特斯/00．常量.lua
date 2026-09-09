@@ -2,13 +2,14 @@
 local ____exports = {}
 ---
 -- @noSelfInFile
-____exports["莫尔特斯任务ID"] = 10022
-____exports["莫尔特斯解锁剧情进度"] = 34
+____exports["莫尔特斯任务ID"] = 11022
+____exports["莫尔特斯解锁剧情进度"] = 36
 ____exports["赫克提尔语义引用"] = "ZX.赫克提尔"
 ____exports["赫克提尔归位X"] = 14599.8
 ____exports["赫克提尔归位Y"] = -23001.6
 ____exports["赫克提尔归位朝向"] = 270
 ____exports["莫尔特斯传送门特效路径"] = "war3mapImported\\Effect_RiftPurple.mdl"
+____exports["莫尔特斯传送门特效缩放"] = 3
 ____exports["莫尔特斯传送门X"] = 14699.8
 ____exports["莫尔特斯传送门Y"] = -23001.6
 ____exports["莫尔特斯传送门半径"] = 96

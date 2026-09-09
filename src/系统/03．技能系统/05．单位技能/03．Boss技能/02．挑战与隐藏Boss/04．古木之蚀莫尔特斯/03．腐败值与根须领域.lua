@@ -6,6 +6,7 @@ local _____6E05_7406_83AB_5C14_7279_65AF_4E0A_4E0B_6587 = ____01_FF0E_8FD0_884C_
 local _____53D6_73A9_5BB6_8150_8D25_503C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["取玩家腐败值"]
 local _____589E_52A0_73A9_5BB6_8150_8D25_503C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["增加玩家腐败值"]
 local _____6E05_9664_73A9_5BB6_8150_8D25_503C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["清除玩家腐败值"]
+local _____8BBE_7F6E_73A9_5BB6_8150_8D25_503C = ____01_FF0E_8FD0_884C_65F6_4E0A_4E0B_6587["设置玩家腐败值"]
 local ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E = require("系统.03．技能系统.05．单位技能.03．Boss技能.02．挑战与隐藏Boss.04．古木之蚀莫尔特斯.02．数值与表现配置")
 local _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["莫尔特斯数值与表现配置"]
 local _____83AB_5C14_7279_65AF_97F3_6548_914D_7F6E = ____02_FF0E_6570_503C_4E0E_8868_73B0_914D_7F6E["莫尔特斯音效配置"]
@@ -39,8 +40,12 @@ local ____require_result_2 = require("系统.03．技能系统.00．技能模板
 local _____65BD_52A0_7981_9522 = ____require_result_2["施加禁锢"]
 local ____require_result_3 = require("系统.05．Buff系统.00．Buff系统")
 local registerManualBuff = ____require_result_3.registerManualBuff
-local ____require_result_4 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
-local _____83AB_5C14_7279_65AFBuffID = ____require_result_4["莫尔特斯BuffID"]
+local ____require_result_4 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+local _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D = ____require_result_4["是玩家英雄组单位"]
+local ____require_result_5 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_5.registerDeathListener
+local ____require_result_6 = require("系统.05．Buff系统.03．Buff表.01．Boss.02．挑战与隐藏Boss.03．莫尔特斯")
+local _____83AB_5C14_7279_65AFBuffID = ____require_result_6["莫尔特斯BuffID"]
 local jass = require("jass.common")
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
@@ -179,11 +184,39 @@ local function ____on_83AB_5C14_7279_65AF_8FD0_884C_65F6_7EF4_62A4(context)
     end
     _____6CE8_518C_83AB_5C14_7279_65AF_8150_8D25_4F20_8F93_8282_70B9(context)
 end
+local function ____on_83AB_5C14_7279_65AF_73A9_5BB6_82F1_96C4_6B7B_4EA1(_____6B7B_4EA1_5355_4F4D, ______51FB_6740_8005)
+    if not _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D(_____6B7B_4EA1_5355_4F4D) then
+        return
+    end
+    local id = _____53D6_5355_4F4DID(_____6B7B_4EA1_5355_4F4D)
+    if id == 0 then
+        return
+    end
+    local _____4E0A_4E0B_6587_5217_8868 = _____83B7_53D6_5168_90E8_83AB_5C14_7279_65AF_4E0A_4E0B_6587()
+    do
+        local i = 0
+        while i < #_____4E0A_4E0B_6587_5217_8868 do
+            do
+                local context = _____4E0A_4E0B_6587_5217_8868[i + 1]
+                if context == nil then
+                    goto __continue28
+                end
+                if (context["玩家腐败值表"][id] or 0) <= 0 then
+                    goto __continue28
+                end
+                _____8BBE_7F6E_73A9_5BB6_8150_8D25_503C(context, _____6B7B_4EA1_5355_4F4D, 0)
+            end
+            ::__continue28::
+            i = i + 1
+        end
+    end
+end
 ____exports["注册莫尔特斯腐败值与根须领域"] = function()
     if _____5DF2_6CE8_518C then
         return
     end
     _____5DF2_6CE8_518C = true
+    registerDeathListener(____on_83AB_5C14_7279_65AF_73A9_5BB6_82F1_96C4_6B7B_4EA1)
     _____521B_5EFA_5468_671F_673A_5236_8C03_5EA6_5668({["名称"] = "莫尔特斯-运行时维护", ["间隔毫秒"] = _____83AB_5C14_7279_65AF_6570_503C_4E0E_8868_73B0_914D_7F6E["运行时"]["推进间隔毫秒"], ["取上下文列表"] = _____83B7_53D6_5168_90E8_83AB_5C14_7279_65AF_4E0A_4E0B_6587, ["执行"] = ____on_83AB_5C14_7279_65AF_8FD0_884C_65F6_7EF4_62A4})
     _____521B_5EFA_6218_6597_6280_80FD_8C03_5EA6_5668({
         ["名称"] = "莫尔特斯-共生腐朽虫群调度",

@@ -22,6 +22,7 @@ const { 启动基础施法时间线 } = require("系统.03．技能系统.00．�
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 const GetUnitStateJapi = japi.GetUnitState as (this: void, unit: any, state: any) => number;
+const EXSetUnitMoveType = japi.EXSetUnitMoveType as (this: void, unit: any, moveType: number) => void;
 
 const GetUnitTypeId = jass.GetUnitTypeId as (unit: any) => number;
 const GetUnitX = jass.GetUnitX as (unit: any) => number;
@@ -29,7 +30,8 @@ const GetUnitY = jass.GetUnitY as (unit: any) => number;
 const GetHandleId = jass.GetHandleId as (handle: any) => number;
 const GetOwningPlayer = jass.GetOwningPlayer as (unit: any) => any;
 const GetRandomReal = jass.GetRandomReal as (low: number, high: number) => number;
-const IssuePointOrder = jass.IssuePointOrder as (unit: any, order: string, x: number, y: number) => boolean;
+const SetUnitX = jass.SetUnitX as (unit: any, x: number) => void;
+const SetUnitY = jass.SetUnitY as (unit: any, y: number) => void;
 const GetUnitState = jass.GetUnitState as (unit: any, state: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_PLANT = jass.DAMAGE_TYPE_PLANT as any;
@@ -49,10 +51,13 @@ interface 孢子云实例 {
   机制单位实例: 可攻击机制单位实例;
   区域实例?: 持续危险区域实例;
   剩余跳数: number;
+  移动角度: number;
+  伤害计时: number;
 }
 
 const 莫尔特斯单位类型ID = stringToFourCC(莫尔特斯单位技能配置.单位ID);
 const 腐败孢子云技能ID = stringToFourCC(莫尔特斯数值与表现配置.腐败孢子云.技能槽位);
+const 孢子云移动Tick间隔秒 = 0.03;
 let 已注册 = false;
 
 function 销毁孢子云(this: void, data: 孢子云实例): void {
@@ -71,6 +76,7 @@ function 孢子云Tick(this: void, data: 孢子云实例, 区域内单位: any[]
     return;
   }
   data.剩余跳数 = data.剩余跳数 - 1;
+  data.伤害计时 = data.伤害计时 + 孢子云移动Tick间隔秒;
   const currentX = GetUnitX(spore);
   const currentY = GetUnitY(spore);
   const heroes = 获取Boss技能敌对英雄列表(boss);
@@ -79,7 +85,7 @@ function 孢子云Tick(this: void, data: 孢子云实例, 区域内单位: any[]
     const unit = 区域内单位[i];
     if (单位有效(unit)) 区域单位表[GetHandleId(unit)] = true;
   }
-  for (let i = 0; i < heroes.length; i++) {
+  if (data.伤害计时 >= 1) for (let i = 0; i < heroes.length; i++) {
     const hero = heroes[i];
     if (!单位有效(hero)) continue;
     if (!区域单位表[GetHandleId(hero)]) continue;
@@ -97,10 +103,10 @@ function 孢子云Tick(this: void, data: 孢子云实例, 区域内单位: any[]
     创建点特效({ 模型路径: cfg.命中特效路径, X: GetUnitX(hero), Y: GetUnitY(hero), 持续秒: cfg.瞬时特效持续秒 });
     应用莫尔特斯腐败值(data.context, hero, cfg.每秒腐败值);
   }
-  const angle = GetRandomReal(0, 360);
-  const destinationX = 极坐标X(currentX, angle, cfg.移动距离);
-  const destinationY = 极坐标Y(currentY, angle, cfg.移动距离);
-  IssuePointOrder(spore, "move", destinationX, destinationY);
+  if (data.伤害计时 >= 1) data.伤害计时 = 0;
+  const step = cfg.移动距离 * 孢子云移动Tick间隔秒;
+  SetUnitX(spore, 极坐标X(currentX, data.移动角度, step));
+  SetUnitY(spore, 极坐标Y(currentY, data.移动角度, step));
   if (data.剩余跳数 <= 0) 销毁孢子云(data);
 }
 
@@ -113,7 +119,9 @@ function 创建单团孢子云(this: void, context: 莫尔特斯运行时上下�
     context,
     孢子单位: null,
     机制单位实例: undefined as any,
-    剩余跳数: cfg.持续秒,
+    剩余跳数: cfg.持续秒 / 孢子云移动Tick间隔秒,
+    移动角度: GetRandomReal(0, 360),
+    伤害计时: 1,
   };
   const instance = 创建可攻击机制单位({
     清理: context.清理,
@@ -136,6 +144,8 @@ function 创建单团孢子云(this: void, context: 莫尔特斯运行时上下�
   if (instance == null || !单位有效(instance.单位)) return;
   data.机制单位实例 = instance;
   data.孢子单位 = instance.单位;
+  // 原生毒雾云是飞行单位；hfoo 壳为地面单位，在林地地形与根须区域上会寻路失败原地不动，生成即切飞行。
+  EXSetUnitMoveType(data.孢子单位, 0x04);
   播放Boss坐标音效(莫尔特斯音效配置.腐败孢子云.成形, GetUnitX(instance.单位), GetUnitY(instance.单位), 莫尔特斯音效配置.默认裁断距离);
   data.区域实例 = 创建持续危险区域({
     X: GetUnitX(instance.单位),
@@ -143,7 +153,7 @@ function 创建单团孢子云(this: void, context: 莫尔特斯运行时上下�
     锚点单位: instance.单位,
     半径: cfg.半径,
     持续时间: cfg.持续秒 + cfg.Tick间隔毫秒 / 1000,
-    检测间隔: cfg.Tick间隔毫秒 / 1000,
+    检测间隔: 孢子云移动Tick间隔秒,
     所有者: boss,
     影响目标: "敌方",
     提示圈: {

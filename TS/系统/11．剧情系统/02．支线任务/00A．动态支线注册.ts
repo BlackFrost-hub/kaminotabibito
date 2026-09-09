@@ -3,6 +3,15 @@
 import { 任务配置列表, 任务配置 } from "../../08．任务系统/00．配置表/02．任务配置表";
 import { 注册单个任务配置到任务库 } from "../../08．任务系统/00．配置表/05．任务配置注册";
 import { 支线NPC配置列表, 支线NPC配置 } from "./01．支线NPC配置表";
+import { 任务ID分区 } from "../../08．任务系统/00．配置表/01．任务ID分区";
+
+const { 按任务ID查找已创建NPC, 按名称查找已创建NPC } = require("系统.08．任务系统.00．配置表.04．NPC生成器") as {
+  按任务ID查找已创建NPC: (this: void, 任务ID: number) => any;
+  按名称查找已创建NPC: (this: void, NPC名称: string) => any;
+};
+const { tryAttachQuestMarkerForConfigNpc } = require("系统.09．表现系统.02．对话框系统.09．NPC头顶与气泡特效") as {
+  tryAttachQuestMarkerForConfigNpc: (this: void, 单位: any, NPC配置: any) => void;
+};
 
 function 查找运行时任务配置(this: void, 任务ID: number): 任务配置 | null {
   for (const 配置 of 任务配置列表) {
@@ -26,7 +35,15 @@ export function 注册动态支线配置(
   if (!任务 || !任务.任务ID) return false;
   const 任务ID = 任务.任务ID;
 
+  // 新增动态任务使用独立区间；历史任务 ID 保持兼容，避免迁移时破坏已有引用。
+  if (任务ID >= 11000 && (任务ID < 任务ID分区.动态支线.起始 || 任务ID > 任务ID分区.动态支线.结束)) {
+    throw new Error("动态支线任务ID超出分区: " + 任务ID);
+  }
+
   let 运行时任务 = 查找运行时任务配置(任务ID);
+  if (运行时任务 && 运行时任务 !== 任务 && 运行时任务.名称 !== 任务.名称) {
+    throw new Error("动态支线任务ID与已有任务冲突: " + 任务ID + " / " + (运行时任务.名称 || "未命名") + " / " + (任务.名称 || "未命名"));
+  }
   if (!运行时任务) {
     任务配置列表.push(任务);
     运行时任务 = 任务;
@@ -38,5 +55,13 @@ export function 注册动态支线配置(
     运行时NPC = NPC;
   }
 
-  return 注册单个任务配置到任务库(运行时任务, 运行时NPC);
+  const 注册成功 = 注册单个任务配置到任务库(运行时任务, 运行时NPC);
+  if (注册成功 && 运行时NPC != null) {
+    // 动态注册不保证 NPC 已创建：创建后由生成器自动挂标；这里兜底挂已存在的 NPC 单位。
+    let 单位 = 按任务ID查找已创建NPC(任务ID);
+    if (单位 == null || 单位 === 0) 单位 = 按名称查找已创建NPC(运行时NPC.NPC配置名 ?? "");
+    if (单位 == null || 单位 === 0) 单位 = 按名称查找已创建NPC(运行时NPC.NPC名称 ?? "");
+    if (单位 != null && 单位 !== 0) tryAttachQuestMarkerForConfigNpc(单位, 运行时NPC);
+  }
+  return 注册成功;
 }

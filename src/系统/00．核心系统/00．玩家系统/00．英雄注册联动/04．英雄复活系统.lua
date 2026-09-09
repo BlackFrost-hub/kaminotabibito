@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____79FB_52A8_955C_5934_5230_73A9_5BB6, _____662F_5426_6709_6548, _____5355_4F4D_662F_5426_6B7B_4EA1, _____53D6_82F1_96C4_680F_69FD_4F4D, _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6, _____662F_73A9_5BB6_82F1_96C4, _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9, _____8BFB_53D6_5F53_524D_590D_6D3BBoss, ____on_590D_6D3B_955C_5934_79FB_52A8, _____65BD_52A0_590D_6D3B_65E0_654C, _____590D_6D3B_73A9_5BB6_82F1_96C4, jass, g, YDUserDataGetSafe, YDUserDataSetSafe, GetRandomDirectionDeg, getRegisteredPlayerHero, addDelayedCallback, debugLogForce, _____5F00_59CB_65E0_654C_5E27, _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321, StarOther_PanCameraToTimedForPlayer, _____8BBE_7F6E_51B7_5374_6570_5B57_6587_672C, _____663E_793A_51B7_5374_6570_5B57_6587_672C, DzFrameShow, GetUnitX, GetUnitY, IsUnitType, ReviveHeroLoc, GetOwningPlayer, GetHandleId, GetPlayerId, Location, RemoveLocation, SetUnitX, SetUnitY, _____590D_6D3B_65E0_654C_79D2, _____590D_6D3B_534A_5F84, _____590D_6D3B_63A8_8FDB_6B65_6570, _____590D_6D3B_6B21_6570_5C5E_6027, _____590D_6D3B_6B21_6570_8868, ____Boss_6218_8868, ____Boss_6218_5355_4F4D_5C5E_6027, _____82F1_96C4_680F_6587_672C_6846_4F53_6570_91CF, _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6587_672C_7EC4_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868
+local _____79FB_52A8_955C_5934_5230_73A9_5BB6, _____662F_5426_6709_6548, _____5355_4F4D_662F_5426_6B7B_4EA1, _____53D6_82F1_96C4_680F_69FD_4F4D, _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6, _____662F_73A9_5BB6_82F1_96C4, _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9, _____8BFB_53D6_5F53_524D_590D_6D3BBoss, ____on_590D_6D3B_955C_5934_79FB_52A8, _____65BD_52A0_590D_6D3B_65E0_654C, _____590D_6D3B_73A9_5BB6_82F1_96C4, jass, g, YDUserDataGetSafe, YDUserDataSetSafe, GetRandomDirectionDeg, getRegisteredPlayerHero, addDelayedCallback, _____5F00_59CB_65E0_654C_5E27, _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321, StarOther_PanCameraToTimedForPlayer, _____8BBE_7F6E_51B7_5374_6570_5B57_6587_672C, _____663E_793A_51B7_5374_6570_5B57_6587_672C, DzFrameShow, GetUnitX, GetUnitY, IsUnitType, ReviveHeroLoc, GetOwningPlayer, GetPlayerId, Location, RemoveLocation, SetUnitX, SetUnitY, _____590D_6D3B_65E0_654C_79D2, _____590D_6D3B_534A_5F84, _____590D_6D3B_63A8_8FDB_6B65_6570, _____590D_6D3B_6B21_6570_5C5E_6027, _____590D_6D3B_6B21_6570_8868, ____Boss_6218_8868, ____Boss_6218_5355_4F4D_5C5E_6027, _____82F1_96C4_680F_6587_672C_6846_4F53_6570_91CF, _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6587_672C_7EC4_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868
 function _____79FB_52A8_955C_5934_5230_73A9_5BB6(_____73A9_5BB6, x, y)
     StarOther_PanCameraToTimedForPlayer(_____73A9_5BB6, x, y, 0.1)
 end
@@ -83,43 +83,12 @@ end
 function _____8BFB_53D6_5F53_524D_590D_6D3BBoss()
     local battleBoss = YDUserDataGetSafe("string", ____Boss_6218_8868, ____Boss_6218_5355_4F4D_5C5E_6027, "unit")
     if _____662F_5426_6709_6548(battleBoss) and not _____5355_4F4D_662F_5426_6B7B_4EA1(battleBoss) then
-        debugLogForce(
-            "英雄复活",
-            "读取当前复活Boss",
-            "来源=Boss战单位字段",
-            "存活句柄",
-            GetHandleId(battleBoss)
-        )
         return battleBoss
-    end
-    if _____662F_5426_6709_6548(battleBoss) then
-        debugLogForce(
-            "英雄复活",
-            "读取当前复活Boss",
-            "Boss战单位字段残留死亡句柄,跳过",
-            GetHandleId(battleBoss)
-        )
     end
     local _____5168_5C40Boss = g.udg_Boss
     if _____662F_5426_6709_6548(_____5168_5C40Boss) and not _____5355_4F4D_662F_5426_6B7B_4EA1(_____5168_5C40Boss) then
-        debugLogForce(
-            "英雄复活",
-            "读取当前复活Boss",
-            "来源=udg_Boss",
-            "存活句柄",
-            GetHandleId(_____5168_5C40Boss)
-        )
         return _____5168_5C40Boss
     end
-    if _____662F_5426_6709_6548(_____5168_5C40Boss) then
-        debugLogForce(
-            "英雄复活",
-            "读取当前复活Boss",
-            "udg_Boss残留死亡句柄,跳过",
-            GetHandleId(_____5168_5C40Boss)
-        )
-    end
-    debugLogForce("英雄复活", "读取当前复活Boss", "无有效Boss,回退剧情复活点")
     return nil
 end
 function ____on_590D_6D3B_955C_5934_79FB_52A8(variable)
@@ -150,21 +119,14 @@ function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_
     local _____539F_5730X = _____539F_5730_590D_6D3B and GetUnitX(dyingUnit) or 0
     local _____539F_5730Y = _____539F_5730_590D_6D3B and GetUnitY(dyingUnit) or 0
     _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6(_____53D6_82F1_96C4_680F_69FD_4F4D(dyingUnit))
-    local _____6D88_8017_590D_6D3B_6B21_6570_9
+    local _____6D88_8017_590D_6D3B_6B21_6570_8
     if _____6D88_8017_590D_6D3B_6B21_6570 then
-        _____6D88_8017_590D_6D3B_6B21_6570_9 = YDUserDataGetSafe("string", _____590D_6D3B_6B21_6570_8868, _____590D_6D3B_6B21_6570_5C5E_6027, "integer")
+        _____6D88_8017_590D_6D3B_6B21_6570_8 = YDUserDataGetSafe("string", _____590D_6D3B_6B21_6570_8868, _____590D_6D3B_6B21_6570_5C5E_6027, "integer")
     else
-        _____6D88_8017_590D_6D3B_6B21_6570_9 = nil
+        _____6D88_8017_590D_6D3B_6B21_6570_8 = nil
     end
-    local _____5269_4F59_6B21_6570 = _____6D88_8017_590D_6D3B_6B21_6570_9
+    local _____5269_4F59_6B21_6570 = _____6D88_8017_590D_6D3B_6B21_6570_8
     if _____5269_4F59_6B21_6570 ~= nil and _____5269_4F59_6B21_6570 <= 0 then
-        debugLogForce(
-            "英雄复活",
-            "复活点判定",
-            "团队复活次数耗尽,不复活",
-            "英雄",
-            GetHandleId(dyingUnit)
-        )
         return false
     end
     if _____5269_4F59_6B21_6570 ~= nil then
@@ -192,28 +154,11 @@ function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_
                 y = _____539F_5730Y
             }
         )
-        debugLogForce(
-            "英雄复活",
-            "复活点判定",
-            "原地复活",
-            "英雄",
-            GetHandleId(dyingUnit),
-            "落点",
-            _____539F_5730X,
-            _____539F_5730Y
-        )
     else
         local boss = _____8BFB_53D6_5F53_524D_590D_6D3BBoss()
         if _____662F_5426_6709_6548(boss) then
             local pos = _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9(boss, dyingUnit)
             if pos == nil then
-                debugLogForce(
-                    "英雄复活",
-                    "复活点判定",
-                    "Boss复活点不可通行,放弃复活",
-                    "Boss",
-                    GetHandleId(boss)
-                )
                 return false
             end
             local loc = Location(
@@ -234,22 +179,9 @@ function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_
                     y = pos.y
                 }
             )
-            debugLogForce(
-                "英雄复活",
-                "复活点判定",
-                "Boss附近复活",
-                "英雄",
-                GetHandleId(dyingUnit),
-                "Boss",
-                GetHandleId(boss),
-                "落点",
-                pos.x,
-                pos.y
-            )
         else
             local _____590D_6D3B_70B9 = g.udg_FHD
             if not _____662F_5426_6709_6548(_____590D_6D3B_70B9) then
-                debugLogForce("英雄复活", "复活点判定", "剧情复活点无效,放弃复活")
                 return false
             end
             ReviveHeroLoc(dyingUnit, _____590D_6D3B_70B9, true)
@@ -262,15 +194,6 @@ function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_
                     x = GetUnitX(dyingUnit),
                     y = GetUnitY(dyingUnit)
                 }
-            )
-            debugLogForce(
-                "英雄复活",
-                "复活点判定",
-                "剧情复活点复活",
-                "英雄",
-                GetHandleId(dyingUnit),
-                "复活点句柄",
-                GetHandleId(_____590D_6D3B_70B9)
             )
         end
     end
@@ -288,17 +211,15 @@ local ____require_result_2 = require("系统.00．核心系统.00．玩家系统
 getRegisteredPlayerHero = ____require_result_2.getRegisteredPlayerHero
 local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
 addDelayedCallback = ____require_result_3.addDelayedCallback
-local ____require_result_4 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_4.debugLogForce
-local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.08．无敌帧")
-_____5F00_59CB_65E0_654C_5E27 = ____require_result_5["开始无敌帧"]
-local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进")
-_____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321 = ____require_result_6["沿角度步进直到地形阻挡"]
-local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
-StarOther_PanCameraToTimedForPlayer = ____require_result_7.StarOther_PanCameraToTimedForPlayer
-local ____G_8 = _G
-local onTick10ms = ____G_8.onTick10ms
-local offTick10ms = ____G_8.offTick10ms
+local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.08．无敌帧")
+_____5F00_59CB_65E0_654C_5E27 = ____require_result_4["开始无敌帧"]
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进")
+_____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321 = ____require_result_5["沿角度步进直到地形阻挡"]
+local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
+StarOther_PanCameraToTimedForPlayer = ____require_result_6.StarOther_PanCameraToTimedForPlayer
+local ____G_7 = _G
+local onTick10ms = ____G_7.onTick10ms
+local offTick10ms = ____G_7.offTick10ms
 local _____51B7_5374_6570_5B57_6587_672C_6A21_5757 = require("系统.09．表现系统.01．UI工具.06．冷却数字文本")
 local _____521B_5EFA_51B7_5374_6570_5B57_6587_672C_7EC4 = _____51B7_5374_6570_5B57_6587_672C_6A21_5757["创建冷却数字文本组"]
 local _____8BBE_7F6E_51B7_5374_6570_5B57_6587_672C_951A_70B9 = _____51B7_5374_6570_5B57_6587_672C_6A21_5757["设置冷却数字文本锚点"]
@@ -324,7 +245,6 @@ local Cos = jass.Cos
 local Sin = jass.Sin
 local GetLocalPlayer = jass.GetLocalPlayer
 GetOwningPlayer = jass.GetOwningPlayer
-GetHandleId = jass.GetHandleId
 GetPlayerId = jass.GetPlayerId
 Location = jass.Location
 RemoveLocation = jass.RemoveLocation
