@@ -169,7 +169,6 @@ function 释放D姿态切换(this: void, _context: any, 施法者: any, _技能�
 let 已注册 = false;
 
 export function 注册朱雀院椿D(this: void): void {
-  debugLogForce("椿-D", "注册", "名称", "注册朱雀院椿D");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

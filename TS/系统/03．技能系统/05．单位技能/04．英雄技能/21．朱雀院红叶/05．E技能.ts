@@ -447,7 +447,6 @@ function 释放E三叶散华(this: void, _context: any, 施法者: any, 技能�
 let 已注册 = false;
 
 export function 注册朱雀院红叶E(this: void): void {
-  debugLogForce("红叶-E", "注册", "名称", "E", "函数", "注册朱雀院红叶E");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

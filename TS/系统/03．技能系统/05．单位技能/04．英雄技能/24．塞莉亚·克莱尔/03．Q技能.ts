@@ -447,7 +447,6 @@ function 释放Q棱晶魔弹(this: void, _context: any, 施法者: any, 技能�
 let 已注册 = false;
 
 export function 注册塞莉亚Q(this: void): void {
-  debugLogForce("塞莉亚-Q", "注册", "名称", "注册塞莉亚Q");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

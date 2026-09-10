@@ -28,6 +28,9 @@ export interface 渔夫订单 {
   提交对白: string;
 }
 
+/** 渔获收购任务 ID。10101~10109 是恶魔城支线子段，渔夫同为第三章 NPC，顺位取 10110。 */
+export const 渔夫收购任务ID = 10110;
+
 /** 熔岩鱼全家（用于"任意"订单的凑数）。 */
 export const 熔岩鱼物品ID列表: readonly string[] = ["I0AT", "I0AU", "I0AV", "I0AW"];
 

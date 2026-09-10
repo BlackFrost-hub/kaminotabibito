@@ -2,5 +2,7 @@
 local ____exports = {}
 local ____01_FF0E_7194_5CA9_6076_9B54AI = require("系统.03．技能系统.06．AI自动使用技能.00．AI配置.01．BossAI配置表.01．熔岩恶魔AI")
 local _____7194_5CA9_6076_9B54AI_914D_7F6E = ____01_FF0E_7194_5CA9_6076_9B54AI["熔岩恶魔AI配置"]
-____exports["BossAI配置表"] = {_____7194_5CA9_6076_9B54AI_914D_7F6E}
+local ____02_FF0E_7194_6D46_9C7C_738BAI = require("系统.03．技能系统.06．AI自动使用技能.00．AI配置.01．BossAI配置表.02．熔浆鱼王AI")
+local _____7194_6D46_9C7C_738BAI_914D_7F6E = ____02_FF0E_7194_6D46_9C7C_738BAI["熔浆鱼王AI配置"]
+____exports["BossAI配置表"] = {_____7194_5CA9_6076_9B54AI_914D_7F6E, _____7194_6D46_9C7C_738BAI_914D_7F6E}
 return ____exports

@@ -232,7 +232,6 @@ function 确保区域标记死亡清理(this: void): void {
 }
 
 export function 注册爱蜜莉雅普攻联动(this: void): void {
-  debugLogForce("爱蜜莉雅-普攻联动", "注册", "名称", "注册爱蜜莉雅普攻联动");
   if (已注册) return;
   已注册 = true;
   确保区域标记死亡清理();

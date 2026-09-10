@@ -675,7 +675,6 @@ ____exports["清理芙莉莲状态"] = function(_____82F1_96C4)
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册芙莉莲被动"] = function()
-    debugLogForce("芙莉莲-被动", "注册", "名称", "注册芙莉莲被动")
     if _____5DF2_6CE8_518C then
         return
     end

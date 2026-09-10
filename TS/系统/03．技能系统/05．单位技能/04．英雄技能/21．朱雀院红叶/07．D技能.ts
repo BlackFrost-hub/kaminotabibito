@@ -230,7 +230,6 @@ function 破绽斩延长D(this: void, 红叶: any, _目标: any): void {
 let 已注册 = false;
 
 export function 注册朱雀院红叶D(this: void): void {
-  debugLogForce("红叶-D", "注册", "名称", "D", "函数", "注册朱雀院红叶D");
   if (已注册) return;
   已注册 = true;
   注册破绽斩监听(破绽斩延长D);

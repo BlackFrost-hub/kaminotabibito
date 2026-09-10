@@ -615,14 +615,6 @@ ____exports["延长Q2窗口"] = function(_____65BD_6CD5_8005, _____5EF6_957F_79D
     end
 end
 ____exports["注册朱雀院红叶Q"] = function()
-    debugLogForce(
-        "红叶-Q",
-        "注册",
-        "名称",
-        "Q",
-        "函数",
-        "注册朱雀院红叶Q"
-    )
     if _____5DF2_6CE8_518C then
         return
     end

@@ -852,7 +852,6 @@ local function _____786E_4FDD_6B7B_4EA1_6E05_7406()
 end
 --- 注册朱雀院椿被动（VF 吸收 + 普攻反击斩 + 死亡清理；幂等）
 ____exports["注册朱雀院椿被动"] = function()
-    debugLogForce("椿-被动", "注册", "名称", "注册朱雀院椿被动")
     if _____5DF2_6CE8_518C then
         return
     end

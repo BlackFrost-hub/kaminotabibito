@@ -817,7 +817,6 @@ let 普攻联动已注册 = false;
 
 /** 注册被动入口（幂等）：死亡清理监听 + 强化普攻伤害监听。 */
 export function 注册伊蕾娜被动效果(this: void): void {
-  debugLogForce("伊蕾娜-被动", "注册", "名称", "注册伊蕾娜被动效果");
   确保死亡监听();
   if (普攻联动已注册) return;
   普攻联动已注册 = true;

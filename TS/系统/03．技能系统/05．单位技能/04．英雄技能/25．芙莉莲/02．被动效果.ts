@@ -493,7 +493,6 @@ export function 清理芙莉莲状态(this: void, 英雄: any): void {
 let 已注册 = false;
 
 export function 注册芙莉莲被动(this: void): void {
-  debugLogForce("芙莉莲-被动", "注册", "名称", "注册芙莉莲被动");
   if (已注册) return;
   已注册 = true;
   // 死亡清理：芙莉莲死亡清自身状态；目标死亡清对应解析

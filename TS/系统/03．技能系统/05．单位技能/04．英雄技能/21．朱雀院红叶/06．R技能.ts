@@ -375,7 +375,6 @@ function 释放R奥义(this: void, _context: any, 施法者: any, 技能实例ID
 let 已注册 = false;
 
 export function 注册朱雀院红叶R(this: void): void {
-  debugLogForce("红叶-R", "注册", "名称", "R", "函数", "注册朱雀院红叶R");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

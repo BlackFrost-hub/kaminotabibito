@@ -379,7 +379,6 @@ function 释放W招架(this: void, _context: any, 施法者: any, 技能实例ID
 let 已注册 = false;
 
 export function 注册朱雀院椿W(this: void): void {
-  debugLogForce("椿-W", "注册", "名称", "注册朱雀院椿W");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

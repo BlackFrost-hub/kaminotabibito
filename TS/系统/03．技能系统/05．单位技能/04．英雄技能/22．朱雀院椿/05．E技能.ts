@@ -388,7 +388,6 @@ function 释放E间合(this: void, _context: any, 施法者: any, 技能实例ID
 let 已注册 = false;
 
 export function 注册朱雀院椿E(this: void): void {
-  debugLogForce("椿-E", "注册", "名称", "注册朱雀院椿E");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

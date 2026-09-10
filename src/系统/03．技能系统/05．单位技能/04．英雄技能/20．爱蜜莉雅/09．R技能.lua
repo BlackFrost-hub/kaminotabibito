@@ -600,7 +600,6 @@ local function _____91CA_653ER_6C38_51BB_4E4B_5EAD(_context, _____65BD_6CD5_8005
     )
 end
 ____exports["注册爱蜜莉雅R"] = function()
-    debugLogForce("爱蜜莉雅-R", "注册", "名称", "注册爱蜜莉雅R")
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "爱蜜莉雅-永冻之庭（R）",
         ["单位类型ID"] = _____82F1_96C4_5355_4F4D_7C7B_578BID,

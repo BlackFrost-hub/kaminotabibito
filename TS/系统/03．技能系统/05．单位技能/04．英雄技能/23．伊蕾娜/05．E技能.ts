@@ -419,7 +419,6 @@ function 释放E扫帚远行(this: void, _context: any, 施法者: any, 技能�
 let 已注册 = false;
 
 export function 注册伊蕾娜E(this: void): void {
-  debugLogForce("伊蕾娜-E", "注册", "名称", "注册伊蕾娜E");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

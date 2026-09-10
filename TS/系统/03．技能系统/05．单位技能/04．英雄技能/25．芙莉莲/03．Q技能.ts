@@ -277,7 +277,6 @@ const { 芙莉莲D配置: 芙莉莲D数值引用 } = require("./00．配置") as
 let 已注册 = false;
 
 export function 注册芙莉莲Q(this: void): void {
-  debugLogForce("芙莉莲-Q", "注册", "名称", "注册芙莉莲Q");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

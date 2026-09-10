@@ -430,7 +430,6 @@ export function 延长Q2窗口(this: void, 施法者: any, 延长秒: number): v
 }
 
 export function 注册朱雀院红叶Q(this: void): void {
-  debugLogForce("红叶-Q", "注册", "名称", "Q", "函数", "注册朱雀院红叶Q");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

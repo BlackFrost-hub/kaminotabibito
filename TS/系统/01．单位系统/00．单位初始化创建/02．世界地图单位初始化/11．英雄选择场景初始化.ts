@@ -290,7 +290,7 @@ function 初始化英雄选择场景(this: void): void {
   英雄选择计时器 = CreateTimer();
   英雄选择计时器窗口 = CreateTimerDialog(英雄选择计时器);
   if (英雄选择计时器窗口 != null && 英雄选择计时器窗口 !== 0) {
-    TimerDialogSetTitle(英雄选择计时器窗口, "TRIGSTR_007");
+    TimerDialogSetTitle(英雄选择计时器窗口, "选择你的英雄");
     TimerDialogDisplay(英雄选择计时器窗口, true);
   }
   TimerStart(英雄选择计时器, 180.0, false, undefined);

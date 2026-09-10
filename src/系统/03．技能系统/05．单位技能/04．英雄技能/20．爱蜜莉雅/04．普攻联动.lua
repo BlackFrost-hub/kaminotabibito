@@ -268,7 +268,6 @@ local function _____786E_4FDD_533A_57DF_6807_8BB0_6B7B_4EA1_6E05_7406()
     end)
 end
 ____exports["注册爱蜜莉雅普攻联动"] = function()
-    debugLogForce("爱蜜莉雅-普攻联动", "注册", "名称", "注册爱蜜莉雅普攻联动")
     if _____5DF2_6CE8_518C then
         return
     end

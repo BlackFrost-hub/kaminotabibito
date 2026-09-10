@@ -409,7 +409,6 @@ function 释放D(this: void, _context: any, 施法者: any, 技能实例ID: numb
 let 已注册 = false;
 
 export function 注册芙莉莲D(this: void): void {
-  debugLogForce("芙莉莲-D", "注册", "名称", "注册芙莉莲D");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

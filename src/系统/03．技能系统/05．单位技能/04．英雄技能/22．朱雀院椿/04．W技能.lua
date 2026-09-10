@@ -580,7 +580,6 @@ local function _____91CA_653EW_62DB_67B6(_context, _____65BD_6CD5_8005, _____628
 end
 local _____5DF2_6CE8_518C = false
 ____exports["注册朱雀院椿W"] = function()
-    debugLogForce("椿-W", "注册", "名称", "注册朱雀院椿W")
     if _____5DF2_6CE8_518C then
         return
     end

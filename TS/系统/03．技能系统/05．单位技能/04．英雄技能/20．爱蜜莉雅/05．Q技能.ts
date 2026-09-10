@@ -308,7 +308,6 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
 }
 
 export function 注册爱蜜莉雅Q(this: void): void {
-  debugLogForce("爱蜜莉雅-Q", "注册", "名称", "注册爱蜜莉雅Q");
   注册单位技能壳监听({
     名称: "爱蜜莉雅-冰之矢（Q）",
     单位类型ID: 英雄单位类型ID,

@@ -375,7 +375,6 @@ function 释放E二段输入(this: void, _context: any, 施法者: any, 技能�
 }
 
 export function 注册爱蜜莉雅E(this: void): void {
-  debugLogForce("爱蜜莉雅-E", "注册", "名称", "注册爱蜜莉雅E");
   注册单位技能壳监听({
     名称: "爱蜜莉雅-冰晶护身（E）",
     单位类型ID: 英雄单位类型ID,

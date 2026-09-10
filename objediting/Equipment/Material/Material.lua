@@ -10,6 +10,7 @@ createEquipmentItem('I0I0', '蛇纹翡翠鲤', {
   level = 1,
   priority = 233,
   goldCost = 70,
+  charges = 1,
   tooltipExtended = '|cff808080[材料/食物]|r|n|cffc0c0c0蛇人族水池里啃食夜光翡翠矿脉碎屑的鲤鱼，鳞片泛着幽绿微光。|r|n|cffffcc99（篝火烤制 12 秒，超时 5 秒烤焦）|r',
   description = '|cff808080[材料/食物]|r|n|cffc0c0c0蛇人族水池里啃食夜光翡翠矿脉碎屑的鲤鱼，鳞片泛着幽绿微光。|r|n|cffffcc99（篝火烤制 12 秒，超时 5 秒烤焦）|r',
 })
@@ -23,6 +24,7 @@ createEquipmentItem('I0I2', '月瞳鳗', {
   level = 1,
   priority = 234,
   goldCost = 80,
+  charges = 1,
   tooltipExtended = '|cff808080[材料/食物]|r|n|cffc0c0c0据传受美杜莎之瞳余韵浸染的鳗鱼，月下瞳纹会幽幽亮起。|r|n|cffffcc99（篝火烤制 15 秒，超时 5 秒烤焦）|r',
   description = '|cff808080[材料/食物]|r|n|cffc0c0c0据传受美杜莎之瞳余韵浸染的鳗鱼，月下瞳纹会幽幽亮起。|r|n|cffffcc99（篝火烤制 15 秒，超时 5 秒烤焦）|r',
 })
@@ -36,6 +38,7 @@ createEquipmentItem('I0I4', '战痕月鳞鱼', {
   level = 1,
   priority = 235,
   goldCost = 90,
+  charges = 1,
   tooltipExtended = '|cff808080[材料/食物]|r|n|cffc0c0c0常年游弋在被魔力反复冲刷的湖岸，鳞片上布满细密战痕。|r|n|cffffcc99（篝火烤制 15 秒，超时 6 秒烤焦）|r',
   description = '|cff808080[材料/食物]|r|n|cffc0c0c0常年游弋在被魔力反复冲刷的湖岸，鳞片上布满细密战痕。|r|n|cffffcc99（篝火烤制 15 秒，超时 6 秒烤焦）|r',
 })
@@ -49,6 +52,7 @@ createEquipmentItem('I0I6', '湖心星鲟', {
   level = 1,
   priority = 236,
   goldCost = 100,
+  charges = 1,
   tooltipExtended = '|cff808080[材料/食物]|r|n|cffc0c0c0沉在湖心深处的鲟鱼，体内沉积着星辉般的细砂。|r|n|cffffcc99（篝火烤制 18 秒，超时 6 秒烤焦）|r',
   description = '|cff808080[材料/食物]|r|n|cffc0c0c0沉在湖心深处的鲟鱼，体内沉积着星辉般的细砂。|r|n|cffffcc99（篝火烤制 18 秒，超时 6 秒烤焦）|r',
 })
@@ -62,6 +66,7 @@ createEquipmentItem('I0I8', '污潮鳗', {
   level = 1,
   priority = 237,
   goldCost = 70,
+  charges = 1,
   tooltipExtended = '|cff808080[材料/食物]|r|n|cffc0c0c0在发黑的水道里长大的鳗鱼，鱼肉浸着刺鼻的腐臭魔力。|r|n|cffffcc99（篝火烤制 12 秒，超时 5 秒烤焦）|r',
   description = '|cff808080[材料/食物]|r|n|cffc0c0c0在发黑的水道里长大的鳗鱼，鱼肉浸着刺鼻的腐臭魔力。|r|n|cffffcc99（篝火烤制 12 秒，超时 5 秒烤焦）|r',
 })
@@ -75,6 +80,7 @@ createEquipmentItem('I0IA', '黑水鳐', {
   level = 1,
   priority = 238,
   goldCost = 80,
+  charges = 1,
   tooltipExtended = '|cff808080[材料/食物]|r|n|cffc0c0c0潜伏在污染水层底部的鳐鱼，背鳍像一片化不开的黑。|r|n|cffffcc99（篝火烤制 15 秒，超时 5 秒烤焦）|r',
   description = '|cff808080[材料/食物]|r|n|cffc0c0c0潜伏在污染水层底部的鳐鱼，背鳍像一片化不开的黑。|r|n|cffffcc99（篝火烤制 15 秒，超时 5 秒烤焦）|r',
 })
@@ -88,6 +94,7 @@ createEquipmentItem('I0IC', '净泉鳗', {
   level = 1,
   priority = 239,
   goldCost = 110,
+  charges = 1,
   tooltipExtended = '|cff808080[材料/食物]|r|n|cffc0c0c0水脉复清后回到上游的鳗鱼，鳃边挂着清亮的泉珠。|r|n|cffffcc99（篝火烤制 18 秒，超时 6 秒烤焦）|r',
   description = '|cff808080[材料/食物]|r|n|cffc0c0c0水脉复清后回到上游的鳗鱼，鳃边挂着清亮的泉珠。|r|n|cffffcc99（篝火烤制 18 秒，超时 6 秒烤焦）|r',
 })
@@ -101,6 +108,7 @@ createEquipmentItem('I0IE', '清辉水母鱼', {
   level = 1,
   priority = 240,
   goldCost = 120,
+  charges = 1,
   tooltipExtended = '|cff808080[材料/食物]|r|n|cffc0c0c0随净化后的水光浮起的水母鱼，通体流转着柔和的清辉。|r|n|cffffcc99（篝火烤制 20 秒，超时 6 秒烤焦）|r',
   description = '|cff808080[材料/食物]|r|n|cffc0c0c0随净化后的水光浮起的水母鱼，通体流转着柔和的清辉。|r|n|cffffcc99（篝火烤制 20 秒，超时 6 秒烤焦）|r',
 })

@@ -507,7 +507,6 @@ function 释放E(this: void, _context: any, 施法者: any, 技能实例ID: numb
 let 已注册 = false;
 
 export function 注册芙莉莲E(this: void): void {
-  debugLogForce("芙莉莲-E", "注册", "名称", "注册芙莉莲E");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

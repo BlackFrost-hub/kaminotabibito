@@ -155,7 +155,6 @@ function 添加单位暂停收尾(this: void, 施法者: any, 来源: string): v
 let 已注册 = false;
 
 export function 注册塞莉亚D(this: void): void {
-  debugLogForce("塞莉亚-D", "注册", "名称", "注册塞莉亚D");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

@@ -425,7 +425,6 @@ end
 _____89E3_6790_5FEB_7167_6E90 = require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.02．被动效果")
 local _____5DF2_6CE8_518C = false
 ____exports["注册芙莉莲R"] = function()
-    debugLogForce("芙莉莲-R", "注册", "名称", "注册芙莉莲R")
     if _____5DF2_6CE8_518C then
         return
     end

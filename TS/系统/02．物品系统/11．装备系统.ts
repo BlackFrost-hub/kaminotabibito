@@ -246,7 +246,12 @@ function handleItemEvent(unit: any, item: any, isPickup: boolean): void {
   const coloredName = 是否彩虹装备等级(undefined, levelText) ? 彩虹颜色文本(undefined, 装备原名) : 装备颜色代码 + 装备原名 + "|r";
   // 消耗品丢弃不显示消息，但仍计算属性。
   if (!isConsumable && !isEquipItemMessageSilenced()) {
-    let msg = "|cffffff00『系统消息』：|r" + "|cFF87CEEB【装备】|r " + actionText + coloredLevel + "级装备『" + coloredName + "』";
+    // 无等级物品（材料等）不显示"级装备"，避免拼出"获得级装备"；材料直接读作「获得材料『名』」
+    const 物品类别 = String(itemData.type || "").trim();
+    const 获得描述 = levelText !== ""
+      ? actionText + coloredLevel + "级装备『" + coloredName + "』"
+      : actionText + (物品类别 === "材料" ? "材料" : "物品") + "『" + coloredName + "』";
+    let msg = "|cffffff00『系统消息』：|r" + "|cFF87CEEB【装备】|r " + 获得描述;
         for (const stat of playerStats) {
       const sign = stat.value > 0 ? "+" : "";
       const isPct = itemRelatedFns.是否百分比装备属性名(stat.name);

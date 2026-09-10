@@ -303,7 +303,9 @@ local function handleItemEvent(self, unit, item, isPickup)
     local coloredLevel = _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7(nil, levelText) and _____5F69_8679_989C_8272_6587_672C(nil, levelText) or (_____88C5_5907_989C_8272_4EE3_7801 .. levelText) .. "|r"
     local coloredName = _____662F_5426_5F69_8679_88C5_5907_7B49_7EA7(nil, levelText) and _____5F69_8679_989C_8272_6587_672C(nil, _____88C5_5907_539F_540D) or (_____88C5_5907_989C_8272_4EE3_7801 .. tostring(_____88C5_5907_539F_540D)) .. "|r"
     if not isConsumable and not isEquipItemMessageSilenced() then
-        local msg = ((((("|cffffff00『系统消息』：|r" .. "|cFF87CEEB【装备】|r ") .. actionText) .. coloredLevel) .. "级装备『") .. coloredName) .. "』"
+        local _____7269_54C1_7C7B_522B = __TS__StringTrim(tostring(itemData.type or ""))
+        local _____83B7_5F97_63CF_8FF0 = levelText ~= "" and (((actionText .. coloredLevel) .. "级装备『") .. coloredName) .. "』" or (((actionText .. (_____7269_54C1_7C7B_522B == "材料" and "材料" or "物品")) .. "『") .. coloredName) .. "』"
+        local msg = ("|cffffff00『系统消息』：|r" .. "|cFF87CEEB【装备】|r ") .. _____83B7_5F97_63CF_8FF0
         for ____, stat in ipairs(playerStats) do
             local sign = stat.value > 0 and "+" or ""
             local isPct = itemRelatedFns["是否百分比装备属性名"](stat.name)

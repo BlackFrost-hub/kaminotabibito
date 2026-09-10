@@ -382,7 +382,6 @@ function 花田联动取解析快照(this: void, 施法者: any): { 目标: any;
 let 已注册 = false;
 
 export function 注册芙莉莲R(this: void): void {
-  debugLogForce("芙莉莲-R", "注册", "名称", "注册芙莉莲R");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

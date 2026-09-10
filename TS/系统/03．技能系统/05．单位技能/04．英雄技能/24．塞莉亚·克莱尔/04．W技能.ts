@@ -263,7 +263,6 @@ function 释放W解析结界(this: void, _context: any, 施法者: any, _技能�
 let 已注册 = false;
 
 export function 注册塞莉亚W(this: void): void {
-  debugLogForce("塞莉亚-W", "注册", "名称", "注册塞莉亚W");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

@@ -475,7 +475,6 @@ local function _____91CA_653EE_4E8C_6BB5_8F93_5165(_context, _____65BD_6CD5_8005
     end
 end
 ____exports["注册爱蜜莉雅E"] = function()
-    debugLogForce("爱蜜莉雅-E", "注册", "名称", "注册爱蜜莉雅E")
     _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C({
         ["名称"] = "爱蜜莉雅-冰晶护身（E）",
         ["单位类型ID"] = _____82F1_96C4_5355_4F4D_7C7B_578BID,

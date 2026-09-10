@@ -448,7 +448,6 @@ function 释放W二段输入(this: void, _context: any, 施法者: any, 技能�
 }
 
 export function 注册爱蜜莉雅W(this: void): void {
-  debugLogForce("爱蜜莉雅-W", "注册", "名称", "注册爱蜜莉雅W");
   注册单位技能壳监听({
     名称: "爱蜜莉雅-冰花绽放（W）",
     单位类型ID: 英雄单位类型ID,

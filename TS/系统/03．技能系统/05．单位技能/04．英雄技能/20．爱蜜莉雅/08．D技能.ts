@@ -159,7 +159,6 @@ function 释放D帕克显现(this: void, _context: any, 施法者: any, _技能�
 }
 
 export function 注册爱蜜莉雅D(this: void): void {
-  debugLogForce("爱蜜莉雅-D", "注册", "名称", "注册爱蜜莉雅D");
   注册单位技能壳监听({
     名称: "爱蜜莉雅-帕克显现（D）",
     单位类型ID: 英雄单位类型ID,

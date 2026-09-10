@@ -576,7 +576,6 @@ function 确保死亡清理(this: void): void {
 
 /** 注册朱雀院椿被动（VF 吸收 + 普攻反击斩 + 死亡清理；幂等） */
 export function 注册朱雀院椿被动(this: void): void {
-  debugLogForce("椿-被动", "注册", "名称", "注册朱雀院椿被动");
   if (已注册) return;
   已注册 = true;
   确保死亡清理();

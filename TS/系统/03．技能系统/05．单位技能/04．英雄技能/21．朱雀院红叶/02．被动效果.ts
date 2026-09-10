@@ -384,7 +384,6 @@ function 确保死亡清理(this: void): void {
 
 /** 注册朱雀院红叶被动（普攻破绽斩 + 死亡清理；幂等） */
 export function 注册朱雀院红叶被动(this: void): void {
-  debugLogForce("红叶-被动", "注册", "名称", "被动", "函数", "注册朱雀院红叶被动");
   if (已注册) return;
   已注册 = true;
   确保死亡清理();

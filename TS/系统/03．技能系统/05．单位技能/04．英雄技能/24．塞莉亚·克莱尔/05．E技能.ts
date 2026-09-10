@@ -375,7 +375,6 @@ function 释放E锚定魔法阵(this: void, _context: any, 施法者: any, 技�
 let 已注册 = false;
 
 export function 注册塞莉亚E(this: void): void {
-  debugLogForce("塞莉亚-E", "注册", "名称", "注册塞莉亚E");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({

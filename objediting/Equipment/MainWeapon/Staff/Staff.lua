@@ -71,3 +71,17 @@ createEquipmentItem('I0H2', '浊潮祭杖', {
   tooltipExtended = '|cffccffff[主武器/法杖]-水系法术|r|n|cffffcc99等级：C+|n评分：5200|r|n|cffffffcc[基础属性]|r|n攻击力+140|n智力+36|n魔法伤害+15%|n水属性伤害+18%|n|cFF808080杖首封存着一小股尚未净化的浊潮，施法时会沿银色杖身逆流而上。|r',
   description = '|cffccffff[主武器/法杖]-水系法术|r|n|cffffcc99等级：C+|n评分：5200|r|n|cffffffcc[基础属性]|r|n攻击力+140|n智力+36|n魔法伤害+15%|n水属性伤害+18%|n|cFF808080杖首封存着一小股尚未净化的浊潮，施法时会沿银色杖身逆流而上。|r',
 })
+
+-- 默洛克渔夫重复收购奖励（移自 MainWeapon.lua 中转站：中转站只负责 dofile 子文件，不能放条目定义）。
+-- 默洛克渔夫重复收购奖励（B+ 档）。纯属性、无主动技能；评分依据见 TS 装备数据同条目注释。
+createEquipmentItem('I0IL', '|cff00ccff焚渊法杖|r', {
+  baseId = 'ratf',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Staff\\BTNabyss_forge_staff.blp',
+  model = 'war3mapImported\\SylvanEdge.mdl',
+  abilities = ' ',
+  classification = 'Campaign',
+  level = 6,
+  score = 8000,
+  tooltipExtended = '|cffccffff[主武器/法杖-智力·法术]|r|n|cffffcc99等级：B+|n评分：8000|r|n|cffffffcc[基础属性]|r|n攻击力+120|n智力+55|n魔法值+900|n魔法伤害+22%|n魔法穿透+20%|n|cFF808080杖顶那团火被铁笼关着，从不熄灭，也不肯变小。|r',
+  description = '|cffccffff[主武器/法杖-智力·法术]|r|n|cffffcc99等级：B+|n评分：8000|r|n|cffffffcc[基础属性]|r|n攻击力+120|n智力+55|n魔法值+900|n魔法伤害+22%|n魔法穿透+20%|n|cFF808080杖顶那团火被铁笼关着，从不熄灭，也不肯变小。|r',
+})

@@ -332,7 +332,6 @@ function 实例化W收尾守护(this: void, 施法者: any, 数据: 伊蕾娜W�
 let 已注册 = false;
 
 export function 注册伊蕾娜W(this: void): void {
-  debugLogForce("伊蕾娜-W", "注册", "名称", "注册伊蕾娜W");
   if (已注册) return;
   已注册 = true;
   注册单位技能壳监听({
