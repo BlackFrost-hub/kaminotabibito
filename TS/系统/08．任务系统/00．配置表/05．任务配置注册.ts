@@ -65,6 +65,18 @@ function 提取属性奖励数值(this: void, 文本: string, 属性名: string)
 }
 
 function 翻译单条奖励(this: void, 原文: string): string {
+  const 原始 = 原文.trim();
+  let 群前缀 = "";
+  for (const 前缀 of 奖励目标前缀列表) {
+    if (原始.indexOf(前缀) !== 0) continue;
+    群前缀 = 前缀 === "Player" ? "完成任务的玩家" : 前缀;
+    break;
+  }
+  const 内容 = 翻译单条奖励内容(原文);
+  return 群前缀 !== "" && 内容 !== "" ? 群前缀 + "：" + 内容 : 内容;
+}
+
+function 翻译单条奖励内容(this: void, 原文: string): string {
   const 文本 = 去除奖励目标前缀(原文);
   if (文本 === "" || 文本 === "null") return "";
 
@@ -168,9 +180,19 @@ export function 解析任务奖励展示文本(this: void, 原文: string): stri
       if (奖励部分 === "") continue;
       const 奖励列表 = 奖励部分.split(";");
       const 展示奖励: string[] = [];
+      const 已出现群: string[] = [];
       for (const 奖励 of 奖励列表) {
         const 结果 = 翻译单条奖励(奖励);
-        if (结果 !== "") 展示奖励.push(结果);
+        if (结果 === "") continue;
+        const 群分隔位置 = 结果.indexOf("：");
+        const 群 = 群分隔位置 > 0 ? 结果.substring(0, 群分隔位置) : "";
+        if (群 !== "" && 已出现群.length > 0 && 已出现群.indexOf(群) < 0) {
+          展示奖励.push("\n\n" + 结果);
+          已出现群.push(群);
+        } else {
+          展示奖励.push(结果);
+          if (群 !== "" && 已出现群.indexOf(群) < 0) 已出现群.push(群);
+        }
       }
       if (展示奖励.length > 0) 输出行.push(翻译奖励条件(条件) + "：" + 展示奖励.join("、"));
       continue;
@@ -178,9 +200,19 @@ export function 解析任务奖励展示文本(this: void, 原文: string): stri
 
     const 奖励列表 = 行.split(";");
     const 展示奖励: string[] = [];
+    const 已出现群: string[] = [];
     for (const 奖励 of 奖励列表) {
       const 结果 = 翻译单条奖励(奖励);
-      if (结果 !== "") 展示奖励.push(结果);
+      if (结果 === "") continue;
+      const 群分隔位置 = 结果.indexOf("：");
+      const 群 = 群分隔位置 > 0 ? 结果.substring(0, 群分隔位置) : "";
+      if (群 !== "" && 已出现群.length > 0 && 已出现群.indexOf(群) < 0) {
+        展示奖励.push("\n\n" + 结果);
+        已出现群.push(群);
+      } else {
+        展示奖励.push(结果);
+        if (群 !== "" && 已出现群.indexOf(群) < 0) 已出现群.push(群);
+      }
     }
     if (展示奖励.length > 0) 输出行.push(展示奖励.join("、"));
   }

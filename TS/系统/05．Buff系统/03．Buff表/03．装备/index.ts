@@ -9,6 +9,7 @@ import { 旧主动物品Buff表 } from "./05．旧主动物品";
 import { 亚伦柯斯装备Buff表 } from "./06．亚伦柯斯装备";
 import { 祖地双灵卫装备Buff表 } from "./07．祖地双灵卫装备";
 import { 异界装备Buff表 } from "./08．异界装备";
+import { 灼热食用Buff表 } from "./09．灼热食用";
 
 export const 装备Buff表: Record<string, BuffData> = {
   ...瑟兰迪尔装备Buff表,
@@ -19,6 +20,7 @@ export const 装备Buff表: Record<string, BuffData> = {
   ...亚伦柯斯装备Buff表,
   ...祖地双灵卫装备Buff表,
   ...异界装备Buff表,
+  ...灼热食用Buff表,
 };
 
 export default 装备Buff表;

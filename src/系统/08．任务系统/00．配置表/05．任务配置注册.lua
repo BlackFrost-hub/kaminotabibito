@@ -3,7 +3,9 @@ local __TS__StringTrim = ____lualib.__TS__StringTrim
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__StringCharAt = ____lualib.__TS__StringCharAt
 local __TS__StringSplit = ____lualib.__TS__StringSplit
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
 local ____exports = {}
+local _____53BB_9664_5956_52B1_76EE_6807_524D_7F00, _____53BB_9664_5B8C_6574_5916_62EC_53F7, _____67E5_627E_6700_540E_5B57_7B26_4F4D_7F6E, _____7FFB_8BD1_6570_503C_8868_8FBE_5F0F, _____63D0_53D6_5C5E_6027_5956_52B1_6570_503C, _____7FFB_8BD1_5355_6761_5956_52B1_5185_5BB9, _____5956_52B1_76EE_6807_524D_7F00_5217_8868
 local ____00_FF0EYDWE_51FD_6570 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
 local getObjectProperty = ____00_FF0EYDWE_51FD_6570.getObjectProperty
 local ObjectType = ____00_FF0EYDWE_51FD_6570.ObjectType
@@ -11,8 +13,7 @@ local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．�
 local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
-local _____5956_52B1_76EE_6807_524D_7F00_5217_8868 = {"所有玩家", "完成任务的玩家", "Player"}
-local function _____53BB_9664_5956_52B1_76EE_6807_524D_7F00(_____539F_6587)
+function _____53BB_9664_5956_52B1_76EE_6807_524D_7F00(_____539F_6587)
     local _____6587_672C = __TS__StringTrim(_____539F_6587)
     for ____, _____524D_7F00 in ipairs(_____5956_52B1_76EE_6807_524D_7F00_5217_8868) do
         do
@@ -29,14 +30,14 @@ local function _____53BB_9664_5956_52B1_76EE_6807_524D_7F00(_____539F_6587)
     end
     return _____6587_672C
 end
-local function _____53BB_9664_5B8C_6574_5916_62EC_53F7(_____539F_6587)
+function _____53BB_9664_5B8C_6574_5916_62EC_53F7(_____539F_6587)
     local _____6587_672C = __TS__StringTrim(_____539F_6587)
     if #_____6587_672C >= 2 and string.sub(_____6587_672C, 1, 1) == "(" and __TS__StringCharAt(_____6587_672C, #_____6587_672C - 1) == ")" then
         return __TS__StringTrim(__TS__StringSubstring(_____6587_672C, 1, #_____6587_672C - 1))
     end
     return _____6587_672C
 end
-local function _____67E5_627E_6700_540E_5B57_7B26_4F4D_7F6E(_____6587_672C, _____76EE_6807_5B57_7B26)
+function _____67E5_627E_6700_540E_5B57_7B26_4F4D_7F6E(_____6587_672C, _____76EE_6807_5B57_7B26)
     do
         local i = #_____6587_672C - 1
         while i >= 0 do
@@ -48,7 +49,7 @@ local function _____67E5_627E_6700_540E_5B57_7B26_4F4D_7F6E(_____6587_672C, ____
     end
     return -1
 end
-local function _____7FFB_8BD1_6570_503C_8868_8FBE_5F0F(_____539F_6587)
+function _____7FFB_8BD1_6570_503C_8868_8FBE_5F0F(_____539F_6587)
     local _____6587_672C = _____53BB_9664_5B8C_6574_5916_62EC_53F7(_____539F_6587)
     if (string.find(_____6587_672C, "IMaxBJ(", nil, true) or 0) - 1 == 0 then
         local _____9017_53F7_4F4D_7F6E = _____67E5_627E_6700_540E_5B57_7B26_4F4D_7F6E(_____6587_672C, ",")
@@ -76,7 +77,7 @@ local function _____7FFB_8BD1_6570_503C_8868_8FBE_5F0F(_____539F_6587)
     )
     return _____6587_672C
 end
-local function _____63D0_53D6_5C5E_6027_5956_52B1_6570_503C(_____6587_672C, _____5C5E_6027_540D)
+function _____63D0_53D6_5C5E_6027_5956_52B1_6570_503C(_____6587_672C, _____5C5E_6027_540D)
     local _____5C5E_6027_4F4D_7F6E = (string.find(_____6587_672C, _____5C5E_6027_540D, nil, true) or 0) - 1
     if _____5C5E_6027_4F4D_7F6E < 0 then
         return ""
@@ -98,7 +99,7 @@ local function _____63D0_53D6_5C5E_6027_5956_52B1_6570_503C(_____6587_672C, ____
         ""
     ))
 end
-local function _____7FFB_8BD1_5355_6761_5956_52B1(_____539F_6587)
+function _____7FFB_8BD1_5355_6761_5956_52B1_5185_5BB9(_____539F_6587)
     local _____6587_672C = _____53BB_9664_5956_52B1_76EE_6807_524D_7F00(_____539F_6587)
     if _____6587_672C == "" or _____6587_672C == "null" then
         return ""
@@ -107,12 +108,12 @@ local function _____7FFB_8BD1_5355_6761_5956_52B1(_____539F_6587)
     for ____, _____5C5E_6027_540D in ipairs(_____767E_5206_6BD4_5C5E_6027) do
         do
             if (string.find(_____6587_672C, _____5C5E_6027_540D, nil, true) or 0) - 1 < 0 then
-                goto __continue22
+                goto __continue26
             end
             local _____6570_503C = _____63D0_53D6_5C5E_6027_5956_52B1_6570_503C(_____6587_672C, _____5C5E_6027_540D)
             return _____6570_503C ~= "" and ((_____5C5E_6027_540D .. "提升") .. _____7FFB_8BD1_6570_503C_8868_8FBE_5F0F(_____6570_503C)) .. "%" or _____5C5E_6027_540D .. "提升"
         end
-        ::__continue22::
+        ::__continue26::
     end
     if (string.find(_____6587_672C, "智力成长", nil, true) or 0) - 1 >= 0 then
         local _____6570_503C = _____63D0_53D6_5C5E_6027_5956_52B1_6570_503C(_____6587_672C, "智力成长")
@@ -158,17 +159,34 @@ local function _____7FFB_8BD1_5355_6761_5956_52B1(_____539F_6587)
         do
             local _____5C5E_6027_4F4D_7F6E = (string.find(_____6587_672C, _____5C5E_6027_540D, nil, true) or 0) - 1
             if _____5C5E_6027_4F4D_7F6E < 0 then
-                goto __continue33
+                goto __continue37
             end
             return ((_____5C5E_6027_540D .. "提升") .. _____7FFB_8BD1_6570_503C_8868_8FBE_5F0F(__TS__StringSubstring(_____6587_672C, 0, _____5C5E_6027_4F4D_7F6E))) .. "点"
         end
-        ::__continue33::
+        ::__continue37::
     end
     local _____7B49_7EA7_4F4D_7F6E = #_____6587_672C - #"等级"
     if _____7B49_7EA7_4F4D_7F6E > 0 and __TS__StringSubstring(_____6587_672C, _____7B49_7EA7_4F4D_7F6E) == "等级" then
         return ("英雄等级提升" .. _____7FFB_8BD1_6570_503C_8868_8FBE_5F0F(__TS__StringSubstring(_____6587_672C, 0, _____7B49_7EA7_4F4D_7F6E))) .. "级"
     end
     return _____6587_672C
+end
+_____5956_52B1_76EE_6807_524D_7F00_5217_8868 = {"所有玩家", "完成任务的玩家", "Player"}
+local function _____7FFB_8BD1_5355_6761_5956_52B1(_____539F_6587)
+    local _____539F_59CB = __TS__StringTrim(_____539F_6587)
+    local _____7FA4_524D_7F00 = ""
+    for ____, _____524D_7F00 in ipairs(_____5956_52B1_76EE_6807_524D_7F00_5217_8868) do
+        do
+            if (string.find(_____539F_59CB, _____524D_7F00, nil, true) or 0) - 1 ~= 0 then
+                goto __continue21
+            end
+            _____7FA4_524D_7F00 = _____524D_7F00 == "Player" and "完成任务的玩家" or _____524D_7F00
+            break
+        end
+        ::__continue21::
+    end
+    local _____5185_5BB9 = _____7FFB_8BD1_5355_6761_5956_52B1_5185_5BB9(_____539F_6587)
+    return _____7FA4_524D_7F00 ~= "" and _____5185_5BB9 ~= "" and (_____7FA4_524D_7F00 .. "：") .. _____5185_5BB9 or _____5185_5BB9
 end
 local function _____8BFB_53D6_6761_4EF6_6570_5B57(_____6587_672C)
     local _____6570_5B57 = 0
@@ -225,41 +243,71 @@ ____exports["解析任务奖励展示文本"] = function(_____539F_6587)
         do
             local _____884C = __TS__StringTrim(_____884C_6587_672C)
             if _____884C == "" or _____884C == "外部：" or _____884C == "内部：" then
-                goto __continue52
+                goto __continue56
             end
             local _____5192_53F7_4F4D_7F6E = (string.find(_____884C, ":", nil, true) or 0) - 1
             if _____5192_53F7_4F4D_7F6E > 0 and _____662F_5426_5956_52B1_6761_4EF6_6587_672C(__TS__StringSubstring(_____884C, 0, _____5192_53F7_4F4D_7F6E)) then
                 local _____6761_4EF6 = __TS__StringTrim(__TS__StringSubstring(_____884C, 0, _____5192_53F7_4F4D_7F6E))
                 local _____5956_52B1_90E8_5206 = __TS__StringTrim(__TS__StringSubstring(_____884C, _____5192_53F7_4F4D_7F6E + 1))
                 if _____5956_52B1_90E8_5206 == "" then
-                    goto __continue52
+                    goto __continue56
                 end
                 local _____5956_52B1_5217_8868 = __TS__StringSplit(_____5956_52B1_90E8_5206, ";")
                 local _____5C55_793A_5956_52B1 = {}
+                local _____5DF2_51FA_73B0_7FA4 = {}
                 for ____, _____5956_52B1 in ipairs(_____5956_52B1_5217_8868) do
-                    local _____7ED3_679C = _____7FFB_8BD1_5355_6761_5956_52B1(_____5956_52B1)
-                    if _____7ED3_679C ~= "" then
-                        _____5C55_793A_5956_52B1[#_____5C55_793A_5956_52B1 + 1] = _____7ED3_679C
+                    do
+                        local _____7ED3_679C = _____7FFB_8BD1_5355_6761_5956_52B1(_____5956_52B1)
+                        if _____7ED3_679C == "" then
+                            goto __continue60
+                        end
+                        local _____7FA4_5206_9694_4F4D_7F6E = (string.find(_____7ED3_679C, "：", nil, true) or 0) - 1
+                        local _____7FA4 = _____7FA4_5206_9694_4F4D_7F6E > 0 and __TS__StringSubstring(_____7ED3_679C, 0, _____7FA4_5206_9694_4F4D_7F6E) or ""
+                        if _____7FA4 ~= "" and #_____5DF2_51FA_73B0_7FA4 > 0 and __TS__ArrayIndexOf(_____5DF2_51FA_73B0_7FA4, _____7FA4) < 0 then
+                            _____5C55_793A_5956_52B1[#_____5C55_793A_5956_52B1 + 1] = "\n\n" .. _____7ED3_679C
+                            _____5DF2_51FA_73B0_7FA4[#_____5DF2_51FA_73B0_7FA4 + 1] = _____7FA4
+                        else
+                            _____5C55_793A_5956_52B1[#_____5C55_793A_5956_52B1 + 1] = _____7ED3_679C
+                            if _____7FA4 ~= "" and __TS__ArrayIndexOf(_____5DF2_51FA_73B0_7FA4, _____7FA4) < 0 then
+                                _____5DF2_51FA_73B0_7FA4[#_____5DF2_51FA_73B0_7FA4 + 1] = _____7FA4
+                            end
+                        end
                     end
+                    ::__continue60::
                 end
                 if #_____5C55_793A_5956_52B1 > 0 then
                     _____8F93_51FA_884C[#_____8F93_51FA_884C + 1] = (_____7FFB_8BD1_5956_52B1_6761_4EF6(_____6761_4EF6) .. "：") .. table.concat(_____5C55_793A_5956_52B1, "、")
                 end
-                goto __continue52
+                goto __continue56
             end
             local _____5956_52B1_5217_8868 = __TS__StringSplit(_____884C, ";")
             local _____5C55_793A_5956_52B1 = {}
+            local _____5DF2_51FA_73B0_7FA4 = {}
             for ____, _____5956_52B1 in ipairs(_____5956_52B1_5217_8868) do
-                local _____7ED3_679C = _____7FFB_8BD1_5355_6761_5956_52B1(_____5956_52B1)
-                if _____7ED3_679C ~= "" then
-                    _____5C55_793A_5956_52B1[#_____5C55_793A_5956_52B1 + 1] = _____7ED3_679C
+                do
+                    local _____7ED3_679C = _____7FFB_8BD1_5355_6761_5956_52B1(_____5956_52B1)
+                    if _____7ED3_679C == "" then
+                        goto __continue67
+                    end
+                    local _____7FA4_5206_9694_4F4D_7F6E = (string.find(_____7ED3_679C, "：", nil, true) or 0) - 1
+                    local _____7FA4 = _____7FA4_5206_9694_4F4D_7F6E > 0 and __TS__StringSubstring(_____7ED3_679C, 0, _____7FA4_5206_9694_4F4D_7F6E) or ""
+                    if _____7FA4 ~= "" and #_____5DF2_51FA_73B0_7FA4 > 0 and __TS__ArrayIndexOf(_____5DF2_51FA_73B0_7FA4, _____7FA4) < 0 then
+                        _____5C55_793A_5956_52B1[#_____5C55_793A_5956_52B1 + 1] = "\n\n" .. _____7ED3_679C
+                        _____5DF2_51FA_73B0_7FA4[#_____5DF2_51FA_73B0_7FA4 + 1] = _____7FA4
+                    else
+                        _____5C55_793A_5956_52B1[#_____5C55_793A_5956_52B1 + 1] = _____7ED3_679C
+                        if _____7FA4 ~= "" and __TS__ArrayIndexOf(_____5DF2_51FA_73B0_7FA4, _____7FA4) < 0 then
+                            _____5DF2_51FA_73B0_7FA4[#_____5DF2_51FA_73B0_7FA4 + 1] = _____7FA4
+                        end
+                    end
                 end
+                ::__continue67::
             end
             if #_____5C55_793A_5956_52B1 > 0 then
                 _____8F93_51FA_884C[#_____8F93_51FA_884C + 1] = table.concat(_____5C55_793A_5956_52B1, "、")
             end
         end
-        ::__continue52::
+        ::__continue56::
     end
     return #_____8F93_51FA_884C > 0 and table.concat(_____8F93_51FA_884C, "\n") or "无"
 end
@@ -282,7 +330,7 @@ local function _____6784_5EFA_4EFB_52A1_76EE_6807(cfg)
                 do
                     local _____76EE_6807_7EC4 = cfg["击杀目标组"][i + 1]
                     if not _____76EE_6807_7EC4 or not _____76EE_6807_7EC4["目标单位"] or _____76EE_6807_7EC4["需求数量"] <= 0 then
-                        goto __continue71
+                        goto __continue81
                     end
                     _____76EE_6807_5217_8868[#_____76EE_6807_5217_8868 + 1] = {
                         id = "kill_group_" .. tostring(i),
@@ -292,7 +340,7 @@ local function _____6784_5EFA_4EFB_52A1_76EE_6807(cfg)
                         completed = false
                     }
                 end
-                ::__continue71::
+                ::__continue81::
                 i = i + 1
             end
         end
@@ -308,7 +356,7 @@ local function _____6784_5EFA_4EFB_52A1_76EE_6807(cfg)
                 do
                     local _____5355_4F4D_4EE3_7801 = __TS__StringTrim(_____5355_4F4D_5217_8868[i + 1])
                     if _____5355_4F4D_4EE3_7801 == "" then
-                        goto __continue75
+                        goto __continue85
                     end
                     local _____663E_793A_540D = __TS__StringTrim(_____663E_793A_540D_5217_8868[i + 1] or _____5355_4F4D_4EE3_7801)
                     _____76EE_6807_5217_8868[#_____76EE_6807_5217_8868 + 1] = {
@@ -319,7 +367,7 @@ local function _____6784_5EFA_4EFB_52A1_76EE_6807(cfg)
                         completed = false
                     }
                 end
-                ::__continue75::
+                ::__continue85::
                 i = i + 1
             end
         end

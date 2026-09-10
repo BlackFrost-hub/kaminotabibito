@@ -3,11 +3,17 @@
 const jass = require("jass.common") as any;
 const jassGlobals = require("jass.globals") as { udg_WYDW?: any; [key: string]: any };
 
-const { registerSpellEffectListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
-  registerSpellEffectListener: (this: void, callback: (this: void, 施法单位: any, 技能ID: number) => void) => void;
+const { 注册物品技能事件监听 } = require("系统.00．核心系统.01．事件中心.13．物品技能事件中心") as {
+  注册物品技能事件监听: (this: void, callback: (this: void, 上下文: any) => void) => void;
 };
 const { 解析配置内部ID } = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具") as {
   解析配置内部ID: (this: void, 配置值: string | undefined | null) => number;
+};
+const { 玩家主副背包持有物品 } = require("系统.03．技能系统.04．快捷键技能.02．按Ctrl切换背包") as {
+  玩家主副背包持有物品: (this: void, hero: any, itemTypeID: number) => boolean;
+};
+const { ConsumeItemTypeCountByChargesBJ } = require("lib.扩展函数.物品相关函数.物品判断函数") as {
+  ConsumeItemTypeCountByChargesBJ: (this: void, whichUnit: any, itemId: number, needCount: number) => boolean;
 };
 const { 创建单位并登记排泄安全 } = require("lib.扩展函数.自定义扩展函数.05．单位相关安全包装") as {
   创建单位并登记排泄安全: (this: void, owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
@@ -47,15 +53,32 @@ const { addDelayedCallback } = require("系统.00．核心系统.05．中心计�
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void) => void) => number;
 };
 
+const { questDB, QuestStatus } = require("系统.08．任务系统.01．任务数据") as {
+  questDB: { getPlayerQuestStatus: (playerId: number, questId: string) => string };
+  QuestStatus: { COMPLETED: string };
+};
+const { 米亚任务ID } = require("系统.11．剧情系统.02．支线任务.02．污染之猫米亚.00．常量") as {
+  米亚任务ID: number;
+};
+
 import { 鱼竿配置, type 鱼竿单位结果配置 } from "./00．鱼竿配置";
+import {
+  钓点区域配置表,
+  钓点鱼池配置表,
+  精灵城水池键,
+  熔浆钓点键,
+  米亚污染池键,
+  米亚净水池键,
+  type 钓点区域定义,
+  type 钓点产物档,
+} from "./00A．钓点区域配置";
 
 const GetHeroLevel = jass.GetHeroLevel as (this: void, unit: any) => number;
 const IsUnitType = jass.IsUnitType as (this: void, unit: any, unitType: number) => boolean;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
-const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
-const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
+const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 const IsTerrainPathable = jass.IsTerrainPathable as (this: void, x: number, y: number, pathingType: any) => boolean;
 const GetRandomInt = jass.GetRandomInt as (this: void, low: number, high: number) => number;
 const SetUnitPosition = jass.SetUnitPosition as (this: void, unit: any, x: number, y: number) => boolean;
@@ -73,6 +96,8 @@ const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const PATHING_TYPE_WALKABILITY = jass.PATHING_TYPE_WALKABILITY as any;
 const PATHING_TYPE_FLOATABILITY = jass.PATHING_TYPE_FLOATABILITY as any;
 const 鱼竿技能类型ID = 解析配置内部ID(鱼竿配置.技能ID);
+/** 熔浆钓点专属鱼竿的物品类型ID；用物品技能事件带出的物品与之比对。 */
+const 熔岩专属鱼竿类型ID = 解析配置内部ID(鱼竿配置.熔岩专属鱼竿物品ID);
 
 const 本地重复刷新标记: Record<number, boolean | undefined> = {};
 let 已初始化鱼竿 = false;
@@ -85,6 +110,49 @@ function 是鱼竿目标水域(this: void, x: number, y: number): boolean {
   const 行走不可通行 = IsTerrainPathable(x, y, PATHING_TYPE_WALKABILITY);
   const 漂浮可通行 = !IsTerrainPathable(x, y, PATHING_TYPE_FLOATABILITY);
   return 行走不可通行 === 鱼竿配置.行走不可通行 && 漂浮可通行 === 鱼竿配置.漂浮可通行;
+}
+
+/** 点是否落在钓点矩形内（边界包含）。 */
+function 点在钓点矩形内(this: void, 区域: 钓点区域定义, x: number, y: number): boolean {
+  return x >= 区域.左 && x <= 区域.右 && y >= 区域.下 && y <= 区域.上;
+}
+
+/** 按优先级取命中的钓点区域；未命中返回 undefined。 */
+function 取钓点区域(this: void, x: number, y: number): 钓点区域定义 | undefined {
+  for (let i = 0; i < 钓点区域配置表.length; i++) {
+    const 区域 = 钓点区域配置表[i];
+    if (点在钓点矩形内(区域, x, y)) return 区域;
+  }
+  return undefined;
+}
+
+/**
+ * 米亚水源是否已净化。
+ * 任务进度为全局共享（questDB 的 playerId 参数不参与寻址），
+ * 且"净化完成"必然蕴含"米亚已击败"，故只需判定任务是否已完成。
+ */
+function 米亚水源已净化(this: void): boolean {
+  const 状态 = questDB.getPlayerQuestStatus(0, 米亚任务ID.toString());
+  return 状态 === QuestStatus.COMPLETED;
+}
+
+/** 取该钓点当前生效的鱼池（精灵城水池按米亚任务状态切换）。 */
+function 取钓点鱼池(this: void, 区域: 钓点区域定义): readonly 钓点产物档[] {
+  if (区域.键 === 精灵城水池键) {
+    const 池键 = 米亚水源已净化() ? 米亚净水池键 : 米亚污染池键;
+    return 钓点鱼池配置表[池键] ?? [];
+  }
+  return 钓点鱼池配置表[区域.键] ?? [];
+}
+
+/** 把回落区间的掷骰值线性映射到通用表 1–100。 */
+function 映射回落值(this: void, 随机值: number, 最小值: number, 最大值: number): number {
+  const 跨度 = 最大值 - 最小值 + 1;
+  if (跨度 <= 0) return 1;
+  const 映射值 = Math.floor((随机值 - 最小值) * 100 / 跨度) + 1;
+  if (映射值 < 1) return 1;
+  if (映射值 > 100) return 100;
+  return 映射值;
 }
 
 function 读取重复刷新标记(this: void, 索引: number): boolean {
@@ -147,6 +215,39 @@ function 创建鱼竿单位结果(this: void, 施法单位: any, 目标X: number
   return 单位;
 }
 
+/** 隐藏遭遇是否已被触发（整局仅一次，全场共用；模块级状态，一局内有效）。 */
+let 隐藏遭遇已触发 = false;
+
+/**
+ * 熔浆钓点的隐藏遭遇：携带材料抛竿时，消耗材料、改钓出单位而不是鱼。
+ * 返回 true 表示本次抛竿已被隐藏遭遇接管，调用方应直接结束本次结算。
+ *
+ * 只对熔浆钓点生效（区域键精确匹配），因此不会影响其它水域与其它钓点。
+ * 整局仅一次：第一个满足条件的人钓走后，后面的人不再触发（见 配置.整局仅一次）。
+ */
+function 处理隐藏遭遇(this: void, 施法单位: any, 区域: 钓点区域定义, 目标X: number, 目标Y: number): boolean {
+  const 配置 = 鱼竿配置.隐藏遭遇;
+  if (配置 == null) return false;
+  if (区域.键 !== 熔浆钓点键) return false;
+  if (配置.整局仅一次 === true && 隐藏遭遇已触发) return false;
+
+  const 材料类型ID = 解析配置内部ID(配置.要求材料物品ID);
+  if (材料类型ID === 0) return false;
+  if (!玩家主副背包持有物品(施法单位, 材料类型ID)) return false;
+  if (!ConsumeItemTypeCountByChargesBJ(施法单位, 材料类型ID, 配置.消耗数量)) return false;
+
+  隐藏遭遇已触发 = true;
+
+  const 单位类型ID = 解析配置内部ID(配置.产出单位ID);
+  if (单位类型ID !== 0) {
+    const 面向角度 = 两点角度(目标X, 目标Y, GetUnitX(施法单位), GetUnitY(施法单位));
+    创建单位并登记排泄安全(读取单位结果所有者("中立敌对"), 单位类型ID, 目标X, 目标Y, 面向角度);
+  }
+  createTimedEffect(鱼竿配置.成功特效路径, 目标X, 目标Y, 0, 鱼竿配置.成功特效持续秒);
+  显示鱼竿提示(施法单位, 配置.触发提示);
+  return true;
+}
+
 function 显示鱼竿提示(this: void, 施法单位: any, 文本: string): void {
   const 玩家 = GetOwningPlayer(施法单位);
   if (玩家 == null || 玩家 === 0) return;
@@ -168,8 +269,11 @@ function 鱼竿收竿标记清除(this: void): void {
   本次收竿单位 = null;
 }
 
-function 结算鱼竿结果(this: void, 施法单位: any, 目标X: number, 目标Y: number): void {
-  const 随机值 = GetRandomInt(鱼竿配置.随机最小值, 鱼竿配置.随机最大值);
+/**
+ * 通用结果结算（原有行为）。
+ * 含单位结果 = false 时只走物品表：钓点回落专用，区域内禁用单位结果池（含 94–100 人类渔夫）。
+ */
+function 结算通用结果(this: void, 施法单位: any, 随机值: number, 目标X: number, 目标Y: number, 含单位结果: boolean): void {
   if (随机值 <= 5) {
     显示鱼竿失败(施法单位);
     return;
@@ -185,6 +289,8 @@ function 结算鱼竿结果(this: void, 施法单位: any, 目标X: number, 目�
     break;
   }
 
+  if (!含单位结果) return;
+
   const 英雄等级 = GetHeroLevel(施法单位);
   for (let i = 0; i < 鱼竿配置.单位结果列表.length; i++) {
     const 结果 = 鱼竿配置.单位结果列表[i];
@@ -192,6 +298,49 @@ function 结算鱼竿结果(this: void, 施法单位: any, 目标X: number, 目�
     if (!英雄等级满足(结果, 英雄等级)) continue;
     创建鱼竿单位结果(施法单位, 目标X, 目标Y, 结果);
   }
+}
+
+/** 钓点区域结算：单次掷骰落在哪个档就产出该档；档无物品则回落通用物品池。 */
+function 结算钓点产物(
+  this: void,
+  施法单位: any,
+  区域: 钓点区域定义,
+  随机值: number,
+  目标X: number,
+  目标Y: number,
+): void {
+  // 隐藏遭遇优先：熔浆钓点携带指定材料时，改钓出单位，完全不走区域鱼池。
+  if (处理隐藏遭遇(施法单位, 区域, 目标X, 目标Y)) return;
+
+  const 档列表 = 取钓点鱼池(区域);
+  for (let i = 0; i < 档列表.length; i++) {
+    const 档 = 档列表[i];
+    if (!区间命中(随机值, 档.随机最小值, 档.随机最大值)) continue;
+
+    if (档.物品ID == null) {
+      const 回落值 = 映射回落值(随机值, 档.随机最小值, 档.随机最大值);
+      结算通用结果(施法单位, 回落值, 目标X, 目标Y, false);
+      return;
+    }
+
+    createTimedEffect(鱼竿配置.成功特效路径, 目标X, 目标Y, 0, 鱼竿配置.成功特效持续秒);
+    const 物品类型ID = 解析配置内部ID(档.物品ID);
+    if (物品类型ID !== 0) 创建物品并给予单位(施法单位, 物品类型ID);
+    return;
+  }
+}
+
+function 结算鱼竿结果(this: void, 施法单位: any, 目标X: number, 目标Y: number): void {
+  const 随机值 = GetRandomInt(鱼竿配置.随机最小值, 鱼竿配置.随机最大值);
+
+  // 钓点区域优先：命中区域时只走该区域鱼池，完全不走通用单位结果池。
+  const 区域 = 取钓点区域(目标X, 目标Y);
+  if (区域 != null) {
+    结算钓点产物(施法单位, 区域, 随机值, 目标X, 目标Y);
+    return;
+  }
+
+  结算通用结果(施法单位, 随机值, 目标X, 目标Y, true);
 }
 
 let 收竿监听已注册 = false;
@@ -291,16 +440,39 @@ function 处理鱼竿等待结束(this: void, _施法单位: any, 原因: string
   }
 }
 
-function 处理鱼竿生效(this: void, 施法单位: any, 技能ID: number): void {
-  if (施法单位 == null || 施法单位 === 0 || 技能ID !== 鱼竿技能类型ID) return;
+/**
+ * 鱼竿入口：走「物品技能事件」而不是裸 SPELL_EFFECT。
+ *
+ * 该事件天然同时携带**物品**（来自 `GetManipulatedItem()`）与**技能ID**（事件中心在
+ * SPELL_EFFECT 阶段按施法者缓存后补上），目标坐标也是当时即时捕获的。
+ * 于是"用的是哪根鱼竿"无需扫描背包即可判定 —— 这正是熔岩专属鱼竿的天然判据。
+ */
+function 处理鱼竿物品技能(this: void, 上下文: any): void {
+  if (上下文 == null) return;
 
-  // 收竿指令已由指令监听在施法下单时结算，这里吸收同一次施放的 SPELL_EFFECT，避免刚收竿又抛新竿。
+  const 施法单位 = 上下文.施法单位;
+  if (施法单位 == null || 施法单位 === 0) return;
+  if (上下文.技能ID !== 鱼竿技能类型ID) return;
+
+  // 收竿指令已由指令监听在施法下单时结算，这里吸收同一次施放的物品技能事件，避免刚收竿又抛新竿。
   if (本次收竿单位 != null && 本次收竿单位 === 施法单位) return;
 
-  // 目标坐标必须在 SPELL_EFFECT 回调中立即读取，不能延迟后再取 GetSpellTargetX/Y。
-  const 目标X = GetSpellTargetX();
-  const 目标Y = GetSpellTargetY();
-  if (!是鱼竿目标水域(目标X, 目标Y)) return;
+  // 目标坐标由事件中心在 SPELL_EFFECT 阶段即时捕获后随上下文传入，等价于原先的即时读取。
+  const 目标X = 上下文.目标X;
+  const 目标Y = 上下文.目标Y;
+
+  // 先判钓点区域：命中即放行，跳过水域判定。
+  // （熔浆等区域的水面不满足"可漂浮"，若先判水域会导致这些钓点在逻辑上不可达。）
+  const 区域 = 取钓点区域(目标X, 目标Y);
+  if (区域 == null && !是鱼竿目标水域(目标X, 目标Y)) return;
+
+  // 熔浆钓点要求熔岩专属鱼竿：用事件带出的物品直接判定。
+  if (区域 != null && 区域.键 === 熔浆钓点键) {
+    if (GetItemTypeId(上下文.物品) !== 熔岩专属鱼竿类型ID) {
+      显示鱼竿提示(施法单位, 鱼竿配置.熔岩专属鱼竿提示);
+      return;
+    }
+  }
 
   const 等待毫秒 = GetRandomInt(鱼竿配置.等待窗口毫秒最小值, 鱼竿配置.等待窗口毫秒最大值);
   if (等待毫秒 <= 0) return;
@@ -324,7 +496,7 @@ function 处理鱼竿生效(this: void, 施法单位: any, 技能ID: number): vo
 export function init鱼竿(this: void): void {
   if (已初始化鱼竿) return;
   已初始化鱼竿 = true;
-  registerSpellEffectListener(处理鱼竿生效);
+  注册物品技能事件监听(处理鱼竿物品技能);
 }
 
 export {};

@@ -103,6 +103,11 @@ export const 装备掉落表: Record<string, UnitData> = {
   "n02R": { id: "n02R", name: "两栖鱼人|cffff0000（精英，给予额外经验）|r", level: 20, isUniversal: "FALSE", unitType: "elite" },
   "n034": { id: "n034", name: "狂暴火焰狼蛛", level: 20, itemIds: "I05V:1;I05W:1", picks: 2, isUniversal: "FALSE", unitType: "berserk" },
   "n035": { id: "n035", name: "狂暴熔岩蝎子", level: 20, itemIds: "I05V:1;I05W:1", picks: 2, isUniversal: "FALSE", unitType: "berserk" },
+  // 熔浆鱼王（隐藏钓鱼遭遇）：熔岩焰鱼必掉 + 两件新装备随机掉 1 件。
+  // itemIds 语义见 05．装备掉落.ts：`always` 标记必掉且受裁剪保护；B/C 用权重 1 也必掉但不保护，
+  // 于是 out(3) > picks(2) 时受保护的 I0AW 留下、I0IH/I0II 随机留 1 件 → 恒为「鱼 + 随机 1 件装备」。
+  // unitType 必须是 normal：elite/Boss 会让 picks 随玩家人数放大（round(picks×(1+0.334×(T-1)))），破坏固定掉落。
+  "n06O": { id: "n06O", name: "熔浆鱼王", level: 22, itemIds: "I0AW:always;I0IH:1;I0II:1", picks: 2, isUniversal: "FALSE", unitType: "normal" },
   "n02S": { id: "n02S", name: "|cff00ccff湖底元素|r|cffff0000(头目)LV22|r", level: 22, isUniversal: "FALSE", unitType: "elite" },
   "n02U": { id: "n02U", name: "|cff00ffff龙虾守卫|r|cffff0000（挑战Boss）LV22|r", level: 22, isUniversal: "FALSE", unitType: "elite" },
   "n04H": { id: "n04H", name: "狂啸熊王", level: 23, itemIds: "I0BR:1;I0BQ:1;I0BS:1", picks: 2, isUniversal: "FALSE", unitType: "elite" },

@@ -113,13 +113,14 @@ local function attachNpcPromptEffect(self, unit, modelPath)
         return
     end
     destroyNpcPromptEffectInternal(nil, unit)
-    if createUnitEffect(
+    local effect = createUnitEffect(
         unit,
         "overhead",
         modelPath,
         nil,
         NPC_PROMPT_EFFECT_KEY
-    ) then
+    )
+    if effect ~= nil and effect ~= 0 then
         g_npcPromptEffectByHandle:set(key, true)
     end
 end
@@ -139,13 +140,13 @@ local function npcConfigQualifiesForQuestMarker(self, npc)
         _____4EFB_52A1_914D_7F6E_5217_8868,
         function(____, q) return q["任务ID"] == rid and q["启用"] ~= false end
     )
-    if npc["类型"] == "任务" then
-        return true
-    end
-    return hasDialog or hasEnabledQuest
+    return npc["类型"] == "任务" or hasDialog or hasEnabledQuest
 end
-function ____exports.tryAttachQuestMarkerForConfigNpc(self, unit, npcConfig)
-    if not unit or npcConfig == nil or not npcConfigQualifiesForQuestMarker(nil, npcConfig) then
+function ____exports.tryAttachQuestMarkerForConfigNpc(unit, npcConfig)
+    if not unit or npcConfig == nil then
+        return
+    end
+    if not npcConfigQualifiesForQuestMarker(nil, npcConfig) then
         return
     end
     if npcConfig["类型"] == "对话" then

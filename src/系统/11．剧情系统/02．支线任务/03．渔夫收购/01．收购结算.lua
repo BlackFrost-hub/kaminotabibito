@@ -1,0 +1,182 @@
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+local ____08_FF0E_4EFB_52A1_5956_52B1_6267_884C = require("系统.09．表现系统.02．对话框系统.08．任务奖励执行")
+local getPlayerFirstHero = ____08_FF0E_4EFB_52A1_5956_52B1_6267_884C.getPlayerFirstHero
+local ____00_FF0E_8BA2_5355_914D_7F6E_8868 = require("系统.11．剧情系统.02．支线任务.03．渔夫收购.00．订单配置表")
+local _____6E14_592B_8BA2_5355_8868 = ____00_FF0E_8BA2_5355_914D_7F6E_8868["渔夫订单表"]
+local _____7194_5CA9_9C7C_7269_54C1ID_5217_8868 = ____00_FF0E_8BA2_5355_914D_7F6E_8868["熔岩鱼物品ID列表"]
+local _____6E14_592B_62D2_7EDD_5BF9_767D = ____00_FF0E_8BA2_5355_914D_7F6E_8868["渔夫拒绝对白"]
+local _____6E14_592B_5F00_573A_5BF9_767D = ____00_FF0E_8BA2_5355_914D_7F6E_8868["渔夫开场对白"]
+--- 默洛克渔夫 · 渔获收购结算
+-- 
+-- 挂在任务的「完成后动作」上。任务本身**不写需求物品**，所以玩家点提交必定进入这里，
+-- 由本模块自己判断背包里凑得出哪一档订单：
+--   1. 按 订单表 顺序（苛刻→宽松）找第一个完全满足的
+--   2. 命中 → 扣鱼 + 给金币 + 给装备 + 渔夫开口
+--   3. 都不满足 → 渔夫拒绝
+-- 这样"奖励是什么"完全不由任务界面公示，玩家只能从渔夫的话里猜。
+local jass = require("jass.common")
+local ____require_result_0 = require("系统.03．技能系统.04．快捷键技能.02．按Ctrl切换背包")
+local _____73A9_5BB6_4E3B_526F_80CC_5305_6301_6709_7269_54C1 = ____require_result_0["玩家主副背包持有物品"]
+local ____require_result_1 = require("lib.扩展函数.物品相关函数.物品判断函数")
+local GetItemTypeTotalCountByChargesBJ = ____require_result_1.GetItemTypeTotalCountByChargesBJ
+local ConsumeItemTypeCountByChargesBJ = ____require_result_1.ConsumeItemTypeCountByChargesBJ
+local ____require_result_2 = require("lib.扩展函数.物品相关函数.index")
+local _____521B_5EFA_7269_54C1_5E76_7ED9_4E88_5355_4F4D = ____require_result_2["创建物品并给予单位"]
+local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.05．玩家工具")
+local AddGoldWithFeedback = ____require_result_3.AddGoldWithFeedback
+local ____require_result_4 = require("系统.03．技能系统.04．快捷键技能.00．配置ID工具")
+local _____89E3_6790_914D_7F6E_5185_90E8ID = ____require_result_4["解析配置内部ID"]
+local GetRandomInt = jass.GetRandomInt
+local IsUnitType = jass.IsUnitType
+local Player = jass.Player
+local UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD
+--- 以渔夫的口吻说话。
+local function _____6E14_592B_8BF4_8BDD(_____73A9_5BB6ID, _____6587_672C)
+    jass.DisplayTimedTextToPlayer(
+        Player(_____73A9_5BB6ID),
+        0,
+        0,
+        8,
+        "|cFFFFFF00『默洛克渔夫』：|r" .. _____6587_672C
+    )
+end
+local function _____6570_91CF(_____82F1_96C4, _____7269_54C1ID)
+    local _____7C7B_578BID = _____89E3_6790_914D_7F6E_5185_90E8ID(_____7269_54C1ID)
+    if _____7C7B_578BID == 0 then
+        return 0
+    end
+    return GetItemTypeTotalCountByChargesBJ(_____82F1_96C4, _____7C7B_578BID)
+end
+--- 指定需求是否全部满足。
+local function _____6EE1_8DB3_6307_5B9A_9700_6C42(_____82F1_96C4, _____8BA2_5355)
+    local _____9700_6C42_5217_8868 = _____8BA2_5355["指定需求"]
+    if _____9700_6C42_5217_8868 == nil then
+        return true
+    end
+    do
+        local i = 0
+        while i < #_____9700_6C42_5217_8868 do
+            if _____6570_91CF(_____82F1_96C4, _____9700_6C42_5217_8868[i + 1]["物品ID"]) < _____9700_6C42_5217_8868[i + 1]["数量"] then
+                return false
+            end
+            i = i + 1
+        end
+    end
+    return true
+end
+--- 任意熔岩鱼总数是否够。
+local function _____6EE1_8DB3_4EFB_610F_9700_6C42(_____82F1_96C4, _____8BA2_5355)
+    local _____9700_8981 = _____8BA2_5355["任意数量"] or 0
+    if _____9700_8981 <= 0 then
+        return true
+    end
+    local _____5408_8BA1 = 0
+    do
+        local i = 0
+        while i < #_____7194_5CA9_9C7C_7269_54C1ID_5217_8868 do
+            _____5408_8BA1 = _____5408_8BA1 + _____6570_91CF(_____82F1_96C4, _____7194_5CA9_9C7C_7269_54C1ID_5217_8868[i + 1])
+            i = i + 1
+        end
+    end
+    return _____5408_8BA1 >= _____9700_8981
+end
+local function _____6EE1_8DB3_8BA2_5355(_____82F1_96C4, _____8BA2_5355)
+    return _____6EE1_8DB3_6307_5B9A_9700_6C42(_____82F1_96C4, _____8BA2_5355) and _____6EE1_8DB3_4EFB_610F_9700_6C42(_____82F1_96C4, _____8BA2_5355)
+end
+--- 扣掉指定需求。
+local function _____6D88_8017_6307_5B9A_9700_6C42(_____82F1_96C4, _____8BA2_5355)
+    local _____9700_6C42_5217_8868 = _____8BA2_5355["指定需求"]
+    if _____9700_6C42_5217_8868 == nil then
+        return
+    end
+    do
+        local i = 0
+        while i < #_____9700_6C42_5217_8868 do
+            ConsumeItemTypeCountByChargesBJ(
+                _____82F1_96C4,
+                _____89E3_6790_914D_7F6E_5185_90E8ID(_____9700_6C42_5217_8868[i + 1]["物品ID"]),
+                _____9700_6C42_5217_8868[i + 1]["数量"]
+            )
+            i = i + 1
+        end
+    end
+end
+--- 从任意熔岩鱼里凑数扣，按种类依次扣够为止。
+local function _____6D88_8017_4EFB_610F_9700_6C42(_____82F1_96C4, _____8BA2_5355)
+    local _____8FD8_5DEE = _____8BA2_5355["任意数量"] or 0
+    if _____8FD8_5DEE <= 0 then
+        return
+    end
+    do
+        local i = 0
+        while i < #_____7194_5CA9_9C7C_7269_54C1ID_5217_8868 and _____8FD8_5DEE > 0 do
+            do
+                local _____7269_54C1ID = _____7194_5CA9_9C7C_7269_54C1ID_5217_8868[i + 1]
+                local _____6301_6709 = _____6570_91CF(_____82F1_96C4, _____7269_54C1ID)
+                if _____6301_6709 <= 0 then
+                    goto __continue22
+                end
+                local _____6263 = _____6301_6709 < _____8FD8_5DEE and _____6301_6709 or _____8FD8_5DEE
+                ConsumeItemTypeCountByChargesBJ(
+                    _____82F1_96C4,
+                    _____89E3_6790_914D_7F6E_5185_90E8ID(_____7269_54C1ID),
+                    _____6263
+                )
+                _____8FD8_5DEE = _____8FD8_5DEE - _____6263
+            end
+            ::__continue22::
+            i = i + 1
+        end
+    end
+end
+local function _____53D1_5956(_____73A9_5BB6ID, _____82F1_96C4, _____8BA2_5355)
+    if _____8BA2_5355["金币"] > 0 then
+        AddGoldWithFeedback({
+            delta = _____8BA2_5355["金币"],
+            player = Player(_____73A9_5BB6ID)
+        })
+    end
+    if _____8BA2_5355["装备ID"] ~= nil and _____8BA2_5355["装备ID"] ~= "" then
+        local _____88C5_5907_7C7B_578BID = _____89E3_6790_914D_7F6E_5185_90E8ID(_____8BA2_5355["装备ID"])
+        if _____88C5_5907_7C7B_578BID ~= 0 then
+            _____521B_5EFA_7269_54C1_5E76_7ED9_4E88_5355_4F4D(_____82F1_96C4, _____88C5_5907_7C7B_578BID)
+        end
+    end
+end
+--- 任务「完成后动作」。签名与项目既有回调一致（编译为 (quest, 玩家ID) 双参调用）。
+____exports["渔夫收购结算"] = function(_____73A9_5BB6ID)
+    local _____73A9_5BB6 = Player(_____73A9_5BB6ID)
+    if _____73A9_5BB6 == nil or _____73A9_5BB6 == 0 then
+        return
+    end
+    local _____82F1_96C4 = getPlayerFirstHero(nil, _____73A9_5BB6)
+    if _____82F1_96C4 == nil or _____82F1_96C4 == 0 then
+        return
+    end
+    if IsUnitType(_____82F1_96C4, UNIT_TYPE_DEAD) then
+        return
+    end
+    _____6E14_592B_8BF4_8BDD(_____73A9_5BB6ID, _____6E14_592B_5F00_573A_5BF9_767D)
+    do
+        local i = 0
+        while i < #_____6E14_592B_8BA2_5355_8868 do
+            do
+                local _____8BA2_5355 = _____6E14_592B_8BA2_5355_8868[i + 1]
+                if not _____6EE1_8DB3_8BA2_5355(_____82F1_96C4, _____8BA2_5355) then
+                    goto __continue33
+                end
+                _____6D88_8017_6307_5B9A_9700_6C42(_____82F1_96C4, _____8BA2_5355)
+                _____6D88_8017_4EFB_610F_9700_6C42(_____82F1_96C4, _____8BA2_5355)
+                _____53D1_5956(_____73A9_5BB6ID, _____82F1_96C4, _____8BA2_5355)
+                _____6E14_592B_8BF4_8BDD(_____73A9_5BB6ID, _____8BA2_5355["提交对白"])
+                return
+            end
+            ::__continue33::
+            i = i + 1
+        end
+    end
+    local _____62D2_7EDD = _____6E14_592B_62D2_7EDD_5BF9_767D[GetRandomInt(1, #_____6E14_592B_62D2_7EDD_5BF9_767D)]
+    _____6E14_592B_8BF4_8BDD(_____73A9_5BB6ID, _____62D2_7EDD)
+end
+return ____exports

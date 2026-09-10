@@ -215,7 +215,7 @@ function ____exports.buildQuestOfferDialog(self, quest, npcName, dialogOwnerId, 
         removeOverheadMarkerOnOpen = true,
         quest = {
             title = npcName,
-            text = (((("【" .. tostring(quest["名称"])) .. "】\n\n") .. questDesc) .. "\n\n奖励：") .. rewardText,
+            text = ((((("【" .. tostring(quest["名称"])) .. "】\n\n") .. questDesc) .. "\n\n奖励：|cffffcc00") .. rewardText) .. "|r",
             onAccept = function()
                 local questId = quest["任务ID"] ~= nil and tostring(quest["任务ID"]) or ""
                 local playerObj = jass.Player(dialogOwnerId)
@@ -326,7 +326,7 @@ function ____exports.buildQuestInProgressDialog(self, quest, npcName, dialogOwne
         lines = {},
         quest = {
             title = npcName,
-            text = (((((("【" .. tostring(quest["名称"])) .. "】进行中...\n\n任务目标：") .. questDesc) .. "\n") .. _____4EFB_52A1_8FDB_5EA6_6587_672C) .. "\n\n奖励：") .. rewardText,
+            text = ((((((("【" .. tostring(quest["名称"])) .. "】进行中...\n\n任务目标：") .. questDesc) .. "\n") .. _____4EFB_52A1_8FDB_5EA6_6587_672C) .. "\n\n奖励：|cffffcc00") .. rewardText) .. "|r",
             acceptText = "提交任务",
             rejectText = "暂时忽略",
             onAccept = function()

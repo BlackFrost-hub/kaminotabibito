@@ -4,6 +4,7 @@ dofile('Equipment/LegacyActiveItems.lua')
 
 dofile('Equipment/ItemUnits/FireTorchUnit.lua')
 dofile('Equipment/Consumable/Consumable.lua')
+dofile('Equipment/Material/Material.lua')
 dofile('Equipment/QuestItem/QuestItem.lua')
 dofile('Equipment/Item/Item.lua')
 dofile('Equipment/Clothes/Clothes.lua')

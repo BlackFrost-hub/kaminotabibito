@@ -35,3 +35,17 @@ createEquipmentItem('I0FW', '无面记忆面纱', {
   tooltipExtended = '|cffccffff[头盔/面纱]-法师防具|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n智力+32|n魔法抗性+22%|n闪避+10%|n生命值+1800|n|cffffffcc[装备效果]|r|n记忆剥落：首次受到非装备技能或技能普攻造成的任一伤害类型时，记录6秒；期间再次受到同类型伤害时，本次伤害降低30%并清除记录，冷却10秒。|n|cFF808080面纱抹去了守卫的姓名，却仍记得如何适应重复降临的痛苦。|r',
   description = '|cffccffff[头盔/面纱]-法师防具|r|n|cffffcc99等级：B|n评分：6850|r|n|cffffffcc[基础属性]|r|n智力+32|n魔法抗性+22%|n闪避+10%|n生命值+1800|n|cffffffcc[装备效果]|r|n记忆剥落：首次受到非装备技能或技能普攻造成的任一伤害类型时，记录6秒；期间再次受到同类型伤害时，本次伤害降低30%并清除记录，冷却10秒。|n|cFF808080面纱抹去了守卫的姓名，却仍记得如何适应重复降临的痛苦。|r',
 })
+
+-- 默洛克渔夫重复收购奖励（B++ 档）。纯属性、无主动技能；评分依据见 TS 装备数据同条目注释。
+createEquipmentItem('I0IR', '|cffFF8000鱼王骨冠|r', {
+  baseId = 'ratf',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Helmet\\BTNfishking_bone_crown.blp',
+  model = 'war3mapImported\\equipment_helmet.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 6,
+  score = 9000,
+  tooltipExtended = '|cffccffff[头盔-全能·辅助]|r|n|cffffcc99等级：B++|n评分：9000|r|n|cffffffcc[基础属性]|r|n全属性+36|n生命值+2600|n护甲+30|n魔法抗性+18%|n|cFF808080牙还朝外。戴上它的人最好别低头看水。|r',
+  description = '|cffccffff[头盔-全能·辅助]|r|n|cffffcc99等级：B++|n评分：9000|r|n|cffffffcc[基础属性]|r|n全属性+36|n生命值+2600|n护甲+30|n魔法抗性+18%|n|cFF808080牙还朝外。戴上它的人最好别低头看水。|r',
+})
+

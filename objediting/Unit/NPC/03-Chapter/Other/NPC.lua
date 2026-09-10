@@ -115,3 +115,23 @@ createDemonCityQuestNpc(
   'Unit\\NPC\\03-Chapter\\Other\\Icon\\DemonGuard.blp',
   1.25
 )
+
+-- 默洛克渔夫：第三章熔岩区域，只出售熔岩鱼竿（I0IG）。
+local murlocFisherman = UnitDefinition:new('n06N', 'nvl2')
+murlocFisherman:setName('默洛克渔夫')
+murlocFisherman:setNameEditorSuffix('')
+murlocFisherman:setTooltipBasic('默洛克渔夫')
+murlocFisherman:setTooltipExtended('出售熔岩鱼竿')
+murlocFisherman:setDescription('红鳞的默洛克渔夫，只在熔岩岸边贩卖专为岩浆水域锻造的钓竿。')
+murlocFisherman:setModelFile('Unit\\NPC\\03-Chapter\\Other\\MurlocFisherman\\HeroMurlocFisheman.mdx')
+murlocFisherman:setModelFileExtraVersions('0')
+murlocFisherman:setIconGameInterface('Unit\\NPC\\03-Chapter\\Other\\Icon\\MurlocFisherman.blp')
+murlocFisherman:setHideMinimapDisplay(true)
+murlocFisherman:setScalingValue(1.2)
+murlocFisherman:setNormalAbilities('Avul,Aneu,Apit')
+murlocFisherman:setItemsSold('I0IG')
+murlocFisherman:setRace(Race.Human)
+murlocFisherman:setUpgradesUsed('')
+murlocFisherman:setLevel(1)
+murlocFisherman:setSpeedBase(1)
+murlocFisherman:setTurnRate(2.0)

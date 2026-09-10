@@ -9,6 +9,16 @@ const GetItemTypeId = jass.GetItemTypeId as (this: void, item: any) => number;
 const { onItemUse } = require("系统.00．核心系统.01．事件中心.04．物品事件中心") as {
   onItemUse: (this: void, callback: (this: void, unit: any, item: any) => void) => number;
 };
+const { 临时玩家属性 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行") as {
+  临时玩家属性: (this: void, unit: any, attr: string, delta: number, duration: number) => void;
+};
+const { registerManualBuff } = require("系统.05．Buff系统.00．Buff系统") as {
+  registerManualBuff: (this: void, target: any, buffID: string, durationSec: number, effectValue: number, extras?: any) => void;
+};
+// 灼热（食用）：烤熔岩灵鱼专属使用增益，数值暂定 30 秒火属性伤害 +30%
+const 灼热使用BuffID = "C075";
+const 灼热使用持续秒 = 30;
+const 灼热使用火伤加成 = 0.3;
 const { doHealItemEffectById } = require("系统.04．伤害系统.02．治疗系统.05．物品治疗效果") as {
   doHealItemEffectById: (this: void, abilId: string, target: any, healHP: number, healMP: number, hotDuration?: number) => void;
 };
@@ -138,7 +148,7 @@ function onUseItem(this: void, eventUnit?: any, eventItem?: any): void {
   if (isSpecialUnit(unit)) return;
   const itemId = GetItemTypeId(item);
   const idStr = fourCCToString(itemId);
-  const entry = (itemsData as Record<string, { hot?: string; hotDuration?: number; abilList?: string }>)[idStr];
+  const entry = (itemsData as Record<string, { hot?: string; hotDuration?: number; abilList?: string; useBuff?: string }>)[idStr];
   if (!entry || !entry.hot || !entry.abilList) return;
 
   const glob = globalThis as any;
@@ -155,6 +165,15 @@ function onUseItem(this: void, eventUnit?: any, eventItem?: any): void {
     } else {
       安排装备回复延迟段(unit, seg, entry.hotDuration);
     }
+  }
+
+  // 附加使用增益（如烤熔岩灵鱼的灼热）：临时属性真实生效 + buff 栏图标展示，双轨同时长
+  if (entry.useBuff === 灼热使用BuffID) {
+    临时玩家属性(unit, "火属性伤害", 灼热使用火伤加成, 灼热使用持续秒);
+    registerManualBuff(unit, 灼热使用BuffID, 灼热使用持续秒, 灼热使用火伤加成 * 100, {
+      effectSourceName: "烤熔岩灵鱼",
+      effectSourceType: "食品",
+    });
   }
 }
 

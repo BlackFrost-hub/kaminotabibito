@@ -482,6 +482,7 @@ createEquipmentItem('I0H4', '星露花', {
   goldCost = 0,
   hitPoints = 1,
   charges = 1,
+  scale = 1.5,
   canBeDropped = true,
   canBeSoldByMerchants = false,
   canBeSoldToMerchants = false,
@@ -501,6 +502,7 @@ createEquipmentItem('I0H5', '晨曦花', {
   goldCost = 0,
   hitPoints = 1,
   charges = 1,
+  scale = 1.5,
   canBeDropped = true,
   canBeSoldByMerchants = false,
   canBeSoldToMerchants = false,
@@ -520,6 +522,7 @@ createEquipmentItem('I0H6', '月影花', {
   goldCost = 0,
   hitPoints = 1,
   charges = 1,
+  scale = 1.5,
   canBeDropped = true,
   canBeSoldByMerchants = false,
   canBeSoldToMerchants = false,
@@ -827,3 +830,44 @@ createEquipmentItem('I0KH', '熔渊坠饰', {
   tooltipExtended = '|cffccffff[饰品/坠饰]-游走闪避·强化|r|n|cffffcc99等级：B+|n评分：8300|r|n|cffffffcc[基础属性]|r|n敏捷+35|n生命值+1800|n护甲+25|n闪避+20%|n移动速度+12%|n生命恢复+50|n|cFF808080坠饰里的教团印记被熔渊之火重新烧亮，告诫也换了措辞：现在，别停下脚步。|r',
   description = '|cffccffff[饰品/坠饰]-游走闪避·强化|r|n|cffffcc99等级：B+|n评分：8300|r|n|cffffffcc[基础属性]|r|n敏捷+35|n生命值+1800|n护甲+25|n闪避+20%|n移动速度+12%|n生命恢复+50|n|cFF808080坠饰里的教团印记被熔渊之火重新烧亮，告诫也换了措辞：现在，别停下脚步。|r',
 })
+
+-- 熔浆鱼王隐藏遭遇掉落（B+ 档，暗属性输出+生存向）。评分依据见 TS 装备数据同条目注释。
+createEquipmentItem('I0II', '|cff9933cc暗渊噬火之戒|r', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNdark_ember_ring.blp',
+  model = 'war3mapImported\\SpiderRingItem.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 7950,
+  tooltipExtended = '|cffccffff[饰品/戒指]-暗属性输出·生存|r|n|cffffcc99等级：B+|n评分：7950|r|n|cffffffcc[基础属性]|r|n全属性+30|n生命值+2000|n暗属性伤害+18%|n魔法抗性+12%|n冷却缩减+8%|n|cFF808080深潭底烧着一点不肯熄的暗火，戴着它的人总觉得背后有水流过。|r',
+  description = '|cffccffff[饰品/戒指]-暗属性输出·生存|r|n|cffffcc99等级：B+|n评分：7950|r|n|cffffffcc[基础属性]|r|n全属性+30|n生命值+2000|n暗属性伤害+18%|n魔法抗性+12%|n冷却缩减+8%|n|cFF808080深潭底烧着一点不肯熄的暗火，戴着它的人总觉得背后有水流过。|r',
+})
+
+-- 默洛克渔夫重复收购奖励（B+ 档）。纯属性、无主动技能；评分依据见 TS 装备数据同条目注释。
+createEquipmentItem('I0IM', '|cff9933cc熔心法印|r', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNember_heart_seal.blp',
+  model = 'war3mapImported\\SpiderRingItem.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 8000,
+  tooltipExtended = '|cffccffff[饰品/法印-法术强度]|r|n|cffffcc99等级：B+|n评分：8000|r|n|cffffffcc[基础属性]|r|n智力+52|n魔法伤害+20%|n冷却缩减+12%|n魔法恢复+30|n|cFF808080印面上的火纹是自己烧出来的，没人刻过。|r',
+  description = '|cffccffff[饰品/法印-法术强度]|r|n|cffffcc99等级：B+|n评分：8000|r|n|cffffffcc[基础属性]|r|n智力+52|n魔法伤害+20%|n冷却缩减+12%|n魔法恢复+30|n|cFF808080印面上的火纹是自己烧出来的，没人刻过。|r',
+})
+
+
+-- 默洛克渔夫重复收购奖励（B+ 档）。纯属性、无主动技能；评分依据见 TS 装备数据同条目注释。
+createEquipmentItem('I0IN', '|cff66ccff潮汐祷歌护符|r', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNtide_chant_amulet.blp',
+  model = 'war3mapImported\\SpiderRingItem.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 8000,
+  tooltipExtended = '|cffccffff[饰品/护符-治疗辅助]|r|n|cffffcc99等级：B+|n评分：8000|r|n|cffffffcc[基础属性]|r|n生命值+1500|n全属性+15|n技能治疗+25%|n冷却缩减+12%|n魔法恢复+30|n|cFF808080凑近了能听见壳里有潮声，据说那是别人的祈祷。|r',
+  description = '|cffccffff[饰品/护符-治疗辅助]|r|n|cffffcc99等级：B+|n评分：8000|r|n|cffffffcc[基础属性]|r|n生命值+1500|n全属性+15|n技能治疗+25%|n冷却缩减+12%|n魔法恢复+30|n|cFF808080凑近了能听见壳里有潮声，据说那是别人的祈祷。|r',
+})
+

@@ -64,3 +64,5 @@ Desktop.ini
 /scripts/*
 !/scripts/fix-map-jass-utf8.js
 /map
+/.workbuddy
+/.zcode

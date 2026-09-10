@@ -133,3 +133,17 @@ createEquipmentItem('I0KF', '守誓圣铠', {
   tooltipExtended = '|cffccffff[衣服/重甲]-守誓/防御|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n生命值+2200|n护甲+30|n力量+22|n生命恢复+35|n眩晕抗性+15%|n|cFF808080以月纹熊革衬里、古树韧藤束边的圣地重铠，胸口的誓文只有守誓者读得完整。|r',
   description = '|cffccffff[衣服/重甲]-守誓/防御|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n生命值+2200|n护甲+30|n力量+22|n生命恢复+35|n眩晕抗性+15%|n|cFF808080以月纹熊革衬里、古树韧藤束边的圣地重铠，胸口的誓文只有守誓者读得完整。|r',
 })
+
+-- 默洛克渔夫重复收购奖励（B+ 档）。纯属性、无主动技能；评分依据见 TS 装备数据同条目注释。
+createEquipmentItem('I0IO', '|cff808080熔岩行者胸甲|r', {
+  baseId = 'ratf',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNmagma_walker_cuirass.blp',
+  model = 'war3mapImported\\Item Jerkin.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 6,
+  score = 8000,
+  tooltipExtended = '|cffccffff[衣服-生存]|r|n|cffffcc99等级：B+|n评分：8000|r|n|cffffffcc[基础属性]|r|n生命值+3000|n全属性+20|n护甲+40|n魔法抗性+15%|n|cFF808080黑曜石甲片一片压一片，走起来有很轻的碰撞声。|r',
+  description = '|cffccffff[衣服-生存]|r|n|cffffcc99等级：B+|n评分：8000|r|n|cffffffcc[基础属性]|r|n生命值+3000|n全属性+20|n护甲+40|n魔法抗性+15%|n|cFF808080黑曜石甲片一片压一片，走起来有很轻的碰撞声。|r',
+})
+

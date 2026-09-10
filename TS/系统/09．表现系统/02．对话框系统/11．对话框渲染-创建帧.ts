@@ -87,7 +87,7 @@ export function createDialogFrames(slotId: number = 0): Frame[] {
   const gameUI = japi.DzGetGameUI();
   const bg = createFrame({ type: FrameType.BACKDROP, name: `DialogBG${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[0] = bg;
-  dzClearPoints(bg); dzSetAbsPoint(bg, 3, 0.23, 0.2421); dzSetSize(bg, 0.377, 0.131); dzSetAlpha(bg, 255); dzSetTexture(bg, DEFAULT_BG_TEX);
+  dzClearPoints(bg); dzSetAbsPoint(bg, 3, 0.23, 0.2421); dzSetSize(bg, 0.40, 0.15); dzSetAlpha(bg, 255); dzSetTexture(bg, DEFAULT_BG_TEX);
   const bgBtn = createFrame({ type: FrameType.GLUETEXTBUTTON, name: `DialogBGBtn${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
   frames[4] = bgBtn;
   if (bgBtn !== 0) {
@@ -101,7 +101,7 @@ export function createDialogFrames(slotId: number = 0): Frame[] {
 
   const titleBg = dzCreate("GameUI", slotTag + 2);
   frames[1] = titleBg;
-  dzShow(titleBg, false); dzClearPoints(titleBg); dzSetAbsPoint(titleBg, 3, 0.24, 0.3083); dzSetSize(titleBg, 0.107, 0.0328); dzSetAlpha(titleBg, 255); dzSetTexture(titleBg, DEFAULT_TITLE_TEX);
+  dzShow(titleBg, false); dzClearPoints(titleBg); dzSetAbsPoint(titleBg, 3, 0.25, 0.302); dzSetSize(titleBg, 0.095, 0.028); dzSetAlpha(titleBg, 255); dzSetTexture(titleBg, DEFAULT_TITLE_TEX);
   const nameText = dzCreate("GameText", slotTag + 3);
   frames[2] = nameText;
   dzShow(nameText, false); dzClearPoints(nameText);
@@ -110,10 +110,10 @@ export function createDialogFrames(slotId: number = 0): Frame[] {
   if (nameText !== 0) pcallSetTextAlignResetThenCenter(nameText);
   const bodyText = dzCreate("GameTextpxL", slotTag + 4);
   frames[3] = bodyText;
-  dzShow(bodyText, false); dzClearPoints(bodyText); dzSetAbsPoint(bodyText, 0, 0.24, 0.28); dzSetSize(bodyText, 0.35, 0.22); dzSetText(bodyText, ""); dzSetFont(bodyText, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE); dzSetEnable(bodyText, false);
+  dzShow(bodyText, false); dzClearPoints(bodyText); dzSetAbsPoint(bodyText, 0, 0.245, 0.275); dzSetSize(bodyText, 0.33, 0.13); dzSetText(bodyText, ""); dzSetFont(bodyText, DEFAULT_FONT, 0.0105); dzSetEnable(bodyText, false);
 
   const acceptBg = createFrame({ type: FrameType.BACKDROP, name: `DialogAcceptBg${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
-  frames[5] = acceptBg; if (acceptBg !== 0) japi.DzFrameSetAbsolutePoint(acceptBg, 4, 0.311, 0.1800);
+  frames[5] = acceptBg; if (acceptBg !== 0) japi.DzFrameSetAbsolutePoint(acceptBg, 4, 0.311, 0.1450);
   if (acceptBg !== 0) japi.DzFrameSetSize(acceptBg, 0.08, 0.022);
   if (acceptBg !== 0) japi.DzFrameSetTexture(acceptBg, "UI\\renwu\\jieshourenwuanniu.tga", 0);
   const acceptLabel = createFrame({ type: FrameType.TEXT, name: `DialogAcceptLabel${nameSuffix}`, parent: acceptBg, template: "template", visible: false }) ?? 0;
@@ -130,7 +130,7 @@ export function createDialogFrames(slotId: number = 0): Frame[] {
   if (acceptBtn !== 0) japi.DzFrameSetText(acceptBtn, "");
 
   const rejectBg = createFrame({ type: FrameType.BACKDROP, name: `DialogRejectBg${nameSuffix}`, parent: gameUI, template: "template", visible: false }) ?? 0;
-  frames[7] = rejectBg; if (rejectBg !== 0) japi.DzFrameSetAbsolutePoint(rejectBg, 4, 0.406, 0.1800);
+  frames[7] = rejectBg; if (rejectBg !== 0) japi.DzFrameSetAbsolutePoint(rejectBg, 4, 0.406, 0.1450);
   if (rejectBg !== 0) japi.DzFrameSetSize(rejectBg, 0.08, 0.022);
   if (rejectBg !== 0) japi.DzFrameSetTexture(rejectBg, "UI\\renwu\\jieshourenwuanniu.tga", 0);
   const rejectLabel = createFrame({ type: FrameType.TEXT, name: `DialogRejectLabel${nameSuffix}`, parent: rejectBg, template: "template", visible: false }) ?? 0;

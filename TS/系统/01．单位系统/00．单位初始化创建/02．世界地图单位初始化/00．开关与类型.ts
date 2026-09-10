@@ -9,6 +9,8 @@ export interface 世界地图单位出生配置 {
   单位名: string;
   兼容单位ID?: string;
   任务NPC任务ID?: number;
+  YD表名?: string;
+  YD键名?: string;
   X: number;
   Y: number;
   朝向: 世界地图单位朝向;

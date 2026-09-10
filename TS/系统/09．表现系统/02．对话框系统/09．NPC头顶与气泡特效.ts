@@ -75,7 +75,8 @@ function attachNpcPromptEffect(unit: any, modelPath: string): void {
   const key = npcPromptHandleKey(unit);
   if (key === 0) return;
   destroyNpcPromptEffectInternal(unit);
-  if (createUnitEffect(unit, "overhead", modelPath, undefined, NPC_PROMPT_EFFECT_KEY)) {
+  const effect = createUnitEffect(unit, "overhead", modelPath, undefined, NPC_PROMPT_EFFECT_KEY);
+  if (effect != null && effect !== 0) {
     g_npcPromptEffectByHandle.set(key, true);
   }
 }
@@ -86,12 +87,12 @@ function npcConfigQualifiesForQuestMarker(npc: 支线NPC配置 | null | undefine
   const rid = npc.任务ID;
   const hasDialog = 对话NPC配置列表.some(d => d.对话ID === rid);
   const hasEnabledQuest = 任务配置列表.some(q => q.任务ID === rid && q.启用 !== false);
-  if (npc.类型 === "任务") return true;
-  return hasDialog || hasEnabledQuest;
+  return npc.类型 === "任务" || hasDialog || hasEnabledQuest;
 }
 
-export function tryAttachQuestMarkerForConfigNpc(unit: any, npcConfig: 支线NPC配置 | null | undefined): void {
-  if (!unit || npcConfig == null || !npcConfigQualifiesForQuestMarker(npcConfig)) return;
+export function tryAttachQuestMarkerForConfigNpc(this: void, unit: any, npcConfig: 支线NPC配置 | null | undefined): void {
+  if (!unit || npcConfig == null) return;
+  if (!npcConfigQualifiesForQuestMarker(npcConfig)) return;
   if (npcConfig.类型 === "对话") {
     attachNpcPromptEffect(unit, NPC_OVERHEAD_BLUE_EXCL);
   } else {

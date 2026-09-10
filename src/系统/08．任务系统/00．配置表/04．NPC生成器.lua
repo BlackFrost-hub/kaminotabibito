@@ -85,13 +85,13 @@ local npcSetModelQueue = {}
 local function onNpcQuestMarkerNoModelDelayed()
     local ctx = table.remove(npcQuestMarkerNoModelQueue, 1)
     if ctx ~= nil then
-        tryAttachQuestMarkerForConfigNpc(nil, ctx.unit, ctx.npcConfig)
+        tryAttachQuestMarkerForConfigNpc(ctx.unit, ctx.npcConfig)
     end
 end
 local function onNpcQuestMarkerAfterModelDelayed()
     local ctx = table.remove(npcQuestMarkerAfterModelQueue, 1)
     if ctx ~= nil then
-        tryAttachQuestMarkerForConfigNpc(nil, ctx.unit, ctx.npcConfig)
+        tryAttachQuestMarkerForConfigNpc(ctx.unit, ctx.npcConfig)
     end
 end
 local function onNpcSetModelDelayed()

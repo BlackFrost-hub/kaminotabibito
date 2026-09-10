@@ -626,6 +626,15 @@ ____exports["装备掉落表"] = {
         isUniversal = "FALSE",
         unitType = "berserk"
     },
+    n06O = {
+        id = "n06O",
+        name = "熔浆鱼王",
+        level = 22,
+        itemIds = "I0AW:always;I0IH:1;I0II:1",
+        picks = 2,
+        isUniversal = "FALSE",
+        unitType = "normal"
+    },
     n02S = {
         id = "n02S",
         name = "|cff00ccff湖底元素|r|cffff0000(头目)LV22|r",

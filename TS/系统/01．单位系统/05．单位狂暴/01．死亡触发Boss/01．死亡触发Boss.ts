@@ -37,7 +37,6 @@ const AddSpecialEffect = jass.AddSpecialEffect as (modelName: string, x: number,
 const CreateUnit = jass.CreateUnit as (owner: any, unitTypeId: number, x: number, y: number, facing: number) => any;
 const DestroyEffect = jass.DestroyEffect as (whichEffect: any) => void;
 const GetHeroLevel = jass.GetHeroLevel as (whichHero: any) => number;
-const GetOwningPlayer = jass.GetOwningPlayer as (whichUnit: any) => any;
 const GetRandomInt = jass.GetRandomInt as (lowBound: number, highBound: number) => number;
 const GetUnitFacing = jass.GetUnitFacing as (whichUnit: any) => number;
 const GetUnitTypeId = jass.GetUnitTypeId as (whichUnit: any) => number;
@@ -45,6 +44,8 @@ const GetUnitX = jass.GetUnitX as (whichUnit: any) => number;
 const GetUnitY = jass.GetUnitY as (whichUnit: any) => number;
 const GroupAddUnit = jass.GroupAddUnit as (whichGroup: any, whichUnit: any) => void;
 const IsUnitType = jass.IsUnitType as (whichUnit: any, whichType: any) => boolean;
+const Player = jass.Player as (this: void, playerId: number) => any;
+const 中立被动玩家 = Player(jass.PLAYER_NEUTRAL_PASSIVE as number);
 
 interface 已解析死亡触发Boss配置 extends 死亡触发Boss配置 {
   触发单位类型ID: number;
@@ -154,8 +155,7 @@ function 创建Boss并广播(this: void, 配置: 已解析死亡触发Boss配置
   const x = 出现坐标[0];
   const y = 出现坐标[1];
   const facing = 取出现朝向(配置, dyingUnit, killingUnit);
-  const owner = GetOwningPlayer(dyingUnit);
-  const boss = CreateUnit(owner, 配置.Boss单位类型ID, x, y, facing);
+  const boss = CreateUnit(中立被动玩家, 配置.Boss单位类型ID, x, y, facing);
   if (boss == null || boss === 0) return;
 
   if (配置.需要加入血条Boss组 !== false) {

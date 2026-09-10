@@ -260,3 +260,199 @@ createElfPotion(
   0,
   1060
 )
+
+-- 第三章烧烤食品：四条熔岩鱼与恶魔犬肉的篝火烤制产物（recipe 在 TS 装备数据，图标沿用对应生食材）。
+createEquipmentItem('I0HR', '烤赤魔鱼', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\BTN000312.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 220,
+  goldCost = 800,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 50% 生命与 1000 点魔法。|r|n赤魔鱼经篝火慢烤后，鱼皮微焦、鱼肉泛着淡淡的赤红。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffffcc使用：恢复 50% 生命与 1000 点魔法。|r|n赤魔鱼经篝火慢烤后，鱼皮微焦、鱼肉泛着淡淡的赤红。|r',
+})
+
+createEquipmentItem('I0HS', '烤熔岩食鱼', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\BTN000313.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 221,
+  goldCost = 1200,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 3000 点生命与 1000 点魔法。|r|n油脂丰厚的熔岩食鱼在火上烤得滋滋作响，一口下去暖意直冲四肢。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffffcc使用：恢复 3000 点生命与 1000 点魔法。|r|n油脂丰厚的熔岩食鱼在火上烤得滋滋作响，一口下去暖意直冲四肢。|r',
+})
+
+createEquipmentItem('I0HT', '烤熔岩灵鱼', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\BTN000314.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 222,
+  goldCost = 1500,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 50% 已损失生命与 50% 已损失魔法。|r|n灵鱼离水后灵性未散，烤制时鳞片间仍有微光流转。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffffcc使用：恢复 50% 已损失生命与 50% 已损失魔法。|r|n灵鱼离水后灵性未散，烤制时鳞片间仍有微光流转。|r',
+})
+
+createEquipmentItem('I0HU', '烤熔岩焰鱼', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroast_molten_flamefish.blp',
+  model = 'Unit\\Minion\\Dunkleosteus.mdx',
+  scale = 0.35,
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 223,
+  goldCost = 2000,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 50% 已损失生命与 50% 已损失魔法。|r|n焰鱼的鱼尾在烤架上仍燃着细小的火苗，据说运气好的人能在鱼腹里找到金块。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 50% 已损失生命与 50% 已损失魔法。|r|n焰鱼的鱼尾在烤架上仍燃着细小的火苗，据说运气好的人能在鱼腹里找到金块。|r',
+})
+
+createEquipmentItem('I0HW', '烤恶魔犬肉串', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\BTN000311.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 224,
+  goldCost = 1500,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 5000 点生命与 1500 点魔法。|r|n恶魔犬肉串在篝火上烤得外焦里嫩，撒上粗盐后香气能飘出半个营地。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 5000 点生命与 1500 点魔法。|r|n恶魔犬肉串在篝火上烤得外焦里嫩，撒上粗盐后香气能飘出半个营地。|r',
+})
+
+createEquipmentItem('I0I1', '烤蛇纹翡翠鲤', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroast_jade_scale_carp.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 225,
+  goldCost = 700,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C|r|n|cffffffcc使用：恢复 3600 点生命与 1200 点魔法。|r|n翡翠鲤烤过后鳞纹全开，油脂里带着一丝矿脉的凉意。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C|r|n|cffffffcc使用：恢复 3600 点生命与 1200 点魔法。|r|n翡翠鲤烤过后鳞纹全开，油脂里带着一丝矿脉的凉意。|r',
+})
+
+createEquipmentItem('I0I3', '烤月瞳鳗', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroast_moonpupil_eel.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 226,
+  goldCost = 800,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 35% 已损失生命与 25% 已损失魔法。|r|n鳗肉细腻，咽下后瞳纹般的花纹会在舌尖一闪而过。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 35% 已损失生命与 25% 已损失魔法。|r|n鳗肉细腻，咽下后瞳纹般的花纹会在舌尖一闪而过。|r',
+})
+
+createEquipmentItem('I0I5', '烤战痕月鳞鱼', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroast_battle_scar_moonscale.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 227,
+  goldCost = 900,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 4200 点生命，并在 4 秒内提高 10% 受到的治疗。|r|n鳞片被烤得卷起，咸香之外还有一股让人想站得更直的力量。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 4200 点生命，并在 4 秒内提高 10% 受到的治疗。|r|n鳞片被烤得卷起，咸香之外还有一股让人想站得更直的力量。|r',
+})
+
+createEquipmentItem('I0I7', '烤湖心星鲟', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroast_lakeheart_sturgeon.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 228,
+  goldCost = 1000,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 45% 生命与 1800 点魔法。|r|n鱼肉里嵌着星砂，咬开时会有细小的光屑在齿间炸开。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 45% 生命与 1800 点魔法。|r|n鱼肉里嵌着星砂，咬开时会有细小的光屑在齿间炸开。|r',
+})
+
+createEquipmentItem('I0I9', '烤污潮鳗', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroast_foul_tide_eel.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 229,
+  goldCost = 700,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C|r|n|cffffffcc使用：恢复 3000 点生命与 1000 点魔法，并在 6 秒内提高 8% 水属性抗性。|r|n土腥与焦香一同涌上来，吞下去后喉咙像结了一层薄薄的膜。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C|r|n|cffffffcc使用：恢复 3000 点生命与 1000 点魔法，并在 6 秒内提高 8% 水属性抗性。|r|n土腥与焦香一同涌上来，吞下去后喉咙像结了一层薄薄的膜。|r',
+})
+
+createEquipmentItem('I0IB', '烤黑水鳐', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroast_blackwater_ray.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 230,
+  goldCost = 800,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C|r|n|cffffffcc使用：恢复 40% 已损失生命与 30% 已损失魔法。|r|n鳐肉发黑却出奇鲜甜，吃下去时身体会本能地缩紧又松开。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C|r|n|cffffffcc使用：恢复 40% 已损失生命与 30% 已损失魔法。|r|n鳐肉发黑却出奇鲜甜，吃下去时身体会本能地缩紧又松开。|r',
+})
+
+createEquipmentItem('I0ID', '烤净泉鳗', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroast_pure_spring_eel.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 231,
+  goldCost = 1100,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 3800 点生命，并在 3 秒内继续恢复 900 点生命。|r|n泉珠在火上化开，肉汁清甜，暖意会在腹中慢慢铺散。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 3800 点生命，并在 3 秒内继续恢复 900 点生命。|r|n泉珠在火上化开，肉汁清甜，暖意会在腹中慢慢铺散。|r',
+})
+
+createEquipmentItem('I0IF', '烤清辉水母鱼', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNroast_clear_glow_jellyfish.blp',
+  model = 'Doodads\\Ruins\\Water\\FishTropical\\FishTropical.mdl',
+  abilities = ' ',
+  classification = 'Charged',
+  level = 6,
+  priority = 232,
+  goldCost = 1200,
+  tooltipExtended = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 2400 点生命与 2200 点魔法。|r|n半透明的鱼肉在盘里泛着微光，入口清凉，像饮了一口晨露。|r',
+  description = '|cffccffff[药剂/食品]|r|n|cffffcc99等级：C+|r|n|cffffffcc使用：恢复 2400 点生命与 2200 点魔法。|r|n半透明的鱼肉在盘里泛着微光，入口清凉，像饮了一口晨露。|r',
+})
+
+-- 熔岩鱼竿：第三章熔岩区域的专属钓具，由默洛克渔夫（n06N）出售。
+local lavaRodDescription = '|cffffff00道具|r|n熔岩锻造的钓竿，可在岩浆水域垂钓熔岩鱼|n|cffffcc99使用次数：20|r|n|cffc0c0c0冷却：1.5秒|r'
+local lavaRodItem = ItemDefinition:new('I0IG', 'azhr')
+lavaRodItem:setName('熔岩鱼竿')
+lavaRodItem:setTooltipBasic('熔岩鱼竿')
+lavaRodItem:setTooltipExtended(lavaRodDescription)
+lavaRodItem:setDescription(lavaRodDescription)
+lavaRodItem:setInterfaceIcon('ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNlava_fishing_rod.blp')
+lavaRodItem:setModelUsed('Common\\Model\\Item\\FinalRod.mdx')
+lavaRodItem:setScalingValue(1.3)
+lavaRodItem:setAbilities('A017')
+lavaRodItem:setClassification('Purchasable')
+lavaRodItem:setCooldownGroup('A017')
+lavaRodItem:setGoldCost(5000)
+lavaRodItem:setLumberCost(0)
+lavaRodItem:setPriority(5000)
+lavaRodItem:setCanBeSoldByMerchants(false)
+lavaRodItem:setCanBeSoldToMerchants(true)
+lavaRodItem:setActivelyUsed(true)
+lavaRodItem:setPerishable(true)
+lavaRodItem:setNumberofCharges(20)
+lavaRodItem:setStockMaximum(8)
+lavaRodItem:setStockReplenishInterval(90)
+lavaRodItem:setHitPoints(100)

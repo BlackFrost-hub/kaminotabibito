@@ -182,7 +182,7 @@ export function buildQuestOfferDialog(
     removeOverheadMarkerOnOpen: true,
     quest: {
       title: npcName,
-      text: `【${quest.名称}】\n\n${questDesc}\n\n奖励：${rewardText}`,
+      text: `【${quest.名称}】\n\n${questDesc}\n\n奖励：|cffffcc00${rewardText}|r`,
       onAccept: () => {
         const questId = quest.任务ID != null ? quest.任务ID.toString() : "";
         const playerObj = jass.Player(dialogOwnerId);
@@ -259,7 +259,7 @@ export function buildQuestInProgressDialog(
     lines: [],
     quest: {
       title: npcName,
-      text: `【${quest.名称}】进行中...\n\n任务目标：${questDesc}\n${任务进度文本}\n\n奖励：${rewardText}`,
+      text: `【${quest.名称}】进行中...\n\n任务目标：${questDesc}\n${任务进度文本}\n\n奖励：|cffffcc00${rewardText}|r`,
       acceptText: "提交任务",
       rejectText: "暂时忽略",
       onAccept: () => {

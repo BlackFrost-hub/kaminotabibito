@@ -29,7 +29,6 @@ local AddSpecialEffect = jass.AddSpecialEffect
 local CreateUnit = jass.CreateUnit
 local DestroyEffect = jass.DestroyEffect
 local GetHeroLevel = jass.GetHeroLevel
-local GetOwningPlayer = jass.GetOwningPlayer
 local GetRandomInt = jass.GetRandomInt
 local GetUnitFacing = jass.GetUnitFacing
 local GetUnitTypeId = jass.GetUnitTypeId
@@ -37,6 +36,8 @@ local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GroupAddUnit = jass.GroupAddUnit
 local IsUnitType = jass.IsUnitType
+local Player = jass.Player
+local _____4E2D_7ACB_88AB_52A8_73A9_5BB6 = Player(jass.PLAYER_NEUTRAL_PASSIVE)
 local _____5DF2_89E3_6790_914D_7F6E_8868 = {}
 local _____6B7B_4EA1_7D2F_8BA1_8868 = {}
 local _____5DF2_89E6_53D1_914D_7F6E_8868 = {}
@@ -153,9 +154,8 @@ local function _____521B_5EFABoss_5E76_5E7F_64AD(_____914D_7F6E, dyingUnit, kill
     local x = _____51FA_73B0_5750_6807[1]
     local y = _____51FA_73B0_5750_6807[2]
     local facing = _____53D6_51FA_73B0_671D_5411(_____914D_7F6E, dyingUnit, killingUnit)
-    local owner = GetOwningPlayer(dyingUnit)
     local boss = CreateUnit(
-        owner,
+        _____4E2D_7ACB_88AB_52A8_73A9_5BB6,
         _____914D_7F6E["Boss单位类型ID"],
         x,
         y,

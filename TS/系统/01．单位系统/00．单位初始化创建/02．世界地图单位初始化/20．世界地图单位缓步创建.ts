@@ -200,6 +200,9 @@ function 创建世界地图单位实例(this: void, 配置: 世界地图单位�
   const 玩家 = 解析世界地图单位玩家(配置);
   const unit = 创建单位并登记排泄安全(玩家, 单位类型ID, 配置.X, 配置.Y, 面向角度);
   尝试缓存世界地图单位(配置, unit);
+  if (配置.YD表名 != null && 配置.YD键名 != null && 配置.YD表名 !== "" && 配置.YD键名 !== "") {
+    YDUserDataSetSafe("string", 配置.YD表名, 配置.YD键名, "unit", unit);
+  }
   if (配置.任务NPC任务ID != null) {
     登记世界地图外部任务NPC单位(配置.任务NPC任务ID, unit);
   }

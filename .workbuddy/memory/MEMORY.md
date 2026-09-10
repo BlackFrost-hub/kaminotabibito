@@ -8,6 +8,10 @@
 
 ## 其他
 
+- **聊天命令机制是好的，不要"修"它（2026-09-10 用户明确纠正）**：`12．聊天命令事件中心` 用 catch-all 注册（`TriggerRegisterPlayerChatEvent(trig, Player(i), "", false)`）+ 动作里 `GetEventPlayerChatString()` 取完整聊天串、按字符串查 Map 派发——这是完全正确可用的写法，全项目 140 处命令注册正常工作。**曾经（含本助手）误判为 bug**：以为派发依赖 `GetEventPlayerChatStringMatched()` 且只匹配到空字符串；实际派发**根本不使用**该 API，所以"必须按 exactMatchOnly=true 注册命令字符串"的前提不成立。另注：catch-all 只在发言玩家那次事件触发一次，不是"×16 玩家遍历"，无性能问题。教训：判断事件派发类 bug 前，先确认动作函数实际调用了哪个 `GetEvent...` API，再下结论。
+- **`按名字反查任意单位ID` 的颜色码担忧已证伪（2026-09-10）**：曾怀疑配置里 `Boss单位名` 带 `|cffff0000（BossLV25）|r` 颜色码会让反查返回 undefined、导致整条配置被 `初始化配置缓存` 静默 `continue` 跳过。**实测证伪**：蜘蛛女皇（`nsbm_蜘蛛女皇`，Boss单位名带色码）的死亡日志正常打出"触发流水"，而该日志只在配置成功进入 `已解析配置表` 后才会输出（触发单位ID 与 Boss单位ID 任一为空都会被 continue 跳过）→ 反查对颜色码工作正常。排查"配置没生效"时不要优先怀疑这里。
+- **加诊断日志必须先确认它真被调用（2026-09-10 教训）**：给 `01．死亡触发Boss.ts` 加概率掷骰日志时，`概率判定带日志` 函数写好了但接线漏了（`满足概率触发条件` 里仍保留原始 `return GetRandomInt(1,100) <= chance`），结果进图日志缺"概率判定"行，一度被误读为"chance<=0 配置没加载"。**新增日志后先 grep 自己的函数名确认调用点存在**，再看日志下结论。
+- **`01．死亡触发Boss.ts` 有有意保留的未提交改动，禁止 git checkout**：`创建Boss并广播` 里 CreateUnit 的 owner 是 `中立被动玩家`（`Player(jass.PLAYER_NEUTRAL_PASSIVE)`），而 HEAD 版本是 `GetOwningPlayer(dyingUnit)`（继承击杀者归属）。这是修"触发后应立即中立被动"的正式改动，尚未提交。改这个文件时手改、不要整体还原。
 - **扩展单位状态位必须走 japi 变体**：操作 `ConvertUnitState(0x12/0x15/0x20/0x23/0x25/0x51...)` 等扩展状态，读写都要用 `jass.japi` 的 `Get/SetUnitState`；`jass.common` 原生变体对扩展状态**静默失败**（读恒 0、写丢弃、不报错），只有标准状态（生命/魔法）可用原生。怀疑状态没生效时加"写入后回读"日志验证。
 - 中文标识符在生成 Lua 中转义为 UTF-16 hex（如 `施加移速提升Buff` → `_____65BD...`），grep 生成 Lua 要按 hex 或转义别名搜。
 - `SetUnitPathing(u, false/true)` 关闭/恢复单位碰撞是项目既有惯例（Saber W、铃仙 R、咲夜 RD），直接恢复不做重叠补偿。

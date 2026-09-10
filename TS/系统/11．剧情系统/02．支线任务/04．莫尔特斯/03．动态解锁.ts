@@ -12,12 +12,16 @@ const { 读取剧情进度, 注册剧情进度变更监听 } = require("系统.1
 const { 读取语义单位引用 } = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.06．剧情通用执行工具") as {
   读取语义单位引用: (this: void, 引用: string) => any;
 };
-const { tryAttachQuestMarkerForConfigNpc } = require("系统.09．表现系统.02．对话框系统.09．NPC头顶与气泡特效") as {
-  tryAttachQuestMarkerForConfigNpc: (this: void, 单位: any, NPC配置: any) => void;
+const { 登记外部任务NPC单位 } = require("系统.08．任务系统.00．配置表.04．NPC生成器") as {
+  登记外部任务NPC单位: (this: void, 任务ID: number, 单位: any) => boolean;
 };
 const { 注册动态支线配置 } = require("系统.11．剧情系统.02．支线任务.00A．动态支线注册") as {
   注册动态支线配置: (this: void, 任务配置: any, NPC配置?: any) => boolean;
 };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const 莫尔特斯动态解锁模块名 = "莫尔特斯-动态解锁";
 
 import {
   赫克提尔归位X,
@@ -48,26 +52,26 @@ function 启用莫尔特斯NPC配置(this: void): any {
   return NPC配置;
 }
 
-function 挂莫尔特斯任务标记并延时补挂(this: void, 赫克提尔: any, NPC配置: any): void {
-  tryAttachQuestMarkerForConfigNpc(赫克提尔, NPC配置);
-  // 解锁在剧情进度回调同帧触发，初始挂标可能随片段收尾一起被清；延时补挂一次保证玩家可见。
-  addDelayedCallback(100, function on莫尔特斯任务标记延时补挂(this: void): void {
-    if (莫尔特斯任务已解锁) tryAttachQuestMarkerForConfigNpc(赫克提尔, NPC配置);
-  });
-}
-
 function 尝试解锁并归位赫克提尔(this: void): boolean {
-  if (读取剧情进度() < 莫尔特斯解锁剧情进度) return false;
+  if (读取剧情进度() < 莫尔特斯解锁剧情进度) {
+    debugLogForce(莫尔特斯动态解锁模块名, "进度不足", "当前=", 读取剧情进度(), "需要=", 莫尔特斯解锁剧情进度);
+    return false;
+  }
 
   const NPC配置 = 启用莫尔特斯NPC配置();
   const 赫克提尔 = 读取语义单位引用(赫克提尔语义引用);
-  if (NPC配置 == null || !句柄有效(赫克提尔)) return false;
+  if (NPC配置 == null || !句柄有效(赫克提尔)) {
+    debugLogForce(莫尔特斯动态解锁模块名, "解锁失败", "NPC配置忙=", NPC配置 == null, "赫克提尔有效=", 句柄有效(赫克提尔));
+    return false;
+  }
 
   IssueImmediateOrder(赫克提尔, "stop");
   SetUnitPosition(赫克提尔, 赫克提尔归位X, 赫克提尔归位Y);
   SetUnitFacing(赫克提尔, 赫克提尔归位朝向);
-  挂莫尔特斯任务标记并延时补挂(赫克提尔, NPC配置);
+  const 已登记 = 登记外部任务NPC单位(莫尔特斯任务配置列表[0].任务ID as number, 赫克提尔);
+  debugLogForce(莫尔特斯动态解锁模块名, "解锁登记外部NPC", "NPC配置名=", NPC配置.NPC配置名, "成功=", 已登记);
   莫尔特斯任务已解锁 = true;
+  debugLogForce(莫尔特斯动态解锁模块名, "解锁并归位完成", "handleId=", jass.GetHandleId(赫克提尔));
   return true;
 }
 
@@ -82,7 +86,8 @@ function 安排赫克提尔归位重试(this: void): void {
   addDelayedCallback(1100, on赫克提尔归位重试);
 }
 
-function on剧情进度变更解锁莫尔特斯(this: void, 新进度: number, _旧进度: number): void {
+function on剧情进度变更解锁莫尔特斯(this: void, 新进度: number, 旧进度: number): void {
+  debugLogForce(莫尔特斯动态解锁模块名, "剧情进度变更", 旧进度, "->", 新进度, "已解锁=", 莫尔特斯任务已解锁);
   if (新进度 < 莫尔特斯解锁剧情进度 || 莫尔特斯任务已解锁) return;
   if (!尝试解锁并归位赫克提尔()) 安排赫克提尔归位重试();
 }
@@ -93,6 +98,7 @@ export function 初始化莫尔特斯动态解锁(this: void): void {
 
   注册剧情进度变更监听(on剧情进度变更解锁莫尔特斯);
   if (读取剧情进度() >= 莫尔特斯解锁剧情进度) {
+    debugLogForce(莫尔特斯动态解锁模块名, "初始化时已满足进度", 读取剧情进度());
     启用莫尔特斯NPC配置();
     安排赫克提尔归位重试();
   }

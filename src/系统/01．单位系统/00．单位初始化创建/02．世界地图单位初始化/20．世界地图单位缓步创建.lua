@@ -91,6 +91,15 @@ function _____521B_5EFA_4E16_754C_5730_56FE_5355_4F4D_5B9E_4F8B(_____914D_7F6E)
         _____9762_5411_89D2_5EA6
     )
     _____5C1D_8BD5_7F13_5B58_4E16_754C_5730_56FE_5355_4F4D(_____914D_7F6E, unit)
+    if _____914D_7F6E["YD表名"] ~= nil and _____914D_7F6E["YD键名"] ~= nil and _____914D_7F6E["YD表名"] ~= "" and _____914D_7F6E["YD键名"] ~= "" then
+        YDUserDataSetSafe(
+            "string",
+            _____914D_7F6E["YD表名"],
+            _____914D_7F6E["YD键名"],
+            "unit",
+            unit
+        )
+    end
     if _____914D_7F6E["任务NPC任务ID"] ~= nil then
         _____767B_8BB0_4E16_754C_5730_56FE_5916_90E8_4EFB_52A1NPC_5355_4F4D(_____914D_7F6E["任务NPC任务ID"], unit)
     end
@@ -318,16 +327,16 @@ local function _____5904_7406_5168_90E8_7F13_6B65_521B_5EFA_4EFB_52A1()
     for ____, _____4EFB_52A1 in ipairs(__TS__ObjectValues(_____7F13_6B65_521B_5EFA_4EFB_52A1_8868)) do
         do
             if _____4EFB_52A1 == nil then
-                goto __continue49
+                goto __continue50
             end
             _____4EFB_52A1["已累计毫秒"] = _____4EFB_52A1["已累计毫秒"] + _____7F13_6B65_521B_5EFA_8C03_5EA6_5668_95F4_9694_6BEB_79D2
             if _____4EFB_52A1["已累计毫秒"] < _____4EFB_52A1["批次间隔毫秒"] then
-                goto __continue49
+                goto __continue50
             end
             _____4EFB_52A1["已累计毫秒"] = 0
             _____6267_884C_5355_4E2A_7F13_6B65_521B_5EFA_4EFB_52A1_4E00_6279(_____4EFB_52A1)
         end
-        ::__continue49::
+        ::__continue50::
     end
     _____5982_65E0_4EFB_52A1_5219_505C_6B62_7F13_6B65_521B_5EFA_8C03_5EA6_5668()
 end

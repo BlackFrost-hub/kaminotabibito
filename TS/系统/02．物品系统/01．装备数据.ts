@@ -507,13 +507,48 @@ items["I0AH"] = {type: "任务", name: "|cffc0c0c0藏宝图第二张|r", goldPri
 items["I0AI"] = {type: "任务", name: "|cffc0c0c0藏宝图第三张|r", goldPrice: 100};
 items["I0AO"] = {type: "材料", name: "信件", goldPrice: 100};
 items["I0AP"] = {type: "材料", name: "高原狼肉", goldPrice: 200};
-items["I0AQ"] = {type: "药剂/食品", name: "高原狼肉", goldPrice: 500, hot: "1500hp", abilList: "A08C"};
+items["I0AQ"] = {type: "药剂/食品", name: "高原狼肉", goldPrice: 500, hot: "2500hp", abilList: "A08C"};
 items["I0AR"] = {type: "药剂/食品", name: "恶魔犬肉", goldPrice: 750, hot: "2500hp;500mp", abilList: "A08C"};
-items["I0AS"] = {type: "材料", name: "恶魔犬肉", goldPrice: 200};
-items["I0AT"] = {type: "材料", name: "|CffFF8000赤魔鱼|r", goldPrice: 50};
-items["I0AU"] = {type: "材料", name: "|CffFF8000熔岩食鱼|r", goldPrice: 50};
-items["I0AV"] = {type: "材料", name: "|CffFF8000熔岩灵鱼|r", goldPrice: 50};
-items["I0AW"] = {type: "材料", name: "|CffFF8000熔岩焰鱼|r", goldPrice: 50};
+items["I0AS"] = {type: "材料", name: "恶魔犬肉", goldPrice: 200, recipe: "h00C:10->I0HW*1:5"};
+items["I0AT"] = {type: "材料", name: "|CffFF8000赤魔鱼|r", goldPrice: 50, recipe: "h00C:10->I0HR*1:5"};
+items["I0AU"] = {type: "材料", name: "|CffFF8000熔岩食鱼|r", goldPrice: 50, recipe: "h00C:10->I0HS*1:5"};
+items["I0AV"] = {type: "材料", name: "|CffFF8000熔岩灵鱼|r", goldPrice: 50, recipe: "h00C:20->I0HT*1:5"};
+items["I0AW"] = {type: "材料", name: "|CffFF8000熔岩焰鱼|r", goldPrice: 50, recipe: "h00C:20->I0HU*1;15%I036*1:5"};
+items["I0HR"] = {type: "药剂/食品", name: "烤赤魔鱼", goldPrice: 800, level: "C+", hot: "50%hp;1000mp", abilList: "A015,A08C"};
+items["I0HS"] = {type: "药剂/食品", name: "烤熔岩食鱼", goldPrice: 1200, level: "C+", hot: "3000hp;1000mp", abilList: "A015,A08C"};
+items["I0HT"] = {type: "药剂/食品", name: "烤熔岩灵鱼", goldPrice: 1500, level: "C+", hot: "50%hpLost;50%mpLost", useBuff: "C075", abilList: "A015,A08C"};
+items["I0HU"] = {type: "药剂/食品", name: "烤熔岩焰鱼", goldPrice: 2000, level: "C+", hot: "50%hpLost;50%mpLost", abilList: "A015,A08C"};
+items["I0HW"] = {type: "药剂/食品", name: "烤恶魔犬肉串", goldPrice: 1500, level: "C+", hot: "5000hp;1500mp", abilList: "A015,A08C"};
+items["I0I0"] = {type: "材料", name: "蛇纹翡翠鲤", goldPrice: 70, recipe: "h00C:12->I0I1*1:5"};
+items["I0I2"] = {type: "材料", name: "月瞳鳗", goldPrice: 80, recipe: "h00C:15->I0I3*1:5"};
+items["I0I4"] = {type: "材料", name: "战痕月鳞鱼", goldPrice: 90, recipe: "h00C:15->I0I5*1:6"};
+items["I0I6"] = {type: "材料", name: "湖心星鲟", goldPrice: 100, recipe: "h00C:18->I0I7*1:6"};
+items["I0I8"] = {type: "材料", name: "污潮鳗", goldPrice: 70, recipe: "h00C:12->I0I9*1:5"};
+items["I0IA"] = {type: "材料", name: "黑水鳐", goldPrice: 80, recipe: "h00C:15->I0IB*1:5"};
+items["I0IC"] = {type: "材料", name: "净泉鳗", goldPrice: 110, recipe: "h00C:18->I0ID*1:6"};
+items["I0IE"] = {type: "材料", name: "清辉水母鱼", goldPrice: 120, recipe: "h00C:20->I0IF*1:6"};
+items["I0I1"] = {type: "药剂/食品", name: "烤蛇纹翡翠鲤", goldPrice: 700, level: "C", hot: "3600hp;1200mp", abilList: "A015"};
+items["I0I3"] = {type: "药剂/食品", name: "烤月瞳鳗", goldPrice: 800, level: "C+", hot: "35%hpLost;25%mpLost", abilList: "A015"};
+items["I0I5"] = {type: "药剂/食品", name: "烤战痕月鳞鱼", goldPrice: 900, level: "C+", hot: "4200hp", PowerUP: "0.10healReceived;time4", abilList: "A015"};
+items["I0I7"] = {type: "药剂/食品", name: "烤湖心星鲟", goldPrice: 1000, level: "C+", hot: "45%hp;1800mp", abilList: "A015"};
+items["I0I9"] = {type: "药剂/食品", name: "烤污潮鳗", goldPrice: 700, level: "C", hot: "3000hp;1000mp", PowerUP: "0.08waterResist;time6", abilList: "A015"};
+items["I0IB"] = {type: "药剂/食品", name: "烤黑水鳐", goldPrice: 800, level: "C", hot: "40%hpLost;30%mpLost", abilList: "A015"};
+items["I0ID"] = {type: "药剂/食品", name: "烤净泉鳗", goldPrice: 1100, level: "C+", hot: "3800hp+900hp", hotDuration: 3, abilList: "A015,A08C"};
+items["I0IF"] = {type: "药剂/食品", name: "烤清辉水母鱼", goldPrice: 1200, level: "C+", hot: "2400hp;2200mp", abilList: "A015"};
+items["I0IG"] = {type: "道具/戒指/饰品", name: "熔岩鱼竿", goldPrice: 5000, abilList: "A017"};
+// 熔浆鱼王隐藏遭遇掉落（B+ 档，火/暗属性向）。设计对比与取舍见下方注释。
+// 装备A 焚渊鱼王之牙：核心定位=火属性输出副武器。
+//   对比 I0JK 熔脉断络斧(副武器 7200: dmg165/str42/护甲穿透22%/hp800)、
+//        I0FT 赤獠断界剑(主武器 7000: dmg180/str35/护甲穿透22%/hp1200)、
+//        I0JM 点魂斧典(副武器 7600: dmg120/int55/魔法伤害22%/火属性伤害20%/魔法穿透18%)。
+//   取舍：攻击力与穿透略低于 I0JK，但换取 hp900 与火属性伤害+20%，总价值高于 7200 档 → 定 8000。
+items["I0IH"] = {type: "副武器", name: "|cffFF8000焚渊鱼王之牙|r", goldPrice: 1600, score: 8000, level: "B+", dmg: 165, str: 38, fireDmg: 0.2, armorPierce: 0.18, hp: 900};
+// 装备B 暗渊噬火之戒：核心定位=暗属性输出+生存饰品。
+//   对比 I0JT 封印守望者勋章(饰品 8100: 全属性35/hp2200/护甲25/冷却缩减10%)、
+//        I0K4 魔烈统御法印(饰品 8200: int50/魔法伤害18%/暗属性伤害18%/冷却缩减10%)、
+//        I0EE 米亚的项圈(灵魂 7050: 全属性28/hp1600/冷却缩减8%/移速8%)。
+//   取舍：主属性与生命略低于 I0JT、且不提供护甲，但换取暗属性伤害+18% 与魔抗+12% → 定 7950。
+items["I0II"] = {type: "道具/戒指/饰品", name: "|cff9933cc暗渊噬火之戒|r", goldPrice: 1590, score: 7950, level: "B+", all: 30, hp: 2000, darkDmg: 0.18, magicResist: 0.12, cdReduction: 0.08};
 items["I0B3"] = {type: "提升属性的物品", name: "能力卡牌", goldPrice: 500, PowerUP: "3all", abilList: "A0LH"};
 items["I0B4"] = {type: "神符", name: "金币+5000", goldPrice: 0, PowerUP: "5000gold", abilList: "A0F1"};
 items["I0B8"] = {type: "其他", name: "阅读描述的内容（其三）|cffff0000LV45|r", goldPrice: 0};
@@ -719,3 +754,29 @@ items["tpow"] = {type: "提升属性的物品", name: "知识之书", goldPrice:
 items["tstr"] = {type: "提升属性的物品", name: "力量之书", goldPrice: 0, PowerUP: "1str", abilList: "A0LH"};
 items["tst2"] = {type: "提升属性的物品", name: "力量之书 +2", goldPrice: 0, PowerUP: "2str", abilList: "A0LH"};
 export default items;
+
+// ===== 默洛克渔夫「重复收购」奖励装备（6×8000 档 + 3×9000 档）=====
+// 设计约束：纯属性、零主动技能（与 8000~9500 档现有装备惯例一致——该档 abilList 全为空）。
+// 覆盖：战士(力量/敏捷)、法师(智力)、辅助(治疗/生存)；普攻流与法术流各有对应。
+// 打分依据：按 score/级区间（B+ = 7001-8500、B++ = 8501-10500）与同档现有装备横向对比定档，非精算。
+// ---- 8000 档 ----
+// 岩浆崩裂重锤：对比 I0FT(主武器7000: dmg180/str35/穿22%/hp1200) 与 I0JK(副武器7200: dmg165/str42/穿22%/hp800)，
+//   攻击略降、补 hp 与主属性，落 8000。
+items["I0IJ"] = {type: "主武器", name: "|cffFF8000岩浆崩裂重锤|r", goldPrice: 1600, score: 8000, level: "B+", dmg: 175, str: 42, armorPierce: 0.2, hp: 700, weaponType: "斧锤"};
+// 炙风碎鳞短刃：对比 I0K8(饰品7000: dmg110/agi40/暴击12%/攻速25%)，各线均高出一档，落 8000。
+items["I0IK"] = {type: "副武器", name: "|cffFF8000炙风碎鳞短刃|r", goldPrice: 1600, score: 8000, level: "B+", dmg: 120, agi: 45, critRate: 0.15, atkSpeed: 0.3};
+// 焚渊法杖：对比 I0JM(副武器7600: dmg120/int55/魔伤22%/火伤20%/魔穿18%)，去掉火伤换 mp，落 8000。
+items["I0IL"] = {type: "主武器", name: "|cff00ccff焚渊法杖|r", goldPrice: 1600, score: 8000, level: "B+", dmg: 120, int: 55, magicDmg: 0.22, magicPierce: 0.2, mp: 900, weaponType: "法杖"};
+// 熔心法印：对比 I0K4(饰品8200: int50/魔伤18%/暗伤18%/冷却10%)，少一条属性伤害、冷却略高，落 8000。
+items["I0IM"] = {type: "道具/戒指/饰品", name: "|cff9933cc熔心法印|r", goldPrice: 1600, score: 8000, level: "B+", int: 52, magicDmg: 0.2, cdReduction: 0.12, mpRegen: 30};
+// 潮汐祷歌护符：对比 I0JR(饰品7400: 冷却14%/治疗24%/魔恢复28)，补 hp 与全属性，落 8000。
+items["I0IN"] = {type: "道具/戒指/饰品", name: "|cff66ccff潮汐祷歌护符|r", goldPrice: 1600, score: 8000, level: "B+", skillHeal: 0.25, cdReduction: 0.12, mpRegen: 30, hp: 1500, all: 15};
+// 熔岩行者胸甲：对比 I0JO(衣服9000: hp3800/护甲50/火抗25%/魔抗20%)，全面低一档，落 8000。
+items["I0IO"] = {type: "衣服", name: "|cff808080熔岩行者胸甲|r", goldPrice: 1600, score: 8000, level: "B+", hp: 3000, armor: 40, magicResist: 0.15, all: 20};
+// ---- 9000 档 ----
+// 熔渊裂地巨斧：对比 I0K5(主武器9200: dmg185/str40/hp1200/吸血8%)，攻击与主属性略高、吸血持平，落 9000。
+items["I0IP"] = {type: "主武器", name: "|cffFF8000熔渊裂地巨斧|r", goldPrice: 1800, score: 9000, level: "B++", dmg: 195, str: 48, armorPierce: 0.22, hp: 1100, lifeSteal: 0.08, weaponType: "斧锤"};
+// 深渊炽炎法典：对比 I0JS(饰品9200: int65/魔伤25%/暗伤22%/魔穿)，各线略低，另配 dmg，落 9000。
+items["I0IQ"] = {type: "副武器", name: "|cff9933cc深渊炽炎法典|r", goldPrice: 1800, score: 9000, level: "B++", dmg: 130, int: 62, magicDmg: 0.25, darkDmg: 0.2, magicPierce: 0.2};
+// 鱼王骨冠：对比 I0JU(饰品9000: all36/hp2600/护甲30/眩晕抗性20%)，把眩晕抗性换为魔抗，落 9000。
+items["I0IR"] = {type: "头盔", name: "|cffFF8000鱼王骨冠|r", goldPrice: 1800, score: 9000, level: "B++", all: 36, hp: 2600, armor: 30, magicResist: 0.18};

@@ -11,9 +11,9 @@ function applyItemHeal(unit, hp, mp, abilId, hotDuration)
     )
 end
 function executeSegment(unit, seg, hotDuration)
-    local ____calcEquipHealHpMp_result_5 = calcEquipHealHpMp(nil, seg.tokens, unit)
-    local hp = ____calcEquipHealHpMp_result_5.hp
-    local mp = ____calcEquipHealHpMp_result_5.mp
+    local ____calcEquipHealHpMp_result_7 = calcEquipHealHpMp(nil, seg.tokens, unit)
+    local hp = ____calcEquipHealHpMp_result_7.hp
+    local mp = ____calcEquipHealHpMp_result_7.mp
     applyItemHeal(
         unit,
         hp,
@@ -95,19 +95,26 @@ local jass = require("jass.common")
 local GetItemTypeId = jass.GetItemTypeId
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.04．物品事件中心")
 local onItemUse = ____require_result_0.onItemUse
-local ____require_result_1 = require("系统.04．伤害系统.02．治疗系统.05．物品治疗效果")
-doHealItemEffectById = ____require_result_1.doHealItemEffectById
-local ____require_result_2 = require("系统.00．核心系统.05．中心计时器")
-local addPeriodicCallback = ____require_result_2.addPeriodicCallback
-removePeriodicCallback = ____require_result_2.removePeriodicCallback
-getServerTime = ____require_result_2.getServerTime
+local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.10．装备战斗执行")
+local _____4E34_65F6_73A9_5BB6_5C5E_6027 = ____require_result_1["临时玩家属性"]
+local ____require_result_2 = require("系统.05．Buff系统.00．Buff系统")
+local registerManualBuff = ____require_result_2.registerManualBuff
+local _____707C_70ED_4F7F_7528BuffID = "C075"
+local _____707C_70ED_4F7F_7528_6301_7EED_79D2 = 30
+local _____707C_70ED_4F7F_7528_706B_4F24_52A0_6210 = 0.3
+local ____require_result_3 = require("系统.04．伤害系统.02．治疗系统.05．物品治疗效果")
+doHealItemEffectById = ____require_result_3.doHealItemEffectById
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+local addPeriodicCallback = ____require_result_4.addPeriodicCallback
+removePeriodicCallback = ____require_result_4.removePeriodicCallback
+getServerTime = ____require_result_4.getServerTime
 local itemsData = require("系统.02．物品系统.01．装备数据").default
-local ____require_result_3 = require("lib.扩展函数.封装函数.01．通用工具.index")
-local fourCCToString = ____require_result_3.fourCCToString
-local isSpecialUnit = ____require_result_3.isSpecialUnit
-local ____require_result_4 = require("系统.02．物品系统.06．装备回复_hot")
-local parseEquipHealSegments = ____require_result_4.parseEquipHealSegments
-calcEquipHealHpMp = ____require_result_4.calcEquipHealHpMp
+local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.index")
+local fourCCToString = ____require_result_5.fourCCToString
+local isSpecialUnit = ____require_result_5.isSpecialUnit
+local ____require_result_6 = require("系统.02．物品系统.06．装备回复_hot")
+local parseEquipHealSegments = ____require_result_6.parseEquipHealSegments
+calcEquipHealHpMp = ____require_result_6.calcEquipHealHpMp
 local _____88C5_5907_56DE_590D_8BA1_65F6_68C0_67E5_95F4_9694_6BEB_79D2 = 10
 _____88C5_5907_56DE_590D_9632_6296_952E_5217_8868 = {}
 _____88C5_5907_56DE_590D_9632_6296_5230_671F_6BEB_79D2_5217_8868 = {}
@@ -178,6 +185,16 @@ local function onUseItem(eventUnit, eventItem)
             end
         end
         ::__continue34::
+    end
+    if entry.useBuff == _____707C_70ED_4F7F_7528BuffID then
+        _____4E34_65F6_73A9_5BB6_5C5E_6027(unit, "火属性伤害", _____707C_70ED_4F7F_7528_706B_4F24_52A0_6210, _____707C_70ED_4F7F_7528_6301_7EED_79D2)
+        registerManualBuff(
+            unit,
+            _____707C_70ED_4F7F_7528BuffID,
+            _____707C_70ED_4F7F_7528_6301_7EED_79D2,
+            _____707C_70ED_4F7F_7528_706B_4F24_52A0_6210 * 100,
+            {effectSourceName = "烤熔岩灵鱼", effectSourceType = "食品"}
+        )
     end
 end
 local INIT_KEY = "__EquipHealInited"

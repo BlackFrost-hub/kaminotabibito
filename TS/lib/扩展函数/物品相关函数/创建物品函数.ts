@@ -15,7 +15,7 @@ const GetLocationX = jass.GetLocationX as (this: void, whichLocation: any) => nu
 const GetLocationY = jass.GetLocationY as (this: void, whichLocation: any) => number;
 const RemoveLocation = jass.RemoveLocation as (this: void, whichLocation: any) => void;
 
-export function 创建物品并注册排泄监听(itemId: number, x: number, y: number): any {
+export function 创建物品并注册排泄监听(this: void, itemId: number, x: number, y: number): any {
   const item = CreateItem(itemId, x, y);
   if (item != null && item !== 0) {
     setLastCreatedItem(item);
@@ -23,12 +23,12 @@ export function 创建物品并注册排泄监听(itemId: number, x: number, y: 
   return item;
 }
 
-export function 在点创建物品并注册排泄监听(itemId: number, whichLocation: any): any {
+export function 在点创建物品并注册排泄监听(this: void, itemId: number, whichLocation: any): any {
   if (whichLocation == null || whichLocation === 0) return null;
   return 创建物品并注册排泄监听(itemId, GetLocationX(whichLocation), GetLocationY(whichLocation));
 }
 
-export function 在点创建物品并注册排泄监听且删除点(itemId: number, whichLocation: any): any {
+export function 在点创建物品并注册排泄监听且删除点(this: void, itemId: number, whichLocation: any): any {
   if (whichLocation == null || whichLocation === 0) return null;
   const item = 创建物品并注册排泄监听(itemId, GetLocationX(whichLocation), GetLocationY(whichLocation));
   RemoveLocation(whichLocation);

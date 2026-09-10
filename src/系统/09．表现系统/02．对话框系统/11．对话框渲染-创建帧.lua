@@ -166,7 +166,7 @@ function ____exports.createDialogFrames(self, slotId)
         0.23,
         0.2421
     )
-    dzSetSize(nil, bg, 0.377, 0.131)
+    dzSetSize(nil, bg, 0.4, 0.15)
     dzSetAlpha(nil, bg, 255)
     dzSetTexture(nil, bg, DEFAULT_BG_TEX)
     local bgBtn = createFrame(nil, {
@@ -193,10 +193,10 @@ function ____exports.createDialogFrames(self, slotId)
         nil,
         titleBg,
         3,
-        0.24,
-        0.3083
+        0.25,
+        0.302
     )
-    dzSetSize(nil, titleBg, 0.107, 0.0328)
+    dzSetSize(nil, titleBg, 0.095, 0.028)
     dzSetAlpha(nil, titleBg, 255)
     dzSetTexture(nil, titleBg, DEFAULT_TITLE_TEX)
     local nameText = dzCreate(nil, "GameText", slotTag + 3)
@@ -220,12 +220,12 @@ function ____exports.createDialogFrames(self, slotId)
         nil,
         bodyText,
         0,
-        0.24,
-        0.28
+        0.245,
+        0.275
     )
-    dzSetSize(nil, bodyText, 0.35, 0.22)
+    dzSetSize(nil, bodyText, 0.33, 0.13)
     dzSetText(nil, bodyText, "")
-    dzSetFont(nil, bodyText, DEFAULT_FONT, DEFAULT_BODY_FONT_SIZE)
+    dzSetFont(nil, bodyText, DEFAULT_FONT, 0.0105)
     dzSetEnable(nil, bodyText, false)
     local acceptBg = createFrame(nil, {
         type = FrameType.BACKDROP,
@@ -236,7 +236,7 @@ function ____exports.createDialogFrames(self, slotId)
     }) or 0
     frames[6] = acceptBg
     if acceptBg ~= 0 then
-        japi.DzFrameSetAbsolutePoint(acceptBg, 4, 0.311, 0.18)
+        japi.DzFrameSetAbsolutePoint(acceptBg, 4, 0.311, 0.145)
     end
     if acceptBg ~= 0 then
         japi.DzFrameSetSize(acceptBg, 0.08, 0.022)
@@ -299,7 +299,7 @@ function ____exports.createDialogFrames(self, slotId)
     }) or 0
     frames[8] = rejectBg
     if rejectBg ~= 0 then
-        japi.DzFrameSetAbsolutePoint(rejectBg, 4, 0.406, 0.18)
+        japi.DzFrameSetAbsolutePoint(rejectBg, 4, 0.406, 0.145)
     end
     if rejectBg ~= 0 then
         japi.DzFrameSetSize(rejectBg, 0.08, 0.022)
