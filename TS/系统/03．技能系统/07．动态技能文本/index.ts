@@ -105,7 +105,7 @@ function 处理Alt松开(this: void): void {
   设置技能提示原始模式(false);
   const hero = 获取本地当前选中英雄();
   if (!isValidHandle(hero)) return;
-  同步刷新英雄技能界面(hero);
+
 }
 
 function onTick(this: void): void {
@@ -156,3 +156,4 @@ export function initDynamicSkillTextSystem(this: void): void {
 export function restoreDynamicSkillTextCurrentHero(this: void): void {
   恢复当前生效英雄();
 }
+

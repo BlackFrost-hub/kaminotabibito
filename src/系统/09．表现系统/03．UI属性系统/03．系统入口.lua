@@ -1,6 +1,7 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ArraySetLength = ____lualib.__TS__ArraySetLength
 local ____exports = {}
-local refreshAllUi, registerKey, dispatchTabKey, onTabKeyDown, onTabKeyUp, registerDamagePanelHotkeys, dispatchFocusHotkey, dispatchFocusTriggeredKey, registerFocusHotkeys, onRefreshLoopTick, startRefreshLoop, jass, registerKeyEventRawStatus, getTriggerKey, getTriggerKeyPlayer, onTick10ms, offTick10ms, _____5E38_91CF, createUiFrames, focusHeroByFunctionKey, showDamagePanel, updateDamagePanel, updateDetailPanels, panCameraToTimedForPlayer, initialized, refreshAccumulator, startupTickHandler
+local refreshAllUi, registerKey, dispatchTabKey, onTabKeyDown, onTabKeyUp, registerDamagePanelHotkeys, dispatchFocusHotkey, dispatchFocusTriggeredKey, registerFocusHotkeys, onRefreshLoopTick, startRefreshLoop, finishUiAttributeSystemInitialization, jass, registerKeyEventRawStatus, getTriggerKey, getTriggerKeyPlayer, onTick10ms, offTick10ms, _____5E38_91CF, createUiFrames, focusHeroByFunctionKey, _onPlayerHeroRegistered, setUiRendererReady, showDamagePanel, updateDamagePanel, updateDetailPanels, panCameraToTimedForPlayer, initialized, refreshAccumulator, startupTickHandler, pendingHeroRegistrations
 function refreshAllUi()
     updateDamagePanel()
     updateDetailPanels()
@@ -70,24 +71,30 @@ end
 function startRefreshLoop()
     onTick10ms(onRefreshLoopTick)
 end
---- UI属性系统总入口。
-function ____exports.initUiAttributeSystem()
-    if not _____5E38_91CF.UI_ATTRIBUTE_SYSTEM_ENABLED then
-        return
-    end
-    if initialized then
+function finishUiAttributeSystemInitialization()
+    if not _____5E38_91CF.UI_ATTRIBUTE_SYSTEM_ENABLED or initialized then
         return
     end
     if startupTickHandler ~= nil then
         offTick10ms(startupTickHandler)
         startupTickHandler = nil
     end
-    initialized = true
+    setUiRendererReady(true)
     createUiFrames()
     refreshAllUi()
+    initialized = true
     registerDamagePanelHotkeys()
     registerFocusHotkeys()
     startRefreshLoop()
+    do
+        local i = 0
+        while i < #pendingHeroRegistrations do
+            local registration = pendingHeroRegistrations[i + 1]
+            _onPlayerHeroRegistered(registration.player, registration.hero)
+            i = i + 1
+        end
+    end
+    __TS__ArraySetLength(pendingHeroRegistrations, 0)
 end
 jass = require("jass.common")
 local _____786C_4EF6_51FD_6570 = require("系统.00．核心系统.02．硬件函数")
@@ -101,7 +108,8 @@ _____5E38_91CF = require("系统.09．表现系统.03．UI属性系统.00．常�
 local ____require_result_0 = require("系统.09．表现系统.03．UI属性系统.02．面板渲染")
 createUiFrames = ____require_result_0.createUiFrames
 focusHeroByFunctionKey = ____require_result_0.focusHeroByFunctionKey
-local _onPlayerHeroRegistered = ____require_result_0.onPlayerHeroRegistered
+_onPlayerHeroRegistered = ____require_result_0.onPlayerHeroRegistered
+setUiRendererReady = ____require_result_0.setUiRendererReady
 showDamagePanel = ____require_result_0.showDamagePanel
 updateDamagePanel = ____require_result_0.updateDamagePanel
 updateDetailPanels = ____require_result_0.updateDetailPanels
@@ -112,6 +120,7 @@ local startupScheduled = false
 local startupAccumulator = 0
 refreshAccumulator = 0
 startupTickHandler = nil
+pendingHeroRegistrations = {}
 local function onStartupTick()
     if initialized then
         return
@@ -120,7 +129,7 @@ local function onStartupTick()
     if startupAccumulator + 0.0001 < _____5E38_91CF.INIT_DELAY_SECONDS then
         return
     end
-    ____exports.initUiAttributeSystem()
+    finishUiAttributeSystemInitialization()
 end
 --- 独立安排 UI 启动时机。
 local function scheduleUiStartup()
@@ -131,12 +140,23 @@ local function scheduleUiStartup()
     startupTickHandler = onStartupTick
     onTick10ms(startupTickHandler)
 end
+--- UI属性系统总入口：只安排延迟启动，避免外部初始化入口绕过 UI 就绪等待。
+function ____exports.initUiAttributeSystem()
+    if not _____5E38_91CF.UI_ATTRIBUTE_SYSTEM_ENABLED or initialized then
+        return
+    end
+    scheduleUiStartup()
+end
 function ____exports.isUiAttributeSystemEnabled()
     return _____5E38_91CF.UI_ATTRIBUTE_SYSTEM_ENABLED
 end
 --- 玩家英雄注册回调。
 -- 由玩家系统调用，每注册一个玩家英雄就创建一个UI槽位。
 function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
+    if not initialized then
+        pendingHeroRegistrations[#pendingHeroRegistrations + 1] = {player = whichPlayer, hero = whichHero}
+        return
+    end
     if type(_onPlayerHeroRegistered) == "function" then
         _onPlayerHeroRegistered(whichPlayer, whichHero)
     end

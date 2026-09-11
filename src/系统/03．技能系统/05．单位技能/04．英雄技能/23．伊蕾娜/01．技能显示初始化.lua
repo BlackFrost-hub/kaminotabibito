@@ -61,7 +61,7 @@ local function _____521D_59CB_5316_4F0A_857E_5A1C_6280_80FD_663E_793A(_player, h
         "单位",
         hero
     )
-    _____52A8_6001_4FEE_6539_5355_4F4D_6280_80FD_6570_636E(hero, _____6280_80FD_663E_793A)
+    _____52A8_6001_4FEE_6539_5355_4F4D_6280_80FD_6570_636E(hero, _____82F1_96C4_5355_4F4D_7C7B_578BID, _____6280_80FD_663E_793A)
 end
 registerPlayerHeroListener(_____521D_59CB_5316_4F0A_857E_5A1C_6280_80FD_663E_793A)
 return ____exports

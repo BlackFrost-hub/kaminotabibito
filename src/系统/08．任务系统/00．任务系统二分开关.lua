@@ -6,7 +6,5 @@ ____exports.ENABLE_QUEST_CONFIG_TABLE = true
 -- 关则仅保留配置表（若上项为 true），无运行时任务数据/管理器——NPC 对话里依赖 questManager 的逻辑会不可用。
 ____exports.ENABLE_QUEST_RUNTIME_CORE = true
 --- 加载 `03．任务UI` + `registerHotkey`（及可选 `04．任务UI拆分` 整包）
-____exports.ENABLE_QUEST_UI_MODULE = true
---- 加载 `09．主线配置驱动`
-____exports.ENABLE_QUEST_MAINLINE_DRIVER = false
+____exports.ENABLE_QUEST_UI_MODULE = false
 return ____exports

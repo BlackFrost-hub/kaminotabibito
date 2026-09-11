@@ -26,7 +26,8 @@ import {
 } from "./00．共享";
 import { 推进一步 } from "./01．命中与移动";
 
-const { onTick10ms, offTick10ms } = globalThis as unknown as {
+// 直接取中心计时器实现，不经全局桥接：全局 onTick10ms 可能被引擎同名函数遮蔽
+const { onTick10ms, offTick10ms } = require("系统.00．核心系统.05．中心计时器") as {
   onTick10ms: (this: void, callback: () => void) => void;
   offTick10ms: (this: void, callback: () => void) => void;
 };

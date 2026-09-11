@@ -6,6 +6,7 @@
  */
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as { debugLogForce: (this: void, module: string, ...args: any[]) => void; };
 
 const selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照") as {
   获取本地选中技能快照: (this: void) => {
@@ -184,11 +185,15 @@ function 更新提示(this: void, hero: any, abilityId: number): void {
   if (提示帧 == null || !有效帧(hero) || abilityId === 0) return;
   当前悬停英雄 = hero;
   当前悬停技能ID = abilityId;
-  if (!原始文本模式) dynamicTextCore.刷新单个英雄技能动态文本(hero, abilityId);
+
   const title = DzGetUnitAbilityTip(hero, abilityId) || "";
   const body = 原始文本模式
     ? dynamicTextCore.获取技能原始提示(hero, abilityId)
     : DzGetUnitAbilityUberTip(hero, abilityId) || "";
+  let bodyColorCount = 0;
+  let bodyColorIndex = body.indexOf("|cff");
+  while (bodyColorIndex >= 0) { bodyColorCount++; bodyColorIndex = body.indexOf("|cff", bodyColorIndex + 4); }
+  debugLogForce("技能提示UI", "读取正文", "abilityId", abilityId, "bodyLength", body.length, "hasColorCode", bodyColorCount > 0, "colorCount", bodyColorCount);
   // 蓝耗由技能消耗系统统一计算并同步；提示框只读取结果，不在 UI 层重复计算。
   const cost = 获取已同步技能魔法消耗(hero, abilityId);
   安全文本(提示帧.name, title);
@@ -276,3 +281,5 @@ export function 初始化技能提示UI(this: void): void {
 }
 
 export {};
+
+

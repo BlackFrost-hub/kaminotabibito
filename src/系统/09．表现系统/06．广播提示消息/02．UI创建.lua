@@ -1,4 +1,5 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__TypeOf = ____lualib.__TS__TypeOf
 local ____exports = {}
 local ____00_FF0E_5E38_91CF_5B9A_4E49 = require("系统.09．表现系统.06．广播提示消息.00．常量定义")
 local _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 = ____00_FF0E_5E38_91CF_5B9A_4E49["广播提示玩家槽数"]
@@ -22,6 +23,8 @@ local _____6587_672C_5DE6_5BF9_9F50 = ____00_FF0E_5E38_91CF_5B9A_4E49["文本左
 ---
 -- @noSelfInFile
 local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local DzGetGameUI = japi.DzGetGameUI
 local DzCreateFrameByTagName = japi.DzCreateFrameByTagName
 local DzFrameSetAbsolutePoint = japi.DzFrameSetAbsolutePoint
@@ -36,23 +39,35 @@ local DzFrameSetPriority = japi.DzFrameSetPriority
 local DzFrameShow = japi.DzFrameShow
 ____exports["广播提示槽帧表"] = {}
 local _____5DF2_521B_5EFA_5E7F_64AD_63D0_793AUI = false
-local function _____521B_5EFA_80CC_666F_5E27(_____540D_79F0, _____7236_7EA7)
-    return DzCreateFrameByTagName(
-        "BACKDROP",
+local _____5E7F_64AD_63D0_793A_5E27_65E5_5FD7_6A21_5757 = "广播提示消息/Frame创建"
+local function _____521B_5EFA_5E27(tag, _____540D_79F0, _____7236_7EA7)
+    if _____7236_7EA7 == nil or _____7236_7EA7 == 0 then
+        debugLogForce(
+            _____5E7F_64AD_63D0_793A_5E27_65E5_5FD7_6A21_5757,
+            "拦截无效父帧",
+            "tag=",
+            tag,
+            "name=",
+            _____540D_79F0,
+            "parent=",
+            _____7236_7EA7
+        )
+        return 0
+    end
+    local frame = DzCreateFrameByTagName(
+        tag,
         _____540D_79F0,
         _____7236_7EA7,
         "template",
         0
     )
+    return frame
+end
+local function _____521B_5EFA_80CC_666F_5E27(_____540D_79F0, _____7236_7EA7)
+    return _____521B_5EFA_5E27("BACKDROP", _____540D_79F0, _____7236_7EA7)
 end
 local function _____521B_5EFA_6587_672C_5E27(_____540D_79F0, _____7236_7EA7)
-    return DzCreateFrameByTagName(
-        "TEXT",
-        _____540D_79F0,
-        _____7236_7EA7,
-        "template",
-        0
-    )
+    return _____521B_5EFA_5E27("TEXT", _____540D_79F0, _____7236_7EA7)
 end
 local function _____521B_5EFA_5355_69FD(_____73A9_5BB6ID, _____69FD_4F4DID, _____6E38_620FUI)
     local _____5E8F_53F7 = _____53D6_5E7F_64AD_63D0_793A_69FD_7D22_5F15(_____73A9_5BB6ID, _____69FD_4F4DID)
@@ -121,11 +136,19 @@ ____exports["创建全部广播提示槽"] = function()
     if _____5DF2_521B_5EFA_5E7F_64AD_63D0_793AUI then
         return
     end
-    _____5DF2_521B_5EFA_5E7F_64AD_63D0_793AUI = true
     local _____6E38_620FUI = DzGetGameUI()
-    if _____6E38_620FUI == 0 then
+    debugLogForce(
+        _____5E7F_64AD_63D0_793A_5E27_65E5_5FD7_6A21_5757,
+        "取得游戏UI",
+        "frame=",
+        _____6E38_620FUI,
+        "frameType=",
+        __TS__TypeOf(_____6E38_620FUI)
+    )
+    if _____6E38_620FUI == nil or _____6E38_620FUI == 0 then
         return
     end
+    _____5DF2_521B_5EFA_5E7F_64AD_63D0_793AUI = true
     do
         local _____73A9_5BB6ID = 0
         while _____73A9_5BB6ID < _____5E7F_64AD_63D0_793A_73A9_5BB6_69FD_6570 do

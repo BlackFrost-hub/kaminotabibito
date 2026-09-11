@@ -1,6 +1,9 @@
 /** @noSelfInFile */
 
 const japi = require("jass.japi") as any;
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
 
 import {
   广播提示玩家槽数,
@@ -59,13 +62,23 @@ export interface 广播提示槽帧 {
 export const 广播提示槽帧表: Array<广播提示槽帧 | undefined> = [];
 
 let 已创建广播提示UI = false;
+const 广播提示帧日志模块 = "广播提示消息/Frame创建";
+
+function 创建帧(this: void, tag: string, 名称: string, 父级: number): number {
+  if (父级 == null || 父级 === 0) {
+    debugLogForce(广播提示帧日志模块, "拦截无效父帧", "tag=", tag, "name=", 名称, "parent=", 父级);
+    return 0;
+  }
+  const frame = DzCreateFrameByTagName(tag, 名称, 父级, "template", 0);
+  return frame;
+}
 
 function 创建背景帧(this: void, 名称: string, 父级: number): number {
-  return DzCreateFrameByTagName("BACKDROP", 名称, 父级, "template", 0);
+  return 创建帧("BACKDROP", 名称, 父级);
 }
 
 function 创建文本帧(this: void, 名称: string, 父级: number): number {
-  return DzCreateFrameByTagName("TEXT", 名称, 父级, "template", 0);
+  return 创建帧("TEXT", 名称, 父级);
 }
 
 function 创建单槽(this: void, 玩家ID: number, 槽位ID: number, 游戏UI: number): 广播提示槽帧 | undefined {
@@ -108,10 +121,11 @@ function 创建单槽(this: void, 玩家ID: number, 槽位ID: number, 游戏UI: 
 
 export function 创建全部广播提示槽(this: void): void {
   if (已创建广播提示UI) return;
-  已创建广播提示UI = true;
 
   const 游戏UI = DzGetGameUI();
-  if (游戏UI === 0) return;
+  debugLogForce(广播提示帧日志模块, "取得游戏UI", "frame=", 游戏UI, "frameType=", typeof 游戏UI);
+  if (游戏UI == null || 游戏UI === 0) return;
+  已创建广播提示UI = true;
 
   for (let 玩家ID = 0; 玩家ID < 广播提示玩家槽数; 玩家ID++) {
     for (let 槽位ID = 0; 槽位ID < 每玩家广播提示槽数; 槽位ID++) {

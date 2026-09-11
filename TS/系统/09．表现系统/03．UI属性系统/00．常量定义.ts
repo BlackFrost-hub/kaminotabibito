@@ -9,7 +9,7 @@
 export const UI_ATTRIBUTE_SYSTEM_ENABLED = true;
 
 /** 系统初始化延迟时间（秒），游戏开始后多久启动UI */
-export const INIT_DELAY_SECONDS = 0.5;
+export const INIT_DELAY_SECONDS = 1.0;
 
 /** UI 周期刷新间隔（秒）。`JASS/jass复制粘贴/属性查看.j` 里伤害统计与属性文本各为 3.00 秒定时、全局无条件执行；此处可单独调频。 */
 export const REFRESH_INTERVAL_SECONDS = 0.5;

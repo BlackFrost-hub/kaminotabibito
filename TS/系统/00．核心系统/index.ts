@@ -56,6 +56,18 @@ function expose(name: string, fn: any): void {
   g[name] = fn;
 }
 
+/**
+ * 强制覆盖式暴露：计时器桥接必须用项目实现，不允许被遮蔽。
+ *
+ * 运行时（Luamain.lua）可能已占用同名全局；`expose` 的"已存在则跳过"会让
+ * 所有通过 `globalThis.onTick10ms` 取用的模块（击退/跳跃/特效绑定/漂浮文字/
+ * 玩家基础核心等）拿到引擎的实现，表现为注册回调时引擎/JAPI 崩溃。
+ */
+function exposeForce(name: string, fn: any): void {
+  if (typeof fn !== "function") return;
+  (globalThis as any)[name] = fn;
+}
+
 function registerCoreGlobals(): void {
   expose("getServerTime", centerTimer.getServerTime);
   expose("getTime", centerTimer.getTime);
@@ -69,15 +81,16 @@ function registerCoreGlobals(): void {
   expose("getDateTimeStringWithMs", centerTimer.getDateTimeStringWithMs);
   expose("setGameDifficulty", centerTimer.setGameDifficulty);
   expose("getGameDifficulty", centerTimer.getGameDifficulty);
-  expose("addPeriodicCallback", centerTimer.addPeriodicCallback);
-  expose("removePeriodicCallback", centerTimer.removePeriodicCallback);
-  expose("addDelayedCallback", centerTimer.addDelayedCallback);
-  expose("removeDelayedCallback", centerTimer.removeDelayedCallback);
-  expose("onSecond", centerTimer.onSecond);
-  expose("offSecond", centerTimer.offSecond);
-  expose("onTick10ms", centerTimer.onTick10ms);
-  expose("offTick10ms", centerTimer.offTick10ms);
-  expose("initCenterTimer", centerTimer.initCenterTimer);
+  // 计时器注册/注销桥接走强制覆盖：这些名字被引擎同名全局遮蔽时会直接崩
+  exposeForce("addPeriodicCallback", centerTimer.addPeriodicCallback);
+  exposeForce("removePeriodicCallback", centerTimer.removePeriodicCallback);
+  exposeForce("addDelayedCallback", centerTimer.addDelayedCallback);
+  exposeForce("removeDelayedCallback", centerTimer.removeDelayedCallback);
+  exposeForce("onSecond", centerTimer.onSecond);
+  exposeForce("offSecond", centerTimer.offSecond);
+  exposeForce("onTick10ms", centerTimer.onTick10ms);
+  exposeForce("offTick10ms", centerTimer.offTick10ms);
+  exposeForce("initCenterTimer", centerTimer.initCenterTimer);
 }
 
 // ========== 初始化 ==========

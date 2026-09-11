@@ -111,10 +111,6 @@ function ____exports.initTaskUIForPlayer(whichPlayer)
         return false
     end
     local pid = jass.GetPlayerId(whichPlayer)
-    local ____opt_12 = taskUIs[pid]
-    if (____opt_12 and ____opt_12.uiInitialized) == true then
-        return true
-    end
     local ui = __TS__New(TaskUI, pid)
     return ui:init(pid)
 end
@@ -125,14 +121,14 @@ function onQuestManagerUiRefresh(self, _playerId, _questId)
             do
                 local ui = taskUIs[i]
                 if ui == nil or not ui.uiInitialized then
-                    goto __continue123
+                    goto __continue122
                 end
                 ui.pagesDirty = true
                 if ui.isVisible then
                     ui:rebuildPages()
                 end
             end
-            ::__continue123::
+            ::__continue122::
             i = i + 1
         end
     end

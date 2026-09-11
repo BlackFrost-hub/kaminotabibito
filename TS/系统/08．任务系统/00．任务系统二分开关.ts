@@ -15,7 +15,5 @@ export const ENABLE_QUEST_CONFIG_TABLE = true;
 export const ENABLE_QUEST_RUNTIME_CORE = true;
 
 /** 加载 `03．任务UI` + `registerHotkey`（及可选 `04．任务UI拆分` 整包） */
-export const ENABLE_QUEST_UI_MODULE = true;
+export const ENABLE_QUEST_UI_MODULE = false;
 
-/** 加载 `09．主线配置驱动` */
-export const ENABLE_QUEST_MAINLINE_DRIVER = false;

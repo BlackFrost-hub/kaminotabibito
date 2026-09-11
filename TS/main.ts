@@ -7,6 +7,10 @@ require("jass.japi"); // 1.27 平台扩展入口；不要假设存在 Blz* 原�
 const jass = require("jass.common") as Record<string, unknown>;
 const jglobals = require("jass.globals") as Record<string, unknown>;
 const slk = require("jass.slk") as Record<string, Record<string, Record<string, string>>>;
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+const MAIN_INIT_LOG_MODULE = "main/系统加载";
 (globalThis as any).slk = slk;
 
 (globalThis as any).print = (...args: any[]) => {
@@ -20,8 +24,15 @@ const slk = require("jass.slk") as Record<string, Record<string, Record<string, 
 
 
 // ---------- 00．核心系统 ----------
-const 核心系统 = require("系统.00．核心系统.index") as { init?: () => void };
-if (typeof 核心系统.init === "function") 核心系统.init();
+const 启用Main系统 = (globalThis as any).__启用Main系统 === true;
+if (true) {
+  const 启用核心系统诊断 = true;
+  if (启用核心系统诊断) {
+    const 核心系统 = require("系统.00．核心系统.index") as { init?: () => void };
+    if (typeof 核心系统.init === "function") 核心系统.init();
+  }
+  const 启用其余系统诊断 = true;
+  if (启用其余系统诊断) {
 
 // ---------- 扩展函数 ----------
 const 扩展函数 = require("lib.扩展函数.index") as { init?: () => void };
@@ -55,24 +66,38 @@ if (typeof 地形系统.init === "function") 地形系统.init();
 const 经济系统 = require("系统.06．经济系统.index") as { init?: () => void };
 if (typeof 经济系统.init === "function") 经济系统.init();
 
+const 启用08以后系统诊断 = true;
+if (启用08以后系统诊断) {
 // // ---------- 08．任务系统 ----------
+const 启用08任务系统诊断 = true;
+if (启用08任务系统诊断) {
 const 任务系统 = require("系统.08．任务系统.03．index") as { init?: () => void };
 if (typeof 任务系统.init === "function") 任务系统.init();
+}
 
 // // ---------- 09．表现系统 ----------
 const 表现系统 = require("系统.09．表现系统.index") as { init?: () => void };
 if (typeof 表现系统.init === "function") 表现系统.init();
 
 // // ---------- 10．存档系统 ----------
+debugLogForce(MAIN_INIT_LOG_MODULE, "准备加载存档系统");
 const 存档系统 = require("系统.10．存档系统.index") as { init?: (this: void) => void };
 if (typeof 存档系统.init === "function") 存档系统.init();
+debugLogForce(MAIN_INIT_LOG_MODULE, "存档系统加载完成");
 
 // // ---------- 11．剧情系统 ----------
+debugLogForce(MAIN_INIT_LOG_MODULE, "准备加载剧情系统");
 const 剧情系统 = require("系统.11．剧情系统.index") as { init?: (this: void) => void };
 if (typeof 剧情系统.init === "function") 剧情系统.init();
+debugLogForce(MAIN_INIT_LOG_MODULE, "剧情系统加载完成");
 
 // // ---------- 12．测试系统 ----------
 // 通过统一的 index.ts 入口加载测试，在 系统.12．测试系统.index 中配置开关
+debugLogForce(MAIN_INIT_LOG_MODULE, "准备加载测试系统");
 require("系统.12．测试系统.index");
+debugLogForce(MAIN_INIT_LOG_MODULE, "测试系统加载完成");
+}
+}
+}
 
 export {};

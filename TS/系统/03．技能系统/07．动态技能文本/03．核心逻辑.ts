@@ -7,12 +7,16 @@
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const heroConfigTool = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具") as {
-  获取单位玩家英雄配置: (this: void, unit: any) => Record<string, any> | null;
-};
-const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
-  stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
-};
+const heroConfigTool = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具") as any;
+const heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as any;
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as { stringToFourCCSafe: (this: void, value: string) => number; };const 静态英雄配置列表 = [
+  require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.00．配置").爱蜜莉雅技能配置,
+  require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.00．配置").朱雀院红叶技能配置,
+  require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.00．配置").朱雀院椿技能配置,
+  require("系统.03．技能系统.05．单位技能.04．英雄技能.23．伊蕾娜.00．配置").伊蕾娜技能配置,
+  require("系统.03．技能系统.05．单位技能.04．英雄技能.24．塞莉亚·克莱尔.00．配置").塞莉亚克莱尔技能配置,
+  require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置").芙莉莲技能配置,
+] as any[];
 const selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照") as {
   获取本地选中技能快照: (this: void) => {
     hero: any | null;
@@ -20,7 +24,8 @@ const selectionSnapshotSystem = require("系统.03．技能系统.00．本地选
   };
 };
 const dynamicSkillData = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据") as {
-  刷新单位技能数据: (this: void, unit: any) => void;
+  刷新单位技能数据: (this: void, unit: any, key: number) => void;
+  获取动态技能说明: (this: void, key: number, abilityId: number) => string | undefined;
 };
 
 const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
@@ -640,7 +645,9 @@ function 替换公式(this: void, unit: any, tip: string, options?: 动态文本
       const 伤害 = 计算公式伤害(unit, 属性匹配项.计算属性名, 匹配结果.倍率);
       const 动态数值 = 包装动态数值(格式化动态整数(伤害));
       // 着色文案：数值自带的颜色前缀回填到计算结果前，保持数值高亮色不变
-      let 替换值 = (匹配结果.数值颜色前缀 != null ? 匹配结果.数值颜色前缀 : "") + 动态数值;
+      const 数值颜色前缀 = 匹配结果.数值颜色前缀 != null ? 匹配结果.数值颜色前缀 : "|cff87ceeb";
+      const 数值颜色后缀 = 匹配结果.数值颜色前缀 != null ? "" : "|r";
+      let 替换值 = 数值颜色前缀 + 动态数值 + 数值颜色后缀;
       if (options != null && options.preserveFormula === true) {
         const 保护标记 = "__DYN_SKIP_" + 保护片段表.length.toString() + "__";
         保护片段表.push({ 标记: 保护标记, 原文: 完整匹配文本 + "（" + 动态数值 + "）" });
@@ -676,18 +683,33 @@ export function 渲染动态文本(this: void, unit: any, tip: string, options?:
  */
 function 处理技能提示(this: void, unit: any, abilityId: number): boolean {
   const currentTip = DzGetUnitAbilityUberTip(unit, abilityId);
-  if (!currentTip) return false;
+  if (!currentTip) { debugLogForce("动态技能文本", "跳过：技能提示为空", "abilityId", abilityId); return false; }
 
   const 缓存键 = 生成提示缓存键(unit, abilityId);
-  let originalTip = 原始提示缓存[缓存键];
+  const heroConfigForText = heroConfigTool.获取单位玩家英雄配置(unit);
+  const dynamicKey = heroConfigForText != null ? stringToFourCCSafe(heroConfigForText.单位类型ID) : 0;
+  let 配置说明 = dynamicKey !== 0 ? dynamicSkillData.获取动态技能说明(dynamicKey, abilityId) : undefined;
+  if (配置说明 == null) {
+    for (let i = 0; i < 静态英雄配置列表.length && 配置说明 == null; i++) {
+      const cfg = 静态英雄配置列表[i];
+      for (const key in cfg) if (cfg[key]?.技能ID != null && stringToFourCCSafe(cfg[key].技能ID) === abilityId) 配置说明 = cfg[key].说明;
+    }
+  }
+  debugLogForce("动态技能文本", "配置说明命中", "abilityId", abilityId, "dynamicKey", dynamicKey, "hit", 配置说明 != null, "length", 配置说明 != null ? 配置说明.length : 0);
+  let originalTip = 配置说明 ?? 原始提示缓存[缓存键];
   if (originalTip == null) {
     originalTip = currentTip;
     原始提示缓存[缓存键] = originalTip;
   }
 
   const newTip = 替换公式(unit, originalTip);
+  let colorCount = 0;
+  let colorIndex = newTip.indexOf("|cff");
+  while (colorIndex >= 0) { colorCount++; colorIndex = newTip.indexOf("|cff", colorIndex + 4); }
+  debugLogForce("动态技能文本", "处理技能", "abilityId", abilityId, "originalLength", originalTip.length, "resultLength", newTip.length, "changed", newTip !== currentTip, "hasColorCode", colorCount > 0, "colorCount", colorCount);
   if (newTip !== currentTip) {
-    DzSetUnitAbilityUberTip(unit, abilityId, newTip);
+    const setResult = DzSetUnitAbilityUberTip(unit, abilityId, newTip);
+    debugLogForce("动态技能文本", "写入技能提示", "abilityId", abilityId, "setResult", setResult, "hasColorCode", newTip.indexOf("|cff") >= 0);
     return true;
   }
   return false;
@@ -732,7 +754,9 @@ export function 检查英雄技能(this: void, hero: any): void {
   if (!isValidHandle(hero)) return;
 
   // Q/W/E/R 可能在英雄注册后才由升级系统加入，先把已登记的显示配置写入新技能。
-  dynamicSkillData.刷新单位技能数据(hero);
+  const heroConfig = heroConfigTool.获取单位玩家英雄配置(hero);
+  const heroKey = heroConfig != null ? stringToFourCCSafe(heroConfig.单位类型ID) : 0;
+  dynamicSkillData.刷新单位技能数据(hero, heroKey);
   const abilityIds = 获取快照技能列表(hero);
   已处理技能缓存[生成英雄缓存键(hero)] = abilityIds;
   // 原始提示只在首次读取技能时缓存；周期刷新不能清掉它，否则 Alt 无法稳定回看原文。
@@ -809,3 +833,18 @@ export function 同步刷新英雄技能原始界面(this: void, hero: any): voi
     DzSetUnitAbilityUpdate(hero, abilityIds[i]);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

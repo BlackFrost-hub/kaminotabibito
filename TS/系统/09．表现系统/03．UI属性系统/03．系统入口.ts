@@ -43,6 +43,7 @@ const {
   createUiFrames,
   focusHeroByFunctionKey,
   onPlayerHeroRegistered: _onPlayerHeroRegistered,
+  setUiRendererReady,
   showDamagePanel,
   updateDamagePanel,
   updateDetailPanels,
@@ -50,6 +51,7 @@ const {
   createUiFrames: (this: void) => void;
   focusHeroByFunctionKey: (this: void, functionKey: number) => any;
   onPlayerHeroRegistered: (this: void, whichPlayer: any, whichHero: any) => void;
+  setUiRendererReady: (this: void, ready: boolean) => void;
   showDamagePanel: (this: void, visible: boolean) => void;
   updateDamagePanel: (this: void) => void;
   updateDetailPanels: (this: void) => void;
@@ -65,6 +67,7 @@ let startupAccumulator = 0;
 let refreshAccumulator = 0;
 /** 延迟启动用 tick，init 后注销，避免每 10ms 空转 */
 let startupTickHandler: (() => void) | null = null;
+const pendingHeroRegistrations: { player: any; hero: any }[] = [];
 
 /**
  * 统一刷新整套 UI 的动态内容。
@@ -144,7 +147,7 @@ function onStartupTick(): void {
   if (initialized) return;
   startupAccumulator = startupAccumulator + 0.01;
   if (startupAccumulator + 0.0001 < 常量.INIT_DELAY_SECONDS) return;
-  initUiAttributeSystem();
+  finishUiAttributeSystemInitialization();
 }
 
 /**
@@ -157,25 +160,34 @@ function scheduleUiStartup(): void {
   onTick10ms(startupTickHandler);
 }
 
-/**
- * UI属性系统总入口。
- */
-export function initUiAttributeSystem(): void {
-  if (!常量.UI_ATTRIBUTE_SYSTEM_ENABLED) return;
-  if (initialized) return;
-
+function finishUiAttributeSystemInitialization(): void {
+  if (!常量.UI_ATTRIBUTE_SYSTEM_ENABLED || initialized) return;
   if (startupTickHandler != null) {
     offTick10ms(startupTickHandler);
     startupTickHandler = null;
   }
 
-  initialized = true;
-
+  setUiRendererReady(true);
   createUiFrames();
   refreshAllUi();
+  initialized = true;
   registerDamagePanelHotkeys();
   registerFocusHotkeys();
   startRefreshLoop();
+
+  for (let i = 0; i < pendingHeroRegistrations.length; i++) {
+    const registration = pendingHeroRegistrations[i];
+    _onPlayerHeroRegistered(registration.player, registration.hero);
+  }
+  pendingHeroRegistrations.length = 0;
+}
+
+/**
+ * UI属性系统总入口：只安排延迟启动，避免外部初始化入口绕过 UI 就绪等待。
+ */
+export function initUiAttributeSystem(): void {
+  if (!常量.UI_ATTRIBUTE_SYSTEM_ENABLED || initialized) return;
+  scheduleUiStartup();
 }
 
 export function isUiAttributeSystemEnabled(): boolean {
@@ -187,6 +199,10 @@ export function isUiAttributeSystemEnabled(): boolean {
  * 由玩家系统调用，每注册一个玩家英雄就创建一个UI槽位。
  */
 export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: any): void {
+  if (!initialized) {
+    pendingHeroRegistrations.push({ player: whichPlayer, hero: whichHero });
+    return;
+  }
   if (typeof _onPlayerHeroRegistered === "function") {
     _onPlayerHeroRegistered(whichPlayer, whichHero);
   }

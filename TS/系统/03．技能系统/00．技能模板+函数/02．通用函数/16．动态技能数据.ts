@@ -5,8 +5,12 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 };
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
-const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitState = japi.GetUnitState as (this: void, unit: any, state: any) => number;
+const GetUnitTypeId = jass.GetUnitTypeId as (this: void, unit: any) => number;
+const { YDUserDataSetSafe, YDUserDataGetSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
+  YDUserDataSetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string, value: any) => void;
+  YDUserDataGetSafe: (this: void, tableType: string, tableKey: any, attr: string, valueType: string) => any;
+};
 
 const 技能动作 = require("平台扩展API动作") as {
   技能_设置技能图标: (this: void, unit: any, abilityId: number, art: string) => boolean;
@@ -36,13 +40,25 @@ export interface 动态技能数据配置 {
 }
 
 const 动态百分比蓝耗表: Record<number, number | undefined> = {};
-const 单位技能数据配置表: Record<string, readonly 动态技能数据配置[] | undefined> = {};
+const 单位技能数据配置表: Record<number, readonly 动态技能数据配置[] | undefined> = {};
+const 动态技能说明表: Record<number, Record<number, string | undefined> | undefined> = {};
+
+
+export function 获取动态技能说明(this: void, 登记键: number, abilityId: number): string | undefined {
+  const 指定说明 = 动态技能说明表[登记键]?.[abilityId];
+  if (指定说明 != null) return 指定说明;
+  for (const key in 动态技能说明表) {
+    const 说明 = 动态技能说明表[Number(key)]?.[abilityId];
+    if (说明 != null) return 说明;
+  }
+  return undefined;
+}
 
 export function 获取动态技能魔耗百分比(this: void, abilityId: number): number {
   return 动态百分比蓝耗表[abilityId] ?? -1;
 }
 
-function 应用单位技能数据(this: void, 单位: any, 配置列表: readonly 动态技能数据配置[], 是否初始化: boolean): void {
+function 应用单位技能数据(this: void, 单位: any, 配置列表: readonly 动态技能数据配置[], 是否初始化: boolean, 跳过刷新命令卡: boolean = false): void {
   for (let i = 0; i < 配置列表.length; i++) {
     const 配置 = 配置列表[i];
     const 技能ID = stringToFourCCSafe(配置.技能ID);
@@ -66,7 +82,7 @@ function 应用单位技能数据(this: void, 单位: any, 配置列表: readonl
     }
     if (配置.施法距离 != null && 技能动作.技能_设置技能施法距离 != null) 技能动作.技能_设置技能施法距离(单位, 技能ID, 配置.施法距离);
     if (配置.快捷键 != null && 技能动作.技能_设置技能快捷键 != null) 技能动作.技能_设置技能快捷键(单位, 技能ID, 配置.快捷键);
-    技能动作.技能_设置刷新数据(单位, 技能ID);
+    if (!跳过刷新命令卡) 技能动作.技能_设置刷新数据(单位, 技能ID);
   }
 }
 
@@ -74,18 +90,51 @@ function 应用单位技能数据(this: void, 单位: any, 配置列表: readonl
  * 只修改当前单位的技能实例，不创建技能、不替换技能、不承担技能逻辑。
  * 所有修改完成后统一刷新命令卡，适用于 Q/W/E/R/D 阶段显示切换。
  */
-export function 动态修改单位技能数据(this: void, 单位: any, 配置列表: readonly 动态技能数据配置[]): void {
+export function 动态修改单位技能数据(this: void, 单位: any, 登记键: number, 配置列表: readonly 动态技能数据配置[], 跳过刷新命令卡: boolean = false): void {
   if (单位 == null || 单位 === 0) return;
-  单位技能数据配置表[GetHandleId(单位).toString()] = 配置列表;
-  应用单位技能数据(单位, 配置列表, true);
+  if (登记键 === 0) return;
+  // 业务英雄 ID 由调用方（英雄注册回调）直接传入：不在此处调用
+  // GetUnitTypeId/GetHandleId 现算——注册时机现算的键在两端可能不一致。
+  单位技能数据配置表[登记键] = 配置列表;
+  const 说明表 = 动态技能说明表[登记键] ?? {};
+  动态技能说明表[登记键] = 说明表;
+  for (let i = 0; i < 配置列表.length; i++) {
+    const 技能ID = stringToFourCCSafe(配置列表[i].技能ID);
+    if (技能ID !== 0 && 配置列表[i].说明 != null) 说明表[技能ID] = 配置列表[i].说明;
+  }
+  应用单位技能数据(单位, 配置列表, true, 跳过刷新命令卡);
 }
 
-/** 新技能通过升级加入后，重新写入该单位已登记的显示配置。 */
-export function 刷新单位技能数据(this: void, 单位: any): void {
-  if (单位 == null || 单位 === 0) return;
-  const 配置列表 = 单位技能数据配置表[GetHandleId(单位).toString()];
+/** 新技能通过升级加入后，重新写入显示数据。此函数属于本地动态文本刷新链，固定跳过命令卡刷新。 */
+export function 刷新单位技能命令卡(this: void, 单位: any, 登记键: number): void {
+  if (单位 == null || 单位 === 0 || 登记键 === 0) return;
+  const 配置列表 = 单位技能数据配置表[登记键];
   if (配置列表 == null) return;
-  应用单位技能数据(单位, 配置列表, false);
+  应用单位技能数据(单位, 配置列表, false, false);
+}
+
+export function 刷新单位技能数据(this: void, 单位: any, 登记键: number): void {
+  if (单位 == null || 单位 === 0) return;
+  const 配置列表 = 单位技能数据配置表[登记键];
+  if (配置列表 == null) return;
+  应用单位技能数据(单位, 配置列表, false, true);
 }
 
 export {};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

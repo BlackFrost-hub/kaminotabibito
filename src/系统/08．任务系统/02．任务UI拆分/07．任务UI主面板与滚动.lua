@@ -62,7 +62,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         scrollThumbFrame = nil,
         scrollThumbHitBtn = nil
     }
-    local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent)
+    local mainPanel = tryCreateFromFdfOnly(nil, "TaskMainPanel", parent, contextId)
     if not mainPanel then
         return empty
     end
@@ -82,7 +82,7 @@ function ____exports.buildTaskMainPanel(self, opts)
         setFramePosition(nil, mainPanel, {point = FramePoint.TOPLEFT, x = ENTRY_X + PANEL_REL_TO_ENTRY_X, y = ENTRY_Y + PANEL_REL_TO_ENTRY_Y})
     end
     setFrameSize(nil, mainPanel, {width = PANEL_W, height = PANEL_H})
-    local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel)
+    local listContainer = tryCreateFromFdfOnly(nil, "TaskListContainer", mainPanel, contextId)
     if listContainer then
         japi.DzFrameClearAllPoints(listContainer)
         setFramePointRelative(
@@ -128,14 +128,16 @@ function ____exports.buildTaskMainPanel(self, opts)
                     name = "TaskScrollBarBtn",
                     parent = mainPanel,
                     template = "template",
-                    visible = true
+                    visible = true,
+                    id = contextId
                 })
                 if ____createFrame_result_1 == nil then
                     ____createFrame_result_1 = 0
                 end
                 local f = ____createFrame_result_1
                 return f
-            end
+            end,
+            contextId
         )
         scrollBarFrame = sbSrc.frame
         if scrollBarFrame and scrollBarFrame ~= 0 then
@@ -165,7 +167,8 @@ function ____exports.buildTaskMainPanel(self, opts)
                 name = "TaskScrollBarHitDyn",
                 parent = mainPanel,
                 template = "template",
-                visible = true
+                visible = true,
+                id = contextId
             })
             if ____createFrame_result_2 == nil then
                 ____createFrame_result_2 = 0
@@ -181,7 +184,8 @@ function ____exports.buildTaskMainPanel(self, opts)
             name = "TaskScrollThumbDyn",
             parent = mainPanel,
             template = "template",
-            visible = true
+            visible = true,
+            id = contextId
         })
         if ____createFrame_result_3 == nil then
             ____createFrame_result_3 = 0
@@ -207,7 +211,8 @@ function ____exports.buildTaskMainPanel(self, opts)
                 name = "TaskScrollThumbHitDyn",
                 parent = mainPanel,
                 template = "template",
-                visible = true
+                visible = true,
+                id = contextId
             })
             if ____createFrame_result_4 == nil then
                 ____createFrame_result_4 = 0

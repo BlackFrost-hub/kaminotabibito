@@ -23,6 +23,10 @@ export const MAX_PAGES_PER_CATEGORY = 50;
 /** 二分开关：关则主面板不创建右侧滚动轨道/滑块/拖拽命中 */
 export const ENABLE_TASK_UI_RIGHT_SCROLLBAR = true;
 
+/** UI 子模块分组开关：当前仅启用 01–07，08–14 暂停用于定位崩溃。 */
+export const ENABLE_TASK_UI_MODULES_01_07 = true;
+export const ENABLE_TASK_UI_MODULES_08_14 = false;
+
 export const ENTRY_W = 0.0880;
 export const ENTRY_H = 0.0227;
 export const ENTRY_X = 0.000;

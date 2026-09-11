@@ -3,14 +3,19 @@ local ____exports = {}
 local ____00_FF0E_914D_7F6E_8868 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.04．英雄技能成长系统.00．配置表")
 local _____82F1_96C4_6280_80FD_6210_957F_914D_7F6E_8868 = ____00_FF0E_914D_7F6E_8868["英雄技能成长配置表"]
 local jass = require("jass.common")
-local ____require_result_0 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
-local registerSkillLearnListener = ____require_result_0.registerSkillLearnListener
-local ____require_result_1 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
-local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_1["调整玩家属性"]
-local _____8C03_6574_5355_4F4D_5C5E_6027 = ____require_result_1["调整单位属性"]
-local _____4E34_65F6_8C03_6574_62A4_7532 = ____require_result_1["临时调整护甲"]
-local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
+local ____require_result_0 = require("系统.03．技能系统.07．动态技能文本.03．核心逻辑")
+local _____5237_65B0_5355_4E2A_82F1_96C4_6280_80FD_52A8_6001_6587_672C = ____require_result_0["刷新单个英雄技能动态文本"]
+local _____540C_6B65_5237_65B0_82F1_96C4_6280_80FD_754C_9762 = ____require_result_0["同步刷新英雄技能界面"]
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_1.debugLogForce
+local ____require_result_2 = require("系统.00．核心系统.01．事件中心.08．技能事件中心")
+local registerSkillLearnListener = ____require_result_2.registerSkillLearnListener
+local ____require_result_3 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.16．属性位移与指令")
+local _____8C03_6574_73A9_5BB6_5C5E_6027 = ____require_result_3["调整玩家属性"]
+local _____8C03_6574_5355_4F4D_5C5E_6027 = ____require_result_3["调整单位属性"]
+local _____4E34_65F6_8C03_6574_62A4_7532 = ____require_result_3["临时调整护甲"]
+local ____require_result_4 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_4.stringToFourCCSafe
 local _____5DF2_521D_59CB_5316 = false
 local _____5DF2_5904_7406_6280_80FD_7B49_7EA7 = {}
 local GetHandleId = jass.GetHandleId
@@ -63,6 +68,18 @@ local function ____on_82F1_96C4_5B66_4E60_6280_80FD(unit, abilityId)
         return
     end
     local heroId = jass.GetUnitTypeId(unit)
+    debugLogForce(
+        "技能学习/动态文本",
+        "学习事件",
+        "heroId",
+        heroId,
+        "abilityId",
+        abilityId,
+        "level",
+        GetUnitAbilityLevel(unit, abilityId)
+    )
+    _____540C_6B65_5237_65B0_82F1_96C4_6280_80FD_754C_9762(unit)
+    _____5237_65B0_5355_4E2A_82F1_96C4_6280_80FD_52A8_6001_6587_672C(unit, abilityId)
     do
         local i = 0
         while i < #_____82F1_96C4_6280_80FD_6210_957F_914D_7F6E_8868 do

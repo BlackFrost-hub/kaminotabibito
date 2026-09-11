@@ -525,8 +525,6 @@ export function initTaskUIForPlayer(this: void, whichPlayer: any): boolean {
   if (!isHumanPlayingPlayer(whichPlayer)) return false;
 
   const pid = jass.GetPlayerId(whichPlayer);
-  if (taskUIs[pid]?.uiInitialized === true) return true;
-
   const ui = new TaskUI(pid);
   return ui.init(pid);
 }

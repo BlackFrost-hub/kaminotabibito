@@ -83,9 +83,18 @@ const detailSlots: { player: any; hero: any; functionKey: number; icon: number; 
 const registeredPlayers: Set<number> = new Set();
 // DzFrame 返回数字 frame id，不是 JASS handle；这里直接用 frame id 做本地详情 hover 反查 key。
 const detailHoverSlotByFrameId: Record<number, number> = {};
+let uiRendererReady = false;
+
+export function setUiRendererReady(this: void, ready: boolean): void {
+  uiRendererReady = ready;
+}
 
 function createFrame(tagName: string, name: string, parent: number): number {
-  return japi.DzCreateFrameByTagName(tagName, name, parent, "template", 0);
+  if (parent == null || parent === 0) {
+    return 0;
+  }
+  const frame = japi.DzCreateFrameByTagName(tagName, name, parent, "template", 0);
+  return frame;
 }
 
 function setAbsolute(frame: number, x: number, y: number): void {
@@ -287,8 +296,9 @@ function createDetailSlotForPlayer(gameUI: number, player: any, hero: any, index
  * `this: void`：TSTL 勿对导出函数注入首参 nil（见玩家英雄获取桥接）。
  */
 export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: any): void {
+  if (!uiRendererReady) return;
   if (whichPlayer == null || whichPlayer === 0) return;
-  
+
   const playerId = jass.GetPlayerId(whichPlayer);
   if (playerId < 0 || playerId >= 常量.MAX_DISPLAY_PLAYERS) return;
   if (registeredPlayers.has(playerId)) return; // 已注册过
@@ -316,6 +326,7 @@ export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: 
  * 具体玩家槽位由 onPlayerHeroRegistered 按需创建。
  */
 export function createUiFrames(): void {
+  if (!uiRendererReady) return;
   const gameUI = japi.DzGetGameUI();
   if (gameUI == null || gameUI === 0) return;
   
@@ -341,6 +352,7 @@ export function focusHeroByFunctionKey(functionKey: number): any {
  * 与 `属性查看.j` 周期回调一致：头像 `DzFrameSetTexture` 只在创建时设一次，定时器里不刷头像。
  */
 export function updateDamagePanel(): void {
+  if (!uiRendererReady) return;
   for (let i = 0; i < damageRows.length; i++) {
     const row = damageRows[i];
     const values = getDamageValues(row.player);
@@ -357,6 +369,7 @@ export function updateDamagePanel(): void {
  * 文本内容完全由属性工具层统一生成，这里只负责回写到 DzFrame。
  */
 export function updateDetailPanels(): void {
+  if (!uiRendererReady) return;
   for (let i = 0; i < detailSlots.length; i++) {
     const slot = detailSlots[i];
     const texts = buildDetailTexts(slot.player);

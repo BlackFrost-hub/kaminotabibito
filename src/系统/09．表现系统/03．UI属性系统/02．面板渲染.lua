@@ -2,10 +2,13 @@ local ____lualib = require("lualib_bundle")
 local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local japi, _____5E38_91CF, buildDetailTexts, formatInteger, getDamageValues, damageRows, detailSlots
+local japi, _____5E38_91CF, buildDetailTexts, formatInteger, getDamageValues, damageRows, detailSlots, uiRendererReady
 --- 刷新伤害统计面板（仅三列数值文本）。
 -- 与 `属性查看.j` 周期回调一致：头像 `DzFrameSetTexture` 只在创建时设一次，定时器里不刷头像。
 function ____exports.updateDamagePanel()
+    if not uiRendererReady then
+        return
+    end
     do
         local i = 0
         while i < #damageRows do
@@ -17,14 +20,14 @@ function ____exports.updateDamagePanel()
                     do
                         local frame = row.values[col + 1]
                         if frame == 0 then
-                            goto __continue58
+                            goto __continue63
                         end
                         japi.DzFrameSetText(
                             frame,
                             (_____5E38_91CF.DAMAGE_COLORS[col + 1] .. formatInteger(values[col + 1])) .. "|r"
                         )
                     end
-                    ::__continue58::
+                    ::__continue63::
                     col = col + 1
                 end
             end
@@ -35,6 +38,9 @@ end
 --- 刷新顶部头像对应的属性详情文本。
 -- 文本内容完全由属性工具层统一生成，这里只负责回写到 DzFrame。
 function ____exports.updateDetailPanels()
+    if not uiRendererReady then
+        return
+    end
     do
         local i = 0
         while i < #detailSlots do
@@ -76,14 +82,22 @@ damageRows = {}
 detailSlots = {}
 local registeredPlayers = __TS__New(Set)
 local detailHoverSlotByFrameId = {}
+uiRendererReady = false
+function ____exports.setUiRendererReady(ready)
+    uiRendererReady = ready
+end
 local function createFrame(tagName, name, parent)
-    return japi.DzCreateFrameByTagName(
+    if parent == nil or parent == 0 then
+        return 0
+    end
+    local frame = japi.DzCreateFrameByTagName(
         tagName,
         name,
         parent,
         "template",
         0
     )
+    return frame
 end
 local function setAbsolute(frame, x, y)
     if frame == 0 then
@@ -377,6 +391,9 @@ end
 -- 每注册一个玩家英雄就创建一个UI槽位。
 -- `this: void`：TSTL 勿对导出函数注入首参 nil（见玩家英雄获取桥接）。
 function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
+    if not uiRendererReady then
+        return
+    end
     if whichPlayer == nil or whichPlayer == 0 then
         return
     end
@@ -402,6 +419,9 @@ end
 --- 创建基础UI框架（伤害面板）。
 -- 具体玩家槽位由 onPlayerHeroRegistered 按需创建。
 function ____exports.createUiFrames()
+    if not uiRendererReady then
+        return
+    end
     local gameUI = japi.DzGetGameUI()
     if gameUI == nil or gameUI == 0 then
         return
@@ -417,11 +437,11 @@ function ____exports.focusHeroByFunctionKey(functionKey)
         while i < #detailSlots do
             do
                 if detailSlots[i + 1].functionKey ~= functionKey then
-                    goto __continue52
+                    goto __continue56
                 end
                 return getPlayerHero(detailSlots[i + 1].player)
             end
-            ::__continue52::
+            ::__continue56::
             i = i + 1
         end
     end

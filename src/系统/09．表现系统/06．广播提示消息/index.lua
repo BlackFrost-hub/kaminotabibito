@@ -17,7 +17,14 @@ local ____on_5E7F_64AD_63D0_793A_6D88_606FTick = ____04_FF0E_52A8_753B_9A71_52A8
 -- @noSelfInFile
 local jass = require("jass.common")
 local GetPlayerId = jass.GetPlayerId
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local addDelayedCallback = ____require_result_0.addDelayedCallback
+local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_1.debugLogForce
 local _____5DF2_521D_59CB_5316_5E7F_64AD_63D0_793A_6D88_606F_7CFB_7EDF = false
+local _____5DF2_5B89_6392_5E7F_64AD_63D0_793A_6D88_606F_7CFB_7EDF_521D_59CB_5316 = false
+local _____5E7F_64AD_63D0_793A_521D_59CB_5316_5EF6_8FDF_6BEB_79D2 = 1500
+local _____5E7F_64AD_63D0_793A_65E5_5FD7_6A21_5757 = "广播提示消息/UI初始化"
 local function _____53D6_76EE_6807_73A9_5BB6ID(_____76EE_6807_73A9_5BB6)
     if _____76EE_6807_73A9_5BB6 == nil or _____76EE_6807_73A9_5BB6 == 0 then
         return -1
@@ -34,15 +41,25 @@ local function _____53D6_63D0_793A_5934_50CF(_____5934_50CF_8DEF_5F84)
     end
     return _____5934_50CF_8DEF_5F84
 end
-____exports["初始化广播提示消息系统"] = function()
+local function _____5B8C_6210_5E7F_64AD_63D0_793A_6D88_606F_7CFB_7EDF_521D_59CB_5316()
     if _____5DF2_521D_59CB_5316_5E7F_64AD_63D0_793A_6D88_606F_7CFB_7EDF then
         return
     end
     _____5DF2_521D_59CB_5316_5E7F_64AD_63D0_793A_6D88_606F_7CFB_7EDF = true
+    debugLogForce(_____5E7F_64AD_63D0_793A_65E5_5FD7_6A21_5757, "开始创建广播提示UI", "delayMs=", _____5E7F_64AD_63D0_793A_521D_59CB_5316_5EF6_8FDF_6BEB_79D2)
     _____521B_5EFA_5168_90E8_5E7F_64AD_63D0_793A_69FD()
-    _____521D_59CB_5316_5E7F_64AD_63D0_793A_6D88_606F_72B6_6001()
     _____542F_52A8_5E7F_64AD_63D0_793A_52A8_753B_9A71_52A8()
     ____on_5E7F_64AD_63D0_793A_6D88_606FTick()
+    debugLogForce(_____5E7F_64AD_63D0_793A_65E5_5FD7_6A21_5757, "广播提示UI初始化完成")
+end
+____exports["初始化广播提示消息系统"] = function()
+    if _____5DF2_521D_59CB_5316_5E7F_64AD_63D0_793A_6D88_606F_7CFB_7EDF or _____5DF2_5B89_6392_5E7F_64AD_63D0_793A_6D88_606F_7CFB_7EDF_521D_59CB_5316 then
+        return
+    end
+    _____5DF2_5B89_6392_5E7F_64AD_63D0_793A_6D88_606F_7CFB_7EDF_521D_59CB_5316 = true
+    _____521D_59CB_5316_5E7F_64AD_63D0_793A_6D88_606F_72B6_6001()
+    debugLogForce(_____5E7F_64AD_63D0_793A_65E5_5FD7_6A21_5757, "已安排延迟初始化", "delayMs=", _____5E7F_64AD_63D0_793A_521D_59CB_5316_5EF6_8FDF_6BEB_79D2)
+    addDelayedCallback(_____5E7F_64AD_63D0_793A_521D_59CB_5316_5EF6_8FDF_6BEB_79D2, _____5B8C_6210_5E7F_64AD_63D0_793A_6D88_606F_7CFB_7EDF_521D_59CB_5316)
 end
 ____exports["发送头像提示给玩家"] = function(_____76EE_6807_73A9_5BB6, _____5934_50CF_8DEF_5F84, _____6587_672C, _____6301_7EED_65F6_95F4)
     ____exports["初始化广播提示消息系统"]()

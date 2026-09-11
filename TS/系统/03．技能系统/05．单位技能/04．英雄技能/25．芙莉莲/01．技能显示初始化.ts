@@ -10,7 +10,7 @@ const { registerPlayerHeroListener } = require("系统.00．核心系统.00．�
   registerPlayerHeroListener: (this: void, callback: (this: void, player: any, hero: any) => void) => void;
 };
 const { 动态修改单位技能数据 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据") as {
-  动态修改单位技能数据: (this: void, unit: any, configs: readonly any[]) => void;
+  动态修改单位技能数据: (this: void, unit: any, key: number, configs: readonly any[]) => void;
 };
 const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLogForce: (this: void, module: string, ...args: any[]) => void;
@@ -27,9 +27,12 @@ const 技能显示 = [
 function 初始化芙莉莲技能显示(this: void, _player: any, hero: any): void {
   debugLogForce("芙莉莲-技能显示初始化", "回调", "类型", "英雄注册", "单位", hero);
   if (hero == null || hero === 0 || jass.GetUnitTypeId(hero) !== 英雄单位类型ID) return;
-  动态修改单位技能数据(hero, 技能显示);
+  动态修改单位技能数据(hero, 英雄单位类型ID, 技能显示);
 }
 
 registerPlayerHeroListener(初始化芙莉莲技能显示);
 
 export {};
+
+
+

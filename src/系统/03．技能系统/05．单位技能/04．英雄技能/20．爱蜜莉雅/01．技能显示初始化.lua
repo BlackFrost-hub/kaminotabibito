@@ -65,7 +65,7 @@ local function _____521D_59CB_5316_7231_871C_8389_96C5_6280_80FD_663E_793A(_play
     if GetUnitTypeId(hero) ~= _____82F1_96C4_5355_4F4D_7C7B_578BID then
         return
     end
-    _____52A8_6001_4FEE_6539_5355_4F4D_6280_80FD_6570_636E(hero, _____663E_793A_914D_7F6E)
+    _____52A8_6001_4FEE_6539_5355_4F4D_6280_80FD_6570_636E(hero, _____82F1_96C4_5355_4F4D_7C7B_578BID, _____663E_793A_914D_7F6E)
 end
 registerPlayerHeroListener(_____521D_59CB_5316_7231_871C_8389_96C5_6280_80FD_663E_793A)
 return ____exports

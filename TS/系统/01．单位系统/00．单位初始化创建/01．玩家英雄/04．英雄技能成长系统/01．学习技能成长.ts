@@ -3,6 +3,8 @@
 import { 英雄技能成长配置表 } from "./00．配置表";
 
 const jass = require("jass.common") as any;
+const { 刷新单个英雄技能动态文本, 同步刷新英雄技能界面 } = require("系统.03．技能系统.07．动态技能文本.03．核心逻辑") as { 刷新单个英雄技能动态文本: (this: void, hero: any, abilityId: number) => void; 同步刷新英雄技能界面: (this: void, hero: any) => void; };
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as { debugLogForce: (this: void, module: string, ...args: any[]) => void; };
 const { registerSkillLearnListener } = require("系统.00．核心系统.01．事件中心.08．技能事件中心") as {
   registerSkillLearnListener: (this: void, callback: (this: void, unit: any, abilityId: number) => void) => void;
 };
@@ -54,6 +56,9 @@ function 应用成长属性(this: void, unit: any, attr: (typeof 英雄技能成
 function on英雄学习技能(this: void, unit: any, abilityId: number): void {
   if (unit == null || unit === 0) return;
   const heroId = jass.GetUnitTypeId(unit) as number;
+  debugLogForce("技能学习/动态文本", "学习事件", "heroId", heroId, "abilityId", abilityId, "level", GetUnitAbilityLevel(unit, abilityId));
+  同步刷新英雄技能界面(unit);
+  刷新单个英雄技能动态文本(unit, abilityId);
   for (let i = 0; i < 英雄技能成长配置表.length; i++) {
     const config = 英雄技能成长配置表[i];
     if (heroId !== stringToFourCCSafe(config.英雄ID)) continue;
@@ -81,3 +86,11 @@ export function 初始化英雄技能成长系统(this: void): void {
 初始化英雄技能成长系统();
 
 export {};
+
+
+
+
+
+
+
+

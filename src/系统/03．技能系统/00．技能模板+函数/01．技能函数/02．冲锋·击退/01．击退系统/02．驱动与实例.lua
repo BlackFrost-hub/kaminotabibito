@@ -122,9 +122,9 @@ ____exports["on冲锋击退系统Tick"] = function()
         ::__continue23::
     end
 end
-local ____G_0 = _G
-local onTick10ms = ____G_0.onTick10ms
-offTick10ms = ____G_0.offTick10ms
+local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
+local onTick10ms = ____require_result_0.onTick10ms
+offTick10ms = ____require_result_0.offTick10ms
 _____5DF2_6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668 = false
 ____tick_8BA1_6570 = 0
 local function _____6CE8_518C_5230_4E2D_5FC3_8BA1_65F6_5668()

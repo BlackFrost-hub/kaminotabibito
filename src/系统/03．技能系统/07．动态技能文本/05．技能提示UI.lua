@@ -6,10 +6,12 @@ local ____exports = {}
 -- 采用与物品提示模拟相同的同步 Frame 方案，避免原生提示框固定高度裁剪长说明。
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+local debugLogForce = ____require_result_0.debugLogForce
 local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
 local dynamicTextCore = require("系统.03．技能系统.07．动态技能文本.03．核心逻辑")
-local ____require_result_0 = require("系统.03．技能系统.02．技能消耗.04．原生魔法消耗同步")
-local _____83B7_53D6_5DF2_540C_6B65_6280_80FD_9B54_6CD5_6D88_8017 = ____require_result_0["获取已同步技能魔法消耗"]
+local ____require_result_1 = require("系统.03．技能系统.02．技能消耗.04．原生魔法消耗同步")
+local _____83B7_53D6_5DF2_540C_6B65_6280_80FD_9B54_6CD5_6D88_8017 = ____require_result_1["获取已同步技能魔法消耗"]
 local DzGetGameUI = japi.DzGetGameUI
 local DzLoadToc = japi.DzLoadToc
 local DzCreateFrame = japi.DzCreateFrame
@@ -260,11 +262,31 @@ local function _____66F4_65B0_63D0_793A(hero, abilityId)
     end
     _____5F53_524D_60AC_505C_82F1_96C4 = hero
     _____5F53_524D_60AC_505C_6280_80FDID = abilityId
-    if not _____539F_59CB_6587_672C_6A21_5F0F then
-        dynamicTextCore["刷新单个英雄技能动态文本"](hero, abilityId)
-    end
     local title = DzGetUnitAbilityTip(hero, abilityId) or ""
     local body = _____539F_59CB_6587_672C_6A21_5F0F and dynamicTextCore["获取技能原始提示"](hero, abilityId) or (DzGetUnitAbilityUberTip(hero, abilityId) or "")
+    local bodyColorCount = 0
+    local bodyColorIndex = (string.find(body, "|cff", nil, true) or 0) - 1
+    while bodyColorIndex >= 0 do
+        bodyColorCount = bodyColorCount + 1
+        bodyColorIndex = (string.find(
+            body,
+            "|cff",
+            math.max(bodyColorIndex + 4 + 1, 1),
+            true
+        ) or 0) - 1
+    end
+    debugLogForce(
+        "技能提示UI",
+        "读取正文",
+        "abilityId",
+        abilityId,
+        "bodyLength",
+        #body,
+        "hasColorCode",
+        bodyColorCount > 0,
+        "colorCount",
+        bodyColorCount
+    )
     local cost = _____83B7_53D6_5DF2_540C_6B65_6280_80FD_9B54_6CD5_6D88_8017(hero, abilityId)
     _____5B89_5168_6587_672C(_____63D0_793A_5E27.name, title)
     local costText = _____683C_5F0F_5316_9B54_8017(cost)

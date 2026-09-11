@@ -44,8 +44,17 @@ end
 local jass = require("jass.common")
 local japi = require("jass.japi")
 local heroConfigTool = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具")
+local heroBridge = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
+local _____9759_6001_82F1_96C4_914D_7F6E_5217_8868 = {
+    require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.00．配置")["爱蜜莉雅技能配置"],
+    require("系统.03．技能系统.05．单位技能.04．英雄技能.21．朱雀院红叶.00．配置")["朱雀院红叶技能配置"],
+    require("系统.03．技能系统.05．单位技能.04．英雄技能.22．朱雀院椿.00．配置")["朱雀院椿技能配置"],
+    require("系统.03．技能系统.05．单位技能.04．英雄技能.23．伊蕾娜.00．配置")["伊蕾娜技能配置"],
+    require("系统.03．技能系统.05．单位技能.04．英雄技能.24．塞莉亚·克莱尔.00．配置")["塞莉亚克莱尔技能配置"],
+    require("系统.03．技能系统.05．单位技能.04．英雄技能.25．芙莉莲.00．配置")["芙莉莲技能配置"]
+}
 local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
 local dynamicSkillData = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据")
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
@@ -704,7 +713,9 @@ local function _____66FF_6362_516C_5F0F(unit, tip, options)
                     end
                     local _____4F24_5BB3 = _____8BA1_7B97_516C_5F0F_4F24_5BB3(unit, _____5C5E_6027_5339_914D_9879["计算属性名"], _____5339_914D_7ED3_679C["倍率"])
                     local _____52A8_6001_6570_503C = _____5305_88C5_52A8_6001_6570_503C(_____683C_5F0F_5316_52A8_6001_6574_6570(_____4F24_5BB3))
-                    local _____66FF_6362_503C = (_____5339_914D_7ED3_679C["数值颜色前缀"] ~= nil and _____5339_914D_7ED3_679C["数值颜色前缀"] or "") .. _____52A8_6001_6570_503C
+                    local _____6570_503C_989C_8272_524D_7F00 = _____5339_914D_7ED3_679C["数值颜色前缀"] ~= nil and _____5339_914D_7ED3_679C["数值颜色前缀"] or "|cff87ceeb"
+                    local _____6570_503C_989C_8272_540E_7F00 = _____5339_914D_7ED3_679C["数值颜色前缀"] ~= nil and "" or "|r"
+                    local _____66FF_6362_503C = (_____6570_503C_989C_8272_524D_7F00 .. _____52A8_6001_6570_503C) .. _____6570_503C_989C_8272_540E_7F00
                     if options ~= nil and options.preserveFormula == true then
                         local _____4FDD_62A4_6807_8BB0 = ("__DYN_SKIP_" .. tostring(#_____4FDD_62A4_7247_6BB5_8868)) .. "__"
                         _____4FDD_62A4_7247_6BB5_8868[#_____4FDD_62A4_7247_6BB5_8868 + 1] = {["标记"] = _____4FDD_62A4_6807_8BB0, ["原文"] = ((_____5B8C_6574_5339_914D_6587_672C .. "（") .. _____52A8_6001_6570_503C) .. "）"}
@@ -742,17 +753,94 @@ end
 local function _____5904_7406_6280_80FD_63D0_793A(unit, abilityId)
     local currentTip = DzGetUnitAbilityUberTip(unit, abilityId)
     if not currentTip then
+        debugLogForce("动态技能文本", "跳过：技能提示为空", "abilityId", abilityId)
         return false
     end
     local _____7F13_5B58_952E = _____751F_6210_63D0_793A_7F13_5B58_952E(unit, abilityId)
-    local originalTip = _____539F_59CB_63D0_793A_7F13_5B58[_____7F13_5B58_952E]
+    local heroConfigForText = heroConfigTool["获取单位玩家英雄配置"](heroConfigTool, unit)
+    local dynamicKey = heroConfigForText ~= nil and stringToFourCCSafe(heroConfigForText["单位类型ID"]) or 0
+    local ____temp_2
+    if dynamicKey ~= 0 then
+        ____temp_2 = dynamicSkillData["获取动态技能说明"](dynamicKey, abilityId)
+    else
+        ____temp_2 = nil
+    end
+    local _____914D_7F6E_8BF4_660E = ____temp_2
+    if _____914D_7F6E_8BF4_660E == nil then
+        do
+            local i = 0
+            while i < #_____9759_6001_82F1_96C4_914D_7F6E_5217_8868 and _____914D_7F6E_8BF4_660E == nil do
+                local cfg = _____9759_6001_82F1_96C4_914D_7F6E_5217_8868[i + 1]
+                for key in pairs(cfg) do
+                    local ____opt_3 = cfg[key]
+                    if ____opt_3 ~= nil then
+                        ____opt_3 = ____opt_3["技能ID"]
+                    end
+                    if ____opt_3 ~= nil and stringToFourCCSafe(cfg[key]["技能ID"]) == abilityId then
+                        _____914D_7F6E_8BF4_660E = cfg[key]["说明"]
+                    end
+                end
+                i = i + 1
+            end
+        end
+    end
+    debugLogForce(
+        "动态技能文本",
+        "配置说明命中",
+        "abilityId",
+        abilityId,
+        "dynamicKey",
+        dynamicKey,
+        "hit",
+        _____914D_7F6E_8BF4_660E ~= nil,
+        "length",
+        _____914D_7F6E_8BF4_660E ~= nil and #_____914D_7F6E_8BF4_660E or 0
+    )
+    local originalTip = _____914D_7F6E_8BF4_660E or _____539F_59CB_63D0_793A_7F13_5B58[_____7F13_5B58_952E]
     if originalTip == nil then
         originalTip = currentTip
         _____539F_59CB_63D0_793A_7F13_5B58[_____7F13_5B58_952E] = originalTip
     end
     local newTip = _____66FF_6362_516C_5F0F(unit, originalTip)
+    local colorCount = 0
+    local colorIndex = (string.find(newTip, "|cff", nil, true) or 0) - 1
+    while colorIndex >= 0 do
+        colorCount = colorCount + 1
+        colorIndex = (string.find(
+            newTip,
+            "|cff",
+            math.max(colorIndex + 4 + 1, 1),
+            true
+        ) or 0) - 1
+    end
+    debugLogForce(
+        "动态技能文本",
+        "处理技能",
+        "abilityId",
+        abilityId,
+        "originalLength",
+        #originalTip,
+        "resultLength",
+        #newTip,
+        "changed",
+        newTip ~= currentTip,
+        "hasColorCode",
+        colorCount > 0,
+        "colorCount",
+        colorCount
+    )
     if newTip ~= currentTip then
-        DzSetUnitAbilityUberTip(unit, abilityId, newTip)
+        local setResult = DzSetUnitAbilityUberTip(unit, abilityId, newTip)
+        debugLogForce(
+            "动态技能文本",
+            "写入技能提示",
+            "abilityId",
+            abilityId,
+            "setResult",
+            setResult,
+            "hasColorCode",
+            (string.find(newTip, "|cff", nil, true) or 0) - 1 >= 0
+        )
         return true
     end
     return false
@@ -770,7 +858,7 @@ local function _____6062_590D_5355_4E2A_6280_80FD_539F_59CB_6587_672C(unit, abil
     return true
 end
 local function _____89E3_6790_914D_7F6E_6280_80FD_5217_8868(hero)
-    local config = heroConfigTool["获取单位玩家英雄配置"](hero)
+    local config = heroConfigTool["获取单位玩家英雄配置"](heroConfigTool, hero)
     if config == nil then
         return {}
     end
@@ -783,7 +871,7 @@ local function _____89E3_6790_914D_7F6E_6280_80FD_5217_8868(hero)
             do
                 local rawList = fields[i + 1]
                 if type(rawList) ~= "string" then
-                    goto __continue151
+                    goto __continue158
                 end
                 local parts = __TS__StringSplit(rawList, ",")
                 do
@@ -792,17 +880,17 @@ local function _____89E3_6790_914D_7F6E_6280_80FD_5217_8868(hero)
                         do
                             local abilityId = stringToFourCCSafe(parts[j + 1])
                             if abilityId == 0 or seen[abilityId] == true then
-                                goto __continue154
+                                goto __continue161
                             end
                             seen[abilityId] = true
                             result[#result + 1] = abilityId
                         end
-                        ::__continue154::
+                        ::__continue161::
                         j = j + 1
                     end
                 end
             end
-            ::__continue151::
+            ::__continue158::
             i = i + 1
         end
     end
@@ -813,7 +901,9 @@ ____exports["检查英雄技能"] = function(hero)
     if not isValidHandle(hero) then
         return
     end
-    dynamicSkillData["刷新单位技能数据"](hero)
+    local heroConfig = heroConfigTool["获取单位玩家英雄配置"](heroConfigTool, hero)
+    local heroKey = heroConfig ~= nil and stringToFourCCSafe(heroConfig["单位类型ID"]) or 0
+    dynamicSkillData["刷新单位技能数据"](hero, heroKey)
     local abilityIds = _____83B7_53D6_5FEB_7167_6280_80FD_5217_8868(hero)
     _____5DF2_5904_7406_6280_80FD_7F13_5B58[_____751F_6210_82F1_96C4_7F13_5B58_952E(hero)] = abilityIds
     do

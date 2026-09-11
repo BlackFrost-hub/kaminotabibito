@@ -3,7 +3,7 @@ local ____exports = {}
 --- 是否启用UI属性系统
 ____exports.UI_ATTRIBUTE_SYSTEM_ENABLED = true
 --- 系统初始化延迟时间（秒），游戏开始后多久启动UI
-____exports.INIT_DELAY_SECONDS = 0.5
+____exports.INIT_DELAY_SECONDS = 1
 --- UI 周期刷新间隔（秒）。`JASS/jass复制粘贴/属性查看.j` 里伤害统计与属性文本各为 3.00 秒定时、全局无条件执行；此处可单独调频。
 ____exports.REFRESH_INTERVAL_SECONDS = 0.5
 --- 最大显示玩家数量（显示前5个玩家）

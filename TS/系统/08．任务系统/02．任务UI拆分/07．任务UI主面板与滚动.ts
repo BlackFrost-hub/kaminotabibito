@@ -105,7 +105,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
     scrollThumbHitBtn: null,
   };
 
-  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent);
+  const mainPanel = tryCreateFromFdfOnly("TaskMainPanel", parent, contextId);
   if (!mainPanel) {
     return empty;
   }
@@ -123,7 +123,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
   }
   setFrameSize(mainPanel, { width: PANEL_W, height: PANEL_H });
 
-  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel);
+  const listContainer = tryCreateFromFdfOnly("TaskListContainer", mainPanel, contextId);
   if (listContainer) {
     (japi as any).DzFrameClearAllPoints(listContainer);
     setFramePointRelative(
@@ -169,9 +169,10 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
           parent: mainPanel,
           template: "template",
           visible: true,
+          id: contextId,
         }) ?? 0;
       return f;
-    });
+    }, contextId);
     scrollBarFrame = sbSrc.frame;
     if (scrollBarFrame && scrollBarFrame !== 0) {
       (japi as any).DzFrameShow(scrollBarFrame, true);
@@ -182,11 +183,12 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
 
       scrollBarHitBtn =
         createFrame({
-          type: FrameType.GLUETEXTBUTTON,
-          name: "TaskScrollBarHitDyn",
-          parent: mainPanel,
-          template: "template",
-          visible: true,
+        type: FrameType.GLUETEXTBUTTON,
+        name: "TaskScrollBarHitDyn",
+        parent: mainPanel,
+        template: "template",
+        visible: true,
+        id: contextId,
         }) ?? 0;
       if (scrollBarHitBtn && scrollBarHitBtn !== 0) {
         setupTransparentGlueHitLayer(scrollBarFrame, scrollBarHitBtn);
@@ -201,6 +203,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
         parent: mainPanel,
         template: "template",
         visible: true,
+        id: contextId,
       }) ?? 0;
     if (scrollThumbFrame && scrollThumbFrame !== 0) {
       setFrameTexture(scrollThumbFrame, "UI\\Widgets\\EscMenu\\Human\\slider-knob.blp");
@@ -224,6 +227,7 @@ export function buildTaskMainPanel(opts: BuildTaskMainPanelOpts): BuildMainPanel
           parent: mainPanel,
           template: "template",
           visible: true,
+          id: contextId,
         }) ?? 0;
       if (scrollThumbHitBtn && scrollThumbHitBtn !== 0) {
         setupTransparentGlueHitLayer(scrollThumbFrame, scrollThumbHitBtn);

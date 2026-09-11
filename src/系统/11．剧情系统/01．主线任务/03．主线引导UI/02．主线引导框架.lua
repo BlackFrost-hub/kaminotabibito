@@ -16,6 +16,7 @@ local DzGetGameUI = japi.DzGetGameUI
 local FRAME_POINT_CENTER = 4
 local BTN_ICON_TEXTURE = "ReplaceableTextures\\CommandButtons\\BTNStaffOfPurification.blp"
 local TEXTBOX_TEXTURE = "war3mapImported\\wenbenkuang.blp"
+local FRAME_NAME_PREFIX = "剧情主线引导_"
 ____exports["帧"] = {
     ["主线任务"] = 0,
     ["任务提示"] = 0,
@@ -30,7 +31,7 @@ ____exports["创建主线引导帧"] = function()
     local gameUI = DzGetGameUI()
     ____exports["帧"]["主线任务"] = DzCreateFrameByTagName(
         "BACKDROP",
-        "主线任务",
+        FRAME_NAME_PREFIX .. "主线任务",
         gameUI,
         "template",
         0
@@ -40,7 +41,7 @@ ____exports["创建主线引导帧"] = function()
     DzFrameSetTexture(____exports["帧"]["主线任务"], BTN_ICON_TEXTURE, 0)
     ____exports["帧"]["任务提示"] = DzCreateFrameByTagName(
         "TEXT",
-        "任务提示",
+        FRAME_NAME_PREFIX .. "任务提示",
         ____exports["帧"]["主线任务"],
         "template",
         0
@@ -51,7 +52,7 @@ ____exports["创建主线引导帧"] = function()
     DzFrameShow(____exports["帧"]["任务提示"], true)
     ____exports["帧"]["放大效果"] = DzCreateFrameByTagName(
         "BACKDROP",
-        "放大效果",
+        FRAME_NAME_PREFIX .. "放大效果",
         ____exports["帧"]["主线任务"],
         "template",
         0
@@ -69,7 +70,7 @@ ____exports["创建主线引导帧"] = function()
     DzFrameShow(____exports["帧"]["放大效果"], false)
     ____exports["帧"]["文本框"] = DzCreateFrameByTagName(
         "BACKDROP",
-        "主线任务文本框",
+        FRAME_NAME_PREFIX .. "文本框",
         ____exports["帧"]["主线任务"],
         "template",
         0
@@ -87,7 +88,7 @@ ____exports["创建主线引导帧"] = function()
     DzFrameShow(____exports["帧"]["文本框"], false)
     ____exports["帧"]["提示文本"] = DzCreateFrameByTagName(
         "TEXT",
-        "主线任务提示文本",
+        FRAME_NAME_PREFIX .. "提示文本",
         ____exports["帧"]["文本框"],
         "template",
         0
@@ -110,7 +111,7 @@ ____exports["创建主线引导按钮"] = function(onClick)
     local FRAME_EVENT_MOUSE_CLICK = 1
     ____exports["帧"]["按钮"] = DzCreateFrameByTagName(
         "GLUETEXTBUTTON",
-        "主线按钮",
+        FRAME_NAME_PREFIX .. "按钮",
         ____exports["帧"]["主线任务"],
         "template",
         0
