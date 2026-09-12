@@ -1,4 +1,4 @@
-﻿interface ItemDataEntry {
+interface ItemDataEntry {
   name: string;
   type?: string;
   score?: number;
@@ -733,6 +733,17 @@ items["I0KF"] = {type: "衣服", name: "守誓圣铠", goldPrice: 1300, score: 6
 items["I0KG"] = {type: "图纸", name: "熔渊坠饰合成书", goldPrice: 0};
 items["I0KH"] = {type: "道具/戒指/饰品", name: "熔渊坠饰", goldPrice: 1660, score: 8300, level: "B+", dodge: 0.2, agi: 35, hp: 1800, armor: 25, movespeed2: 0.12, hpRegen: 50};
 items["I0KI"] = {type: "道具/戒指/饰品", name: "焚羽余烬晶核", goldPrice: 1780, score: 8900, level: "B++", int: 55, magicDmg: 0.18, fireDmg: 0.18, waterDmg: 0.18, hpRegen: 24};
+// 祖地秘境道中与环境互动掉落（评分低于双灵卫 Boss 装备 6800～7000 档 10%～15%，设计见 11．剧情系统/03．世界线变动/01．灵心归源世界线/03．副本与战斗设计.md 第五节）。
+items["I0KJ"] = {type: "主武器", name: "执刑巨刃", goldPrice: 1320, score: 6600, level: "B", dmg: 170, str: 30, critRate: 0.15, armorPierce: 0.16, hp: 900, weaponType: "剑"};
+items["I0KK"] = {type: "衣服", name: "金鳞守誓铠", goldPrice: 1200, score: 6000, level: "B", hp: 2600, armor: 30, str: 24, stunResist: 0.18};
+items["I0KL"] = {type: "副武器", name: "深渊潮汐法典", goldPrice: 1340, score: 6700, level: "B", int: 44, magicDmg: 0.16, magicPierce: 0.14, cdReduction: 0.08, abilList: "IP03"};
+items["I0KM"] = {type: "主武器", name: "鳞影裂波刃", goldPrice: 1220, score: 6100, level: "B", dmg: 135, agi: 35, critRate: 0.18, movespeed2: 0.08, weaponType: "匕首"};
+items["I0KN"] = {type: "道具/戒指/饰品", name: "灵潮护心灯", goldPrice: 1180, score: 5900, level: "C++", skillHeal: 0.16, cdReduction: 0.10, hp: 1200, mpRegen: 18};
+items["I0KO"] = {type: "道具/戒指/饰品", name: "潮印祈福徽", goldPrice: 1160, score: 5800, level: "C++", all: 20, cdReduction: 0.09, mpCost: -0.08, hp: 1000};
+items["I0KP"] = {type: "头盔", name: "祖地战冠", goldPrice: 1200, score: 6000, level: "B", str: 26, hp: 1500, armor: 16, critRate: 0.10};
+items["I0KQ"] = {type: "副武器", name: "潮汐蓝宝石", goldPrice: 1180, score: 5900, level: "C++", int: 32, mp: 800, mpRegen: 16, magicDmg: 0.10, abilList: "IN14"};
+items["I0KR"] = {type: "衣服", name: "影潮轻披", goldPrice: 1160, score: 5800, level: "C++", agi: 28, dodge: 0.10, hp: 1300, movespeed2: 0.06};
+items["I0KS"] = {type: "道具/戒指/饰品", name: "守灵人指环", goldPrice: 1300, score: 6500, level: "B", skillHeal: 0.14, cdReduction: 0.10, mpRegen: 16, all: 18, abilList: "IU14"};
 items["I0KC"] = {type: "道具/戒指/饰品", name: "七晶封印棱章", goldPrice: 1960, score: 9800, level: "B++", all: 34, hp: 2500, armor: 28, magicResist: 0.18, cdReduction: 0.06};
 items["I0KD"] = {type: "道具/戒指/饰品", name: "英魂归寂长灯", goldPrice: 2020, score: 10100, level: "B++", cdReduction: 0.14, skillHeal: 0.25, mpRegen: 32, hp: 2200, stunResist: 0.22};
 items["I0K5"] = {type: "主武器", name: "赤契噬魂刃", goldPrice: 1840, score: 9200, level: "B++", dmg: 185, str: 40, hp: 1200, lifeSteal: 0.08, weaponType: "剑"};

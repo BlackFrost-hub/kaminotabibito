@@ -19,6 +19,8 @@ local ____08_FF0E_5F02_754C_88C5_5907 = require("系统.05．Buff系统.03．Buf
 local _____5F02_754C_88C5_5907Buff_8868 = ____08_FF0E_5F02_754C_88C5_5907["异界装备Buff表"]
 local ____09_FF0E_707C_70ED_98DF_7528 = require("系统.05．Buff系统.03．Buff表.03．装备.09．灼热食用")
 local _____707C_70ED_98DF_7528Buff_8868 = ____09_FF0E_707C_70ED_98DF_7528["灼热食用Buff表"]
+local ____10_FF0E_7956_5730_79D8_5883_88C5_5907 = require("系统.05．Buff系统.03．Buff表.03．装备.10．祖地秘境装备")
+local _____7956_5730_79D8_5883_88C5_5907Buff_8868 = ____10_FF0E_7956_5730_79D8_5883_88C5_5907["祖地秘境装备Buff表"]
 ____exports["装备Buff表"] = __TS__ObjectAssign(
     {},
     _____745F_5170_8FEA_5C14_88C5_5907Buff_8868,
@@ -29,7 +31,8 @@ ____exports["装备Buff表"] = __TS__ObjectAssign(
     _____4E9A_4F26_67EF_65AF_88C5_5907Buff_8868,
     _____7956_5730_53CC_7075_536B_88C5_5907Buff_8868,
     _____5F02_754C_88C5_5907Buff_8868,
-    _____707C_70ED_98DF_7528Buff_8868
+    _____707C_70ED_98DF_7528Buff_8868,
+    _____7956_5730_79D8_5883_88C5_5907Buff_8868
 )
 ____exports.default = ____exports["装备Buff表"]
 return ____exports

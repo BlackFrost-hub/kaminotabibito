@@ -92,3 +92,33 @@ createEquipmentItem('I0IQ', '|cff9933cc深渊炽炎法典|r', {
   description = '|cffccffff[副武器/法典-智力·法术]|r|n|cffffcc99等级：B++|n评分：9000|r|n|cffffffcc[基础属性]|r|n攻击力+130|n智力+62|n魔法伤害+25%|n暗属性伤害+20%|n魔法穿透+20%|n|cFF808080书脊的金属扣一直温着，翻页时会有暗色的火星飘出来。|r',
 })
 
+-- 祖地秘境道中掉落（深渊鳞将）。主动装备：潮汐冲击走通用点目标壳 IP03；评分与属性见 TS 装备数据同条目。
+createEquipmentItem('I0KL', '深渊潮汐法典', {
+  baseId = 'ratf',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNDeepTidalCodex.blp',
+  model = 'war3mapImported\\TomeOfRetraining.mdl',
+  abilities = 'IP03',
+  cooldownGroup = 'IP03',
+  classification = 'Permanent',
+  level = 6,
+  score = 6700,
+  activelyUsed = true,
+  tooltipExtended = '|cffccffff[副武器/法典]-法师/潮汐爆发|r|n|cffffcc99等级：B|n评分：6700|r|n|cffffffcc[基础属性]|r|n智力+44|n魔法伤害+16%|n魔法穿透+14%|n冷却缩减+8%|n|cffffffcc[装备效果]|r|n使用·潮汐冲击：短暂蓄势0.4秒后，向目标点方向释放潮汐波，对直线450码、宽160码内的敌人造成攻击力100%的魔法伤害，并使其移动速度降低25%，持续2秒；冷却18秒，施法距离700码。|n|cFF808080鳞将压阵时掀起的深渊回潮被抄进书页，翻开的那一瞬潮水仍会应声而来。|r',
+  description = '|cffccffff[副武器/法典]-法师/潮汐爆发|r|n|cffffcc99等级：B|n评分：6700|r|n|cffffffcc[基础属性]|r|n智力+44|n魔法伤害+16%|n魔法穿透+14%|n冷却缩减+8%|n|cffffffcc[装备效果]|r|n使用·潮汐冲击：短暂蓄势0.4秒后，向目标点方向释放潮汐波，对直线450码、宽160码内的敌人造成攻击力100%的魔法伤害，并使其移动速度降低25%，持续2秒；冷却18秒，施法距离700码。|n|cFF808080鳞将压阵时掀起的深渊回潮被抄进书页，翻开的那一瞬潮水仍会应声而来。|r',
+})
+
+-- 祖地秘境环境互动掉落。主动装备：活水回蓝复用无目标壳 IN14（独立冷却间隔组）；评分与属性见 TS 装备数据同条目。
+createEquipmentItem('I0KQ', '潮汐蓝宝石', {
+  baseId = 'ratf',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\SubWeapon\\BTNTidalSapphire.blp',
+  model = 'Objects\\InventoryItems\\CrystalShard\\CrystalShard.mdl',
+  abilities = 'IN14',
+  cooldownGroup = '潮汐蓝宝石-活水回蓝',
+  classification = 'Permanent',
+  level = 6,
+  score = 5900,
+  activelyUsed = true,
+  tooltipExtended = '|cffccffff[副武器/宝石]-法师/资源恢复|r|n|cffffcc99等级：C++|n评分：5900|r|n|cffffffcc[基础属性]|r|n智力+32|n魔法值+800|n魔法恢复+16|n魔法伤害+10%|n|cffffffcc[使用]|r|n活水回蓝：立即恢复25%最大魔法值，并在5秒内魔法恢复提高100%；冷却25秒。|n|cFF808080秘境潮眼深处凝出的宝石，凑近能听见很轻的水声，像有人在水下换气。|r',
+  description = '|cffccffff[副武器/宝石]-法师/资源恢复|r|n|cffffcc99等级：C++|n评分：5900|r|n|cffffffcc[基础属性]|r|n智力+32|n魔法值+800|n魔法恢复+16|n魔法伤害+10%|n|cffffffcc[使用]|r|n活水回蓝：立即恢复25%最大魔法值，并在5秒内魔法恢复提高100%；冷却25秒。|n|cFF808080秘境潮眼深处凝出的宝石，凑近能听见很轻的水声，像有人在水下换气。|r',
+})
+

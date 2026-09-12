@@ -297,6 +297,22 @@ export function 刷新装备冷却(this: void, key: string): void {
   设置装备冷却(key, 0);
 }
 
+/**
+ * 清空指定单位相关的全部装备冷却记录。
+ * 装备冷却表以 `前缀:标签:单位句柄` / `前缀:标签:单位句柄:目标句柄` 为键，
+ * 按句柄段匹配删除，供测试命令（-CD）重置装备逻辑冷却使用。
+ */
+export function 清空单位装备冷却(this: void, unit: any): void {
+  if (unit == null || unit === 0) return;
+  const hid = String(GetHandleId(unit));
+  for (const key in 装备冷却表) {
+    const segs = key.split(":");
+    const last = segs[segs.length - 1];
+    const prev = segs.length > 1 ? segs[segs.length - 2] : "";
+    if (last === hid || prev === hid) delete 装备冷却表[key];
+  }
+}
+
 function 设置装备冷却毫秒(this: void, key: string, 毫秒: number): void {
   设置装备冷却(key, 毫秒 / 1000);
 }

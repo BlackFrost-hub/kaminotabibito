@@ -60,3 +60,16 @@ createEquipmentItem('I0KB', '王庭礼剑', {
   tooltipExtended = '|cffccffff[主武器/礼剑]-王庭仪典|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n攻击力+120|n敏捷+20|n暴击率+25%|n攻击速度+25%|n|cFF808080王庭武备堂的陈列礼剑，铭牌写着仿制品，剑格内侧的守夜人戳记却骗不了人——被调包的是赝品，真品一直立在原地。|r',
   description = '|cffccffff[主武器/礼剑]-王庭仪典|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n攻击力+120|n敏捷+20|n暴击率+25%|n攻击速度+25%|n|cFF808080王庭武备堂的陈列礼剑，铭牌写着仿制品，剑格内侧的守夜人戳记却骗不了人——被调包的是赝品，真品一直立在原地。|r',
 })
+
+-- 祖地秘境道中掉落（金鳞执刑官）。评分与属性见 TS 装备数据同条目。
+createEquipmentItem('I0KJ', '执刑巨刃', {
+  baseId = 'ratc',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\MainWeapon\\Sword\\BTNZudiExecutionerGreatblade.blp',
+  model = 'war3mapImported\\ysj.mdx',
+  abilities = ' ',
+  classification = 'Campaign',
+  level = 6,
+  score = 6600,
+  tooltipExtended = '|cffccffff[主武器/巨剑]-战士/斩杀|r|n|cffffcc99等级：B|n评分：6600|r|n|cffffffcc[基础属性]|r|n攻击力+170|n力量+30|n暴击率+15%|n护甲穿透+16%|n生命值+900|n|cffffffcc[特效]|r|n处决：普通攻击当前生命值不高于40%的敌人时，额外造成攻击力30%的物理伤害。|n|cFF808080执刑官用来终结渎誓者的巨刃，刃口的金鳞纹只在猎物露出破绽时亮起。|r',
+  description = '|cffccffff[主武器/巨剑]-战士/斩杀|r|n|cffffcc99等级：B|n评分：6600|r|n|cffffffcc[基础属性]|r|n攻击力+170|n力量+30|n暴击率+15%|n护甲穿透+16%|n生命值+900|n|cffffffcc[特效]|r|n处决：普通攻击当前生命值不高于40%的敌人时，额外造成攻击力30%的物理伤害。|n|cFF808080执刑官用来终结渎誓者的巨刃，刃口的金鳞纹只在猎物露出破绽时亮起。|r',
+})

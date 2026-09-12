@@ -147,3 +147,29 @@ createEquipmentItem('I0IO', '|cff808080熔岩行者胸甲|r', {
   description = '|cffccffff[衣服-生存]|r|n|cffffcc99等级：B+|n评分：8000|r|n|cffffffcc[基础属性]|r|n生命值+3000|n全属性+20|n护甲+40|n魔法抗性+15%|n|cFF808080黑曜石甲片一片压一片，走起来有很轻的碰撞声。|r',
 })
 
+-- 祖地秘境道中掉落（金鳞执刑官）。评分与属性见 TS 装备数据同条目。
+createEquipmentItem('I0KK', '金鳞守誓铠', {
+  baseId = 'rde1',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNGoldenScaleOathArmor.blp',
+  model = 'war3mapImported\\Item Jerkin.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 6,
+  score = 6000,
+  tooltipExtended = '|cffccffff[衣服/重铠]-战士/受击叠甲|r|n|cffffcc99等级：B|n评分：6000|r|n|cffffffcc[基础属性]|r|n生命值+2600|n护甲+30|n力量+24|n眩晕抗性+18%|n|cffffffcc[特效]|r|n重鳞：受到伤害时叠加重鳞，每层护甲+4，最多5层；6秒未受击后清空。|n|cFF808080执刑官的誓甲内衬仍会记起主人的站姿，每次受击都把鳞片竖得更紧。|r',
+  description = '|cffccffff[衣服/重铠]-战士/受击叠甲|r|n|cffffcc99等级：B|n评分：6000|r|n|cffffffcc[基础属性]|r|n生命值+2600|n护甲+30|n力量+24|n眩晕抗性+18%|n|cffffffcc[特效]|r|n重鳞：受到伤害时叠加重鳞，每层护甲+4，最多5层；6秒未受击后清空。|n|cFF808080执刑官的誓甲内衬仍会记起主人的站姿，每次受击都把鳞片竖得更紧。|r',
+})
+
+-- 祖地秘境环境互动掉落。评分与属性见 TS 装备数据同条目。
+createEquipmentItem('I0KR', '影潮轻披', {
+  baseId = 'rde1',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Clothes\\BTNShadowTideCloak.blp',
+  model = 'war3mapImported\\Item Jerkin.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 6,
+  score = 5800,
+  tooltipExtended = '|cffccffff[衣服/披风]-刺客/闪避机动|r|n|cffffcc99等级：C++|n评分：5800|r|n|cffffffcc[基础属性]|r|n敏捷+28|n闪避+10%|n生命值+1300|n移动速度+6%|n|cffffffcc[特效]|r|n影潮：闪避成功后1.5秒内移动速度提高20%，内置1秒冷却。|n|cFF808080披风下摆始终像浸在水里一样发暗，转身时会甩出一小片看不见的潮。|r',
+  description = '|cffccffff[衣服/披风]-刺客/闪避机动|r|n|cffffcc99等级：C++|n评分：5800|r|n|cffffffcc[基础属性]|r|n敏捷+28|n闪避+10%|n生命值+1300|n移动速度+6%|n|cffffffcc[特效]|r|n影潮：闪避成功后1.5秒内移动速度提高20%，内置1秒冷却。|n|cFF808080披风下摆始终像浸在水里一样发暗，转身时会甩出一小片看不见的潮。|r',
+})
+

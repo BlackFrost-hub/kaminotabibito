@@ -191,9 +191,19 @@ local function getTriggerPlayerOrLocal()
     return jass.GetLocalPlayer()
 end
 local function taskUIEntryClick()
-    local ui = getLocalTaskUI(nil)
+    local ____temp_2
+    if japi.DzGetTriggerUIEventPlayer ~= nil then
+        ____temp_2 = japi.DzGetTriggerUIEventPlayer()
+    else
+        ____temp_2 = getTriggerPlayerOrLocal()
+    end
+    local player = ____temp_2
+    if player == nil or player == 0 then
+        return
+    end
+    local ui = getTaskUIByPlayerId(jass.GetPlayerId(player))
     if ui then
-        ui:togglePanelLocal()
+        ui:togglePanelSync(player)
     end
 end
 TaskUI = __TS__Class()
@@ -338,9 +348,7 @@ function TaskUI.prototype.runInitBodyInPcall(self)
         self:rebuildPages()
     end
     self:resetToDefault()
-    if stage >= 5 then
-        ____exports.registerTaskUIRefreshCallback(nil)
-    end
+    ____exports.registerTaskUIRefreshCallback(nil)
     self:hidePanelState()
     self:hidePanelUI()
     self.uiInitialized = true
@@ -463,13 +471,13 @@ function TaskUI.prototype.listSetCurrentPage(self, ____type, page)
     end
 end
 function TaskUI.prototype.listGetExpandedQuestId(self, ____type)
-    local ____temp_2
+    local ____temp_3
     if ____type == self.currentCategory then
-        ____temp_2 = self.expandedQuestId
+        ____temp_3 = self.expandedQuestId
     else
-        ____temp_2 = nil
+        ____temp_3 = nil
     end
-    return ____temp_2
+    return ____temp_3
 end
 function TaskUI.prototype.getPageCount(self, ____type)
     return getTaskUICategoryPageCount(nil, self.precreatedListPool, ____type)
@@ -526,13 +534,13 @@ function TaskUI.prototype.switchCategoryLocal(self, ____type)
 end
 function TaskUI.prototype.toggleExpandLocal(self, questId)
     local oldExpanded = self.expandedQuestId
-    local ____temp_3
+    local ____temp_4
     if oldExpanded == questId then
-        ____temp_3 = nil
+        ____temp_4 = nil
     else
-        ____temp_3 = questId
+        ____temp_4 = questId
     end
-    self.expandedQuestId = ____temp_3
+    self.expandedQuestId = ____temp_4
     toggleExpandLocal(
         nil,
         self.precreatedListPool,

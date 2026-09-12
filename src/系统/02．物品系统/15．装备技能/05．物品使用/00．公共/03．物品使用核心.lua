@@ -43,6 +43,9 @@ local _____9634_5F71_9677_9631_88C5_7F6E = require("系统.02．物品系统.15�
 local _____8D85_4F4D_9B54_6CD5_6B8B_7AE0_5929_7A7A_5760_843D = require("系统.02．物品系统.15．装备技能.00．物品.186．超位魔法残章天空坠落")
 local _____9ED1_7FFC_5B88_62A4_91CD_76FE = require("系统.02．物品系统.15．装备技能.00．物品.188．黑翼守护重盾")
 local _____6DF1_4E95_6D3B_6C34_56CA = require("系统.02．物品系统.15．装备技能.00．物品.192．深井活水囊")
+local _____6DF1_6E0A_6F6E_6C50_6CD5_5178 = require("系统.02．物品系统.15．装备技能.00．物品.195．深渊潮汐法典")
+local _____6F6E_6C50_84DD_5B9D_77F3 = require("系统.02．物品系统.15．装备技能.00．物品.200．潮汐蓝宝石")
+local _____5B88_7075_4EBA_6307_73AF = require("系统.02．物品系统.15．装备技能.00．物品.202．守灵人指环")
 local _____5DF2_521D_59CB_5316 = false
 local function _____7269_54C1_4F7F_7528_5355_4F4D_662F_82F1_96C4(ctx)
     local unit = ctx["施法单位"]
@@ -201,6 +204,21 @@ local function ____on_7269_54C1_4F7F_7528_94FE_8DEF(ctx)
         ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["深井活水囊"]
         if ____cond6 then
             _____6DF1_4E95_6D3B_6C34_56CA["处理深井活水囊使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["深渊潮汐法典"]
+        if ____cond6 then
+            _____6DF1_6E0A_6F6E_6C50_6CD5_5178["处理深渊潮汐法典使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["潮汐蓝宝石"]
+        if ____cond6 then
+            _____6F6E_6C50_84DD_5B9D_77F3["处理潮汐蓝宝石使用"](ctx)
+            break
+        end
+        ____cond6 = ____cond6 or ____switch6 == _____7269_54C1_4F7F_7528_88C5_5907ID["守灵人指环"]
+        if ____cond6 then
+            _____5B88_7075_4EBA_6307_73AF["处理守灵人指环使用"](ctx)
             break
         end
     until true

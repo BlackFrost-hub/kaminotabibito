@@ -11,6 +11,14 @@ export interface 祖地双灵卫试炼状态 {
   进度UI: any;
 }
 
+export interface 祖地双灵卫道中状态 {
+  已开启: boolean;
+  当前关卡序号: number;
+  存活单位句柄表: Record<number, true | undefined>;
+  存活单位数: number;
+  全部通关: boolean;
+}
+
 export interface 祖地双灵卫副本状态类型 {
   已初始化: boolean;
   任务已接受: boolean;
@@ -33,6 +41,7 @@ export interface 祖地双灵卫副本状态类型 {
   本思雅单位: any;
   埃德里安单位: any;
   Boss单位列表: any[];
+  道中: 祖地双灵卫道中状态;
   试炼: Record<祖地双灵卫试炼类型, 祖地双灵卫试炼状态>;
 }
 
@@ -69,6 +78,13 @@ export const 祖地双灵卫副本状态: 祖地双灵卫副本状态类型 = {
   本思雅单位: null,
   埃德里安单位: null,
   Boss单位列表: [],
+  道中: {
+    已开启: false,
+    当前关卡序号: 0,
+    存活单位句柄表: {},
+    存活单位数: 0,
+    全部通关: false,
+  },
   试炼: {
     持续伤害: 创建空试炼状态(),
     单次伤害: 创建空试炼状态(),

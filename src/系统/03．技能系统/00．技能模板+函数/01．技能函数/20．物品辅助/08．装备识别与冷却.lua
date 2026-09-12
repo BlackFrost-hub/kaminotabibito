@@ -1,5 +1,6 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
+local __TS__StringSplit = ____lualib.__TS__StringSplit
 local ____exports = {}
 local _____53D6_88C5_5907_51B7_5374_663E_793A_6301_6709_8005, _____8BB0_5F55_88C5_5907_51B7_5374_663E_793A_6301_6709_8005, GetHandleId, _____88C5_5907_51B7_5374_663E_793A_6301_6709_8005_8868
 function _____53D6_88C5_5907_51B7_5374_663E_793A_6301_6709_8005(_____88C5_5907_540D)
@@ -360,6 +361,23 @@ ____exports["设置装备冷却"] = function(key, _____79D2_6570)
 end
 ____exports["刷新装备冷却"] = function(key)
     ____exports["设置装备冷却"](key, 0)
+end
+--- 清空指定单位相关的全部装备冷却记录。
+-- 装备冷却表以 `前缀:标签:单位句柄` / `前缀:标签:单位句柄:目标句柄` 为键，
+-- 按句柄段匹配删除，供测试命令（-CD）重置装备逻辑冷却使用。
+____exports["清空单位装备冷却"] = function(unit)
+    if unit == nil or unit == 0 then
+        return
+    end
+    local hid = tostring(GetHandleId(unit))
+    for key in pairs(_____88C5_5907_51B7_5374_8868) do
+        local segs = __TS__StringSplit(key, ":")
+        local last = segs[#segs]
+        local prev = #segs > 1 and segs[#segs - 2 + 1] or ""
+        if last == hid or prev == hid then
+            __TS__Delete(_____88C5_5907_51B7_5374_8868, key)
+        end
+    end
 end
 local function _____8BBE_7F6E_88C5_5907_51B7_5374_6BEB_79D2(key, _____6BEB_79D2)
     ____exports["设置装备冷却"](key, _____6BEB_79D2 / 1000)

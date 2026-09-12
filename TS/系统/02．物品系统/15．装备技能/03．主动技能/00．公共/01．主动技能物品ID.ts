@@ -40,6 +40,9 @@ export const 焰虚宝珠物品ID = 取装备物品ID(主动技能装备名称.�
 export const 先祖之狱杖物品ID = 取装备物品ID(主动技能装备名称.先祖之狱杖);
 export const 咆哮之心物品ID = 取装备物品ID(主动技能装备名称.咆哮之心);
 export const 瑟兰迪尔的决心物品ID = 取装备物品ID(主动技能装备名称.瑟兰迪尔的决心);
+export const 深渊潮汐法典物品ID = 取装备物品ID(主动技能装备名称.深渊潮汐法典);
+export const 潮汐蓝宝石物品ID = 取装备物品ID(主动技能装备名称.潮汐蓝宝石);
+export const 守灵人指环物品ID = 取装备物品ID(主动技能装备名称.守灵人指环);
 
 export function 取主动技能物品ID(this: void, 装备名称: string): number {
   return 取装备物品ID(装备名称);

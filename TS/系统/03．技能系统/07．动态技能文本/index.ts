@@ -25,10 +25,6 @@ const 功能开关模块 = require("系统.00．核心系统.02．功能开关.0
   本地玩家是否开启动态技能文本: (this: void) => boolean;
 };
 
-const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLog: (module: string, ...args: any[]) => void;
-};
-
 import { 动态文本白名单 } from "./01．公式配置";
 import { 获取属性值 } from "./02．属性计算";
 import {
@@ -38,7 +34,6 @@ import {
 } from "./03．核心逻辑";
 import { 初始化技能提示UI, 设置技能提示原始模式 } from "./05．技能提示UI";
 
-const MODULE_NAME = "动态技能文本";
 const REFRESH_MS = 300;
 const ALT_KEY_CODE = 18;
 
@@ -137,7 +132,6 @@ function onTick(this: void): void {
 
 export function registerDynamicSkillTextHero(this: void, whichHero: any): void {
   if (!isValidHandle(whichHero)) return;
-  debugLog(MODULE_NAME, "注册英雄用于动态文本");
 }
 
 export function initDynamicSkillTextSystem(this: void): void {
@@ -150,7 +144,6 @@ export function initDynamicSkillTextSystem(this: void): void {
   // Alt 只切换本地 UI；不应通过全端同步回调修改其他玩家的提示状态。
   registerKeyEventByCode(ALT_KEY_CODE, KEY_STATE.DOWN, false, 处理Alt按下 as any);
   registerKeyEventByCode(ALT_KEY_CODE, KEY_STATE.UP, false, 处理Alt松开 as any);
-  debugLog(MODULE_NAME, "初始化动态技能文本系统");
 }
 
 export function restoreDynamicSkillTextCurrentHero(this: void): void {

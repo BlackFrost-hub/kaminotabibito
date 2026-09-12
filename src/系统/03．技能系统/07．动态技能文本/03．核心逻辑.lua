@@ -57,15 +57,12 @@ local _____9759_6001_82F1_96C4_914D_7F6E_5217_8868 = {
 }
 local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
 local dynamicSkillData = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.16．动态技能数据")
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_1.debugLog
 local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local GetHandleId = jass.GetHandleId
 local R2I = jass.R2I
 local DzGetUnitAbilityUberTip = japi.DzGetUnitAbilityUberTip
 local DzSetUnitAbilityUberTip = japi.DzSetUnitAbilityUberTip
 local DzSetUnitAbilityUpdate = japi.DzSetUnitAbilityUpdate
-local MODULE_NAME = "动态技能文本"
 local _____5355_5C5E_6027_6700_5927_66FF_6362_6B21_6570 = 8
 local _____52A8_6001_6570_503C_6807_8BB0_524D_7F00 = "__DYN_NUM_"
 local _____52A8_6001_6570_503C_6807_8BB0_540E_7F00 = "__"
@@ -724,7 +721,6 @@ local function _____66FF_6362_516C_5F0F(unit, tip, options)
                     result = (__TS__StringSubstring(result, 0, _____5339_914D_5F00_59CB) .. _____66FF_6362_503C) .. __TS__StringSubstring(result, _____5339_914D_5F00_59CB + #_____5B8C_6574_5339_914D_6587_672C)
                     _____66FF_6362_6B21_6570 = _____66FF_6362_6B21_6570 + 1
                     if _____66FF_6362_6B21_6570 >= _____5355_5C5E_6027_6700_5927_66FF_6362_6B21_6570 then
-                        debugLog(nil, MODULE_NAME, "单属性替换达到上限，提前中止", _____5C5E_6027_5339_914D_9879["文本名"])
                         break
                     end
                     _____641C_7D22_8D77_70B9 = _____5339_914D_5F00_59CB + #_____66FF_6362_503C
@@ -753,30 +749,29 @@ end
 local function _____5904_7406_6280_80FD_63D0_793A(unit, abilityId)
     local currentTip = DzGetUnitAbilityUberTip(unit, abilityId)
     if not currentTip then
-        debugLogForce("动态技能文本", "跳过：技能提示为空", "abilityId", abilityId)
         return false
     end
     local _____7F13_5B58_952E = _____751F_6210_63D0_793A_7F13_5B58_952E(unit, abilityId)
     local heroConfigForText = heroConfigTool["获取单位玩家英雄配置"](heroConfigTool, unit)
     local dynamicKey = heroConfigForText ~= nil and stringToFourCCSafe(heroConfigForText.unit) or 0
-    local ____temp_2
+    local ____temp_1
     if dynamicKey ~= 0 then
-        ____temp_2 = dynamicSkillData["获取动态技能说明"](dynamicKey, abilityId)
+        ____temp_1 = dynamicSkillData["获取动态技能说明"](dynamicKey, abilityId)
     else
-        ____temp_2 = nil
+        ____temp_1 = nil
     end
-    local _____914D_7F6E_8BF4_660E = ____temp_2
+    local _____914D_7F6E_8BF4_660E = ____temp_1
     if _____914D_7F6E_8BF4_660E == nil then
         do
             local i = 0
             while i < #_____9759_6001_82F1_96C4_914D_7F6E_5217_8868 and _____914D_7F6E_8BF4_660E == nil do
                 local cfg = _____9759_6001_82F1_96C4_914D_7F6E_5217_8868[i + 1]
                 for key in pairs(cfg) do
-                    local ____opt_3 = cfg[key]
-                    if ____opt_3 ~= nil then
-                        ____opt_3 = ____opt_3["技能ID"]
+                    local ____opt_2 = cfg[key]
+                    if ____opt_2 ~= nil then
+                        ____opt_2 = ____opt_2["技能ID"]
                     end
-                    if ____opt_3 ~= nil and stringToFourCCSafe(cfg[key]["技能ID"]) == abilityId then
+                    if ____opt_2 ~= nil and stringToFourCCSafe(cfg[key]["技能ID"]) == abilityId then
                         _____914D_7F6E_8BF4_660E = cfg[key]["说明"]
                     end
                 end
@@ -784,63 +779,14 @@ local function _____5904_7406_6280_80FD_63D0_793A(unit, abilityId)
             end
         end
     end
-    debugLogForce(
-        "动态技能文本",
-        "配置说明命中",
-        "abilityId",
-        abilityId,
-        "dynamicKey",
-        dynamicKey,
-        "hit",
-        _____914D_7F6E_8BF4_660E ~= nil,
-        "length",
-        _____914D_7F6E_8BF4_660E ~= nil and #_____914D_7F6E_8BF4_660E or 0
-    )
     local originalTip = _____914D_7F6E_8BF4_660E or _____539F_59CB_63D0_793A_7F13_5B58[_____7F13_5B58_952E]
     if originalTip == nil then
         originalTip = currentTip
         _____539F_59CB_63D0_793A_7F13_5B58[_____7F13_5B58_952E] = originalTip
     end
     local newTip = _____66FF_6362_516C_5F0F(unit, originalTip)
-    local colorCount = 0
-    local colorIndex = (string.find(newTip, "|cff", nil, true) or 0) - 1
-    while colorIndex >= 0 do
-        colorCount = colorCount + 1
-        colorIndex = (string.find(
-            newTip,
-            "|cff",
-            math.max(colorIndex + 4 + 1, 1),
-            true
-        ) or 0) - 1
-    end
-    debugLogForce(
-        "动态技能文本",
-        "处理技能",
-        "abilityId",
-        abilityId,
-        "originalLength",
-        #originalTip,
-        "resultLength",
-        #newTip,
-        "changed",
-        newTip ~= currentTip,
-        "hasColorCode",
-        colorCount > 0,
-        "colorCount",
-        colorCount
-    )
     if newTip ~= currentTip then
-        local setResult = DzSetUnitAbilityUberTip(unit, abilityId, newTip)
-        debugLogForce(
-            "动态技能文本",
-            "写入技能提示",
-            "abilityId",
-            abilityId,
-            "setResult",
-            setResult,
-            "hasColorCode",
-            (string.find(newTip, "|cff", nil, true) or 0) - 1 >= 0
-        )
+        DzSetUnitAbilityUberTip(unit, abilityId, newTip)
         return true
     end
     return false
@@ -871,7 +817,7 @@ local function _____89E3_6790_914D_7F6E_6280_80FD_5217_8868(hero)
             do
                 local rawList = fields[i + 1]
                 if type(rawList) ~= "string" then
-                    goto __continue158
+                    goto __continue157
                 end
                 local parts = __TS__StringSplit(rawList, ",")
                 do
@@ -880,17 +826,17 @@ local function _____89E3_6790_914D_7F6E_6280_80FD_5217_8868(hero)
                         do
                             local abilityId = stringToFourCCSafe(parts[j + 1])
                             if abilityId == 0 or seen[abilityId] == true then
-                                goto __continue161
+                                goto __continue160
                             end
                             seen[abilityId] = true
                             result[#result + 1] = abilityId
                         end
-                        ::__continue161::
+                        ::__continue160::
                         j = j + 1
                     end
                 end
             end
-            ::__continue158::
+            ::__continue157::
             i = i + 1
         end
     end

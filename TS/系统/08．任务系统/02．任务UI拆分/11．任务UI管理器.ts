@@ -100,8 +100,13 @@ function getTaskUIByPlayerId(this: void, playerId: number): TaskUI | undefined {
 }
 
 function taskUIEntryClick(this: void): void {
-  const ui = getLocalTaskUI();
-  if (ui) ui.togglePanelLocal();
+  // 入口是同步帧点击，键盘玩家 API 在这里可能为空；必须读取 UI 事件玩家。
+  const player = (japi as any).DzGetTriggerUIEventPlayer != null
+    ? (japi as any).DzGetTriggerUIEventPlayer()
+    : getTriggerPlayerOrLocal();
+  if (player == null || player === 0) return;
+  const ui = getTaskUIByPlayerId(jass.GetPlayerId(player));
+  if (ui) ui.togglePanelSync(player);
 }
 
 class TaskUI {
@@ -238,10 +243,8 @@ private localPlayer: any = null;
     // 滚轮、轨道和拖拽只能在面板首次打开后注册。
     // 禁止在初始化阶段通过 STAGE 注册硬件输入；否则会复发双开加载卡死。
     this.resetToDefault();
-    if (stage >= 5) {
-      // 阶段5：注册页面刷新回调（08/13，完整初始化）
-      registerTaskUIRefreshCallback();
-    }
+    // 任务接受/完成可能发生在 STAGE=3；刷新监听不能跟随高阶段 UI 二分开关。
+    registerTaskUIRefreshCallback();
     this.hidePanelState();
     this.hidePanelUI();
     this.uiInitialized = true;
@@ -503,7 +506,7 @@ function taskUIInitPcallBody(): void {
   pcallInitTarget?.runInitBodyInPcall();
 }
 
-// 原生同步键盘/帧事件已经全端派发，直接按触发玩家选槽，不再次广播。
+// 键盘中心已同步有效按键，直接按发送玩家选槽，不再次广播或读取本机聊天状态。
 function taskUIHotkeyTogglePanel(this: void, player: any): void {
   if (player == null || player === 0) return;
   const ui = getTaskUIByPlayerId(jass.GetPlayerId(player));

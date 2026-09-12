@@ -49,3 +49,16 @@ createEquipmentItem('I0IR', '|cffFF8000鱼王骨冠|r', {
   description = '|cffccffff[头盔-全能·辅助]|r|n|cffffcc99等级：B++|n评分：9000|r|n|cffffffcc[基础属性]|r|n全属性+36|n生命值+2600|n护甲+30|n魔法抗性+18%|n|cFF808080牙还朝外。戴上它的人最好别低头看水。|r',
 })
 
+-- 祖地秘境环境互动掉落。评分与属性见 TS 装备数据同条目。
+createEquipmentItem('I0KP', '祖地战冠', {
+  baseId = 'ckng',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Helmet\\BTNAncestralWarCrown.blp',
+  model = 'war3mapImported\\equipment_helmet.mdl',
+  abilities = ' ',
+  classification = 'Permanent',
+  level = 6,
+  score = 6000,
+  tooltipExtended = '|cffccffff[头盔/战冠]-战士/击杀增攻|r|n|cffffcc99等级：B|n评分：6000|r|n|cffffffcc[基础属性]|r|n力量+26|n生命值+1500|n护甲+16|n暴击率+10%|n|cffffffcc[特效]|r|n战意：击杀敌方单位后获得一层战意，每层攻击力+8%，最多3层，持续4秒，击杀刷新时长。|n|cFF808080先祖战士的冠冕沉在财宝堆最下面，捡起它的手会不自觉握紧成拳。|r',
+  description = '|cffccffff[头盔/战冠]-战士/击杀增攻|r|n|cffffcc99等级：B|n评分：6000|r|n|cffffffcc[基础属性]|r|n力量+26|n生命值+1500|n护甲+16|n暴击率+10%|n|cffffffcc[特效]|r|n战意：击杀敌方单位后获得一层战意，每层攻击力+8%，最多3层，持续4秒，击杀刷新时长。|n|cFF808080先祖战士的冠冕沉在财宝堆最下面，捡起它的手会不自觉握紧成拳。|r',
+})
+

@@ -407,7 +407,7 @@ ____exports["注册单个任务配置到任务库"] = function(cfg, npcCfg)
     end
     questDB:registerQuest({
         id = questId,
-        type = QuestType.DAILY,
+        type = cfg["显示分类"] == "支线" and QuestType.SIDE or QuestType.DAILY,
         title = cfg["名称"] or questId,
         description = cfg["描述"] or cfg["名称"] or "",
         objectives = _____6784_5EFA_4EFB_52A1_76EE_6807(cfg),

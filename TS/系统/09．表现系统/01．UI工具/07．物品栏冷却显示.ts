@@ -270,4 +270,13 @@ export function 清除物品栏物品冷却(this: void, hero: any, item: any): v
   设置物品栏物品冷却(hero, item, 0);
 }
 
+/** 清除指定英雄全部物品栏槽位的冷却 UI 记录（供 -CD 测试命令重置使用）。 */
+export function 清除单位全部物品栏冷却(this: void, hero: any): void {
+  if (!单位有效(hero)) return;
+  for (let slot = 0; slot < 物品栏槽位数量; slot++) {
+    const item = UnitItemInSlot(hero, slot);
+    if (句柄有效(item)) 设置物品栏物品冷却(hero, item, 0);
+  }
+}
+
 export {};

@@ -10,12 +10,15 @@ local ____06_FF0E_7956_5730_53CC_7075_536BBoss_573A_666F = require("系统.11．
 local ____init_7956_5730_53CC_7075_536BBoss_573A_666F = ____06_FF0E_7956_5730_53CC_7075_536BBoss_573A_666F["init祖地双灵卫Boss场景"]
 local ____07_FF0E_7956_5730_53CC_7075_536B_5956_52B1_63D0_4EA4 = require("系统.11．剧情系统.03．世界线变动.01．灵心归源世界线.04．精灵往事.07．祖地双灵卫奖励提交")
 local ____init_7956_5730_53CC_7075_536B_5956_52B1_63D0_4EA4 = ____07_FF0E_7956_5730_53CC_7075_536B_5956_52B1_63D0_4EA4["init祖地双灵卫奖励提交"]
+local ____08_FF0E_7956_5730_53CC_7075_536B_9053_4E2D_5173_5361 = require("系统.11．剧情系统.03．世界线变动.01．灵心归源世界线.04．精灵往事.08．祖地双灵卫道中关卡")
+local ____init_7956_5730_53CC_7075_536B_9053_4E2D_5173_5361 = ____08_FF0E_7956_5730_53CC_7075_536B_9053_4E2D_5173_5361["init祖地双灵卫道中关卡"]
 function ____exports.init()
     ____init_7956_5730_53CC_7075_536B_8BD5_70BC()
     ____init_7956_5730_53CC_7075_536B_5165_53E3_4E0E_5BF9_8BDD()
     ____init_7956_5730_53CC_7075_536B_4F20_9001_4E0E_95F8_95E8()
     ____init_7956_5730_53CC_7075_536BBoss_573A_666F()
     ____init_7956_5730_53CC_7075_536B_5956_52B1_63D0_4EA4()
+    ____init_7956_5730_53CC_7075_536B_9053_4E2D_5173_5361()
 end
 do
     local ____export = require("系统.11．剧情系统.03．世界线变动.01．灵心归源世界线.04．精灵往事.01．祖地双灵卫副本配置")
@@ -67,6 +70,14 @@ do
 end
 do
     local ____export = require("系统.11．剧情系统.03．世界线变动.01．灵心归源世界线.04．精灵往事.07．祖地双灵卫奖励提交")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require("系统.11．剧情系统.03．世界线变动.01．灵心归源世界线.04．精灵往事.08．祖地双灵卫道中关卡")
     for ____exportKey, ____exportValue in pairs(____export) do
         if ____exportKey ~= "default" then
             ____exports[____exportKey] = ____exportValue

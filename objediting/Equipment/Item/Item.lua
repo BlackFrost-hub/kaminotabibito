@@ -871,3 +871,44 @@ createEquipmentItem('I0IN', '|cff66ccff潮汐祷歌护符|r', {
   description = '|cffccffff[饰品/护符-治疗辅助]|r|n|cffffcc99等级：B+|n评分：8000|r|n|cffffffcc[基础属性]|r|n生命值+1500|n全属性+15|n技能治疗+25%|n冷却缩减+12%|n魔法恢复+30|n|cFF808080凑近了能听见壳里有潮声，据说那是别人的祈祷。|r',
 })
 
+-- 祖地秘境道中掉落（灵潮祭司）。评分与属性见 TS 装备数据同条目。
+createEquipmentItem('I0KN', '灵潮护心灯', {
+  baseId = 'azhr',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNSpiritTideHeartLantern.blp',
+  model = 'war3mapImported\\Lightforged Lantern.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 5900,
+  tooltipExtended = '|cffccffff[饰品/心灯]-奶妈/持续治疗|r|n|cffffcc99等级：C++|n评分：5900|r|n|cffffffcc[基础属性]|r|n技能治疗+16%|n冷却缩减+10%|n生命值+1200|n魔法恢复+18|n|cffffffcc[特效]|r|n护心：战斗状态下每5秒为600码内生命比例最低的友军（含自己）恢复持有者攻击力40%的生命。|n|cFF808080祭司散场后留在祭坛边的心灯，灯芯还认得每个需要照看的人。|r',
+  description = '|cffccffff[饰品/心灯]-奶妈/持续治疗|r|n|cffffcc99等级：C++|n评分：5900|r|n|cffffffcc[基础属性]|r|n技能治疗+16%|n冷却缩减+10%|n生命值+1200|n魔法恢复+18|n|cffffffcc[特效]|r|n护心：战斗状态下每5秒为600码内生命比例最低的友军（含自己）恢复持有者攻击力40%的生命。|n|cFF808080祭司散场后留在祭坛边的心灯，灯芯还认得每个需要照看的人。|r',
+})
+
+-- 祖地秘境道中掉落（灵潮祭司）。评分与属性见 TS 装备数据同条目。
+createEquipmentItem('I0KO', '潮印祈福徽', {
+  baseId = 'ratf',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNTideBlessingSeal.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = ' ',
+  classification = 'PowerUp',
+  level = 6,
+  score = 5800,
+  tooltipExtended = '|cffccffff[饰品/徽印]-辅助/施法增益|r|n|cffffcc99等级：C++|n评分：5800|r|n|cffffffcc[基础属性]|r|n全属性+20|n冷却缩减+9%|n魔法消耗-8%|n生命值+1000|n|cffffffcc[特效]|r|n祈福：施放非物品技能后，为600码内友军（含自己）提供5%物理与魔法抗性，持续2秒，重复施法刷新。|n|cFF808080徽面盖着祭司按下的潮纹指印，每次施法都会浅浅亮一下，像在替谁点头。|r',
+  description = '|cffccffff[饰品/徽印]-辅助/施法增益|r|n|cffffcc99等级：C++|n评分：5800|r|n|cffffffcc[基础属性]|r|n全属性+20|n冷却缩减+9%|n魔法消耗-8%|n生命值+1000|n|cffffffcc[特效]|r|n祈福：施放非物品技能后，为600码内友军（含自己）提供5%物理与魔法抗性，持续2秒，重复施法刷新。|n|cFF808080徽面盖着祭司按下的潮纹指印，每次施法都会浅浅亮一下，像在替谁点头。|r',
+})
+
+-- 祖地秘境环境互动掉落。主动装备：守灵守护复用单位目标壳 IU14（独立冷却间隔组）；评分与属性见 TS 装备数据同条目。
+createEquipmentItem('I0KS', '守灵人指环', {
+  baseId = 'ratf',
+  icon = 'ReplaceableTextures\\CommandButtons\\Equipment\\Icon\\Item\\BTNSpiritGuardianRing.blp',
+  model = 'war3mapImported\\RingOfProtection.mdl',
+  abilities = 'IU14',
+  cooldownGroup = '守灵人指环-守灵守护',
+  classification = 'PowerUp',
+  level = 6,
+  score = 6500,
+  activelyUsed = true,
+  tooltipExtended = '|cffccffff[饰品/指环]-奶妈辅助/主动护盾|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n技能治疗+14%|n冷却缩减+10%|n魔法恢复+16|n全属性+18|n|cffffffcc[使用]|r|n守灵守护：为一名友方目标施加持有者智力×3的护盾，持续5秒；冷却20秒，施法距离700码。|n|cFF808080守灵人交接岗哨时留下的指环，环身温热，替人挡过很多次来不及说出口的伤。|r',
+  description = '|cffccffff[饰品/指环]-奶妈辅助/主动护盾|r|n|cffffcc99等级：B|n评分：6500|r|n|cffffffcc[基础属性]|r|n技能治疗+14%|n冷却缩减+10%|n魔法恢复+16|n全属性+18|n|cffffffcc[使用]|r|n守灵守护：为一名友方目标施加持有者智力×3的护盾，持续5秒；冷却20秒，施法距离700码。|n|cFF808080守灵人交接岗哨时留下的指环，环身温热，替人挡过很多次来不及说出口的伤。|r',
+})
+

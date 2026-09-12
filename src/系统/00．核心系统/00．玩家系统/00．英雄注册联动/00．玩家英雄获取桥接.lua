@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local invokeUiAttrOnPlayerHeroRegistered, invokeSelectionCenterInit, invokeSelectionCenterSeed, _____505C_6B62_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65, ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick, _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65, jass, centerTimer, YDUserDataGetSafe, registerMoveSpeedTornadoHero, petItemHandoff, chestSystem, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2, uiRegisteredPlayers, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID, dialogSystem, buffUISystem, threatPanelSystem, initPlayerSelectionCenter, seedSoleSelectedUnitForPlayer
+local invokeUiAttrOnPlayerHeroRegistered, invokeSelectionCenterInit, invokeSelectionCenterSeed, _____505C_6B62_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65, ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick, _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65, jass, centerTimer, YDUserDataGetSafe, registerMoveSpeedTornadoHero, petItemHandoff, chestSystem, heroVoiceSystem, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2, uiRegisteredPlayers, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID, dialogSystem, buffUISystem, threatPanelSystem, initPlayerSelectionCenter, seedSoleSelectedUnitForPlayer
 function invokeUiAttrOnPlayerHeroRegistered(whichPlayer, whichHero)
     local mod = require("系统.09．表现系统.03．UI属性系统.03．系统入口")
     local cb = mod.onPlayerHeroRegistered
@@ -68,6 +68,9 @@ function _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65(_____4
         if ____cond19 then
             invokeSelectionCenterInit(owner)
             invokeSelectionCenterSeed(owner, whichHero)
+            if type(heroVoiceSystem.onPlayerHeroRegistered) == "function" then
+                heroVoiceSystem.onPlayerHeroRegistered(owner, whichHero)
+            end
             break
         end
         ____cond19 = ____cond19 or ____switch19 == 5
@@ -148,6 +151,7 @@ local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英
 registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero
 petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
+heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index")
 _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2 = 150
 local _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF_6BEB_79D2 = 800
 --- 只接受玩家 1-5 当前操作的英雄，且排除电脑玩家。

@@ -4,6 +4,12 @@ local ____01_FF0E_7956_5730_53CC_7075_536B_526F_672C_914D_7F6E = require("系统
 local _____7956_5730_53CC_7075_536B_526F_672C_914D_7F6E = ____01_FF0E_7956_5730_53CC_7075_536B_526F_672C_914D_7F6E["祖地双灵卫副本配置"]
 local ____02_FF0E_7956_5730_53CC_7075_536B_526F_672C_72B6_6001 = require("系统.11．剧情系统.03．世界线变动.01．灵心归源世界线.04．精灵往事.02．祖地双灵卫副本状态")
 local _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001 = ____02_FF0E_7956_5730_53CC_7075_536B_526F_672C_72B6_6001["祖地双灵卫副本状态"]
+local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
+local questDB = ____01_FF0E_4EFB_52A1_6570_636E.questDB
+local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
+local QuestStatus = ____01_FF0E_4EFB_52A1_6570_636E.QuestStatus
+local ____02_FF0E_4EFB_52A1_7BA1_7406_5668 = require("系统.08．任务系统.02．任务管理器")
+local questManager = ____02_FF0E_4EFB_52A1_7BA1_7406_5668.questManager
 local jass = require("jass.common")
 local ____require_result_0 = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
 local addSelectionListener = ____require_result_0.addSelectionListener
@@ -13,6 +19,30 @@ local ____require_result_2 = require("系统.02．物品系统.18．首领奖励
 local _____5EF6_8FDF_6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762 = ____require_result_2["延迟打开首领奖励选择界面"]
 local ____require_result_3 = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index")
 local _____7956_5730_53CC_7075_536B_5956_52B1_6C60ID = ____require_result_3["祖地双灵卫奖励池ID"]
+local _____53CC_7075_536B_4EFB_52A1ID = "11040"
+local function _____786E_4FDD_53CC_7075_536B_4EFB_52A1_5DF2_767B_8BB0()
+    if questDB:getQuest(_____53CC_7075_536B_4EFB_52A1ID) then
+        return
+    end
+    questDB:registerQuest({
+        id = _____53CC_7075_536B_4EFB_52A1ID,
+        type = QuestType.SIDE,
+        title = "精灵往事·归还信物",
+        description = "向埃德里安提交祖地调查结果。完成后获得双灵卫首领战利品选择与能量碎片。",
+        objectives = {{
+            id = "双灵卫调查",
+            description = "完成祖地双灵卫试炼并提交调查结果",
+            current = 0,
+            required = 1,
+            completed = false
+        }},
+        rewards = {{type = "item", value = 0, description = "双灵卫首领战利品选择；能量碎片"}},
+        status = QuestStatus.UNDISCOVERED,
+        startNpc = "埃德里安",
+        createdAt = 0,
+        updatedAt = 0
+    })
+end
 local ____require_result_4 = require("系统.09．表现系统.06．广播提示消息.index")
 local _____5E7F_64AD_5355_4F4D_63D0_793A = ____require_result_4["广播单位提示"]
 local GetPlayerController = jass.GetPlayerController
@@ -36,13 +66,13 @@ local function _____53D1_653E_7956_5730_53CC_7075_536B_5168_961F_5956_52B1()
             do
                 local player = Player(playerId)
                 if not _____662F_5728_5C40_7528_6237(player) then
-                    goto __continue6
+                    goto __continue8
                 end
                 local current = GetPlayerState(player, jass.PLAYER_STATE_RESOURCE_LUMBER)
                 SetPlayerState(player, jass.PLAYER_STATE_RESOURCE_LUMBER, current + 1)
                 _____5EF6_8FDF_6253_5F00_9996_9886_5956_52B1_9009_62E9_754C_9762(_____7956_5730_53CC_7075_536B_5956_52B1_6C60ID, player)
             end
-            ::__continue6::
+            ::__continue8::
             playerId = playerId + 1
         end
     end
@@ -53,6 +83,8 @@ local function ____on_63A5_53D7_7956_5730_53CC_7075_536B_5956_52B1_63D0_4EA4()
     if not _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["Boss战已完成"] or _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["奖励已提交"] then
         return
     end
+    _____786E_4FDD_53CC_7075_536B_4EFB_52A1_5DF2_767B_8BB0()
+    questManager:onQuestAccepted(0, _____53CC_7075_536B_4EFB_52A1ID)
     _____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["奖励已提交"] = true
     _____53D1_653E_7956_5730_53CC_7075_536B_5168_961F_5956_52B1()
     if _____53E5_67C4_6709_6548(_____7956_5730_53CC_7075_536B_526F_672C_72B6_6001["埃德里安单位"]) then
@@ -109,6 +141,7 @@ ____exports["init祖地双灵卫奖励提交"] = function()
         return
     end
     _____5956_52B1_63D0_4EA4_6A21_5757_5DF2_521D_59CB_5316 = true
+    _____786E_4FDD_53CC_7075_536B_4EFB_52A1_5DF2_767B_8BB0()
     addSelectionListener(____on_7956_5730_53CC_7075_536B_5956_52B1NPC_9009_62E9)
 end
 return ____exports

@@ -20,6 +20,8 @@ export interface 击杀目标组配置 {
 
 export interface 任务配置 {
   任务ID?: number;
+  /** 任务 UI 显示分类：支线或小任务；未填写时保持历史默认小任务。 */
+  显示分类?: "支线" | "小任务";
   名称?: string;
   类型?: string;
   开始NPC?: string;

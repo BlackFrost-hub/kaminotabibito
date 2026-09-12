@@ -43,9 +43,9 @@ const chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事
   registerChestSystemHero: (this: void, whichHero: any) => void;
 };
 
-// const heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index") as {
-//   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
-// };
+const heroVoiceSystem = require("系统.09．表现系统.10．英雄语音.05．指令音效.index") as {
+  onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
+};
 
 const 英雄依赖注册队列间隔毫秒 = 150;
 const 英雄依赖注册启动延迟毫秒 = 800;
@@ -164,9 +164,9 @@ function 处理英雄依赖注册任务一步(this: void, 任务: 英雄依赖�
     case 4:
       invokeSelectionCenterInit(owner);
       invokeSelectionCenterSeed(owner, whichHero);
-      // if (typeof heroVoiceSystem.onPlayerHeroRegistered === "function") {
-      //   heroVoiceSystem.onPlayerHeroRegistered(owner, whichHero);
-      // }
+      if (typeof heroVoiceSystem.onPlayerHeroRegistered === "function") {
+        heroVoiceSystem.onPlayerHeroRegistered(owner, whichHero);
+      }
       break;
     case 5:
       if (!uiRegisteredPlayers.has(playerId)) {

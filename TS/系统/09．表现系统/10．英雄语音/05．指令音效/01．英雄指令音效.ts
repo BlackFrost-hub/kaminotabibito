@@ -236,6 +236,9 @@ export function onPlayerHeroRegistered(this: void, _whichPlayer: any, whichHero:
 export function init英雄指令音效系统(this: void): void {
   if (英雄指令音效系统已初始化) return;
   英雄指令音效系统已初始化 = true;
+  // 2026-09-12 二分：选中分支重新启用。真实点击产生的选中事件走输入流水线复制，各客户端确定性触发，
+  // GetRandomInt 消耗次数、YDUserData 冷却写入、周期回调注册均各端一致；本地分支仅 StartSound。
+  // 联机验证：疯狂连点选中 10 分钟不掉线即确认安全。
   addSelectionListener(玩家选中事件回调);
   registerPointOrderListener(玩家点命令事件回调);
   扫描已注册英雄();

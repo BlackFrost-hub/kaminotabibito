@@ -321,4 +321,20 @@ end
 ____exports["清除物品栏物品冷却"] = function(hero, item)
     ____exports["设置物品栏物品冷却"](hero, item, 0)
 end
+--- 清除指定英雄全部物品栏槽位的冷却 UI 记录（供 -CD 测试命令重置使用）。
+____exports["清除单位全部物品栏冷却"] = function(hero)
+    if not _____5355_4F4D_6709_6548(hero) then
+        return
+    end
+    do
+        local slot = 0
+        while slot < _____7269_54C1_680F_69FD_4F4D_6570_91CF do
+            local item = UnitItemInSlot(hero, slot)
+            if _____53E5_67C4_6709_6548(item) then
+                ____exports["设置物品栏物品冷却"](hero, item, 0)
+            end
+            slot = slot + 1
+        end
+    end
+end
 return ____exports

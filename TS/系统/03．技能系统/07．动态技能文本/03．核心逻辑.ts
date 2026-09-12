@@ -28,10 +28,6 @@ const dynamicSkillData = require("系统.03．技能系统.00．技能模板+函
   获取动态技能说明: (this: void, key: number, abilityId: number) => string | undefined;
 };
 
-const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLog: (module: string, ...args: any[]) => void;
-};
-
 import {
   属性名称列表,
   动态文本白名单,
@@ -51,7 +47,6 @@ const DzGetUnitAbilityUberTip = japi.DzGetUnitAbilityUberTip as (unit: any, abil
 const DzSetUnitAbilityUberTip = japi.DzSetUnitAbilityUberTip as (unit: any, abilityId: number, tip: string) => boolean;
 const DzSetUnitAbilityUpdate = japi.DzSetUnitAbilityUpdate as (unit: any, abilityId: number) => boolean;
 
-const MODULE_NAME = "动态技能文本";
 const 单属性最大替换次数 = 8;
 const 动态数值标记前缀 = "__DYN_NUM_";
 const 动态数值标记后缀 = "__";
@@ -656,7 +651,6 @@ function 替换公式(this: void, unit: any, tip: string, options?: 动态文本
       result = result.substring(0, 匹配开始) + 替换值 + result.substring(匹配开始 + 完整匹配文本.length);
       替换次数++;
       if (替换次数 >= 单属性最大替换次数) {
-        debugLog(MODULE_NAME, "单属性替换达到上限，提前中止", 属性匹配项.文本名);
         break;
       }
       搜索起点 = 匹配开始 + 替换值.length;
@@ -683,7 +677,7 @@ export function 渲染动态文本(this: void, unit: any, tip: string, options?:
  */
 function 处理技能提示(this: void, unit: any, abilityId: number): boolean {
   const currentTip = DzGetUnitAbilityUberTip(unit, abilityId);
-  if (!currentTip) { debugLogForce("动态技能文本", "跳过：技能提示为空", "abilityId", abilityId); return false; }
+  if (!currentTip) return false;
 
   const 缓存键 = 生成提示缓存键(unit, abilityId);
   const heroConfigForText = heroConfigTool.获取单位玩家英雄配置(unit);
@@ -696,7 +690,6 @@ function 处理技能提示(this: void, unit: any, abilityId: number): boolean {
       for (const key in cfg) if (cfg[key]?.技能ID != null && stringToFourCCSafe(cfg[key].技能ID) === abilityId) 配置说明 = cfg[key].说明;
     }
   }
-  debugLogForce("动态技能文本", "配置说明命中", "abilityId", abilityId, "dynamicKey", dynamicKey, "hit", 配置说明 != null, "length", 配置说明 != null ? 配置说明.length : 0);
   let originalTip = 配置说明 ?? 原始提示缓存[缓存键];
   if (originalTip == null) {
     originalTip = currentTip;
@@ -704,13 +697,8 @@ function 处理技能提示(this: void, unit: any, abilityId: number): boolean {
   }
 
   const newTip = 替换公式(unit, originalTip);
-  let colorCount = 0;
-  let colorIndex = newTip.indexOf("|cff");
-  while (colorIndex >= 0) { colorCount++; colorIndex = newTip.indexOf("|cff", colorIndex + 4); }
-  debugLogForce("动态技能文本", "处理技能", "abilityId", abilityId, "originalLength", originalTip.length, "resultLength", newTip.length, "changed", newTip !== currentTip, "hasColorCode", colorCount > 0, "colorCount", colorCount);
   if (newTip !== currentTip) {
-    const setResult = DzSetUnitAbilityUberTip(unit, abilityId, newTip);
-    debugLogForce("动态技能文本", "写入技能提示", "abilityId", abilityId, "setResult", setResult, "hasColorCode", newTip.indexOf("|cff") >= 0);
+    DzSetUnitAbilityUberTip(unit, abilityId, newTip);
     return true;
   }
   return false;

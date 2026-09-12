@@ -292,7 +292,7 @@ export function 注册单个任务配置到任务库(
 
   questDB.registerQuest({
     id: questId,
-    type: QuestType.DAILY,
+    type: cfg.显示分类 === "支线" ? QuestType.SIDE : QuestType.DAILY,
     title: cfg.名称 || questId,
     description: cfg.描述 || cfg.名称 || "",
     objectives: 构建任务目标(cfg),

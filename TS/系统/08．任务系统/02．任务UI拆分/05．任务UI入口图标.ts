@@ -100,8 +100,9 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     }) ?? 0;
   if (btn) {
     (japi as any).DzFrameSetAllPoints(btn, entryFrame);
-    // 入口显隐是纯本地 UI 操作，避免同步帧回调在各客户端误选槽位。
-    setFrameClickEvent(btn, onTogglePanel, false);
+    // 首次打开会注册滚轮/轨道等交互，必须走同步帧回调，让所有端对称完成初始化。
+    // 回调内部按 DzGetTriggerKeyPlayer 路由槽位，最终显隐仍只作用于该玩家本机。
+    setFrameClickEvent(btn, onTogglePanel, true);
   }
 
   return { entryFrame, entryText };

@@ -2,6 +2,8 @@
 
 import { 祖地双灵卫副本配置 } from "./01．祖地双灵卫副本配置";
 import { 祖地双灵卫副本状态 } from "./02．祖地双灵卫副本状态";
+import { questDB, QuestType, QuestStatus } from "../../../../08．任务系统/01．任务数据";
+import { questManager } from "../../../../08．任务系统/02．任务管理器";
 
 const jass = require("jass.common") as any;
 
@@ -20,6 +22,24 @@ const { 延迟打开首领奖励选择界面 } = require("系统.02．物品系�
 const { 祖地双灵卫奖励池ID } = require("系统.02．物品系统.18．首领奖励选择.01．奖励配置表.index") as {
   祖地双灵卫奖励池ID: string;
 };
+
+const 双灵卫任务ID = "11040";
+
+function 确保双灵卫任务已登记(this: void): void {
+  if (questDB.getQuest(双灵卫任务ID)) return;
+  questDB.registerQuest({
+    id: 双灵卫任务ID,
+    type: QuestType.SIDE,
+    title: "精灵往事·归还信物",
+    description: "向埃德里安提交祖地调查结果。完成后获得双灵卫首领战利品选择与能量碎片。",
+    objectives: [{ id: "双灵卫调查", description: "完成祖地双灵卫试炼并提交调查结果", current: 0, required: 1, completed: false }],
+    rewards: [{ type: "item", value: 0, description: "双灵卫首领战利品选择；能量碎片" }],
+    status: QuestStatus.UNDISCOVERED,
+    startNpc: "埃德里安",
+    createdAt: 0,
+    updatedAt: 0,
+  });
+}
 const { 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
   广播单位提示: (this: void, sourceUnit: any, text: string, durationMs?: number) => void;
 };
@@ -60,6 +80,8 @@ function on拒绝祖地双灵卫奖励提交(this: void): void {
 
 function on接受祖地双灵卫奖励提交(this: void): void {
   if (!祖地双灵卫副本状态.Boss战已完成 || 祖地双灵卫副本状态.奖励已提交) return;
+  确保双灵卫任务已登记();
+  questManager.onQuestAccepted(0, 双灵卫任务ID);
   祖地双灵卫副本状态.奖励已提交 = true;
   发放祖地双灵卫全队奖励();
   if (句柄有效(祖地双灵卫副本状态.埃德里安单位)) {
@@ -130,5 +152,6 @@ function on祖地双灵卫奖励NPC选择(this: void, player: any, playerId: num
 export function init祖地双灵卫奖励提交(this: void): void {
   if (奖励提交模块已初始化) return;
   奖励提交模块已初始化 = true;
+  确保双灵卫任务已登记();
   addSelectionListener(on祖地双灵卫奖励NPC选择);
 }
