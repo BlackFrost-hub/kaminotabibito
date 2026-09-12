@@ -12,7 +12,6 @@ import {
 import {
   LIST_VIEW_H,
   LIST_CONTAINER_W,
-  MAX_PAGES_PER_CATEGORY,
   BG_TEX,
 } from "./01．任务UI常量";
 import {
@@ -35,8 +34,8 @@ const OBJECTIVE_HEIGHT = LIST_ITEM_H * 0.25;
 const FAIL_HEIGHT = LIST_ITEM_H * 0.2;
 const DETAIL_HEIGHT = LIST_ITEM_H * 0.22;
 
-// ========== 虚拟分区：分类/页/变体/行槽位预创建 ==========
-function createRowSlot(ctx: TaskUIListControlContext, parent: number, prefix: string, rowIndex: number, onClick: () => void): TaskUIRowSlotFrames {
+// ========== 虚拟分区：分类根节点创建，任务页按需创建 ==========
+function createRowSlot(ctx: TaskUIListControlContext, parent: number, prefix: string, rowIndex: number, onClick: (this: void) => void): TaskUIRowSlotFrames {
   const objectiveFrames: number[] = [];
   const detailFrames: number[] = [];
   const backdrop = createHiddenBackdrop(ctx, "TaskButtonBackdrop", prefix + "_Backdrop_" + rowIndex, parent, BG_TEX, rowIndex + 1) || 0;
@@ -59,7 +58,7 @@ function createVariant(ctx: TaskUIListControlContext, page: TaskUIPageFrames, ca
   const prefix = "TV" + category + "_" + pageIndex + "_" + variantIndex;
   for (let rowIndex = 0; rowIndex < ROWS_PER_PAGE; rowIndex++) {
     const slot = createRowSlot(ctx, root as number, prefix + "_R" + rowIndex, rowIndex, taskRowClickHandlersByIndex[rowIndex]!);
-    if (slot.clickBtn) taskRowBindingByFrameId[slot.clickBtn] = { page, rowIndex };
+    if (slot.clickBtn) taskRowBindingByFrameId[slot.clickBtn] = { page, rowIndex, playerId: ctx.currentPlayerId };
     rowSlots.push(slot);
   }
   return { root, rowSlots };
@@ -84,10 +83,20 @@ function createCategory(ctx: TaskUIListControlContext, category: QuestType): Tas
     ctx.applyDzTextFontAndCenterAlignment(emptyText);
   }
   const pages: TaskUIPageFrames[] = [];
-  for (let pageIndex = 0; pageIndex < MAX_PAGES_PER_CATEGORY; pageIndex++) {
-    pages.push(createPage(ctx, root as number, category, pageIndex));
-  }
-  return { root, emptyText: emptyText || null, pageCount: 0, pages };
+  const categoryView: TaskUICategoryFrames = {
+    root,
+    emptyText: emptyText || null,
+    pageCount: 0,
+    pages,
+    ensurePage: (pageIndex: number): TaskUIPageFrames => {
+      let page = pages[pageIndex];
+      if (page !== undefined) return page;
+      page = createPage(ctx, root as number, category, pageIndex);
+      pages[pageIndex] = page;
+      return page;
+    },
+  };
+  return categoryView;
 }
 
 export function createTaskUIPrecreatedListPool(ctx: TaskUIListControlContext): TaskUIPrecreatedListPool | null {

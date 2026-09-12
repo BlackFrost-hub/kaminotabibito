@@ -15,6 +15,7 @@
  */
 
 const jass = require("jass.common") as any;
+import { registerKeyEventByCode } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 const 硬件函数 = require("系统.00．核心系统.02．硬件函数") as {
   registerKeyEventRawStatus: (keyCode: number, status: number, sync: boolean, action: () => void) => any;
   getTriggerKey: () => number;
@@ -103,13 +104,13 @@ function onTabKeyUp(): void {
  * 使用命名函数 dispatchTabKey 避免匿名闭包进 JASS 回调。
  */
 function registerDamagePanelHotkeys(): void {
-  registerKey(常量.KEY_EVENT_DOWN, 常量.KEY_TAB, onTabKeyDown);
-  registerKey(常量.KEY_EVENT_UP, 常量.KEY_TAB, onTabKeyUp);
+  registerKeyEventByCode(常量.KEY_TAB, 常量.KEY_EVENT_DOWN as any, false, onTabKeyDown as any);
+  registerKeyEventByCode(常量.KEY_TAB, 常量.KEY_EVENT_UP as any, false, onTabKeyUp as any);
 }
 
 /** 模块级分发函数：F2-F6 跳镜头统一入口（避免匿名闭包） */
 function dispatchFocusHotkey(keyCode: number): void {
-  const p = getTriggerKeyPlayer();
+  const p = jass.GetLocalPlayer();
   if (p == null) return;
   const hero = focusHeroByFunctionKey(keyCode);
   if (hero == null) return;
@@ -117,9 +118,12 @@ function dispatchFocusHotkey(keyCode: number): void {
   panCameraToTimedForPlayer(p, jass.GetUnitX(hero), jass.GetUnitY(hero), 0.05);
 }
 
-function dispatchFocusTriggeredKey(): void {
-  dispatchFocusHotkey(getTriggerKey());
-}
+function onF2(): void { dispatchFocusHotkey(113); }
+function onF3(): void { dispatchFocusHotkey(114); }
+function onF4(): void { dispatchFocusHotkey(115); }
+function onF5(): void { dispatchFocusHotkey(116); }
+function onF6(): void { dispatchFocusHotkey(117); }
+const F键回调: Array<() => void> = [onF2, onF3, onF4, onF5, onF6];
 
 /**
  * 注册 F2-F6 跳镜头。
@@ -128,7 +132,7 @@ function dispatchFocusTriggeredKey(): void {
 function registerFocusHotkeys(): void {
   for (let i = 0; i < 常量.KEY_F.length; i++) {
     const functionKey = 常量.KEY_F[i];
-    registerKey(常量.KEY_EVENT_UP, functionKey, dispatchFocusTriggeredKey);
+    registerKeyEventByCode(functionKey, 常量.KEY_EVENT_UP as any, false, F键回调[i] as any);
   }
 }
 
@@ -211,3 +215,12 @@ export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: 
 if (常量.UI_ATTRIBUTE_SYSTEM_ENABLED) {
   scheduleUiStartup();
 }
+
+
+
+
+
+
+
+
+

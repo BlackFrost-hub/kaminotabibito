@@ -1,11 +1,15 @@
 /**
  * 主面板顶部分类标签（主线 / 支线 / 小任务）
  *
- * 架构：N 槽分类标签；每个 slot 独立创建，sync=true 回调再按触发玩家路由。
+ * 架构：N 槽分类标签；同步点击按触发玩家选槽，只在所属玩家本机显示。
  */
 
 const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
+const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
+  debugLogForce: (this: void, module: string, ...args: any[]) => void;
+};
+let categoryFrameDiagnosticCount = 0;
 
 import { QuestType } from "../01．任务数据";
 import { TAB_REL_Y, TAB_FRAME_W, TAB_FRAME_H, TAB_CATEGORY_FONT_SCALE } from "./01．任务UI常量";
@@ -23,6 +27,15 @@ const categoryTabClickHandlers: Partial<Record<QuestType, CategoryTabHandler>> =
 const tabTooltipByFrameId: Record<number, { msg: string; handler: ((msg: string) => void) | null } | undefined> = {};
 
 function handleCategoryTabClick(category: QuestType): void {
+  if (categoryFrameDiagnosticCount < 3) {
+    const frame = japi.DzGetTriggerUIEventFrame();
+    const uiPlayer = japi.DzGetTriggerUIEventPlayer();
+    const keyPlayer = japi.DzGetTriggerKeyPlayer();
+    categoryFrameDiagnosticCount++;
+    debugLogForce("任务UI-Frame对照", "分类同步点击", "category", category, "frame", frame,
+      "uiPid", uiPlayer == null || uiPlayer === 0 ? -1 : jass.GetPlayerId(uiPlayer),
+      "keyPid", keyPlayer == null || keyPlayer === 0 ? -1 : jass.GetPlayerId(keyPlayer));
+  }
   const handler = categoryTabClickHandlers[category];
   if (!handler) return;
   const onSwitchCategory = handler.onSwitchCategory;
@@ -41,6 +54,7 @@ function onDailyTabClick(): void { handleCategoryTabClick(QuestType.DAILY); }
 
 // 命名函数替代匿名闭包 - 悬停提示
 function onTabHoverShow(): void {
+  if (japi.DzGetTriggerKeyPlayer() !== jass.GetLocalPlayer()) return;
   let frame = (japi as any).DzGetTriggerUIEventFrame?.() ?? 0;
   if (!frame) frame = (japi as any).DzGetMouseFocus?.() ?? 0;
   const entry = frame ? tabTooltipByFrameId[frame] : undefined;
@@ -173,7 +187,7 @@ function createTaskTab(opts: {
     registerCategoryTabClickHandler(category, onSwitchCategory, onClickSound);
     tabTooltipByFrameId[tab] = { msg: tooltip, handler: onShowTabTooltip };
     setFrameClickEvent(tab, tabClickHandlers[category], true);
-    setFrameHoverEvents(tab, onTabHoverShow, onTabHoverHide, false);
+    setFrameHoverEvents(tab, onTabHoverShow, onTabHoverHide, true);
   }
 
   return { bg, tab };

@@ -1,13 +1,19 @@
-const japi = require("jass.japi") as any;
 const { round, clampMin, clampRange } = require("lib.扩展函数.封装函数.01．通用工具.index") as {
   round: (this: void, value: number) => number;
   clampMin: (this: void, value: number, minValue: number) => number;
   clampRange: (this: void, value: number, minValue: number, maxValue: number) => number;
 };
-declare const print: ((msg: string) => void) | undefined;
+const japi = require("jass.japi") as any;
+const { createTriggerOrNull, getMouseY, registerMouseButtonEventByCode, registerMouseMoveEventByCode } = require("../../../lib/扩展函数/封装函数/04．硬件输入/index") as {
+  createTriggerOrNull: () => any;
+  getMouseY: () => number;
+  registerMouseButtonEventByCode: (trigger: any, button: number, status: number, sync: boolean, action: () => void) => void;
+  registerMouseMoveEventByCode: (trigger: any, sync: boolean, action: () => void) => void;
+};
 
 import {
   ENABLE_MOUSE_WHEEL_SCROLL,
+  ENABLE_TASK_UI_TRACK_CLICK,
   ENTRY_Y,
   PANEL_REL_TO_ENTRY_Y,
   LIST_VIEW_H,
@@ -18,21 +24,16 @@ import {
   SCROLL_THUMB_BOTTOM_COMPENSATION,
 } from "./01．任务UI常量";
 import {
-  isWheelTargetForTaskList as isWheelTargetForTaskListByJapi,
-  isTaskScrollThumbDragHit,
-  isTaskScrollBarTrackHit,
-} from "./03．任务UI列表与滚动";
-import {
-  createTriggerOrNull,
   getClientHeight,
-  getMouseY,
   getMouseYRelative,
   getWindowHeight,
   getScrollbarTrackThumbTravelPx,
-  registerMouseButtonEventByCode,
-  registerMouseMoveEventByCode,
+  frameSetScriptByCode,
 } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
 import { pcallDzFrameShow } from "./02．任务UI辅助";
+
+/** 帧事件 ID（见 `.cursor/rules/engine/dzapi/ui-frame-types.mdc`） */
+const FRAME_EVENT_CLICK = 1;
 
 export interface TaskUIScrollContext {
   playerId: number;
@@ -45,10 +46,8 @@ export interface TaskUIScrollContext {
   FramePoint: any;
   setFramePointRelative: any;
   taskListWheelRegistered: boolean;
-  getMouseFocus?: (this: void) => number;
   getWheelDelta?: () => number;
-  /** `this: void`：避免 TSTL 编成 `ctx:registerMouseWheel` 把上下文表塞进 `sync` 位 */
-  registerMouseWheel(this: void, sync: boolean, cb: () => void, playerId?: number): unknown;
+  registerMouseWheel?: (this: void, sync: boolean, cb: () => void, playerId?: number) => unknown;
   isVisible: () => boolean;
   isOwnedByLocalPlayer: () => boolean;
   getCurrentPageCount: () => number;
@@ -58,11 +57,14 @@ export interface TaskUIScrollContext {
 }
 
 // ── 模块级上下文（避免匿名闭包进 JASS） ──
-/** N 槽：所有已注册的滚动上下文，滚轮/拖拽事件路由到可见的那个 */
-// ========== 虚拟分区：滚轮翻页 + 滑块拖拽 ==========
+/** N 槽：所有已注册的滚动上下文，滚轮/轨道点击帧事件路由到可见的那个 */
 const allWheelCtxs: TaskUIScrollContext[] = [];
-/** 帧上 MOUSE_DOWN 在部分环境不触发；用全局鼠标（`registerMouseButtonEventByCode`，见 ui-frame-types.mdc） */
 let taskThumbGlobalMouseRegistered = false;
+let taskGlobalWheelRegistered = false;
+let dragCtx: TaskUIScrollContext | null = null;
+let thumbDragActive = false;
+let thumbDragStartMouseYPx = 0;
+let thumbDragStartPage = 0;
 
 function findVisibleWheelCtx(): TaskUIScrollContext | null {
   for (let i = 0; i < allWheelCtxs.length; i++) {
@@ -72,22 +74,21 @@ function findVisibleWheelCtx(): TaskUIScrollContext | null {
   return null;
 }
 
-function taskUIWheelEventPcallBody(): void {
+/**
+ * 本地全局滚轮回调，只路由到本地玩家当前可见的槽位。
+ * 回调为全局具名函数，符合 Dz 回调约束。
+ */
+function onMouseWheelEvent(): void {
   const ctx = findVisibleWheelCtx();
   if (!ctx || !ctx.isVisible()) return;
-  if (!isWheelTargetForTaskListByJapi(japi, ctx.getMouseFocus, ctx.listContainer, ctx.scrollBarHitBtn || ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn)) return;
   handleTaskUIListWheel(ctx);
-}
-
-function onMouseWheelEvent(): void {
-  taskUIWheelEventPcallBody();
 }
 
 function thumbTravelNorm(): number {
   return LIST_VIEW_H - SCROLL_THUMB_SIZE - SCROLL_THUMB_TOP_COMPENSATION - SCROLL_THUMB_BOTTOM_COMPENSATION;
 }
 
-/** 按 0..1 比例摆 thumb（与当前页无关，用于拖拽跟手） */
+/** 按 0..1 比例摆放滑块（按页索引换算，非拖拽跟手） */
 function setTaskScrollThumbByRatio(ctx: TaskUIScrollContext, ratio: number): void {
   if (!ctx.scrollBarFrame || !ctx.scrollThumbFrame) return;
   const centeredX = (SCROLLBAR_W - SCROLL_THUMB_SIZE) * 0.5;
@@ -108,11 +109,6 @@ function updateTaskUIScrollThumbPosition(ctx: TaskUIScrollContext, pageCount: nu
   setTaskScrollThumbByRatio(ctx, ratio);
 }
 
-export function isTaskUIWheelTarget(ctx: TaskUIScrollContext): boolean {
-  if (!ctx.mainPanel) return false;
-  return isWheelTargetForTaskListByJapi(japi, ctx.getMouseFocus, ctx.listContainer, ctx.scrollBarHitBtn || ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn);
-}
-
 export function handleTaskUIListWheel(ctx: TaskUIScrollContext): void {
   const pageCount = ctx.getCurrentPageCount();
   if (pageCount <= 1) return;
@@ -126,63 +122,6 @@ export function handleTaskUIListWheel(ctx: TaskUIScrollContext): void {
   ctx.setCurrentPage(nextPage);
   ctx.onPageChanged(currentPage, nextPage);
   updateTaskUIScrollThumbPosition(ctx, pageCount);
-}
-
-// ── 虚拟分区：滑块拖拽（按下/移动/抬起） ──
-let dragCtx: TaskUIScrollContext | null = null;
-// 褰撳墠浠诲姟 UI 鍙湁涓€濂楀彲鎷栨嫿婊戝潡锛屾墍浠ヤ娇鐢ㄦā鍧楃骇 drag session銆?
-// 濡傛灉鍚庣画鍚屼竴瀹㈡埛绔唴鍚屾椂寮曞叆澶氬鍙嫋鎷?UI锛岃繖閲岄渶瑕佹敼鎴愭寜 context 鎸傝浇鐨勬嫋鎷界姸鎬併€? 
-/** 仅在为 true 时处理 MOUSE_UP / MOVE，避免未收到 DOWN 时误算 */
-let thumbDragActive = false;
-let thumbDragStartMouseYPx = 0;
-let thumbDragStartPage = 0;
-
-function ratioFromThumbDragMouseY(pageCount: number, mouseYPx: number): number {
-  const travelNorm = thumbTravelNorm();
-  if (travelNorm <= 0 || pageCount <= 1) return 0;
-  const travelPx = getScrollbarTrackThumbTravelPx(travelNorm);
-  const startRatio = pageCount > 1 ? thumbDragStartPage / (pageCount - 1) : 0;
-  return clampRange(startRatio + (mouseYPx - thumbDragStartMouseYPx) / travelPx, 0, 1);
-}
-
-function onThumbDragStart(): void {
-  if (!dragCtx) return;
-  if (dragCtx.getCurrentPageCount() <= 1) return;
-  thumbDragStartMouseYPx = getMouseY();
-  thumbDragStartPage = dragCtx.getCurrentPage();
-  thumbDragActive = true;
-  onThumbDragMove();
-}
-
-/** 鼠标移动：thumb 实时跟手；翻页仅当 round(ratio) 对应页与当前页不同（即跨过至少半格「页距」） */
-function onThumbDragMove(): void {
-  if (!thumbDragActive || !dragCtx) return;
-  const pageCount = dragCtx.getCurrentPageCount();
-  if (pageCount <= 1) return;
-  const ratio = ratioFromThumbDragMouseY(pageCount, getMouseY());
-  setTaskScrollThumbByRatio(dragCtx, ratio);
-  const targetPage = clampRange(round(ratio * (pageCount - 1)), 0, pageCount - 1);
-  const cur = dragCtx.getCurrentPage();
-  if (targetPage !== cur) {
-    dragCtx.setCurrentPage(targetPage);
-    dragCtx.onPageChanged(cur, targetPage);
-  }
-}
-
-function onThumbDragEnd(): void {
-  if (!thumbDragActive) return;
-  thumbDragActive = false;
-  if (!dragCtx) return;
-  const pageCount = dragCtx.getCurrentPageCount();
-  if (pageCount <= 1) return;
-  const ratio = ratioFromThumbDragMouseY(pageCount, getMouseY());
-  const targetPage = clampRange(round(ratio * (pageCount - 1)), 0, pageCount - 1);
-  const cur = dragCtx.getCurrentPage();
-  if (targetPage !== cur) {
-    dragCtx.setCurrentPage(targetPage);
-    dragCtx.onPageChanged(cur, targetPage);
-  }
-  updateTaskUIScrollThumbPosition(dragCtx, pageCount);
 }
 
 // ── 虚拟分区：轨道点击跳页 ──
@@ -229,61 +168,99 @@ function onScrollBarTrackClick(ctx: TaskUIScrollContext): void {
   updateTaskUIScrollThumbPosition(ctx, pageCount);
 }
 
-/** 本图约定：左键按下 (btn=1,status=1)、释放 (1,0)，见 .cursor/rules/engine/dzapi/ui-frame-types.mdc */
-function taskUIThumbPressPcallBody(): void {
+// ── 虚拟分区：轨道点击（帧事件 ID 1） ──
+/**
+ * 轨道点击回调：帧事件已带命中信息，直接用本地鼠标纵坐标换算目标页。
+ * 纯本机 UI 交互，`sync=false`（见 n-slot-ui-symmetric-execution §4.4）。
+ */
+function onTaskUITrackClickEvent(): void {
   const ctx = findVisibleWheelCtx();
   if (!ctx || !ctx.isVisible()) return;
-  const thumbHit = isTaskScrollThumbDragHit(japi, ctx.getMouseFocus, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn);
-  if (thumbHit) {
-    dragCtx = ctx;
-    onThumbDragStart();
-    return;
-  }
-  const trackHit = isTaskScrollBarTrackHit(japi, ctx.getMouseFocus, ctx.scrollBarHitBtn || ctx.scrollBarFrame, ctx.scrollThumbFrame, ctx.scrollThumbHitBtn);
-  if (!trackHit) return;
   onScrollBarTrackClick(ctx);
 }
 
+function ratioFromThumbDragMouseY(pageCount: number, mouseYPx: number): number {
+  const travelPx = getScrollbarTrackThumbTravelPx(thumbTravelNorm());
+  if (travelPx <= 0 || pageCount <= 1) return 0;
+  const startRatio = thumbDragStartPage / (pageCount - 1);
+  return clampRange(startRatio + (mouseYPx - thumbDragStartMouseYPx) / travelPx, 0, 1);
+}
+
+function onThumbDragStart(): void {
+  if (!dragCtx) return;
+  if (dragCtx.getCurrentPageCount() <= 1) return;
+  thumbDragStartMouseYPx = getMouseY();
+  thumbDragStartPage = dragCtx.getCurrentPage();
+  thumbDragActive = true;
+}
+
+function onThumbDragMove(): void {
+  if (!thumbDragActive || !dragCtx) return;
+  const pageCount = dragCtx.getCurrentPageCount();
+  if (pageCount <= 1) return;
+  const ratio = ratioFromThumbDragMouseY(pageCount, getMouseY());
+  setTaskScrollThumbByRatio(dragCtx, ratio);
+  const targetPage = clampRange(round(ratio * (pageCount - 1)), 0, pageCount - 1);
+  const currentPage = dragCtx.getCurrentPage();
+  if (targetPage !== currentPage) {
+    dragCtx.setCurrentPage(targetPage);
+    dragCtx.onPageChanged(currentPage, targetPage);
+  }
+}
+
+function onThumbDragEnd(): void {
+  if (!thumbDragActive) return;
+  thumbDragActive = false;
+  if (dragCtx) updateTaskUIScrollThumbPosition(dragCtx, dragCtx.getCurrentPageCount());
+}
+
 function onGlobalThumbLeftPress(): void {
-  taskUIThumbPressPcallBody();
+  const ctx = findVisibleWheelCtx();
+  if (!ctx) return;
+  const focus = japi.DzGetMouseFocus();
+  if (focus !== ctx.scrollThumbFrame && focus !== ctx.scrollThumbHitBtn) return;
+  dragCtx = ctx;
+  onThumbDragStart();
 }
 
-function taskUIThumbReleasePcallBody(): void {
-  onThumbDragEnd();
-}
+function onGlobalThumbLeftRelease(): void { onThumbDragEnd(); }
+function onGlobalThumbDragMove(): void { onThumbDragMove(); }
 
-function onGlobalThumbLeftRelease(): void {
-  taskUIThumbReleasePcallBody();
-}
-
-function taskUIThumbMovePcallBody(): void {
-  onThumbDragMove();
-}
-
-function onGlobalThumbDragMove(): void {
-  taskUIThumbMovePcallBody();
-}
-
-// ── 虚拟分区：全局鼠标事件注册与滚轮注册 ──
 function ensureTaskThumbGlobalMouseRegistered(): void {
   if (taskThumbGlobalMouseRegistered) return;
-  const trig = createTriggerOrNull();
-  if (!trig) return;
-  registerMouseButtonEventByCode(trig, 1, 1, false, onGlobalThumbLeftPress);
-  registerMouseButtonEventByCode(trig, 1, 0, false, onGlobalThumbLeftRelease);
-  registerMouseMoveEventByCode(trig, false, onGlobalThumbDragMove);
+  const trigger = createTriggerOrNull();
+  if (!trigger) return;
+  registerMouseButtonEventByCode(trigger, 1, 1, false, onGlobalThumbLeftPress);
+  registerMouseButtonEventByCode(trigger, 1, 0, false, onGlobalThumbLeftRelease);
+  registerMouseMoveEventByCode(trigger, false, onGlobalThumbDragMove);
   taskThumbGlobalMouseRegistered = true;
 }
 
-export function registerTaskUIListWheel(ctx: TaskUIScrollContext): unknown {
-  dragCtx = ctx;
-  allWheelCtxs.push(ctx);
-  ensureTaskThumbGlobalMouseRegistered();
+function registerSlotFrameEvents(ctx: TaskUIScrollContext): void {
+  if (ctx.taskListWheelRegistered) return;
 
-  if (!ENABLE_MOUSE_WHEEL_SCROLL) return null;
-  if (ctx.taskListWheelRegistered) return null;
-  ctx.registerMouseWheel(false, onMouseWheelEvent);
+  // 轨道点击跳页：帧事件 ID 1，挂轨道命中帧；纯本机 UI 交互 → sync=false
+  if (ENABLE_TASK_UI_TRACK_CLICK) {
+    const trackFrame = ctx.scrollBarHitBtn || ctx.scrollBarFrame;
+    if (trackFrame) {
+      frameSetScriptByCode(trackFrame, FRAME_EVENT_CLICK, onTaskUITrackClickEvent, false);
+    }
+  }
+
   ctx.taskListWheelRegistered = true;
+}
+
+export function registerTaskUIListWheel(ctx: TaskUIScrollContext): unknown {
+  allWheelCtxs.push(ctx);
+  dragCtx = ctx;
+  ensureTaskThumbGlobalMouseRegistered();
+  if (ENABLE_MOUSE_WHEEL_SCROLL && !taskGlobalWheelRegistered && ctx.registerMouseWheel) {
+    // 滚轮是每个客户端一套的本地硬件事件，不能绑定第一个初始化槽位。
+    // 所有玩家槽位都在每个客户端创建；只注册一次后由回调路由到本地可见槽位。
+    ctx.registerMouseWheel(false, onMouseWheelEvent);
+    taskGlobalWheelRegistered = true;
+  }
+  registerSlotFrameEvents(ctx);
   return null;
 }
 

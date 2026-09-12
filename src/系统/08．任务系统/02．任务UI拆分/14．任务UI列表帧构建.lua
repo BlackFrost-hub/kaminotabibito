@@ -18,7 +18,7 @@ function ____exports.createHiddenRoot(self, ctx, name, parent, width, height)
     end
     local frame = ctx:createFrame({
         type = "FRAME",
-        name = name,
+        name = (name .. "_s") .. tostring(ctx.currentPlayerId),
         parent = parent,
         template = "template",
         visible = false,
@@ -40,7 +40,7 @@ function ____exports.createHiddenRoot(self, ctx, name, parent, width, height)
 end
 function ____exports.createHiddenText(self, ctx, name, parent, width, height)
     local frame = ctx:createTextLabel(
-        name,
+        (name .. "_s") .. tostring(ctx.currentPlayerId),
         parent,
         "",
         {
@@ -59,11 +59,11 @@ function ____exports.createHiddenText(self, ctx, name, parent, width, height)
     return frame
 end
 function ____exports.createHiddenBackdrop(self, ctx, templateName, frameName, parent, texture, contextId)
-    local frame = tryCreateFromFdfOnly(nil, templateName, parent, contextId or ctx.contextId) or 0
+    local frame = tryCreateFromFdfOnly(nil, templateName, parent, ctx.contextId + (contextId or 0)) or 0
     if not frame then
         frame = ctx:createFrame({
             type = ctx.FrameType.BACKDROP,
-            name = frameName,
+            name = (frameName .. "_s") .. tostring(ctx.currentPlayerId),
             parent = parent,
             template = "template",
             visible = false,
@@ -78,7 +78,7 @@ end
 function ____exports.createPlainHiddenBackdrop(self, ctx, name, parent)
     local frame = ctx:createFrame({
         type = ctx.FrameType.BACKDROP,
-        name = name,
+        name = (name .. "_s") .. tostring(ctx.currentPlayerId),
         parent = parent,
         template = "template",
         visible = false,
@@ -89,7 +89,7 @@ end
 function ____exports.createHiddenButton(self, ctx, name, parent, onClick)
     local frame = ctx:createFrame({
         type = ctx.FrameType.GLUETEXTBUTTON,
-        name = name,
+        name = (name .. "_s") .. tostring(ctx.currentPlayerId),
         parent = parent,
         template = "template",
         visible = false,
@@ -100,7 +100,7 @@ function ____exports.createHiddenButton(self, ctx, name, parent, onClick)
     if not frame then
         return nil
     end
-    ctx:setFrameClickEvent(frame, onClick, true)
+    ctx:setFrameClickEvent(frame, onClick, false)
     return frame
 end
 local function hideFrames(self, frames, setVisible)

@@ -21,7 +21,7 @@ export function createHiddenRoot(
   const frame =
     ctx.createFrame({
       type: "FRAME",
-      name,
+      name: name + "_s" + ctx.currentPlayerId,
       parent,
       template: "template",
       visible: false,
@@ -42,7 +42,7 @@ export function createHiddenText(
 ): number | null {
   const frame =
     ctx.createTextLabel(
-      name,
+      name + "_s" + ctx.currentPlayerId,
       parent,
       "",
       {
@@ -67,12 +67,12 @@ export function createHiddenBackdrop(
   texture?: string,
   contextId?: number
 ): number | null {
-  let frame = tryCreateFromFdfOnly(templateName, parent, contextId ?? ctx.contextId) || 0;
+  let frame = tryCreateFromFdfOnly(templateName, parent, ctx.contextId + (contextId ?? 0)) || 0;
   if (!frame) {
     frame =
       ctx.createFrame({
         type: ctx.FrameType.BACKDROP,
-        name: frameName,
+        name: frameName + "_s" + ctx.currentPlayerId,
         parent,
         template: "template",
         visible: false,
@@ -93,7 +93,7 @@ export function createPlainHiddenBackdrop(
   const frame =
     ctx.createFrame({
       type: ctx.FrameType.BACKDROP,
-      name,
+      name: name + "_s" + ctx.currentPlayerId,
       parent,
       template: "template",
       visible: false,
@@ -106,12 +106,12 @@ export function createHiddenButton(
   ctx: TaskUIListControlContext,
   name: string,
   parent: number,
-  onClick: () => void
+  onClick: (this: void) => void
 ): number | null {
   const frame =
     ctx.createFrame({
       type: ctx.FrameType.GLUETEXTBUTTON,
-      name,
+      name: name + "_s" + ctx.currentPlayerId,
       parent,
       template: "template",
       visible: false,
@@ -120,7 +120,8 @@ export function createHiddenButton(
       id: ctx.contextId,
     }) || 0;
   if (!frame) return null;
-  ctx.setFrameClickEvent(frame, onClick, true);
+  // 任务行只做本地展开/折叠；本地回调通过鼠标焦点查找当前行。
+  ctx.setFrameClickEvent(frame, onClick, false);
   return frame;
 }
 

@@ -17,7 +17,8 @@ import { QuestDatabase, QuestType, QuestStatus, QuestData } from "./01．任务�
  */
 function registerDummyMainQuests(): void {
   const db = QuestDatabase.getInstance();
-  const now = os.time();
+  // 测试数据必须跨客户端完全一致，不能使用本地时间作为任务字段。
+  const now = 0;
   for (let i = 1; i <= 20; i++) {
     const questId = `dummy_main_${i < 10 ? "00" + i : i < 100 ? "0" + i : String(i)}`;
     // 先注册任务定义
@@ -76,8 +77,8 @@ if (ENABLE_QUEST_RUNTIME_CORE) {
     };
     初始化击杀任务进度();
   }
-  // 注册20个假主线任务用于测试
-  // registerDummyMainQuests();
+  // 暂保留20个假任务，验证多玩家槽位隔离和分页；测试完成后关闭。
+  registerDummyMainQuests();
 }
 
 // ========== 任务 UI（04 拆分模块） ==========

@@ -1,8 +1,9 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local thumbTravelNorm, setTaskScrollThumbByRatio, updateTaskUIScrollThumbPosition, ratioFromThumbDragMouseY, onThumbDragMove, round, clampMin, clampRange, dragCtx, thumbDragActive, thumbDragStartMouseYPx, thumbDragStartPage
+local thumbTravelNorm, setTaskScrollThumbByRatio, updateTaskUIScrollThumbPosition, clampMin, clampRange
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.02．任务UI拆分.01．任务UI常量")
 local ENABLE_MOUSE_WHEEL_SCROLL = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_MOUSE_WHEEL_SCROLL
+local ENABLE_TASK_UI_TRACK_CLICK = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENABLE_TASK_UI_TRACK_CLICK
 local ENTRY_Y = ____01_FF0E_4EFB_52A1UI_5E38_91CF.ENTRY_Y
 local PANEL_REL_TO_ENTRY_Y = ____01_FF0E_4EFB_52A1UI_5E38_91CF.PANEL_REL_TO_ENTRY_Y
 local LIST_VIEW_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_VIEW_H
@@ -11,19 +12,12 @@ local SCROLLBAR_TOP_INSET = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLLBAR_TOP_INSE
 local SCROLL_THUMB_SIZE = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_SIZE
 local SCROLL_THUMB_TOP_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_TOP_COMPENSATION
 local SCROLL_THUMB_BOTTOM_COMPENSATION = ____01_FF0E_4EFB_52A1UI_5E38_91CF.SCROLL_THUMB_BOTTOM_COMPENSATION
-local ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8 = require("系统.08．任务系统.02．任务UI拆分.03．任务UI列表与滚动")
-local isWheelTargetForTaskListByJapi = ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8.isWheelTargetForTaskList
-local isTaskScrollThumbDragHit = ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8.isTaskScrollThumbDragHit
-local isTaskScrollBarTrackHit = ____03_FF0E_4EFB_52A1UI_5217_8868_4E0E_6EDA_52A8.isTaskScrollBarTrackHit
 local ____index = require("lib.扩展函数.封装函数.04．硬件输入.index")
-local createTriggerOrNull = ____index.createTriggerOrNull
 local getClientHeight = ____index.getClientHeight
-local getMouseY = ____index.getMouseY
 local getMouseYRelative = ____index.getMouseYRelative
 local getWindowHeight = ____index.getWindowHeight
 local getScrollbarTrackThumbTravelPx = ____index.getScrollbarTrackThumbTravelPx
-local registerMouseButtonEventByCode = ____index.registerMouseButtonEventByCode
-local registerMouseMoveEventByCode = ____index.registerMouseMoveEventByCode
+local frameSetScriptByCode = ____index.frameSetScriptByCode
 local ____02_FF0E_4EFB_52A1UI_8F85_52A9 = require("系统.08．任务系统.02．任务UI拆分.02．任务UI辅助")
 local pcallDzFrameShow = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameShow
 function thumbTravelNorm(self)
@@ -86,49 +80,26 @@ function ____exports.handleTaskUIListWheel(self, ctx)
     ctx:onPageChanged(currentPage, nextPage)
     updateTaskUIScrollThumbPosition(nil, ctx, pageCount)
 end
-function ratioFromThumbDragMouseY(self, pageCount, mouseYPx)
-    local travelNorm = thumbTravelNorm(nil)
-    if travelNorm <= 0 or pageCount <= 1 then
-        return 0
-    end
-    local travelPx = getScrollbarTrackThumbTravelPx(nil, travelNorm)
-    local startRatio = pageCount > 1 and thumbDragStartPage / (pageCount - 1) or 0
-    return clampRange(startRatio + (mouseYPx - thumbDragStartMouseYPx) / travelPx, 0, 1)
-end
-function onThumbDragMove(self)
-    if not thumbDragActive or not dragCtx then
-        return
-    end
-    local pageCount = dragCtx:getCurrentPageCount()
-    if pageCount <= 1 then
-        return
-    end
-    local ratio = ratioFromThumbDragMouseY(
-        nil,
-        pageCount,
-        getMouseY(nil)
-    )
-    setTaskScrollThumbByRatio(nil, dragCtx, ratio)
-    local targetPage = clampRange(
-        round(ratio * (pageCount - 1)),
-        0,
-        pageCount - 1
-    )
-    local cur = dragCtx:getCurrentPage()
-    if targetPage ~= cur then
-        dragCtx:setCurrentPage(targetPage)
-        dragCtx:onPageChanged(cur, targetPage)
-    end
-end
-local japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
-round = ____require_result_0.round
+local round = ____require_result_0.round
 clampMin = ____require_result_0.clampMin
 clampRange = ____require_result_0.clampRange
---- N 槽：所有已注册的滚动上下文，滚轮/拖拽事件路由到可见的那个
+local japi = require("jass.japi")
+local ____require_result_1 = require("lib.扩展函数.封装函数.04．硬件输入.index")
+local createTriggerOrNull = ____require_result_1.createTriggerOrNull
+local getMouseY = ____require_result_1.getMouseY
+local registerMouseButtonEventByCode = ____require_result_1.registerMouseButtonEventByCode
+local registerMouseMoveEventByCode = ____require_result_1.registerMouseMoveEventByCode
+--- 帧事件 ID（见 `.cursor/rules/engine/dzapi/ui-frame-types.mdc`）
+local FRAME_EVENT_CLICK = 1
+--- N 槽：所有已注册的滚动上下文，滚轮/轨道点击帧事件路由到可见的那个
 local allWheelCtxs = {}
---- 帧上 MOUSE_DOWN 在部分环境不触发；用全局鼠标（`registerMouseButtonEventByCode`，见 ui-frame-types.mdc）
 local taskThumbGlobalMouseRegistered = false
+local taskGlobalWheelRegistered = false
+local dragCtx = nil
+local thumbDragActive = false
+local thumbDragStartMouseYPx = 0
+local thumbDragStartPage = 0
 local function findVisibleWheelCtx(self)
     do
         local i = 0
@@ -142,85 +113,14 @@ local function findVisibleWheelCtx(self)
     end
     return nil
 end
-local function taskUIWheelEventPcallBody(self)
+--- 本地全局滚轮回调，只路由到本地玩家当前可见的槽位。
+-- 回调为全局具名函数，符合 Dz 回调约束。
+local function onMouseWheelEvent(self)
     local ctx = findVisibleWheelCtx(nil)
     if not ctx or not ctx:isVisible() then
         return
     end
-    if not isWheelTargetForTaskListByJapi(
-        nil,
-        japi,
-        ctx.getMouseFocus,
-        ctx.listContainer,
-        ctx.scrollBarHitBtn or ctx.scrollBarFrame,
-        ctx.scrollThumbFrame,
-        ctx.scrollThumbHitBtn
-    ) then
-        return
-    end
     ____exports.handleTaskUIListWheel(nil, ctx)
-end
-local function onMouseWheelEvent(self)
-    taskUIWheelEventPcallBody(nil)
-end
-function ____exports.isTaskUIWheelTarget(self, ctx)
-    if not ctx.mainPanel then
-        return false
-    end
-    return isWheelTargetForTaskListByJapi(
-        nil,
-        japi,
-        ctx.getMouseFocus,
-        ctx.listContainer,
-        ctx.scrollBarHitBtn or ctx.scrollBarFrame,
-        ctx.scrollThumbFrame,
-        ctx.scrollThumbHitBtn
-    )
-end
-dragCtx = nil
-thumbDragActive = false
-thumbDragStartMouseYPx = 0
-thumbDragStartPage = 0
-local function onThumbDragStart(self)
-    if not dragCtx then
-        return
-    end
-    if dragCtx:getCurrentPageCount() <= 1 then
-        return
-    end
-    thumbDragStartMouseYPx = getMouseY(nil)
-    thumbDragStartPage = dragCtx:getCurrentPage()
-    thumbDragActive = true
-    onThumbDragMove(nil)
-end
-local function onThumbDragEnd(self)
-    if not thumbDragActive then
-        return
-    end
-    thumbDragActive = false
-    if not dragCtx then
-        return
-    end
-    local pageCount = dragCtx:getCurrentPageCount()
-    if pageCount <= 1 then
-        return
-    end
-    local ratio = ratioFromThumbDragMouseY(
-        nil,
-        pageCount,
-        getMouseY(nil)
-    )
-    local targetPage = clampRange(
-        round(ratio * (pageCount - 1)),
-        0,
-        pageCount - 1
-    )
-    local cur = dragCtx:getCurrentPage()
-    if targetPage ~= cur then
-        dragCtx:setCurrentPage(targetPage)
-        dragCtx:onPageChanged(cur, targetPage)
-    end
-    updateTaskUIScrollThumbPosition(nil, dragCtx, pageCount)
 end
 local function getTaskScrollTrackTopYNorm(self)
     return ENTRY_Y + PANEL_REL_TO_ENTRY_Y - SCROLLBAR_TOP_INSET
@@ -267,63 +167,104 @@ local function onScrollBarTrackClick(self, ctx)
     ctx:onPageChanged(currentPage, targetPage)
     updateTaskUIScrollThumbPosition(nil, ctx, pageCount)
 end
---- 本图约定：左键按下 (btn=1,status=1)、释放 (1,0)，见 .cursor/rules/engine/dzapi/ui-frame-types.mdc
-local function taskUIThumbPressPcallBody(self)
+--- 轨道点击回调：帧事件已带命中信息，直接用本地鼠标纵坐标换算目标页。
+-- 纯本机 UI 交互，`sync=false`（见 n-slot-ui-symmetric-execution §4.4）。
+local function onTaskUITrackClickEvent(self)
     local ctx = findVisibleWheelCtx(nil)
     if not ctx or not ctx:isVisible() then
         return
     end
-    local thumbHit = isTaskScrollThumbDragHit(
-        nil,
-        japi,
-        ctx.getMouseFocus,
-        ctx.scrollThumbFrame,
-        ctx.scrollThumbHitBtn
-    )
-    if thumbHit then
-        dragCtx = ctx
-        onThumbDragStart(nil)
-        return
-    end
-    local trackHit = isTaskScrollBarTrackHit(
-        nil,
-        japi,
-        ctx.getMouseFocus,
-        ctx.scrollBarHitBtn or ctx.scrollBarFrame,
-        ctx.scrollThumbFrame,
-        ctx.scrollThumbHitBtn
-    )
-    if not trackHit then
-        return
-    end
     onScrollBarTrackClick(nil, ctx)
 end
-local function onGlobalThumbLeftPress(self)
-    taskUIThumbPressPcallBody(nil)
+local function ratioFromThumbDragMouseY(self, pageCount, mouseYPx)
+    local travelPx = getScrollbarTrackThumbTravelPx(
+        nil,
+        thumbTravelNorm(nil)
+    )
+    if travelPx <= 0 or pageCount <= 1 then
+        return 0
+    end
+    local startRatio = thumbDragStartPage / (pageCount - 1)
+    return clampRange(startRatio + (mouseYPx - thumbDragStartMouseYPx) / travelPx, 0, 1)
 end
-local function taskUIThumbReleasePcallBody(self)
-    onThumbDragEnd(nil)
+local function onThumbDragStart(self)
+    if not dragCtx then
+        return
+    end
+    if dragCtx:getCurrentPageCount() <= 1 then
+        return
+    end
+    thumbDragStartMouseYPx = getMouseY(nil)
+    thumbDragStartPage = dragCtx:getCurrentPage()
+    thumbDragActive = true
+end
+local function onThumbDragMove(self)
+    if not thumbDragActive or not dragCtx then
+        return
+    end
+    local pageCount = dragCtx:getCurrentPageCount()
+    if pageCount <= 1 then
+        return
+    end
+    local ratio = ratioFromThumbDragMouseY(
+        nil,
+        pageCount,
+        getMouseY(nil)
+    )
+    setTaskScrollThumbByRatio(nil, dragCtx, ratio)
+    local targetPage = clampRange(
+        round(ratio * (pageCount - 1)),
+        0,
+        pageCount - 1
+    )
+    local currentPage = dragCtx:getCurrentPage()
+    if targetPage ~= currentPage then
+        dragCtx:setCurrentPage(targetPage)
+        dragCtx:onPageChanged(currentPage, targetPage)
+    end
+end
+local function onThumbDragEnd(self)
+    if not thumbDragActive then
+        return
+    end
+    thumbDragActive = false
+    if dragCtx then
+        updateTaskUIScrollThumbPosition(
+            nil,
+            dragCtx,
+            dragCtx:getCurrentPageCount()
+        )
+    end
+end
+local function onGlobalThumbLeftPress(self)
+    local ctx = findVisibleWheelCtx(nil)
+    if not ctx then
+        return
+    end
+    local focus = japi.DzGetMouseFocus()
+    if focus ~= ctx.scrollThumbFrame and focus ~= ctx.scrollThumbHitBtn then
+        return
+    end
+    dragCtx = ctx
+    onThumbDragStart(nil)
 end
 local function onGlobalThumbLeftRelease(self)
-    taskUIThumbReleasePcallBody(nil)
-end
-local function taskUIThumbMovePcallBody(self)
-    onThumbDragMove(nil)
+    onThumbDragEnd(nil)
 end
 local function onGlobalThumbDragMove(self)
-    taskUIThumbMovePcallBody(nil)
+    onThumbDragMove(nil)
 end
 local function ensureTaskThumbGlobalMouseRegistered(self)
     if taskThumbGlobalMouseRegistered then
         return
     end
-    local trig = createTriggerOrNull(nil)
-    if not trig then
+    local trigger = createTriggerOrNull(nil)
+    if not trigger then
         return
     end
     registerMouseButtonEventByCode(
         nil,
-        trig,
+        trigger,
         1,
         1,
         false,
@@ -331,27 +272,36 @@ local function ensureTaskThumbGlobalMouseRegistered(self)
     )
     registerMouseButtonEventByCode(
         nil,
-        trig,
+        trigger,
         1,
         0,
         false,
         onGlobalThumbLeftRelease
     )
-    registerMouseMoveEventByCode(nil, trig, false, onGlobalThumbDragMove)
+    registerMouseMoveEventByCode(nil, trigger, false, onGlobalThumbDragMove)
     taskThumbGlobalMouseRegistered = true
 end
-function ____exports.registerTaskUIListWheel(self, ctx)
-    dragCtx = ctx
-    allWheelCtxs[#allWheelCtxs + 1] = ctx
-    ensureTaskThumbGlobalMouseRegistered(nil)
-    if not ENABLE_MOUSE_WHEEL_SCROLL then
-        return nil
-    end
+local function registerSlotFrameEvents(self, ctx)
     if ctx.taskListWheelRegistered then
-        return nil
+        return
     end
-    ctx.registerMouseWheel(false, onMouseWheelEvent)
+    if ENABLE_TASK_UI_TRACK_CLICK then
+        local trackFrame = ctx.scrollBarHitBtn or ctx.scrollBarFrame
+        if trackFrame then
+            frameSetScriptByCode(trackFrame, FRAME_EVENT_CLICK, onTaskUITrackClickEvent, false)
+        end
+    end
     ctx.taskListWheelRegistered = true
+end
+function ____exports.registerTaskUIListWheel(self, ctx)
+    allWheelCtxs[#allWheelCtxs + 1] = ctx
+    dragCtx = ctx
+    ensureTaskThumbGlobalMouseRegistered(nil)
+    if ENABLE_MOUSE_WHEEL_SCROLL and not taskGlobalWheelRegistered and ctx.registerMouseWheel then
+        ctx.registerMouseWheel(false, onMouseWheelEvent)
+        taskGlobalWheelRegistered = true
+    end
+    registerSlotFrameEvents(nil, ctx)
     return nil
 end
 function ____exports.updateTaskUIScrollBarVisibility(self, ctx, pageCount, hasQuestRows)

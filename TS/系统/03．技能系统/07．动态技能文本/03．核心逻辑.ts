@@ -687,7 +687,8 @@ function 处理技能提示(this: void, unit: any, abilityId: number): boolean {
 
   const 缓存键 = 生成提示缓存键(unit, abilityId);
   const heroConfigForText = heroConfigTool.获取单位玩家英雄配置(unit);
-  const dynamicKey = heroConfigForText != null ? stringToFourCCSafe(heroConfigForText.单位类型ID) : 0;
+  // 英雄配置里的类型字段名是 "unit"（不是 单位类型ID），取错会恒为 0、动态说明整条失效
+  const dynamicKey = heroConfigForText != null ? stringToFourCCSafe(heroConfigForText.unit) : 0;
   let 配置说明 = dynamicKey !== 0 ? dynamicSkillData.获取动态技能说明(dynamicKey, abilityId) : undefined;
   if (配置说明 == null) {
     for (let i = 0; i < 静态英雄配置列表.length && 配置说明 == null; i++) {
@@ -755,7 +756,8 @@ export function 检查英雄技能(this: void, hero: any): void {
 
   // Q/W/E/R 可能在英雄注册后才由升级系统加入，先把已登记的显示配置写入新技能。
   const heroConfig = heroConfigTool.获取单位玩家英雄配置(hero);
-  const heroKey = heroConfig != null ? stringToFourCCSafe(heroConfig.单位类型ID) : 0;
+  // 同上：字段名是 "unit"；取错则 heroKey=0，登记表查不到、本刷新空转
+  const heroKey = heroConfig != null ? stringToFourCCSafe(heroConfig.unit) : 0;
   dynamicSkillData.刷新单位技能数据(hero, heroKey);
   const abilityIds = 获取快照技能列表(hero);
   已处理技能缓存[生成英雄缓存键(hero)] = abilityIds;
@@ -795,6 +797,9 @@ export function 刷新单个英雄技能动态文本(this: void, hero: any, abil
 export function 获取技能原始提示(this: void, hero: any, abilityId: number): string {
   if (!isValidHandle(hero) || abilityId === 0) return "";
   const 缓存键 = 生成提示缓存键(hero, abilityId);
+  const dynamicKey = heroBridge.getRegisteredPlayerHeroTypeId(hero);
+  const 配置说明 = dynamicSkillData.获取动态技能说明(dynamicKey, abilityId);
+  if (配置说明 != null) return 配置说明;
   const 已缓存文本 = 原始提示缓存[缓存键];
   if (已缓存文本 != null) return 已缓存文本;
 
@@ -833,6 +838,7 @@ export function 同步刷新英雄技能原始界面(this: void, hero: any): voi
     DzSetUnitAbilityUpdate(hero, abilityIds[i]);
   }
 }
+
 
 
 

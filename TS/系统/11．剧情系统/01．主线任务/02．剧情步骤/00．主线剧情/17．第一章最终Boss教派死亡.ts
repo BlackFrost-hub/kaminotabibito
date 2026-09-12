@@ -20,6 +20,9 @@ const { GetPlayersAll, ForGroupBJ } = require("lib.扩展函数.BJ函数.07．�
 const { 切换区域背景音乐表达式 } = require("系统.07．地形系统.07．区域背景音乐.04．区域背景音乐运行时") as {
   切换区域背景音乐表达式: (this: void, expr: string | undefined, add: boolean) => number;
 };
+const { 获取矩形区域 } = require("系统.07．地形系统.09．动态矩形区域注册表.index") as {
+  获取矩形区域: (this: void, 名称: string) => any;
+};
 const { 创建点特效 } = require("lib.扩展函数.封装函数.01．通用工具.03．特效") as {
   创建点特效: (this: void, 参数: { 模型路径: string; X: number; Y: number; 面向角度?: number; 缩放?: number; 动画速度?: number; 持续秒?: number }) => any;
 };
@@ -93,6 +96,13 @@ const SetUnitAnimation = jass.SetUnitAnimation as (this: void, whichUnit: any, a
 const SetUnitVertexColor = jass.SetUnitVertexColor as (this: void, whichUnit: any, red: number, green: number, blue: number, alpha: number) => void;
 const GetEnumUnit = jass.GetEnumUnit as (this: void) => any;
 const Player = jass.Player as (this: void, playerId: number) => any;
+const Condition = jass.Condition as (this: void, func: (this: void) => boolean) => any;
+const GetFilterUnit = jass.GetFilterUnit as (this: void) => any;
+const GetOwningPlayer = jass.GetOwningPlayer as (this: void, whichUnit: any) => any;
+const GetUnitsInRectMatching = jass.GetUnitsInRectMatching as (this: void, whichRect: any, filter: any) => any;
+const IsPlayerInForce = jass.IsPlayerInForce as (this: void, whichPlayer: any, whichForce: any) => boolean;
+const ShowUnit = jass.ShowUnit as (this: void, whichUnit: any, show: boolean) => void;
+const PLAYER_NEUTRAL_PASSIVE = jass.PLAYER_NEUTRAL_PASSIVE as number;
 const UNIT_TYPE_DEAD = jass.UNIT_TYPE_DEAD as any;
 const bj_DEGTORAD = jass.bj_DEGTORAD as number;
 const bj_QUESTMESSAGE_HINT = (require("jass.globals") as any).bj_QUESTMESSAGE_HINT as number;
@@ -101,7 +111,10 @@ const bj_QUESTMESSAGE_UPDATED = (require("jass.globals") as any).bj_QUESTMESSAGE
 const 蒙面人死亡现场残影键 = "剧情运行时.蒙面人死亡.残影";
 const 蒙面人死亡击杀玩家键 = "剧情运行时.蒙面人死亡.击杀玩家";
 const 蒙面人死亡现场玩家暂停来源 = "剧情系统:蒙面人死亡现场";
+/** 死亡收尾后延迟恢复精灵村被隐藏NPC（毫秒） */
+const 蒙面人死亡恢复精灵村NPC延迟毫秒 = 180000;
 let 蒙面人死亡环境音乐延迟ID = 0;
+let 蒙面人死亡恢复精灵村NPC延迟ID = 0;
 let 蒙面人死亡音乐已启动 = false;
 let 蒙面人死亡残影渐隐周期ID = 0;
 let 蒙面人死亡残影渐隐次数 = 0;
@@ -214,6 +227,10 @@ function 清理蒙面人死亡现场(this: void): void {
     蒙面人死亡环境音乐延迟ID = 0;
     恢复蒙面人死亡区域音乐();
   }
+  if (蒙面人死亡恢复精灵村NPC延迟ID !== 0) {
+    removeDelayedCallback(蒙面人死亡恢复精灵村NPC延迟ID);
+    蒙面人死亡恢复精灵村NPC延迟ID = 0;
+  }
   if (蒙面人死亡残影渐隐周期ID !== 0) {
     removePeriodicCallback(蒙面人死亡残影渐隐周期ID);
     蒙面人死亡残影渐隐周期ID = 0;
@@ -227,6 +244,38 @@ function 清理蒙面人死亡现场(this: void): void {
   const 玩家英雄组 = YDUserDataGetSafe("string", "玩家英雄", "单位组", "group");
   if (玩家英雄组 != null && 玩家英雄组 !== 0) ForGroupBJ(玩家英雄组, 恢复蒙面人死亡玩家控制);
   退出剧情电影模式并恢复镜头();
+}
+
+/** 与 16 章隐藏条件一致：精灵村矩形内、非玩家组的中立被动单位 */
+function 是村内中立被动单位(this: void): boolean {
+  const unit = GetFilterUnit();
+  if (unit == null || unit === 0) return false;
+  const 玩家组 = YDUserDataGetSafe("string", "玩家", "玩家组", "force");
+  return 玩家组 != null && 玩家组 !== 0
+    && GetOwningPlayer(unit) === Player(PLAYER_NEUTRAL_PASSIVE)
+    && !IsPlayerInForce(GetOwningPlayer(unit), 玩家组);
+}
+
+/** 恢复 16 章隐藏的精灵村NPC（ShowUnit true），180 秒延迟回调调用 */
+function 恢复精灵村中立单位(this: void): void {
+  蒙面人死亡恢复精灵村NPC延迟ID = 0;
+  const 矩形 = 获取矩形区域("精灵村");
+  if (矩形 == null || 矩形 === 0) return;
+  const 单位组 = GetUnitsInRectMatching(矩形, Condition(是村内中立被动单位));
+  if (单位组 == null || 单位组 === 0) return;
+  let unit = FirstOfGroup(单位组);
+  while (unit != null && unit !== 0) {
+    GroupRemoveUnit(单位组, unit);
+    ShowUnit(unit, true);
+    unit = FirstOfGroup(单位组);
+  }
+  DestroyGroup(单位组);
+}
+
+/** 死亡收尾后延迟恢复精灵村NPC（若清理时未到点则取消，防止片段重播重复注册） */
+function 启动延迟恢复精灵村NPC(this: void): void {
+  if (蒙面人死亡恢复精灵村NPC延迟ID !== 0) removeDelayedCallback(蒙面人死亡恢复精灵村NPC延迟ID);
+  蒙面人死亡恢复精灵村NPC延迟ID = addDelayedCallback(蒙面人死亡恢复精灵村NPC延迟毫秒, 恢复精灵村中立单位);
 }
 
 function 清理现场中立机械单位(this: void): void {
@@ -345,9 +394,13 @@ export function 执行蒙面人死亡收尾(this: void, 参数: 剧情动作参�
   }
 
   const 长老 = YDUserDataGetSafe("string", "主线NPC", "精灵村长老", "unit");
-  if (!句柄有效(长老)) return;
-  SetUnitX(长老, Number(参数.族长新位置X) || 28775.2);
-  SetUnitY(长老, Number(参数.族长新位置Y) || -28660.2);
+  if (句柄有效(长老)) {
+    SetUnitX(长老, Number(参数.族长新位置X) || 28775.2);
+    SetUnitY(长老, Number(参数.族长新位置Y) || -28660.2);
+  }
+
+  // 死亡收尾结束后 180 秒恢复被隐藏的精灵村NPC
+  启动延迟恢复精灵村NPC();
 }
 
 export const 第一章最终Boss教派死亡剧情动作注册表: Record<string, 剧情动作处理器> = {

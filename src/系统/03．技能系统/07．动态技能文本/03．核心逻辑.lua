@@ -758,7 +758,7 @@ local function _____5904_7406_6280_80FD_63D0_793A(unit, abilityId)
     end
     local _____7F13_5B58_952E = _____751F_6210_63D0_793A_7F13_5B58_952E(unit, abilityId)
     local heroConfigForText = heroConfigTool["获取单位玩家英雄配置"](heroConfigTool, unit)
-    local dynamicKey = heroConfigForText ~= nil and stringToFourCCSafe(heroConfigForText["单位类型ID"]) or 0
+    local dynamicKey = heroConfigForText ~= nil and stringToFourCCSafe(heroConfigForText.unit) or 0
     local ____temp_2
     if dynamicKey ~= 0 then
         ____temp_2 = dynamicSkillData["获取动态技能说明"](dynamicKey, abilityId)
@@ -902,7 +902,7 @@ ____exports["检查英雄技能"] = function(hero)
         return
     end
     local heroConfig = heroConfigTool["获取单位玩家英雄配置"](heroConfigTool, hero)
-    local heroKey = heroConfig ~= nil and stringToFourCCSafe(heroConfig["单位类型ID"]) or 0
+    local heroKey = heroConfig ~= nil and stringToFourCCSafe(heroConfig.unit) or 0
     dynamicSkillData["刷新单位技能数据"](hero, heroKey)
     local abilityIds = _____83B7_53D6_5FEB_7167_6280_80FD_5217_8868(hero)
     _____5DF2_5904_7406_6280_80FD_7F13_5B58[_____751F_6210_82F1_96C4_7F13_5B58_952E(hero)] = abilityIds
@@ -954,6 +954,11 @@ ____exports["获取技能原始提示"] = function(hero, abilityId)
         return ""
     end
     local _____7F13_5B58_952E = _____751F_6210_63D0_793A_7F13_5B58_952E(hero, abilityId)
+    local dynamicKey = heroBridge:getRegisteredPlayerHeroTypeId(hero)
+    local _____914D_7F6E_8BF4_660E = dynamicSkillData["获取动态技能说明"](dynamicKey, abilityId)
+    if _____914D_7F6E_8BF4_660E ~= nil then
+        return _____914D_7F6E_8BF4_660E
+    end
     local _____5DF2_7F13_5B58_6587_672C = _____539F_59CB_63D0_793A_7F13_5B58[_____7F13_5B58_952E]
     if _____5DF2_7F13_5B58_6587_672C ~= nil then
         return _____5DF2_7F13_5B58_6587_672C

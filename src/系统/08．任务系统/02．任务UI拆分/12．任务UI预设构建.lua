@@ -8,7 +8,6 @@ local taskRowBindingByFrameId = ____08_FF0E_4EFB_52A1UI_5217_8868_63A7_5236.task
 local ____01_FF0E_4EFB_52A1UI_5E38_91CF = require("系统.08．任务系统.02．任务UI拆分.01．任务UI常量")
 local LIST_VIEW_H = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_VIEW_H
 local LIST_CONTAINER_W = ____01_FF0E_4EFB_52A1UI_5E38_91CF.LIST_CONTAINER_W
-local MAX_PAGES_PER_CATEGORY = ____01_FF0E_4EFB_52A1UI_5E38_91CF.MAX_PAGES_PER_CATEGORY
 local BG_TEX = ____01_FF0E_4EFB_52A1UI_5E38_91CF.BG_TEX
 local ____14_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA = require("系统.08．任务系统.02．任务UI拆分.14．任务UI列表帧构建")
 local createHiddenRoot = ____14_FF0E_4EFB_52A1UI_5217_8868_5E27_6784_5EFA.createHiddenRoot
@@ -128,7 +127,7 @@ local function createVariant(self, ctx, page, category, pageIndex, variantIndex)
                 taskRowClickHandlersByIndex[rowIndex + 1]
             )
             if slot.clickBtn then
-                taskRowBindingByFrameId[slot.clickBtn] = {page = page, rowIndex = rowIndex}
+                taskRowBindingByFrameId[slot.clickBtn] = {page = page, rowIndex = rowIndex, playerId = ctx.currentPlayerId}
             end
             rowSlots[#rowSlots + 1] = slot
             rowIndex = rowIndex + 1
@@ -178,20 +177,28 @@ local function createCategory(self, ctx, category)
         ctx:applyDzTextFontAndCenterAlignment(emptyText)
     end
     local pages = {}
-    do
-        local pageIndex = 0
-        while pageIndex < MAX_PAGES_PER_CATEGORY do
-            pages[#pages + 1] = createPage(
+    local categoryView = {
+        root = root,
+        emptyText = emptyText or nil,
+        pageCount = 0,
+        pages = pages,
+        ensurePage = function(____, pageIndex)
+            local page = pages[pageIndex + 1]
+            if page ~= nil then
+                return page
+            end
+            page = createPage(
                 nil,
                 ctx,
                 root,
                 category,
                 pageIndex
             )
-            pageIndex = pageIndex + 1
+            pages[pageIndex + 1] = page
+            return page
         end
-    end
-    return {root = root, emptyText = emptyText or nil, pageCount = 0, pages = pages}
+    }
+    return categoryView
 end
 function ____exports.createTaskUIPrecreatedListPool(self, ctx)
     if not ctx.listContainer then

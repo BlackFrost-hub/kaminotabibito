@@ -17,15 +17,30 @@ export const ENABLE_FDF_SCROLLBAR_BORDER = true;
 export const ENABLE_FDF_SCROLLBAR_THUMB = true;
 export const ENABLE_MOUSE_WHEEL_SCROLL = true;
 
-/** 每分类预设最大页数（用于固定次数遍历隐藏，不依赖 pages.length） */
-export const MAX_PAGES_PER_CATEGORY = 50;
+/** 历史兼容配置。任务页现在按实际任务数据动态创建，不再按此值预创建空页。 */
+export const MAX_PAGES_PER_CATEGORY = 35;
 
-/** 二分开关：关则主面板不创建右侧滚动轨道/滑块/拖拽命中 */
+/** 二分开关：关则任务UI主面板不创建右侧滚动轨道/滑块/拖拽命中 */
 export const ENABLE_TASK_UI_RIGHT_SCROLLBAR = true;
 
-/** UI 子模块分组开关：当前仅启用 01–07，08–14 暂停用于定位崩溃。 */
-export const ENABLE_TASK_UI_MODULES_01_07 = true;
-export const ENABLE_TASK_UI_MODULES_08_14 = false;
+/**
+ * 二分开关：滚动轨道点击跳页（帧事件 ID 1，挂轨道命中帧，`sync=false`）。
+ * 历史：拖拽滑块曾依赖全局鼠标注册（`sync=false`/`sync=true` 双开均卡死，2026-09-12 实测），
+ * 已移除全局注册；滚轮改用帧事件 ID 6（同一文件 `registerTaskUIListWheel`）。
+ */
+export const ENABLE_TASK_UI_TRACK_CLICK = true;
+
+/**
+ * 任务UI 初始化阶段上限（二分主开关，见 `00．任务系统二分开关.ts` 的 ENABLE_QUEST_UI_MODULE）：
+ *  0 = 完全不初始化（等同关闭整块）
+ *  1 = 仅入口图标（05）
+ *  2 = + 主面板与滚动条（07，含 FDF 帧创建）
+ *  3 = + 动态列表页创建与首次数据填充（12/14/08）
+ *  4 = 与3相同；硬件输入始终在面板首次打开后注册，禁止恢复加载期注册
+ *  5 = + 页面刷新回调（08/13，完整初始化）
+ * 每档都是合法前缀，可独立运行；改动后必须 Run Map 重打包再双开测试。
+ */
+export const QUEST_UI_INIT_STAGE = 3;
 
 export const ENTRY_W = 0.0880;
 export const ENTRY_H = 0.0227;

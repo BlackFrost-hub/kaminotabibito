@@ -47,10 +47,6 @@ const chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事
 //   onPlayerHeroRegistered?: (this: void, whichPlayer: any, whichHero: any) => void;
 // };
 
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLogForce: (module: string, ...args: any[]) => void;
-};
-
 const 英雄依赖注册队列间隔毫秒 = 150;
 const 英雄依赖注册启动延迟毫秒 = 800;
 
@@ -166,7 +162,6 @@ function 处理英雄依赖注册任务一步(this: void, 任务: 英雄依赖�
     case 3:
       break;
     case 4:
-      debugLogForce("HeroBridge", "registerHeroDependents pid=" + playerId + " has=" + uiRegisteredPlayers.has(playerId));
       invokeSelectionCenterInit(owner);
       invokeSelectionCenterSeed(owner, whichHero);
       // if (typeof heroVoiceSystem.onPlayerHeroRegistered === "function") {
@@ -256,22 +251,15 @@ export function registerPlayerHeroListener(this: void, callback: PlayerHeroListe
     if (playerHeroListeners[i] === callback) return;
   }
   playerHeroListeners.push(callback);
-  debugLogForce("HeroBridge", "listener registered", "index=" + (playerHeroListeners.length - 1));
 }
 
 function notifyPlayerHeroListeners(this: void, whichPlayer: any, whichHero: any): void {
-  const heroTypeId = jass.GetUnitTypeId(whichHero);
-  const playerId = jass.GetPlayerId(whichPlayer);
-  debugLogForce("HeroBridge", "notify begin", "pid=" + playerId, "heroId=" + heroTypeId, "count=" + playerHeroListeners.length);
   for (let i = 0; i < playerHeroListeners.length; i++) {
     const callback = playerHeroListeners[i];
     if (callback != null) {
-      debugLogForce("HeroBridge", "listener begin", "index=" + i, "pid=" + playerId, "heroId=" + heroTypeId);
       callback(whichPlayer, whichHero);
-      debugLogForce("HeroBridge", "listener done", "index=" + i, "pid=" + playerId, "heroId=" + heroTypeId);
     }
   }
-  debugLogForce("HeroBridge", "notify done", "pid=" + playerId, "heroId=" + heroTypeId);
 }
 
 export function getRegisteredPlayerHeroTypeId(this: void, whichHero: any): number {
@@ -291,11 +279,9 @@ function registerPlayerHero(whichPlayer: any, whichHero: any): void {
     }
   }
   if (heroGroup != null && heroGroup !== 0) GroupAddUnit(heroGroup, whichHero);
-  debugLogForce("HeroBridge", "register begin", "pid=" + jass.GetPlayerId(whichPlayer), "heroId=" + jass.GetUnitTypeId(whichHero));
   YDUserDataSet("player", whichPlayer, C.YD_ATTR_PLAYER_HERO_UNIT, "unit", whichHero);
   notifyPlayerHeroListeners(whichPlayer, whichHero);
   registerHeroDependents(whichHero);
-  debugLogForce("HeroBridge", "register done", "pid=" + jass.GetPlayerId(whichPlayer), "heroId=" + jass.GetUnitTypeId(whichHero));
 }
 
 export function directRegisterPlayerHero(this: void, whichPlayer: any, whichHero: any): void {

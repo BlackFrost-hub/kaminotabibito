@@ -100,7 +100,7 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     }) ?? 0;
   if (btn) {
     (japi as any).DzFrameSetAllPoints(btn, entryFrame);
-    // sync=true：帧点击全房触发，回调内部做全局状态+本地UI分层
+    // 同步回调按触发玩家选槽，显隐仅在该玩家本机执行。
     setFrameClickEvent(btn, onTogglePanel, true);
   }
 

@@ -154,7 +154,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 local frame = slot.objectiveFrames[i + 1] or 0
                 local text = buildObjectiveText(nil, quest, i)
                 if not frame or text == "" then
-                    goto __continue68
+                    goto __continue60
                 end
                 ctx:setFramePointRelative(
                     frame,
@@ -170,7 +170,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 ____exports.setVisible(nil, frame, true)
                 y = y - OBJECTIVE_HEIGHT
             end
-            ::__continue68::
+            ::__continue60::
             i = i + 1
         end
     end
@@ -205,7 +205,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 local frame = slot.detailFrames[i + 1] or 0
                 local text = details[i + 1] or ""
                 if not frame or text == "" then
-                    goto __continue72
+                    goto __continue64
                 end
                 ctx:setFramePointRelative(
                     frame,
@@ -221,7 +221,7 @@ function renderQuestRowSlot(self, ctx, slot, quest, rowTopRel, expanded, parent)
                 ____exports.setVisible(nil, frame, true)
                 y = y - DETAIL_HEIGHT
             end
-            ::__continue72::
+            ::__continue64::
             i = i + 1
         end
     end
@@ -261,7 +261,7 @@ function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
                 local slot = variant.rowSlots[rowIndex + 1]
                 if not quest then
                     hideRowSlot(nil, slot, ____exports.setVisible)
-                    goto __continue82
+                    goto __continue74
                 end
                 local expanded = rowIndex == expandedRowIndex
                 local itemH = getQuestItemHeight(nil, quest, expanded)
@@ -288,7 +288,7 @@ function renderVariant(self, ctx, variant, pageQuests, expandedRowIndex)
                 end
                 rowTopRel = rowTopRel - (itemH + QUEST_ROW_GAP)
             end
-            ::__continue82::
+            ::__continue74::
             rowIndex = rowIndex + 1
         end
     end
@@ -298,7 +298,7 @@ local jass = require("jass.common")
 japi = require("jass.japi")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local clampRange = ____require_result_0.clampRange
-____exports.currentTaskRowExpandHandler = nil
+____exports.currentTaskRowQuestExpandHandler = nil
 ____exports.currentTaskRowClickSound = nil
 ____exports.taskRowBindingByFrameId = {}
 --- `pcall` 单次槽位：任务 UI 列表控制内不会嵌套这些导出
@@ -329,14 +329,14 @@ local function pcallRebuildTaskUIFacadeListPoolBody(self)
         local categoryView = ctx.precreatedListPool.categories[category]
         local quests = getQuestsForUI(nil, ctx.currentPlayerId, category)
         local pages = chunkQuests(nil, quests)
-        local renderedPageCount = #pages < #categoryView.pages and #pages or #categoryView.pages
+        local renderedPageCount = #pages
         categoryView.pageCount = renderedPageCount
         setText(nil, categoryView.emptyText, EMPTY_TEXTS[category])
         ____exports.setVisible(nil, categoryView.emptyText, false)
         do
             local pageIndex = 0
             while pageIndex < renderedPageCount do
-                local page = categoryView.pages[pageIndex + 1]
+                local page = categoryView:ensurePage(pageIndex)
                 local pageQuests = pages[pageIndex + 1] or ({})
                 page.questIds = createEmptyQuestIdList(nil)
                 do
@@ -463,67 +463,76 @@ QUEST_ROW_GAP = 0.01
 VIEW_BOTTOM_REL = LIST_CONTENT_TOP_INSET - LIST_VIEW_H
 VIEW_EPS = 0.002
 function ____exports.handleTaskRowClick(self)
-    local frame = japi.DzGetTriggerUIEventFrame()
+    local ____this_2
+    ____this_2 = japi
+    local ____opt_1 = ____this_2.DzGetTriggerUIEventFrame
+    if ____opt_1 ~= nil then
+        ____opt_1 = ____opt_1(____this_2)
+    end
+    local ____opt_1_3 = ____opt_1
+    if ____opt_1_3 == nil then
+        ____opt_1_3 = 0
+    end
+    local frame = ____opt_1_3
     if not frame then
-        frame = japi.DzGetMouseFocus()
+        local ____this_5
+        ____this_5 = japi
+        local ____opt_4 = ____this_5.DzGetMouseFocus
+        if ____opt_4 ~= nil then
+            ____opt_4 = ____opt_4(____this_5)
+        end
+        local ____opt_4_6 = ____opt_4
+        if ____opt_4_6 == nil then
+            ____opt_4_6 = 0
+        end
+        frame = ____opt_4_6
     end
     local bindingFrame = findTaskRowBindingFrame(nil, frame)
-    if not bindingFrame then
-        return
-    end
     local binding = ____exports.taskRowBindingByFrameId[bindingFrame]
     if not binding then
+        return
+    end
+    local localPlayer = jass.GetLocalPlayer()
+    local playerId = jass.GetPlayerId(localPlayer)
+    if binding.playerId ~= playerId then
         return
     end
     local questId = binding.page.questIds[binding.rowIndex + 1]
     if not questId then
         return
     end
-    local ____opt_1 = ____exports.currentTaskRowExpandHandler
-    if ____opt_1 ~= nil then
-        ____exports.currentTaskRowExpandHandler(binding.rowIndex)
+    local ____opt_7 = ____exports.currentTaskRowQuestExpandHandler
+    if ____opt_7 ~= nil then
+        ____exports.currentTaskRowQuestExpandHandler(questId)
     end
-    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
-    if triggerPlayer == jass.GetLocalPlayer() then
-        local ____opt_3 = ____exports.currentTaskRowClickSound
-        if ____opt_3 ~= nil then
-            ____exports.currentTaskRowClickSound()
-        end
+    local ____opt_9 = ____exports.currentTaskRowClickSound
+    if ____opt_9 ~= nil then
+        ____exports.currentTaskRowClickSound()
     end
 end
-local function handleTaskRowClickByRowIndex(self, rowIndex)
-    local ____opt_5 = ____exports.currentTaskRowExpandHandler
-    if ____opt_5 ~= nil then
-        ____exports.currentTaskRowExpandHandler(rowIndex)
-    end
-    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
-    if triggerPlayer == jass.GetLocalPlayer() then
-        local ____opt_7 = ____exports.currentTaskRowClickSound
-        if ____opt_7 ~= nil then
-            ____exports.currentTaskRowClickSound()
-        end
-    end
+function ____exports.setTaskRowQuestExpandHandler(self, handler)
+    ____exports.currentTaskRowQuestExpandHandler = handler
 end
 function ____exports.handleTaskRowClickRow0(self)
-    handleTaskRowClickByRowIndex(nil, 0)
+    ____exports.handleTaskRowClick(nil)
 end
 function ____exports.handleTaskRowClickRow1(self)
-    handleTaskRowClickByRowIndex(nil, 1)
+    ____exports.handleTaskRowClick(nil)
 end
 function ____exports.handleTaskRowClickRow2(self)
-    handleTaskRowClickByRowIndex(nil, 2)
+    ____exports.handleTaskRowClick(nil)
 end
 function ____exports.handleTaskRowClickRow3(self)
-    handleTaskRowClickByRowIndex(nil, 3)
+    ____exports.handleTaskRowClick(nil)
 end
 function ____exports.handleTaskRowClickRow4(self)
-    handleTaskRowClickByRowIndex(nil, 4)
+    ____exports.handleTaskRowClick(nil)
 end
 function ____exports.handleTaskRowClickRow5(self)
-    handleTaskRowClickByRowIndex(nil, 5)
+    ____exports.handleTaskRowClick(nil)
 end
 function ____exports.handleTaskRowClickRow6(self)
-    handleTaskRowClickByRowIndex(nil, 6)
+    ____exports.handleTaskRowClick(nil)
 end
 ____exports.taskRowClickHandlersByIndex = {
     ____exports.handleTaskRowClickRow0,
@@ -534,35 +543,13 @@ ____exports.taskRowClickHandlersByIndex = {
     ____exports.handleTaskRowClickRow5,
     ____exports.handleTaskRowClickRow6
 }
---- 行按钮在 `ensurePage` 之后绑定，避免 `createHiddenButton` 注册期携带工厂闭包
-function ____exports.bindTaskRowClickButtonsForPage(self, page)
-    do
-        local vi = 0
-        while vi < #page.variants do
-            local variant = page.variants[vi + 1]
-            do
-                local ri = 0
-                while ri < #variant.rowSlots do
-                    local ____opt_9 = variant.rowSlots[ri + 1]
-                    local btn = ____opt_9 and ____opt_9.clickBtn or nil
-                    if btn then
-                        ____exports.taskRowBindingByFrameId[btn] = {page = page, rowIndex = ri}
-                    end
-                    ri = ri + 1
-                end
-            end
-            vi = vi + 1
-        end
-    end
-end
 function ____exports.rebuildTaskUIFacadeListPool(self, ctx)
     pcallTaskUIListCtx = ctx
     pcall(pcallRebuildTaskUIFacadeListPoolBody)
     pcallTaskUIListCtx = nil
 end
 --- 设置行点击的回调，由管理器在创建池时调用
-function ____exports.setTaskRowHandlers(self, expand, sound)
-    ____exports.currentTaskRowExpandHandler = expand
+function ____exports.setTaskRowClickSound(self, sound)
     ____exports.currentTaskRowClickSound = sound
 end
 function ____exports.getTaskUICategoryPageCount(self, pool, category)

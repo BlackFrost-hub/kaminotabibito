@@ -14,13 +14,34 @@ local pcallDzFrameShow = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameShow
 local pcallDzFrameSetAlpha = ____02_FF0E_4EFB_52A1UI_8F85_52A9.pcallDzFrameSetAlpha
 --- 主面板顶部分类标签（主线 / 支线 / 小任务）
 -- 
--- 架构：N 槽分类标签；每个 slot 独立创建，sync=true 回调再按触发玩家路由。
+-- 架构：N 槽分类标签；同步点击按触发玩家选槽，只在所属玩家本机显示。
 local jass = require("jass.common")
 local japi = require("jass.japi")
+local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
+local debugLogForce = ____require_result_0.debugLogForce
+local categoryFrameDiagnosticCount = 0
 --- 用 Record 固定三类槽位，避免 Map 弱序/迭代习惯
 local categoryTabClickHandlers = {}
 local tabTooltipByFrameId = {}
 local function handleCategoryTabClick(self, category)
+    if categoryFrameDiagnosticCount < 3 then
+        local frame = japi.DzGetTriggerUIEventFrame()
+        local uiPlayer = japi.DzGetTriggerUIEventPlayer()
+        local keyPlayer = japi.DzGetTriggerKeyPlayer()
+        categoryFrameDiagnosticCount = categoryFrameDiagnosticCount + 1
+        debugLogForce(
+            "任务UI-Frame对照",
+            "分类同步点击",
+            "category",
+            category,
+            "frame",
+            frame,
+            "uiPid",
+            (uiPlayer == nil or uiPlayer == 0) and -1 or jass.GetPlayerId(uiPlayer),
+            "keyPid",
+            (keyPlayer == nil or keyPlayer == 0) and -1 or jass.GetPlayerId(keyPlayer)
+        )
+    end
     local handler = categoryTabClickHandlers[category]
     if not handler then
         return
@@ -43,37 +64,40 @@ local function onDailyTabClick(self)
     handleCategoryTabClick(nil, QuestType.DAILY)
 end
 local function onTabHoverShow(self)
-    local ____this_1
-    ____this_1 = japi
-    local ____opt_0 = ____this_1.DzGetTriggerUIEventFrame
-    if ____opt_0 ~= nil then
-        ____opt_0 = ____opt_0(____this_1)
+    if japi.DzGetTriggerKeyPlayer() ~= jass.GetLocalPlayer() then
+        return
     end
-    local ____opt_0_2 = ____opt_0
-    if ____opt_0_2 == nil then
-        ____opt_0_2 = 0
+    local ____this_2
+    ____this_2 = japi
+    local ____opt_1 = ____this_2.DzGetTriggerUIEventFrame
+    if ____opt_1 ~= nil then
+        ____opt_1 = ____opt_1(____this_2)
     end
-    local frame = ____opt_0_2
+    local ____opt_1_3 = ____opt_1
+    if ____opt_1_3 == nil then
+        ____opt_1_3 = 0
+    end
+    local frame = ____opt_1_3
     if not frame then
-        local ____this_4
-        ____this_4 = japi
-        local ____opt_3 = ____this_4.DzGetMouseFocus
-        if ____opt_3 ~= nil then
-            ____opt_3 = ____opt_3(____this_4)
+        local ____this_5
+        ____this_5 = japi
+        local ____opt_4 = ____this_5.DzGetMouseFocus
+        if ____opt_4 ~= nil then
+            ____opt_4 = ____opt_4(____this_5)
         end
-        local ____opt_3_5 = ____opt_3
-        if ____opt_3_5 == nil then
-            ____opt_3_5 = 0
+        local ____opt_4_6 = ____opt_4
+        if ____opt_4_6 == nil then
+            ____opt_4_6 = 0
         end
-        frame = ____opt_3_5
+        frame = ____opt_4_6
     end
-    local ____frame_6
+    local ____frame_7
     if frame then
-        ____frame_6 = tabTooltipByFrameId[frame]
+        ____frame_7 = tabTooltipByFrameId[frame]
     else
-        ____frame_6 = nil
+        ____frame_7 = nil
     end
-    local entry = ____frame_6
+    local entry = ____frame_7
     if not entry or not entry.handler or entry.msg == "" then
         return
     end
@@ -86,29 +110,29 @@ local function registerCategoryTabClickHandler(self, category, onSwitchCategory,
     categoryTabClickHandlers[category] = {onSwitchCategory = onSwitchCategory, onClickSound = onClickSound}
 end
 local function createTaskTab(self, opts)
-    local ____opts_7 = opts
-    local japi = ____opts_7.japi
-    local tabParent = ____opts_7.tabParent
-    local bgName = ____opts_7.bgName
-    local tabName = ____opts_7.tabName
-    local labelName = ____opts_7.labelName
-    local x = ____opts_7.x
-    local labelText = ____opts_7.labelText
-    local category = ____opts_7.category
-    local tooltip = ____opts_7.tooltip
-    local FramePoint = ____opts_7.FramePoint
-    local setFramePointRelative = ____opts_7.setFramePointRelative
-    local setFrameSize = ____opts_7.setFrameSize
-    local setFrameHoverEvents = ____opts_7.setFrameHoverEvents
-    local setFrameClickEvent = ____opts_7.setFrameClickEvent
-    local setButtonText = ____opts_7.setButtonText
-    local createTabLabelTextOnBackdrop = ____opts_7.createTabLabelTextOnBackdrop
-    local setupTransparentGlueHitLayer = ____opts_7.setupTransparentGlueHitLayer
-    local onClickSound = ____opts_7.onClickSound
-    local onSwitchCategory = ____opts_7.onSwitchCategory
-    local onShowTabTooltip = ____opts_7.onShowTabTooltip
-    local contextId = ____opts_7.contextId
-    local nameSuffix = ____opts_7.nameSuffix
+    local ____opts_8 = opts
+    local japi = ____opts_8.japi
+    local tabParent = ____opts_8.tabParent
+    local bgName = ____opts_8.bgName
+    local tabName = ____opts_8.tabName
+    local labelName = ____opts_8.labelName
+    local x = ____opts_8.x
+    local labelText = ____opts_8.labelText
+    local category = ____opts_8.category
+    local tooltip = ____opts_8.tooltip
+    local FramePoint = ____opts_8.FramePoint
+    local setFramePointRelative = ____opts_8.setFramePointRelative
+    local setFrameSize = ____opts_8.setFrameSize
+    local setFrameHoverEvents = ____opts_8.setFrameHoverEvents
+    local setFrameClickEvent = ____opts_8.setFrameClickEvent
+    local setButtonText = ____opts_8.setButtonText
+    local createTabLabelTextOnBackdrop = ____opts_8.createTabLabelTextOnBackdrop
+    local setupTransparentGlueHitLayer = ____opts_8.setupTransparentGlueHitLayer
+    local onClickSound = ____opts_8.onClickSound
+    local onSwitchCategory = ____opts_8.onSwitchCategory
+    local onShowTabTooltip = ____opts_8.onShowTabTooltip
+    local contextId = ____opts_8.contextId
+    local nameSuffix = ____opts_8.nameSuffix
     local bg = tryCreateFromFdfOnly(nil, bgName, tabParent, contextId)
     if bg then
         japi.DzFrameClearAllPoints(bg)
@@ -163,28 +187,28 @@ local function createTaskTab(self, opts)
             tab,
             onTabHoverShow,
             onTabHoverHide,
-            false
+            true
         )
     end
     return {bg = bg, tab = tab}
 end
 function ____exports.buildTaskPanelCategoryTabs(self, opts)
-    local ____opts_8 = opts
-    local japi = ____opts_8.japi
-    local tabParent = ____opts_8.tabParent
-    local FramePoint = ____opts_8.FramePoint
-    local setFramePointRelative = ____opts_8.setFramePointRelative
-    local setFrameSize = ____opts_8.setFrameSize
-    local setFrameHoverEvents = ____opts_8.setFrameHoverEvents
-    local setFrameClickEvent = ____opts_8.setFrameClickEvent
-    local setButtonText = ____opts_8.setButtonText
-    local createTabLabelTextOnBackdrop = ____opts_8.createTabLabelTextOnBackdrop
-    local setupTransparentGlueHitLayer = ____opts_8.setupTransparentGlueHitLayer
-    local onClickSound = ____opts_8.onClickSound
-    local onSwitchCategory = ____opts_8.onSwitchCategory
-    local onShowTabTooltip = ____opts_8.onShowTabTooltip
-    local slotId = ____opts_8.slotId
-    local contextId = ____opts_8.contextId
+    local ____opts_9 = opts
+    local japi = ____opts_9.japi
+    local tabParent = ____opts_9.tabParent
+    local FramePoint = ____opts_9.FramePoint
+    local setFramePointRelative = ____opts_9.setFramePointRelative
+    local setFrameSize = ____opts_9.setFrameSize
+    local setFrameHoverEvents = ____opts_9.setFrameHoverEvents
+    local setFrameClickEvent = ____opts_9.setFrameClickEvent
+    local setButtonText = ____opts_9.setButtonText
+    local createTabLabelTextOnBackdrop = ____opts_9.createTabLabelTextOnBackdrop
+    local setupTransparentGlueHitLayer = ____opts_9.setupTransparentGlueHitLayer
+    local onClickSound = ____opts_9.onClickSound
+    local onSwitchCategory = ____opts_9.onSwitchCategory
+    local onShowTabTooltip = ____opts_9.onShowTabTooltip
+    local slotId = ____opts_9.slotId
+    local contextId = ____opts_9.contextId
     local nameSuffix = "_s" .. tostring(slotId)
     local common = {
         japi = japi,

@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local Set = ____lualib.Set
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local invokeUiAttrOnPlayerHeroRegistered, invokeSelectionCenterInit, invokeSelectionCenterSeed, _____505C_6B62_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65, ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick, _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65, jass, centerTimer, YDUserDataGetSafe, registerMoveSpeedTornadoHero, petItemHandoff, chestSystem, debugLogForce, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2, uiRegisteredPlayers, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID, dialogSystem, buffUISystem, threatPanelSystem, initPlayerSelectionCenter, seedSoleSelectedUnitForPlayer
+local invokeUiAttrOnPlayerHeroRegistered, invokeSelectionCenterInit, invokeSelectionCenterSeed, _____505C_6B62_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65, ____on_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217Tick, _____8C03_5EA6_82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65, jass, centerTimer, YDUserDataGetSafe, registerMoveSpeedTornadoHero, petItemHandoff, chestSystem, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2, uiRegisteredPlayers, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217, _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_4E0B_4E00_6B65_5EF6_8FDFID, dialogSystem, buffUISystem, threatPanelSystem, initPlayerSelectionCenter, seedSoleSelectedUnitForPlayer
 function invokeUiAttrOnPlayerHeroRegistered(whichPlayer, whichHero)
     local mod = require("系统.09．表现系统.03．UI属性系统.03．系统入口")
     local cb = mod.onPlayerHeroRegistered
@@ -66,11 +66,6 @@ function _____5904_7406_82F1_96C4_4F9D_8D56_6CE8_518C_4EFB_52A1_4E00_6B65(_____4
         end
         ____cond19 = ____cond19 or ____switch19 == 4
         if ____cond19 then
-            debugLogForce(
-                nil,
-                "HeroBridge",
-                (("registerHeroDependents pid=" .. tostring(playerId)) .. " has=") .. tostring(uiRegisteredPlayers:has(playerId))
-            )
             invokeSelectionCenterInit(owner)
             invokeSelectionCenterSeed(owner, whichHero)
             break
@@ -153,8 +148,6 @@ local moveTornado = require("系统.00．核心系统.00．玩家系统.00．英
 registerMoveSpeedTornadoHero = moveTornado.registerMoveSpeedTornadoHero
 petItemHandoff = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.03．背包满移交宠物")
 chestSystem = require("系统.06．经济系统.00．宝箱系统.02．事件注册")
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
-debugLogForce = ____require_result_2.debugLogForce
 _____82F1_96C4_4F9D_8D56_6CE8_518C_961F_5217_95F4_9694_6BEB_79D2 = 150
 local _____82F1_96C4_4F9D_8D56_6CE8_518C_542F_52A8_5EF6_8FDF_6BEB_79D2 = 800
 --- 只接受玩家 1-5 当前操作的英雄，且排除电脑玩家。
@@ -212,6 +205,7 @@ local function registerHeroDependents(whichHero)
     end
 end
 local playerHeroListeners = {}
+local registeredHeroTypeIds = {}
 function ____exports.registerPlayerHeroListener(callback)
     if callback == nil then
         return
@@ -226,62 +220,37 @@ function ____exports.registerPlayerHeroListener(callback)
         end
     end
     playerHeroListeners[#playerHeroListeners + 1] = callback
-    debugLogForce(
-        nil,
-        "HeroBridge",
-        "listener registered",
-        "index=" .. tostring(#playerHeroListeners - 1)
-    )
 end
 local function notifyPlayerHeroListeners(whichPlayer, whichHero)
-    local heroTypeId = jass.GetUnitTypeId(whichHero)
-    local playerId = jass.GetPlayerId(whichPlayer)
-    debugLogForce(
-        nil,
-        "HeroBridge",
-        "notify begin",
-        "pid=" .. tostring(playerId),
-        "heroId=" .. tostring(heroTypeId),
-        "count=" .. tostring(#playerHeroListeners)
-    )
     do
         local i = 0
         while i < #playerHeroListeners do
             local callback = playerHeroListeners[i + 1]
             if callback ~= nil then
-                debugLogForce(
-                    nil,
-                    "HeroBridge",
-                    "listener begin",
-                    "index=" .. tostring(i),
-                    "pid=" .. tostring(playerId),
-                    "heroId=" .. tostring(heroTypeId)
-                )
                 callback(whichPlayer, whichHero)
-                debugLogForce(
-                    nil,
-                    "HeroBridge",
-                    "listener done",
-                    "index=" .. tostring(i),
-                    "pid=" .. tostring(playerId),
-                    "heroId=" .. tostring(heroTypeId)
-                )
             end
             i = i + 1
         end
     end
-    debugLogForce(
-        nil,
-        "HeroBridge",
-        "notify done",
-        "pid=" .. tostring(playerId),
-        "heroId=" .. tostring(heroTypeId)
-    )
+end
+function ____exports.getRegisteredPlayerHeroTypeId(whichHero)
+    do
+        local i = 0
+        while i < #registeredHeroTypeIds do
+            if registeredHeroTypeIds[i + 1].hero == whichHero then
+                return registeredHeroTypeIds[i + 1].typeId
+            end
+            i = i + 1
+        end
+    end
+    return 0
 end
 local function registerPlayerHero(whichPlayer, whichHero)
     if whichPlayer == nil or whichPlayer == 0 or whichHero == nil or whichHero == 0 then
         return
     end
+    local heroTypeId = jass.GetUnitTypeId(whichHero)
+    registeredHeroTypeIds[#registeredHeroTypeIds + 1] = {hero = whichHero, typeId = heroTypeId}
     local heroGroup = ____exports["获取玩家英雄单位组"]()
     if heroGroup == nil or heroGroup == 0 then
         heroGroup = CreateGroup()
@@ -299,13 +268,6 @@ local function registerPlayerHero(whichPlayer, whichHero)
     if heroGroup ~= nil and heroGroup ~= 0 then
         GroupAddUnit(heroGroup, whichHero)
     end
-    debugLogForce(
-        nil,
-        "HeroBridge",
-        "register begin",
-        "pid=" .. tostring(jass.GetPlayerId(whichPlayer)),
-        "heroId=" .. tostring(jass.GetUnitTypeId(whichHero))
-    )
     YDUserDataSet(
         nil,
         "player",
@@ -316,13 +278,6 @@ local function registerPlayerHero(whichPlayer, whichHero)
     )
     notifyPlayerHeroListeners(whichPlayer, whichHero)
     registerHeroDependents(whichHero)
-    debugLogForce(
-        nil,
-        "HeroBridge",
-        "register done",
-        "pid=" .. tostring(jass.GetPlayerId(whichPlayer)),
-        "heroId=" .. tostring(jass.GetUnitTypeId(whichHero))
-    )
 end
 function ____exports.directRegisterPlayerHero(whichPlayer, whichHero)
     registerPlayerHero(whichPlayer, whichHero)

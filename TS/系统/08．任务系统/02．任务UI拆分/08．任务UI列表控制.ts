@@ -85,9 +85,9 @@ export function resolveQuestRowIconPath(icon: string | undefined): string {
 
 
 // ========== 虚拟分区：行交互事件（点击/展开/折叠） ==========
-export let currentTaskRowExpandHandler: ((this: void, rowIndex: number) => void) | null = null;
+export let currentTaskRowQuestExpandHandler: ((this: void, questId: string) => void) | null = null;
 export let currentTaskRowClickSound: ((this: void) => void) | null = null;
-export const taskRowBindingByFrameId: Record<number, { page: TaskUIPageFrames; rowIndex: number } | undefined> = {};
+export const taskRowBindingByFrameId: Record<number, { page: TaskUIPageFrames; rowIndex: number; playerId: number } | undefined> = {};
 
 /** `pcall` 单次槽位：任务 UI 列表控制内不会嵌套这些导出 */
 let pcallTaskUIListCtx: TaskUIListControlContext | null = null;
@@ -110,14 +110,14 @@ function pcallRebuildTaskUIFacadeListPoolBody(): void {
     const categoryView = ctx.precreatedListPool.categories[category];
     const quests = getQuestsForUI(ctx.currentPlayerId, category);
     const pages = chunkQuests(quests);
-    const renderedPageCount = pages.length < categoryView.pages.length ? pages.length : categoryView.pages.length;
+    const renderedPageCount = pages.length;
 
     categoryView.pageCount = renderedPageCount;
     setText(categoryView.emptyText, EMPTY_TEXTS[category]);
     setVisible(categoryView.emptyText, false);
 
     for (let pageIndex = 0; pageIndex < renderedPageCount; pageIndex++) {
-      const page = categoryView.pages[pageIndex];
+      const page = categoryView.ensurePage(pageIndex);
       const pageQuests = pages[pageIndex] || [];
       page.questIds = createEmptyQuestIdList();
       for (let rowIndex = 0; rowIndex < ROWS_PER_PAGE; rowIndex++) {
@@ -235,6 +235,7 @@ export interface TaskUICategoryFrames {
   emptyText: number | null;
   pageCount: number;
   pages: TaskUIPageFrames[];
+  ensurePage: (pageIndex: number) => TaskUIPageFrames;
 }
 
 export interface TaskUIPrecreatedListPool {
@@ -263,7 +264,6 @@ export interface TaskUIListControlContext {
   applyDzTextFontAndAlignment: any;
   playClickSound: () => void;
   updateScrollBarVisibility: (pageCount: number, hasQuestRows: boolean) => void;
-  toggleExpand: (rowIndex: number) => void;
   getCurrentPage: (type: QuestType) => number;
   setCurrentPage: (type: QuestType, page: number) => void;
   getExpandedQuestId: (type: QuestType) => string | null;
@@ -285,40 +285,35 @@ function hideFrames(frames: Array<number | null>): void {
 }
 
 export function handleTaskRowClick(): void {
-  let frame = (japi as any).DzGetTriggerUIEventFrame();
-  if (!frame) {
-    frame = (japi as any).DzGetMouseFocus();
-  }
+  // 本地 Frame 回调在部分 JAPI 版本中没有 UIEventFrame 上下文；鼠标焦点仍是本端可靠来源。
+  let frame = (japi as any).DzGetTriggerUIEventFrame?.() ?? 0;
+  if (!frame) frame = (japi as any).DzGetMouseFocus?.() ?? 0;
   const bindingFrame = findTaskRowBindingFrame(frame);
-  if (!bindingFrame) return;
   const binding = taskRowBindingByFrameId[bindingFrame];
   if (!binding) return;
+  const localPlayer = jass.GetLocalPlayer();
+  const playerId = jass.GetPlayerId(localPlayer);
+  if (binding.playerId !== playerId) return;
   const questId = binding.page.questIds[binding.rowIndex];
   if (!questId) return;
-  currentTaskRowExpandHandler?.(binding.rowIndex);
-  const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer();
-  if (triggerPlayer === jass.GetLocalPlayer()) {
-    currentTaskRowClickSound?.();
-  }
+  currentTaskRowQuestExpandHandler?.(questId);
+  currentTaskRowClickSound?.();
 }
 
-function handleTaskRowClickByRowIndex(rowIndex: number): void {
-  currentTaskRowExpandHandler?.(rowIndex);
-  const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer();
-  if (triggerPlayer === jass.GetLocalPlayer()) {
-    currentTaskRowClickSound?.();
-  }
+export function setTaskRowQuestExpandHandler(handler: (this: void, questId: string) => void): void {
+  currentTaskRowQuestExpandHandler = handler;
 }
 
-export function handleTaskRowClickRow0(): void { handleTaskRowClickByRowIndex(0); }
-export function handleTaskRowClickRow1(): void { handleTaskRowClickByRowIndex(1); }
-export function handleTaskRowClickRow2(): void { handleTaskRowClickByRowIndex(2); }
-export function handleTaskRowClickRow3(): void { handleTaskRowClickByRowIndex(3); }
-export function handleTaskRowClickRow4(): void { handleTaskRowClickByRowIndex(4); }
-export function handleTaskRowClickRow5(): void { handleTaskRowClickByRowIndex(5); }
-export function handleTaskRowClickRow6(): void { handleTaskRowClickByRowIndex(6); }
+// 在最外层原生回调读取上下文；原始参数仅诊断，不作为同步业务输入。
+export function handleTaskRowClickRow0(): void { handleTaskRowClick(); }
+export function handleTaskRowClickRow1(): void { handleTaskRowClick(); }
+export function handleTaskRowClickRow2(): void { handleTaskRowClick(); }
+export function handleTaskRowClickRow3(): void { handleTaskRowClick(); }
+export function handleTaskRowClickRow4(): void { handleTaskRowClick(); }
+export function handleTaskRowClickRow5(): void { handleTaskRowClick(); }
+export function handleTaskRowClickRow6(): void { handleTaskRowClick(); }
 
-export const taskRowClickHandlersByIndex: Array<() => void> = [
+export const taskRowClickHandlersByIndex: Array<any> = [
   handleTaskRowClickRow0,
   handleTaskRowClickRow1,
   handleTaskRowClickRow2,
@@ -327,20 +322,6 @@ export const taskRowClickHandlersByIndex: Array<() => void> = [
   handleTaskRowClickRow5,
   handleTaskRowClickRow6,
 ];
-
-// ========== 虚拟分区：行点击回调绑定 ==========
-/** 行按钮在 `ensurePage` 之后绑定，避免 `createHiddenButton` 注册期携带工厂闭包 */
-export function bindTaskRowClickButtonsForPage(page: TaskUIPageFrames): void {
-  for (let vi = 0; vi < page.variants.length; vi++) {
-    const variant = page.variants[vi];
-    for (let ri = 0; ri < variant.rowSlots.length; ri++) {
-      const btn = variant.rowSlots[ri]?.clickBtn ?? null;
-      if (btn) {
-        taskRowBindingByFrameId[btn] = { page, rowIndex: ri };
-      }
-    }
-  }
-}
 
 // ========== 虚拟分区：行渲染（单行槽位布局与文案填充） ==========
 function renderQuestRowSlot(
@@ -493,11 +474,9 @@ export function rebuildTaskUIFacadeListPool(ctx: TaskUIListControlContext): void
 }
 
 /** 设置行点击的回调，由管理器在创建池时调用 */
-export function setTaskRowHandlers(
-  expand: (this: void, rowIndex: number) => void,
+export function setTaskRowClickSound(
   sound: (this: void) => void
 ): void {
-  currentTaskRowExpandHandler = expand;
   currentTaskRowClickSound = sound;
 }
 
