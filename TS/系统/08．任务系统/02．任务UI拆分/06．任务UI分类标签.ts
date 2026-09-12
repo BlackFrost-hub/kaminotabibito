@@ -38,13 +38,8 @@ function handleCategoryTabClick(category: QuestType): void {
   }
   const handler = categoryTabClickHandlers[category];
   if (!handler) return;
-  const onSwitchCategory = handler.onSwitchCategory;
-  onSwitchCategory(category);
-  const triggerPlayer = (japi as any).DzGetTriggerKeyPlayer();
-  if (triggerPlayer === jass.GetLocalPlayer()) {
-    const onClickSound = handler.onClickSound;
-    onClickSound();
-  }
+  handler.onSwitchCategory(category);
+  handler.onClickSound();
 }
 
 // 命名函数替代匿名闭包 - 分类标签点击
@@ -186,7 +181,8 @@ function createTaskTab(opts: {
     }
     registerCategoryTabClickHandler(category, onSwitchCategory, onClickSound);
     tabTooltipByFrameId[tab] = { msg: tooltip, handler: onShowTabTooltip };
-    setFrameClickEvent(tab, tabClickHandlers[category], true);
+    // 分类切换只改变本机面板，不能用同步帧回调广播到其他玩家槽位。
+    setFrameClickEvent(tab, tabClickHandlers[category], false);
     setFrameHoverEvents(tab, onTabHoverShow, onTabHoverHide, true);
   }
 

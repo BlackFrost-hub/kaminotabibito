@@ -3,7 +3,7 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local getTaskUIByPlayerId, taskUIInitPcallBody, taskUIHotkeyTogglePanel, taskUIHotkeySwitchCategory, isHumanPlayingPlayer, onQuestManagerUiRefresh, jass, taskUIs, refreshCallbackRegistered, TaskUI, pcallInitTarget
+local getTaskUIByPlayerId, taskUIInitPcallBody, isHumanPlayingPlayer, onQuestManagerUiRefresh, jass, taskUIs, refreshCallbackRegistered, TaskUI, pcallInitTarget
 local ____01_FF0E_4EFB_52A1_6570_636E = require("系统.08．任务系统.01．任务数据")
 local QuestType = ____01_FF0E_4EFB_52A1_6570_636E.QuestType
 local ____08_FF0E_4EFB_52A1UI_5217_8868_63A7_5236 = require("系统.08．任务系统.02．任务UI拆分.08．任务UI列表控制")
@@ -72,24 +72,6 @@ function taskUIInitPcallBody(self)
         pcallInitTarget:runInitBodyInPcall()
     end
 end
-function taskUIHotkeyTogglePanel(player)
-    if player == nil or player == 0 then
-        return
-    end
-    local ui = getTaskUIByPlayerId(jass.GetPlayerId(player))
-    if ui then
-        ui:togglePanelSync(player)
-    end
-end
-function taskUIHotkeySwitchCategory(player, ____type)
-    if player == nil or player == 0 then
-        return
-    end
-    local ui = getTaskUIByPlayerId(jass.GetPlayerId(player))
-    if ui then
-        ui:switchCategorySync(player, ____type)
-    end
-end
 function isHumanPlayingPlayer(whichPlayer)
     if whichPlayer == nil or whichPlayer == 0 then
         return false
@@ -121,14 +103,14 @@ function onQuestManagerUiRefresh(self, _playerId, _questId)
             do
                 local ui = taskUIs[i]
                 if ui == nil or not ui.uiInitialized then
-                    goto __continue125
+                    goto __continue134
                 end
                 ui.pagesDirty = true
                 if ui.isVisible then
                     ui:rebuildPages()
                 end
             end
-            ::__continue125::
+            ::__continue134::
             i = i + 1
         end
     end
@@ -163,6 +145,13 @@ local function getTriggerPlayerId(self)
     local pid = jass.GetPlayerId(tp)
     return type(pid) == "number" and pid >= 0 and pid < MAX_PLAYERS and pid or -1
 end
+local function getLocalTaskUI(self)
+    local player = jass.GetLocalPlayer()
+    if player == nil or player == 0 then
+        return nil
+    end
+    return getTaskUIByPlayerId(jass.GetPlayerId(player))
+end
 local function taskUIModulePlayClickSound()
     local lp = jass.GetLocalPlayer()
     local pid = jass.GetPlayerId(lp)
@@ -188,12 +177,9 @@ local function taskUIModuleRowQuestExpand(questId)
     end
 end
 local function taskUIModuleSwitchCategory(____type)
-    local pid = getTriggerPlayerId(nil)
-    if pid >= 0 then
-        taskUIHotkeySwitchCategory(
-            jass.Player(pid),
-            ____type
-        )
+    local ui = getLocalTaskUI(nil)
+    if ui then
+        ui:switchCategoryLocal(____type)
     end
 end
 local function taskUIModuleNoopTabTooltip(_msg)
@@ -205,9 +191,9 @@ local function getTriggerPlayerOrLocal()
     return jass.GetLocalPlayer()
 end
 local function taskUIEntryClick()
-    local pid = getTriggerPlayerId(nil)
-    if pid >= 0 then
-        taskUIHotkeyTogglePanel(jass.Player(pid))
+    local ui = getLocalTaskUI(nil)
+    if ui then
+        ui:togglePanelLocal()
     end
 end
 TaskUI = __TS__Class()
@@ -523,16 +509,20 @@ function TaskUI.prototype.switchCategorySync(self, player, ____type)
         return
     end
     local triggerPid = jass.GetPlayerId(player)
-    local localPid = jass.GetPlayerId(jass.GetLocalPlayer())
-    if triggerPid ~= self.playerId or triggerPid ~= localPid then
+    if triggerPid ~= self.playerId then
         return
     end
     self:switchCategoryState(____type)
-    self:switchCategoryUI(____type)
+    if player == jass.GetLocalPlayer() then
+        self:switchCategoryUI(____type)
+    end
 end
 function TaskUI.prototype.switchCategory(self, ____type)
-    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
-    self:switchCategorySync(triggerPlayer, ____type)
+    self:switchCategoryLocal(____type)
+end
+function TaskUI.prototype.switchCategoryLocal(self, ____type)
+    self:switchCategoryState(____type)
+    self:switchCategoryUI(____type)
 end
 function TaskUI.prototype.toggleExpandLocal(self, questId)
     local oldExpanded = self.expandedQuestId
@@ -586,10 +576,25 @@ function TaskUI.prototype.togglePanelSync(self, player)
         return
     end
     local triggerPid = jass.GetPlayerId(player)
-    local localPid = jass.GetPlayerId(jass.GetLocalPlayer())
-    if triggerPid ~= self.playerId or triggerPid ~= localPid then
+    if triggerPid ~= self.playerId then
         return
     end
+    if self.isVisible then
+        self:hidePanelState()
+        if player == jass.GetLocalPlayer() then
+            self:hidePanelUI()
+        end
+    else
+        self:showPanelState()
+        if player == jass.GetLocalPlayer() then
+            self:showPanelUI()
+        end
+    end
+end
+function TaskUI.prototype.togglePanel(self)
+    self:togglePanelLocal()
+end
+function TaskUI.prototype.togglePanelLocal(self)
     if self.isVisible then
         self:hidePanelState()
         self:hidePanelUI()
@@ -597,10 +602,6 @@ function TaskUI.prototype.togglePanelSync(self, player)
         self:showPanelState()
         self:showPanelUI()
     end
-end
-function TaskUI.prototype.togglePanel(self)
-    local triggerPlayer = getTriggerPlayerOrLocal()
-    self:togglePanelSync(triggerPlayer)
 end
 function TaskUI.prototype.showPanelState(self)
     self:resetToDefault()
@@ -677,6 +678,24 @@ __TS__SetDescriptor(
     true
 )
 pcallInitTarget = nil
+local function taskUIHotkeyTogglePanel(player)
+    if player == nil or player == 0 then
+        return
+    end
+    local ui = getTaskUIByPlayerId(jass.GetPlayerId(player))
+    if ui then
+        ui:togglePanelSync(player)
+    end
+end
+local function taskUIHotkeySwitchCategory(player, ____type)
+    if player == nil or player == 0 then
+        return
+    end
+    local ui = getTaskUIByPlayerId(jass.GetPlayerId(player))
+    if ui then
+        ui:switchCategorySync(player, ____type)
+    end
+end
 --- 由 `00．玩家英雄获取桥接` 调用。
 -- 所有客户端对称执行（全局创建），异步显隐。
 function ____exports.onPlayerHeroRegistered(whichPlayer, _whichHero)

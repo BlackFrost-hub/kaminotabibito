@@ -100,8 +100,8 @@ export function buildTaskEntryIcon(opts: BuildTaskEntryIconOpts): BuildEntryIcon
     }) ?? 0;
   if (btn) {
     (japi as any).DzFrameSetAllPoints(btn, entryFrame);
-    // 同步回调按触发玩家选槽，显隐仅在该玩家本机执行。
-    setFrameClickEvent(btn, onTogglePanel, true);
+    // 入口显隐是纯本地 UI 操作，避免同步帧回调在各客户端误选槽位。
+    setFrameClickEvent(btn, onTogglePanel, false);
   }
 
   return { entryFrame, entryText };

@@ -46,13 +46,8 @@ local function handleCategoryTabClick(self, category)
     if not handler then
         return
     end
-    local onSwitchCategory = handler.onSwitchCategory
-    onSwitchCategory(category)
-    local triggerPlayer = japi.DzGetTriggerKeyPlayer()
-    if triggerPlayer == jass.GetLocalPlayer() then
-        local onClickSound = handler.onClickSound
-        onClickSound()
-    end
+    handler.onSwitchCategory(category)
+    handler.onClickSound()
 end
 local function onMainTabClick(self)
     handleCategoryTabClick(nil, QuestType.MAIN)
@@ -181,7 +176,7 @@ local function createTaskTab(self, opts)
         end
         registerCategoryTabClickHandler(nil, category, onSwitchCategory, onClickSound)
         tabTooltipByFrameId[tab] = {msg = tooltip, handler = onShowTabTooltip}
-        setFrameClickEvent(nil, tab, tabClickHandlers[category], true)
+        setFrameClickEvent(nil, tab, tabClickHandlers[category], false)
         setFrameHoverEvents(
             nil,
             tab,

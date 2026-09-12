@@ -60,6 +60,12 @@ function getTriggerPlayerId(): number {
   return (typeof pid === "number" && pid >= 0 && pid < MAX_PLAYERS) ? pid : -1;
 }
 
+function getLocalTaskUI(): TaskUI | undefined {
+  const player = jass.GetLocalPlayer();
+  if (player == null || player === 0) return undefined;
+  return getTaskUIByPlayerId(jass.GetPlayerId(player));
+}
+
 function taskUIModulePlayClickSound(this: void): void {
   const lp = jass.GetLocalPlayer();
   const pid = jass.GetPlayerId(lp);
@@ -75,8 +81,8 @@ function taskUIModuleRowQuestExpand(this: void, questId: string): void {
 }
 
 function taskUIModuleSwitchCategory(this: void, type: QuestType): void {
-  const pid = getTriggerPlayerId();
-  if (pid >= 0) taskUIHotkeySwitchCategory(jass.Player(pid), type);
+  const ui = getLocalTaskUI();
+  if (ui) ui.switchCategoryLocal(type);
 }
 
 function taskUIModuleNoopTabTooltip(this: void, _msg: string): void {}
@@ -94,8 +100,8 @@ function getTaskUIByPlayerId(this: void, playerId: number): TaskUI | undefined {
 }
 
 function taskUIEntryClick(this: void): void {
-  const pid = getTriggerPlayerId();
-  if (pid >= 0) taskUIHotkeyTogglePanel(jass.Player(pid));
+  const ui = getLocalTaskUI();
+  if (ui) ui.togglePanelLocal();
 }
 
 class TaskUI {
@@ -360,20 +366,23 @@ private localPlayer: any = null;
     updateTaskUIScrollBarVisibility(this.getScrollContext(), pc, pc > 0);
   }
 
-  /** sync=true 回调入口：入口和分类只允许触发玩家自己的客户端槽位响应。 */
+  /** sync=true 回调入口：所有客户端同步更新触发玩家槽位，再只在本机显示该槽位。 */
   switchCategorySync(player: any, type: QuestType): void {
     if (player == null || player === 0) return;
     const triggerPid = jass.GetPlayerId(player);
-    const localPid = jass.GetPlayerId(jass.GetLocalPlayer());
-    if (triggerPid !== this.playerId || triggerPid !== localPid) return;
+    if (triggerPid !== this.playerId) return;
     this.switchCategoryState(type);
-    this.switchCategoryUI(type);
+    if (player === jass.GetLocalPlayer()) this.switchCategoryUI(type);
   }
 
   /** 鼠标 Tab 点击入口（sync=true 帧回调，全房触发） */
   switchCategory(type: QuestType): void {
-    const triggerPlayer = japi.DzGetTriggerKeyPlayer();
-    this.switchCategorySync(triggerPlayer, type);
+    this.switchCategoryLocal(type);
+  }
+
+  switchCategoryLocal(type: QuestType): void {
+    this.switchCategoryState(type);
+    this.switchCategoryUI(type);
   }
 
   /** 本地行点击入口：只切换当前玩家自己的任务 UI。 */
@@ -400,12 +409,25 @@ private localPlayer: any = null;
     switchPageLocal(this.precreatedListPool, this.currentCategory, currentPage, nextPage);
   }
 
-  /** sync=true 回调入口：面板显隐只作用于触发玩家本机的槽位。 */
+  /** sync=true 回调入口：所有客户端同步更新触发玩家槽位，再只在本机显隐。 */
   togglePanelSync(player: any): void {
     if (player == null || player === 0) return;
     const triggerPid = jass.GetPlayerId(player);
-    const localPid = jass.GetPlayerId(jass.GetLocalPlayer());
-    if (triggerPid !== this.playerId || triggerPid !== localPid) return;
+    if (triggerPid !== this.playerId) return;
+    if (this.isVisible) {
+      this.hidePanelState();
+      if (player === jass.GetLocalPlayer()) this.hidePanelUI();
+    } else {
+      this.showPanelState();
+      if (player === jass.GetLocalPlayer()) this.showPanelUI();
+    }
+  }
+
+  togglePanel(): void {
+    this.togglePanelLocal();
+  }
+
+  togglePanelLocal(): void {
     if (this.isVisible) {
       this.hidePanelState();
       this.hidePanelUI();
@@ -413,11 +435,6 @@ private localPlayer: any = null;
       this.showPanelState();
       this.showPanelUI();
     }
-  }
-
-  togglePanel(): void {
-    const triggerPlayer = getTriggerPlayerOrLocal();
-    this.togglePanelSync(triggerPlayer);
   }
 
   /** 全局状态：标记面板可见 + 重置状态 */
