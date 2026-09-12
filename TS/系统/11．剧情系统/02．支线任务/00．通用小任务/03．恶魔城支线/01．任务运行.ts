@@ -51,8 +51,8 @@ const { 广播单位提示 } = require("系统.09．表现系统.06．广播提�
 };
 const { questDB } = require("系统.08．任务系统.01．任务数据") as {
   questDB: {
-    getPlayerActiveQuests: (this: void, 玩家ID: number) => Array<{ id: string; objectives: Array<{ id: string; current: number; required: number }> }>;
-    updateObjective: (this: void, 玩家ID: number, 任务ID: string, 目标ID: string, 进度: number) => boolean;
+    getPlayerActiveQuests: (玩家ID: number) => Array<{ id: string; objectives: Array<{ id: string; current: number; required: number }> }>;
+    updateObjective: (玩家ID: number, 任务ID: string, 目标ID: string, 进度: number) => boolean;
   };
 };
 const { 触发任务UI刷新 } = require("系统.08．任务系统.02．任务管理器") as {

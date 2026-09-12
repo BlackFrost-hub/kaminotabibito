@@ -201,9 +201,10 @@ function 执行Boss死亡清理(this: void, 配置: Boss死亡结算配置, Boss
   for (let i = 0; i < 清理列表.length; i++) 执行清理项(清理列表[i], Boss单位);
 }
 
-function 取Boss死亡位置(this: void, Boss单位: any, 击杀者: any): { x: number; y: number } {
+function 取Boss死亡位置(this: void, 配置: Boss死亡结算配置, Boss单位: any, 击杀者: any): { x: number; y: number } {
   if (Boss单位 != null && Boss单位 !== 0) return { x: GetUnitX(Boss单位), y: GetUnitY(Boss单位) };
   if (击杀者 != null && 击杀者 !== 0) return { x: GetUnitX(击杀者), y: GetUnitY(击杀者) };
+  if (配置.兜底掉落X != null && 配置.兜底掉落Y != null) return { x: 配置.兜底掉落X, y: 配置.兜底掉落Y };
   return { x: 0, y: 0 };
 }
 
@@ -235,7 +236,7 @@ function 处理Boss死亡特殊逻辑前置(this: void, 配置: Boss死亡结算
 function 处理Boss死亡特殊逻辑掉落(this: void, 配置: Boss死亡结算配置, Boss单位: any, 击杀者: any): void {
   if (!Boss死亡结算命中标签(配置, Boss死亡结算特殊逻辑标签.沙漠宝藏击杀者非中立)) return;
 
-  const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
+  const 位置 = 取Boss死亡位置(配置, Boss单位, 击杀者);
   if (配置.非装备批量掉落物品名 == null || 配置.非装备批量掉落物品名 === "") return;
   const 金币物品ID = stringToFourCCSafe(按名字反查物品ID(配置.非装备批量掉落物品名));
   const 掉落次数最小值 = 配置.非装备批量掉落最小数量 ?? 15;
@@ -250,7 +251,7 @@ function 掉落Boss死亡直接物品(this: void, 配置: Boss死亡结算配置
   const 物品列表 = 配置.直接掉落物品名列表;
   const 物品ID列表 = 配置.直接掉落物品ID列表;
   if ((物品列表 == null || 物品列表.length <= 0) && (物品ID列表 == null || 物品ID列表.length <= 0)) return;
-  const 位置 = 取Boss死亡位置(Boss单位, 击杀者);
+  const 位置 = 取Boss死亡位置(配置, Boss单位, 击杀者);
   if (物品列表 != null) {
     for (let i = 0; i < 物品列表.length; i++) {
       const 物品名 = 物品列表[i];

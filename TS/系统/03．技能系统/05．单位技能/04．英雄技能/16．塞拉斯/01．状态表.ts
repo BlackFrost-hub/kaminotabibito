@@ -1,13 +1,13 @@
 /** @noSelfInFile */
-// 塞拉斯专用同步状态表：普通/大魔法开关、当前元素、攻击标记、E 增幅统一入口。
+// 塞拉斯专用同步状态表：普通/大魔法开关、当前元素、攻击标记。
+// E 增幅已迁移至英雄技能成长系统：学习 A0JX 时写入玩家属性「魔法伤害」，由伤害系统统一加算。
 // 所有读写都在同步游戏逻辑中进行；本地表现（按钮/文字）由各技能文件内的本地分支处理。
 
-import { 塞拉斯技能配置, 塞拉斯元素 } from "./00．配置";
+import { 塞拉斯元素 } from "./00．配置";
 
 const jass = require("jass.common") as any;
 
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
-const GetUnitAbilityLevel = jass.GetUnitAbilityLevel as (this: void, unit: any, abilityId: number) => number;
 
 export interface 塞拉斯魔法状态 {
   英雄句柄ID: number;
@@ -114,15 +114,3 @@ export function 塞拉斯拥有任意攻击标记(this: void, unit: any): boolea
   return marks.火 || marks.冰 || marks.雷;
 }
 
-/**
- * E 属性提升统一增幅入口（塞拉斯专用）。
- * 增幅 = (10 + 3 × A0JX等级)%；只用于塞拉斯火冰雷魔法技能伤害，
- * 不修正普攻与灼烧周期伤害。项目统一魔法伤害修正入口落地后迁移本函数。
- */
-export function 塞拉斯魔法技能增幅倍率(this: void, unit: any): number {
-  if (unit == null || unit === 0) return 1;
-  const level = GetUnitAbilityLevel(unit, 塞拉斯技能配置.E.技能类型ID);
-  if (level <= 0) return 1;
-  const 增幅百分比 = 塞拉斯技能配置.E.每级魔法伤害基础增幅百分比 + 塞拉斯技能配置.E.每级魔法伤害成长百分比 * level;
-  return 1 + 增幅百分比 / 100;
-}

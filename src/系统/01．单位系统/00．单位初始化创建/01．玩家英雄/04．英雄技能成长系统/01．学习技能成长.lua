@@ -25,15 +25,40 @@ local SetHeroInt = jass.SetHeroInt
 local function _____53D6_6280_80FD_5904_7406_952E(unit, abilityId)
     return (tostring(GetHandleId(unit)) .. "#") .. tostring(abilityId)
 end
-local function _____5E94_7528_6210_957F_5C5E_6027(unit, attr, _____7B49_7EA7_589E_91CF, _____662F_5426_9996_6B21)
-    local amount = attr["每级增量"] * _____7B49_7EA7_589E_91CF + (_____662F_5426_9996_6B21 and (attr["初始增量"] or 0) or 0)
+local function _____5E94_7528_6210_957F_5C5E_6027(unit, attr, _____7B49_7EA7_589E_91CF, _____662F_5426_9996_6B21, _____65E7_7B49_7EA7, _____65B0_7B49_7EA7)
+    local amount = attr["每级增量"] * _____7B49_7EA7_589E_91CF
+    if attr["分段增量"] ~= nil and #attr["分段增量"] > 0 then
+        amount = 0
+        do
+            local lv = _____65E7_7B49_7EA7 + 1
+            while lv <= _____65B0_7B49_7EA7 do
+                local _____6BB5_589E_91CF = attr["每级增量"]
+                do
+                    local s = 0
+                    while s < #attr["分段增量"] do
+                        local _____6BB5 = attr["分段增量"][s + 1]
+                        if _____6BB5["上限等级"] == nil or lv <= _____6BB5["上限等级"] then
+                            _____6BB5_589E_91CF = _____6BB5["增量"]
+                            break
+                        end
+                        s = s + 1
+                    end
+                end
+                amount = amount + _____6BB5_589E_91CF
+                lv = lv + 1
+            end
+        end
+    end
+    if _____662F_5426_9996_6B21 then
+        amount = amount + (attr["初始增量"] or 0)
+    end
     if amount == 0 then
         return
     end
     repeat
-        local ____switch5 = attr["处理方式"] or "玩家属性"
-        local ____cond5 = ____switch5 == "英雄智力"
-        if ____cond5 then
+        local ____switch12 = attr["处理方式"] or "玩家属性"
+        local ____cond12 = ____switch12 == "英雄智力"
+        if ____cond12 then
             SetHeroInt(
                 unit,
                 GetHeroInt(unit, false) + amount,
@@ -41,22 +66,22 @@ local function _____5E94_7528_6210_957F_5C5E_6027(unit, attr, _____7B49_7EA7_589
             )
             return
         end
-        ____cond5 = ____cond5 or ____switch5 == "来源治疗率"
-        if ____cond5 then
+        ____cond12 = ____cond12 or ____switch12 == "来源治疗率"
+        if ____cond12 then
             _____8C03_6574_5355_4F4D_5C5E_6027(unit, attr["属性名"] or "治疗率", amount)
             return
         end
-        ____cond5 = ____cond5 or ____switch5 == "护甲"
-        if ____cond5 then
+        ____cond12 = ____cond12 or ____switch12 == "护甲"
+        if ____cond12 then
             _____4E34_65F6_8C03_6574_62A4_7532(unit, amount)
             return
         end
-        ____cond5 = ____cond5 or ____switch5 == "单位属性"
-        if ____cond5 then
+        ____cond12 = ____cond12 or ____switch12 == "单位属性"
+        if ____cond12 then
             _____8C03_6574_5355_4F4D_5C5E_6027(unit, attr["属性名"], amount)
             return
         end
-        ____cond5 = ____cond5 or ____switch5 == "玩家属性"
+        ____cond12 = ____cond12 or ____switch12 == "玩家属性"
         do
             _____8C03_6574_73A9_5BB6_5C5E_6027(unit, attr["属性名"], amount)
             return
@@ -86,10 +111,10 @@ local function ____on_82F1_96C4_5B66_4E60_6280_80FD(unit, abilityId)
             do
                 local config = _____82F1_96C4_6280_80FD_6210_957F_914D_7F6E_8868[i + 1]
                 if heroId ~= stringToFourCCSafe(config["英雄ID"]) then
-                    goto __continue9
+                    goto __continue16
                 end
                 if abilityId ~= stringToFourCCSafe(config["技能ID"]) then
-                    goto __continue9
+                    goto __continue16
                 end
                 local key = _____53D6_6280_80FD_5904_7406_952E(unit, abilityId)
                 local currentLevel = GetUnitAbilityLevel(unit, abilityId)
@@ -103,13 +128,20 @@ local function ____on_82F1_96C4_5B66_4E60_6280_80FD(unit, abilityId)
                     local j = 0
                     while j < #config["属性"] do
                         local attr = config["属性"][j + 1]
-                        _____5E94_7528_6210_957F_5C5E_6027(unit, attr, levelDelta, firstLearn)
+                        _____5E94_7528_6210_957F_5C5E_6027(
+                            unit,
+                            attr,
+                            levelDelta,
+                            firstLearn,
+                            previousLevel,
+                            currentLevel
+                        )
                         j = j + 1
                     end
                 end
                 _____5DF2_5904_7406_6280_80FD_7B49_7EA7[key] = currentLevel
             end
-            ::__continue9::
+            ::__continue16::
             i = i + 1
         end
     end

@@ -70,3 +70,17 @@ export function 创建物品并给予单位(this: void, unit: any, itemId: numbe
   RemoveItem(item);
   return 0;
 }
+
+/**
+ * 创建物品并优先放入单位物品栏；放不下时不销毁，物品留在单位脚下由玩家拾取。
+ * 返回物品句柄（入包或掉地均算成功）；参数无效或引擎创建失败才返回 0。
+ */
+export function 创建物品给予或掉落安全(this: void, unit: any, itemId: number): any {
+  if (unit == null || unit === 0 || !(itemId > 0)) return 0;
+  const x = GetUnitX(unit);
+  const y = GetUnitY(unit);
+  const item = 创建物品并注册排泄监听(itemId, x, y);
+  if (!是有效物品句柄(item)) return 0;
+  if (给予单位物品(unit, item)) return item;
+  return item;
+}

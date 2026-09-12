@@ -1,11 +1,8 @@
 local ____lualib = require("lualib_bundle")
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.16．塞拉斯.00．配置")
-local _____585E_62C9_65AF_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["塞拉斯技能配置"]
 local jass = require("jass.common")
 local GetHandleId = jass.GetHandleId
-local GetUnitAbilityLevel = jass.GetUnitAbilityLevel
 local _____9B54_6CD5_72B6_6001_8868 = {}
 local _____653B_51FB_6807_8BB0_8868 = {}
 ____exports["取塞拉斯句柄ID"] = function(unit)
@@ -119,19 +116,5 @@ ____exports["塞拉斯拥有任意攻击标记"] = function(unit)
         return false
     end
     return marks["火"] or marks["冰"] or marks["雷"]
-end
---- E 属性提升统一增幅入口（塞拉斯专用）。
--- 增幅 = (10 + 3 × A0JX等级)%；只用于塞拉斯火冰雷魔法技能伤害，
--- 不修正普攻与灼烧周期伤害。项目统一魔法伤害修正入口落地后迁移本函数。
-____exports["塞拉斯魔法技能增幅倍率"] = function(unit)
-    if unit == nil or unit == 0 then
-        return 1
-    end
-    local level = GetUnitAbilityLevel(unit, _____585E_62C9_65AF_6280_80FD_914D_7F6E.E["技能类型ID"])
-    if level <= 0 then
-        return 1
-    end
-    local _____589E_5E45_767E_5206_6BD4 = _____585E_62C9_65AF_6280_80FD_914D_7F6E.E["每级魔法伤害基础增幅百分比"] + _____585E_62C9_65AF_6280_80FD_914D_7F6E.E["每级魔法伤害成长百分比"] * level
-    return 1 + _____589E_5E45_767E_5206_6BD4 / 100
 end
 return ____exports

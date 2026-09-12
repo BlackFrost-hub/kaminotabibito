@@ -5,12 +5,7 @@
 
 import { 塞拉斯技能配置, 塞拉斯元素 } from "./00．配置";
 import { 塞拉斯BuffID } from "../../../../05．Buff系统/03．Buff表/02．英雄/06．塞拉斯";
-import {
-  获取或创建塞拉斯魔法状态,
-  消费塞拉斯大魔法化,
-  设置塞拉斯攻击标记,
-  塞拉斯魔法技能增幅倍率,
-} from "./01．状态表";
+import { 获取或创建塞拉斯魔法状态, 消费塞拉斯大魔法化, 设置塞拉斯攻击标记 } from "./01．状态表";
 import { 塞拉斯元素施法后自动关闭 } from "./02．技能入口与关闭";
 import { 注册单位技能壳监听 } from "../../../00．技能模板+函数/04．机制组件/10．复杂战斗通用机制/16．单位技能壳监听注册器";
 import { 读取单位攻击力, 单位存活 } from "../../../00．技能模板+函数/02．通用函数/19．战斗公共工具";
@@ -150,7 +145,7 @@ function 推进灼烧周期(this: void, variable?: any): void {
 
   registerManualBuff(target, 塞拉斯BuffID.灼烧, 层数 * 1.0, 0.015, { stack: 层数 - 1, allowZeroStack: true, sourceUnit: caster });
 
-  // 每秒目标已损失生命值的 1.5%；灼烧周期伤害不参与 E 增幅、不触发远程普攻被动（标签过滤）
+  // 每秒目标已损失生命值的 1.5%；灼烧为火焰魔法伤害，E 的「魔法伤害」属性经伤害系统一并生效，不触发远程普攻被动（标签过滤）
   const 已损失生命 = GetUnitState(target, UNIT_STATE_MAX_LIFE) - GetUnitState(target, UNIT_STATE_LIFE);
   const 伤害 = 已损失生命 * 元素配置.火焰.灼烧每秒已损失生命比例;
   if (伤害 > 0.5 && 单位存活(caster)) {
@@ -346,8 +341,8 @@ function 释放元素魔法(this: void, context: 元素施法上下文, caster: 
   const 等级 = GetUnitAbilityLevel(caster, Q入口类型ID);
   const 倍率组 = 取元素伤害类型基数(元素);
   const 攻击力 = 读取单位攻击力(caster);
-  const 增幅 = 塞拉斯魔法技能增幅倍率(caster);
-  const 伤害快照 = 攻击力 * (倍率组.基础倍率 + 倍率组.每级成长 * 等级) * 增幅;
+  // E 属性提升的魔法伤害%由英雄技能成长系统写入玩家属性「魔法伤害」，伤害系统主计算流程统一加算，此处不再手动乘增幅
+  const 伤害快照 = 攻击力 * (倍率组.基础倍率 + 倍率组.每级成长 * 等级);
 
   context.施法者 = caster;
   context.技能实例ID = 技能实例ID;

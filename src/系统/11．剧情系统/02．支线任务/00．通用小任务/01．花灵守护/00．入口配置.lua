@@ -11,7 +11,7 @@ local _____82B1_7075_5B88_62A4_4EFB_52A1ID = "10026"
 local _____82B1_7075_5B88_62A4_9632_5B88_552F_4E00_952E = "side_quest_flower_spirit_defense"
 local function _____5B8C_6210_82B1_7075_5B88_62A4_76EE_6807(_____4E0A_4E0B_6587)
     local _____73A9_5BB6ID = _____4E0A_4E0B_6587
-    if questDB.updateObjective(_____73A9_5BB6ID, _____82B1_7075_5B88_62A4_4EFB_52A1ID, "obj1", 1) then
+    if questDB:updateObjective(_____73A9_5BB6ID, _____82B1_7075_5B88_62A4_4EFB_52A1ID, "obj1", 1) then
         _____89E6_53D1_4EFB_52A1UI_5237_65B0(_____73A9_5BB6ID, _____82B1_7075_5B88_62A4_4EFB_52A1ID)
     end
 end

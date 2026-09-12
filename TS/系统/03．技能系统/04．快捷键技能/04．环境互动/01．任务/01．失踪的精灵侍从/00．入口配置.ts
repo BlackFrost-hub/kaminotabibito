@@ -13,12 +13,12 @@ const { 创建点特效, 销毁点特效 } = require("lib.扩展函数.封装函
 };
 const { questDB } = require("系统.08．任务系统.01．任务数据") as {
   questDB: {
-    updateObjective: (this: void, 玩家ID: number, 任务ID: string, 目标ID: string, 进度: number) => boolean;
+    updateObjective: (玩家ID: number, 任务ID: string, 目标ID: string, 进度: number) => boolean;
     globalData?: { quests: Map<string, { objectives: Array<{ current: number; required: number }> }> };
   };
 };
 const { questManager } = require("系统.08．任务系统.02．任务管理器") as {
-  questManager: { triggerUIRefresh: (this: void, 玩家ID: number, 任务ID?: string) => void };
+  questManager: { triggerUIRefresh: (玩家ID: number, 任务ID?: string) => void };
 };
 const { 广播单位提示 } = require("系统.09．表现系统.06．广播提示消息.index") as {
   广播单位提示: (this: void, 来源单位: any, 文本: string, 持续时间?: number) => void;

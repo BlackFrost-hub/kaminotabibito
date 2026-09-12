@@ -151,7 +151,7 @@ local _____5408_6CD5_51B3_6597_56DE_8C03ID = 0
 local _____5408_6CD5_51B3_6597_5DF2_7ED3_675F = false
 local function _____67E5_627E_6D3B_52A8_4EFB_52A1(_____73A9_5BB6ID, _____4EFB_52A1ID)
     local _____4EFB_52A1_952E = tostring(_____4EFB_52A1ID)
-    local _____6D3B_52A8_4EFB_52A1_5217_8868 = questDB.getPlayerActiveQuests(_____73A9_5BB6ID)
+    local _____6D3B_52A8_4EFB_52A1_5217_8868 = questDB:getPlayerActiveQuests(_____73A9_5BB6ID)
     do
         local i = 0
         while i < #_____6D3B_52A8_4EFB_52A1_5217_8868 do
@@ -173,7 +173,7 @@ local function _____66F4_65B0_4EFB_52A1_76EE_6807(_____73A9_5BB6ID, _____4EFB_52
     if _____76EE_6807 == nil or _____65B0_8FDB_5EA6 <= _____76EE_6807.current then
         return false
     end
-    if not questDB.updateObjective(_____73A9_5BB6ID, _____4EFB_52A1.id, _____76EE_6807.id, _____65B0_8FDB_5EA6) then
+    if not questDB:updateObjective(_____73A9_5BB6ID, _____4EFB_52A1.id, _____76EE_6807.id, _____65B0_8FDB_5EA6) then
         return false
     end
     _____89E6_53D1_4EFB_52A1UI_5237_65B0(_____73A9_5BB6ID, _____4EFB_52A1.id)

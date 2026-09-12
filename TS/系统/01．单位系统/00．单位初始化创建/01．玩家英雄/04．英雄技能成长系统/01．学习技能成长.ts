@@ -29,8 +29,24 @@ function 取技能处理键(this: void, unit: any, abilityId: number): string {
   return `${GetHandleId(unit)}#${abilityId}`;
 }
 
-function 应用成长属性(this: void, unit: any, attr: (typeof 英雄技能成长配置表)[number]["属性"][number], 等级增量: number, 是否首次: boolean): void {
-  const amount = attr.每级增量 * 等级增量 + (是否首次 ? (attr.初始增量 ?? 0) : 0);
+function 应用成长属性(this: void, unit: any, attr: (typeof 英雄技能成长配置表)[number]["属性"][number], 等级增量: number, 是否首次: boolean, 旧等级: number, 新等级: number): void {
+  let amount = attr.每级增量 * 等级增量;
+  // 分段增量：按旧等级+1 → 新等级逐级落段累计（学习等级只升不降，逐级判定安全）
+  if (attr.分段增量 != null && attr.分段增量.length > 0) {
+    amount = 0;
+    for (let lv = 旧等级 + 1; lv <= 新等级; lv++) {
+      let 段增量 = attr.每级增量;
+      for (let s = 0; s < attr.分段增量.length; s++) {
+        const 段 = attr.分段增量[s];
+        if (段.上限等级 == null || lv <= 段.上限等级) {
+          段增量 = 段.增量;
+          break;
+        }
+      }
+      amount += 段增量;
+    }
+  }
+  if (是否首次) amount += attr.初始增量 ?? 0;
   if (amount === 0) return;
 
   switch (attr.处理方式 ?? "玩家属性") {
@@ -71,7 +87,7 @@ function on英雄学习技能(this: void, unit: any, abilityId: number): void {
     const firstLearn = previousLevel === 0;
     for (let j = 0; j < config.属性.length; j++) {
       const attr = config.属性[j];
-      应用成长属性(unit, attr, levelDelta, firstLearn);
+      应用成长属性(unit, attr, levelDelta, firstLearn, previousLevel, currentLevel);
     }
     已处理技能等级[key] = currentLevel;
   }

@@ -27,6 +27,7 @@ export function init(this: void): void {
   初始化主线剧情入口();
   初始化主线剧情物品事件();
   初始化主线剧情特殊事件();
-  // 暂时停用主线引导 UI，用于隔离双开时的 JAPI Frame 崩溃。
-  debugLogForce(MAINLINE_UI_INIT_LOG_MODULE, "主线引导 UI 已禁用");
+  // 2026-09-13：恢复主线引导 UI（此前双开 JAPI Frame 崩溃问题已完成隔离与分析，重新启用）
+  debugLogForce(MAINLINE_UI_INIT_LOG_MODULE, "开始延迟初始化", "delayMs=", MAINLINE_UI_INIT_DELAY_MS);
+  addDelayedCallback(MAINLINE_UI_INIT_DELAY_MS, 延迟初始化主线引导UI);
 }

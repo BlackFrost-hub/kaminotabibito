@@ -7,7 +7,7 @@ import {
 } from "../../../../03．技能系统/00．技能模板+函数/01．技能函数/27．通用防守";
 
 const { questDB } = require("系统.08．任务系统.01．任务数据") as {
-  questDB: { updateObjective: (this: void, playerId: number, questId: string, objectiveId: string, progress: number) => boolean };
+  questDB: { updateObjective: (playerId: number, questId: string, objectiveId: string, progress: number) => boolean };
 };
 const { 触发任务UI刷新 } = require("系统.08．任务系统.02．任务管理器") as {
   触发任务UI刷新: (this: void, playerId: number, questId?: string) => void;

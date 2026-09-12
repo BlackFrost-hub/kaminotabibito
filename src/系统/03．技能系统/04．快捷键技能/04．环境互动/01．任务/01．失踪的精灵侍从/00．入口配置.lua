@@ -127,14 +127,14 @@ local function _____5904_7406_5931_8E2A_4F8D_4ECE_8C03_67E5_70B9(_____73A9_5BB6I
     if _____8FDB_5EA6 == nil or _____8FDB_5EA6["当前"] >= _____8FDB_5EA6["需求"] then
         return false
     end
-    if not questDB.updateObjective(_____73A9_5BB6ID, _____5931_8E2A_7684_7CBE_7075_4F8D_4ECE_4EFB_52A1_952E, _____5931_8E2A_7684_7CBE_7075_4F8D_4ECE_4EFB_52A1_76EE_6807ID, _____8FDB_5EA6["当前"] + 1) then
+    if not questDB:updateObjective(_____73A9_5BB6ID, _____5931_8E2A_7684_7CBE_7075_4F8D_4ECE_4EFB_52A1_952E, _____5931_8E2A_7684_7CBE_7075_4F8D_4ECE_4EFB_52A1_76EE_6807ID, _____8FDB_5EA6["当前"] + 1) then
         return false
     end
     _____5DF2_8C03_67E5_7EBF_7D22ID_8868[_____7EBF_7D22.ID] = true
     _____6CE8_9500_73AF_5883_4E92_52A8_8C03_67E5_70B9(_____7EBF_7D22.ID)
     _____6E05_7406_8C03_67E5_7EBF_7D22_7279_6548(_____7EBF_7D22.ID)
     _____5E7F_64AD_5355_4F4D_63D0_793A(_____65BD_6CD5_5355_4F4D, _____7EBF_7D22["发现文本"], 5000)
-    questManager.triggerUIRefresh(_____73A9_5BB6ID, _____5931_8E2A_7684_7CBE_7075_4F8D_4ECE_4EFB_52A1_952E)
+    questManager:triggerUIRefresh(_____73A9_5BB6ID, _____5931_8E2A_7684_7CBE_7075_4F8D_4ECE_4EFB_52A1_952E)
     local _____65B0_8FDB_5EA6 = _____8FDB_5EA6["当前"] + 1
     if _____65B0_8FDB_5EA6 >= _____8FDB_5EA6["需求"] then
         _____5E7F_64AD_5355_4F4D_63D0_793A(_____65BD_6CD5_5355_4F4D, "|cffffff00『调查结果』：|r三处线索已经查齐了。回去向内务总管·语维复命吧。", 5000)

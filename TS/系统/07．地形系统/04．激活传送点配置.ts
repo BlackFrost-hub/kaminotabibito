@@ -153,6 +153,22 @@ export const 激活传送点配置: Record<string, PointConfig> = {
     UnitID: "e08L",
     text: "|cffffff00『系统提示』|r：激活『静灵森』传送点。",
     enabled: true
+  },
+  "20": {
+    name: "精灵城中心",
+    teleportX: "-8177.0",
+    teleportY: "-9740.8",
+    UnitID: "e08L",
+    text: "|cffffff00『系统提示』|r：激活|cffff8080『精灵城中心』|r传送点。",
+    enabled: true
+  },
+  "21": {
+    name: "王宫",
+    teleportX: "15087.5",
+    teleportY: "-24624.7",
+    UnitID: "e08L",
+    text: "|cffffff00『系统提示』|r：激活|cffff8080『王宫』|r传送点。",
+    enabled: true
   }
 };
 export default 激活传送点配置;

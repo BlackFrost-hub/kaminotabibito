@@ -252,7 +252,7 @@ local function _____6267_884CBoss_6B7B_4EA1_6E05_7406(_____914D_7F6E, ____Boss_5
         end
     end
 end
-local function _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
+local function _____53D6Boss_6B7B_4EA1_4F4D_7F6E(_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
     if ____Boss_5355_4F4D ~= nil and ____Boss_5355_4F4D ~= 0 then
         return {
             x = GetUnitX(____Boss_5355_4F4D),
@@ -264,6 +264,9 @@ local function _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6
             x = GetUnitX(_____51FB_6740_8005),
             y = GetUnitY(_____51FB_6740_8005)
         }
+    end
+    if _____914D_7F6E["兜底掉落X"] ~= nil and _____914D_7F6E["兜底掉落Y"] ~= nil then
+        return {x = _____914D_7F6E["兜底掉落X"], y = _____914D_7F6E["兜底掉落Y"]}
     end
     return {x = 0, y = 0}
 end
@@ -299,7 +302,7 @@ local function _____5904_7406Boss_6B7B_4EA1_7279_6B8A_903B_8F91_6389_843D(_____9
     if not ____Boss_6B7B_4EA1_7ED3_7B97_547D_4E2D_6807_7B7E(_____914D_7F6E, ____Boss_6B7B_4EA1_7ED3_7B97_7279_6B8A_903B_8F91_6807_7B7E["沙漠宝藏击杀者非中立"]) then
         return
     end
-    local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
+    local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
     if _____914D_7F6E["非装备批量掉落物品名"] == nil or _____914D_7F6E["非装备批量掉落物品名"] == "" then
         return
     end
@@ -323,7 +326,7 @@ local function _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, 
     if (_____7269_54C1_5217_8868 == nil or #_____7269_54C1_5217_8868 <= 0) and (_____7269_54C1ID_5217_8868 == nil or #_____7269_54C1ID_5217_8868 <= 0) then
         return
     end
-    local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(____Boss_5355_4F4D, _____51FB_6740_8005)
+    local _____4F4D_7F6E = _____53D6Boss_6B7B_4EA1_4F4D_7F6E(_____914D_7F6E, ____Boss_5355_4F4D, _____51FB_6740_8005)
     if _____7269_54C1_5217_8868 ~= nil then
         do
             local i = 0
@@ -343,7 +346,7 @@ local function _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, 
                                 _____539F_59CB_7269_54C1ID
                             )
                         end
-                        goto __continue67
+                        goto __continue68
                     end
                     local _____5DF2_521B_5EFA_7269_54C1 = CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
                     if _____9700_8981_8F93_51FA_6389_843D_8C03_8BD5(_____914D_7F6E) then
@@ -365,7 +368,7 @@ local function _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, 
                         )
                     end
                 end
-                ::__continue67::
+                ::__continue68::
                 i = i + 1
             end
         end
@@ -380,7 +383,7 @@ local function _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, 
                         if _____9700_8981_8F93_51FA_6389_843D_8C03_8BD5(_____914D_7F6E) then
                             debugLogForce(_____6A21_5757_540D, "直接掉落内部ID无效", "rawId", _____7269_54C1ID_5217_8868[i + 1])
                         end
-                        goto __continue73
+                        goto __continue74
                     end
                     local _____5DF2_521B_5EFA_7269_54C1 = CreateItem(_____7269_54C1ID, _____4F4D_7F6E.x, _____4F4D_7F6E.y)
                     if _____9700_8981_8F93_51FA_6389_843D_8C03_8BD5(_____914D_7F6E) then
@@ -400,7 +403,7 @@ local function _____6389_843DBoss_6B7B_4EA1_76F4_63A5_7269_54C1(_____914D_7F6E, 
                         )
                     end
                 end
-                ::__continue73::
+                ::__continue74::
                 i = i + 1
             end
         end

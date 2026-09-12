@@ -52,6 +52,9 @@ export interface Boss死亡结算配置 {
   直接掉落物品名列表?: string[];
   /** 无法通过装备数据表反查时使用，例如剧情任务物品或旧 JASS raw id。 */
   直接掉落物品ID列表?: string[];
+  /** Boss 与击杀者句柄都无效时的掉落兜底坐标；不配置则退回 (0, 0)。 */
+  兜底掉落X?: number;
+  兜底掉落Y?: number;
   非装备批量掉落物品名?: string;
   非装备批量掉落最小数量?: number;
   非装备批量掉落最大数量?: number;

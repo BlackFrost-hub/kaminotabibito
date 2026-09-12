@@ -82,4 +82,21 @@ ____exports["创建物品并给予单位"] = function(unit, itemId)
     RemoveItem(item)
     return 0
 end
+--- 创建物品并优先放入单位物品栏；放不下时不销毁，物品留在单位脚下由玩家拾取。
+-- 返回物品句柄（入包或掉地均算成功）；参数无效或引擎创建失败才返回 0。
+____exports["创建物品给予或掉落安全"] = function(unit, itemId)
+    if unit == nil or unit == 0 or not (itemId > 0) then
+        return 0
+    end
+    local x = GetUnitX(unit)
+    local y = GetUnitY(unit)
+    local item = ____exports["创建物品并注册排泄监听"](itemId, x, y)
+    if not _____662F_6709_6548_7269_54C1_53E5_67C4(item) then
+        return 0
+    end
+    if ____exports["给予单位物品"](unit, item) then
+        return item
+    end
+    return item
+end
 return ____exports
