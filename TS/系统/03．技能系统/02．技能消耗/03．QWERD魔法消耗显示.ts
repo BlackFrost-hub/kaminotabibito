@@ -61,6 +61,7 @@ const SHADOW_OFFSET_X = 0.0006;
 const SHADOW_OFFSET_Y = -0.0006;
 let initialized = false;
 let 显示缓存: 显示表 | null = null;
+let 剧情电影模式隐藏UI = false;
 
 function isValidHandle(handle: any): boolean {
   return handle != null && handle !== 0;
@@ -232,9 +233,19 @@ function hideAll(this: void): void {
   隐藏单元(显示缓存.D);
 }
 
+/** 由剧情电影总控调用；不在本模块自行判断或写入剧情状态。 */
+export function 设置剧情电影模式隐藏魔法消耗(this: void, 隐藏: boolean): void {
+  剧情电影模式隐藏UI = 隐藏;
+  if (隐藏) hideAll();
+}
+
 function onTick(this: void): void {
   const currentUi = 确保显示缓存();
   if (currentUi == null) return;
+  if (剧情电影模式隐藏UI) {
+    hideAll();
+    return;
+  }
   if (功能开关模块.本地玩家是否开启魔法消耗显示() !== true) {
     hideAll();
     return;

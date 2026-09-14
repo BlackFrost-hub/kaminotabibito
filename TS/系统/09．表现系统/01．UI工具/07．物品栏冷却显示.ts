@@ -89,8 +89,8 @@ function 查找物品所在槽位(this: void, hero: any, targetItem: any): numbe
 
 function 格式化剩余秒(this: void, 剩余毫秒: number): string {
   if (剩余毫秒 <= 0) return "";
-  const 十分秒 = math.floor(剩余毫秒 / 100 + 0.999);
-  const 秒 = math.floor(十分秒 / 10);
+  const 十分秒 = jass.R2I(剩余毫秒 / 100 + 0.999);
+  const 秒 = jass.R2I(十分秒 / 10);
   const 小数 = 十分秒 - 秒 * 10;
   return tostring(秒) + "." + tostring(小数);
 }
@@ -119,6 +119,14 @@ function 隐藏全部槽位UI(this: void): void {
   }
 }
 
+let 剧情电影模式隐藏UI = false;
+
+/** 由剧情电影总控调用；不在本模块自行判断或写入剧情状态。 */
+export function 设置剧情电影模式隐藏物品冷却(this: void, 隐藏: boolean): void {
+  剧情电影模式隐藏UI = 隐藏;
+  if (隐藏) 隐藏全部槽位UI();
+}
+
 function 隐藏物品所在槽位UI(this: void, hero: any, item: any): void {
   if (!是否本地玩家单位(hero)) return;
   const slot = 查找物品所在槽位(hero, item);
@@ -140,7 +148,7 @@ function 确保槽位UI(this: void, slot: number): 物品栏冷却槽位UI | nul
     宽度: 0.042,
     高度: 0.020,
     字体大小: 0.020,
-    优先级: 9001,
+    优先级: 8001,
     对齐: 18,
     层: 物品冷却数字层,
   });
@@ -149,7 +157,7 @@ function 确保槽位UI(this: void, slot: number): 物品栏冷却槽位UI | nul
   DzFrameSetModel(转圈框体, 冷却转圈模型, 0, 0);
   DzFrameSetAnimate(转圈框体, 0, false);
   DzFrameSetAnimateOffset(转圈框体, 0);
-  DzFrameSetPriority(转圈框体, 9000);
+  DzFrameSetPriority(转圈框体, 8000);
   DzFrameSetSize(转圈框体, 0.032, 0.032);
   DzFrameShow(转圈框体, false);
   显示冷却数字文本(数字文本组, false);
@@ -160,6 +168,10 @@ function 确保槽位UI(this: void, slot: number): 物品栏冷却槽位UI | nul
 }
 
 function 刷新物品栏冷却显示(this: void): void {
+  if (剧情电影模式隐藏UI) {
+    隐藏全部槽位UI();
+    return;
+  }
   const now = 当前毫秒();
   let writeIndex = 0;
   隐藏全部槽位UI();

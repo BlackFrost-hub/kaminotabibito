@@ -98,7 +98,7 @@ local function createTextGroup(name)
         ["宽度"] = TEXT_W,
         ["高度"] = TEXT_H,
         ["字体大小"] = FONT_SIZE,
-        ["优先级"] = 0,
+        ["优先级"] = 8000,
         ["对齐"] = 8,
         ["层"] = _____51B7_5374_6570_5B57_6587_672C_6A21_5757["技能冷却数字层"]
     })
@@ -209,12 +209,24 @@ local function hideAll()
     _____8BBE_7F6E_51B7_5374_6570_5B57_6587_672C(_____6587_672C_7EC4_7F13_5B58.D, "")
     _____663E_793A_51B7_5374_6570_5B57_6587_672C(_____6587_672C_7EC4_7F13_5B58.D, false)
 end
+local _____5267_60C5_7535_5F71_6A21_5F0F_9690_85CFUI = false
+--- 由剧情电影总控调用；不在本模块自行判断或写入剧情状态。
+____exports["设置剧情电影模式隐藏QWERD冷却"] = function(_____9690_85CF)
+    _____5267_60C5_7535_5F71_6A21_5F0F_9690_85CFUI = _____9690_85CF
+    if _____9690_85CF then
+        hideAll()
+    end
+end
 local function onTick()
     local currentGroups = _____786E_4FDD_6587_672C_7EC4_7F13_5B58()
     if currentGroups == nil then
         return
     end
     if _____529F_80FD_5F00_5173_6A21_5757["本地玩家是否开启冷却显示"]() ~= true then
+        hideAll()
+        return
+    end
+    if _____5267_60C5_7535_5F71_6A21_5F0F_9690_85CFUI then
         hideAll()
         return
     end

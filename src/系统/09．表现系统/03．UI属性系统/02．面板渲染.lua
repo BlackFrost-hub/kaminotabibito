@@ -182,6 +182,7 @@ local function createDamagePanel(gameUI)
     setAbsolute(damagePanel, _____5E38_91CF.DAMAGE_PANEL_X, _____5E38_91CF.DAMAGE_PANEL_Y)
     japi.DzFrameSetSize(damagePanel, _____5E38_91CF.DAMAGE_PANEL_WIDTH, _____5E38_91CF.DAMAGE_PANEL_HEIGHT)
     japi.DzFrameSetAlpha(damagePanel, _____5E38_91CF.DAMAGE_PANEL_ALPHA)
+    japi.DzFrameSetPriority(damagePanel, _____5E38_91CF.ATTRIBUTE_UI_PRIORITY)
     show(damagePanel, false)
     do
         local i = 0
@@ -260,6 +261,7 @@ local function createDetailSlotForPlayer(gameUI, player, hero, index)
     end
     setAbsolute(icon, iconX, _____5E38_91CF.HERO_ICON_Y)
     japi.DzFrameSetSize(icon, _____5E38_91CF.HERO_ICON_WIDTH, _____5E38_91CF.HERO_ICON_HEIGHT)
+    japi.DzFrameSetPriority(icon, _____5E38_91CF.ATTRIBUTE_UI_PRIORITY + 1)
     local iconPath = getHeroIcon(hero)
     japi.DzFrameSetTexture(icon, iconPath, 0)
     show(icon, true)

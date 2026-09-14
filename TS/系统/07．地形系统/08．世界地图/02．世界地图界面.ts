@@ -144,6 +144,8 @@ export function 初始化世界地图界面(this: void): void {
 
   const 地图根帧 = DzCreateFrameByTagName("BACKDROP", "name", 游戏界面, "template", 0);
   世界地图帧.地图根帧 = 地图根帧;
+  // 世界地图与冷却数字同属游戏界面根帧；根帧必须明确置于冷却数字之上。
+  DzFrameSetPriority(地图根帧, 10000);
   DzFrameShow(地图根帧, true);
   DzFrameShow(地图根帧, false);
 
@@ -158,4 +160,3 @@ export function 初始化世界地图界面(this: void): void {
     世界地图帧.地点帧组表.push(创建地点帧(地图根帧, 配置索引));
   }
 }
-

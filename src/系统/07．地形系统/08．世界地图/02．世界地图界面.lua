@@ -201,6 +201,7 @@ ____exports["初始化世界地图界面"] = function()
         0
     )
     ____exports["世界地图帧"]["地图根帧"] = _____5730_56FE_6839_5E27
+    DzFrameSetPriority(_____5730_56FE_6839_5E27, 10000)
     DzFrameShow(_____5730_56FE_6839_5E27, true)
     DzFrameShow(_____5730_56FE_6839_5E27, false)
     local _____5730_56FE_63D0_793A = DzCreateFrameByTagName(

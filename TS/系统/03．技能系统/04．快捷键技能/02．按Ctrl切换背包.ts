@@ -3,7 +3,8 @@
 /**
  * 背包切换功能
  *
- * 按Ctrl键切换英雄背包与辅助背包
+ * 按 Z 键切换英雄背包与辅助背包。
+ * 走 `registerKeyUpSync`：本机过滤聊天框后经同步数据回调全端派发（避免异步）。
  */
 
 const jass = require("jass.common") as any;
@@ -20,17 +21,8 @@ const { UnitRemoveItemSwapped } = require("lib.扩展函数.BJ函数.index") as 
 const { 单位是否暂停 } = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统") as {
   单位是否暂停: (this: void, unit: any) => boolean;
 };
-const { registerSyncHardwareKey } = require("lib.扩展函数.封装函数.04．硬件输入.08．同步硬件输入中心") as {
-  registerSyncHardwareKey: (
-    this: void,
-    key: number | string,
-    status: number,
-    callback: (this: void, event: { player: any; key: number; status: number }) => void
-  ) => any;
-};
-const { KEY_STATE } = require("lib.扩展函数.封装函数.04．硬件输入.01．常量定义") as {
-  KEY_STATE: { UP: number };
-};
+import { registerKeyUpSync } from "../../../lib/扩展函数/封装函数/04．硬件输入/index";
+import { KEY } from "../../../lib/扩展函数/封装函数/04．硬件输入/01．常量定义";
 const DzGetTriggerKeyPlayer = (require("jass.japi") as any).DzGetTriggerKeyPlayer as (this: void) => any;
 const { beginEquipItemMessageSilence, endEquipItemMessageSilence } = require("系统.02．物品系统.11．装备系统") as {
   beginEquipItemMessageSilence: (this: void) => void;
@@ -42,14 +34,6 @@ const IsUnitSelected = jass.IsUnitSelected as (this: void, unit: any, player: an
 const IsUnitPaused = jass.IsUnitPaused as (this: void, unit: any) => boolean;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
 const RemoveItem = jass.RemoveItem as (this: void, item: any) => void;
-
-interface 同步键盘事件 {
-  player: any;
-  key: number;
-  status: number;
-}
-
-const Ctrl键码 = 17;
 
 /** 触发器 */
 let switchBagTrigger: any = null;
@@ -94,7 +78,7 @@ function 查找单位背包物品(this: void, unit: any, itemTypeId: number): an
   return null;
 }
 
-/** 获取英雄对应的副背包马甲；与 Ctrl 切包使用同一份玩家数据。 */
+/** 获取英雄对应的副背包马甲；与 Z 切包使用同一份玩家数据。 */
 function 获取副背包马甲(this: void, hero: any): any {
   if (hero == null || hero === 0) return null;
   return YDUserDataGetSafe("player", GetOwningPlayer(hero), "切换背包辅助", "unit");
@@ -102,7 +86,7 @@ function 获取副背包马甲(this: void, hero: any): any {
 
 /**
  * 在英雄主背包与副背包马甲的 12 个格子中查找指定物品。
- * 剧情物品交付、入口校验均应使用此函数，避免 Ctrl 切包后被误判为未携带。
+ * 剧情物品交付、入口校验均应使用此函数，避免 Z 切包后被误判为未携带。
  */
 export function 查找玩家主副背包物品(this: void, hero: any, itemTypeId: number): any {
   const 主背包物品 = 查找单位背包物品(hero, itemTypeId);
@@ -128,16 +112,22 @@ export function 移除玩家主副背包物品(this: void, hero: any, itemTypeId
 }
 
 /**
- * 按Ctrl切换背包事件处理
+ * 按 Z 切换背包事件处理。
+ *
+ * 由 `registerKeyUpSync` 派发：聊天框输入时已在本机被过滤，不会触发切换；
+ * 回调在全端对称触发，用传入的 player 判定输入所属玩家。
+ *
+ * 注意：必须声明 `this: any`（不能用 `this: void`）——派发侧生成 `callback(nil, player, key)`，
+ * 声明 `this: void` 会导致参数错位（同 `04．任务UI热键.ts` 的写法）。
  */
-function onCtrlSwitchBag(this: void, event: 同步键盘事件): void {
-  const player = event.player || DzGetTriggerKeyPlayer();
-  if (player == null || player === 0) {
+function onSwitchBagKey(this: any, player: any, _key: number): void {
+  const 输入玩家 = player || DzGetTriggerKeyPlayer();
+  if (输入玩家 == null || 输入玩家 === 0) {
     return;
   }
 
   // 获取玩家的英雄
-  const hero = YDUserDataGetSafe("player", player, "英雄", "unit");
+  const hero = YDUserDataGetSafe("player", 输入玩家, "英雄", "unit");
   if (hero == null || hero === 0) {
     return;
   }
@@ -148,7 +138,7 @@ function onCtrlSwitchBag(this: void, event: 同步键盘事件): void {
   }
 
   // 检查英雄是否被当前玩家选中
-  const isHeroSelected = IsUnitSelected(hero, player);
+  const isHeroSelected = IsUnitSelected(hero, 输入玩家);
   if (!isHeroSelected) {
     return;
   }
@@ -180,11 +170,13 @@ function onCtrlSwitchBag(this: void, event: 同步键盘事件): void {
 
 /**
  * 初始化背包切换功能
+ *
+ * `registerKeyUpSync`：本机注册按键 → 过滤聊天框输入 → `DzSyncData` 广播 → 全端对称派发。
  */
 export function initSwitchBag(this: void): void {
   if (switchBagTrigger != null) return;
 
-  switchBagTrigger = registerSyncHardwareKey(Ctrl键码, KEY_STATE.UP, onCtrlSwitchBag);
+  switchBagTrigger = registerKeyUpSync(KEY.Z, onSwitchBagKey);
 }
 
 export {};

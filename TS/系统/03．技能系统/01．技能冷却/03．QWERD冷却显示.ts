@@ -131,7 +131,7 @@ function createTextGroup(this: void, name: string): any {
     宽度: TEXT_W,
     高度: TEXT_H,
     字体大小: FONT_SIZE,
-    优先级: 0,
+    优先级: 8000,
     对齐: 8,
     层: 冷却数字文本模块.技能冷却数字层,
   });
@@ -226,10 +226,22 @@ function hideAll(this: void): void {
   显示冷却数字文本(文本组缓存.D, false);
 }
 
+let 剧情电影模式隐藏UI = false;
+
+/** 由剧情电影总控调用；不在本模块自行判断或写入剧情状态。 */
+export function 设置剧情电影模式隐藏QWERD冷却(this: void, 隐藏: boolean): void {
+  剧情电影模式隐藏UI = 隐藏;
+  if (隐藏) hideAll();
+}
+
 function onTick(this: void): void {
   const currentGroups = 确保文本组缓存();
   if (currentGroups == null) return;
   if (功能开关模块.本地玩家是否开启冷却显示() !== true) {
+    hideAll();
+    return;
+  }
+  if (剧情电影模式隐藏UI) {
     hideAll();
     return;
   }

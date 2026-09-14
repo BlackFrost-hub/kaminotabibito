@@ -19,7 +19,6 @@ local _____955C_5934_51FD_6570 = require("lib.扩展函数.Star扩展函数.Star
 local _____97F3_6548_51FD_6570 = require("lib.扩展函数.封装函数.02．音效系统.04．MP3音效播放")
 local _____5267_60C5_8FDB_5EA6_7CFB_7EDF = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.01．剧情动作上下文")
 local _____8C03_8BD5_8F93_51FA = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local DzGetTriggerUIEventFrame = japi.DzGetTriggerUIEventFrame
 local DzGetTriggerUIEventPlayer = japi.DzGetTriggerUIEventPlayer
 local GetLocalPlayer = jass.GetLocalPlayer
 local GetPlayerId = jass.GetPlayerId
@@ -61,27 +60,6 @@ local function _____83B7_53D6_4F20_9001_914D_7F6EBy_914D_7F6EID(_____914D_7F6EID
     end
     return nil
 end
-local function _____83B7_53D6_89E6_53D1_5E27_4F20_9001_914D_7F6E()
-    local _____89E6_53D1_5E27 = DzGetTriggerUIEventFrame()
-    do
-        local _____7D22_5F15 = 0
-        while _____7D22_5F15 < #_____4E16_754C_5730_56FE_4F20_9001_914D_7F6E_8868 do
-            do
-                local _____914D_7F6E = _____4E16_754C_5730_56FE_4F20_9001_914D_7F6E_8868[_____7D22_5F15 + 1]
-                if _____914D_7F6E["地点ID"] == nil then
-                    goto __continue12
-                end
-                local _____5730_70B9_5E27 = _____83B7_53D6_4E16_754C_5730_56FE_5730_70B9_5E27(_____914D_7F6E["地点ID"])
-                if _____5730_70B9_5E27 ~= nil and _____5730_70B9_5E27["按钮"] == _____89E6_53D1_5E27 then
-                    return _____914D_7F6E
-                end
-            end
-            ::__continue12::
-            _____7D22_5F15 = _____7D22_5F15 + 1
-        end
-    end
-    return nil
-end
 local function ____on_4E16_754C_5730_56FE_9ED1_5E55_7ED3_675F()
     local timer = GetExpiredTimer()
     DisplayCineFilter(false)
@@ -107,10 +85,32 @@ local function _____4F20_9001_6761_4EF6_901A_8FC7(_____914D_7F6E, _____82F1_96C4
 end
 local function _____6267_884C_4F20_9001_914D_7F6E(_____914D_7F6E, _____73A9_5BB6)
     if _____73A9_5BB6 == nil or _____73A9_5BB6 == 0 then
+        _____8C03_8BD5_8F93_51FA.debugLogForce("世界地图传送", "传送失败：玩家为空", "配置ID=", _____914D_7F6E["配置ID"])
         return false
     end
     local _____82F1_96C4 = _____82F1_96C4_6865_63A5.getRegisteredPlayerHero(_____73A9_5BB6)
-    if _____82F1_96C4 == nil or _____82F1_96C4 == 0 or not _____4F20_9001_6761_4EF6_901A_8FC7(_____914D_7F6E, _____82F1_96C4) then
+    if _____82F1_96C4 == nil or _____82F1_96C4 == 0 then
+        _____8C03_8BD5_8F93_51FA.debugLogForce(
+            "世界地图传送",
+            "传送失败：未找到玩家英雄",
+            "配置ID=",
+            _____914D_7F6E["配置ID"],
+            "玩家ID=",
+            GetPlayerId(_____73A9_5BB6)
+        )
+        return false
+    end
+    if not _____4F20_9001_6761_4EF6_901A_8FC7(_____914D_7F6E, _____82F1_96C4) then
+        _____8C03_8BD5_8F93_51FA.debugLogForce(
+            "世界地图传送",
+            "传送失败：传送条件不满足",
+            "配置ID=",
+            _____914D_7F6E["配置ID"],
+            "玩家ID=",
+            GetPlayerId(_____73A9_5BB6),
+            "所需BuffID=",
+            _____914D_7F6E["所需BuffID"]
+        )
         return false
     end
     if GetLocalPlayer() == _____73A9_5BB6 then
@@ -159,15 +159,35 @@ local function _____6267_884C_4F20_9001_914D_7F6E(_____914D_7F6E, _____73A9_5BB6
     end
     return true
 end
-local function ____on_4E16_754C_5730_56FE_5730_70B9_53CC_51FB()
-    local _____914D_7F6E = _____83B7_53D6_89E6_53D1_5E27_4F20_9001_914D_7F6E()
-    if _____914D_7F6E == nil then
-        return
+local function ____on_4E16_754C_5730_56FE_5730_70B9_53CC_51FB(_____914D_7F6EID)
+    local _____914D_7F6E = _____83B7_53D6_4F20_9001_914D_7F6EBy_914D_7F6EID(_____914D_7F6EID)
+    if _____914D_7F6E ~= nil then
+        _____6267_884C_4F20_9001_914D_7F6E(
+            _____914D_7F6E,
+            DzGetTriggerUIEventPlayer()
+        )
     end
-    _____6267_884C_4F20_9001_914D_7F6E(
-        _____914D_7F6E,
-        DzGetTriggerUIEventPlayer()
-    )
+end
+local function ____on_7CBE_7075_6751_53CC_51FB()
+    ____on_4E16_754C_5730_56FE_5730_70B9_53CC_51FB("精灵村")
+end
+local function ____on_86C7_4EBA_8425_5730_53CC_51FB()
+    ____on_4E16_754C_5730_56FE_5730_70B9_53CC_51FB("蛇人营地")
+end
+local function ____on_6C99_6F20_7EFF_6D32_53CC_51FB()
+    ____on_4E16_754C_5730_56FE_5730_70B9_53CC_51FB("沙漠绿洲")
+end
+local function ____on_7194_5CA9_5C0F_9547_53CC_51FB()
+    ____on_4E16_754C_5730_56FE_5730_70B9_53CC_51FB("熔岩小镇")
+end
+local function ____on_6076_9B54_57CE_53CC_51FB()
+    ____on_4E16_754C_5730_56FE_5730_70B9_53CC_51FB("恶魔城")
+end
+local function ____on_7CBE_7075_4F20_9001_9635_53CC_51FB()
+    ____on_4E16_754C_5730_56FE_5730_70B9_53CC_51FB("精灵传送阵")
+end
+local function ____on_7CBE_7075_738B_57CE_53CC_51FB()
+    ____on_4E16_754C_5730_56FE_5730_70B9_53CC_51FB("精灵王城")
 end
 ____exports["执行世界地图传送"] = function(_____914D_7F6EID, _____73A9_5BB6)
     local _____914D_7F6E = _____83B7_53D6_4F20_9001_914D_7F6EBy_914D_7F6EID(_____914D_7F6EID)
@@ -188,7 +208,8 @@ ____exports["注册世界地图地点传送"] = function(_____5730_70B9ID)
     if _____5730_70B9_5E27 == nil or _____5730_70B9_5E27["按钮"] == 0 then
         return
     end
-    ____Frame_5DE5_5177.frameSetScriptByCode(_____5730_70B9_5E27["按钮"], _____53CC_51FB_4E8B_4EF6, ____on_4E16_754C_5730_56FE_5730_70B9_53CC_51FB, true)
+    local _____56DE_8C03 = _____914D_7F6E["配置ID"] == "精灵村" and ____on_7CBE_7075_6751_53CC_51FB or (_____914D_7F6E["配置ID"] == "蛇人营地" and ____on_86C7_4EBA_8425_5730_53CC_51FB or (_____914D_7F6E["配置ID"] == "沙漠绿洲" and ____on_6C99_6F20_7EFF_6D32_53CC_51FB or (_____914D_7F6E["配置ID"] == "熔岩小镇" and ____on_7194_5CA9_5C0F_9547_53CC_51FB or (_____914D_7F6E["配置ID"] == "恶魔城" and ____on_6076_9B54_57CE_53CC_51FB or (_____914D_7F6E["配置ID"] == "精灵传送阵" and ____on_7CBE_7075_4F20_9001_9635_53CC_51FB or ____on_7CBE_7075_738B_57CE_53CC_51FB)))))
+    ____Frame_5DE5_5177.frameSetScriptByCode(_____5730_70B9_5E27["按钮"], _____53CC_51FB_4E8B_4EF6, _____56DE_8C03, true)
     _____5DF2_6CE8_518C_4F20_9001_5730_70B9_8868[_____5730_70B9ID] = true
 end
 return ____exports

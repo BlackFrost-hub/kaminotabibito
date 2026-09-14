@@ -34,8 +34,8 @@ local _____7269_54C1_63D0_793A_7F13_5B58_6E05_7406TickID = 0
 local function _____53D6_7269_7F16_7F13_5B58_952E(objectType, objectId, property)
     return (((tostring(objectType) .. ":") .. tostring(objectId)) .. ":") .. property
 end
-local function _____53D6_7269_54C1_6570_636E_7F13_5B58_952E(itemKey, dataType)
-    return (tostring(itemKey) .. ":") .. tostring(dataType)
+local function _____53D6_7269_54C1_6570_636E_7F13_5B58_952E(itemKey, itemTypeId, dataType)
+    return (((tostring(itemKey) .. ":") .. tostring(itemTypeId)) .. ":") .. tostring(dataType)
 end
 ____exports["清空物品提示读取缓存"] = function()
     _____7269_7F16_5B57_7B26_4E32_7F13_5B58 = {}
@@ -147,6 +147,7 @@ end
 local function _____5B89_5168_53D6_7269_54C1_6570_636E_5B57_7B26_4E32(itemTypeId, dataType, _____7F13_5B58_7269_54C1_952E)
     local _____7F13_5B58_952E = _____53D6_7269_54C1_6570_636E_7F13_5B58_952E(
         _____7F13_5B58_7269_54C1_952E or "type:" .. tostring(itemTypeId),
+        itemTypeId,
         dataType
     )
     local _____5DF2_7F13_5B58 = _____7269_54C1_6570_636E_5B57_7B26_4E32_7F13_5B58[_____7F13_5B58_952E]
@@ -174,6 +175,7 @@ ____exports["安全取物品实例数据字符串"] = function(item, itemTypeId,
     end
     local _____5B9E_4F8B_7F13_5B58_952E = _____53D6_7269_54C1_6570_636E_7F13_5B58_952E(
         GetHandleId(item),
+        itemTypeId,
         dataType
     )
     local _____5DF2_7F13_5B58 = _____7269_54C1_6570_636E_5B57_7B26_4E32_7F13_5B58[_____5B9E_4F8B_7F13_5B58_952E]

@@ -489,6 +489,7 @@ function 刷新所有单位头顶血条(this: void): void {
   if (tick计数 < 血条刷新间隔Tick) return;
   tick计数 = 0;
 
+
   处理待创建单位();
 
   let writeIndex = 0;

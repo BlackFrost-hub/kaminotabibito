@@ -8,6 +8,7 @@
  */
 
 const jass = require("jass.common") as any;
+const japi = require("jass.japi") as any;
 
 const { addPeriodicCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addPeriodicCallback: (this: void, intervalMs: number, callback: () => void) => number;
@@ -103,7 +104,23 @@ function 处理Alt松开(this: void): void {
 
 }
 
+/** 修正 Alt 按键事件偶发丢失（切换窗口、聊天框或焦点变化时尤其常见）。 */
+function 同步Alt按键状态(this: void): void {
+  const alt物理按下 = typeof japi.DzIsKeyDown === "function" && !!japi.DzIsKeyDown(ALT_KEY_CODE);
+  if (alt物理按下 && !Alt同步按下) {
+    const hero = 获取本地当前选中英雄();
+    if (isValidHandle(hero)) {
+      Alt同步按下 = true;
+      设置技能提示原始模式(true);
+    }
+  } else if (!alt物理按下 && Alt同步按下) {
+    Alt同步按下 = false;
+    设置技能提示原始模式(false);
+  }
+}
+
 function onTick(this: void): void {
+  同步Alt按键状态();
   const 已开启 = 功能开关模块.本地玩家是否开启动态技能文本();
   const localHero = 已开启 ? 获取本地当前选中英雄() : null;
 

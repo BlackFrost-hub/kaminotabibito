@@ -40,7 +40,8 @@ const 默认内条左偏移 = 0.005;
 const 默认内条上偏移 = -0.0115;
 const 默认内条宽度 = 0.072;
 const 默认内条高度 = 0.0062;
-const 默认层级 = 6700;
+// 世界坐标表现必须压过所有单位头顶状态条与屏幕辅助 UI。
+const 默认层级 = 10000;
 const 默认平滑过渡秒 = 0.2;
 const 驱动间隔秒 = 0.01;
 const 默认底框贴图 = 'UI\\WorldProgress\\world_progress_frame.tga';

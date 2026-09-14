@@ -202,11 +202,11 @@ ____exports["尝试兜底搜敌并下令"] = function(context, nowMs)
         IssueTargetOrder(context["Boss单位"], "attack", threatTarget)
         return
     end
-    local ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_19 = _____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA(context)
-    if ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_19 == nil then
-        ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_19 = _____4ECE_9644_8FD1_5355_4F4D_67E5_627E_6700_8FD1_654C_4EBA(context)
+    local ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_20 = _____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA(context)
+    if ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_20 == nil then
+        ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_20 = _____4ECE_9644_8FD1_5355_4F4D_67E5_627E_6700_8FD1_654C_4EBA(context)
     end
-    local fallbackTarget = ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_19
+    local fallbackTarget = ____4ECE_73A9_5BB6_82F1_96C4_7EC4_67E5_627E_6700_8FD1_654C_4EBA_result_20
     if fallbackTarget == nil or fallbackTarget == 0 then
         return
     end
@@ -221,44 +221,46 @@ ____exports["尝试兜底搜敌并下令"] = function(context, nowMs)
         fallbackTargetId
     )
 end
+local ____require_result_0 = require("系统.01．单位系统.07．异界Boss.01．异界Boss挑战配置")
+local _____83B7_53D6_5F53_524D_5F02_754CBoss_6311_6218_8FD0_884C = ____require_result_0["获取当前异界Boss挑战运行"]
 local jass = require("jass.common")
 local jglobals = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
-local ____require_result_1 = require("lib.扩展函数.BJ函数.06．任务消息")
-local QuestMessageBJ = ____require_result_1.QuestMessageBJ
-local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
-local GetPlayersAll = ____require_result_2.GetPlayersAll
-local ____require_result_3 = require("lib.扩展函数.BJ函数.04．矩形与区域")
-RectContainsUnit = ____require_result_3.RectContainsUnit
-local ____require_result_4 = require("lib.扩展函数.BJ函数.05A．电影函数")
-local TransmissionFromUnitWithNameBJ = ____require_result_4.TransmissionFromUnitWithNameBJ
-local CinematicFilterGenericBJ = ____require_result_4.CinematicFilterGenericBJ
-local ____require_result_5 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
-IsUnitPausedBJ = ____require_result_5.IsUnitPausedBJ
-local ____require_result_6 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDUserDataGetSafe = ____require_result_6.YDUserDataGetSafe
-local YDUserDataSetSafe = ____require_result_6.YDUserDataSetSafe
-local YDUserDataClearSafe = ____require_result_6.YDUserDataClearSafe
-local ____require_result_7 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
-local YDUserDataClearTable = ____require_result_7.YDUserDataClearTable
-local ____require_result_8 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
-getEnemyThreats = ____require_result_8.getEnemyThreats
-local ____require_result_9 = require("lib.扩展函数.封装函数.02．音效系统.index")
-local Sound3DII_Mp3PlayReuse = ____require_result_9.Sound3DII_Mp3PlayReuse
-local ____require_result_10 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
-local StarOther_PanCameraToTimedUnitForPlayer = ____require_result_10.StarOther_PanCameraToTimedUnitForPlayer
-local ____require_result_11 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
-local YDWEAngleBetweenUnits = ____require_result_11.YDWEAngleBetweenUnits
-local ____require_result_12 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
-isValidCombatEnemyUnit = ____require_result_12.isValidCombatEnemyUnit
-local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_13.debugLogForce
-local ____require_result_14 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
-_____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_14["单位是否正在原生施法"]
-local ____require_result_15 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
-local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_15["移除单位暂停"]
-local _____6E05_9664_5355_4F4D_5168_90E8_6682_505C_5360_7528 = ____require_result_15["清除单位全部暂停占用"]
+local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
+local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
+local ____require_result_2 = require("lib.扩展函数.BJ函数.06．任务消息")
+local QuestMessageBJ = ____require_result_2.QuestMessageBJ
+local ____require_result_3 = require("lib.扩展函数.BJ函数.07．杂项")
+local GetPlayersAll = ____require_result_3.GetPlayersAll
+local ____require_result_4 = require("lib.扩展函数.BJ函数.04．矩形与区域")
+RectContainsUnit = ____require_result_4.RectContainsUnit
+local ____require_result_5 = require("lib.扩展函数.BJ函数.05A．电影函数")
+local TransmissionFromUnitWithNameBJ = ____require_result_5.TransmissionFromUnitWithNameBJ
+local CinematicFilterGenericBJ = ____require_result_5.CinematicFilterGenericBJ
+local ____require_result_6 = require("lib.扩展函数.BJ函数.08．单位BJ扩展")
+IsUnitPausedBJ = ____require_result_6.IsUnitPausedBJ
+local ____require_result_7 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDUserDataGetSafe = ____require_result_7.YDUserDataGetSafe
+local YDUserDataSetSafe = ____require_result_7.YDUserDataSetSafe
+local YDUserDataClearSafe = ____require_result_7.YDUserDataClearSafe
+local ____require_result_8 = require("lib.扩展函数.YDWE函数.01．YDUserData兼容")
+local YDUserDataClearTable = ____require_result_8.YDUserDataClearTable
+local ____require_result_9 = require("系统.01．单位系统.06．仇恨系统.00．仇恨存储")
+getEnemyThreats = ____require_result_9.getEnemyThreats
+local ____require_result_10 = require("lib.扩展函数.封装函数.02．音效系统.index")
+local Sound3DII_Mp3PlayReuse = ____require_result_10.Sound3DII_Mp3PlayReuse
+local ____require_result_11 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
+local StarOther_PanCameraToTimedUnitForPlayer = ____require_result_11.StarOther_PanCameraToTimedUnitForPlayer
+local ____require_result_12 = require("lib.扩展函数.YDWE函数.00．YDWE函数")
+local YDWEAngleBetweenUnits = ____require_result_12.YDWEAngleBetweenUnits
+local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.02．条件判断函数")
+isValidCombatEnemyUnit = ____require_result_13.isValidCombatEnemyUnit
+local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
+debugLogForce = ____require_result_14.debugLogForce
+local ____require_result_15 = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.06．施法·蓄力·充能.施法状态")
+_____5355_4F4D_662F_5426_6B63_5728_539F_751F_65BD_6CD5 = ____require_result_15["单位是否正在原生施法"]
+local ____require_result_16 = require("lib.扩展函数.Star扩展函数.Star扩展库.03．硬直暂停系统")
+local _____79FB_9664_5355_4F4D_6682_505C = ____require_result_16["移除单位暂停"]
+local _____6E05_9664_5355_4F4D_5168_90E8_6682_505C_5360_7528 = ____require_result_16["清除单位全部暂停占用"]
 local _____5267_60C5Boss_9884_7F6E_6682_505C_6765_6E90 = "剧情系统:Boss预置"
 local _____5267_60C5_89E6_53D1_5355_4F4D_63A7_5236_6682_505C_6765_6E90 = "剧情系统:触发单位控制"
 local ____Boss_6218_8F6C_573A_6682_505C_6765_6E90 = "Boss战运行:转场等待"
@@ -358,11 +360,11 @@ local function ____on_73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_5355_4F4D()
     _____73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_6570_91CF = _____73A9_5BB6_82F1_96C4_8F6C_573A_642C_8FD0_6570_91CF + 1
 end
 local function _____8BFB_53D6_73A9_5BB6_7EC4()
-    local ____YDUserDataGetSafe_result_16 = YDUserDataGetSafe("string", "玩家", "玩家组", "force")
-    if ____YDUserDataGetSafe_result_16 == nil then
-        ____YDUserDataGetSafe_result_16 = GetPlayersAll()
+    local ____YDUserDataGetSafe_result_17 = YDUserDataGetSafe("string", "玩家", "玩家组", "force")
+    if ____YDUserDataGetSafe_result_17 == nil then
+        ____YDUserDataGetSafe_result_17 = GetPlayersAll()
     end
-    return ____YDUserDataGetSafe_result_16
+    return ____YDUserDataGetSafe_result_17
 end
 ____exports["单位是否死亡"] = function(unit)
     if unit == nil or unit == 0 then
@@ -386,6 +388,12 @@ ____exports["读取Boss战单位布尔"] = function(bossUnit, _____5B57_6BB5_540
     return YDUserDataGetSafe("unit", bossUnit, _____5B57_6BB5_540D, "boolean") == true
 end
 ____exports["读取Boss战单位"] = function(_____5B57_6BB5_540D)
+    if _____5B57_6BB5_540D == "触发玩家" then
+        local _____6311_6218 = _____83B7_53D6_5F53_524D_5F02_754CBoss_6311_6218_8FD0_884C()
+        if _____6311_6218 ~= nil then
+            return _____6311_6218["触发单位"]
+        end
+    end
     return YDUserDataGetSafe("string", ____Boss_6218_8868_540D, _____5B57_6BB5_540D, "unit")
 end
 ____exports["确保Boss战区域视野"] = function(rectHandle)
@@ -400,13 +408,13 @@ ____exports["确保Boss战区域视野"] = function(rectHandle)
             do
                 local whichPlayer = Player(playerId)
                 if whichPlayer == nil or whichPlayer == 0 then
-                    goto __continue57
+                    goto __continue59
                 end
                 if _____73A9_5BB6_7EC4 ~= nil and _____73A9_5BB6_7EC4 ~= 0 and not IsPlayerInForce(whichPlayer, _____73A9_5BB6_7EC4) then
-                    goto __continue57
+                    goto __continue59
                 end
                 if _____8BFB_53D6_77E9_5F62_73A9_5BB6_53EF_89C1_5EA6_4FEE_6574_5668(rectHandleId, playerId) ~= nil then
-                    goto __continue57
+                    goto __continue59
                 end
                 local fogModifier = CreateFogModifierRect(
                     whichPlayer,
@@ -416,12 +424,12 @@ ____exports["确保Boss战区域视野"] = function(rectHandle)
                     false
                 )
                 if fogModifier == nil or fogModifier == 0 then
-                    goto __continue57
+                    goto __continue59
                 end
                 FogModifierStart(fogModifier)
                 _____8BB0_5F55_77E9_5F62_73A9_5BB6_53EF_89C1_5EA6_4FEE_6574_5668(rectHandleId, playerId, fogModifier)
             end
-            ::__continue57::
+            ::__continue59::
             playerId = playerId + 1
         end
     end
@@ -463,8 +471,8 @@ ____exports["完成Boss战转场搬运"] = function(context)
     local _____5DF2_8FC1_79FB_9884_7F6E_968F_4ECE_6570_91CF = 0
     DisplayCineFilter(false)
     if bossX ~= 0 or bossY ~= 0 then
-        local ____require_result_17 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
-        local _____8FC1_79FB_5267_60C5Boss_9884_7F6E_968F_4ECE = ____require_result_17["迁移剧情Boss预置随从"]
+        local ____require_result_18 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
+        local _____8FC1_79FB_5267_60C5Boss_9884_7F6E_968F_4ECE = ____require_result_18["迁移剧情Boss预置随从"]
         _____5DF2_8FC1_79FB_9884_7F6E_968F_4ECE_6570_91CF = _____8FC1_79FB_5267_60C5Boss_9884_7F6E_968F_4ECE(
             boss,
             GetUnitX(boss),
@@ -534,7 +542,7 @@ local function handoffBossPortalToPlayerSeven(rectHandle)
             end
             GroupRemoveUnit(group, unit)
             if GetUnitTypeId(unit) ~= ____Boss_6218_4F20_9001_95E8_5355_4F4D_7C7B_578BID then
-                goto __continue70
+                goto __continue72
             end
             SetUnitOwner(
                 unit,
@@ -542,7 +550,7 @@ local function handoffBossPortalToPlayerSeven(rectHandle)
                 true
             )
         end
-        ::__continue70::
+        ::__continue72::
     end
     DestroyGroup(group)
 end
@@ -554,8 +562,8 @@ local function forceResumeBossAfterTransition(boss)
     PauseUnit(boss, false)
 end
 ____exports["完成Boss战启动"] = function(context)
-    local ____require_result_18 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
-    local _____91CA_653E_5E76_767B_8BB0_5267_60C5Boss_9884_7F6E_968F_4ECE = ____require_result_18["释放并登记剧情Boss预置随从"]
+    local ____require_result_19 = require("系统.11．剧情系统.01．主线任务.00．剧情系统核心工具.03．剧情Boss预置桥接")
+    local _____91CA_653E_5E76_767B_8BB0_5267_60C5Boss_9884_7F6E_968F_4ECE = ____require_result_19["释放并登记剧情Boss预置随从"]
     _____63A5_7BA1Boss_6218_533A_57DF_97F3_9891(context)
     ____exports["确保Boss战区域视野"](context["地点矩形"])
     _____91CA_653E_5E76_767B_8BB0_5267_60C5Boss_9884_7F6E_968F_4ECE(context["Boss单位"])
@@ -683,7 +691,7 @@ ____exports["处理待清理Boss单位YD数据"] = function(nowMs)
             do
                 local task = _____5F85_6E05_7406BossYD_4EFB_52A1_5217_8868[i + 1]
                 if nowMs < task["截止时间"] then
-                    goto __continue102
+                    goto __continue104
                 end
                 local currentContext = _____8BFB_53D6Boss_6218_8FD0_884C_4E0A_4E0B_6587(task.bossUnit)
                 if currentContext == nil or currentContext["运行代次"] == task["运行代次"] then
@@ -699,7 +707,7 @@ ____exports["处理待清理Boss单位YD数据"] = function(nowMs)
                 end
                 __TS__ArraySplice(_____5F85_6E05_7406BossYD_4EFB_52A1_5217_8868, i, 1)
             end
-            ::__continue102::
+            ::__continue104::
             i = i - 1
         end
     end

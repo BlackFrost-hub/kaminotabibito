@@ -83,8 +83,8 @@ local function _____683C_5F0F_5316_5269_4F59_79D2(_____5269_4F59_6BEB_79D2)
     if _____5269_4F59_6BEB_79D2 <= 0 then
         return ""
     end
-    local _____5341_5206_79D2 = math.floor(_____5269_4F59_6BEB_79D2 / 100 + 0.999)
-    local _____79D2 = math.floor(_____5341_5206_79D2 / 10)
+    local _____5341_5206_79D2 = jass.R2I(_____5269_4F59_6BEB_79D2 / 100 + 0.999)
+    local _____79D2 = jass.R2I(_____5341_5206_79D2 / 10)
     local _____5C0F_6570 = _____5341_5206_79D2 - _____79D2 * 10
     return (tostring(_____79D2) .. ".") .. tostring(_____5C0F_6570)
 end
@@ -121,6 +121,14 @@ local function _____9690_85CF_5168_90E8_69FD_4F4DUI()
         end
     end
 end
+local _____5267_60C5_7535_5F71_6A21_5F0F_9690_85CFUI = false
+--- 由剧情电影总控调用；不在本模块自行判断或写入剧情状态。
+____exports["设置剧情电影模式隐藏物品冷却"] = function(_____9690_85CF)
+    _____5267_60C5_7535_5F71_6A21_5F0F_9690_85CFUI = _____9690_85CF
+    if _____9690_85CF then
+        _____9690_85CF_5168_90E8_69FD_4F4DUI()
+    end
+end
 local function _____9690_85CF_7269_54C1_6240_5728_69FD_4F4DUI(hero, item)
     if not _____662F_5426_672C_5730_73A9_5BB6_5355_4F4D(hero) then
         return
@@ -153,7 +161,7 @@ local function _____786E_4FDD_69FD_4F4DUI(slot)
         ["宽度"] = 0.042,
         ["高度"] = 0.02,
         ["字体大小"] = 0.02,
-        ["优先级"] = 9001,
+        ["优先级"] = 8001,
         ["对齐"] = 18,
         ["层"] = _____7269_54C1_51B7_5374_6570_5B57_5C42
     })
@@ -163,7 +171,7 @@ local function _____786E_4FDD_69FD_4F4DUI(slot)
     DzFrameSetModel(_____8F6C_5708_6846_4F53, _____51B7_5374_8F6C_5708_6A21_578B, 0, 0)
     DzFrameSetAnimate(_____8F6C_5708_6846_4F53, 0, false)
     DzFrameSetAnimateOffset(_____8F6C_5708_6846_4F53, 0)
-    DzFrameSetPriority(_____8F6C_5708_6846_4F53, 9000)
+    DzFrameSetPriority(_____8F6C_5708_6846_4F53, 8000)
     DzFrameSetSize(_____8F6C_5708_6846_4F53, 0.032, 0.032)
     DzFrameShow(_____8F6C_5708_6846_4F53, false)
     _____663E_793A_51B7_5374_6570_5B57_6587_672C(_____6570_5B57_6587_672C_7EC4, false)
@@ -172,6 +180,10 @@ local function _____786E_4FDD_69FD_4F4DUI(slot)
     return ui
 end
 local function _____5237_65B0_7269_54C1_680F_51B7_5374_663E_793A()
+    if _____5267_60C5_7535_5F71_6A21_5F0F_9690_85CFUI then
+        _____9690_85CF_5168_90E8_69FD_4F4DUI()
+        return
+    end
     local now = _____5F53_524D_6BEB_79D2()
     local writeIndex = 0
     _____9690_85CF_5168_90E8_69FD_4F4DUI()
@@ -182,21 +194,21 @@ local function _____5237_65B0_7269_54C1_680F_51B7_5374_663E_793A()
                 local record = _____51B7_5374_8BB0_5F55_5217_8868[i + 1]
                 local remaining = record["结束毫秒"] - now
                 if remaining <= 0 or not _____5355_4F4D_6709_6548(record.hero) or not _____53E5_67C4_6709_6548(record.item) then
-                    goto __continue34
+                    goto __continue37
                 end
                 _____51B7_5374_8BB0_5F55_5217_8868[writeIndex + 1] = record
                 writeIndex = writeIndex + 1
                 if not _____662F_5426_672C_5730_73A9_5BB6_5355_4F4D(record.hero) then
-                    goto __continue34
+                    goto __continue37
                 end
                 local slot = _____67E5_627E_7269_54C1_6240_5728_69FD_4F4D(record.hero, record.item)
                 if slot < 0 then
-                    goto __continue34
+                    goto __continue37
                 end
                 local button = DzFrameGetItemBarButton(slot)
                 local ui = _____786E_4FDD_69FD_4F4DUI(slot)
                 if not _____53E5_67C4_6709_6548(button) or ui == nil then
-                    goto __continue34
+                    goto __continue37
                 end
                 DzFrameClearAllPoints(ui["转圈框体"])
                 DzFrameSetAllPoints(ui["转圈框体"], button)
@@ -219,7 +231,7 @@ local function _____5237_65B0_7269_54C1_680F_51B7_5374_663E_793A()
                 DzFrameShow(ui["转圈框体"], true)
                 _____663E_793A_51B7_5374_6570_5B57_6587_672C(ui["数字文本组"], true)
             end
-            ::__continue34::
+            ::__continue37::
             i = i + 1
         end
     end
@@ -276,12 +288,12 @@ ____exports["设置物品栏物品冷却"] = function(hero, item, durationMs)
                 do
                     local record = _____51B7_5374_8BB0_5F55_5217_8868[i + 1]
                     if record.item == item then
-                        goto __continue53
+                        goto __continue56
                     end
                     _____51B7_5374_8BB0_5F55_5217_8868[writeIndex + 1] = record
                     writeIndex = writeIndex + 1
                 end
-                ::__continue53::
+                ::__continue56::
                 i = i + 1
             end
         end

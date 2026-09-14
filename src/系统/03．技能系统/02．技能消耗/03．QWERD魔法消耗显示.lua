@@ -39,6 +39,7 @@ local SHADOW_OFFSET_X = 0.0006
 local SHADOW_OFFSET_Y = -0.0006
 local initialized = false
 local _____663E_793A_7F13_5B58 = nil
+local _____5267_60C5_7535_5F71_6A21_5F0F_9690_85CFUI = false
 local function isValidHandle(handle)
     return handle ~= nil and handle ~= 0
 end
@@ -259,9 +260,20 @@ local function hideAll()
     _____9690_85CF_5355_5143(_____663E_793A_7F13_5B58.R)
     _____9690_85CF_5355_5143(_____663E_793A_7F13_5B58.D)
 end
+--- 由剧情电影总控调用；不在本模块自行判断或写入剧情状态。
+____exports["设置剧情电影模式隐藏魔法消耗"] = function(_____9690_85CF)
+    _____5267_60C5_7535_5F71_6A21_5F0F_9690_85CFUI = _____9690_85CF
+    if _____9690_85CF then
+        hideAll()
+    end
+end
 local function onTick()
     local currentUi = _____786E_4FDD_663E_793A_7F13_5B58()
     if currentUi == nil then
+        return
+    end
+    if _____5267_60C5_7535_5F71_6A21_5F0F_9690_85CFUI then
+        hideAll()
         return
     end
     if _____529F_80FD_5F00_5173_6A21_5757["本地玩家是否开启魔法消耗显示"]() ~= true then

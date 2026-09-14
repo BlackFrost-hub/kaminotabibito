@@ -614,6 +614,7 @@ ____exports.items.I01H = {
 ____exports.items.I01J = {
     type = "头盔",
     name = "|cff993366祭祀面具（唯一）|r",
+    ["死亡掉落"] = true,
     goldPrice = 5000,
     score = 1450,
     level = "D",
@@ -1935,6 +1936,7 @@ ____exports.items.I0FL = {type = "神符", name = "盗贼神符（魔抗）", go
 ____exports.items.I01I = {
     type = "灵魂",
     name = "邪恶之心（死亡掉落）",
+    ["死亡掉落"] = true,
     goldPrice = 1000,
     level = "D",
     dmg = 40,

@@ -41,8 +41,8 @@ function 取物编缓存键(this: void, objectType: number, objectId: number | s
   return objectType + ":" + tostring(objectId) + ":" + property;
 }
 
-function 取物品数据缓存键(this: void, itemKey: number | string, dataType: number): string {
-  return tostring(itemKey) + ":" + dataType;
+function 取物品数据缓存键(this: void, itemKey: number | string, itemTypeId: number, dataType: number): string {
+  return tostring(itemKey) + ":" + itemTypeId + ":" + dataType;
 }
 
 export function 清空物品提示读取缓存(this: void): void {
@@ -157,7 +157,7 @@ function 执行读取物品数据字符串(this: any): void {
 }
 
 function 安全取物品数据字符串(this: void, itemTypeId: number, dataType: number, 缓存物品键?: number | string): string {
-  const 缓存键 = 取物品数据缓存键(缓存物品键 ?? ("type:" + itemTypeId), dataType);
+  const 缓存键 = 取物品数据缓存键(缓存物品键 ?? ("type:" + itemTypeId), itemTypeId, dataType);
   const 已缓存 = 物品数据字符串缓存[缓存键];
   if (已缓存 !== undefined && 已缓存 !== "") {
     记录物品数据缓存访问(缓存键);
@@ -181,7 +181,7 @@ function 安全取物品数据字符串(this: void, itemTypeId: number, dataType
 
 export function 安全取物品实例数据字符串(this: void, item: any, itemTypeId: number, dataType: number): string {
   if (item == null || item === 0) return 安全取物品数据字符串(itemTypeId, dataType);
-  const 实例缓存键 = 取物品数据缓存键(GetHandleId(item), dataType);
+  const 实例缓存键 = 取物品数据缓存键(GetHandleId(item), itemTypeId, dataType);
   const 已缓存 = 物品数据字符串缓存[实例缓存键];
   if (已缓存 !== undefined && 已缓存 !== "") {
     记录物品数据缓存访问(实例缓存键);

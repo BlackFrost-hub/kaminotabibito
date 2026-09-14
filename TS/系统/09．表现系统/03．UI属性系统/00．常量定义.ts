@@ -17,6 +17,9 @@ export const REFRESH_INTERVAL_SECONDS = 0.5;
 /** 最大显示玩家数量（显示前5个玩家） */
 export const MAX_DISPLAY_PLAYERS = 5;
 
+/** 属性头像、属性详情和统计面板的层级；低于世界坐标 UI。 */
+export const ATTRIBUTE_UI_PRIORITY = 8000;
+
 // ==================== 通用UI配置 ====================
 
 /** 面板背景纹理路径 */

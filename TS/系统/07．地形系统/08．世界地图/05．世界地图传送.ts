@@ -62,7 +62,6 @@ import { 获取世界地图地点帧 } from "./02．世界地图界面";
 import { 本地隐藏世界地图 } from "./03．世界地图交互";
 import type { 世界地图传送配置 } from "./00．类型定义";
 
-const DzGetTriggerUIEventFrame = japi.DzGetTriggerUIEventFrame as (this: void) => number;
 const DzGetTriggerUIEventPlayer = japi.DzGetTriggerUIEventPlayer as (this: void) => any;
 const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
@@ -102,17 +101,6 @@ function 获取传送配置By配置ID(this: void, 配置ID: string): 世界地�
   return undefined;
 }
 
-function 获取触发帧传送配置(this: void): 世界地图传送配置 | undefined {
-  const 触发帧 = DzGetTriggerUIEventFrame();
-  for (let 索引 = 0; 索引 < 世界地图传送配置表.length; 索引++) {
-    const 配置 = 世界地图传送配置表[索引];
-    if (配置.地点ID == null) continue;
-    const 地点帧 = 获取世界地图地点帧(配置.地点ID);
-    if (地点帧 != null && 地点帧.按钮 === 触发帧) return 配置;
-  }
-  return undefined;
-}
-
 function on世界地图黑幕结束(this: void): void {
   const timer = GetExpiredTimer();
   DisplayCineFilter(false);
@@ -134,9 +122,19 @@ function 传送条件通过(this: void, 配置: 世界地图传送配置, 英雄
 }
 
 function 执行传送配置(this: void, 配置: 世界地图传送配置, 玩家: any): boolean {
-  if (玩家 == null || 玩家 === 0) return false;
+  if (玩家 == null || 玩家 === 0) {
+    调试输出.debugLogForce("世界地图传送", "传送失败：玩家为空", "配置ID=", 配置.配置ID);
+    return false;
+  }
   const 英雄 = 英雄桥接.getRegisteredPlayerHero(玩家);
-  if (英雄 == null || 英雄 === 0 || !传送条件通过(配置, 英雄)) return false;
+  if (英雄 == null || 英雄 === 0) {
+    调试输出.debugLogForce("世界地图传送", "传送失败：未找到玩家英雄", "配置ID=", 配置.配置ID, "玩家ID=", GetPlayerId(玩家));
+    return false;
+  }
+  if (!传送条件通过(配置, 英雄)) {
+    调试输出.debugLogForce("世界地图传送", "传送失败：传送条件不满足", "配置ID=", 配置.配置ID, "玩家ID=", GetPlayerId(玩家), "所需BuffID=", 配置.所需BuffID);
+    return false;
+  }
 
   if (GetLocalPlayer() === 玩家) {
     本地隐藏世界地图(玩家);
@@ -178,11 +176,18 @@ function 执行传送配置(this: void, 配置: 世界地图传送配置, 玩家
   return true;
 }
 
-function on世界地图地点双击(this: void): void {
-  const 配置 = 获取触发帧传送配置();
-  if (配置 == null) return;
-  执行传送配置(配置, DzGetTriggerUIEventPlayer());
+function on世界地图地点双击(this: void, 配置ID: string): void {
+  const 配置 = 获取传送配置By配置ID(配置ID);
+  if (配置 != null) 执行传送配置(配置, DzGetTriggerUIEventPlayer());
 }
+
+function on精灵村双击(this: void): void { on世界地图地点双击("精灵村"); }
+function on蛇人营地双击(this: void): void { on世界地图地点双击("蛇人营地"); }
+function on沙漠绿洲双击(this: void): void { on世界地图地点双击("沙漠绿洲"); }
+function on熔岩小镇双击(this: void): void { on世界地图地点双击("熔岩小镇"); }
+function on恶魔城双击(this: void): void { on世界地图地点双击("恶魔城"); }
+function on精灵传送阵双击(this: void): void { on世界地图地点双击("精灵传送阵"); }
+function on精灵王城双击(this: void): void { on世界地图地点双击("精灵王城"); }
 
 export function 执行世界地图传送(this: void, 配置ID: string, 玩家: any): boolean {
   const 配置 = 获取传送配置By配置ID(配置ID);
@@ -196,6 +201,7 @@ export function 注册世界地图地点传送(this: void, 地点ID: number): vo
   if (配置 == null) return;
   const 地点帧 = 获取世界地图地点帧(地点ID);
   if (地点帧 == null || 地点帧.按钮 === 0) return;
-  Frame工具.frameSetScriptByCode(地点帧.按钮, 双击事件, on世界地图地点双击, true);
+  const 回调 = 配置.配置ID === "精灵村" ? on精灵村双击 : 配置.配置ID === "蛇人营地" ? on蛇人营地双击 : 配置.配置ID === "沙漠绿洲" ? on沙漠绿洲双击 : 配置.配置ID === "熔岩小镇" ? on熔岩小镇双击 : 配置.配置ID === "恶魔城" ? on恶魔城双击 : 配置.配置ID === "精灵传送阵" ? on精灵传送阵双击 : on精灵王城双击;
+  Frame工具.frameSetScriptByCode(地点帧.按钮, 双击事件, 回调, true);
   已注册传送地点表[地点ID] = true;
 }

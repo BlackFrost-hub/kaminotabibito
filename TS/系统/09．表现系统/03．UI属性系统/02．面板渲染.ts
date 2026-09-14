@@ -61,6 +61,7 @@ const 常量 = require("系统.09．表现系统.03．UI属性系统.00．常量
   DETAIL_SEP_END_ROW: number;
   DETAIL_LINE_LAYOUTS: readonly { x: number; y: number }[];
   MAX_DISPLAY_PLAYERS: number;
+  ATTRIBUTE_UI_PRIORITY: number;
 };
 const {
   buildDetailTexts,
@@ -163,6 +164,7 @@ function createDamagePanel(gameUI: number): void {
   setAbsolute(damagePanel, 常量.DAMAGE_PANEL_X, 常量.DAMAGE_PANEL_Y);
   japi.DzFrameSetSize(damagePanel, 常量.DAMAGE_PANEL_WIDTH, 常量.DAMAGE_PANEL_HEIGHT);
   japi.DzFrameSetAlpha(damagePanel, 常量.DAMAGE_PANEL_ALPHA);
+  japi.DzFrameSetPriority(damagePanel, 常量.ATTRIBUTE_UI_PRIORITY);
   show(damagePanel, false);
 
   for (let i = 0; i < 常量.DAMAGE_LABELS.length; i++) {
@@ -207,6 +209,7 @@ function createDetailSlotForPlayer(gameUI: number, player: any, hero: any, index
   }
   setAbsolute(icon, iconX, 常量.HERO_ICON_Y);
   japi.DzFrameSetSize(icon, 常量.HERO_ICON_WIDTH, 常量.HERO_ICON_HEIGHT);
+  japi.DzFrameSetPriority(icon, 常量.ATTRIBUTE_UI_PRIORITY + 1);
   const iconPath = getHeroIcon(hero);
   japi.DzFrameSetTexture(icon, iconPath, 0);
   show(icon, true);

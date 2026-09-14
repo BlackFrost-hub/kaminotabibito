@@ -8,6 +8,8 @@ ____exports.INIT_DELAY_SECONDS = 1
 ____exports.REFRESH_INTERVAL_SECONDS = 0.5
 --- 最大显示玩家数量（显示前5个玩家）
 ____exports.MAX_DISPLAY_PLAYERS = 5
+--- 属性头像、属性详情和统计面板的层级；低于世界坐标 UI。
+____exports.ATTRIBUTE_UI_PRIORITY = 8000
 --- 面板背景纹理路径
 ____exports.PANEL_TEXTURE = "UI\\wenbenkuang.blp"
 --- 界面锚点类型：左下角 = 4

@@ -19,6 +19,7 @@ local _____8BBE_7F6E_6280_80FD_63D0_793A_539F_59CB_6A21_5F0F = ____05_FF0E_6280_
 -- - 只处理本地玩家当前唯一选中的已注册英雄
 -- - 不再轮询所有已注册英雄
 local jass = require("jass.common")
+local japi = require("jass.japi")
 local ____require_result_0 = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____require_result_0.addPeriodicCallback
 local selectionSnapshotSystem = require("系统.03．技能系统.00．本地选中技能快照")
@@ -108,7 +109,22 @@ local function _____5904_7406Alt_677E_5F00()
         return
     end
 end
+--- 修正 Alt 按键事件偶发丢失（切换窗口、聊天框或焦点变化时尤其常见）。
+local function _____540C_6B65Alt_6309_952E_72B6_6001()
+    local ____alt_7269_7406_6309_4E0B = type(japi.DzIsKeyDown) == "function" and not not japi.DzIsKeyDown(ALT_KEY_CODE)
+    if ____alt_7269_7406_6309_4E0B and not ____Alt_540C_6B65_6309_4E0B then
+        local hero = _____83B7_53D6_672C_5730_5F53_524D_9009_4E2D_82F1_96C4()
+        if isValidHandle(hero) then
+            ____Alt_540C_6B65_6309_4E0B = true
+            _____8BBE_7F6E_6280_80FD_63D0_793A_539F_59CB_6A21_5F0F(true)
+        end
+    elseif not ____alt_7269_7406_6309_4E0B and ____Alt_540C_6B65_6309_4E0B then
+        ____Alt_540C_6B65_6309_4E0B = false
+        _____8BBE_7F6E_6280_80FD_63D0_793A_539F_59CB_6A21_5F0F(false)
+    end
+end
 local function onTick()
+    _____540C_6B65Alt_6309_952E_72B6_6001()
     local _____5DF2_5F00_542F = _____529F_80FD_5F00_5173_6A21_5757["本地玩家是否开启动态技能文本"]()
     local _____5DF2_5F00_542F_2
     if _____5DF2_5F00_542F then

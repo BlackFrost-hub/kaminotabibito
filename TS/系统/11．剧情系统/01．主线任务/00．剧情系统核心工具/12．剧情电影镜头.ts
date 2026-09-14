@@ -18,6 +18,15 @@ const {
 const { getRegisteredPlayerHero } = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接") as {
   getRegisteredPlayerHero: (this: void, whichPlayer: any) => any;
 };
+const QWERD冷却显示 = require("系统.03．技能系统.01．技能冷却.03．QWERD冷却显示") as {
+  设置剧情电影模式隐藏QWERD冷却: (this: void, 隐藏: boolean) => void;
+};
+const 物品冷却显示 = require("系统.09．表现系统.01．UI工具.07．物品栏冷却显示") as {
+  设置剧情电影模式隐藏物品冷却: (this: void, 隐藏: boolean) => void;
+};
+const 魔法消耗显示 = require("系统.03．技能系统.02．技能消耗.03．QWERD魔法消耗显示") as {
+  设置剧情电影模式隐藏魔法消耗: (this: void, 隐藏: boolean) => void;
+};
 
 const GetLocalPlayer = jass.GetLocalPlayer as (this: void) => any;
 const GetPlayerId = jass.GetPlayerId as (this: void, whichPlayer: any) => number;
@@ -40,6 +49,11 @@ export interface 剧情镜头预设参数 {
 }
 
 let 剧情电影模式已开启 = false;
+
+/** 供表现层查询本地剧情电影状态，避免 UI 在原生电影界面上继续刷新。 */
+export function 当前是否为剧情电影模式(this: void): boolean {
+  return 剧情电影模式已开启;
+}
 interface 剧情电影模式前镜头状态 {
   目标距离: number;
   高度偏移: number;
@@ -72,6 +86,9 @@ export function 进入剧情电影模式(this: void): void {
   记录本地玩家镜头状态();
   剧情电影模式已开启 = true;
   CinematicModeBJ(true, GetPlayersAll());
+  QWERD冷却显示.设置剧情电影模式隐藏QWERD冷却(true);
+  物品冷却显示.设置剧情电影模式隐藏物品冷却(true);
+  魔法消耗显示.设置剧情电影模式隐藏魔法消耗(true);
 }
 
 export function 应用剧情电影镜头(this: void, 预设: 剧情镜头预设参数, duration: number): void {
@@ -81,6 +98,9 @@ export function 应用剧情电影镜头(this: void, 预设: 剧情镜头预设�
 export function 退出剧情电影模式并恢复镜头(this: void): void {
   if (!剧情电影模式已开启) return;
   剧情电影模式已开启 = false;
+  QWERD冷却显示.设置剧情电影模式隐藏QWERD冷却(false);
+  物品冷却显示.设置剧情电影模式隐藏物品冷却(false);
+  魔法消耗显示.设置剧情电影模式隐藏魔法消耗(false);
   CinematicModeBJ(false, GetPlayersAll());
 
   const localPlayer = GetLocalPlayer();

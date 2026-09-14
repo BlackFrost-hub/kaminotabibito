@@ -24,6 +24,9 @@ import {
   记录矩形玩家可见度修整器,
 } from "./01．Boss战运行上下文";
 import { 接管Boss战区域音频 } from "./02．Boss战区域音频";
+const { 获取当前异界Boss挑战运行 } = require("系统.01．单位系统.07．异界Boss.01．异界Boss挑战配置") as {
+  获取当前异界Boss挑战运行: (this: void) => { Boss单位: any; 触发单位: any } | undefined;
+};
 
 const jass = require("jass.common") as any;
 const jglobals = require("jass.globals") as any;
@@ -366,6 +369,10 @@ export function 读取Boss战单位布尔(this: void, bossUnit: any, 字段名: 
 }
 
 export function 读取Boss战单位(this: void, 字段名: string): any {
+  if (字段名 === "触发玩家") {
+    const 挑战 = 获取当前异界Boss挑战运行();
+    if (挑战 != null) return 挑战.触发单位;
+  }
   return YDUserDataGetSafe("string", Boss战表名, 字段名, "unit");
 }
 
