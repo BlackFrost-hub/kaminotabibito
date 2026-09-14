@@ -47,15 +47,13 @@ local itemCreateFns = require("lib.扩展函数.物品相关函数.index")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.index")
 local stringToFourCC = ____require_result_0.stringToFourCC
 local isSpecialUnit = ____require_result_0.isSpecialUnit
-local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_1.debugLog
-local ____require_result_2 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
-local registerDeathListener = ____require_result_2.registerDeathListener
+local ____require_result_1 = require("系统.00．核心系统.01．事件中心.07．单位死亡事件中心")
+local registerDeathListener = ____require_result_1.registerDeathListener
 local idData = require("系统.02．物品系统.02．装备掉落表").default or require("系统.02．物品系统.02．装备掉落表").idData or ({})
 itemsData = require("系统.02．物品系统.01．装备数据").default or ({})
-local ____require_result_3 = require("系统.02．物品系统.19．掉落次数限制表")
-local _____662F_5426_5141_8BB8_9650_6B21_7269_54C1_6389_843D = ____require_result_3["是否允许限次物品掉落"]
-local _____8BB0_5F55_9650_6B21_7269_54C1_6389_843D = ____require_result_3["记录限次物品掉落"]
+local ____require_result_2 = require("系统.02．物品系统.19．掉落次数限制表")
+local _____662F_5426_5141_8BB8_9650_6B21_7269_54C1_6389_843D = ____require_result_2["是否允许限次物品掉落"]
+local _____8BB0_5F55_9650_6B21_7269_54C1_6389_843D = ____require_result_2["记录限次物品掉落"]
 local PREFIX = "|cffffff00『系统提示』：|r"
 local function typeIdToUnitId(typeId)
     for id in pairs(idData) do
@@ -145,11 +143,11 @@ local function weightedPickOne(pool)
         sum = sum + p.weight
     end
     if sum <= 0 then
-        local ____opt_4 = pool[jass.GetRandomInt(1, #pool)]
-        if ____opt_4 ~= nil then
-            ____opt_4 = ____opt_4.id
+        local ____opt_3 = pool[jass.GetRandomInt(1, #pool)]
+        if ____opt_3 ~= nil then
+            ____opt_3 = ____opt_3.id
         end
-        return ____opt_4
+        return ____opt_3
     end
     local r = jass.GetRandomReal(0, 1) * sum
     local acc = 0
@@ -170,28 +168,9 @@ local function pickFromWeightedPool(pool, picks)
     local out = {}
     for ____, p in ipairs(pool) do
         if p.weight >= 1 or p.always then
-            debugLog(
-                nil,
-                "装备掉落",
-                "必掉物品:",
-                p.id,
-                p.weight
-            )
             out[#out + 1] = p.id
         else
             local r = jass.GetRandomReal(0, 1)
-            debugLog(
-                nil,
-                "装备掉落",
-                "概率判定:",
-                p.id,
-                "weight:",
-                p.weight,
-                "r:",
-                r,
-                "命中:",
-                r < p.weight
-            )
             if r < p.weight then
                 out[#out + 1] = p.id
             end
@@ -328,18 +307,7 @@ local function onUnitDeath(unit, _killer)
     local typeId = jass.GetUnitTypeId(unit)
     local unitId = typeIdToUnitId(typeId)
     local entry = unitId and idData[unitId] or nil
-    debugLog(
-        nil,
-        "装备掉落",
-        "单位死亡 typeId:",
-        typeId,
-        "unitId:",
-        unitId,
-        "entry:",
-        entry and entry.name
-    )
     if entry and entry.itemIds ~= nil then
-        debugLog(nil, "装备掉落", "找到掉落表 itemIds:", entry.itemIds)
         local dropProc = entry.dropProc ~= nil and __TS__Number(entry.dropProc) or 1
         local r = jass.GetRandomInt(1, 10000)
         if r > dropProc * 10000 then

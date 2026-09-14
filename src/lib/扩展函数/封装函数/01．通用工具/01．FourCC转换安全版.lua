@@ -1,4 +1,6 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__Number = ____lualib.__TS__Number
+local __TS__NumberIsNaN = ____lualib.__TS__NumberIsNaN
 local ____exports = {}
 --- FourCC 安全封装版
 -- 
@@ -20,6 +22,13 @@ function ____exports.stringToFourCCSafe(s)
 end
 --- 将 FourCC 数值转换为 4 字符字符串。
 function ____exports.fourCCToStringSafe(fourcc)
+    if fourcc == nil or fourcc == 0 then
+        return ""
+    end
+    fourcc = __TS__Number(fourcc)
+    if __TS__NumberIsNaN(__TS__Number(fourcc)) then
+        return ""
+    end
     local c1 = stringChar(fourcc % 256)
     local c2 = stringChar(R2I(fourcc / 256) % 256)
     local c3 = stringChar(R2I(fourcc / 65536) % 256)

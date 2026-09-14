@@ -7,9 +7,8 @@ const ydweAbility = require("lib.扩展函数.YDWE函数.00．YDWE函数") as {
 const { YDWEGetUnitAbilityDataStringSafe } = require("lib.扩展函数.YDWE函数.09．YDUserData安全版") as {
   YDWEGetUnitAbilityDataStringSafe: (this: void, u: any, abilcode: number, level: number, dataType: number) => string;
 };
-const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
+const { debugLog } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
   debugLog: (this: void, module: string, ...args: any[]) => void;
-  setDebug: (this: void, module: string, on: boolean) => void;
 };
 const 玩家英雄配置工具 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具") as {
   获取单位玩家英雄配置: (this: void, unit: any) => Record<string, any> | null;
@@ -18,9 +17,7 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
   stringToFourCCSafe: (this: void, value: string | undefined | null) => number;
 };
 
-/** QWERD 显示排查调试开关：true 时输出 D 槽位探测过程（聊天输入 -dc 打一次快照汇总）。 */
-export const QWERD_DEBUG = true;
-setDebug("QWERD调试", QWERD_DEBUG);
+/** QWERD 显示排查调试开关 */
 
 const DzFrameGetCommandBarButton = japi.DzFrameGetCommandBarButton as (row: number, column: number) => number;
 const KKCommandButtonGetAbilityId = japi.KKCommandButtonGetAbilityId as (frame: number) => number;

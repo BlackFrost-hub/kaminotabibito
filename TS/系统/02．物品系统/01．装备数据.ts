@@ -1,5 +1,6 @@
 interface ItemDataEntry {
   name: string;
+  惩罚死亡丢弃?: boolean;
   type?: string;
   score?: number;
   level?: string;
@@ -153,7 +154,7 @@ items["I025"] = {type: "主武器", name: "铁矛", goldPrice: 100, score: 1433,
 items["I05G"] = {type: "道具/戒指/饰品", name: "蝎王腰带", goldPrice: 600, score: 1434, level: "D-", dmg: 20, hp: 150, hpRegen: 15, abilList: "A075"};
 items["I02S"] = {type: "鞋子", name: "山地跑鞋", goldPrice: 100, score: 1441, level: "D", armor: 8, hp: 300, hpRegen: 5, movespeed2: 75};
 items["I01H"] = {type: "主武器", name: "祭祀之杖", goldPrice: 1000, score: 1450, level: "D", dmg: 25, magicDmg: 0.2, abilList: "A03G", weaponType: "法杖"};
-items["I01J"] = {type: "头盔", name: "|cff993366祭祀面具（唯一）|r", goldPrice: 5000, score: 1450, level: "D", int: 25};
+items["I01J"] = {type: "头盔", name: "|cff993366祭祀面具（唯一）|r", 惩罚死亡丢弃: true, goldPrice: 5000, score: 1450, level: "D", int: 25};
 items["I01V"] = {type: "鞋子", name: "草鞋", goldPrice: 250, score: 1450, level: "D", mpRegen: 5, cdReduction: 0.2, movespeed2: 75};
 items["I02F"] = {type: "头盔", name: "皮风帽", goldPrice: 100, score: 1452, level: "D-", dmg: 4, atkSpeed: 0.2, armor: 10, hp: 450};
 items["I05E"] = {type: "副武器", name: "蝎王双钳", goldPrice: 200, score: 1459, level: "D", dmg: 20, str: 5, armor: 3, hp: 300};
@@ -298,7 +299,7 @@ items["I018"] = {type: "主武器", name: "银蛇剑", goldPrice: 0};
 items["I019"] = {type: "主武器", name: "蛇包剑", goldPrice: 0};
 items["I01A"] = {type: "材料", name: "合成|打造", goldPrice: 0};
 items["I0FL"] = {type: "神符", name: "盗贼神符（魔抗）", goldPrice: 0, PowerUP: "20%magicResist;time10"};
-items["I01I"] = {type: "灵魂", name: "邪恶之心（死亡掉落）", goldPrice: 1000, level: "D", dmg: 40, hp: 1500, magicLifeSteal: 0.05, onlyone: true};
+items["I01I"] = {type: "灵魂", name: "邪恶之心（死亡掉落）", 惩罚死亡丢弃: true, goldPrice: 1000, level: "D", dmg: 40, hp: 1500, magicLifeSteal: 0.05, onlyone: true};
 items["I01L"] = {type: "神符", name: "金币+200", goldPrice: 0, PowerUP: "200gold", abilList: "A03O"};
 items["I01M"] = {type: "神符", name: "金币+400", goldPrice: 0, PowerUP: "400gold", abilList: "A03P"};
 items["I01N"] = {type: "神符", name: "金币+600", goldPrice: 0, PowerUP: "600gold", abilList: "A03Q"};
@@ -574,7 +575,7 @@ items["I0CQ"] = {type: "任务", name: "|cffcc99ff暗狱之书|r", goldPrice: 0,
 items["I0CS"] = {type: "材料", name: "有毒杂草", goldPrice: 150};
 items["I0CT"] = {type: "任务", name: "|cff99ccff驱散灵树邪气|r（|cffff000015级精英战斗|r）", goldPrice: 0, int: 1};
 items["I0CW"] = {type: "任务", name: "领取技能", goldPrice: 2000};
-items["I0CX"] = {type: "任务", name: "领悟暗之力", goldPrice: 2000, PowerUP: "2all"};
+items["I0CX"] = {type: "任务", name: "领悟暗之力", goldPrice: 2000, PowerUP: "2all", abilList: "A0LH"};
 items["I0CY"] = {type: "材料", name: "荧光草", goldPrice: 0};
 items["I0D3"] = {type: "主武器", name: "|cffffcc99沙烈魔斧|r", goldPrice: 2000, level: "C", dmg: 75, str: 16, agi: 20, int: 20, critDmg: 0.2, accuracy: 0.1, primaryBonus: "力量+16/敏捷+20/智力+20", weaponType: "斧锤"};
 items["I0D4"] = {type: "道具/戒指/饰品", name: "食人魔头颅", goldPrice: 1000};

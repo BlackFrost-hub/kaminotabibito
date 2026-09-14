@@ -395,44 +395,46 @@ local function ____on_804A_5929_6302_8F7D_51CF_901F_6D4B_8BD5(player, _command)
         0.5
     )
 end
-local function _____53D1_653E_5355_4E2A_88C5_5907(unit, _____5E8F_53F7)
-    _____4E22_5F03_6D4B_8BD5_88C5_5907(unit)
-    if _____5E8F_53F7 == 192 then
-        local _____521B_5EFA_6570_91CF = 0
-        local x = GetUnitX(unit)
-        local y = GetUnitY(unit)
-        do
-            local i = 0
-            while i < #_____7CBE_7075_836F_6C34_6D4B_8BD5_88C5_5907_5217_8868 do
-                do
-                    local _____88C5_5907_540D = _____7CBE_7075_836F_6C34_6D4B_8BD5_88C5_5907_5217_8868[i + 1]
-                    local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____88C5_5907_540D)
-                    local itemTypeId = stringToFourCCSafe(rawId)
-                    if itemTypeId == 0 then
-                        debugLogForce(_____6A21_5757_540D, "未找到精灵药水ID", _____88C5_5907_540D)
-                        goto __continue72
-                    end
-                    local item = CreateItem(itemTypeId, x, y)
-                    if item == nil or item == 0 then
-                        debugLogForce(
-                            _____6A21_5757_540D,
-                            "创建精灵药水失败",
-                            _____88C5_5907_540D,
-                            rawId,
-                            itemTypeId
-                        )
-                        goto __continue72
-                    end
-                    _____7ED9_4E88_5355_4F4D_7269_54C1(unit, item)
-                    _____521B_5EFA_6570_91CF = _____521B_5EFA_6570_91CF + 1
-                end
-                ::__continue72::
-                i = i + 1
-            end
-        end
-        debugLogForce(_____6A21_5757_540D, "已发放全部精灵药水", "创建数量", _____521B_5EFA_6570_91CF)
+local function _____53D1_653E_5168_90E8_7CBE_7075_836F_6C34(unit)
+    if unit == nil or unit == 0 then
         return
     end
+    local _____521B_5EFA_6570_91CF = 0
+    local x = GetUnitX(unit)
+    local y = GetUnitY(unit)
+    do
+        local i = 0
+        while i < #_____7CBE_7075_836F_6C34_6D4B_8BD5_88C5_5907_5217_8868 do
+            do
+                local _____88C5_5907_540D = _____7CBE_7075_836F_6C34_6D4B_8BD5_88C5_5907_5217_8868[i + 1]
+                local rawId = _____6309_540D_5B57_53CD_67E5_7269_54C1ID(_____88C5_5907_540D)
+                local itemTypeId = stringToFourCCSafe(rawId)
+                if itemTypeId == 0 then
+                    debugLogForce(_____6A21_5757_540D, "未找到精灵药水ID", _____88C5_5907_540D)
+                    goto __continue72
+                end
+                local item = CreateItem(itemTypeId, x, y)
+                if item == nil or item == 0 then
+                    debugLogForce(
+                        _____6A21_5757_540D,
+                        "创建精灵药水失败",
+                        _____88C5_5907_540D,
+                        rawId,
+                        itemTypeId
+                    )
+                    goto __continue72
+                end
+                _____7ED9_4E88_5355_4F4D_7269_54C1(unit, item)
+                _____521B_5EFA_6570_91CF = _____521B_5EFA_6570_91CF + 1
+            end
+            ::__continue72::
+            i = i + 1
+        end
+    end
+    debugLogForce(_____6A21_5757_540D, "已发放全部精灵药水", "创建数量", _____521B_5EFA_6570_91CF)
+end
+local function _____53D1_653E_5355_4E2A_88C5_5907(unit, _____5E8F_53F7)
+    _____4E22_5F03_6D4B_8BD5_88C5_5907(unit)
     if _____5E8F_53F7 > 0 and _____5E8F_53F7 <= #_____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F then
         local _____88C5_5907_540D = _____7269_54C1_4E3B_52A8_6280_80FD_6D4B_8BD5_53D1_653E_987A_5E8F[_____5E8F_53F7]
         if _____53D1_653E_88C5_5907(unit, _____88C5_5907_540D) then
@@ -450,7 +452,7 @@ local function ____on_804A_5929wp_6D4B_8BD5(player, command)
         return
     end
     if command == _____7CBE_7075_836F_6C34_5957_88C5_6D4B_8BD5_547D_4EE4 then
-        _____53D1_653E_5355_4E2A_88C5_5907(unit, 192)
+        _____53D1_653E_5168_90E8_7CBE_7075_836F_6C34(unit)
         return
     end
     do

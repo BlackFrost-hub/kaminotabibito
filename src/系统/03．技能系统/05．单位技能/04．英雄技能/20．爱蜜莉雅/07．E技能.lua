@@ -67,13 +67,10 @@ local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播�
 jass = require("jass.common")
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-local fourCCToStringSafe = ____require_result_1.fourCCToStringSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
-local GetUnitName = jass.GetUnitName
 local GetOwningPlayer = jass.GetOwningPlayer
-local GetPlayerId = jass.GetPlayerId
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
@@ -113,8 +110,6 @@ local platformAbilityApi = require("平台扩展API取值")
 local platformAbilityAction = require("平台扩展API动作")
 local ____require_result_12 = require("系统.00．核心系统.05．中心计时器")
 local addDelayedCallback = ____require_result_12.addDelayedCallback
-local ____require_result_13 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_13.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 local ____E_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.E["技能ID"])
 local _____62A4_76FE_7279_6548_952E = "爱蜜莉雅E护盾"
@@ -152,28 +147,6 @@ local function _____65BD_52A0_843D_70B9_51B0_7206(_____65BD_6CD5_8005, X, Y, ___
             ) then
                 goto __continue3
             end
-            debugLogForce(
-                "爱蜜莉雅-E",
-                "伤害",
-                "标签",
-                "爱蜜莉雅-E冰爆",
-                "玩家",
-                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                "四码",
-                fourCCToStringSafe(____E_6280_80FD_7C7B_578BID),
-                "实例",
-                _____6280_80FD_5B9E_4F8BID or "-",
-                "目标",
-                GetUnitName(u),
-                "handle",
-                u,
-                "X",
-                math.floor(GetUnitX(u)),
-                "Y",
-                math.floor(GetUnitY(u)),
-                "数值",
-                _____4F24_5BB3_503C
-            )
             _____9020_6210_6280_80FD_4F24_5BB3({
                 ["来源"] = _____65BD_6CD5_8005,
                 ["目标"] = u,
@@ -198,22 +171,6 @@ local function _____7ED3_675FE_62A4_76FE_5206_652F(_____65BD_6CD5_8005, _____63A
     if _____6570_636E == nil or _____6570_636E["已结束"] then
         return
     end
-    debugLogForce(
-        "爱蜜莉雅-E",
-        "结束",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____E_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "原因",
-        _____5206_652F,
-        "X",
-        math.floor(GetUnitX(_____65BD_6CD5_8005)),
-        "Y",
-        math.floor(GetUnitY(_____65BD_6CD5_8005))
-    )
     _____6570_636E["已结束"] = true
     if _____5206_652F == "提前" and _____6570_636E["位移ID"] ~= 0 then
         _____505C_6B62_4F4D_79FB(_____6570_636E["位移ID"], "中断")
@@ -250,32 +207,8 @@ local function _____7ED3_675FE_62A4_76FE_5206_652F(_____65BD_6CD5_8005, _____63A
 end
 local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
-        debugLogForce(
-            "爱蜜莉雅-E",
-            "释放被拒",
-            "原因",
-            "施法者无效",
-            "分支",
-            "护身"
-        )
         return
     end
-    debugLogForce(
-        "爱蜜莉雅-E",
-        "释放",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____E_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "目标",
-        "点施放",
-        "目标X",
-        math.floor(GetSpellTargetX()),
-        "目标Y",
-        math.floor(GetSpellTargetY())
-    )
     _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C(_____65BD_6CD5_8005, _____7231_871C_8389_96C5_52A8_4F5C_69FD.E)
     local _____6D3B_8DC3_5217_8868 = _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "E护盾")
     do
@@ -377,24 +310,6 @@ local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005
         ["缩放"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰面路径"]["缩放"],
         ["持续秒"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰面路径"]["持续秒"]
     })
-    debugLogForce(
-        "爱蜜莉雅-E",
-        "位移",
-        "类型",
-        "冲锋",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____E_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "X",
-        math.floor(GetUnitX(_____65BD_6CD5_8005)),
-        "Y",
-        math.floor(GetUnitY(_____65BD_6CD5_8005)),
-        "距离",
-        _____7231_871C_8389_96C5E_914D_7F6E["位移距离"]
-    )
     _____6570_636E["位移ID"] = _____5F00_59CB_51B2_950B(
         _____65BD_6CD5_8005,
         {
@@ -441,30 +356,8 @@ local function _____91CA_653EE_51B0_6676_62A4_8EAB(_context, _____65BD_6CD5_8005
 end
 local function _____91CA_653EE_4E8C_6BB5_8F93_5165(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
-        debugLogForce(
-            "爱蜜莉雅-E",
-            "释放被拒",
-            "原因",
-            "施法者无效",
-            "分支",
-            "二段输入"
-        )
         return
     end
-    debugLogForce(
-        "爱蜜莉雅-E",
-        "释放",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____E_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "目标",
-        "无",
-        "分支",
-        "二段输入"
-    )
     local _____6D3B_8DC3_5217_8868 = _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "E护盾")
     do
         local i = 0

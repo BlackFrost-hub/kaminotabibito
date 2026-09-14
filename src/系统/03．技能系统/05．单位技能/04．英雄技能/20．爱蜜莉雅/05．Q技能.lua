@@ -24,12 +24,9 @@ local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播�
 local jass = require("jass.common")
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-local fourCCToStringSafe = ____require_result_1.fourCCToStringSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitName = jass.GetUnitName
 local GetOwningPlayer = jass.GetOwningPlayer
-local GetPlayerId = jass.GetPlayerId
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local GetSpellTargetUnit = jass.GetSpellTargetUnit
@@ -46,8 +43,6 @@ local _____6CE8_518C_5355_4F4D_6280_80FD_58F3_76D1_542C = ____require_result_5["
 local ____require_result_6 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具")
 local _____8BFB_53D6_5355_4F4D_653B_51FB_529B = ____require_result_6["读取单位攻击力"]
 local _____4E24_70B9_89D2_5EA6 = ____require_result_6["两点角度"]
-local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_7.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 local ____Q_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.Q["技能ID"])
 --- 分裂冰刃：从冰晶位置向前/侧方扇形分裂（复用冰矢模型，小缩放）
@@ -89,33 +84,6 @@ local function _____53D1_5C04_5206_88C2_51B0_5203(_____65BD_6CD5_8005, X, Y, ___
                 },
                 ["飞行高度"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["分裂冰刃"]["高度"]
             })
-            local ____debugLogForce_14 = debugLogForce
-            local ____temp_12 = _____5206_88C2_5F39_9053 ~= nil and "成功" or "失败"
-            local ____temp_13 = i + 1
-            local ____opt_result_10
-            if _____5206_88C2_5F39_9053 ~= nil then
-                ____opt_result_10 = _____5206_88C2_5F39_9053["弹幕ID"]
-            end
-            local ____opt_result_10_11 = ____opt_result_10
-            if ____opt_result_10_11 == nil then
-                ____opt_result_10_11 = 0
-            end
-            ____debugLogForce_14(
-                "爱蜜莉雅-Q",
-                "分裂冰刃",
-                "创建",
-                ____temp_12,
-                "序号",
-                ____temp_13,
-                "弹道ID",
-                ____opt_result_10_11,
-                "模型",
-                _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["分裂冰刃"]["模型路径"],
-                "X",
-                math.floor(X),
-                "Y",
-                math.floor(Y)
-            )
             i = i + 1
         end
     end
@@ -172,26 +140,6 @@ local function _____91CA_653EQ_51B0_4E4B_77E2(_context, _____65BD_6CD5_8005, ___
     local _____8D77_70B9Y = GetUnitY(_____65BD_6CD5_8005)
     local _____57FA_7840_65B9_5411 = _____4E24_70B9_89D2_5EA6(_____8D77_70B9X, _____8D77_70B9Y, _____76EE_6807X, _____76EE_6807Y)
     local _____8F68_8FF9 = _____76EE_6807_5355_4F4D ~= nil and _____76EE_6807_5355_4F4D ~= 0 and ({["类型"] = "追踪", ["目标"] = _____76EE_6807_5355_4F4D, ["追踪转向速度"] = 360}) or ({["类型"] = "直线", ["距离"] = _____7231_871C_8389_96C5Q_914D_7F6E["最大距离"]})
-    debugLogForce(
-        "爱蜜莉雅-Q",
-        "释放",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____Q_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "目标",
-        _____76EE_6807_5355_4F4D ~= nil and _____76EE_6807_5355_4F4D ~= 0 and GetUnitName(_____76EE_6807_5355_4F4D) or "点施放",
-        "目标X",
-        math.floor(_____76EE_6807X),
-        "目标Y",
-        math.floor(_____76EE_6807Y),
-        "轨迹",
-        _____76EE_6807_5355_4F4D ~= nil and _____76EE_6807_5355_4F4D ~= 0 and "追踪" or "直线",
-        "伤害",
-        _____4F24_5BB3
-    )
     local _____5DF2_7A7F_6676 = false
     local _____6700_8FD1X = _____8D77_70B9X
     local _____6700_8FD1Y = _____8D77_70B9Y
@@ -223,26 +171,6 @@ local function _____91CA_653EQ_51B0_4E4B_77E2(_context, _____65BD_6CD5_8005, ___
                 _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["Q命中"]["高度"],
                 _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["Q命中"]["裁断距离"]
             )
-            debugLogForce(
-                "爱蜜莉雅-Q",
-                "命中",
-                "玩家",
-                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                "四码",
-                fourCCToStringSafe(____Q_6280_80FD_7C7B_578BID),
-                "实例",
-                _____6280_80FD_5B9E_4F8BID or "-",
-                "目标",
-                GetUnitName(_____76EE_6807),
-                "handle",
-                _____76EE_6807,
-                "X",
-                math.floor(GetUnitX(_____76EE_6807)),
-                "Y",
-                math.floor(GetUnitY(_____76EE_6807)),
-                "伤害",
-                _____4F24_5BB3
-            )
             _____7ED3_7B97_7231_871C_8389_96C5_6280_80FD_547D_4E2D(_____65BD_6CD5_8005, _____76EE_6807, _____6765_6E90_952E, {
                 ["伤害值"] = _____4F24_5BB3,
                 ["技能ID"] = ____Q_6280_80FD_7C7B_578BID,
@@ -267,30 +195,9 @@ local function _____91CA_653EQ_51B0_4E4B_77E2(_context, _____65BD_6CD5_8005, ___
             end
             local _____5750_6807 = _____8BFB_53D6_7231_871C_8389_96C5_51B0_6676_8282_70B9(_____65BD_6CD5_8005, _____8282_70B9)
             if _____5750_6807 == nil then
-                debugLogForce(
-                    "爱蜜莉雅-Q",
-                    "穿晶失败",
-                    "取到冰晶但节点坐标为空",
-                    "弹幕X",
-                    math.floor(_____5B9E_4F8B["当前X"]),
-                    "弹幕Y",
-                    math.floor(_____5B9E_4F8B["当前Y"])
-                )
                 return
             end
             _____5DF2_7A7F_6676 = true
-            debugLogForce(
-                "爱蜜莉雅-Q",
-                "穿晶",
-                "玩家",
-                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                "实例",
-                _____6280_80FD_5B9E_4F8BID or "-",
-                "冰晶X",
-                math.floor(_____5750_6807.X),
-                "冰晶Y",
-                math.floor(_____5750_6807.Y)
-            )
             local _____788E_88C2_7279_6548 = _____521B_5EFA_70B9_7279_6548({
                 ["模型路径"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["命中冰爆"]["模型路径"],
                 RGB = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["命中冰爆"].RGB,
@@ -300,17 +207,7 @@ local function _____91CA_653EQ_51B0_4E4B_77E2(_context, _____65BD_6CD5_8005, ___
                 ["缩放"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["命中冰爆"]["缩放"],
                 ["持续秒"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["命中冰爆"]["持续秒"]
             })
-            debugLogForce(
-                "爱蜜莉雅-Q",
-                "冰晶碎裂特效",
-                _____788E_88C2_7279_6548 ~= nil and _____788E_88C2_7279_6548 ~= 0 and "创建成功" or "创建失败",
-                "路径",
-                _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["命中冰爆"]["模型路径"],
-                "X",
-                math.floor(_____5750_6807.X),
-                "Y",
-                math.floor(_____5750_6807.Y)
-            )
+            local ____ = _____788E_88C2_7279_6548
             Sound3DII_CooPlayReuse(
                 _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["Q命中"]["路径"],
                 _____5750_6807.X,
@@ -318,36 +215,24 @@ local function _____91CA_653EQ_51B0_4E4B_77E2(_context, _____65BD_6CD5_8005, ___
                 _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["Q命中"]["高度"],
                 _____7231_871C_8389_96C5_97F3_6548_914D_7F6E["Q命中"]["裁断距离"]
             )
-            local ____53D1_5C04_5206_88C2_51B0_5203_17 = _____53D1_5C04_5206_88C2_51B0_5203
-            local ____array_16 = __TS__SparseArrayNew(_____65BD_6CD5_8005, _____5750_6807.X, _____5750_6807.Y)
-            local ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_15 = _____5B9E_4F8B["当前方向角"]
-            if ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_15 == nil then
-                ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_15 = _____57FA_7840_65B9_5411
+            local ____53D1_5C04_5206_88C2_51B0_5203_9 = _____53D1_5C04_5206_88C2_51B0_5203
+            local ____array_8 = __TS__SparseArrayNew(_____65BD_6CD5_8005, _____5750_6807.X, _____5750_6807.Y)
+            local ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_7 = _____5B9E_4F8B["当前方向角"]
+            if ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_7 == nil then
+                ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_7 = _____57FA_7840_65B9_5411
             end
-            __TS__SparseArrayPush(____array_16, ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_15, _____6280_80FD_5B9E_4F8BID)
-            ____53D1_5C04_5206_88C2_51B0_5203_17(__TS__SparseArraySpread(____array_16))
-            local ____53D1_5C04Q_5E15_514B_51B0_5F39_21 = _____53D1_5C04Q_5E15_514B_51B0_5F39
-            local ____65BD_6CD5_8005_19 = _____65BD_6CD5_8005
-            local ____6280_80FD_5B9E_4F8BID_20 = _____6280_80FD_5B9E_4F8BID
-            local ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_18 = _____5B9E_4F8B["当前方向角"]
-            if ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_18 == nil then
-                ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_18 = _____57FA_7840_65B9_5411
+            __TS__SparseArrayPush(____array_8, ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_7, _____6280_80FD_5B9E_4F8BID)
+            ____53D1_5C04_5206_88C2_51B0_5203_9(__TS__SparseArraySpread(____array_8))
+            local ____53D1_5C04Q_5E15_514B_51B0_5F39_13 = _____53D1_5C04Q_5E15_514B_51B0_5F39
+            local ____65BD_6CD5_8005_11 = _____65BD_6CD5_8005
+            local ____6280_80FD_5B9E_4F8BID_12 = _____6280_80FD_5B9E_4F8BID
+            local ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_10 = _____5B9E_4F8B["当前方向角"]
+            if ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_10 == nil then
+                ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_10 = _____57FA_7840_65B9_5411
             end
-            ____53D1_5C04Q_5E15_514B_51B0_5F39_21(____65BD_6CD5_8005_19, _____76EE_6807_5355_4F4D, ____6280_80FD_5B9E_4F8BID_20, ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_18)
+            ____53D1_5C04Q_5E15_514B_51B0_5F39_13(____65BD_6CD5_8005_11, _____76EE_6807_5355_4F4D, ____6280_80FD_5B9E_4F8BID_12, ____5B9E_4F8B__5F53_524D_65B9_5411_89D2_10)
         end,
         ["on到达点"] = function(_____5F39_5E55ID, ______539F_56E0)
-            debugLogForce(
-                "爱蜜莉雅-Q",
-                "到达终点",
-                "玩家",
-                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                "实例",
-                _____6280_80FD_5B9E_4F8BID or "-",
-                "X",
-                math.floor(_____6700_8FD1X),
-                "Y",
-                math.floor(_____6700_8FD1Y)
-            )
             _____521B_5EFA_7231_871C_8389_96C5_573A_4E0A_51B0_6676(
                 _____65BD_6CD5_8005,
                 "Q",

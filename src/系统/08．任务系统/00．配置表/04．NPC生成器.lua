@@ -25,8 +25,6 @@ local __pcallModelPath = ""
 local function __pcallSetUnitModelBody(self)
     japi.DzSetUnitModel(__pcallModelUnit, __pcallModelPath)
 end
-local ____require_result_2 = require("lib.扩展函数.自定义扩展函数.index")
-local debugLog = ____require_result_2.debugLog
 --- 维护已创建 NPC 的稳定查表，供同步入口按配置键回查真实单位。
 local g_npcUnitByRequireId = __TS__New(Map)
 local g_npcUnitByNpcNameId = __TS__New(Map)
@@ -101,16 +99,7 @@ local function onNpcSetModelDelayed()
     end
     __pcallModelUnit = ctx.unit
     __pcallModelPath = ctx.modelPath
-    local ok = pcall(__pcallSetUnitModelBody)
-    if not ok then
-        debugLog(
-            nil,
-            "NPC生成器",
-            "设置单位模型失败（已忽略）",
-            ctx.npcLabel,
-            "model=" .. tostring(ctx.modelPath)
-        )
-    end
+    pcall(__pcallSetUnitModelBody)
 end
 local function scheduleTryAttachQuestMarker(unit, npcConfig)
     if npcConfig["模型路径"] then
@@ -130,17 +119,10 @@ local function createSingleNPC(npcConfig, registerQuestId)
         registerQuestId = true
     end
     if not npcConfig["单位ID"] or npcConfig["坐标X"] == nil or npcConfig["坐标Y"] == nil then
-        debugLog(
-            nil,
-            "NPC生成器",
-            "配置不完整，跳过:",
-            tostring(npcConfig["NPC配置名"])
-        )
         return nil
     end
     local unitCode = npcConfig["单位ID"]
     if #unitCode ~= 4 then
-        debugLog(nil, "NPC生成器", "单位代码无效:", unitCode)
         return nil
     end
     local unit = _____521B_5EFA_5267_60C5NPC_5355_4F4D({
@@ -151,13 +133,6 @@ local function createSingleNPC(npcConfig, registerQuestId)
         ["登记死亡排泄"] = true
     })
     if not unit then
-        debugLog(
-            nil,
-            "NPC生成器",
-            "创建单位失败:",
-            tostring(npcConfig["NPC配置名"]),
-            ("(" .. unitCode) .. ")"
-        )
         return nil
     end
     if npcConfig["NPC名称"] then
@@ -173,18 +148,9 @@ local function createSingleNPC(npcConfig, registerQuestId)
     runNpcInitAction(nil, unit, npcConfig["初始化动作"])
     scheduleTryAttachQuestMarker(unit, npcConfig)
     registerCreatedNpcUnit(npcConfig, unit, registerQuestId)
-    debugLog(
-        nil,
-        "NPC生成器",
-        "成功创建NPC:",
-        tostring(npcConfig["NPC配置名"]),
-        "at",
-        ((("(" .. tostring(npcConfig["坐标X"])) .. ", ") .. tostring(npcConfig["坐标Y"])) .. ")"
-    )
     return unit
 end
 ____exports["初始化NPC"] = function()
-    debugLog(nil, "NPC生成器", "开始初始化NPC...")
     g_npcUnitByRequireId:clear()
     g_npcUnitByNpcNameId:clear()
     g_npcUnitByDisplayName:clear()
@@ -202,11 +168,9 @@ ____exports["按名称创建NPC"] = function(____NPC_540D_79F0)
         function(____, npc) return npc["NPC配置名"] == ____NPC_540D_79F0 or npc["NPC名称"] == ____NPC_540D_79F0 end
     )
     if not npcConfig then
-        debugLog(nil, "NPC生成器", "未找到NPC配置:", ____NPC_540D_79F0)
         return nil
     end
     if npcConfig["启用"] ~= true then
-        debugLog(nil, "NPC生成器", "NPC未启用:", ____NPC_540D_79F0)
         return nil
     end
     return createSingleNPC(npcConfig)
@@ -217,23 +181,9 @@ ____exports["按任务ID创建NPC"] = function(_____4EFB_52A1ID)
         function(____, npc) return npc["任务ID"] == _____4EFB_52A1ID end
     )
     if not npcConfig then
-        debugLog(
-            nil,
-            "NPC生成器",
-            "未找到任务ID对应的NPC:",
-            tostring(_____4EFB_52A1ID)
-        )
         return nil
     end
     if npcConfig["启用"] ~= true then
-        debugLog(
-            nil,
-            "NPC生成器",
-            "NPC未启用:",
-            tostring(npcConfig["NPC配置名"]),
-            "(任务ID:",
-            tostring(_____4EFB_52A1ID) .. ")"
-        )
         return nil
     end
     return createSingleNPC(npcConfig)
@@ -248,25 +198,25 @@ ____exports["获取全部NPC配置"] = function()
     return {table.unpack(_____652F_7EBFNPC_914D_7F6E_5217_8868)}
 end
 ____exports["按任务ID查找已创建NPC"] = function(_____4EFB_52A1ID)
-    local ____temp_3 = g_npcUnitByRequireId:get(_____4EFB_52A1ID)
-    if ____temp_3 == nil then
-        ____temp_3 = nil
+    local ____temp_2 = g_npcUnitByRequireId:get(_____4EFB_52A1ID)
+    if ____temp_2 == nil then
+        ____temp_2 = nil
     end
-    return ____temp_3
+    return ____temp_2
 end
 ____exports["按名称查找已创建NPC"] = function(____NPC_540D_79F0)
     if not ____NPC_540D_79F0 then
         return nil
     end
-    local ____temp_4 = g_npcUnitByNpcNameId:get(____NPC_540D_79F0)
-    if ____temp_4 == nil then
-        ____temp_4 = g_npcUnitByDisplayName:get(____NPC_540D_79F0)
+    local ____temp_3 = g_npcUnitByNpcNameId:get(____NPC_540D_79F0)
+    if ____temp_3 == nil then
+        ____temp_3 = g_npcUnitByDisplayName:get(____NPC_540D_79F0)
     end
-    local ____temp_4_5 = ____temp_4
-    if ____temp_4_5 == nil then
-        ____temp_4_5 = nil
+    local ____temp_3_4 = ____temp_3
+    if ____temp_3_4 == nil then
+        ____temp_3_4 = nil
     end
-    return ____temp_4_5
+    return ____temp_3_4
 end
 --- 按任务中的结构化配置创建唯一的提交 NPC，不覆盖开始 NPC 的任务 ID 索引。
 ____exports["创建任务结束NPC"] = function(_____4EFB_52A1)

@@ -1,6 +1,6 @@
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local _____79FB_52A8_955C_5934_5230_73A9_5BB6, _____662F_5426_6709_6548, _____5355_4F4D_662F_5426_6B7B_4EA1, _____53D6_82F1_96C4_680F_69FD_4F4D, _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6, _____662F_73A9_5BB6_82F1_96C4, _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9, _____8BFB_53D6_5F53_524D_590D_6D3BBoss, ____on_590D_6D3B_955C_5934_79FB_52A8, _____65BD_52A0_590D_6D3B_65E0_654C, _____590D_6D3B_73A9_5BB6_82F1_96C4, jass, g, YDUserDataGetSafe, YDUserDataSetSafe, GetRandomDirectionDeg, getRegisteredPlayerHero, addDelayedCallback, _____5F00_59CB_65E0_654C_5E27, _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321, StarOther_PanCameraToTimedForPlayer, _____8BBE_7F6E_51B7_5374_6570_5B57_6587_672C, _____663E_793A_51B7_5374_6570_5B57_6587_672C, DzFrameShow, GetUnitX, GetUnitY, IsUnitType, ReviveHeroLoc, GetOwningPlayer, GetPlayerId, Location, RemoveLocation, SetUnitX, SetUnitY, _____590D_6D3B_65E0_654C_79D2, _____590D_6D3B_534A_5F84, _____590D_6D3B_63A8_8FDB_6B65_6570, _____590D_6D3B_6B21_6570_5C5E_6027, _____590D_6D3B_6B21_6570_8868, ____Boss_6218_8868, ____Boss_6218_5355_4F4D_5C5E_6027, _____82F1_96C4_680F_6587_672C_6846_4F53_6570_91CF, _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6587_672C_7EC4_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868
+local _____79FB_52A8_955C_5934_5230_73A9_5BB6, _____662F_5426_6709_6548, _____5355_4F4D_662F_5426_6B7B_4EA1, _____53D6_82F1_96C4_680F_69FD_4F4D, _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6, _____662F_73A9_5BB6_82F1_96C4, _____5BFB_627E_53EF_901A_884C_590D_6D3B_70B9, _____8BFB_53D6_5F53_524D_590D_6D3BBoss, ____on_590D_6D3B_955C_5934_79FB_52A8, _____65BD_52A0_590D_6D3B_65E0_654C, _____590D_6D3B_73A9_5BB6_82F1_96C4, jass, _____590D_6D3B_540E_653E_56DE_60E9_7F5A_7269_54C1, g, YDUserDataGetSafe, YDUserDataSetSafe, GetRandomDirectionDeg, getRegisteredPlayerHero, addDelayedCallback, _____5F00_59CB_65E0_654C_5E27, _____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321, StarOther_PanCameraToTimedForPlayer, _____8BBE_7F6E_51B7_5374_6570_5B57_6587_672C, _____663E_793A_51B7_5374_6570_5B57_6587_672C, DzFrameShow, GetUnitX, GetUnitY, IsUnitType, ReviveHeroLoc, GetOwningPlayer, GetPlayerId, Location, RemoveLocation, SetUnitX, SetUnitY, _____590D_6D3B_65E0_654C_79D2, _____590D_6D3B_534A_5F84, _____590D_6D3B_63A8_8FDB_6B65_6570, _____590D_6D3B_6B21_6570_5C5E_6027, _____590D_6D3B_6B21_6570_8868, ____Boss_6218_8868, ____Boss_6218_5355_4F4D_5C5E_6027, _____82F1_96C4_680F_6587_672C_6846_4F53_6570_91CF, _____82F1_96C4_680F_5012_8BA1_65F6_5E95_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5DE6_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_53F3_63CF_8FB9_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_9634_5F71_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6846_4F53_8868, _____82F1_96C4_680F_5012_8BA1_65F6_6587_672C_7EC4_8868, _____82F1_96C4_680F_5012_8BA1_65F6_5269_4F59_79D2_8868
 function _____79FB_52A8_955C_5934_5230_73A9_5BB6(_____73A9_5BB6, x, y)
     StarOther_PanCameraToTimedForPlayer(_____73A9_5BB6, x, y, 0.1)
 end
@@ -119,13 +119,13 @@ function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_
     local _____539F_5730X = _____539F_5730_590D_6D3B and GetUnitX(dyingUnit) or 0
     local _____539F_5730Y = _____539F_5730_590D_6D3B and GetUnitY(dyingUnit) or 0
     _____9690_85CF_82F1_96C4_680F_5012_8BA1_65F6(_____53D6_82F1_96C4_680F_69FD_4F4D(dyingUnit))
-    local _____6D88_8017_590D_6D3B_6B21_6570_8
+    local _____6D88_8017_590D_6D3B_6B21_6570_9
     if _____6D88_8017_590D_6D3B_6B21_6570 then
-        _____6D88_8017_590D_6D3B_6B21_6570_8 = YDUserDataGetSafe("string", _____590D_6D3B_6B21_6570_8868, _____590D_6D3B_6B21_6570_5C5E_6027, "integer")
+        _____6D88_8017_590D_6D3B_6B21_6570_9 = YDUserDataGetSafe("string", _____590D_6D3B_6B21_6570_8868, _____590D_6D3B_6B21_6570_5C5E_6027, "integer")
     else
-        _____6D88_8017_590D_6D3B_6B21_6570_8 = nil
+        _____6D88_8017_590D_6D3B_6B21_6570_9 = nil
     end
-    local _____5269_4F59_6B21_6570 = _____6D88_8017_590D_6D3B_6B21_6570_8
+    local _____5269_4F59_6B21_6570 = _____6D88_8017_590D_6D3B_6B21_6570_9
     if _____5269_4F59_6B21_6570 ~= nil and _____5269_4F59_6B21_6570 <= 0 then
         return false
     end
@@ -197,29 +197,34 @@ function _____590D_6D3B_73A9_5BB6_82F1_96C4(dyingUnit, _____6D88_8017_590D_6D3B_
             )
         end
     end
+    if _____662F_5426_6709_6548(dyingUnit) and IsUnitType(dyingUnit, jass.UNIT_TYPE_DEAD) ~= true then
+        _____590D_6D3B_540E_653E_56DE_60E9_7F5A_7269_54C1(nil, dyingUnit)
+    end
     return true
 end
 jass = require("jass.common")
+local ____require_result_0 = require("系统.02．物品系统.15．装备技能.07．获得物品.00．公共.00．获得物品配置表")
+_____590D_6D3B_540E_653E_56DE_60E9_7F5A_7269_54C1 = ____require_result_0["复活后放回惩罚物品"]
 local japi = require("jass.japi")
 g = require("jass.globals")
-local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
-YDUserDataGetSafe = ____require_result_0.YDUserDataGetSafe
-YDUserDataSetSafe = ____require_result_0.YDUserDataSetSafe
-local ____require_result_1 = require("lib.扩展函数.BJ函数.07．杂项")
-GetRandomDirectionDeg = ____require_result_1.GetRandomDirectionDeg
-local ____require_result_2 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
-getRegisteredPlayerHero = ____require_result_2.getRegisteredPlayerHero
-local ____require_result_3 = require("系统.00．核心系统.05．中心计时器")
-addDelayedCallback = ____require_result_3.addDelayedCallback
-local ____require_result_4 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.08．无敌帧")
-_____5F00_59CB_65E0_654C_5E27 = ____require_result_4["开始无敌帧"]
-local ____require_result_5 = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进")
-_____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321 = ____require_result_5["沿角度步进直到地形阻挡"]
-local ____require_result_6 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
-StarOther_PanCameraToTimedForPlayer = ____require_result_6.StarOther_PanCameraToTimedForPlayer
-local ____G_7 = _G
-local onTick10ms = ____G_7.onTick10ms
-local offTick10ms = ____G_7.offTick10ms
+local ____require_result_1 = require("lib.扩展函数.YDWE函数.09．YDUserData安全版")
+YDUserDataGetSafe = ____require_result_1.YDUserDataGetSafe
+YDUserDataSetSafe = ____require_result_1.YDUserDataSetSafe
+local ____require_result_2 = require("lib.扩展函数.BJ函数.07．杂项")
+GetRandomDirectionDeg = ____require_result_2.GetRandomDirectionDeg
+local ____require_result_3 = require("系统.00．核心系统.00．玩家系统.00．英雄注册联动.00．玩家英雄获取桥接")
+getRegisteredPlayerHero = ____require_result_3.getRegisteredPlayerHero
+local ____require_result_4 = require("系统.00．核心系统.05．中心计时器")
+addDelayedCallback = ____require_result_4.addDelayedCallback
+local ____require_result_5 = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.08．无敌帧")
+_____5F00_59CB_65E0_654C_5E27 = ____require_result_5["开始无敌帧"]
+local ____require_result_6 = require("lib.扩展函数.封装函数.01．通用工具.11．地形步进")
+_____6CBF_89D2_5EA6_6B65_8FDB_76F4_5230_5730_5F62_963B_6321 = ____require_result_6["沿角度步进直到地形阻挡"]
+local ____require_result_7 = require("lib.扩展函数.Star扩展函数.Star扩展库.00．镜头函数")
+StarOther_PanCameraToTimedForPlayer = ____require_result_7.StarOther_PanCameraToTimedForPlayer
+local ____G_8 = _G
+local onTick10ms = ____G_8.onTick10ms
+local offTick10ms = ____G_8.offTick10ms
 local _____51B7_5374_6570_5B57_6587_672C_6A21_5757 = require("系统.09．表现系统.01．UI工具.06．冷却数字文本")
 local _____521B_5EFA_51B7_5374_6570_5B57_6587_672C_7EC4 = _____51B7_5374_6570_5B57_6587_672C_6A21_5757["创建冷却数字文本组"]
 local _____8BBE_7F6E_51B7_5374_6570_5B57_6587_672C_951A_70B9 = _____51B7_5374_6570_5B57_6587_672C_6A21_5757["设置冷却数字文本锚点"]

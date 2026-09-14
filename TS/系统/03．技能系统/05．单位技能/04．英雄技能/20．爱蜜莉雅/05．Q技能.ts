@@ -24,15 +24,12 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
-  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
-const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
-const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const GetSpellTargetUnit = jass.GetSpellTargetUnit as (this: void) => any;
@@ -54,9 +51,6 @@ const { 注册单位技能壳监听 } = require("系统.03．技能系统.00．�
 const { 读取单位攻击力, 两点角度 } = require("系统.03．技能系统.00．技能模板+函数.02．通用函数.19．战斗公共工具") as {
   读取单位攻击力: (this: void, unit: any) => number;
   两点角度: (this: void, x1: number, y1: number, x2: number, y2: number) => number;
-};
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
 };
 
 const 英雄单位类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.单位类型ID);
@@ -101,22 +95,6 @@ function 发射分裂冰刃(this: void, 施法者: any, X: number, Y: number, �
       },
       飞行高度: 爱蜜莉雅表现配置.分裂冰刃.高度,
     });
-    debugLogForce(
-      "爱蜜莉雅-Q",
-      "分裂冰刃",
-      "创建",
-      分裂弹道 != null ? "成功" : "失败",
-      "序号",
-      i + 1,
-      "弹道ID",
-      分裂弹道?.弹幕ID ?? 0,
-      "模型",
-      爱蜜莉雅表现配置.分裂冰刃.模型路径,
-      "X",
-      Math.floor(X),
-      "Y",
-      Math.floor(Y),
-    );
   }
 }
 
@@ -170,26 +148,6 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
   const 轨迹 = 目标单位 != null && 目标单位 !== 0
     ? { 类型: "追踪", 目标: 目标单位, 追踪转向速度: 360 }
     : { 类型: "直线", 距离: 爱蜜莉雅Q配置.最大距离 };
-  debugLogForce(
-    "爱蜜莉雅-Q",
-    "释放",
-    "玩家",
-    GetPlayerId(GetOwningPlayer(施法者)) + 1,
-    "四码",
-    fourCCToStringSafe(Q技能类型ID),
-    "实例",
-    技能实例ID ?? "-",
-    "目标",
-    目标单位 != null && 目标单位 !== 0 ? GetUnitName(目标单位) : "点施放",
-    "目标X",
-    Math.floor(目标X),
-    "目标Y",
-    Math.floor(目标Y),
-    "轨迹",
-    目标单位 != null && 目标单位 !== 0 ? "追踪" : "直线",
-    "伤害",
-    伤害,
-  );
 
   let 已穿晶 = false;
   // 穿晶/终点生成冰晶需要弹道最后实际位置；on到达点 触发时弹道已结束，
@@ -222,26 +180,6 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
     on命中: function Q命中(this: void, 目标: any, _弹幕ID: number): void {
       // 命中冰爆音：主矢真实命中结算点一次（坐标=命中位置；与穿晶分裂、冻结解除碎裂复用 Q命中 槽，参数配置驱动）
       Sound3DII_CooPlayReuse(爱蜜莉雅音效配置.Q命中.路径, GetUnitX(目标), GetUnitY(目标), 爱蜜莉雅音效配置.Q命中.高度, 爱蜜莉雅音效配置.Q命中.裁断距离);
-      debugLogForce(
-        "爱蜜莉雅-Q",
-        "命中",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(施法者)) + 1,
-        "四码",
-        fourCCToStringSafe(Q技能类型ID),
-        "实例",
-        技能实例ID ?? "-",
-        "目标",
-        GetUnitName(目标),
-        "handle",
-        目标,
-        "X",
-        Math.floor(GetUnitX(目标)),
-        "Y",
-        Math.floor(GetUnitY(目标)),
-        "伤害",
-        伤害,
-      );
       结算爱蜜莉雅技能命中(施法者, 目标, 来源键, {
         伤害值: 伤害,
         技能ID: Q技能类型ID,
@@ -260,11 +198,9 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
       if (节点 == null) return;
       const 坐标 = 读取爱蜜莉雅冰晶节点(施法者, 节点);
       if (坐标 == null) {
-        debugLogForce("爱蜜莉雅-Q", "穿晶失败", "取到冰晶但节点坐标为空", "弹幕X", Math.floor(实例.当前X), "弹幕Y", Math.floor(实例.当前Y));
         return;
       }
       已穿晶 = true;
-      debugLogForce("爱蜜莉雅-Q", "穿晶", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "实例", 技能实例ID ?? "-", "冰晶X", Math.floor(坐标.X), "冰晶Y", Math.floor(坐标.Y));
       // 穿晶：冰晶碎裂 + 分裂冰刃 + D 强化冰弹
       const 碎裂特效 = 创建点特效({
         模型路径: 爱蜜莉雅表现配置.命中冰爆.模型路径,
@@ -275,17 +211,7 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
         缩放: 爱蜜莉雅表现配置.命中冰爆.缩放,
         持续秒: 爱蜜莉雅表现配置.命中冰爆.持续秒,
       });
-      debugLogForce(
-        "爱蜜莉雅-Q",
-        "冰晶碎裂特效",
-        碎裂特效 != null && 碎裂特效 !== 0 ? "创建成功" : "创建失败",
-        "路径",
-        爱蜜莉雅表现配置.命中冰爆.模型路径,
-        "X",
-        Math.floor(坐标.X),
-        "Y",
-        Math.floor(坐标.Y),
-      );
+      void 碎裂特效;
       // 穿晶分裂音：复用 Q命中 槽（已穿晶去重保证单次；坐标=冰晶碎裂点，参数配置驱动）
       Sound3DII_CooPlayReuse(爱蜜莉雅音效配置.Q命中.路径, 坐标.X, 坐标.Y, 爱蜜莉雅音效配置.Q命中.高度, 爱蜜莉雅音效配置.Q命中.裁断距离);
       发射分裂冰刃(施法者, 坐标.X, 坐标.Y, 实例.当前方向角 ?? 基础方向, 技能实例ID);
@@ -294,7 +220,6 @@ function 释放Q冰之矢(this: void, _context: any, 施法者: any, 技能实�
     on到达点: function Q终点(this: void, 弹幕ID: number, _原因: string): void {
       // 终点生成新冰晶节点（超上限按配置替换最旧）
       // 注：此时弹道已结束，不能再用 获取弹道当前位置（会返回 0,0 兜底），用 onTick 记录的最近坐标
-      debugLogForce("爱蜜莉雅-Q", "到达终点", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "实例", 技能实例ID ?? "-", "X", Math.floor(最近X), "Y", Math.floor(最近Y));
       创建爱蜜莉雅场上冰晶(施法者, "Q", 最近X, 最近Y, 爱蜜莉雅Q配置.终点冰晶持续秒);
       void 弹幕ID;
     },

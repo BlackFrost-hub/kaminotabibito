@@ -8380,16 +8380,6 @@ ____exports["总单位配置表"] = {
         modelScale = 2,
         unit = "n03Y"
     },
-    n040 = {
-        _parent = "nwiz",
-        Name = "亡灵法师-安格斯",
-        file = "units\\undead\\Necromancer\\Necromancer.mdl",
-        abilList = "Asid,Aneu,Apit",
-        atkType1 = "magic",
-        race = "human",
-        modelScale = 2.2,
-        unit = "n040"
-    },
     n041 = {
         _parent = "nbal",
         Name = "亡灵骷髅",

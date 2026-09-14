@@ -2,10 +2,43 @@ local ____lualib = require("lualib_bundle")
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local ____exports = {}
+local normalizeModuleName, padTimePart, getDebugTimePrefix, _print, _____5F53_524D_8C03_8BD5_6E38_620F_65F6_95F4_79D2
+function normalizeModuleName(module)
+    if module == nil or module == "" then
+        return "未标记模块"
+    end
+    return tostring(module)
+end
+function padTimePart(value, width)
+    local text = tostring(value)
+    while #text < width do
+        text = "0" .. text
+    end
+    return text
+end
+function getDebugTimePrefix()
+    local elapsed = _____5F53_524D_8C03_8BD5_6E38_620F_65F6_95F4_79D2
+    local totalMs = math.floor(elapsed * 1000 + 0.5)
+    local totalSeconds = math.floor(totalMs / 1000)
+    local milliseconds = totalMs - totalSeconds * 1000
+    local minutes = math.floor(totalSeconds / 60)
+    local seconds = totalSeconds - minutes * 60
+    local hours = math.floor(minutes / 60)
+    local displayMinutes = minutes - hours * 60
+    return ((((((("[" .. padTimePart(hours, 2)) .. ":") .. padTimePart(displayMinutes, 2)) .. ":") .. padTimePart(seconds, 2)) .. ".") .. padTimePart(milliseconds, 3)) .. "]"
+end
+function ____exports.debugLogForce(module, ...)
+    local moduleName = normalizeModuleName(module)
+    if not _print then
+        return
+    end
+    local prefix = ((getDebugTimePrefix() .. "[") .. moduleName) .. "] "
+    _print(prefix, ...)
+end
 ---
 -- @noSelfInFile
 local jass = require("jass.common")
-local _print = _G.print
+_print = _G.print
 local _pcall = pcall
 local _xpcall = _G.xpcall
 local _luaDebug = _G.debug
@@ -25,43 +58,17 @@ end
 local _getInfo = ____temp_1
 local DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer
 local Player = jass.Player
-local DEBUG_FLAGS = {}
 local _____8FD0_884C_65F6_9519_8BEF_63D0_793A_73A9_5BB6_6570 = 12
 local _____8FD0_884C_65F6_9519_8BEF_63D0_793A_6301_7EED_65F6_95F4 = 20
 local _____8FD0_884C_65F6_9519_8BEF_5C4F_5E55_6700_5927_884C_6570 = 6
 local _____8FD0_884C_65F6_9519_8BEF_5C4F_5E55_6700_5927_5B57_7B26_6570 = 900
 local _____5F53_524D_8FD0_884C_65F6_9519_8BEF_5806_6808_6808 = {}
-local _____5F53_524D_8C03_8BD5_6E38_620F_65F6_95F4_79D2 = 0
+_____5F53_524D_8C03_8BD5_6E38_620F_65F6_95F4_79D2 = 0
 local function toMessagePart(value)
     if value == nil then
         return "nil"
     end
     return tostring(value)
-end
-local function normalizeModuleName(module)
-    if module == nil or module == "" then
-        return "未标记模块"
-    end
-    return tostring(module)
-end
-local function padTimePart(value, width)
-    local text = tostring(value)
-    while #text < width do
-        text = "0" .. text
-    end
-    return text
-end
---- 由中心计时器在既有同步 tick 中更新；日志读取时不创建计时器或异步回调。
-local function getDebugTimePrefix()
-    local elapsed = _____5F53_524D_8C03_8BD5_6E38_620F_65F6_95F4_79D2
-    local totalMs = math.floor(elapsed * 1000 + 0.5)
-    local totalSeconds = math.floor(totalMs / 1000)
-    local milliseconds = totalMs - totalSeconds * 1000
-    local minutes = math.floor(totalSeconds / 60)
-    local seconds = totalSeconds - minutes * 60
-    local hours = math.floor(minutes / 60)
-    local displayMinutes = minutes - hours * 60
-    return ((((((("[" .. padTimePart(hours, 2)) .. ":") .. padTimePart(displayMinutes, 2)) .. ":") .. padTimePart(seconds, 2)) .. ".") .. padTimePart(milliseconds, 3)) .. "]"
 end
 function ____exports.setDebugGameTime(elapsedSeconds)
     if type(elapsedSeconds) == "number" and elapsedSeconds >= 0 then
@@ -128,30 +135,9 @@ local function limitRuntimeErrorText(text)
     end
     return result
 end
-function ____exports.setDebug(module, on)
-    DEBUG_FLAGS[normalizeModuleName(module)] = on
-end
-function ____exports.isDebug(module)
-    return DEBUG_FLAGS[normalizeModuleName(module)] == true
-end
+--- 默认输出，与 debugLogForce 行为一致；开关由 main.ts 的 print 总开关统一控制。
 function ____exports.debugLog(module, ...)
-    local moduleName = normalizeModuleName(module)
-    if not ____exports.isDebug(moduleName) then
-        return
-    end
-    if not _print then
-        return
-    end
-    local prefix = ((getDebugTimePrefix() .. "[") .. moduleName) .. "] "
-    _print(prefix, ...)
-end
-function ____exports.debugLogForce(module, ...)
-    local moduleName = normalizeModuleName(module)
-    if not _print then
-        return
-    end
-    local prefix = ((getDebugTimePrefix() .. "[") .. moduleName) .. "] "
-    _print(prefix, ...)
+    ____exports.debugLogForce(module, ...)
 end
 function ____exports.reportRuntimeError(module, ____error, ...)
     local details = {...}

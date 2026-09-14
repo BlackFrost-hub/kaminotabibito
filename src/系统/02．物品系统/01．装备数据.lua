@@ -614,7 +614,7 @@ ____exports.items.I01H = {
 ____exports.items.I01J = {
     type = "头盔",
     name = "|cff993366祭祀面具（唯一）|r",
-    ["死亡掉落"] = true,
+    ["惩罚死亡丢弃"] = true,
     goldPrice = 5000,
     score = 1450,
     level = "D",
@@ -1936,7 +1936,7 @@ ____exports.items.I0FL = {type = "神符", name = "盗贼神符（魔抗）", go
 ____exports.items.I01I = {
     type = "灵魂",
     name = "邪恶之心（死亡掉落）",
-    ["死亡掉落"] = true,
+    ["惩罚死亡丢弃"] = true,
     goldPrice = 1000,
     level = "D",
     dmg = 40,
@@ -3628,7 +3628,13 @@ ____exports.items.I0CQ = {type = "任务", name = "|cffcc99ff暗狱之书|r", go
 ____exports.items.I0CS = {type = "材料", name = "有毒杂草", goldPrice = 150}
 ____exports.items.I0CT = {type = "任务", name = "|cff99ccff驱散灵树邪气|r（|cffff000015级精英战斗|r）", goldPrice = 0, int = 1}
 ____exports.items.I0CW = {type = "任务", name = "领取技能", goldPrice = 2000}
-____exports.items.I0CX = {type = "任务", name = "领悟暗之力", goldPrice = 2000, PowerUP = "2all"}
+____exports.items.I0CX = {
+    type = "任务",
+    name = "领悟暗之力",
+    goldPrice = 2000,
+    PowerUP = "2all",
+    abilList = "A0LH"
+}
 ____exports.items.I0CY = {type = "材料", name = "荧光草", goldPrice = 0}
 ____exports.items.I0D3 = {
     type = "主武器",

@@ -36,7 +36,6 @@ const DisplayTimedTextToPlayer = jass.DisplayTimedTextToPlayer as (
 ) => void;
 const Player = jass.Player as (index: number) => any;
 
-const DEBUG_FLAGS: Record<string, boolean> = {};
 const 运行时错误提示玩家数 = 12;
 const 运行时错误提示持续时间 = 20;
 const 运行时错误屏幕最大行数 = 6;
@@ -131,20 +130,9 @@ function limitRuntimeErrorText(text: string): string {
   return result;
 }
 
-export function setDebug(module: string, on: boolean): void {
-  DEBUG_FLAGS[normalizeModuleName(module)] = on;
-}
-
-export function isDebug(module: string): boolean {
-  return DEBUG_FLAGS[normalizeModuleName(module)] === true;
-}
-
+/** 默认输出，与 debugLogForce 行为一致；开关由 main.ts 的 print 总开关统一控制。 */
 export function debugLog(module: string, ...args: any[]): void {
-  const moduleName = normalizeModuleName(module);
-  if (!isDebug(moduleName)) return;
-  if (!_print) return;
-  const prefix = getDebugTimePrefix() + "[" + moduleName + "] ";
-  _print(prefix, ...args);
+  debugLogForce(module, ...args);
 }
 
 export function debugLogForce(module: string, ...args: any[]): void {

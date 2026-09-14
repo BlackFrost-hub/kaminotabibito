@@ -88,9 +88,20 @@ export function hasPlayerCompletedQuest(playerId: number, questId: string): bool
 
 export function 读取任务目标进度(this: void, playerId: number, questId: string): { 当前: number; 需求: number } | null {
   const globalData = (questDB as any).globalData;
-  const activeQuest = globalData != null ? globalData.quests.get(questId) : null;
+  const normalizedQuestId = String(questId);
+  let activeQuest = globalData != null ? globalData.quests.get(normalizedQuestId) : null;
+  if (activeQuest == null && globalData != null) activeQuest = globalData.quests.get(Number(normalizedQuestId));
   if (activeQuest == null || activeQuest.objectives == null || activeQuest.objectives.length === 0) return null;
-  const objective = activeQuest.objectives[0];
+  // ⚠️ activeQuest 来自 (questDB as any).globalData，是 any 类型：生成 Lua 不会把 objectives[0] 做 0→1 转换，
+  // 而 Lua 数组是 1 起，写 [0] 永远取到 nil（防守/调查任务因此恒判「未完成」）。
+  // 改为迭代取第一个非空目标——索引无关，与 isKillQuestObjectiveCompleted 同款写法。
+  let objective: any = null;
+  for (const 候选 of activeQuest.objectives) {
+    if (候选 != null) {
+      objective = 候选;
+      break;
+    }
+  }
   if (objective == null) return null;
   return { 当前: objective.current, 需求: objective.required };
 }

@@ -12,7 +12,7 @@ local _____521B_5EFA_7269_54C1_5E76_6CE8_518C_6392_6CC4_76D1_542C = ____require_
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
 local _____603B_6389_843D_5224_5B9A_5206_6BCD = 10000
-local _____603B_6389_843D_547D_4E2D_503C = 100
+local _____603B_6389_843D_547D_4E2D_503C = 150
 local _____5DF2_521D_59CB_5316_666E_901A_5C0F_602A_989D_5916_6389_843D = false
 local function ____on_666E_901A_5C0F_602A_6B7B_4EA1_5C1D_8BD5_989D_5916_6389_843D(_____6B7B_4EA1_5355_4F4D, ______51FB_6740_8005)
     if _____6B7B_4EA1_5355_4F4D == nil or _____6B7B_4EA1_5355_4F4D == 0 then

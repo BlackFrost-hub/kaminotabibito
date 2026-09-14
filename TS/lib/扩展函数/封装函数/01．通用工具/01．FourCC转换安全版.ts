@@ -26,7 +26,10 @@ export function stringToFourCCSafe(this: void, s: string | undefined | null): nu
 /**
  * 将 FourCC 数值转换为 4 字符字符串。
  */
-export function fourCCToStringSafe(this: void, fourcc: number): string {
+export function fourCCToStringSafe(this: void, fourcc: number | undefined | null): string {
+  if (fourcc == null || fourcc === 0) return "";
+  fourcc = Number(fourcc);
+  if (isNaN(fourcc)) return "";
   const c1 = stringChar(fourcc % 256);
   const c2 = stringChar(R2I(fourcc / 256) % 256);
   const c3 = stringChar(R2I(fourcc / 65536) % 256);

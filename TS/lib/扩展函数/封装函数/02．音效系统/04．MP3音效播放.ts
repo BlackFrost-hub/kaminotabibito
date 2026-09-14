@@ -14,11 +14,9 @@ const { addPeriodicCallback, removePeriodicCallback, getServerTime } = require("
 import { SoundModel } from "./01．声音模型";
 import { createSoundInternal, getSoundInternal, getDefaultSoundModel, KEY_COUNT, KEY_INDEX, KEY_ENABLED_SLOT_BASE, POOL_MAX, hash } from "./02．音效池";
 
-const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
+const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
-  setDebug: (module: string, on: boolean) => void;
 };
-setDebug("Sound3DII", false);
 
 // 导入最后播放的音效变量
 import { lastPlayedSound } from "./03．3D音效播放";

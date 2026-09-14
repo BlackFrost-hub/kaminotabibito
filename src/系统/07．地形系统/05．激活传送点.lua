@@ -5,7 +5,7 @@ local __TS__ParseFloat = ____lualib.__TS__ParseFloat
 local __TS__StringSubstring = ____lualib.__TS__StringSubstring
 local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
-local neutralPassivePlayer, dbg, resolveGgUnitByKey, parseCoord, resolveWatchUnit, runActivationEffects, onActivationPointEnter, registerOnePoint, initActivationPointsInternal, jass, g, _____83B7_53D6_77E9_5F62_533A_57DF, stringToFourCC, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, Sound3DII_Mp3PlayReuse, unitSpecificEventCenter, ACTIVATION_SOUND, activationPointTriggerKeyByHid, activationPointTriggerFiredByKey, activationPointTriggerWatchUnitByKey, activationPointTriggerHandleByKey, activationPointTriggerUnregisterByKey, ACTIVATION_RANGE
+local neutralPassivePlayer, resolveGgUnitByKey, parseCoord, resolveWatchUnit, runActivationEffects, onActivationPointEnter, registerOnePoint, initActivationPointsInternal, jass, g, _____83B7_53D6_77E9_5F62_533A_57DF, stringToFourCC, _____662F_73A9_5BB6_82F1_96C4_7EC4_5355_4F4D, Sound3DII_Mp3PlayReuse, unitSpecificEventCenter, ACTIVATION_SOUND, activationPointTriggerKeyByHid, activationPointTriggerFiredByKey, activationPointTriggerWatchUnitByKey, activationPointTriggerHandleByKey, activationPointTriggerUnregisterByKey, ACTIVATION_RANGE
 local ____04_FF0E_6FC0_6D3B_4F20_9001_70B9_914D_7F6E = require("系统.07．地形系统.04．激活传送点配置")
 local _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E = ____04_FF0E_6FC0_6D3B_4F20_9001_70B9_914D_7F6E.default
 function neutralPassivePlayer()
@@ -17,8 +17,6 @@ function neutralPassivePlayer()
     end
     local pid = ____temp_6
     return jass.Player(pid)
-end
-function dbg(_msg)
 end
 function resolveGgUnitByKey(unitKey)
     local gg = g
@@ -183,7 +181,6 @@ end
 function registerOnePoint(cfg, key)
     local watchUnit = resolveWatchUnit(cfg)
     if watchUnit == nil or watchUnit == 0 then
-        dbg("跳过：无有效监视单位 " .. key)
         return
     end
     local trig = jass.CreateTrigger()
@@ -202,19 +199,16 @@ function registerOnePoint(cfg, key)
     jass.TriggerAddAction(trig, onActivationPointEnter)
 end
 function initActivationPointsInternal()
-    local count = 0
     for key in pairs(_____6FC0_6D3B_4F20_9001_70B9_914D_7F6E) do
         do
             local cfg = _____6FC0_6D3B_4F20_9001_70B9_914D_7F6E[key]
             if not cfg or cfg.enabled == false then
-                goto __continue52
+                goto __continue40
             end
             registerOnePoint(cfg, key)
-            count = count + 1
         end
-        ::__continue52::
+        ::__continue40::
     end
-    dbg("已注册激活传送点(接近检测): " .. tostring(count))
 end
 jass = require("jass.common")
 g = require("jass.globals")
@@ -230,7 +224,6 @@ local ____require_result_4 = require("lib.扩展函数.封装函数.02．音效�
 Sound3DII_Mp3PlayReuse = ____require_result_4.Sound3DII_Mp3PlayReuse
 local ____require_result_5 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLog = ____require_result_5.debugLog
-local setDebug = ____require_result_5.setDebug
 unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心")
 ACTIVATION_SOUND = "Sound\\Interface\\SecretFound.wav"
 activationPointTriggerKeyByHid = {}
@@ -238,85 +231,12 @@ activationPointTriggerFiredByKey = {}
 activationPointTriggerWatchUnitByKey = {}
 activationPointTriggerHandleByKey = {}
 activationPointTriggerUnregisterByKey = {}
---- 设为 true：开局 0s / 1s 各打一行，对比 g / jass.common / globalThis 上 `gg_unit_htow_0030`。
--- 若三处长期全 nil/0：先在编辑器保存地图（生成 war3map 里 gg_unit_*），再打包/runmap；否则 Lua 读不到预置单位。
-local DEBUG_GG_UNIT_HTOW_0030 = false
-setDebug(nil, "激活传送点", DEBUG_GG_UNIT_HTOW_0030)
-local DEBUG_GG_UNIT_HTOW_KEY = "gg_unit_htow_0030"
 ACTIVATION_RANGE = 300
-local function formatGgUnitProbe(u)
-    if u == nil or u == 0 then
-        return "nil/0"
-    end
-    local tail = ""
-    tail = " typeId=" .. tostring(jass.GetUnitTypeId(u))
-    if jass.UNIT_STATE_LIFE ~= nil then
-        tail = (tail .. " life=") .. tostring(jass.GetUnitState(u, jass.UNIT_STATE_LIFE))
-    end
-    return "ok" .. tail
-end
-local function onDebugSnapshot0sDelayed()
-    local gAny = g
-    local jc = jass
-    local G = _G
-    local key = DEBUG_GG_UNIT_HTOW_KEY
-    local vg = gAny[key]
-    local vj = jc[key]
-    local vG = G[key]
-    local msg = (((((((("[激活传送点调试] " .. "0s") .. " ") .. key) .. " | g=") .. formatGgUnitProbe(vg)) .. " | jass.common=") .. formatGgUnitProbe(vj)) .. " | globalThis=") .. formatGgUnitProbe(vG)
-    do
-        local pi = 0
-        while pi < 4 do
-            jass.DisplayTimedTextToPlayer(
-                jass.Player(pi),
-                0,
-                0,
-                14,
-                msg
-            )
-            pi = pi + 1
-        end
-    end
-    debugLog(nil, "激活传送点", msg)
-end
-local function onDebugSnapshot1sDelayed()
-    local gAny = g
-    local jc = jass
-    local G = _G
-    local key = DEBUG_GG_UNIT_HTOW_KEY
-    local vg = gAny[key]
-    local vj = jc[key]
-    local vG = G[key]
-    local msg = (((((((("[激活传送点调试] " .. "1s") .. " ") .. key) .. " | g=") .. formatGgUnitProbe(vg)) .. " | jass.common=") .. formatGgUnitProbe(vj)) .. " | globalThis=") .. formatGgUnitProbe(vG)
-    do
-        local pi = 0
-        while pi < 4 do
-            jass.DisplayTimedTextToPlayer(
-                jass.Player(pi),
-                0,
-                0,
-                14,
-                msg
-            )
-            pi = pi + 1
-        end
-    end
-    debugLog(nil, "激活传送点", msg)
-end
 local function onInitActivationPointsDelayed()
     initActivationPointsInternal()
 end
---- 开局 0s、1s 各一行：对比三处来源（用于排查间歇 nil）
-local function scheduleDebugGgUnitHtow0030()
-    if not DEBUG_GG_UNIT_HTOW_0030 then
-        return
-    end
-    addDelayedCallback(0, onDebugSnapshot0sDelayed)
-    addDelayedCallback(1000, onDebugSnapshot1sDelayed)
-end
 --- 在地图初始化时调用（建议用 0.00 秒计时器）
 ____exports["init激活传送点"] = function()
-    scheduleDebugGgUnitHtow0030()
     addDelayedCallback(0, onInitActivationPointsDelayed)
 end
 return ____exports

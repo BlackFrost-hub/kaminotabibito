@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { 祭祀面具配置, 获得物品装备ID } from "../07．获得物品/00．公共/00．获得物品配置表";
+import { 祭祀面具配置, 获得物品装备ID, 登记并丢弃惩罚装备 } from "../07．获得物品/00．公共/00．获得物品配置表";
 
 const { 注册持有型周期效果 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.02．持有型周期效果") as {
   注册持有型周期效果: (this: void, params: {
@@ -28,6 +28,7 @@ function on祭祀面具周期(this: void, unit: any): void {
   减少魔法值(unit, amount, true, false);
   if (!单位存活(unit)) return;
   if (取最大魔法(unit) < 祭祀面具配置.死亡最小最大魔法 || 取当前魔法(unit) < 祭祀面具配置.死亡最小当前魔法) {
+    登记并丢弃惩罚装备(unit);
     KillUnit(unit);
     DisplayTimedTextToPlayer(GetOwningPlayer(unit), 0, 0, 20, 祭祀面具配置.死亡提示);
   }

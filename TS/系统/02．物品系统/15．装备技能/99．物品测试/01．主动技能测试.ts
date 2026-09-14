@@ -274,31 +274,32 @@ function on聊天挂载减速测试(this: void, player: any, _command: string): 
   debugLogForce(模块名, "已给测试英雄施加减速Buff", "持续秒数", 12, "减速比例", 0.5);
 }
 
+function 发放全部精灵药水(this: void, unit: any): void {
+  if (unit == null || unit === 0) return;
+  let 创建数量 = 0;
+  const x = GetUnitX(unit);
+  const y = GetUnitY(unit);
+  for (let i = 0; i < 精灵药水测试装备列表.length; i++) {
+    const 装备名 = 精灵药水测试装备列表[i];
+    const rawId = 按名字反查物品ID(装备名);
+    const itemTypeId = stringToFourCCSafe(rawId);
+    if (itemTypeId === 0) {
+      debugLogForce(模块名, "未找到精灵药水ID", 装备名);
+      continue;
+    }
+    const item = CreateItem(itemTypeId, x, y);
+    if (item == null || item === 0) {
+      debugLogForce(模块名, "创建精灵药水失败", 装备名, rawId, itemTypeId);
+      continue;
+    }
+    给予单位物品(unit, item);
+    创建数量 += 1;
+  }
+  debugLogForce(模块名, "已发放全部精灵药水", "创建数量", 创建数量);
+}
+
 function 发放单个装备(this: void, unit: any, 序号: number): void {
   丢弃测试装备(unit);
-  if (序号 === 192) {
-    let 创建数量 = 0;
-    const x = GetUnitX(unit);
-    const y = GetUnitY(unit);
-    for (let i = 0; i < 精灵药水测试装备列表.length; i++) {
-      const 装备名 = 精灵药水测试装备列表[i];
-      const rawId = 按名字反查物品ID(装备名);
-      const itemTypeId = stringToFourCCSafe(rawId);
-      if (itemTypeId === 0) {
-        debugLogForce(模块名, "未找到精灵药水ID", 装备名);
-        continue;
-      }
-      const item = CreateItem(itemTypeId, x, y);
-      if (item == null || item === 0) {
-        debugLogForce(模块名, "创建精灵药水失败", 装备名, rawId, itemTypeId);
-        continue;
-      }
-      给予单位物品(unit, item);
-      创建数量 += 1;
-    }
-    debugLogForce(模块名, "已发放全部精灵药水", "创建数量", 创建数量);
-    return;
-  }
   if (序号 > 0 && 序号 <= 物品主动技能测试发放顺序.length) {
     const 装备名 = 物品主动技能测试发放顺序[序号 - 1];
     if (发放装备(unit, 装备名)) {
@@ -317,7 +318,7 @@ function on聊天wp测试(this: void, player: any, command: string): void {
   }
 
   if (command === 精灵药水套装测试命令) {
-    发放单个装备(unit, 192);
+    发放全部精灵药水(unit);
     return;
   }
 

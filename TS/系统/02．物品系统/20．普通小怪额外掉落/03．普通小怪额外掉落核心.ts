@@ -16,7 +16,7 @@ const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通�
 };
 
 const 总掉落判定分母 = 10000;
-const 总掉落命中值 = 100;
+const 总掉落命中值 = 150;
 let 已初始化普通小怪额外掉落 = false;
 
 function on普通小怪死亡尝试额外掉落(this: void, 死亡单位: any, _击杀者: any): void {
@@ -24,6 +24,7 @@ function on普通小怪死亡尝试额外掉落(this: void, 死亡单位: any, _
 
   const 资格 = 获取普通小怪额外掉落资格(jass.GetUnitTypeId(死亡单位) as number);
   if (资格 == null) return;
+
   if ((jass.GetRandomInt(1, 总掉落判定分母) as number) > 总掉落命中值) return;
 
   const 章节装备池 = 获取章节普通小怪额外装备池(资格.章节);
@@ -52,4 +53,3 @@ export function 初始化普通小怪额外掉落(this: void): void {
 }
 
 初始化普通小怪额外掉落();
-

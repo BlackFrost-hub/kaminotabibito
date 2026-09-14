@@ -15,15 +15,11 @@ local ____01_FF0E_82F1_96C4_6280_80FD_558A_8BDD = require("系统.09．表现系
 local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____01_FF0E_82F1_96C4_6280_80FD_558A_8BDD["播放英雄技能喊话"]
 local jass = require("jass.common")
 local ____require_result_0 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
-local stringToFourCC = ____require_result_0.stringToFourCCSafe
-local fourCCToStringSafe = ____require_result_0.fourCCToStringSafe
+local stringToFourCCSafe = ____require_result_0.stringToFourCCSafe
 local GetHandleId = jass.GetHandleId
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
 local GetUnitFacing = jass.GetUnitFacing
-local GetUnitName = jass.GetUnitName
-local GetOwningPlayer = jass.GetOwningPlayer
-local GetPlayerId = jass.GetPlayerId
 local ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL
 local DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
 local WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS
@@ -44,14 +40,12 @@ local ____require_result_6 = require("系统.03．技能系统.00．技能模板
 local _____53D1_5C04_5F39_9053 = ____require_result_6["发射弹道"]
 local platformAbilityApi = require("平台扩展API取值")
 local platformAbilityAction = require("平台扩展API动作")
-local ____require_result_7 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_7.debugLogForce
-local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
-local ____Q_6280_80FDID = stringToFourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.Q["技能ID"])
-local ____W_6280_80FDID = stringToFourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.W["技能ID"])
-local ____E_6280_80FDID = stringToFourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.E["技能ID"])
-local ____R_6280_80FDID = stringToFourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.R["技能ID"])
-local ____D_6280_80FDID = stringToFourCC(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.D["技能ID"])
+local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
+local ____Q_6280_80FDID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.Q["技能ID"])
+local ____W_6280_80FDID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.W["技能ID"])
+local ____E_6280_80FDID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.E["技能ID"])
+local ____R_6280_80FDID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.R["技能ID"])
+local ____D_6280_80FDID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.D["技能ID"])
 --- 爱蜜莉雅区域目标计数表：目标句柄 → 覆盖区域数（W/R 区域进入/离开维护）
 local _____533A_57DF_76EE_6807_8BA1_6570_8868 = {}
 --- W/R 区域进入时调用（目标进入冰花/领域判定）
@@ -190,25 +184,25 @@ local function _____5904_7406_7231_871C_8389_96C5_9020_6210_4F24_5BB3(target, at
     if attacker == nil or attacker == 0 or not _____662F_7231_871C_8389_96C5(attacker) then
         return
     end
-    local ____opt_result_10
+    local ____opt_result_9
     if snapshot ~= nil then
-        ____opt_result_10 = snapshot.isNormalAttack
+        ____opt_result_9 = snapshot.isNormalAttack
     end
-    if ____opt_result_10 ~= true then
+    if ____opt_result_9 ~= true then
         return
     end
-    local ____opt_result_13
+    local ____opt_result_12
     if snapshot ~= nil then
-        ____opt_result_13 = snapshot.isWrappedSkillDamage
+        ____opt_result_12 = snapshot.isWrappedSkillDamage
     end
-    if ____opt_result_13 == true then
+    if ____opt_result_12 == true then
         return
     end
-    local ____opt_result_16
+    local ____opt_result_15
     if snapshot ~= nil then
-        ____opt_result_16 = snapshot.originalAttacker
+        ____opt_result_15 = snapshot.originalAttacker
     end
-    if ____opt_result_16 ~= nil and snapshot.originalAttacker ~= attacker then
+    if ____opt_result_15 ~= nil and snapshot.originalAttacker ~= attacker then
         return
     end
     if target == nil or target == 0 then
@@ -220,21 +214,6 @@ local function _____5904_7406_7231_871C_8389_96C5_9020_6210_4F24_5BB3(target, at
     local _____5F53_524D_5C42_6570 = _____83B7_53D6_5355_4F4DBuff_5C42_6570(attacker, _____7231_871C_8389_96C5BuffID["契约应和"])
     local _____65B0_5C42_6570 = _____5F53_524D_5C42_6570 + 1
     if _____65B0_5C42_6570 >= _____7231_871C_8389_96C5_666E_653B_914D_7F6E["契约应和上限"] then
-        debugLogForce(
-            "爱蜜莉雅-普攻联动",
-            "状态",
-            "第3次有效普攻触发帕克追击",
-            "玩家",
-            GetPlayerId(GetOwningPlayer(attacker)) + 1,
-            "目标",
-            GetUnitName(target),
-            "handle",
-            target,
-            "X",
-            math.floor(GetUnitX(target)),
-            "Y",
-            math.floor(GetUnitY(target))
-        )
         _____79FB_9664_5355_4F4D_6307_5B9ABuff(attacker, _____7231_871C_8389_96C5BuffID["契约应和"])
         if _____53D1_5C04_5E15_514B_8FFD_51FB_51B0_5F39(attacker, target) then
             _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(attacker, "爱蜜莉雅", "AEP1")

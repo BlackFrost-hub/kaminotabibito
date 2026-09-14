@@ -2,7 +2,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__StringSplit = ____lualib.__TS__StringSplit
 local __TS__ArraySplice = ____lualib.__TS__ArraySplice
 local ____exports = {}
-local ____W_53D6_5B9E_65F6_533A_57DF_654C_4EBA, ____W_533A_57DF_5185_76EE_6807_7ED3_7B97, _____65BD_52A0W_5BD2_610F, _____4E8C_6BB5_5F15_7206W, jass, fourCCToStringSafe, GetOwningPlayer, GetPlayerId, DAMAGE_TYPE_COLD, _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3, _____53D1_5C04_5F39_9053, Sound3DII_CooPlayReuse, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____4E24_70B9_89D2_5EA6, _____5355_4F4D_5B58_6D3B, _____786E_8BA4_9650_65F6_4E8C_6BB5_6280_80FD_58F3, _____521B_5EFA_7231_871C_8389_96C5_573A_4E0A_51B0_6676, _____6D88_8D39_7231_871C_8389_96C5D_5F3A_5316, debugLogForce, ____W_6280_80FD_7C7B_578BID, _____65BD_52A0_7231_871C_8389_96C5_5BD2_610F
+local ____W_53D6_5B9E_65F6_533A_57DF_654C_4EBA, ____W_533A_57DF_5185_76EE_6807_7ED3_7B97, _____65BD_52A0W_5BD2_610F, _____4E8C_6BB5_5F15_7206W, jass, DAMAGE_TYPE_COLD, _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3, _____53D1_5C04_5F39_9053, Sound3DII_CooPlayReuse, _____8BFB_53D6_5355_4F4D_653B_51FB_529B, _____4E24_70B9_89D2_5EA6, _____5355_4F4D_5B58_6D3B, _____786E_8BA4_9650_65F6_4E8C_6BB5_6280_80FD_58F3, _____521B_5EFA_7231_871C_8389_96C5_573A_4E0A_51B0_6676, _____6D88_8D39_7231_871C_8389_96C5D_5F3A_5316, ____W_6280_80FD_7C7B_578BID, _____65BD_52A0_7231_871C_8389_96C5_5BD2_610F
 local ____00_FF0E_914D_7F6E = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.00．配置")
 local _____7231_871C_8389_96C5_6280_80FD_914D_7F6E = ____00_FF0E_914D_7F6E["爱蜜莉雅技能配置"]
 local _____7231_871C_8389_96C5W_914D_7F6E = ____00_FF0E_914D_7F6E["爱蜜莉雅W配置"]
@@ -63,22 +63,6 @@ function ____W_533A_57DF_5185_76EE_6807_7ED3_7B97(_____65BD_6CD5_8005, _____533A
             i = i + 1
         end
     end
-    debugLogForce(
-        "爱蜜莉雅-W",
-        "伤害",
-        "标签",
-        "爱蜜莉雅-W冰花",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____W_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "目标数",
-        #_____76EE_6807_5217_8868,
-        "数值",
-        _____4F24_5BB3_503C
-    )
     _____9020_6210_6279_91CFAOE_6280_80FD_4F24_5BB3({
         ["来源"] = _____65BD_6CD5_8005,
         ["目标列表"] = _____76EE_6807_5217_8868,
@@ -112,25 +96,6 @@ function _____4E8C_6BB5_5F15_7206W(_____65BD_6CD5_8005, _____63A7_5236_5668, ___
     if _____6570_636E == nil or _____6570_636E["已二段"] then
         return
     end
-    debugLogForce(
-        "爱蜜莉雅-W",
-        "状态",
-        "二段引爆",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____W_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "X",
-        math.floor(_____6570_636E["目标X"]),
-        "Y",
-        math.floor(_____6570_636E["目标Y"]),
-        "瞄准X",
-        math.floor(_____7784_51C6X),
-        "瞄准Y",
-        math.floor(_____7784_51C6Y)
-    )
     _____6570_636E["已二段"] = true
     local _____65B9_5411 = _____4E24_70B9_89D2_5EA6(_____6570_636E["目标X"], _____6570_636E["目标Y"], _____7784_51C6X, _____7784_51C6Y)
     local _____4F24_5BB3 = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005) * _____7231_871C_8389_96C5W_914D_7F6E["二段伤害攻击力倍率"]
@@ -195,8 +160,8 @@ function _____4E8C_6BB5_5F15_7206W(_____65BD_6CD5_8005, _____63A7_5236_5668, ___
         end
     end
     if _____6570_636E["区域"] ~= nil then
-        local ____self_17 = _____6570_636E["区域"]
-        ____self_17["销毁"](____self_17)
+        local ____self_16 = _____6570_636E["区域"]
+        ____self_16["销毁"](____self_16)
         _____6570_636E["区域"] = nil
     end
     _____63A7_5236_5668["完成"](_____63A7_5236_5668)
@@ -206,12 +171,9 @@ local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播�
 jass = require("jass.common")
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-fourCCToStringSafe = ____require_result_1.fourCCToStringSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitName = jass.GetUnitName
-GetOwningPlayer = jass.GetOwningPlayer
-GetPlayerId = jass.GetPlayerId
+local GetOwningPlayer = jass.GetOwningPlayer
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD
@@ -244,8 +206,6 @@ local ____require_result_12 = require("系统.03．技能系统.05．单位技�
 _____521B_5EFA_7231_871C_8389_96C5_573A_4E0A_51B0_6676 = ____require_result_12["创建爱蜜莉雅场上冰晶"]
 local ____require_result_13 = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.02．公共状态与冰晶")
 _____6D88_8D39_7231_871C_8389_96C5D_5F3A_5316 = ____require_result_13["消费爱蜜莉雅D强化"]
-local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-debugLogForce = ____require_result_14.debugLogForce
 local ____W_4E8C_6BB5_540C_6B65_524D_7F00 = "EMW2"
 local GetLocalPlayer = jass.GetLocalPlayer
 local R2S = jass.R2S
@@ -254,11 +214,11 @@ local TriggerAddAction = jass.TriggerAddAction
 local japiAny = require("jass.japi")
 local DzGetMouseTerrainX = japiAny.DzGetMouseTerrainX
 local DzGetMouseTerrainY = japiAny.DzGetMouseTerrainY
-local ____require_result_15 = require("lib.扩展函数.KK扩展API.02．事件注册函数")
-local DzSyncData = ____require_result_15.DzSyncData
-local DzTriggerRegisterSyncDataTrg = ____require_result_15.DzTriggerRegisterSyncDataTrg
-local DzGetTriggerSyncPlayer = ____require_result_15.DzGetTriggerSyncPlayer
-local DzGetTriggerSyncData = ____require_result_15.DzGetTriggerSyncData
+local ____require_result_14 = require("lib.扩展函数.KK扩展API.02．事件注册函数")
+local DzSyncData = ____require_result_14.DzSyncData
+local DzTriggerRegisterSyncDataTrg = ____require_result_14.DzTriggerRegisterSyncDataTrg
+local DzGetTriggerSyncPlayer = ____require_result_14.DzGetTriggerSyncPlayer
+local DzGetTriggerSyncData = ____require_result_14.DzGetTriggerSyncData
 local S2R = jass.S2R
 --- 待引爆队列：施法时各端登记（对称），同步数据到达后按施法者主人匹配消费
 local ____W_4E8C_6BB5_5F85_5F15_7206_5217_8868 = {}
@@ -301,54 +261,18 @@ local function _____6CE8_518CW_4E8C_6BB5_9F20_6807_540C_6B65()
                     i = i + 1
                 end
             end
-            debugLogForce(
-                "爱蜜莉雅-W",
-                "二段同步",
-                "警告",
-                "无匹配的待引爆实例",
-                "玩家",
-                GetPlayerId(player) + 1,
-                "X",
-                _____9F20_6807X,
-                "Y",
-                _____9F20_6807Y
-            )
         end
     )
     DzTriggerRegisterSyncDataTrg(trig, ____W_4E8C_6BB5_540C_6B65_524D_7F00, false)
 end
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 ____W_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.W["技能ID"])
-local ____require_result_16 = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.03．被动效果")
-_____65BD_52A0_7231_871C_8389_96C5_5BD2_610F = ____require_result_16["施加爱蜜莉雅寒意"]
+local ____require_result_15 = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.03．被动效果")
+_____65BD_52A0_7231_871C_8389_96C5_5BD2_610F = ____require_result_15["施加爱蜜莉雅寒意"]
 local function _____91CA_653EW_51B0_82B1(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
-        debugLogForce(
-            "爱蜜莉雅-W",
-            "释放被拒",
-            "原因",
-            "施法者无效",
-            "分支",
-            "冰花"
-        )
         return
     end
-    debugLogForce(
-        "爱蜜莉雅-W",
-        "释放",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____W_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "目标",
-        "点施放",
-        "目标X",
-        math.floor(GetSpellTargetX()),
-        "目标Y",
-        math.floor(GetSpellTargetY())
-    )
     _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C(_____65BD_6CD5_8005, _____7231_871C_8389_96C5_52A8_4F5C_69FD.W)
     local _____6D3B_8DC3_5217_8868 = _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "W冰花")
     do
@@ -390,8 +314,8 @@ local function _____91CA_653EW_51B0_82B1(_context, _____65BD_6CD5_8005, _____628
         ["结束回调"] = function(_____539F_56E0, ______63A7_5236_5668)
             _____6570_636E["结束原因"] = _____539F_56E0
             if _____6570_636E["区域"] ~= nil then
-                local ____self_18 = _____6570_636E["区域"]
-                ____self_18["销毁"](____self_18)
+                local ____self_17 = _____6570_636E["区域"]
+                ____self_17["销毁"](____self_17)
                 _____6570_636E["区域"] = nil
             end
         end
@@ -437,8 +361,8 @@ local function _____91CA_653EW_51B0_82B1(_context, _____65BD_6CD5_8005, _____628
             if _____6570_636E["二段壳"] ~= nil then
                 _____6E05_7406_9650_65F6_4E8C_6BB5_6280_80FD_58F3(_____6570_636E["二段壳"])
             end
-            local ____self_19 = _____533A_57DF["区域效果"]
-            local _____6B8B_7559_5355_4F4D = ____self_19["获取当前区域内单位"](____self_19)
+            local ____self_18 = _____533A_57DF["区域效果"]
+            local _____6B8B_7559_5355_4F4D = ____self_18["获取当前区域内单位"](____self_18)
             do
                 local i = 0
                 while i < #_____6B8B_7559_5355_4F4D do
@@ -504,20 +428,6 @@ local function _____91CA_653EW_51B0_82B1(_context, _____65BD_6CD5_8005, _____628
         ["持续秒"] = _____7231_871C_8389_96C5W_914D_7F6E["持续秒"],
         ["二段说明"] = ("|cffffcc00技能说明：|r从冰花中心向鼠标位置扇形发射冰片并立即引爆。|n" .. "|cffffcc00伤害：|r提前引爆造成攻击力|cff87ceeb120%|r的|cff66ccff冰魔法伤害|r；每枚冰片造成攻击力|cff87ceeb30%|r的|cff66ccff冰魔法伤害|r。|n") .. "|cffffcc00不做任何操作：|r冰花自然结束（伤害降为攻击力|cff87ceeb90%|r），按钮自动恢复。"
     })
-    debugLogForce(
-        "爱蜜莉雅-W",
-        "特效",
-        "类型",
-        "创建",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____W_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "路径",
-        _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰花主体"]["模型路径"]
-    )
     local _____51B0_82B1_7279_6548 = _____521B_5EFA_70B9_7279_6548({
         ["模型路径"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰花主体"]["模型路径"],
         RGB = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["冰花主体"].RGB,
@@ -555,30 +465,8 @@ local function _____91CA_653EW_51B0_82B1(_context, _____65BD_6CD5_8005, _____628
 end
 local function _____91CA_653EW_4E8C_6BB5_8F93_5165(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
-        debugLogForce(
-            "爱蜜莉雅-W",
-            "释放被拒",
-            "原因",
-            "施法者无效",
-            "分支",
-            "二段输入"
-        )
         return
     end
-    debugLogForce(
-        "爱蜜莉雅-W",
-        "释放",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____W_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "目标",
-        "点施放",
-        "分支",
-        "二段输入"
-    )
     local _____6D3B_8DC3_5217_8868 = _____67E5_8BE2_6218_6597_6280_80FD_5B9E_4F8B(_____65BD_6CD5_8005, "W冰花")
     do
         local i = 0

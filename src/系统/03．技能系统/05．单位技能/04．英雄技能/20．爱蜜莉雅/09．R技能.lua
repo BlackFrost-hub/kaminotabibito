@@ -25,12 +25,9 @@ local _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD = ____require_result_0["播�
 local jass = require("jass.common")
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
-local fourCCToStringSafe = ____require_result_1.fourCCToStringSafe
 local GetUnitX = jass.GetUnitX
 local GetUnitY = jass.GetUnitY
-local GetUnitName = jass.GetUnitName
 local GetOwningPlayer = jass.GetOwningPlayer
-local GetPlayerId = jass.GetPlayerId
 local GetSpellTargetX = jass.GetSpellTargetX
 local GetSpellTargetY = jass.GetSpellTargetY
 local AddLightning = jass.AddLightning
@@ -63,8 +60,6 @@ local _____65BD_52A0_7231_871C_8389_96C5_5BD2_610F = ____require_result_12["施�
 local ____require_result_13 = require("系统.03．技能系统.05．单位技能.04．英雄技能.20．爱蜜莉雅.02．公共状态与冰晶")
 local _____83B7_53D6_7231_871C_8389_96C5D_5F3A_5316 = ____require_result_13["获取爱蜜莉雅D强化"]
 local _____6D88_8D39_7231_871C_8389_96C5D_5F3A_5316 = ____require_result_13["消费爱蜜莉雅D强化"]
-local ____require_result_14 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
-local debugLogForce = ____require_result_14.debugLogForce
 local _____82F1_96C4_5355_4F4D_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E["单位类型ID"])
 local ____R_6280_80FD_7C7B_578BID = stringToFourCCSafe(_____7231_871C_8389_96C5_6280_80FD_914D_7F6E.R["技能ID"])
 --- 结束时点实时快照：按中心+半径枚举当前敌人（刚进入结算、已离开不结算）
@@ -147,25 +142,6 @@ local function ____R_6E05_7406_8FDE_63A5_5149(_____6570_636E)
 end
 --- 蓄力完成：创建领域 + 冰晶读取 + D 强化结算（由充能系统 充能完成回调 调用）
 local function ____R_521B_5EFA_9886_57DF(_____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID, _____4E2D_5FC3X, _____4E2D_5FC3Y, _____534A_5F84, _____6700_7EC8_4F24_5BB3, _____6709_5F3A_5316, _____6765_6E90_952E, _____51B0_5C71_7279_6548, _____6E05_7406_51B0_5C71)
-    debugLogForce(
-        "爱蜜莉雅-R",
-        "状态",
-        "创建领域",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____R_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "X",
-        math.floor(_____4E2D_5FC3X),
-        "Y",
-        math.floor(_____4E2D_5FC3Y),
-        "半径",
-        _____534A_5F84,
-        "有强化",
-        _____6709_5F3A_5316
-    )
     if not _____5355_4F4D_5B58_6D3B(_____65BD_6CD5_8005) then
         return false
     end
@@ -188,23 +164,11 @@ local function ____R_521B_5EFA_9886_57DF(_____65BD_6CD5_8005, _____6280_80FD_5B9
         ["技能实例ID"] = _____6280_80FD_5B9E_4F8BID,
         ["数据"] = _____6570_636E,
         ["结束回调"] = function(_____539F_56E0, _c)
-            debugLogForce(
-                "爱蜜莉雅-R",
-                "结束",
-                "玩家",
-                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                "四码",
-                fourCCToStringSafe(____R_6280_80FD_7C7B_578BID),
-                "实例",
-                _____6280_80FD_5B9E_4F8BID or "-",
-                "原因",
-                _____539F_56E0
-            )
             _____6570_636E["结束原因"] = _____539F_56E0
             ____R_6E05_7406_8FDE_63A5_5149(_____6570_636E)
             if _____6570_636E["区域"] ~= nil then
-                local ____self_15 = _____6570_636E["区域"]
-                ____self_15["销毁"](____self_15)
+                local ____self_14 = _____6570_636E["区域"]
+                ____self_14["销毁"](____self_14)
                 _____6570_636E["区域"] = nil
             end
         end
@@ -247,8 +211,8 @@ local function ____R_521B_5EFA_9886_57DF(_____65BD_6CD5_8005, _____6280_80FD_5B9
             )
         end,
         ["on销毁"] = function()
-            local ____self_16 = _____533A_57DF["区域效果"]
-            local _____6B8B_7559_5355_4F4D = ____self_16["获取当前区域内单位"](____self_16)
+            local ____self_15 = _____533A_57DF["区域效果"]
+            local _____6B8B_7559_5355_4F4D = ____self_15["获取当前区域内单位"](____self_15)
             do
                 local i = 0
                 while i < #_____6B8B_7559_5355_4F4D do
@@ -266,26 +230,6 @@ local function ____R_521B_5EFA_9886_57DF(_____65BD_6CD5_8005, _____6280_80FD_5B9
             end
             _____6570_636E["已结束"] = true
             local _____533A_57DF_5185_5355_4F4D = ____R_53D6_5B9E_65F6_533A_57DF_654C_4EBA(_____65BD_6CD5_8005, _____4E2D_5FC3X, _____4E2D_5FC3Y, _____534A_5F84)
-            debugLogForce(
-                "爱蜜莉雅-R",
-                "伤害",
-                "标签",
-                "爱蜜莉雅-R最终冰爆",
-                "玩家",
-                GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                "四码",
-                fourCCToStringSafe(____R_6280_80FD_7C7B_578BID),
-                "实例",
-                _____6280_80FD_5B9E_4F8BID or "-",
-                "X",
-                math.floor(_____4E2D_5FC3X),
-                "Y",
-                math.floor(_____4E2D_5FC3Y),
-                "目标数",
-                #_____533A_57DF_5185_5355_4F4D,
-                "数值",
-                _____6570_636E["最终伤害"]
-            )
             ____R_533A_57DF_5185_7ED3_7B97(_____65BD_6CD5_8005, _____533A_57DF_5185_5355_4F4D, _____6280_80FD_5B9E_4F8BID, _____6570_636E["最终伤害"])
             _____521B_5EFA_70B9_7279_6548({
                 ["模型路径"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["最终冰爆"]["模型路径"],
@@ -380,8 +324,8 @@ local function ____R_521B_5EFA_9886_57DF(_____65BD_6CD5_8005, _____6280_80FD_5B9
                 _____4E2D_5FC3Y
             )
             if _____5149 ~= nil and _____5149 ~= 0 then
-                local ____6570_636E__8FDE_63A5_5149_17 = _____6570_636E["连接光"]
-                ____6570_636E__8FDE_63A5_5149_17[#____6570_636E__8FDE_63A5_5149_17 + 1] = _____5149
+                local ____6570_636E__8FDE_63A5_5149_16 = _____6570_636E["连接光"]
+                ____6570_636E__8FDE_63A5_5149_16[#____6570_636E__8FDE_63A5_5149_16 + 1] = _____5149
             end
             local _____5E8F_53F7 = _____8282_70B9["序号"]
             local _____7206_53D1_5EF6_8FDF = 0.25 + i * 0.2
@@ -437,27 +381,10 @@ local function ____R_521B_5EFA_9886_57DF(_____65BD_6CD5_8005, _____6280_80FD_5B9
 end
 local function _____91CA_653ER_6C38_51BB_4E4B_5EAD(_context, _____65BD_6CD5_8005, _____6280_80FD_5B9E_4F8BID)
     if _____65BD_6CD5_8005 == nil or _____65BD_6CD5_8005 == 0 then
-        debugLogForce("爱蜜莉雅-R", "释放被拒", "原因", "施法者无效")
         return
     end
     local _____4E2D_5FC3X = GetSpellTargetX()
     local _____4E2D_5FC3Y = GetSpellTargetY()
-    debugLogForce(
-        "爱蜜莉雅-R",
-        "释放",
-        "玩家",
-        GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-        "四码",
-        fourCCToStringSafe(____R_6280_80FD_7C7B_578BID),
-        "实例",
-        _____6280_80FD_5B9E_4F8BID or "-",
-        "目标",
-        "点施放",
-        "目标X",
-        math.floor(_____4E2D_5FC3X),
-        "目标Y",
-        math.floor(_____4E2D_5FC3Y)
-    )
     _____64AD_653E_7231_871C_8389_96C5_52A8_4F5C(_____65BD_6CD5_8005, _____7231_871C_8389_96C5_52A8_4F5C_69FD.R)
     local _____653B_51FB_529B = _____8BFB_53D6_5355_4F4D_653B_51FB_529B(_____65BD_6CD5_8005)
     local ____D_72B6_6001 = _____83B7_53D6_7231_871C_8389_96C5D_5F3A_5316(_____65BD_6CD5_8005)
@@ -498,19 +425,6 @@ local function _____91CA_653ER_6C38_51BB_4E4B_5EAD(_context, _____65BD_6CD5_8005
             ["世界坐标进度UI高度偏移"] = _____7231_871C_8389_96C5_8BFB_6761_914D_7F6E["跟随Z偏移"],
             ["显示进度条特效"] = false,
             ["开始回调"] = function(______5355_4F4D, _____5145_80FDID)
-                debugLogForce(
-                    "爱蜜莉雅-R",
-                    "状态",
-                    "蓄力开始",
-                    "玩家",
-                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                    "四码",
-                    fourCCToStringSafe(____R_6280_80FD_7C7B_578BID),
-                    "实例",
-                    _____6280_80FD_5B9E_4F8BID or "-",
-                    "充能ID",
-                    _____5145_80FDID
-                )
                 _____64AD_653E_82F1_96C4_6280_80FD_558A_8BDD(_____65BD_6CD5_8005, "爱蜜莉雅", _____7231_871C_8389_96C5_6280_80FD_914D_7F6E.R["技能ID"])
                 _____6CD5_9635_7279_6548 = _____521B_5EFA_70B9_7279_6548({
                     ["模型路径"] = _____7231_871C_8389_96C5_8868_73B0_914D_7F6E["蓄力法阵"]["模型路径"],
@@ -546,21 +460,6 @@ local function _____91CA_653ER_6C38_51BB_4E4B_5EAD(_context, _____65BD_6CD5_8005
                 )
             end,
             ["结束回调"] = function(______5355_4F4D, _____539F_56E0, _____5145_80FDID)
-                debugLogForce(
-                    "爱蜜莉雅-R",
-                    "状态",
-                    "蓄力结束",
-                    "玩家",
-                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                    "四码",
-                    fourCCToStringSafe(____R_6280_80FD_7C7B_578BID),
-                    "实例",
-                    _____6280_80FD_5B9E_4F8BID or "-",
-                    "充能ID",
-                    _____5145_80FDID,
-                    "原因",
-                    _____539F_56E0
-                )
                 if _____6CD5_9635_7279_6548 ~= nil and _____6CD5_9635_7279_6548 ~= 0 then
                     jass.DestroyEffect(_____6CD5_9635_7279_6548)
                     _____6CD5_9635_7279_6548 = nil
@@ -570,19 +469,6 @@ local function _____91CA_653ER_6C38_51BB_4E4B_5EAD(_context, _____65BD_6CD5_8005
                 end
             end,
             ["充能完成回调"] = function(______5355_4F4D, _____5145_80FDID)
-                debugLogForce(
-                    "爱蜜莉雅-R",
-                    "状态",
-                    "蓄力完成→创建领域",
-                    "玩家",
-                    GetPlayerId(GetOwningPlayer(_____65BD_6CD5_8005)) + 1,
-                    "四码",
-                    fourCCToStringSafe(____R_6280_80FD_7C7B_578BID),
-                    "实例",
-                    _____6280_80FD_5B9E_4F8BID or "-",
-                    "充能ID",
-                    _____5145_80FDID
-                )
                 _____51B0_5C71_5DF2_79FB_4EA4R_5B9E_4F8B = ____R_521B_5EFA_9886_57DF(
                     _____65BD_6CD5_8005,
                     _____6280_80FD_5B9E_4F8BID,

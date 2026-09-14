@@ -1,9 +1,83 @@
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____lualib = require("lualib_bundle")
+local __TS__ArrayIndexOf = ____lualib.__TS__ArrayIndexOf
+local __TS__Delete = ____lualib.__TS__Delete
 local ____exports = {}
 local ____require_result_0 = require("系统.02．物品系统.13．物品名反查")
 local resolveItemIdByName = ____require_result_0.resolveItemIdByName
 local ____require_result_1 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_1.stringToFourCCSafe
+local jass = require("jass.common")
+local _____60E9_7F5A_7269_54C1_767B_8BB0 = {}
+local ____require_result_2 = require("lib.扩展函数.物品相关函数.index")
+local getItemDataEntry = ____require_result_2.getItemDataEntry
+local _____88C5_5907_6570_636E_8868 = require("系统.02．物品系统.01．装备数据").default
+local _____60E9_7F5A_88C5_5907_7C7B_578BID_8868 = {}
+for itemId in pairs(_____88C5_5907_6570_636E_8868) do
+    local ____opt_3 = _____88C5_5907_6570_636E_8868[itemId]
+    if ____opt_3 ~= nil then
+        ____opt_3 = ____opt_3["惩罚死亡丢弃"]
+    end
+    if ____opt_3 == true then
+        local typeId = stringToFourCCSafe(itemId)
+        if typeId ~= 0 then
+            _____60E9_7F5A_88C5_5907_7C7B_578BID_8868[typeId] = true
+        end
+    end
+end
+____exports["登记并丢弃惩罚装备"] = function(unit)
+    if unit == nil or unit == 0 then
+        return
+    end
+    do
+        local slot = 0
+        while slot < 6 do
+            local item = jass.UnitItemInSlot(unit, slot)
+            local itemTypeId = item ~= nil and item ~= 0 and jass.GetItemTypeId(item) or 0
+            local marked = itemTypeId ~= 0 and _____60E9_7F5A_88C5_5907_7C7B_578BID_8868[itemTypeId] == true
+            if item ~= nil and item ~= 0 and marked then
+                local key = jass.GetHandleId(unit)
+                local ____60E9_7F5A_7269_54C1_767B_8BB0_key_6 = _____60E9_7F5A_7269_54C1_767B_8BB0[key]
+                if ____60E9_7F5A_7269_54C1_767B_8BB0_key_6 == nil then
+                    local ____temp_5 = {}
+                    _____60E9_7F5A_7269_54C1_767B_8BB0[key] = ____temp_5
+                    ____60E9_7F5A_7269_54C1_767B_8BB0_key_6 = ____temp_5
+                end
+                local list = ____60E9_7F5A_7269_54C1_767B_8BB0_key_6
+                if __TS__ArrayIndexOf(list, item) < 0 then
+                    list[#list + 1] = item
+                end
+                local x = jass.GetUnitX(unit)
+                local y = jass.GetUnitY(unit)
+                local removed = jass.UnitRemoveItem(unit, item)
+                jass.SetItemPosition(item, x, y)
+                return
+            end
+            slot = slot + 1
+        end
+    end
+end
+____exports["复活后放回惩罚物品"] = function(unit)
+    local key = jass.GetHandleId(unit)
+    local list = _____60E9_7F5A_7269_54C1_767B_8BB0[key]
+    if not list then
+        return
+    end
+    __TS__Delete(_____60E9_7F5A_7269_54C1_767B_8BB0, key)
+    do
+        local i = 0
+        while i < #list do
+            local item = list[i + 1]
+            if item ~= nil and item ~= 0 then
+                jass.SetItemPosition(
+                    item,
+                    jass.GetUnitX(unit),
+                    jass.GetUnitY(unit)
+                )
+            end
+            i = i + 1
+        end
+    end
+end
 local function _____53D6_88C5_5907_7269_54C1ID(_____88C5_5907_540D_79F0)
     return stringToFourCCSafe(resolveItemIdByName(_____88C5_5907_540D_79F0))
 end

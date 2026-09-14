@@ -54,8 +54,6 @@ removePeriodicCallback = ____require_result_0.removePeriodicCallback
 getServerTime = ____require_result_0.getServerTime
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.index")
 local debugLog = ____require_result_1.debugLog
-local setDebug = ____require_result_1.setDebug
-setDebug(nil, "Sound3DII", false)
 local soundDestroyFallbackIntervalMs = 10
 soundDestroyFallbackSounds = {}
 soundDestroyFallbackDueMs = {}

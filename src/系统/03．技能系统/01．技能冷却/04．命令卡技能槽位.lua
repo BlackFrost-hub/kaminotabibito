@@ -11,13 +11,10 @@ local ____require_result_0 = require("lib.扩展函数.YDWE函数.09．YDUserDat
 local YDWEGetUnitAbilityDataStringSafe = ____require_result_0.YDWEGetUnitAbilityDataStringSafe
 local ____require_result_1 = require("lib.扩展函数.自定义扩展函数.03．调试输出")
 local debugLog = ____require_result_1.debugLog
-local setDebug = ____require_result_1.setDebug
 local _____73A9_5BB6_82F1_96C4_914D_7F6E_5DE5_5177 = require("系统.01．单位系统.00．单位初始化创建.01．玩家英雄.01．玩家英雄配置工具")
 local ____require_result_2 = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版")
 local stringToFourCCSafe = ____require_result_2.stringToFourCCSafe
---- QWERD 显示排查调试开关：true 时输出 D 槽位探测过程（聊天输入 -dc 打一次快照汇总）。
-____exports.QWERD_DEBUG = true
-setDebug("QWERD调试", ____exports.QWERD_DEBUG)
+--- QWERD 显示排查调试开关
 local DzFrameGetCommandBarButton = japi.DzFrameGetCommandBarButton
 local KKCommandButtonGetAbilityId = japi.KKCommandButtonGetAbilityId
 ____exports["命令卡热键槽位表"] = {

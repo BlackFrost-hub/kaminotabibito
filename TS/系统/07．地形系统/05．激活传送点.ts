@@ -24,9 +24,8 @@ import 激活传送点配置, { PointConfig } from "./04．激活传送点配置
 const { Sound3DII_Mp3PlayReuse } = require("lib.扩展函数.封装函数.02．音效系统.index") as {
   Sound3DII_Mp3PlayReuse: (this: void, path: string, player?: any) => void;
 };
-const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
+const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
   debugLog: (module: string, ...args: any[]) => void;
-  setDebug: (module: string, on: boolean) => void;
 };
 const unitSpecificEventCenter = require("系统.00．核心系统.01．事件中心.03．单位特定事件中心") as {
   registerUnitInRangeTrigger: (
@@ -46,15 +45,6 @@ const activationPointTriggerWatchUnitByKey: Record<string, any> = {};
 const activationPointTriggerHandleByKey: Record<string, any> = {};
 const activationPointTriggerUnregisterByKey: Record<string, (() => void) | undefined> = {};
 
-/**
- * 设为 true：开局 0s / 1s 各打一行，对比 g / jass.common / globalThis 上 `gg_unit_htow_0030`。
- * 若三处长期全 nil/0：先在编辑器保存地图（生成 war3map 里 gg_unit_*），再打包/runmap；否则 Lua 读不到预置单位。
- */
-const DEBUG_GG_UNIT_HTOW_0030 = false;
-setDebug("激活传送点", DEBUG_GG_UNIT_HTOW_0030);
-const DEBUG_GG_UNIT_HTOW_KEY = "gg_unit_htow_0030";
-
-/** 接近传送点多少距离算激活（与地图尺度一致） */
 const ACTIVATION_RANGE = 300;
 /** 有坐标时 CreateUnit 的所属玩家：中立被动（common.j 的 PLAYER_NEUTRAL_PASSIVE，一般为 15） */
 function neutralPassivePlayer(): any {
@@ -62,8 +52,6 @@ function neutralPassivePlayer(): any {
     (jass as any).PLAYER_NEUTRAL_PASSIVE != null ? (jass as any).PLAYER_NEUTRAL_PASSIVE : 15;
   return (jass as any).Player(pid);
 }
-
-function dbg(_msg: string): void {}
 
 /** 预置 gg_unit_*：与 JASS 全局对齐时可能在 globals、common 或 Lua _G（globalThis）之一 */
 function resolveGgUnitByKey(unitKey: string): any {
@@ -79,75 +67,8 @@ function resolveGgUnitByKey(unitKey: string): any {
   return null;
 }
 
-function formatGgUnitProbe(u: any): string {
-  if (u == null || u === 0) return "nil/0";
-  let tail = "";
-  tail = " typeId=" + (jass as any).GetUnitTypeId(u);
-  if ((jass as any).UNIT_STATE_LIFE != null) {
-    tail = tail + " life=" + (jass as any).GetUnitState(u, (jass as any).UNIT_STATE_LIFE);
-  }
-  return "ok" + tail;
-}
-
-function onDebugSnapshot0sDelayed(this: void): void {
-  const gAny = g as any;
-  const jc = jass as any;
-  const G = globalThis as any;
-  const key = DEBUG_GG_UNIT_HTOW_KEY;
-  const vg = gAny[key];
-  const vj = jc[key];
-  const vG = G[key];
-  const msg =
-    "[激活传送点调试] " +
-    "0s" +
-    " " +
-    key +
-    " | g=" +
-    formatGgUnitProbe(vg) +
-    " | jass.common=" +
-    formatGgUnitProbe(vj) +
-    " | globalThis=" +
-    formatGgUnitProbe(vG);
-  for (let pi = 0; pi < 4; pi++) {
-    (jass as any).DisplayTimedTextToPlayer((jass as any).Player(pi), 0, 0, 14, msg);
-  }
-  debugLog("激活传送点", msg);
-}
-
-function onDebugSnapshot1sDelayed(this: void): void {
-  const gAny = g as any;
-  const jc = jass as any;
-  const G = globalThis as any;
-  const key = DEBUG_GG_UNIT_HTOW_KEY;
-  const vg = gAny[key];
-  const vj = jc[key];
-  const vG = G[key];
-  const msg =
-    "[激活传送点调试] " +
-    "1s" +
-    " " +
-    key +
-    " | g=" +
-    formatGgUnitProbe(vg) +
-    " | jass.common=" +
-    formatGgUnitProbe(vj) +
-    " | globalThis=" +
-    formatGgUnitProbe(vG);
-  for (let pi = 0; pi < 4; pi++) {
-    (jass as any).DisplayTimedTextToPlayer((jass as any).Player(pi), 0, 0, 14, msg);
-  }
-  debugLog("激活传送点", msg);
-}
-
 function onInitActivationPointsDelayed(this: void): void {
   initActivationPointsInternal();
-}
-
-/** 开局 0s、1s 各一行：对比三处来源（用于排查间歇 nil） */
-function scheduleDebugGgUnitHtow0030(): void {
-  if (!DEBUG_GG_UNIT_HTOW_0030) return;
-  addDelayedCallback(0, onDebugSnapshot0sDelayed);
-  addDelayedCallback(1000, onDebugSnapshot1sDelayed);
 }
 
 function parseCoord(v: string | number | undefined): number | null {
@@ -252,7 +173,6 @@ function onActivationPointEnter(): void {
 function registerOnePoint(cfg: PointConfig, key: string): void {
   const watchUnit = resolveWatchUnit(cfg);
   if (watchUnit == null || watchUnit === 0) {
-    dbg("跳过：无有效监视单位 " + key);
     return;
   }
 
@@ -274,19 +194,15 @@ function registerOnePoint(cfg: PointConfig, key: string): void {
 }
 
 function initActivationPointsInternal(): void {
-  let count = 0;
   for (const key in 激活传送点配置) {
     const cfg = 激活传送点配置[key];
     // enabled === false：不创建单位、不挂 TriggerRegisterUnitInRange
     if (!cfg || cfg.enabled === false) continue;
     registerOnePoint(cfg, key);
-    count++;
   }
-  dbg("已注册激活传送点(接近检测): " + count);
 }
 
 /** 在地图初始化时调用（建议用 0.00 秒计时器） */
 export function init激活传送点(): void {
-  scheduleDebugGgUnitHtow0030();
   addDelayedCallback(0, onInitActivationPointsDelayed);
 }

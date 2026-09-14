@@ -6,6 +6,49 @@ const { resolveItemIdByName } = require("系统.02．物品系统.13．物品名
 const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, raw: string | undefined | null) => number;
 };
+const jass = require("jass.common") as any;
+const 惩罚物品登记: Record<number, any[]> = {};
+
+const { getItemDataEntry } = require("lib.扩展函数.物品相关函数.index") as { getItemDataEntry: (item: any) => any };
+const 装备数据表 = (require("系统.02．物品系统.01．装备数据") as { default: Record<string, any> }).default;
+const 惩罚装备类型ID表: Record<number, true> = {};
+for (const itemId in 装备数据表) {
+  if (装备数据表[itemId]?.惩罚死亡丢弃 === true) {
+    const typeId = stringToFourCCSafe(itemId);
+    if (typeId !== 0) 惩罚装备类型ID表[typeId] = true;
+  }
+}
+
+export function 登记并丢弃惩罚装备(this: void, unit: any): void {
+  if (unit == null || unit === 0) { return; }
+  for (let slot = 0; slot < 6; slot++) {
+    const item = jass.UnitItemInSlot(unit, slot);
+    const itemTypeId = item != null && item !== 0 ? jass.GetItemTypeId(item) as number : 0;
+    const marked = itemTypeId !== 0 && 惩罚装备类型ID表[itemTypeId] === true;
+    if (item != null && item !== 0 && marked) {
+      const key = jass.GetHandleId(unit) as number;
+      const list = 惩罚物品登记[key] ?? (惩罚物品登记[key] = []);
+      if (list.indexOf(item) < 0) list.push(item);
+      const x = jass.GetUnitX(unit);
+      const y = jass.GetUnitY(unit);
+      // UnitDropItemPoint 在部分死亡/受控状态下可能失败，先强制移出背包再落地。
+      const removed = jass.UnitRemoveItem(unit, item);
+      jass.SetItemPosition(item, x, y);
+      return;
+    }
+  }
+}
+
+export function 复活后放回惩罚物品(this: void, unit: any): void {
+  const key = jass.GetHandleId(unit) as number;
+  const list = 惩罚物品登记[key];
+  if (!list) return;
+  delete 惩罚物品登记[key];
+  for (let i = 0; i < list.length; i++) {
+    const item = list[i];
+    if (item != null && item !== 0) jass.SetItemPosition(item, jass.GetUnitX(unit), jass.GetUnitY(unit));
+  }
+}
 
 function 取装备物品ID(this: void, 装备名称: string): number {
   return stringToFourCCSafe(resolveItemIdByName(装备名称));

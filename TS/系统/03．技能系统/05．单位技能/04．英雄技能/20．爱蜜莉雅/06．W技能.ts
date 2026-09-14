@@ -19,15 +19,12 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
-  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
-const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
-const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
@@ -73,9 +70,6 @@ const { 创建爱蜜莉雅场上冰晶 } = require("./03．被动效果") as {
 const { 消费爱蜜莉雅D强化 } = require("./02．公共状态与冰晶") as {
   消费爱蜜莉雅D强化: (this: void, 英雄: any) => boolean;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 
 // 二段引爆方向联机同步：施法者主人本机读鼠标地面坐标 → DzSyncData → 各端在同步回调中引爆（对称执行，参照「按B传送BB」先例）
 const W二段同步前缀 = "EMW2";
@@ -119,7 +113,6 @@ function 注册W二段鼠标同步(this: void): void {
         return;
       }
     }
-    debugLogForce("爱蜜莉雅-W", "二段同步", "警告", "无匹配的待引爆实例", "玩家", GetPlayerId(player) + 1, "X", 鼠标X, "Y", 鼠标Y);
   });
   DzTriggerRegisterSyncDataTrg(trig, W二段同步前缀, false);
 }
@@ -159,7 +152,6 @@ function W区域内目标结算(this: void, 施法者: any, 区域内单位: any
   if (区域内单位 == null || 区域内单位.length <= 0) return;
   const 目标列表: any[] = [];
   for (let i = 0; i < 区域内单位.length; i++) 目标列表.push(区域内单位[i]);
-  debugLogForce("爱蜜莉雅-W", "伤害", "标签", "爱蜜莉雅-W冰花", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能类型ID), "实例", 技能实例ID ?? "-", "目标数", 目标列表.length, "数值", 伤害值);
   造成批量AOE技能伤害({
     来源: 施法者,
     目标列表,
@@ -190,7 +182,6 @@ function 施加W寒意(this: void, 施法者: any, 目标: any, 技能实例ID: 
 function 二段引爆W(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 瞄准X: number, 瞄准Y: number): void {
   const 数据 = 控制器.数据 as W冰花数据;
   if (数据 == null || 数据.已二段) return;
-  debugLogForce("爱蜜莉雅-W", "状态", "二段引爆", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能类型ID), "实例", 技能实例ID ?? "-", "X", Math.floor(数据.目标X), "Y", Math.floor(数据.目标Y), "瞄准X", Math.floor(瞄准X), "瞄准Y", Math.floor(瞄准Y));
   数据.已二段 = true;
   // 冰片方向：从冰花区域中心指向施法者主人按下二段瞬间的鼠标地面点（同步坐标，各端一致）
   const 方向 = 两点角度(数据.目标X, 数据.目标Y, 瞄准X, 瞄准Y);
@@ -248,25 +239,8 @@ function 二段引爆W(this: void, 施法者: any, 控制器: any, 技能实例I
 
 function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0) {
-    debugLogForce("爱蜜莉雅-W", "释放被拒", "原因", "施法者无效", "分支", "冰花");
     return;
   }
-  debugLogForce(
-    "爱蜜莉雅-W",
-    "释放",
-    "玩家",
-    GetPlayerId(GetOwningPlayer(施法者)) + 1,
-    "四码",
-    fourCCToStringSafe(W技能类型ID),
-    "实例",
-    技能实例ID ?? "-",
-    "目标",
-    "点施放",
-    "目标X",
-    Math.floor(GetSpellTargetX()),
-    "目标Y",
-    Math.floor(GetSpellTargetY()),
-  );
   播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.W);
   // 二段：已有活跃 W 且未二段（走鼠标同步路径；一段施法事件先于此分支返回）
   const 活跃列表 = 查询战斗技能实例(施法者, "W冰花");
@@ -380,7 +354,6 @@ function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID
   });
 
   // 冰花 + 寒气边界表现（常驻句柄，生命周期由实例清理统一管理：自然到期随收束销毁，打断/死亡提前销毁；不传持续秒避免 EC_CreateEffect 内置定时器与 DestroyEffect 双销毁）
-  debugLogForce("爱蜜莉雅-W", "特效", "类型", "创建", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(W技能类型ID), "实例", 技能实例ID ?? "-", "路径", 爱蜜莉雅表现配置.冰花主体.模型路径);
   const 冰花特效 = 创建点特效({
     模型路径: 爱蜜莉雅表现配置.冰花主体.模型路径,
    RGB: 爱蜜莉雅表现配置.冰花主体.RGB,
@@ -413,23 +386,8 @@ function 释放W冰花(this: void, _context: any, 施法者: any, 技能实例ID
 
 function 释放W二段输入(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0) {
-    debugLogForce("爱蜜莉雅-W", "释放被拒", "原因", "施法者无效", "分支", "二段输入");
     return;
   }
-  debugLogForce(
-    "爱蜜莉雅-W",
-    "释放",
-    "玩家",
-    GetPlayerId(GetOwningPlayer(施法者)) + 1,
-    "四码",
-    fourCCToStringSafe(W技能类型ID),
-    "实例",
-    技能实例ID ?? "-",
-    "目标",
-    "点施放",
-    "分支",
-    "二段输入",
-  );
   const 活跃列表 = 查询战斗技能实例(施法者, "W冰花");
   for (let i = 0; i < 活跃列表.length; i++) {
     const 活跃 = 活跃列表[i];

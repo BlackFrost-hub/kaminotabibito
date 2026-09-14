@@ -1,7 +1,6 @@
-local ____lualib = require("lualib_bundle")
-local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local uiSetFrameTexture, uiHideFrame, uiShowFrame, hideSlot, hideAllSlots, renderBuffBarLocal, rebuildAllBuffBarViewModels, syncBuffBar, onBuffUiRefreshTick, jass, japi, debugLog, MAX_SLOTS, slots, buffBarViewModelByPlayerId, MAX_PLAYER_ID
+local uiSetFrameTexture, uiHideFrame, uiShowFrame, hideSlot, hideAllSlots, renderBuffBarLocal, rebuildAllBuffBarViewModels, syncBuffBar, onBuffUiRefreshTick, jass, japi, MAX_SLOTS, slots, buffBarViewModelByPlayerId, MAX_PLAYER_ID
 local ____05_FF0E_73A9_5BB6_9009_4E2D_5355_4F4D_4E8B_4EF6_4E2D_5FC3 = require("系统.00．核心系统.01．事件中心.05．玩家选中单位事件中心")
 local getSoleSelectedUnitForPlayerImported = ____05_FF0E_73A9_5BB6_9009_4E2D_5355_4F4D_4E8B_4EF6_4E2D_5FC3.getSoleSelectedUnitForPlayer
 local initPlayerSelectionCenterImported = ____05_FF0E_73A9_5BB6_9009_4E2D_5355_4F4D_4E8B_4EF6_4E2D_5FC3.initPlayerSelectionCenter
@@ -130,22 +129,13 @@ end
 function syncBuffBar()
     local localPlayerId = jass.GetPlayerId(jass.GetLocalPlayer())
     rebuildAllBuffBarViewModels()
-    local ____temp_1
+    local ____temp_0
     if localPlayerId >= 0 then
-        ____temp_1 = buffBarViewModelByPlayerId[localPlayerId]
+        ____temp_0 = buffBarViewModelByPlayerId[localPlayerId]
     else
-        ____temp_1 = nil
+        ____temp_0 = nil
     end
-    local viewModel = ____temp_1
-    local visCount = viewModel and #__TS__ArrayFilter(
-        viewModel.slots,
-        function(____, s) return s.visible end
-    ) or 0
-    debugLog(
-        nil,
-        "BuffUI",
-        (((((("pid=" .. tostring(localPlayerId)) .. " vm=") .. (viewModel and "yes" or "nil")) .. " vis=") .. tostring(visCount)) .. " slotsLen=") .. tostring(#slots)
-    )
+    local viewModel = ____temp_0
     if jass.GetLocalPlayer() == jass.Player(localPlayerId) and viewModel then
         renderBuffBarLocal(viewModel)
     elseif jass.GetLocalPlayer() == jass.Player(localPlayerId) then
@@ -163,10 +153,6 @@ local getGameUI = ____hwMod.getGameUI
 local ____centerTimer = require("系统.00．核心系统.05．中心计时器")
 local addPeriodicCallback = ____centerTimer.addPeriodicCallback
 local addDelayedCallback = ____centerTimer.addDelayedCallback
-local ____require_result_0 = require("lib.扩展函数.自定义扩展函数.index")
-debugLog = ____require_result_0.debugLog
-local setDebug = ____require_result_0.setDebug
-setDebug(nil, "BuffUI", false)
 MAX_SLOTS = getMaxSlotsImported()
 local BUFF_BAR_X0 = 0.204
 local BUFF_BAR_Y = 0.1655
@@ -296,11 +282,6 @@ local function createOneSlot(index, parent)
         template = "template",
         visible = false
     }) or 0
-    debugLog(
-        nil,
-        "BuffUI",
-        (("slot" .. tostring(index)) .. " bd=") .. tostring(bd)
-    )
     if not bd or bd == 0 then
         return nil
     end
@@ -478,11 +459,6 @@ local function initSelectionCentersForBuffUi()
 end
 local function createUi()
     local parent = getGameUI()
-    debugLog(
-        nil,
-        "BuffUI",
-        "createUi parent=" .. tostring(parent)
-    )
     if parent == 0 or parent == nil then
         return
     end
@@ -520,11 +496,6 @@ function ____exports.init()
     startBuffUiSystem()
 end
 function ____exports.onPlayerHeroRegistered(whichPlayer, whichHero)
-    debugLog(
-        nil,
-        "BuffUI",
-        "onPlayerHeroRegistered called, init=" .. tostring(buffUiInitialized)
-    )
     startBuffUiSystem()
 end
 return ____exports

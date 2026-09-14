@@ -1,4 +1,4 @@
-﻿const jass = require("jass.common") as any;
+const jass = require("jass.common") as any;
 const japi = require("jass.japi") as any;
 import {
   getSoleSelectedUnitForPlayer as getSoleSelectedUnitForPlayerImported,
@@ -28,12 +28,6 @@ const getGameUI = ____hwMod.getGameUI as (this: void) => number;
 const ____centerTimer = require("系统.00．核心系统.05．中心计时器");
 const addPeriodicCallback = ____centerTimer.addPeriodicCallback as (this: void, intervalMs: number, callback: (this: void) => void) => number;
 const addDelayedCallback = ____centerTimer.addDelayedCallback as (this: void, delayMs: number, callback: (this: void) => void) => number;
-const { debugLog, setDebug } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLog: (module: string, ...args: any[]) => void;
-  setDebug: (module: string, on: boolean) => void;
-};
-
-setDebug("BuffUI", false);
 
 const MAX_SLOTS = getMaxSlotsImported();
 const BUFF_BAR_X0 = 0.204;
@@ -173,7 +167,6 @@ function createOneSlot(this: void, index: number, parent: number): SlotFrames | 
       template: "template",
       visible: false,
     }) || 0;
-  debugLog("BuffUI", "slot" + index + " bd=" + bd);
   if (!bd || bd === 0) return null;
   uiSetFramePosition(bd, { point: UI工具.FramePoint.TOPLEFT, x, y: BUFF_BAR_Y });
   uiSetFrameSize(bd, { width: ICON_W, height: ICON_H });
@@ -404,8 +397,6 @@ function syncBuffBar(this: void): void {
   const localPlayerId = jass.GetPlayerId(jass.GetLocalPlayer());
   rebuildAllBuffBarViewModels();
   const viewModel = localPlayerId >= 0 ? buffBarViewModelByPlayerId[localPlayerId] : undefined;
-  const visCount = viewModel ? viewModel.slots.filter(s => s.visible).length : 0;
-  debugLog("BuffUI", "pid=" + localPlayerId + " vm=" + (viewModel ? "yes" : "nil") + " vis=" + visCount + " slotsLen=" + slots.length);
   if (jass.GetLocalPlayer() === jass.Player(localPlayerId) && viewModel) {
     renderBuffBarLocal(viewModel);
   } else if (jass.GetLocalPlayer() === jass.Player(localPlayerId)) {
@@ -415,7 +406,6 @@ function syncBuffBar(this: void): void {
 
 function createUi(this: void): void {
   const parent = getGameUI();
-  debugLog("BuffUI", "createUi parent=" + parent);
   if (parent === 0 || parent == null) return;
   for (let i = 0; i < MAX_SLOTS; i++) {
     const s = createOneSlot(i, parent);
@@ -450,7 +440,6 @@ export function init(this: void): void {
 }
 
 export function onPlayerHeroRegistered(this: void, whichPlayer: any, whichHero: any): void {
-  debugLog("BuffUI", "onPlayerHeroRegistered called, init=" + buffUiInitialized);
   startBuffUiSystem();
 }
 

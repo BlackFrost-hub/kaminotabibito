@@ -17,17 +17,13 @@ import { 是爱蜜莉雅 } from "./03．被动效果";
 import { 播放英雄技能喊话 } from "../../../../09．表现系统/10．英雄语音/10．技能喊话/01．英雄技能喊话";
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe: stringToFourCC, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
-  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetHandleId = jass.GetHandleId as (this: void, handle: any) => number;
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
-const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
-const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
-const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const ATTACK_TYPE_NORMAL = jass.ATTACK_TYPE_NORMAL as any;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
 const WEAPON_TYPE_WHOKNOWS = jass.WEAPON_TYPE_WHOKNOWS as any;
@@ -60,16 +56,13 @@ const platformAbilityApi = require("平台扩展API取值") as {
 const platformAbilityAction = require("平台扩展API动作") as {
   技能_设置技能冷却时间: (this: void, 单位: any, 技能代码: number, 冷却: number, 最大冷却: number) => boolean;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 
-const 英雄单位类型ID = stringToFourCC(爱蜜莉雅技能配置.单位类型ID);
-const Q技能ID = stringToFourCC(爱蜜莉雅技能配置.Q.技能ID);
-const W技能ID = stringToFourCC(爱蜜莉雅技能配置.W.技能ID);
-const E技能ID = stringToFourCC(爱蜜莉雅技能配置.E.技能ID);
-const R技能ID = stringToFourCC(爱蜜莉雅技能配置.R.技能ID);
-const D技能ID = stringToFourCC(爱蜜莉雅技能配置.D.技能ID);
+const 英雄单位类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.单位类型ID);
+const Q技能ID = stringToFourCCSafe(爱蜜莉雅技能配置.Q.技能ID);
+const W技能ID = stringToFourCCSafe(爱蜜莉雅技能配置.W.技能ID);
+const E技能ID = stringToFourCCSafe(爱蜜莉雅技能配置.E.技能ID);
+const R技能ID = stringToFourCCSafe(爱蜜莉雅技能配置.R.技能ID);
+const D技能ID = stringToFourCCSafe(爱蜜莉雅技能配置.D.技能ID);
 
 //=============================================================================
 // 区域目标标记（W 冰花 / R 领域：进入 +1，离开 -1）
@@ -206,7 +199,6 @@ function 处理爱蜜莉雅造成伤害(this: void, target: any, attacker: any, 
   const 新层数 = 当前层数 + 1;
   if (新层数 >= 爱蜜莉雅普攻配置.契约应和上限) {
     // 第 3 次：消耗全部应和，触发帕克追击
-    debugLogForce("爱蜜莉雅-普攻联动", "状态", "第3次有效普攻触发帕克追击", "玩家", GetPlayerId(GetOwningPlayer(attacker)) + 1, "目标", GetUnitName(target), "handle", target, "X", Math.floor(GetUnitX(target)), "Y", Math.floor(GetUnitY(target)));
     移除单位指定Buff(attacker, 爱蜜莉雅BuffID.契约应和);
     if (发射帕克追击冰弹(attacker, target)) {
       播放英雄技能喊话(attacker, "爱蜜莉雅", "AEP1");

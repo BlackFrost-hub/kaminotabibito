@@ -24,10 +24,6 @@ let __pcallModelUnit: any = 0;
 let __pcallModelPath = "";
 function __pcallSetUnitModelBody(this: any): void { japi.DzSetUnitModel(__pcallModelUnit, __pcallModelPath); }
 
-const { debugLog } = require("lib.扩展函数.自定义扩展函数.index") as {
-  debugLog: (module: string, ...args: any[]) => void;
-};
-
 /**
  * 维护已创建 NPC 的稳定查表，供同步入口按配置键回查真实单位。
  */
@@ -98,10 +94,7 @@ function onNpcSetModelDelayed(this: void): void {
   if (!ctx) return;
   __pcallModelUnit = ctx.unit;
   __pcallModelPath = ctx.modelPath;
-  const ok = pcall(__pcallSetUnitModelBody);
-  if (!ok) {
-    debugLog("NPC生成器", "设置单位模型失败（已忽略）", ctx.npcLabel, "model=" + tostring(ctx.modelPath));
-  }
+  pcall(__pcallSetUnitModelBody);
 }
 
 function scheduleTryAttachQuestMarker(unit: any, npcConfig: 支线NPC配置): void {
@@ -121,13 +114,11 @@ function scheduleSetUnitModel(unit: any, modelPath: string, npcLabel: string): v
 
 function createSingleNPC(npcConfig: 支线NPC配置, registerQuestId: boolean = true): any {
   if (!npcConfig.单位ID || npcConfig.坐标X == null || npcConfig.坐标Y == null) {
-    debugLog("NPC生成器", "配置不完整，跳过:", tostring(npcConfig.NPC配置名));
     return null;
   }
 
   const unitCode = npcConfig.单位ID;
   if (unitCode.length !== 4) {
-    debugLog("NPC生成器", "单位代码无效:", unitCode);
     return null;
   }
 
@@ -139,7 +130,6 @@ function createSingleNPC(npcConfig: 支线NPC配置, registerQuestId: boolean = 
     登记死亡排泄: true,
   });
   if (!unit) {
-    debugLog("NPC生成器", "创建单位失败:", tostring(npcConfig.NPC配置名), "(" + unitCode + ")");
     return null;
   }
 
@@ -155,18 +145,10 @@ function createSingleNPC(npcConfig: 支线NPC配置, registerQuestId: boolean = 
   scheduleTryAttachQuestMarker(unit, npcConfig);
   registerCreatedNpcUnit(npcConfig, unit, registerQuestId);
 
-  debugLog(
-    "NPC生成器",
-    "成功创建NPC:",
-    tostring(npcConfig.NPC配置名),
-    "at",
-    "(" + tostring(npcConfig.坐标X) + ", " + tostring(npcConfig.坐标Y) + ")"
-  );
   return unit;
 }
 
 export function 初始化NPC(): void {
-  debugLog("NPC生成器", "开始初始化NPC...");
   g_npcUnitByRequireId.clear();
   g_npcUnitByNpcNameId.clear();
   g_npcUnitByDisplayName.clear();
@@ -183,11 +165,9 @@ export function 初始化NPC(): void {
 export function 按名称创建NPC(NPC名称: string): any {
   const npcConfig = 支线NPC配置列表.find((npc) => npc.NPC配置名 === NPC名称 || npc.NPC名称 === NPC名称);
   if (!npcConfig) {
-    debugLog("NPC生成器", "未找到NPC配置:", NPC名称);
     return null;
   }
   if (npcConfig.启用 !== true) {
-    debugLog("NPC生成器", "NPC未启用:", NPC名称);
     return null;
   }
   return createSingleNPC(npcConfig);
@@ -196,11 +176,9 @@ export function 按名称创建NPC(NPC名称: string): any {
 export function 按任务ID创建NPC(任务ID: number): any {
   const npcConfig = 支线NPC配置列表.find((npc) => npc.任务ID === 任务ID);
   if (!npcConfig) {
-    debugLog("NPC生成器", "未找到任务ID对应的NPC:", tostring(任务ID));
     return null;
   }
   if (npcConfig.启用 !== true) {
-    debugLog("NPC生成器", "NPC未启用:", tostring(npcConfig.NPC配置名), "(任务ID:", tostring(任务ID) + ")");
     return null;
   }
   return createSingleNPC(npcConfig);

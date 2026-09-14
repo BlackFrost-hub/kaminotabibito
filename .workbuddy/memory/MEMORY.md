@@ -18,3 +18,16 @@
 - 移速 >522 突破只走 `施加移速提升Buff` / 装备移速 两个封装（内部自动接 SOS 突破系统）；直接 SetUnitMoveSpeed/AIms 被引擎钳制 522。
 - 英雄 Buff 图标标准 80×80；AI 生成图标避免画具体动漫人物（形象不可控），用纯意象。
 - 局部构建：`npm run build:files -- "<file>"`；用户自己开地图测试，绝不擅自打包。
+
+## TSTL 第四盲区：`any` 类型数组的 `[0]` 索引不做 0→1 转换（2026-09-14 实战确认）
+
+`obj.field` / `map.get(...)` 链上若任一环是 **`any`**（例如 `(questDB as any).globalData`），那么对它取下标
+`arr[0]` 生成 Lua 就是**原样 `arr[0]`**；而 Lua 数组 1 起 → 永远读到 **nil**，且 TS 侧零报错。
+
+- **有类型标注时安全**：`Map<string, {objectives: Array<...>}>` 这类断言会让 TSTL 正常做 `[0]` → `[1]` 转换 ✓
+  （所以同库里"失踪的精灵侍从"的私有读法一直是好的，而 `03．任务状态.ts` 走 `(questDB as any)` 的那处坏了）
+- **索引无关的安全写法**（推荐）：`for (const x of arr) { if (x != null) { use(x); break; } }` —— 与击杀任务
+  `isKillQuestObjectiveCompleted` 同款。`.find(...)` 同样安全。
+- 实战案例：`读取任务目标进度` 用 `activeQuest.objectives[0]` 恒返回 null → `任务目标是否完成` 恒 false
+  → **防守/调查类任务打完却提交失败**（提示「花灵守护尚未完成，暂时无法提交任务」），而任务进度 UI 也一直是 0/N。
+  排查关键：`updateObjective`（用 `.find()`）返回 **true** 却读不到目标 —— 读写两条路的一致性差异就是线索。

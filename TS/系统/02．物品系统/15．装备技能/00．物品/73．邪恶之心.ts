@@ -1,6 +1,6 @@
 /** @noSelfInFile */
 
-import { 邪恶之心配置, 获得物品装备ID } from "../07．获得物品/00．公共/00．获得物品配置表";
+import { 邪恶之心配置, 获得物品装备ID, 登记并丢弃惩罚装备 } from "../07．获得物品/00．公共/00．获得物品配置表";
 
 const { 注册持有型周期效果 } = require("系统.03．技能系统.00．技能模板+函数.01．技能函数.20．物品辅助.02．持有型周期效果") as {
   注册持有型周期效果: (this: void, params: {
@@ -28,6 +28,7 @@ function on邪恶之心周期(this: void, unit: any): void {
   减少生命值(unit, amount, true, false, undefined, 1);
   if (!单位存活(unit)) return;
   if (取最大生命(unit) < 邪恶之心配置.死亡最小最大生命 || 取当前生命(unit) < 邪恶之心配置.死亡最小当前生命) {
+    登记并丢弃惩罚装备(unit);
     KillUnit(unit);
     DisplayTimedTextToPlayer(GetOwningPlayer(unit), 0, 0, 20, 邪恶之心配置.死亡提示);
   }

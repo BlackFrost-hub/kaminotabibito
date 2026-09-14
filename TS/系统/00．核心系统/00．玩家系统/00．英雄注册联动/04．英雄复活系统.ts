@@ -1,6 +1,7 @@
 /** @noSelfInFile */
 
 const jass = require("jass.common") as any;
+const { 复活后放回惩罚物品 } = require("系统.02．物品系统.15．装备技能.07．获得物品.00．公共.00．获得物品配置表") as { 复活后放回惩罚物品: (unit: any) => void };
 const japi = require("jass.japi") as any;
 const g = require("jass.globals") as { udg_FHD?: any; udg_Boss?: any; [key: string]: any };
 
@@ -424,6 +425,10 @@ function 复活玩家英雄(this: void, dyingUnit: any, 消耗复活次数: bool
       施加复活无敌(dyingUnit);
       addDelayedCallback(0, on复活镜头移动, { 玩家: GetOwningPlayer(dyingUnit), x: GetUnitX(dyingUnit), y: GetUnitY(dyingUnit) });
     }
+  }
+
+  if (是否有效(dyingUnit) && IsUnitType(dyingUnit, jass.UNIT_TYPE_DEAD) !== true) {
+    复活后放回惩罚物品(dyingUnit);
   }
 
   return true;

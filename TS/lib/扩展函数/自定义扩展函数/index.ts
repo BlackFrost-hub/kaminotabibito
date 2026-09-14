@@ -33,8 +33,6 @@ export function registerBridge(): void {
     expose("isValidEnemyUnit", conditionCheck.isValidEnemyUnit);
     expose("isValidCombatEnemyUnit", conditionCheck.isValidCombatEnemyUnit);
     expose("isNotUsingInventoryItem", conditionCheck.isNotUsingInventoryItem);
-    expose("setDebug", debugOutput.setDebug);
-    expose("isDebug", debugOutput.isDebug);
     expose("debugLog", debugOutput.debugLog);
     expose("debugLogForce", debugOutput.debugLogForce);
     expose("reportRuntimeError", debugOutput.reportRuntimeError);

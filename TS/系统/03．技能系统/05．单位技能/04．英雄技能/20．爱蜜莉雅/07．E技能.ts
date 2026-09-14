@@ -22,16 +22,13 @@ const { 播放英雄技能喊话 } = require("系统.09．表现系统.10．英�
 };
 
 const jass = require("jass.common") as any;
-const { stringToFourCCSafe, fourCCToStringSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
+const { stringToFourCCSafe } = require("lib.扩展函数.封装函数.01．通用工具.01．FourCC转换安全版") as {
   stringToFourCCSafe: (this: void, s: string | undefined | null) => number;
-  fourCCToStringSafe: (this: void, fourcc: number) => string;
 };
 const GetUnitX = jass.GetUnitX as (this: void, unit: any) => number;
 const GetUnitY = jass.GetUnitY as (this: void, unit: any) => number;
 const GetUnitFacing = jass.GetUnitFacing as (this: void, unit: any) => number;
-const GetUnitName = jass.GetUnitName as (this: void, unit: any) => string;
 const GetOwningPlayer = jass.GetOwningPlayer as (this: void, unit: any) => any;
-const GetPlayerId = jass.GetPlayerId as (this: void, player: any) => number;
 const GetSpellTargetX = jass.GetSpellTargetX as (this: void) => number;
 const GetSpellTargetY = jass.GetSpellTargetY as (this: void) => number;
 const DAMAGE_TYPE_COLD = jass.DAMAGE_TYPE_COLD as any;
@@ -87,9 +84,6 @@ const platformAbilityAction = require("平台扩展API动作") as {
 const { addDelayedCallback } = require("系统.00．核心系统.05．中心计时器") as {
   addDelayedCallback: (this: void, delayMs: number, callback: (this: void, variable?: any) => void, variable?: any) => number;
 };
-const { debugLogForce } = require("lib.扩展函数.自定义扩展函数.03．调试输出") as {
-  debugLogForce: (this: void, module: string, ...args: any[]) => void;
-};
 
 const 英雄单位类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.单位类型ID);
 const E技能类型ID = stringToFourCCSafe(爱蜜莉雅技能配置.E.技能ID);
@@ -122,7 +116,6 @@ function 施加落点冰爆(this: void, 施法者: any, X: number, Y: number, �
     jass.GroupRemoveUnit(目标组, u);
     if (u === 施法者 || !单位存活(u)) continue;
     if (!jass.IsUnitEnemy(u, jass.GetOwningPlayer(施法者))) continue;
-    debugLogForce("爱蜜莉雅-E", "伤害", "标签", "爱蜜莉雅-E冰爆", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能类型ID), "实例", 技能实例ID ?? "-", "目标", GetUnitName(u), "handle", u, "X", Math.floor(GetUnitX(u)), "Y", Math.floor(GetUnitY(u)), "数值", 伤害值);
     造成技能伤害({
       来源: 施法者,
       目标: u,
@@ -144,7 +137,6 @@ function 施加落点冰爆(this: void, 施法者: any, X: number, Y: number, �
 function 结束E护盾分支(this: void, 施法者: any, 控制器: any, 技能实例ID: number | undefined, 分支: "自然" | "提前" | "破盾"): void {
   const 数据 = 控制器.数据 as E护盾数据;
   if (数据 == null || 数据.已结束) return;
-  debugLogForce("爱蜜莉雅-E", "结束", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能类型ID), "实例", 技能实例ID ?? "-", "原因", 分支, "X", Math.floor(GetUnitX(施法者)), "Y", Math.floor(GetUnitY(施法者)));
   // 先置 已结束 再停止位移：停止位移同步触发位移结束回调，此时必须已标记结束（否则落点冰爆/冰晶/D强化被重复执行）
   数据.已结束 = true;
   // 提前结束：停止位移
@@ -176,25 +168,8 @@ function 结束E护盾分支(this: void, 施法者: any, 控制器: any, 技能�
 
 function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0) {
-    debugLogForce("爱蜜莉雅-E", "释放被拒", "原因", "施法者无效", "分支", "护身");
     return;
   }
-  debugLogForce(
-    "爱蜜莉雅-E",
-    "释放",
-    "玩家",
-    GetPlayerId(GetOwningPlayer(施法者)) + 1,
-    "四码",
-    fourCCToStringSafe(E技能类型ID),
-    "实例",
-    技能实例ID ?? "-",
-    "目标",
-    "点施放",
-    "目标X",
-    Math.floor(GetSpellTargetX()),
-    "目标Y",
-    Math.floor(GetSpellTargetY()),
-  );
   播放爱蜜莉雅动作(施法者, 爱蜜莉雅动作槽.E);
   // 已有护盾：提前结束
   const 活跃列表 = 查询战斗技能实例(施法者, "E护盾");
@@ -287,7 +262,6 @@ function 释放E冰晶护身(this: void, _context: any, 施法者: any, 技能�
     缩放: 爱蜜莉雅表现配置.冰面路径.缩放,
     持续秒: 爱蜜莉雅表现配置.冰面路径.持续秒,
   });
-  debugLogForce("爱蜜莉雅-E", "位移", "类型", "冲锋", "玩家", GetPlayerId(GetOwningPlayer(施法者)) + 1, "四码", fourCCToStringSafe(E技能类型ID), "实例", 技能实例ID ?? "-", "X", Math.floor(GetUnitX(施法者)), "Y", Math.floor(GetUnitY(施法者)), "距离", 爱蜜莉雅E配置.位移距离);
   数据.位移ID = 开始冲锋(施法者, {
     距离: 爱蜜莉雅E配置.位移距离,
     每秒速度: 爱蜜莉雅E配置.位移速度,
@@ -350,23 +324,8 @@ function E施加保护脉冲(this: void, 施法者: any, X: number, Y: number, �
 
 function 释放E二段输入(this: void, _context: any, 施法者: any, 技能实例ID: number | undefined): void {
   if (施法者 == null || 施法者 === 0) {
-    debugLogForce("爱蜜莉雅-E", "释放被拒", "原因", "施法者无效", "分支", "二段输入");
     return;
   }
-  debugLogForce(
-    "爱蜜莉雅-E",
-    "释放",
-    "玩家",
-    GetPlayerId(GetOwningPlayer(施法者)) + 1,
-    "四码",
-    fourCCToStringSafe(E技能类型ID),
-    "实例",
-    技能实例ID ?? "-",
-    "目标",
-    "无",
-    "分支",
-    "二段输入",
-  );
   const 活跃列表 = 查询战斗技能实例(施法者, "E护盾");
   for (let i = 0; i < 活跃列表.length; i++) {
     结束E护盾分支(施法者, 活跃列表[i], 技能实例ID, "提前");
